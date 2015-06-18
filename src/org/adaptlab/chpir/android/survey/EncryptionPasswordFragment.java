@@ -30,11 +30,12 @@ public class EncryptionPasswordFragment extends Fragment {
                 String decryptionPassword = mPasswordEditText.getText().toString();
                 
                 if (decryptionPassword.isEmpty()) {
-                    Toast.makeText(getActivity(), "Please enter a password!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), R.string.encryption_password_empty, Toast.LENGTH_LONG).show();
                 } else {
                 	AppUtil.setDecryptionPassword(decryptionPassword);
-                	if (!AppUtil.isDecryptionPassword(decryptionPassword)) {
-                		Toast.makeText(getActivity(), "Please enter the correct decryption password!", Toast.LENGTH_LONG).show();
+                	if (!AppUtil.isDecryptionPasswordCorrect()) {
+                		Toast.makeText(getActivity(), R.string.encryption_password_incorrect, Toast.LENGTH_LONG).show();
+                		mPasswordEditText.setText("");
                 	} else {
                 		getActivity().finish();
                 	}

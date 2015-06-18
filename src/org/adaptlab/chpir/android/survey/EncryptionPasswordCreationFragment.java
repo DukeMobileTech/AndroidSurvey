@@ -34,9 +34,9 @@ public class EncryptionPasswordCreationFragment extends Fragment {
                 String encryptionPassword = mPasswordEditText.getText().toString();
                 String encryptionPasswordConfirmation = mPasswordConfirmationEditText.getText().toString();
                 if (encryptionPassword.isEmpty() || encryptionPasswordConfirmation.isEmpty()) {
-                    Toast.makeText(getActivity(), "Please enter a password/password confirmation!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), R.string.encryption_password_empty, Toast.LENGTH_LONG).show();
                 } else if (!TextUtils.equals(encryptionPassword, encryptionPasswordConfirmation)) {
-                	Toast.makeText(getActivity(), "Password and password confirmation do not match!", Toast.LENGTH_LONG).show();
+                	Toast.makeText(getActivity(), R.string.encryption_password_confirmation_mismatch, Toast.LENGTH_LONG).show();
                 } else {
                 	AppUtil.setDecryptionPassword(encryptionPassword);
                 	if (AppUtil.encryptResponses()) {

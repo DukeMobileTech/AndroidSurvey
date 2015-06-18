@@ -64,6 +64,10 @@ public class EncryptUtil {
            
            return new String(plaintext , "UTF-8");
        }
+       
+       public static void destroyKey() {
+    	   theKey = null;
+       }
 
        private static SecretKey getKey(String password, byte[] salt) throws NoSuchAlgorithmException, InvalidKeySpecException {
            if (theKey != null) return theKey;

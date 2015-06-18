@@ -150,13 +150,11 @@ public class Response extends SendModel {
 	}
 
 	public String getText() {
-		Log.i(TAG, "Getting encrypted text: " + mText);
 		if (!TextUtils.isEmpty(mText)) {
 			boolean exceptionThrown = true;
 			try {
 				String decryptedText = EncryptUtil.decrypt(mText, AppUtil.getDecryptionPassword());
 				exceptionThrown = false;
-				Log.i(TAG, "Getting decrypted text: " + decryptedText);
 				return decryptedText;
 			} catch (InvalidKeyException ike) {
 				Log.e(TAG, "Invalid Key Exception", ike);
@@ -187,7 +185,6 @@ public class Response extends SendModel {
 	}
 
 	public void setResponse(String text) {
-		Log.i(TAG, "Unencrypted text: " + text);
 		if (text != null) {
 			boolean exceptionThrown = true;
 			try {
@@ -214,7 +211,6 @@ public class Response extends SendModel {
 				AppUtil.displayPasswordScreen();
 			}
 		}
-		Log.i(TAG, "Encrypted text: " + mText);
 	}
 	
 	public void setSurvey(Survey survey) {

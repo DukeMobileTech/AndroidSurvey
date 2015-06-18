@@ -91,4 +91,7 @@
     <string name="encryption_password_create_confirmation">Confirmation</string>
     <string name="encryption_password_create_instructions">Please choose a password and enter it below.</string>
     <string name="encryption_password_instructions">Please enter your password below to decrypt.</string>
+    <string name="encryption_password_empty">Password is empty! Please enter a password!</string>
+    <string name="encryption_password_incorrect">Please enter the correct decryption password!</string>
+    <string name="encryption_password_confirmation_mismatch">Password and password confirmation do not match!</string>
 </resources>

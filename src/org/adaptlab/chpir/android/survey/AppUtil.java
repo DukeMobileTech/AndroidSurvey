@@ -170,7 +170,7 @@ public class AppUtil {
     
     public static void setUpAppEncryption() {
     	if (getAdminSettingsInstance().isEncrypted()) {
-			displayPasswordScreen();
+			if (getDecryptionPassword() == null) { displayPasswordScreen(); }
     	} else {
     		Intent i = new Intent(mContext, EncryptionPasswordCreationActivity.class);
     		mContext.startActivity(i);
@@ -219,11 +219,13 @@ public class AppUtil {
     	return DECRYPTION_PASSWORD;
     }
     
-    public static boolean isDecryptionPassword(String password) {
+    public static boolean isDecryptionPasswordCorrect() {
     	for (Response response : Response.getAll()) {
     		if (!TextUtils.isEmpty(response.getTextAsIs())) {
+    			boolean exceptionThrown = true;
     			try {
-					EncryptUtil.decrypt(response.getTextAsIs(), password);
+					EncryptUtil.decrypt(response.getTextAsIs(), getDecryptionPassword());
+					exceptionThrown = false;
 					return true;
     			} catch (InvalidKeyException ike) {
     				Log.e(TAG, "Invalid Key Exception", ike);
@@ -242,7 +244,11 @@ public class AppUtil {
     			} catch (UnsupportedEncodingException uee) {
     				Log.e(TAG, "Unsupported Encoding Exception", uee);
     			}
-    			return false;
+    			if (exceptionThrown) {
+    				setDecryptionPassword(null);
+    				EncryptUtil.destroyKey();
+    				return false;
+    			}
     		}
     	}
     	return true;
