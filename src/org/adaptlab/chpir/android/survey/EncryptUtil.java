@@ -18,10 +18,9 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.commons.codec.binary.Base64;
+import android.util.Base64;
 
 public class EncryptUtil {
-
     private static int iterationCount = 1000;
     private static int keyLength = 256;
     private static SecretKey theKey = null;
@@ -44,7 +43,7 @@ public class EncryptUtil {
            cipher.init(Cipher.ENCRYPT_MODE, key, ivParams);
            byte[] cipherText = cipher.doFinal(value.getBytes("UTF-8"));
            
-           return salt + "::" + iv + "::" + new String(cipherText, "UTF-8");
+           return Base64.encodeToString(salt, Base64.NO_WRAP) + "::" + Base64.encodeToString(iv, Base64.NO_WRAP) + "::" + Base64.encodeToString(cipherText, Base64.NO_WRAP);
        }
        
        public static String decrypt(String ciphertext, String password) throws NoSuchAlgorithmException, InvalidKeySpecException,
@@ -52,10 +51,9 @@ public class EncryptUtil {
                BadPaddingException, UnsupportedEncodingException {
            
            String[] fields = ciphertext.split("::");
-
-           byte[] salt = Base64.decodeBase64(fields[0]);
-           byte[] iv = Base64.decodeBase64(fields[1]);
-           byte[] cipherBytes = Base64.decodeBase64(fields[2]);
+           byte[] salt = Base64.decode(fields[0], Base64.NO_WRAP);
+           byte[] iv = Base64.decode(fields[1], Base64.NO_WRAP);
+           byte[] cipherBytes = Base64.decode(fields[2], Base64.NO_WRAP);
            
            SecretKey key = getKey(password, salt);
 
@@ -70,10 +68,8 @@ public class EncryptUtil {
        private static SecretKey getKey(String password, byte[] salt) throws NoSuchAlgorithmException, InvalidKeySpecException {
            if (theKey != null) return theKey;
 
-           KeySpec keySpec = new PBEKeySpec(password.toCharArray(), salt,
-                               iterationCount, keyLength);
-           SecretKeyFactory keyFactory = SecretKeyFactory
-                               .getInstance("PBKDF2WithHmacSHA1");
+           KeySpec keySpec = new PBEKeySpec(password.toCharArray(), salt, iterationCount, keyLength);
+           SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
            byte[] keyBytes = keyFactory.generateSecret(keySpec).getEncoded();
            SecretKey key = new SecretKeySpec(keyBytes, "AES");
            theKey = key;

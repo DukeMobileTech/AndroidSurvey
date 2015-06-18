@@ -1,6 +1,15 @@
 package org.adaptlab.chpir.android.survey;
 
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.UUID;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.survey.Models.AdminSettings;
@@ -26,20 +35,23 @@ import android.app.AlertDialog;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 
 public class AppUtil {
     private final static String TAG = "AppUtil";
-    public final static boolean PRODUCTION = true;
+    public final static boolean PRODUCTION = false;
     public final static boolean REQUIRE_SECURITY_CHECKS = PRODUCTION;
     public static boolean DEBUG = !PRODUCTION;
     
     public static String ADMIN_PASSWORD_HASH;
     public static String ACCESS_TOKEN;
+    private static String DECRYPTION_PASSWORD;
     private static Context mContext;
     private static AdminSettings adminSettingsInstance;
     
@@ -76,6 +88,7 @@ public class AppUtil {
         }
         
         setAdminSettingsInstance();
+        setUpAppEncryption();
         
         ADMIN_PASSWORD_HASH = context.getResources().getString(R.string.admin_password_hash);
         ACCESS_TOKEN = adminSettingsInstance.getApiKey();  
@@ -155,6 +168,30 @@ public class AppUtil {
         return true;
     }
     
+    public static void setUpAppEncryption() {
+    	if (getAdminSettingsInstance().isEncrypted()) {
+			displayPasswordScreen();
+    	} else {
+    		Intent i = new Intent(mContext, EncryptionPasswordCreationActivity.class);
+    		mContext.startActivity(i);
+    	}
+    }
+
+	public static void displayPasswordScreen() {
+		Intent i = new Intent(mContext, EncryptionPasswordActivity.class);
+		mContext.startActivity(i);
+	}
+    
+    public static boolean encryptResponses() { 
+    	for (Response response : Response.getAll()) {
+    		response.setResponse(response.getTextAsIs());
+    		response.save();
+    	}
+    	//TODO Encrypt special/other responses
+    	getAdminSettingsInstance().setEncryption(true);
+    	Log.i(TAG, "ENCRYPTION DONE " + getAdminSettingsInstance().isEncrypted());
+    	return true;
+    }
     
     /*
      * Hash the entered password and compare it with admin password hash
@@ -172,6 +209,43 @@ public class AppUtil {
     		setAdminSettingsInstance();
     	}
     	return adminSettingsInstance;
+    }
+    
+    public static void setDecryptionPassword(String password) {
+    	DECRYPTION_PASSWORD = password;
+    }
+    
+    public static String getDecryptionPassword() {
+    	return DECRYPTION_PASSWORD;
+    }
+    
+    public static boolean isDecryptionPassword(String password) {
+    	for (Response response : Response.getAll()) {
+    		if (!TextUtils.isEmpty(response.getTextAsIs())) {
+    			try {
+					EncryptUtil.decrypt(response.getTextAsIs(), password);
+					return true;
+    			} catch (InvalidKeyException ike) {
+    				Log.e(TAG, "Invalid Key Exception", ike);
+    			} catch (NoSuchAlgorithmException nsae) {
+    				Log.e(TAG, "No Such Algorithm Exception", nsae);
+    			} catch (InvalidKeySpecException ikse) {
+    				Log.e(TAG, "Invalid Key Spec Exception", ikse);
+    			} catch (NoSuchPaddingException nspe) {
+    				Log.e(TAG, "No Such Padding Exception", nspe);
+    			} catch (InvalidAlgorithmParameterException iape) {
+    				Log.e(TAG, "Invalid Algorithm Parameter Exception", iape);
+    			} catch (IllegalBlockSizeException ibse) {
+    				Log.e(TAG, "Illegal Block Size Exception", ibse);
+    			} catch (BadPaddingException bpe) {
+    				Log.e(TAG, "Bad Padding Exception", bpe);
+    			} catch (UnsupportedEncodingException uee) {
+    				Log.e(TAG, "Unsupported Encoding Exception", uee);
+    			}
+    			return false;
+    		}
+    	}
+    	return true;
     }
     
 }

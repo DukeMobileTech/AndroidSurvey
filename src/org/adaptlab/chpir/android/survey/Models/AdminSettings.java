@@ -41,6 +41,8 @@ public class AdminSettings extends Model {
     private boolean mRequirePassword;
     @Column(name= "RecordSurveyLocation")
     private boolean mRecordSurveyLocation;
+    @Column(name = "Encrypted")
+    private boolean mEncrypted;
     
     private static AdminSettings adminSettings;
     
@@ -239,5 +241,14 @@ public class AdminSettings extends Model {
     public String getApiUrl() {
 		return getApiDomainName() + "api/" + getApiVersion() + "/" + "projects/" + getProjectId() + "/";
 	}
+    
+    public boolean isEncrypted() {
+    	return mEncrypted;
+    }
+    
+    public void setEncryption(boolean status) {
+    	mEncrypted = status;
+    	save();
+    }
     
 }

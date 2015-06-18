@@ -1,15 +1,27 @@
 package org.adaptlab.chpir.android.survey.Models;
 
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+
 import org.adaptlab.chpir.android.activerecordcloudsync.SendModel;
+import org.adaptlab.chpir.android.survey.AppUtil;
 import org.adaptlab.chpir.android.survey.AuthUtils;
+import org.adaptlab.chpir.android.survey.EncryptUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.activeandroid.annotation.Column;
@@ -138,11 +150,71 @@ public class Response extends SendModel {
 	}
 
 	public String getText() {
+		Log.i(TAG, "Getting encrypted text: " + mText);
+		if (!TextUtils.isEmpty(mText)) {
+			boolean exceptionThrown = true;
+			try {
+				String decryptedText = EncryptUtil.decrypt(mText, AppUtil.getDecryptionPassword());
+				exceptionThrown = false;
+				Log.i(TAG, "Getting decrypted text: " + decryptedText);
+				return decryptedText;
+			} catch (InvalidKeyException ike) {
+				Log.e(TAG, "Invalid Key Exception", ike);
+			} catch (NoSuchAlgorithmException nsae) {
+				Log.e(TAG, "No Such Algorithm Exception", nsae);
+			} catch (InvalidKeySpecException ikse) {
+				Log.e(TAG, "Invalid Key Spec Exception", ikse);
+			} catch (NoSuchPaddingException nspe) {
+				Log.e(TAG, "No Such Padding Exception", nspe);
+			} catch (InvalidAlgorithmParameterException iape) {
+				Log.e(TAG, "Invalid Algorithm Parameter Exception", iape);
+			} catch (IllegalBlockSizeException ibse) {
+				Log.e(TAG, "Illegal Block Size Exception", ibse);
+			} catch (BadPaddingException bpe) {
+				Log.e(TAG, "Bad Padding Exception", bpe);
+			} catch (UnsupportedEncodingException uee) {
+				Log.e(TAG, "Unsupported Encoding Exception", uee);
+			}
+			if (exceptionThrown) {
+				AppUtil.displayPasswordScreen();
+			}
+		}
+		return mText;
+	}
+	
+	public String getTextAsIs() {
 		return mText;
 	}
 
 	public void setResponse(String text) {
-		mText = text;
+		Log.i(TAG, "Unencrypted text: " + text);
+		if (text != null) {
+			boolean exceptionThrown = true;
+			try {
+				mText = EncryptUtil.encrypt(text, AppUtil.getDecryptionPassword());
+				exceptionThrown = false;
+			} catch (InvalidKeyException ike) {
+				Log.e(TAG, "Invalid Key Exception", ike);
+			} catch (NoSuchAlgorithmException nsae) {
+				Log.e(TAG, "No Such Algorithm Exception", nsae);
+			} catch (InvalidKeySpecException ikse) {
+				Log.e(TAG, "Invalid Key Spec Exception", ikse);
+			} catch (NoSuchPaddingException nspe) {
+				Log.e(TAG, "No Such Padding Exception", nspe);
+			} catch (InvalidAlgorithmParameterException iape) {
+				Log.e(TAG, "Invalid Algorithm Parameter Exception", iape);
+			} catch (IllegalBlockSizeException ibse) {
+				Log.e(TAG, "Illegal Block Size Exception", ibse);
+			} catch (BadPaddingException bpe) {
+				Log.e(TAG, "Bad Padding Exception", bpe);
+			} catch (UnsupportedEncodingException uee) {
+				Log.e(TAG, "Unsupported Encoding Exception", uee);
+			}
+			if (exceptionThrown) {
+				AppUtil.displayPasswordScreen();
+			}
+		}
+		Log.i(TAG, "Encrypted text: " + mText);
 	}
 	
 	public void setSurvey(Survey survey) {
