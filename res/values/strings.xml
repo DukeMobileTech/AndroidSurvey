@@ -89,7 +89,7 @@
     <string name="delete_surveys_title">Delete Selected Surveys?</string>
     <string name="delete_surveys_message">You will not be able to recover the surveys once you delete them!</string>
     <string name="encryption_password_create_confirmation">Confirmation</string>
-    <string name="encryption_password_create_instructions">Please choose a password and enter it below.</string>
+    <string name="encryption_password_create_instructions">Please choose a password to use for data encryption and enter it below. Please remember your password and keep it safe. If you forget it, you will have to wipe off existing data from this app before recreating a new password.</string>
     <string name="encryption_password_instructions">Please enter your password below to decrypt.</string>
     <string name="encryption_password_empty">Password is empty! Please enter a password!</string>
     <string name="encryption_password_incorrect">Please enter the correct decryption password!</string>
