@@ -151,31 +151,7 @@ public class Response extends SendModel {
 
 	public String getText() {
 		if (!TextUtils.isEmpty(mText)) {
-			boolean exceptionThrown = true;
-			try {
-				String decryptedText = EncryptUtil.decrypt(mText, AppUtil.getDecryptionPassword());
-				exceptionThrown = false;
-				return decryptedText;
-			} catch (InvalidKeyException ike) {
-				Log.e(TAG, "Invalid Key Exception", ike);
-			} catch (NoSuchAlgorithmException nsae) {
-				Log.e(TAG, "No Such Algorithm Exception", nsae);
-			} catch (InvalidKeySpecException ikse) {
-				Log.e(TAG, "Invalid Key Spec Exception", ikse);
-			} catch (NoSuchPaddingException nspe) {
-				Log.e(TAG, "No Such Padding Exception", nspe);
-			} catch (InvalidAlgorithmParameterException iape) {
-				Log.e(TAG, "Invalid Algorithm Parameter Exception", iape);
-			} catch (IllegalBlockSizeException ibse) {
-				Log.e(TAG, "Illegal Block Size Exception", ibse);
-			} catch (BadPaddingException bpe) {
-				Log.e(TAG, "Bad Padding Exception", bpe);
-			} catch (UnsupportedEncodingException uee) {
-				Log.e(TAG, "Unsupported Encoding Exception", uee);
-			}
-			if (exceptionThrown) {
-				AppUtil.displayPasswordScreen();
-			}
+			return decrypt(mText);
 		}
 		return mText;
 	}
@@ -186,30 +162,9 @@ public class Response extends SendModel {
 
 	public void setResponse(String text) {
 		if (text != null) {
-			boolean exceptionThrown = true;
-			try {
-				mText = EncryptUtil.encrypt(text, AppUtil.getDecryptionPassword());
-				exceptionThrown = false;
-			} catch (InvalidKeyException ike) {
-				Log.e(TAG, "Invalid Key Exception", ike);
-			} catch (NoSuchAlgorithmException nsae) {
-				Log.e(TAG, "No Such Algorithm Exception", nsae);
-			} catch (InvalidKeySpecException ikse) {
-				Log.e(TAG, "Invalid Key Spec Exception", ikse);
-			} catch (NoSuchPaddingException nspe) {
-				Log.e(TAG, "No Such Padding Exception", nspe);
-			} catch (InvalidAlgorithmParameterException iape) {
-				Log.e(TAG, "Invalid Algorithm Parameter Exception", iape);
-			} catch (IllegalBlockSizeException ibse) {
-				Log.e(TAG, "Illegal Block Size Exception", ibse);
-			} catch (BadPaddingException bpe) {
-				Log.e(TAG, "Bad Padding Exception", bpe);
-			} catch (UnsupportedEncodingException uee) {
-				Log.e(TAG, "Unsupported Encoding Exception", uee);
-			}
-			if (exceptionThrown) {
-				AppUtil.displayPasswordScreen();
-			}
+			mText = encrypt(text);
+		} else {
+			mText = text;
 		}
 	}
 	
@@ -222,18 +177,40 @@ public class Response extends SendModel {
 	}
 	
 	public void setOtherResponse(String otherResponse) {
-	    mOtherResponse = otherResponse;
+	    if (otherResponse != null) {
+	    	mOtherResponse = encrypt(otherResponse);
+	    } else {
+	    	mOtherResponse = otherResponse;
+	    }
 	}
 	
 	public String getOtherResponse() {
+		if (!TextUtils.isEmpty(mOtherResponse)) {
+			return decrypt(mOtherResponse);
+		}
 	    return mOtherResponse;
 	}
 	
+	public String getOtherResponseAsIs() {
+		return mOtherResponse;
+	}
+	
 	public void setSpecialResponse(String specialResponse) {
-		mSpecialResponse = specialResponse;
+		if (specialResponse != null) {
+			mSpecialResponse = encrypt(specialResponse);
+		} else {
+			mSpecialResponse = specialResponse;
+		}
 	}
 	
 	public String getSpecialResponse() {
+		if (!TextUtils.isEmpty(mSpecialResponse)) {
+			return decrypt(mSpecialResponse);
+		}
+		return mSpecialResponse;
+	}
+	
+	public String getSpecialResponseAsIs() {
 		return mSpecialResponse;
 	}
 	
@@ -302,4 +279,65 @@ public class Response extends SendModel {
     private int getQuestionVersion() {
         return mQuestionVersion;
     }
+    
+    private String decrypt(String text) {
+    	boolean exceptionThrown = true;
+		try {
+			String decryptedText = EncryptUtil.decrypt(text, AppUtil.getDecryptionPassword());
+			//if (AppUtil.DEBUG) Log.i(TAG, "Encrypted: " + text + " Unencrypted: " + decryptedText);
+			exceptionThrown = false;
+			return decryptedText;
+		} catch (InvalidKeyException ike) {
+			Log.e(TAG, "Invalid Key Exception", ike);
+		} catch (NoSuchAlgorithmException nsae) {
+			Log.e(TAG, "No Such Algorithm Exception", nsae);
+		} catch (InvalidKeySpecException ikse) {
+			Log.e(TAG, "Invalid Key Spec Exception", ikse);
+		} catch (NoSuchPaddingException nspe) {
+			Log.e(TAG, "No Such Padding Exception", nspe);
+		} catch (InvalidAlgorithmParameterException iape) {
+			Log.e(TAG, "Invalid Algorithm Parameter Exception", iape);
+		} catch (IllegalBlockSizeException ibse) {
+			Log.e(TAG, "Illegal Block Size Exception", ibse);
+		} catch (BadPaddingException bpe) {
+			Log.e(TAG, "Bad Padding Exception", bpe);
+		} catch (UnsupportedEncodingException uee) {
+			Log.e(TAG, "Unsupported Encoding Exception", uee);
+		}
+		if (exceptionThrown) {
+			AppUtil.displayPasswordScreen();
+		}
+		return null;
+    }
+    
+    private String encrypt(String text) {
+    	boolean exceptionThrown = true;
+		try {
+			String encryptedText = EncryptUtil.encrypt(text, AppUtil.getDecryptionPassword());
+			//if (AppUtil.DEBUG) Log.i(TAG, "Unencrypted: " + text + " Encrypted: " + encryptedText);
+			exceptionThrown = false;
+			return encryptedText;
+		} catch (InvalidKeyException ike) {
+			Log.e(TAG, "Invalid Key Exception", ike);
+		} catch (NoSuchAlgorithmException nsae) {
+			Log.e(TAG, "No Such Algorithm Exception", nsae);
+		} catch (InvalidKeySpecException ikse) {
+			Log.e(TAG, "Invalid Key Spec Exception", ikse);
+		} catch (NoSuchPaddingException nspe) {
+			Log.e(TAG, "No Such Padding Exception", nspe);
+		} catch (InvalidAlgorithmParameterException iape) {
+			Log.e(TAG, "Invalid Algorithm Parameter Exception", iape);
+		} catch (IllegalBlockSizeException ibse) {
+			Log.e(TAG, "Illegal Block Size Exception", ibse);
+		} catch (BadPaddingException bpe) {
+			Log.e(TAG, "Bad Padding Exception", bpe);
+		} catch (UnsupportedEncodingException uee) {
+			Log.e(TAG, "Unsupported Encoding Exception", uee);
+		}
+		if (exceptionThrown) {
+			AppUtil.displayPasswordScreen();
+		}
+		return null;
+    }
+    
 }

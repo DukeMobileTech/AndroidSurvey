@@ -45,7 +45,7 @@ import com.crashlytics.android.Crashlytics;
 
 public class AppUtil {
     private final static String TAG = "AppUtil";
-    public final static boolean PRODUCTION = false;
+    public final static boolean PRODUCTION = !BuildConfig.DEBUG;
     public final static boolean REQUIRE_SECURITY_CHECKS = PRODUCTION;
     public static boolean DEBUG = !PRODUCTION;
     
@@ -185,11 +185,11 @@ public class AppUtil {
     public static boolean encryptResponses() { 
     	for (Response response : Response.getAll()) {
     		response.setResponse(response.getTextAsIs());
+    		response.setSpecialResponse(response.getSpecialResponseAsIs());
+    		response.setOtherResponse(response.getOtherResponseAsIs());
     		response.save();
     	}
-    	//TODO Encrypt special/other responses
     	getAdminSettingsInstance().setEncryption(true);
-    	Log.i(TAG, "ENCRYPTION DONE " + getAdminSettingsInstance().isEncrypted());
     	return true;
     }
     
