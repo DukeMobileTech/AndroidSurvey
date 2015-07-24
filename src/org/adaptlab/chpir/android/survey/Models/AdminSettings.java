@@ -248,7 +248,8 @@ public class AdminSettings extends Model {
     }
 
     public String getLastSyncTime() {
-        return Long.toString(mLastSyncTime);
+        if (mLastSyncTime == null) { return ""; }
+    	return Long.toString(mLastSyncTime);
     }
 
 }
