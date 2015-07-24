@@ -1,6 +1,14 @@
 package org.adaptlab.chpir.android.survey;
 
-import java.util.UUID;
+import android.app.AlertDialog;
+import android.app.admin.DevicePolicyManager;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.util.Log;
+
+import com.crashlytics.android.Crashlytics;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.survey.Models.AdminSettings;
@@ -22,19 +30,11 @@ import org.adaptlab.chpir.android.survey.Models.Survey;
 import org.adaptlab.chpir.android.survey.Tasks.ApkUpdateTask;
 import org.adaptlab.chpir.android.survey.Vendor.BCrypt;
 
-import android.app.AlertDialog;
-import android.app.admin.DevicePolicyManager;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.util.Log;
-
-import com.crashlytics.android.Crashlytics;
+import java.util.UUID;
 
 public class AppUtil {
     private final static String TAG = "AppUtil";
-    public final static boolean PRODUCTION = false;
+    public final static boolean PRODUCTION = true;
     public final static boolean REQUIRE_SECURITY_CHECKS = PRODUCTION;
     public static boolean DEBUG = !PRODUCTION;
     

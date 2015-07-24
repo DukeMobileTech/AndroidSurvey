@@ -1,15 +1,5 @@
 package org.adaptlab.chpir.android.survey.Models;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
-import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
-import org.adaptlab.chpir.android.survey.AppUtil;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.Context;
 import android.graphics.Typeface;
 import android.util.Log;
@@ -19,13 +9,23 @@ import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
+import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
+import org.adaptlab.chpir.android.survey.AppUtil;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 @Table(name = "Instruments")
 public class Instrument extends ReceiveModel {
     private static final String TAG = "Instrument";
-    
+
     public static final String KHMER_LANGUAGE_CODE = "km";
     public static final String KHMER_FONT_LOCATION = "fonts/khmerOS.ttf";
-    
+
     public static final String LEFT_ALIGNMENT = "left";
 
     @Column(name = "Title")
@@ -70,11 +70,11 @@ public class Instrument extends ReceiveModel {
                 return translation.getTitle();
             }
         }
-        
+
         // Fall back to default
         return mTitle;
     }
-        
+
     public String getAlignment() {
         if (getLanguage().equals(getDeviceLanguage())) return mAlignment;
         for(InstrumentTranslation translation : translations()) {
@@ -86,7 +86,7 @@ public class Instrument extends ReceiveModel {
         // Fall back to default
         return mAlignment;
     }
-    
+
     public InstrumentTranslation getTranslationByLanguage(String language) {
         for(InstrumentTranslation translation : translations()) {
             if (translation.getLanguage().equals(language)) {
@@ -97,26 +97,26 @@ public class Instrument extends ReceiveModel {
         translation.setLanguage(language);
         return translation;
     }
-    
+
     public Typeface getTypeFace(Context context) {
         if (getDeviceLanguage().equals(KHMER_LANGUAGE_CODE)) {
-            return Typeface.createFromAsset(context.getAssets(), KHMER_FONT_LOCATION); 
+            return Typeface.createFromAsset(context.getAssets(), KHMER_FONT_LOCATION);
         } else {
             return Typeface.DEFAULT;
         }
     }
-    
-	public int getDefaultGravity() {
+
+    public int getDefaultGravity() {
         if (getAlignment().equals(LEFT_ALIGNMENT)) {
             return Gravity.LEFT;
         } else {
             return Gravity.RIGHT;
         }
     }
-    
+
     public static String getDeviceLanguage() {
-    	//Log.i(TAG, "Custom Locale Code: " + AppUtil.getAdminSettingsInstance().getCustomLocaleCode());
-    	if ( AppUtil.getAdminSettingsInstance().getCustomLocaleCode() != null && !AppUtil.getAdminSettingsInstance().getCustomLocaleCode().equals("")) {
+        //Log.i(TAG, "Custom Locale Code: " + AppUtil.getAdminSettingsInstance().getCustomLocaleCode());
+        if ( AppUtil.getAdminSettingsInstance().getCustomLocaleCode() != null && !AppUtil.getAdminSettingsInstance().getCustomLocaleCode().equals("")) {
             return AppUtil.getAdminSettingsInstance().getCustomLocaleCode();
         }
         return Locale.getDefault().getLanguage();
@@ -126,13 +126,13 @@ public class Instrument extends ReceiveModel {
     public void createObjectFromJSON(JSONObject jsonObject) {
         try {
             Long remoteId = jsonObject.getLong("id");
-                        
+
             // If an instrument already exists, update it from the remote
             Instrument instrument = Instrument.findByRemoteId(remoteId);
             if (instrument == null) {
                 instrument = this;
             }
-            
+
             if (AppUtil.DEBUG) Log.i(TAG, "Creating object from JSON Object: " + jsonObject);
             instrument.setRemoteId(remoteId);
             instrument.setTitle(jsonObject.getString("title"));
@@ -143,10 +143,10 @@ public class Instrument extends ReceiveModel {
             instrument.setProjectId(jsonObject.getLong("project_id"));
             instrument.setPublished(jsonObject.getBoolean("published"));
             if (!jsonObject.isNull("deleted_at")) {
-            	instrument.setDeleted(true);
+                instrument.setDeleted(true);
             }
             instrument.save();
-            
+
             // Generate translations
             JSONArray translationsArray = jsonObject.getJSONArray("translations");
             for(int i = 0; i < translationsArray.length(); i++) {
@@ -159,27 +159,27 @@ public class Instrument extends ReceiveModel {
             }
         } catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);
-        }  
+        }
     }
-    
+
     /*
      * Finders
      */
     public static List<Instrument> getAll() {
         return new Select().from(Instrument.class).where("Deleted != ?", 1).orderBy("Title").execute();
     }
-    
+
     public static List<Instrument> getAllProjectInstruments(Long projectId) {
-    	return new Select().from(Instrument.class)
-    			.where("ProjectID = ? AND Published = ? AND Deleted != ?", projectId, 1, 1)	//sqlite saves booleans as integers
-    			.orderBy("Title")
-    			.execute();
+        return new Select().from(Instrument.class)
+                .where("ProjectID = ? AND Published = ? AND Deleted != ?", projectId, 1, 1)	//sqlite saves booleans as integers
+                .orderBy("Title")
+                .execute();
     }
-    
+
     public static Instrument findByRemoteId(Long id) {
         return new Select().from(Instrument.class).where("RemoteId = ?", id).executeSingle();
     }
-    
+
     /*
      * Relationships
      */
@@ -189,23 +189,23 @@ public class Instrument extends ReceiveModel {
                 .orderBy("NumberInInstrument ASC")
                 .execute();
     }
-    
+
     public List<Survey> surveys() {
         return getMany(Survey.class, "Instrument");
     }
-    
+
     public List<InstrumentTranslation> translations() {
         return getMany(InstrumentTranslation.class, "Instrument");
     }
-    
+
     public List<Section> sections() {
-    	return new Select("Sections.*, Questions.QuestionIdentifier").from(Section.class)
-    			.innerJoin(Question.class)
-    			.on("Sections.StartQuestionIdentifier=Questions.QuestionIdentifier AND Sections.Instrument = " + getId())
-    			.orderBy("Questions.NumberInInstrument")
-    			.execute();
+        return new Select("Sections.*, Questions.QuestionIdentifier").from(Section.class)
+                .innerJoin(Question.class)
+                .on("Sections.StartQuestionIdentifier=Questions.QuestionIdentifier AND Sections.Instrument = " + getId())
+                .orderBy("Questions.NumberInInstrument")
+                .execute();
     }
-    
+
     public static List<Instrument> loadedInstruments() {
         List<Instrument> instrumentList = new ArrayList<Instrument>();
         for (Instrument instrument : Instrument.getAll()) {
@@ -213,14 +213,14 @@ public class Instrument extends ReceiveModel {
         }
         return instrumentList;
     }
-      
-     public boolean loaded() {
-    	 if (questions().size() != getQuestionCount()) return false;
-         for (Question question : questions()) {
-             if (!question.loaded()) return false;
-         }
-         return true;
-     }
+
+    public boolean loaded() {
+        if (questions().size() != getQuestionCount()) return false;
+        for (Question question : questions()) {
+            if (!question.loaded()) return false;
+        }
+        return true;
+    }
         
     /*
      * Getters/Setters
@@ -229,15 +229,15 @@ public class Instrument extends ReceiveModel {
     public void setTitle(String title) {
         mTitle = title;
     }
-    
+
     public Long getRemoteId() {
         return mRemoteId;
     }
-    
+
     public void setRemoteId(Long id) {
         mRemoteId = id;
     }
-    
+
     public String getLanguage() {
         return mLanguage;
     }
@@ -246,63 +246,49 @@ public class Instrument extends ReceiveModel {
     public String toString() {
         return mTitle;
     }
-    
+
     public void setVersionNumber(int version) {
         mVersionNumber = version;
     }
-    
+
     public int getVersionNumber() {
         return mVersionNumber;
     }
-    
+
     public int getQuestionCount() {
         return mQuestionCount;
     }
-    
+
     public void setProjectId(Long id) {
-    	mProjectId = id;
+        mProjectId = id;
     }
-    
+
     public Long getProjectId() {
-    	return mProjectId;
+        return mProjectId;
     }
-    
+
     public boolean getPublished() {
-    	return mPublished;
+        return mPublished;
     }
-     
+
     public void setLanguage(String language) {
         mLanguage = language;
     }
-    
+
     private void setAlignment(String alignment) {
         mAlignment = alignment;
     }
-    
+
     private void setDeleted(boolean deleted) {
-    	mDeleted = deleted;
+        mDeleted = deleted;
     }
-    
+
     public void setQuestionCount(int num) {
         mQuestionCount = num;
     }
-    
+
     public void setPublished(boolean published) {
-    	mPublished = published;
-    }
-    
-    public static String getInstrumentVersions() {
-    	String instrumentIds = "";
-    	String instrumentVersions = "";
-    	Long projectId = Long.parseLong(AppUtil.getAdminSettingsInstance().getProjectId());
-    	List<Instrument> instruments = Instrument.getAllProjectInstruments(projectId);
-    	for (int k = 0; k < instruments.size(); k++) {
-    		instrumentIds += Long.toString(instruments.get(k).getRemoteId());
-    		instrumentVersions += instruments.get(k).getVersionNumber();
-    		if (k < instruments.size() - 1) instrumentIds += ",";
-    		if (k < instruments.size() - 1) instrumentVersions += ",";
-    	}
-    	return "&device_instrument_versions=" + instrumentVersions + "&device_instruments=" + instrumentIds;
+        mPublished = published;
     }
 
 }

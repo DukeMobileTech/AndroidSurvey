@@ -1,17 +1,18 @@
 package org.adaptlab.chpir.android.activerecordcloudsync;
 
+import android.content.Context;
+import android.util.Log;
+
+import org.adaptlab.chpir.android.survey.AppUtil;
+import org.adaptlab.chpir.android.survey.Models.AdminSettings;
+import org.adaptlab.chpir.android.survey.R;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import org.adaptlab.chpir.android.survey.AppUtil;
-import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.Models.Instrument;
-
-import android.content.Context;
-import android.util.Log;
 
 public class ActiveRecordCloudSync {
     private static final String TAG="ActiveRecordCloudSync";
@@ -19,47 +20,51 @@ public class ActiveRecordCloudSync {
             new LinkedHashMap<String, Class<? extends ReceiveModel>>();
     private static Map<String, Class<? extends SendModel>> mSendTables =
             new LinkedHashMap<String, Class<? extends SendModel>>();
-    
+
     private static String mEndPoint;        // The remote API endpoint url
     private static String mAccessToken;     // API Access Key
     private static int mVersionCode;        // App version code from Manifest
     private static String mInstrumentVersions;
-    
+    private static Long mLastSyncTime;
+    private static int mFetchCount;
+
     /**
      * Add a ReceiveTable.  A ReceiveTable is an active record model class that extends the
      * ReceiveModel abstract class.
-     * 
+     *
      * @param tableName
      * @param receiveTable
      */
     public static void addReceiveTable(String tableName, Class<? extends ReceiveModel> receiveTable) {
         mReceiveTables.put(tableName, receiveTable);
     }
-    
+
     public static Map<String, Class<? extends ReceiveModel>> getReceiveTables() {
         return mReceiveTables;
     }
-    
+
     public static void addSendTable(String tableName, Class<? extends SendModel> sendTable) {
         mSendTables.put(tableName, sendTable);
     }
-    
+
     public static void setEndPoint(String endPoint) {
         if (AppUtil.DEBUG) Log.i(TAG, "Api End point is: " + endPoint);
 
         char lastChar = endPoint.charAt(endPoint.length() - 1);
         if (lastChar != '/') endPoint = endPoint + "/";
-        
+
         mEndPoint = endPoint;
     }
-    
+
     public static String getEndPoint() {
         return mEndPoint;
     }
-    
+
     public static void syncReceiveTables(Context context) {
         NetworkNotificationUtils.showNotification(context, android.R.drawable.stat_sys_download, R.string.sync_notification_text);
-        ActiveRecordCloudSync.setInstrumentVersions();
+        Date currentTime = new Date();
+        ActiveRecordCloudSync.setLastSyncTime(currentTime.getTime());
+        ActiveRecordCloudSync.setFetchCount(0);
         for (Map.Entry<String, Class<? extends ReceiveModel>> entry : mReceiveTables.entrySet()) {
             if (AppUtil.DEBUG) Log.i(TAG, "Syncing " + entry.getValue() + " from remote table " + entry.getKey());
             HttpFetchr httpFetchr = new HttpFetchr(entry.getKey(), entry.getValue());
@@ -67,7 +72,7 @@ public class ActiveRecordCloudSync {
         }
         NetworkNotificationUtils.showNotification(context, android.R.drawable.stat_sys_download_done, R.string.sync_notification_complete_text);
     }
-    
+
     public static void syncSendTables(Context context) {
         NetworkNotificationUtils.showNotification(context, android.R.drawable.stat_sys_download, R.string.sync_notification_text);
         for (Map.Entry<String, Class<? extends SendModel>> entry : mSendTables.entrySet()) {
@@ -77,7 +82,7 @@ public class ActiveRecordCloudSync {
         }
         NetworkNotificationUtils.showNotification(context, android.R.drawable.stat_sys_download_done, R.string.sync_notification_complete_text);
     }
-    
+
     public static boolean isApiAvailable() {
         if (getPingAddress() == null) return true;
         int responseCode = ping(getPingAddress(), 10000);
@@ -93,43 +98,51 @@ public class ActiveRecordCloudSync {
         int responseCode = ping(getPingAddress(), 10000);
         return responseCode != 426;  // Http Status Code 426 = upgrade required     
     }
-    
+
     public static void setAccessToken(String token) {
         mAccessToken = token;
     }
-    
+
     public static String getAccessToken() {
         return mAccessToken;
     }
-    
+
     public static void setVersionCode(int code) {
         mVersionCode = code;
     }
-    
+
     /*
      * Version code from AndroidManifest
      */
     public static int getVersionCode() {
         return mVersionCode;
     }
-    
+
     /*
      * Append to all api calls.
      * Ensure that the access token is valid and the version code is up to date
      * before allowing an update.
      */
     public static String getParams() {
-    	return "?access_token=" + getAccessToken() + "&version_code=" + getVersionCode() + getInstrumentVersions();
+        return "?access_token=" + getAccessToken() + "&version_code=" + getVersionCode() + "&last_sync_time=" + AdminSettings.getInstance().getLastSyncTime() ;
     }
-    
-    public static void setInstrumentVersions() {
-    	mInstrumentVersions = Instrument.getInstrumentVersions();
+
+    public static void setFetchCount(int count) {
+        mFetchCount = count;
     }
-    
-    public static String getInstrumentVersions() {
-    	return mInstrumentVersions;
+
+    public static int getFetchCount() {
+        return mFetchCount;
     }
-    
+
+    public static Long getLastSyncTime() {
+        return mLastSyncTime;
+    }
+
+    private static void setLastSyncTime(Long time) {
+        mLastSyncTime = time;
+    }
+
     private static String getPingAddress() {
         if (!getReceiveTables().keySet().isEmpty()) {
             return getEndPoint() + getReceiveTables().keySet().iterator().next();
