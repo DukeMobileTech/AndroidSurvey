@@ -1,0 +1,246 @@
+ECLIPSE ANDROID PROJECT IMPORT SUMMARY
+======================================
+
+Ignored Files:
+--------------
+The following files were *not* copied into the new Gradle project; you
+should evaluate whether these are still needed in your project and if
+so manually move them:
+
+* .DS_Store
+* .gitignore
+* .travis.yml
+* LICENSE
+* README.md
+* build/
+* build/AndroidSurvey.apk
+* build/AndroidSurvey.unaligned.apk
+* build/intermediates/
+* build/intermediates/gradle_project_sync_data.bin
+* build/org/
+* build/org/adaptlab/
+* build/org/adaptlab/chpir/
+* build/org/adaptlab/chpir/android/
+* build/org/adaptlab/chpir/android/activerecordcloudsync/
+* build/org/adaptlab/chpir/android/activerecordcloudsync/ActiveRecordCloudSync.class
+* build/org/adaptlab/chpir/android/activerecordcloudsync/HttpFetchr.class
+* build/org/adaptlab/chpir/android/activerecordcloudsync/HttpPushr.class
+* build/org/adaptlab/chpir/android/activerecordcloudsync/NetworkNotificationUtils.class
+* build/org/adaptlab/chpir/android/activerecordcloudsync/PollService.class
+* build/org/adaptlab/chpir/android/activerecordcloudsync/ReceiveModel.class
+* build/org/adaptlab/chpir/android/activerecordcloudsync/SendModel.class
+* build/org/adaptlab/chpir/android/survey/
+* build/org/adaptlab/chpir/android/survey/AdminActivity.class
+* build/org/adaptlab/chpir/android/survey/AdminFragment$1.class
+* build/org/adaptlab/chpir/android/survey/AdminFragment.class
+* build/org/adaptlab/chpir/android/survey/AppUtil$1.class
+* build/org/adaptlab/chpir/android/survey/AppUtil.class
+* build/org/adaptlab/chpir/android/survey/AuthUtils.class
+* build/org/adaptlab/chpir/android/survey/AuthorizedActivity.class
+* build/org/adaptlab/chpir/android/survey/BuildConfig.class
+* build/org/adaptlab/chpir/android/survey/CameraFragment$1.class
+* build/org/adaptlab/chpir/android/survey/CameraFragment$2.class
+* build/org/adaptlab/chpir/android/survey/CameraFragment$3.class
+* build/org/adaptlab/chpir/android/survey/CameraFragment$4.class
+* build/org/adaptlab/chpir/android/survey/CameraFragment.class
+* build/org/adaptlab/chpir/android/survey/DatabaseSeed.class
+* build/org/adaptlab/chpir/android/survey/EncryptUtil.class
+* build/org/adaptlab/chpir/android/survey/FormatUtils.class
+* build/org/adaptlab/chpir/android/survey/GridFragment.class
+* build/org/adaptlab/chpir/android/survey/InstrumentActivity.class
+* build/org/adaptlab/chpir/android/survey/InstrumentFragment$1.class
+* build/org/adaptlab/chpir/android/survey/InstrumentFragment$2$1.class
+* build/org/adaptlab/chpir/android/survey/InstrumentFragment$2$2.class
+* build/org/adaptlab/chpir/android/survey/InstrumentFragment$2.class
+* build/org/adaptlab/chpir/android/survey/InstrumentFragment$3.class
+* build/org/adaptlab/chpir/android/survey/InstrumentFragment$4.class
+* build/org/adaptlab/chpir/android/survey/InstrumentFragment$InstrumentAdapter.class
+* build/org/adaptlab/chpir/android/survey/InstrumentFragment$InstrumentListLabel.class
+* build/org/adaptlab/chpir/android/survey/InstrumentFragment$LoadInstrumentTask$1.class
+* build/org/adaptlab/chpir/android/survey/InstrumentFragment$LoadInstrumentTask.class
+* build/org/adaptlab/chpir/android/survey/InstrumentFragment$LoadSurveyTask.class
+* build/org/adaptlab/chpir/android/survey/InstrumentFragment$RefreshInstrumentsTask.class
+* build/org/adaptlab/chpir/android/survey/InstrumentFragment$SetInstrumentLabelTask.class
+* build/org/adaptlab/chpir/android/survey/InstrumentFragment$SurveyAdapter.class
+* build/org/adaptlab/chpir/android/survey/InstrumentFragment.class
+* build/org/adaptlab/chpir/android/survey/Location/
+* build/org/adaptlab/chpir/android/survey/Location/LocationReceiver.class
+* build/org/adaptlab/chpir/android/survey/Location/LocationServiceManager$1.class
+* build/org/adaptlab/chpir/android/survey/Location/LocationServiceManager.class
+* build/org/adaptlab/chpir/android/survey/LoginActivity.class
+* build/org/adaptlab/chpir/android/survey/LoginFragment$1.class
+* build/org/adaptlab/chpir/android/survey/LoginFragment.class
+* build/org/adaptlab/chpir/android/survey/Manifest$permission.class
+* build/org/adaptlab/chpir/android/survey/Manifest.class
+* build/org/adaptlab/chpir/android/survey/Models/
+* build/org/adaptlab/chpir/android/survey/Models/AdminSettings.class
+* build/org/adaptlab/chpir/android/survey/Models/DefaultAdminSettings.class
+* build/org/adaptlab/chpir/android/survey/Models/DeviceSyncEntry.class
+* build/org/adaptlab/chpir/android/survey/Models/DeviceUser.class
+* build/org/adaptlab/chpir/android/survey/Models/EventLog$EventType.class
+* build/org/adaptlab/chpir/android/survey/Models/EventLog.class
+* build/org/adaptlab/chpir/android/survey/Models/Grid.class
+* build/org/adaptlab/chpir/android/survey/Models/GridLabel.class
+* build/org/adaptlab/chpir/android/survey/Models/Image.class
+* build/org/adaptlab/chpir/android/survey/Models/Instrument.class
+* build/org/adaptlab/chpir/android/survey/Models/InstrumentTranslation.class
+* build/org/adaptlab/chpir/android/survey/Models/Option.class
+* build/org/adaptlab/chpir/android/survey/Models/OptionTranslation.class
+* build/org/adaptlab/chpir/android/survey/Models/Photo.class
+* build/org/adaptlab/chpir/android/survey/Models/Question$QuestionType.class
+* build/org/adaptlab/chpir/android/survey/Models/Question.class
+* build/org/adaptlab/chpir/android/survey/Models/QuestionTranslation.class
+* build/org/adaptlab/chpir/android/survey/Models/Response.class
+* build/org/adaptlab/chpir/android/survey/Models/ResponsePhoto.class
+* build/org/adaptlab/chpir/android/survey/Models/Rule$RuleType.class
+* build/org/adaptlab/chpir/android/survey/Models/Rule.class
+* build/org/adaptlab/chpir/android/survey/Models/Section.class
+* build/org/adaptlab/chpir/android/survey/Models/SectionTranslation.class
+* build/org/adaptlab/chpir/android/survey/Models/Skip.class
+* build/org/adaptlab/chpir/android/survey/Models/Survey.class
+* build/org/adaptlab/chpir/android/survey/PictureUtils.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragment$1.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragment$2.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragment$GestureListener.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragment.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragmentFactory.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/AddressQuestionFragment.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/DateQuestionFragment$1.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/DateQuestionFragment.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/DecimalNumberQuestionFragment.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/EmailAddressQuestionFragment.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/FreeResponseQuestionFragment$1.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/FreeResponseQuestionFragment.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/FrontPictureQuestionFragment$1.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/FrontPictureQuestionFragment.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/InstructionsQuestionFragment.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/IntegerQuestionFragment.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/LabeledSliderQuestionFragment.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/ListOfIntegerBoxesQuestionFragment.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/ListOfItemsQuestionFragment$1.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/ListOfItemsQuestionFragment.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/ListOfTextBoxesQuestionFragment.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/MonthAndYearQuestionFragment.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/MultipleSelectGridFragment$1.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/MultipleSelectGridFragment.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/PhoneNumberQuestionFragment.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/PictureQuestionFragment$1.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/PictureQuestionFragment.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/RatingQuestionFragment$1.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/RatingQuestionFragment.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/RearPictureQuestionFragment$1.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/RearPictureQuestionFragment.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/SelectMultipleImageQuestionFragment$1.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/SelectMultipleImageQuestionFragment$ImageAdapter.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/SelectMultipleImageQuestionFragment.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/SelectMultipleQuestionFragment$1.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/SelectMultipleQuestionFragment.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/SelectMultipleWriteOtherQuestionFragment$1.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/SelectMultipleWriteOtherQuestionFragment.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/SelectOneImageQuestionFragment$1.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/SelectOneImageQuestionFragment$ImageAdapter.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/SelectOneImageQuestionFragment.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/SelectOneQuestionFragment$1.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/SelectOneQuestionFragment.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/SelectOneWriteOtherQuestionFragment$1.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/SelectOneWriteOtherQuestionFragment.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/SingleSelectGridFragment$1.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/SingleSelectGridFragment.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/SliderQuestionFragment$1.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/SliderQuestionFragment.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/TimeQuestionFragment$1.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/TimeQuestionFragment.class
+* build/org/adaptlab/chpir/android/survey/QuestionFragments/YearQuestionFragment.class
+* build/org/adaptlab/chpir/android/survey/R$attr.class
+* build/org/adaptlab/chpir/android/survey/R$bool.class
+* build/org/adaptlab/chpir/android/survey/R$color.class
+* build/org/adaptlab/chpir/android/survey/R$dimen.class
+* build/org/adaptlab/chpir/android/survey/R$drawable.class
+* build/org/adaptlab/chpir/android/survey/R$id.class
+* build/org/adaptlab/chpir/android/survey/R$layout.class
+* build/org/adaptlab/chpir/android/survey/R$menu.class
+* build/org/adaptlab/chpir/android/survey/R$string.class
+* build/org/adaptlab/chpir/android/survey/R$style.class
+* build/org/adaptlab/chpir/android/survey/R.class
+* build/org/adaptlab/chpir/android/survey/Receivers/
+* build/org/adaptlab/chpir/android/survey/Receivers/InstrumentListReceiver.class
+* build/org/adaptlab/chpir/android/survey/Receivers/NetworkStateChangeReceiver.class
+* build/org/adaptlab/chpir/android/survey/Receivers/NotificationReceiver.class
+* build/org/adaptlab/chpir/android/survey/Receivers/StartupReceiver.class
+* build/org/adaptlab/chpir/android/survey/Receivers/SurveyLaunchReceiver.class
+* build/org/adaptlab/chpir/android/survey/ReviewPageActivity.class
+* build/org/adaptlab/chpir/android/survey/ReviewPageFragment$QuestionAdapter.class
+* build/org/adaptlab/chpir/android/survey/ReviewPageFragment.class
+* build/org/adaptlab/chpir/android/survey/Rules/
+* build/org/adaptlab/chpir/android/survey/Rules/InstrumentLaunchRule.class
+* build/org/adaptlab/chpir/android/survey/Rules/InstrumentSurveyLimitPerMinuteRule.class
+* build/org/adaptlab/chpir/android/survey/Rules/InstrumentSurveyLimitRule.class
+* build/org/adaptlab/chpir/android/survey/Rules/InstrumentTimingRule.class
+* build/org/adaptlab/chpir/android/survey/Rules/PassableRule.class
+* build/org/adaptlab/chpir/android/survey/Rules/RuleBuilder.class
+* build/org/adaptlab/chpir/android/survey/Rules/RuleCallback.class
+* build/org/adaptlab/chpir/android/survey/SingleFragmentActivity.class
+* build/org/adaptlab/chpir/android/survey/SurveyActivity.class
+* build/org/adaptlab/chpir/android/survey/SurveyFragment$1.class
+* build/org/adaptlab/chpir/android/survey/SurveyFragment$DrawerItemClickListener.class
+* build/org/adaptlab/chpir/android/survey/SurveyFragment.class
+* build/org/adaptlab/chpir/android/survey/Tasks/
+* build/org/adaptlab/chpir/android/survey/Tasks/ApkUpdateTask$1.class
+* build/org/adaptlab/chpir/android/survey/Tasks/ApkUpdateTask$2.class
+* build/org/adaptlab/chpir/android/survey/Tasks/ApkUpdateTask$DownloadApkTask.class
+* build/org/adaptlab/chpir/android/survey/Tasks/ApkUpdateTask.class
+* build/org/adaptlab/chpir/android/survey/Tasks/DownloadImagesTask.class
+* build/org/adaptlab/chpir/android/survey/Tasks/SendResponsesTask.class
+* build/org/adaptlab/chpir/android/survey/Vendor/
+* build/org/adaptlab/chpir/android/survey/Vendor/BCrypt.class
+* dump.rdb
+* manifest/
+* manifest/Manifest.xml
+* proguard-project.txt
+
+Replaced Jars with Dependencies:
+--------------------------------
+The importer recognized the following .jar files as third party
+libraries and replaced them with Gradle dependencies instead. This has
+the advantage that more explicit version information is known, and the
+libraries can be updated automatically. However, it is possible that
+the .jar file in your project was of an older version than the
+dependency we picked, which could render the project not compileable.
+You can disable the jar replacement in the import wizard and try again:
+
+android-support-v4.jar => com.android.support:support-v4:18.0.0
+
+Moved Files:
+------------
+Android Gradle projects use a different directory structure than ADT
+Eclipse projects. Here's how the projects were restructured:
+
+* AndroidManifest.xml => app/src/main/AndroidManifest.xml
+* assets/ => app/src/main/assets/
+* libs/ActiveAndroid.jar => app/libs/ActiveAndroid.jar
+* libs/commons-codec-1.8.jar => app/libs/commons-codec-1.8.jar
+* libs/core-1.51.0.0.jar => app/libs/core-1.51.0.0.jar
+* libs/crashlytics.jar => app/libs/crashlytics.jar
+* libs/pg-1.51.0.0.jar => app/libs/pg-1.51.0.0.jar
+* libs/pkix-1.51.0.0.jar => app/libs/pkix-1.51.0.0.jar
+* libs/prov-1.51.0.0.jar => app/libs/prov-1.51.0.0.jar
+* lint.xml => app/lint.xml
+* res/ => app/src/main/res/
+* src/ => app/src/main/java/
+* src/org/adaptlab/chpir/android/survey/Location/.DS_Store => app/src/main/resources/org/adaptlab/chpir/android/survey/Location/.DS_Store
+
+Next Steps:
+-----------
+You can now build the project. The Gradle project needs network
+connectivity to download dependencies.
+
+Bugs:
+-----
+If for some reason your project does not build, and you determine that
+it is due to a bug or limitation of the Eclipse to Gradle importer,
+please file a bug at http://b.android.com with category
+Component-Tools.
+
+(This import summary is for your information only, and can be deleted
+after import once you are satisfied with the results.)

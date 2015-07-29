@@ -1,0 +1,30 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 18
+    buildToolsVersion "22.0.1"
+
+    defaultConfig {
+        applicationId "org.adaptlab.chpir.android.survey"
+        minSdkVersion 14
+        targetSdkVersion 18
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:18.0.0'
+    compile files('libs/ActiveAndroid.jar')
+    compile files('libs/commons-codec-1.8.jar')
+    compile files('libs/core-1.51.0.0.jar')
+    compile files('libs/crashlytics.jar')
+    compile files('libs/pg-1.51.0.0.jar')
+    compile files('libs/pkix-1.51.0.0.jar')
+    compile files('libs/prov-1.51.0.0.jar')
+}
