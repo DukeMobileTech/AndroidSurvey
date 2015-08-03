@@ -27,6 +27,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -333,10 +334,7 @@ public class SurveyFragment extends Fragment {
             moveToPreviousQuestion();
             return true;
         case R.id.menu_item_next:
-            if (mQuestionFragment.getSpecialResponse().equals(Response.SKIP)) {
-                mQuestionFragment.saveSpecialResponse("");
-            }
-            moveToNextQuestion();
+            unSkipAndMoveToNextQuestion();
             return true;
         case R.id.menu_item_skip:
         	setSpecialResponse(Response.SKIP);
@@ -363,7 +361,14 @@ public class SurveyFragment extends Fragment {
         }
     }
 
-	@Override
+    private void unSkipAndMoveToNextQuestion() {
+        if (mQuestionFragment.getSpecialResponse().equals(Response.SKIP)) {
+            mQuestionFragment.saveSpecialResponse("");
+        }
+        moveToNextQuestion();
+    }
+
+    @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         menu.findItem(R.id.menu_item_previous)
@@ -406,6 +411,15 @@ public class SurveyFragment extends Fragment {
 	}
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        View gestureView = getActivity().findViewById(R.id.fragmentContainer);
+        gestureView.setClickable(true);
+        gestureView.setFocusable(true);
+
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent,
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_survey, parent, false);
@@ -426,21 +440,21 @@ public class SurveyFragment extends Fragment {
         createQuestionFragment();
         ActivityCompat.invalidateOptionsMenu(getActivity());
         getActivity().getActionBar().setTitle(mInstrument.getTitle());
+
+        LinearLayout swipeView = (LinearLayout) v.findViewById(R.id.linear_layout_for_question_index);
         mGestureDetector = new GestureDetector(getActivity(), new GestureListener());
-        v.setOnTouchListener(new View.OnTouchListener() {
+        swipeView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                Log.i(TAG, "onTouch");
                 return mGestureDetector.onTouchEvent(event);
             }
         });
-        Log.i(TAG, "View Created");
+
         return v;
     }
 
     public class GestureListener extends GestureDetector.SimpleOnGestureListener {
-        private float flingMin = 100;
-        private float velocityMin = 100;
+        private float MINIMUM_FLING_DISTANCE = 100;
 
         @Override
         public boolean onDown(MotionEvent event) {
@@ -449,32 +463,14 @@ public class SurveyFragment extends Fragment {
 
         @Override
         public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float velocityY) {
-            boolean forward = false;
-            boolean backward = false;
-            float horizontalDiff = event2.getX() - event1.getX();
-            float verticalDiff = event2.getY() - event1.getY();
-            float absHDiff = Math.abs(horizontalDiff);
-            float absVDiff = Math.abs(verticalDiff);
-            float absVelocityX = Math.abs(velocityX);
-            float absVelocityY = Math.abs(velocityY);
-            if(absHDiff > absVDiff && absHDiff > flingMin && absVelocityX > velocityMin){
-                if (horizontalDiff > 0) {
-                    backward = true;
+            float horizontalDifference = event2.getX() - event1.getX();
+            float absoluteHorizontalDifference = Math.abs(horizontalDifference);
+            if (absoluteHorizontalDifference > MINIMUM_FLING_DISTANCE) {
+                if (horizontalDifference > 0) {
+                    moveToPreviousQuestion();
                 } else {
-                    forward = true;
+                    unSkipAndMoveToNextQuestion();
                 }
-            } else if (absVDiff > flingMin && absVelocityY > velocityMin) {
-                if(verticalDiff > 0) backward=true;
-                else forward=true;
-            }
-
-            if(forward){
-                //Move to next question
-                Log.i(TAG, "NEXT QUESTION");
-            }
-            else if(backward){
-                //Move to previous question
-                Log.i(TAG, "NEXT QUESTION");
             }
             return true;
         }
