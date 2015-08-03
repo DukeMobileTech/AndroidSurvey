@@ -411,15 +411,6 @@ public class SurveyFragment extends Fragment {
 	}
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        View gestureView = getActivity().findViewById(R.id.fragmentContainer);
-        gestureView.setClickable(true);
-        gestureView.setFocusable(true);
-
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent,
             Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_survey, parent, false);
