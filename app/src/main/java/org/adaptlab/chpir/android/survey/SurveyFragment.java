@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.ActivityCompat;
@@ -482,6 +483,7 @@ public class SurveyFragment extends Fragment {
 			FragmentManager fm = getChildFragmentManager();       
 	        mQuestionFragment = (QuestionFragment) QuestionFragmentFactory.createQuestionFragment(mQuestion, mSurvey);
 	        switchOutFragments(fm);
+            changeOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } 
 	}
 	
@@ -497,7 +499,12 @@ public class SurveyFragment extends Fragment {
     	mQuestionFragment.setArguments(bundle);
     	FragmentManager fm = getChildFragmentManager();
     	switchOutFragments(fm);
+        changeOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 	}
+
+    private void changeOrientation(int orientation) {
+        getActivity().setRequestedOrientation(orientation);
+    }
 
 	private void switchOutFragments(FragmentManager fm) {
 		if (fm.findFragmentById(R.id.question_container) == null) {

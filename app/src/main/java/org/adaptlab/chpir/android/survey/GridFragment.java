@@ -1,17 +1,17 @@
 package org.adaptlab.chpir.android.survey;
 
-import java.util.List;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.ViewGroup;
+
+import com.activeandroid.Model;
 
 import org.adaptlab.chpir.android.survey.Models.Grid;
 import org.adaptlab.chpir.android.survey.Models.Question;
 import org.adaptlab.chpir.android.survey.Models.Response;
 import org.adaptlab.chpir.android.survey.Models.Survey;
 
-import android.os.Bundle;
-import android.util.Log;
-import android.view.ViewGroup;
-
-import com.activeandroid.Model;
+import java.util.List;
 
 public abstract class GridFragment extends QuestionFragment {
 	public final static String EXTRA_GRID_ID = 
@@ -28,7 +28,7 @@ public abstract class GridFragment extends QuestionFragment {
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
+		if (savedInstanceState != null) {
         	mGrid = Grid.findByRemoteId(savedInstanceState.getLong(EXTRA_GRID_ID));
         	mQuestions = mGrid.questions();
         } else {
