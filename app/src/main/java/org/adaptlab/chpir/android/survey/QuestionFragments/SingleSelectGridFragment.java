@@ -1,14 +1,5 @@
 package org.adaptlab.chpir.android.survey.QuestionFragments;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.adaptlab.chpir.android.survey.GridFragment;
-import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.Models.GridLabel;
-import org.adaptlab.chpir.android.survey.Models.Question;
-import org.adaptlab.chpir.android.survey.Models.Response;
-
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -22,13 +13,18 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import org.adaptlab.chpir.android.survey.GridFragment;
+import org.adaptlab.chpir.android.survey.Models.GridLabel;
+import org.adaptlab.chpir.android.survey.Models.Question;
+import org.adaptlab.chpir.android.survey.Models.Response;
+import org.adaptlab.chpir.android.survey.R;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class SingleSelectGridFragment extends GridFragment {
-	
-	private static int OPTION_COLUMN_WIDTH = 400;
-	private static int QUESTION_COLUMN_WIDTH = 700;
-	
-	private int mIndex;
-	private List<Question> mQuestions;
+    private static final String TAG = "SingleSelectGridFragment";
+    private int mIndex;
 	private List<RadioGroup> mRadioGroups;
 	
 	@Override
@@ -45,38 +41,37 @@ public class SingleSelectGridFragment extends GridFragment {
 		}
 	}
 	
-	@Override
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.fragment_table_question, parent, false);        
-		
+        View v = inflater.inflate(R.layout.fragment_table_question, parent, false);
 		TableLayout headerTableLayout = (TableLayout) v.findViewById(R.id.header_table_view);
 		TableRow headerRow= new TableRow(getActivity());
-		headerRow.setBackground(getResources().getDrawable(R.drawable.table_border));
+        headerRow.setBackground(getResources().getDrawable(R.drawable.table_border));
 		TextView questionTextHeader = new TextView(getActivity());
         questionTextHeader.setText("Question Text");
-        questionTextHeader.setWidth(QUESTION_COLUMN_WIDTH);
+        questionTextHeader.setWidth(getQuestionColumnWidth());
         questionTextHeader.setTypeface(Typeface.DEFAULT_BOLD);
         headerRow.addView(questionTextHeader);
         
         for (GridLabel label : getGrid().labels()) {
         	TextView textView = new TextView(getActivity());
-        	textView.setText(label.getLabelText());
-        	textView.setWidth(OPTION_COLUMN_WIDTH);
+            textView.setText(label.getLabelText());
+        	textView.setWidth(getOptionColumnWidth());
         	textView.setTypeface(Typeface.DEFAULT_BOLD);
         	headerRow.addView(textView);
         }
         headerTableLayout.addView(headerRow, 0);
 		
-		TableLayout bodyTableLayout = (TableLayout) v.findViewById(R.id.body_table_view);    
-        mQuestions = getQuestions();
+		TableLayout bodyTableLayout = (TableLayout) v.findViewById(R.id.body_table_view);
         mRadioGroups = new ArrayList<RadioGroup>();
-        for (int k = 0; k < mQuestions.size(); k++) {
-	        final Question q = mQuestions.get(k);        
+        List<Question> questionList = getQuestions();
+        for (int k = 0; k < questionList.size(); k++) {
+	        final Question q = questionList.get(k);
         	TableRow questionRow= new TableRow(getActivity());
-        	questionRow.setBackground(getResources().getDrawable(R.drawable.table_border));
+            questionRow.setBackground(getResources().getDrawable(R.drawable.table_border));
             TextView questionText = new TextView(getActivity());
             questionText.setText(q.getText());
-            questionText.setWidth(QUESTION_COLUMN_WIDTH);
+            questionText.setWidth(getQuestionColumnWidth());
             questionRow.addView(questionText);
             
             RadioGroup radioButtons = new RadioGroup(getActivity());
@@ -84,9 +79,9 @@ public class SingleSelectGridFragment extends GridFragment {
             for (GridLabel label : getGrid().labels()) {
             	int id = getGrid().labels().indexOf(label);
             	RadioButton button = new RadioButton(getActivity());
-            	button.setSaveEnabled(false);
-            	button.setId(id);
-            	button.setWidth(OPTION_COLUMN_WIDTH);
+                button.setSaveEnabled(false);
+                button.setId(id);
+            	button.setWidth(getOptionColumnWidth());
             	radioButtons.addView(button, id);
             }
             questionRow.addView(radioButtons);           

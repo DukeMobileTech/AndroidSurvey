@@ -1,7 +1,9 @@
 package org.adaptlab.chpir.android.survey;
 
+import android.graphics.Point;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
 import android.view.ViewGroup;
 
 import com.activeandroid.Model;
@@ -18,14 +20,18 @@ public abstract class GridFragment extends QuestionFragment {
             "org.adaptlab.chpir.android.survey.grid_id";
 	public final static String EXTRA_SURVEY_ID =
 			"org.adaptlab.chpir.android.survey.survey_id";
-	
+	public static final double QUESTION_WIDTH_RATIO = 0.4;
+	public static final double QUESTION_OPTION_RATIO = 0.6;
+	public static final int WIDTH_MARGIN = 80;
+
 	protected void createQuestionComponent(ViewGroup questionComponent){};
 	
 	private static final String TAG = "GridFragment";
 	private Grid mGrid;
 	private Survey mSurvey;
 	private List<Question> mQuestions;
-	
+    private int optionColumnWidth;
+    private int questionColumnWidth;
 	@Override
     public void onCreate(Bundle savedInstanceState) {
 		if (savedInstanceState != null) {
@@ -38,6 +44,16 @@ public abstract class GridFragment extends QuestionFragment {
         init();
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+		setDimensions();
+	}
+
+	private void setDimensions() {
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int width = size.x - WIDTH_MARGIN;
+        questionColumnWidth = (int) (QUESTION_WIDTH_RATIO * width);
+        optionColumnWidth = (int) (QUESTION_OPTION_RATIO * width)/getGrid().labels().size();
 	}
 	
 	@Override
@@ -110,4 +126,8 @@ public abstract class GridFragment extends QuestionFragment {
 	protected Survey getSurvey() {
 		return mSurvey;
 	}
+
+    protected int getOptionColumnWidth() { return optionColumnWidth; }
+
+    protected int getQuestionColumnWidth() { return questionColumnWidth; }
 }
