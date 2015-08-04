@@ -766,7 +766,12 @@ public class SurveyFragment extends Fragment {
     }
     
     public boolean isLastQuestion() {
-        return mInstrument.questions().size() == mQuestionNumber + 1;
+        if (mQuestion.belongsToGrid()) {
+            Question lastGridQuestion = mGrid.questions().get(mGrid.questions().size() - 1);
+            return mInstrument.questions().size() == lastGridQuestion.getNumberInInstrument();
+        } else {
+            return mInstrument.questions().size() == mQuestionNumber + 1;
+        }
     }
 
     public boolean hasValidResponse() {
