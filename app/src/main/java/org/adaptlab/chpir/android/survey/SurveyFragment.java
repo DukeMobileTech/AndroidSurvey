@@ -680,16 +680,13 @@ public class SurveyFragment extends Fragment {
      * the next question.
      */
     public void moveToNextQuestion() {
-    	int questionsInInstrument = mInstrument.questions().size();
+        if (mQuestion.firstInGrid()) {
+            setQuestionToLastInGrid();
+        }
+        int questionsInInstrument = mInstrument.questions().size();
         if (mQuestionNumber < questionsInInstrument - 1) {    
-            if (mQuestion.firstInGrid()) {
-            	mQuestionNumber = mGrid.questions().get(mGrid.questions().size() - 1).getNumberInInstrument() - 1;
-            	mPreviousQuestions.add(mQuestion.getNumberInInstrument() - 1);
-            	mQuestion = mGrid.questions().get(mGrid.questions().size() - 1);
-            } else {
-            	mPreviousQuestions.add(mQuestionNumber);
-            }
-            mQuestion = getNextQuestion(mQuestionNumber);  
+            mPreviousQuestions.add(mQuestionNumber);
+            mQuestion = getNextQuestion(mQuestionNumber);
             if (mQuestion.getGrid() != null) {
             	mGrid = mQuestion.getGrid();
             }
@@ -697,13 +694,19 @@ public class SurveyFragment extends Fragment {
             if (!setQuestionText(mQuestionText)) {
                 setSpecialResponse(Response.LOGICAL_SKIP);
                 moveToNextQuestion();
-            }  
+            }
         } else if (isLastQuestion() && !setQuestionText(mQuestionText)) {
         	finishSurvey();
         }
         updateQuestionCountLabel();
     }
-    
+
+    private void setQuestionToLastInGrid() {
+        mQuestionNumber = mGrid.questions().get(mGrid.questions().size() - 1).getNumberInInstrument() - 1;
+        mPreviousQuestions.add(mQuestion.getNumberInInstrument() - 1);
+        mQuestion = mGrid.questions().get(mGrid.questions().size() - 1);
+    }
+
     /*
      * Move to previous question.  Takes into account if
      * this question is following up another question.  If
@@ -857,10 +860,12 @@ public class SurveyFragment extends Fragment {
     }
     
     private void updateQuestionCountLabel() {    	
-        int numberQuestions = mInstrument.questions().size();
-        
-        mQuestionIndex.setText((mQuestionNumber + 1) + " " + getString(R.string.of) + " " + numberQuestions);        
-        mProgressBar.setProgress((int) (100 * (mQuestionNumber + 1) / (float) numberQuestions));
+        if (mQuestion.belongsToGrid()) {
+            mQuestionIndex.setText((mQuestionNumber + 1) + " - " + (mQuestionNumber + mGrid.questions().size()) + " " + getString(R.string.of) + " " + mInstrument.questions().size());
+        } else {
+            mQuestionIndex.setText((mQuestionNumber + 1) + " " + getString(R.string.of) + " " + mInstrument.questions().size());
+        }
+        mProgressBar.setProgress((int) (100 * (mQuestionNumber + 1) / (float) mInstrument.questions().size()));
         
         if (isAdded()) {
             ActivityCompat.invalidateOptionsMenu(getActivity());
