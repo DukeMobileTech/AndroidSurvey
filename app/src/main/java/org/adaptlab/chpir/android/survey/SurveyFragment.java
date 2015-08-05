@@ -339,12 +339,8 @@ public class SurveyFragment extends Fragment {
             return true;
         case R.id.menu_item_skip:
         	setSpecialResponse(Response.SKIP);
-            if (isLastQuestion()) {
-                finishSurvey();
-            } else {
-                moveToNextQuestion();
-            }
-        	return true;
+            proceedToNextQuestion();
+            return true;
         case R.id.menu_item_rf:
             setSpecialResponse(Response.RF);
             return true;
@@ -362,11 +358,15 @@ public class SurveyFragment extends Fragment {
         }
     }
 
+    private void proceedToNextQuestion() {
+        if (isLastQuestion()) finishSurvey(); else moveToNextQuestion();
+    }
+
     private void unSkipAndMoveToNextQuestion() {
         if (mQuestionFragment.getSpecialResponse().equals(Response.SKIP)) {
             mQuestionFragment.saveSpecialResponse("");
         }
-        moveToNextQuestion();
+        proceedToNextQuestion();
     }
 
     @Override
