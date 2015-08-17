@@ -37,12 +37,12 @@ public class AppUtil {
     public final static boolean PRODUCTION = !BuildConfig.DEBUG;
     public final static boolean REQUIRE_SECURITY_CHECKS = PRODUCTION;
     public static boolean DEBUG = !PRODUCTION;
-    
+
     public static String ADMIN_PASSWORD_HASH;
     public static String ACCESS_TOKEN;
     private static Context mContext;
     private static AdminSettings adminSettingsInstance;
-    
+
     /*
      * Get the version code from the AndroidManifest
      */
@@ -55,9 +55,9 @@ public class AppUtil {
         }
         return -1;
     }
-    
+
     public static String getVersionName(Context context) {
-    	try {
+        try {
             PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
             return pInfo.versionName;
         } catch (NameNotFoundException nnfe) {
@@ -65,35 +65,35 @@ public class AppUtil {
         }
         return "";
     }
-    
+
     public static final void appInit(Context context) {
-    	mContext = context;
+        mContext = context;
         if (AppUtil.REQUIRE_SECURITY_CHECKS) {
             if (!AppUtil.runDeviceSecurityChecks(context)) {
                 // Device has failed security checks
                 return;
             }
         }
-        
+
         setAdminSettingsInstance();
-        
+
         ADMIN_PASSWORD_HASH = context.getResources().getString(R.string.admin_password_hash);
-        ACCESS_TOKEN = adminSettingsInstance.getApiKey();  
-                
+        ACCESS_TOKEN = adminSettingsInstance.getApiKey();
+
         if (PRODUCTION) {
             Crashlytics.start(context);
             Crashlytics.setUserIdentifier(adminSettingsInstance.getDeviceIdentifier());
             Crashlytics.setString("device label", adminSettingsInstance.getDeviceLabel());
         }
-        
+
         DatabaseSeed.seed(context);
 
         if (adminSettingsInstance.getDeviceIdentifier() == null) {
-        	adminSettingsInstance.setDeviceIdentifier(UUID.randomUUID().toString());
+            adminSettingsInstance.setDeviceIdentifier(UUID.randomUUID().toString());
         }
-        
+
         if (adminSettingsInstance.getDeviceLabel() == null) {
-        	adminSettingsInstance.setDeviceLabel("");
+            adminSettingsInstance.setDeviceLabel("");
         }
 
         ActiveRecordCloudSync.setAccessToken(ACCESS_TOKEN);
@@ -117,14 +117,16 @@ public class AppUtil {
         new ApkUpdateTask(mContext).execute();
     }
 
-	private static void setAdminSettingsInstance() {
-		if (mContext.getResources().getBoolean(R.bool.default_admin_settings)) {
-        	adminSettingsInstance = DefaultAdminSettings.getInstance();
-        } else {
-        	adminSettingsInstance = AdminSettings.getInstance();
+    private static void setAdminSettingsInstance() {
+        if (mContext != null) {
+            if (mContext.getResources().getBoolean(R.bool.default_admin_settings)) {
+                adminSettingsInstance = DefaultAdminSettings.getInstance();
+            } else {
+                adminSettingsInstance = AdminSettings.getInstance();
+            }
         }
-	}
-    
+    }
+
     /*
      * Security checks that must pass for the application to start.
      * 
@@ -139,39 +141,43 @@ public class AppUtil {
                 .getSystemService(Context.DEVICE_POLICY_SERVICE);
         if (devicePolicyManager.getStorageEncryptionStatus() != DevicePolicyManager.ENCRYPTION_STATUS_ACTIVE) {
             new AlertDialog.Builder(context)
-            .setTitle(R.string.encryption_required_title)
-            .setMessage(R.string.encryption_required_text)
-            .setCancelable(false)
-            .setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    // Kill app on OK
-                    int pid = android.os.Process.myPid(); 
-                    android.os.Process.killProcess(pid);
-                }
-             })
-             .show();
+                    .setTitle(R.string.encryption_required_title)
+                    .setMessage(R.string.encryption_required_text)
+                    .setCancelable(false)
+                    .setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Kill app on OK
+                            int pid = android.os.Process.myPid();
+                            android.os.Process.killProcess(pid);
+                        }
+                    })
+                    .show();
             return false;
         }
         return true;
     }
-    
-    
+
+
     /*
      * Hash the entered password and compare it with admin password hash
      */
     public static boolean checkAdminPassword(String password) {
         return BCrypt.checkpw(password, ADMIN_PASSWORD_HASH);
     }
-    
+
     public static Context getContext() {
-    	return mContext;
+        return mContext;
     }
-    
+
+    public static void setContext(Context context) {
+        mContext = context;
+    }
+
     public static AdminSettings getAdminSettingsInstance() {
-    	if (adminSettingsInstance == null) {
-    		setAdminSettingsInstance();
-    	}
-    	return adminSettingsInstance;
+        if (adminSettingsInstance == null) {
+            setAdminSettingsInstance();
+        }
+        return adminSettingsInstance;
     }
-    
+
 }

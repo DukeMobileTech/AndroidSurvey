@@ -118,7 +118,9 @@ public class SurveyFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-        
+
+        if (AppUtil.getContext() == null) AppUtil.setContext(getActivity());
+
         if (savedInstanceState != null) {
             mInstrument = Instrument.findByRemoteId(savedInstanceState.getLong(EXTRA_INSTRUMENT_ID));
             if (!checkRules()) getActivity().finish();

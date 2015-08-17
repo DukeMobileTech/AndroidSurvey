@@ -1,13 +1,13 @@
 package org.adaptlab.chpir.android.activerecordcloudsync;
 
-import java.util.Date;
-
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.preference.PreferenceManager;
+
+import java.util.Date;
 
 public class PollService extends IntentService {
     private static final String TAG = "PollService";
@@ -20,7 +20,6 @@ public class PollService extends IntentService {
         super(TAG);
         sPollInterval = DEFAULT_POLL_INTERVAL;
     }
-    
 
     @Override
     protected void onHandleIntent(Intent intent) {
@@ -45,11 +44,11 @@ public class PollService extends IntentService {
             alarmManager.cancel(pi);
             pi.cancel();
         }
-        
+
         PreferenceManager.getDefaultSharedPreferences(context)
-            .edit()
-            .putBoolean(PollService.PREF_IS_ALARM_ON, isOn)
-            .commit();
+                .edit()
+                .putBoolean(PollService.PREF_IS_ALARM_ON, isOn)
+                .commit();
     }
 
     public static boolean isServiceAlarmOn(Context context) {
