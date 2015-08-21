@@ -24,8 +24,7 @@ public class ActiveRecordCloudSync {
     private static String mEndPoint;        // The remote API endpoint url
     private static String mAccessToken;     // API Access Key
     private static int mVersionCode;        // App version code from Manifest
-    private static String mInstrumentVersions;
-    private static Long mLastSyncTime;
+    private static String mLastSyncTime;
     private static int mFetchCount;
 
     /**
@@ -63,7 +62,7 @@ public class ActiveRecordCloudSync {
     public static void syncReceiveTables(Context context) {
         NetworkNotificationUtils.showNotification(context, android.R.drawable.stat_sys_download, R.string.sync_notification_text);
         Date currentTime = new Date();
-        ActiveRecordCloudSync.setLastSyncTime(currentTime.getTime());
+        ActiveRecordCloudSync.setLastSyncTime(Long.toString(currentTime.getTime()));
         ActiveRecordCloudSync.setFetchCount(0);
         for (Map.Entry<String, Class<? extends ReceiveModel>> entry : mReceiveTables.entrySet()) {
             if (AppUtil.DEBUG) Log.i(TAG, "Syncing " + entry.getValue() + " from remote table " + entry.getKey());
@@ -135,11 +134,11 @@ public class ActiveRecordCloudSync {
         return mFetchCount;
     }
 
-    public static Long getLastSyncTime() {
+    public static String getLastSyncTime() {
         return mLastSyncTime;
     }
 
-    private static void setLastSyncTime(Long time) {
+    private static void setLastSyncTime(String time) {
         mLastSyncTime = time;
     }
 

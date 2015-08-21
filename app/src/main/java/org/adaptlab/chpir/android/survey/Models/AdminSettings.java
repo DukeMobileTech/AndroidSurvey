@@ -8,6 +8,9 @@ import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 @Table(name = "AdminSettings")
 public class AdminSettings extends Model {
     private static final String TAG = "AdminSettings";
@@ -41,8 +44,8 @@ public class AdminSettings extends Model {
     private boolean mRequirePassword;
     @Column(name= "RecordSurveyLocation")
     private boolean mRecordSurveyLocation;
-    @Column(name = "LastSyncTime")
-    private Long mLastSyncTime;
+    @Column(name = "LastSyncTimes")
+    private String mLastSyncTime;
 
     private static AdminSettings adminSettings;
 
@@ -242,14 +245,30 @@ public class AdminSettings extends Model {
         return getApiDomainName() + "api/" + getApiVersion() + "/" + "projects/" + getProjectId() + "/";
     }
 
-    public void setLastSyncTime(Long syncTime) {
-        mLastSyncTime = syncTime;
+    public void setLastSyncTime(String syncTime) {
+        JSONObject projectTime = null;
+        try {
+            projectTime = new JSONObject();
+            projectTime.put(getProjectId(), syncTime);
+        } catch (JSONException je ) {
+            Log.e(TAG, "JSON exception", je);
+        }
+        mLastSyncTime = projectTime.toString();
         save();
     }
 
     public String getLastSyncTime() {
-        if (mLastSyncTime == null) { return ""; }
-    	return Long.toString(mLastSyncTime);
+        String lastSyncTime = "";
+        if (mLastSyncTime == null) { return lastSyncTime; }
+        try {
+            JSONObject projectLastSyncTime = new JSONObject(mLastSyncTime);
+            if (!projectLastSyncTime.isNull(getProjectId())) {
+                lastSyncTime = projectLastSyncTime.getString(getProjectId());
+            }
+        } catch (JSONException je) {
+            Log.e(TAG, "JSON exception", je);
+        }
+        return lastSyncTime;
     }
 
 }
