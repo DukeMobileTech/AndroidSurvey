@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.os.Build;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
@@ -178,6 +179,10 @@ public class AppUtil {
             setAdminSettingsInstance();
         }
         return adminSettingsInstance;
+    }
+
+    public static String getOsBuildNumber() {
+        return Build.DISPLAY;
     }
 
 }
