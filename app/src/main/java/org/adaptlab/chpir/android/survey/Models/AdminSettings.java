@@ -246,9 +246,13 @@ public class AdminSettings extends Model {
     }
 
     public void setLastSyncTime(String syncTime) {
-        JSONObject projectTime = null;
+        JSONObject projectTime = new JSONObject();
         try {
-            projectTime = new JSONObject();
+            if (mLastSyncTime == null) {
+                projectTime = new JSONObject();
+            } else {
+                projectTime = new JSONObject(mLastSyncTime);
+            }
             projectTime.put(getProjectId(), syncTime);
         } catch (JSONException je ) {
             Log.e(TAG, "JSON exception", je);

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.util.Log;
 
 import org.adaptlab.chpir.android.survey.AppUtil;
-import org.adaptlab.chpir.android.survey.Models.AdminSettings;
 import org.adaptlab.chpir.android.survey.R;
 
 import java.io.IOException;
@@ -123,7 +122,7 @@ public class ActiveRecordCloudSync {
      * before allowing an update.
      */
     public static String getParams() {
-        return "?access_token=" + getAccessToken() + "&version_code=" + getVersionCode() + "&last_sync_time=" + AdminSettings.getInstance().getLastSyncTime() ;
+        return "?access_token=" + getAccessToken() + "&version_code=" + getVersionCode() + "&last_sync_time=" + AppUtil.getAdminSettingsInstance().getLastSyncTime() ;
     }
 
     public static void setFetchCount(int count) {

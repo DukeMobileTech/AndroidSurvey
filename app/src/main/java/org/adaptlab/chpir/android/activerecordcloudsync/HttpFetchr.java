@@ -2,7 +2,7 @@ package org.adaptlab.chpir.android.activerecordcloudsync;
 
 import android.util.Log;
 
-import org.adaptlab.chpir.android.survey.Models.AdminSettings;
+import org.adaptlab.chpir.android.survey.AppUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -62,7 +62,7 @@ public class HttpFetchr {
 
     private void recordLastSyncTime() {
         if (ActiveRecordCloudSync.getFetchCount() == ActiveRecordCloudSync.getReceiveTables().size()) {
-            AdminSettings.getInstance().setLastSyncTime(ActiveRecordCloudSync.getLastSyncTime());
+            AppUtil.getAdminSettingsInstance().setLastSyncTime(ActiveRecordCloudSync.getLastSyncTime());
         }
     }
 
