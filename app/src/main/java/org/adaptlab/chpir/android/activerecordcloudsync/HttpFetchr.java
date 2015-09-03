@@ -3,6 +3,9 @@ package org.adaptlab.chpir.android.activerecordcloudsync;
 import android.util.Log;
 
 import org.adaptlab.chpir.android.survey.AppUtil;
+import org.adaptlab.chpir.android.survey.Models.AdminSettings;
+import org.adaptlab.chpir.android.survey.Models.Instrument;
+import org.adaptlab.chpir.android.survey.Tasks.GetReceiveTablesTask;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -12,6 +15,7 @@ import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
 
 public class HttpFetchr {
     private static final String TAG = "HttpFetchr";
@@ -62,13 +66,25 @@ public class HttpFetchr {
 
     private void recordLastSyncTime() {
         if (ActiveRecordCloudSync.getFetchCount() == ActiveRecordCloudSync.getReceiveTables().size()) {
-            AppUtil.getAdminSettingsInstance().setLastSyncTime(ActiveRecordCloudSync.getLastSyncTime());
+            String latestSyncTime = ActiveRecordCloudSync.getLastSyncTime();
+            AdminSettings adminSettings = AppUtil.getAdminSettingsInstance();
+            String projectId = adminSettings.getProjectId();
+            List<Instrument> instruments = Instrument.getAllProjectInstruments(Long.valueOf(projectId));
+            for (Instrument instrument : instruments) {
+                if (!instrument.loaded()) {
+                    latestSyncTime = "";
+                }
+            }
+            adminSettings.setLastSyncTime(latestSyncTime);
+            if (latestSyncTime.equals("")) {
+                new GetReceiveTablesTask(AppUtil.getContext()).execute();
+            }
         }
     }
 
     private byte[] getUrlBytes(String urlSpec) throws IOException {
         URL url = new URL(urlSpec);
-        HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();

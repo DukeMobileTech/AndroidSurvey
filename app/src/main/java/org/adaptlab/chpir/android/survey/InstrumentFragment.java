@@ -1,19 +1,5 @@
 package org.adaptlab.chpir.android.survey;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
-import org.adaptlab.chpir.android.activerecordcloudsync.NetworkNotificationUtils;
-import org.adaptlab.chpir.android.survey.Models.Instrument;
-import org.adaptlab.chpir.android.survey.Models.Response;
-import org.adaptlab.chpir.android.survey.Models.Survey;
-import org.adaptlab.chpir.android.survey.Rules.InstrumentLaunchRule;
-import org.adaptlab.chpir.android.survey.Rules.RuleBuilder;
-import org.adaptlab.chpir.android.survey.Rules.RuleCallback;
-import org.adaptlab.chpir.android.survey.Tasks.DownloadImagesTask;
-
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
@@ -40,6 +26,20 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
+import org.adaptlab.chpir.android.activerecordcloudsync.NetworkNotificationUtils;
+import org.adaptlab.chpir.android.survey.Models.Instrument;
+import org.adaptlab.chpir.android.survey.Models.Response;
+import org.adaptlab.chpir.android.survey.Models.Survey;
+import org.adaptlab.chpir.android.survey.Rules.InstrumentLaunchRule;
+import org.adaptlab.chpir.android.survey.Rules.RuleBuilder;
+import org.adaptlab.chpir.android.survey.Rules.RuleCallback;
+import org.adaptlab.chpir.android.survey.Tasks.DownloadImagesTask;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 public class InstrumentFragment extends ListFragment {
 	public final static String TAG = "InstrumentFragment";
