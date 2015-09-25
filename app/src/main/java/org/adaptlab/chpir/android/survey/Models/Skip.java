@@ -1,23 +1,23 @@
 package org.adaptlab.chpir.android.survey.Models;
 
-import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.util.Log;
 
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
+import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 @Table(name = "Skips")
 public class Skip extends ReceiveModel {
 	private static final String TAG = "Skip";
 	@Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
     private Long mRemoteId;
-	@Column(name = "Option")
+	@Column(name = "Option", onUpdate = Column.ForeignKeyAction.CASCADE, onDelete = Column.ForeignKeyAction.CASCADE)
 	private Option mOption;
-	@Column(name = "Question")
+	@Column(name = "Question", onUpdate = Column.ForeignKeyAction.CASCADE, onDelete = Column.ForeignKeyAction.CASCADE)
 	private Question mQuestion;
 	
 	@Override
@@ -36,7 +36,7 @@ public class Skip extends ReceiveModel {
             } else {
             	Skip deletedSkip = Skip.findByRemoteId(remoteId);
             	if (deletedSkip != null) {
-            		deletedSkip.delete();
+            		Skip.delete(Skip.class, getId());
             	}
             }
 		} catch (JSONException je) {

@@ -1,17 +1,17 @@
 package org.adaptlab.chpir.android.survey.Models;
 
-import java.util.List;
+import android.util.Log;
+
+import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
-
-import com.activeandroid.annotation.Column;
-import com.activeandroid.annotation.Table;
-import com.activeandroid.query.Select;
+import java.util.List;
 
 @Table(name = "Sections")
 public class Section extends ReceiveModel {
@@ -20,7 +20,7 @@ public class Section extends ReceiveModel {
 	
 	@Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
     private Long mRemoteId;
-	@Column(name = "Instrument")
+	@Column(name = "Instrument", onUpdate = Column.ForeignKeyAction.CASCADE, onDelete = Column.ForeignKeyAction.CASCADE)
     private Instrument mInstrument;
 	@Column(name = "Title")
     private String mTitle;
@@ -44,7 +44,7 @@ public class Section extends ReceiveModel {
             } else {
             	Section deletedSection = Section.findByRemoteId(remoteId);
                 if (deletedSection != null) {
-                	deletedSection.delete();
+					Section.delete(Section.class, getId());
                 }
             }
             
