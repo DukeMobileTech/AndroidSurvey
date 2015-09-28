@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources
-  xmlns:tools="http://schemas.android.com/tools"
-  tools:ignore="MissingTranslation" >
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 
     <string name="app_name">Survey</string>
     <string name="action_settings">Settings</string>
@@ -24,16 +22,16 @@
     <string name="api_version">Api Version</string>
     <string name="project_id">Project Id</string>
     <string name="last_update">Last update:  </string>
-    <string name="sync_notification_text">Syncing with server...</string>   
-    <string name="sync_notification_complete_text">Syncing with server complete.</string>    
-    <string name="network_unavailable">No network available on the device.</string> 
-    <string name="api_unavailable">Remote api is not responsive.</string>   
-    <string name="unacceptable_version_code">You must upgrade your application before continuing.</string>   
-    <string name="surveys">surveys</string>  
+    <string name="sync_notification_text">Syncing with server...</string>
+    <string name="sync_notification_complete_text">Syncing with server complete.</string>
+    <string name="network_unavailable">No network available on the device.</string>
+    <string name="api_unavailable">Remote api is not responsive.</string>
+    <string name="unacceptable_version_code">You must upgrade your application before continuing.</string>
+    <string name="surveys">surveys</string>
     <string name="hello">Hello World</string>
-    <string name="questions">questions</string> 
-    <string name="question">question</string> 
-    <string name="encryption_required_title">Encryption required</string> 
+    <string name="questions">questions</string>
+    <string name="question">question</string>
+    <string name="encryption_required_title">Encryption required</string>
     <string name="encryption_required_text">This application requires that the device be encrypted.  Please encrypt your device to continue.</string>
     <string name="okay">OK</string>
     <string name="password_title">Enter password</string>
@@ -88,4 +86,5 @@
     <string name="delete">Delete</string>
     <string name="delete_surveys_title">Delete Selected Surveys?</string>
     <string name="delete_surveys_message">You will not be able to recover the surveys once you delete them!</string>
+    <string name="skipped_questions">Unanswered Questions</string>
 </resources>

@@ -1,11 +1,5 @@
 package org.adaptlab.chpir.android.survey;
 
-import java.util.ArrayList;
-
-import org.adaptlab.chpir.android.survey.Models.Question;
-import org.adaptlab.chpir.android.survey.Models.Survey;
-import org.adaptlab.chpir.android.survey.Tasks.SendResponsesTask;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
@@ -20,6 +14,12 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import org.adaptlab.chpir.android.survey.Models.Question;
+import org.adaptlab.chpir.android.survey.Models.Survey;
+import org.adaptlab.chpir.android.survey.Tasks.SendResponsesTask;
+
+import java.util.ArrayList;
 
 public class ReviewPageFragment extends ListFragment {
 	public final static String EXTRA_REVIEW_QUESTION_IDS = "org.adaptlab.chpir.android.survey.review_question_ids";
@@ -42,7 +42,7 @@ public class ReviewPageFragment extends ListFragment {
     		}
     	}
         setListAdapter(new QuestionAdapter(mSkippedQuestions));
-        getActivity().setTitle("Skipped Questions");
+        getActivity().setTitle(getActivity().getResources().getString(R.string.skipped_questions));
 	}
 	
 	@Override

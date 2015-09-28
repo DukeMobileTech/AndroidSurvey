@@ -84,4 +84,5 @@
     <string name="delete">Borrar</string>
     <string name="delete_surveys_title">¿Desea borrar las encuestas seleccionadas?</string>
     <string name="delete_surveys_message">¡No podrá restablecer las encuestas una vez que las borres!</string>
+    <string name="skipped_questions">Las preguntas que se saltaron</string>
 </resources>
