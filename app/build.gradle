@@ -16,6 +16,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
 }
 
 dependencies {
@@ -27,4 +32,6 @@ dependencies {
     compile files('libs/pg-1.51.0.0.jar')
     compile files('libs/pkix-1.51.0.0.jar')
     compile files('libs/prov-1.51.0.0.jar')
+    compile files('libs/commons-lang3-3.4.jar')
+    compile files('libs/opencsv-3.5.jar')
 }
