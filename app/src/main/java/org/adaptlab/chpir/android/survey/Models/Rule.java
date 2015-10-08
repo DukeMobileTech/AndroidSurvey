@@ -1,17 +1,17 @@
 package org.adaptlab.chpir.android.survey.Models;
 
-import java.util.List;
+import android.util.Log;
+
+import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
 import org.adaptlab.chpir.android.survey.AppUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
-
-import com.activeandroid.annotation.Column;
-import com.activeandroid.annotation.Table;
-import com.activeandroid.query.Select;
+import java.util.List;
 
 @Table(name = "Rules")
 public class Rule extends ReceiveModel {
@@ -30,7 +30,7 @@ public class Rule extends ReceiveModel {
     
     public static enum RuleType {
       INSTRUMENT_SURVEY_LIMIT_RULE, INSTRUMENT_TIMING_RULE, INSTRUMENT_SURVEY_LIMIT_PER_MINUTE_RULE,
-      INSTRUMENT_LAUNCH_RULE, PARTICIPANT_TYPE_RULE
+      INSTRUMENT_LAUNCH_RULE, PARTICIPANT_TYPE_RULE, PARTICIPANT_AGE_RULE
     };
     
     // INSTRUMENT_SURVEY_RULE_LIMIT
@@ -45,7 +45,7 @@ public class Rule extends ReceiveModel {
     public static final String NUM_SURVEYS_KEY = "num_surveys";
     public static final String MINUTE_INTERVAL_KEY = "minute_interval";
     public static final String SURVEY_TIMESTAMPS_KEY = "survey_timestamps";
-    
+
     public Rule() {
         super();
         mStoredValues = "";

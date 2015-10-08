@@ -1,14 +1,14 @@
 package org.adaptlab.chpir.android.survey.Receivers;
 
-import org.adaptlab.chpir.android.survey.Models.AdminSettings;
-import org.adaptlab.chpir.android.survey.Models.Instrument;
-import org.adaptlab.chpir.android.survey.Models.Rule;
-import org.adaptlab.chpir.android.survey.Models.Rule.RuleType;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+
+import org.adaptlab.chpir.android.survey.Models.AdminSettings;
+import org.adaptlab.chpir.android.survey.Models.Instrument;
+import org.adaptlab.chpir.android.survey.Models.Rule;
+import org.adaptlab.chpir.android.survey.Models.Rule.RuleType;
 
 public class InstrumentListReceiver extends BroadcastReceiver {
 
@@ -17,6 +17,7 @@ public class InstrumentListReceiver extends BroadcastReceiver {
     private static final String INSTRUMENT_TITLE_LIST = "org.adaptlab.chpir.android.survey.instrument_title_list";
     private static final String INSTRUMENT_ID_LIST = "org.adaptlab.chpir.android.survey.instrument_id_list";
     private static final String INSTRUMENT_PARTICIPANT_TYPE = "org.adaptlab.chpir.android.survey.instrument_participant_type";
+    private static final String INSTRUMENT_PARTICIPANT_AGE = "org.adaptlab.chpir.android.survey.instrument_participant_age";
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -36,15 +37,22 @@ public class InstrumentListReceiver extends BroadcastReceiver {
         String[] instrumentTitleList = new String[instrumentListSize];
         long[] instrumentIdList = new long[instrumentListSize];
         String[] instrumentParticipantTypes = new String[instrumentListSize];
+        String[] instrumentParticipantAges = new String[instrumentListSize];
 
         for (int i = 0; i < instrumentListSize; i++) {
             instrumentTitleList[i] = Instrument.getAllProjectInstruments(currentProjectId).get(i).getTitle();
             instrumentIdList[i] = Instrument.getAllProjectInstruments(currentProjectId).get(i).getRemoteId();
-            Rule rules = Rule.findByRuleTypeAndInstrument(RuleType.PARTICIPANT_TYPE_RULE, Instrument.getAllProjectInstruments(currentProjectId).get(i));
-            if (rules == null) {
+            Rule participantTypeRule = Rule.findByRuleTypeAndInstrument(RuleType.PARTICIPANT_TYPE_RULE, Instrument.getAllProjectInstruments(currentProjectId).get(i));
+            if (participantTypeRule == null) {
                 instrumentParticipantTypes[i] = "";
             } else {
-                instrumentParticipantTypes[i] = rules.getParamJSON().toString();
+                instrumentParticipantTypes[i] = participantTypeRule.getParamJSON().toString();
+            }
+            Rule participantAgeRule = Rule.findByRuleTypeAndInstrument(RuleType.PARTICIPANT_AGE_RULE, Instrument.getAllProjectInstruments(currentProjectId).get(i));
+            if (participantAgeRule == null) {
+                instrumentParticipantAges[i] = "";
+            } else {
+                instrumentParticipantAges[i] = participantAgeRule.getParamJSON().toString();
             }
         }
         
@@ -53,6 +61,7 @@ public class InstrumentListReceiver extends BroadcastReceiver {
         i.putExtra(INSTRUMENT_TITLE_LIST, instrumentTitleList);
         i.putExtra(INSTRUMENT_ID_LIST, instrumentIdList);
         i.putExtra(INSTRUMENT_PARTICIPANT_TYPE, instrumentParticipantTypes);
+        i.putExtra(INSTRUMENT_PARTICIPANT_AGE, instrumentParticipantAges);
         context.sendBroadcast(i);
     }
 }
