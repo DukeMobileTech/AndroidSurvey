@@ -56,9 +56,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 public class SurveyFragment extends Fragment {
     private static final String TAG = "SurveyFragment";
@@ -77,9 +74,7 @@ public class SurveyFragment extends Fragment {
             "org.adaptlab.chpir.android.survey.metadata";
     public final static String EXTRA_QUESTIONS_TO_SKIP_IDS =
             "org.adaptlab.chpir.android.survey.questions_to_skip_ids";
-    public final static String EXTRA_SKIPPED_QUESTIONS_IDS =
-            "org.adaptlab.chpir.android.survey.skipped_questions_ids";
-   
+
     private Question mQuestion;
     private Instrument mInstrument;
     private Survey mSurvey;
@@ -93,7 +88,6 @@ public class SurveyFragment extends Fragment {
     // an Integer array.
     private ArrayList<Integer> mPreviousQuestions;
     private ArrayList<Integer> mQuestionsToSkip;
-    private Set<Integer> mSkippedQuestions;
 
     private TextView mQuestionText;
     private TextView mQuestionIndex;
@@ -129,8 +123,6 @@ public class SurveyFragment extends Fragment {
             mQuestionNumber = savedInstanceState.getInt(EXTRA_QUESTION_NUMBER);
             mPreviousQuestions = savedInstanceState.getIntegerArrayList(EXTRA_PREVIOUS_QUESTION_IDS);
             mQuestionsToSkip = savedInstanceState.getIntegerArrayList(EXTRA_QUESTIONS_TO_SKIP_IDS);
-            ArrayList<Integer> skippedQuestions = savedInstanceState.getIntegerArrayList(EXTRA_SKIPPED_QUESTIONS_IDS);
-            mSkippedQuestions = new LinkedHashSet<Integer>(skippedQuestions);
             if (mQuestion.belongsToGrid()) {
             	mGrid = mQuestion.getGrid();
             }
@@ -244,7 +236,6 @@ public class SurveyFragment extends Fragment {
     public void loadOrCreateQuestion() {
         mPreviousQuestions = new ArrayList<Integer>();  
         mQuestionsToSkip = new ArrayList<Integer>();
-        mSkippedQuestions = new LinkedHashSet<Integer>();
         Long questionId = getActivity().getIntent().getLongExtra(EXTRA_QUESTION_ID, -1);
         if (questionId == -1) {
             mQuestion = mInstrument.questions().get(0);
@@ -315,7 +306,6 @@ public class SurveyFragment extends Fragment {
         outState.putInt(EXTRA_QUESTION_NUMBER, mQuestionNumber);
         outState.putIntegerArrayList(EXTRA_PREVIOUS_QUESTION_IDS, mPreviousQuestions);
         outState.putIntegerArrayList(EXTRA_QUESTIONS_TO_SKIP_IDS, mQuestionsToSkip);
-        outState.putIntegerArrayList(EXTRA_SKIPPED_QUESTIONS_IDS, new ArrayList<Integer>(mSkippedQuestions));
     }
     
     @Override
@@ -550,8 +540,7 @@ public class SurveyFragment extends Fragment {
      * next question in the sequence.
      */
     private Question getNextQuestion(int questionIndex) {
-        setSkippedForReview();
-    	Question nextQuestion = null;      
+    	Question nextQuestion = null;
         if (mQuestion.hasSkipPattern() && mSurvey.getResponseByQuestion(mQuestion) != null) {
         	try {
                 int responseIndex = Integer.parseInt(mSurvey.getResponseByQuestion(mQuestion).getText());                
@@ -627,53 +616,6 @@ public class SurveyFragment extends Fragment {
 	    		mQuestionsToSkip.remove(Integer.valueOf(question.getNumberInInstrument()));
 	    	} 
     	}
-    } 
-    
-    private void setSkippedForReview() {
-    	if (nullResponse() || emptyResponse() || skippedResponse() ) {   		
-    		if (pictureResponseQuestion()) {
-				if (mQuestionFragment.getResponsePhoto().getPicturePath() == null) {
-					mSkippedQuestions.add(mQuestion.getNumberInInstrument());
-				} else {
-					mSkippedQuestions.remove(Integer.valueOf(mQuestion.getNumberInInstrument()));
-				}	
-    		} else {
-    			mSkippedQuestions.add(mQuestion.getNumberInInstrument());
-    		}
-    	} else {
-    		mSkippedQuestions.remove(Integer.valueOf(mQuestion.getNumberInInstrument()));
-    	}
-    }
-    
-    private boolean emptyResponse() {
-    	return (mSurvey.getResponseByQuestion(mQuestion).getText().length() == 0 && 
-    			mSurvey.getResponseByQuestion(mQuestion).getSpecialResponse().length() == 0);
-    }
-    
-    private boolean nullResponse() {
-    	return mSurvey.getResponseByQuestion(mQuestion) == null;
-    }
-    
-    private boolean skippedResponse() {
-    	return mSurvey.getResponseByQuestion(mQuestion).getSpecialResponse() == Response.SKIP;
-    }
-    
-    private boolean pictureResponseQuestion() {
-    	 return (mQuestion.getQuestionType() == QuestionType.FRONT_PICTURE || mQuestion.getQuestionType() == QuestionType.REAR_PICTURE);
-    }
-    
-    private boolean isInstructionsQuestion(Question question) {
-    	return (question.getQuestionType() == QuestionType.INSTRUCTIONS);
-    }
-    
-    private void removeInstructionsQuestions() {
-    	for (Iterator<Integer> iterator = mSkippedQuestions.iterator(); iterator.hasNext();) {
-    	    Integer next = iterator.next();
-			Question question = Question.findByNumberInInstrument(next, mInstrument.getId());
-    	    if (isInstructionsQuestion(question)) {
-    	        iterator.remove();
-    	    }
-    	}
     }
     
     /*
@@ -740,25 +682,16 @@ public class SurveyFragment extends Fragment {
     * complete.  Send to server if network is available.
     */
     public void finishSurvey() {
-    	setSkippedForReview(); //To check if last question is skipped
-    	removeInstructionsQuestions();
     	if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) {
     		setSurveyLocation();
     	}
-    	if (!mSkippedQuestions.isEmpty()) {
-    		ArrayList<String> skippedQuestions = new ArrayList<String>();
-    		for (Integer questionNumber : mSkippedQuestions) {
-    			Question question = Question.findByNumberInInstrument(questionNumber, mInstrument.getId());
-    			skippedQuestions.add(question.getQuestionIdentifier());
-    		}
-    		Intent i = new Intent(getActivity(), ReviewPageActivity.class);
-    		Bundle b = new Bundle();
-    		b.putStringArrayList(ReviewPageFragment.EXTRA_REVIEW_QUESTION_IDS, skippedQuestions);
-    		b.putLong(ReviewPageFragment.EXTRA_REVIEW_SURVEY_ID, mSurvey.getId());
-    		i.putExtras(b);
-    		startActivityForResult(i, REVIEW_CODE);
-    	} 
-    	else {
+        if (mSurvey.emptyResponses().size() > 0) {
+            Intent i = new Intent(getActivity(), ReviewPageActivity.class);
+            Bundle b = new Bundle();
+            b.putLong(ReviewPageFragment.EXTRA_REVIEW_SURVEY_ID, mSurvey.getId());
+            i.putExtras(b);
+            startActivityForResult(i, REVIEW_CODE);
+        } else {
     		getActivity().finish();
 	        mSurvey.setAsComplete();
 	        mSurvey.save();

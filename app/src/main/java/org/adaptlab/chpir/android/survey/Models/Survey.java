@@ -154,7 +154,14 @@ public class Survey extends SendModel {
     public List<Response> responses() {
         return getMany(Response.class, "Survey");
     }
-    
+
+    public List<Response> emptyResponses() {
+        return new Select()
+                .from(Response.class)
+                .where("Survey = ? AND (Text IS null OR Text = '') AND (SpecialResponse IS null OR SpecialResponse = '') AND (Other_Response IS null OR Other_Response = '')", getId())
+                .execute();
+    }
+
     /*
      * Getters/Setters
      */
@@ -215,16 +222,8 @@ public class Survey extends SendModel {
         mLatitude = latitude;
     }
 
-    public String getLatitude() {
-        return mLatitude;
-    }
-
     public void setLongitude(String longitude) {
         mLongitude = longitude;
-    }
-
-    public String getLongitude() {
-        return mLongitude;
     }
 
     public Date getLastUpdated() {
@@ -259,10 +258,6 @@ public class Survey extends SendModel {
 
     public void setProjectId(Long id) {
         mProjectId = id;
-    }
-
-    public Long getProjectId() {
-        return mProjectId;
     }
 
     private String getMetadataLabel() {
