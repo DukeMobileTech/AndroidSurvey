@@ -47,13 +47,8 @@ public class SectionFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_section, parent, false);
         TextView numQuestionsLabel = (TextView) view.findViewById(R.id.number_of_questions_label);
-        numQuestionsLabel.setText(getActivity().getResources().getString(R.string.section_number_of_questions) + ":  ");
+        numQuestionsLabel.setText(getActivity().getResources().getString(R.string.section_number_of_questions) + ":  " + mSection.questions().size());
         numQuestionsLabel.setTypeface(Typeface.DEFAULT_BOLD);
-        TextView numberOfQuestions = (TextView) view.findViewById(R.id.number_of_questions_text);
-        numberOfQuestions.setText(Integer.toString(mSection.questions().size()));
-        numberOfQuestions.setTypeface(Typeface.DEFAULT_BOLD);
-        TextView defaultResponsesLabel = (TextView) view.findViewById(R.id.default_responses_label);
-        defaultResponsesLabel.setText(R.string.section_default_responses_label);
 
         mRadioGroup = (RadioGroup) view.findViewById(R.id.default_responses_radio_group);
         AdminSettings adminSettings = AppUtil.getAdminSettingsInstance();

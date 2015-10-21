@@ -87,9 +87,11 @@
     <string name="delete_surveys_title">Delete Selected Surveys?</string>
     <string name="delete_surveys_message">You will not be able to recover the surveys once you delete them!</string>
     <string name="skipped_questions">Unanswered Questions</string>
-    <string name="proceed">Proceed</string>
+    <string name="proceed">Continue</string>
     <string name="section_number_of_questions">Number of questions in this section</string>
-    <string name="section_default_responses_label">If you want to skip this section and choose a default response for each question, select one of the choices below then press Proceed, otherwise press Cancel to start section.</string>
+    <string name="continue_to_section"> - Press Continue to start section</string>
+    <string name="auto_fill_section"> - Select a response below and press Continue to auto fill section with that response</string>
+    <string name="section_navigation"> - To go to another section without auto filling, press Cancel and use the navigation panel in the top left</string>
     <string name="SKIP">SKIP</string>
     <string name="NA">NA</string>
     <string name="DK">DK</string>

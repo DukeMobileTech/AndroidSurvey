@@ -85,9 +85,11 @@
     <string name="delete_surveys_title">¿Desea borrar las encuestas seleccionadas?</string>
     <string name="delete_surveys_message">¡No podrá restablecer las encuestas una vez que las borres!</string>
     <string name="skipped_questions">Las preguntas que se saltaron</string>
-    <string name="proceed">Seguir</string>
-    <string name="section_number_of_questions">Número de preguntas de esta sección</string>
-    <string name="section_default_responses_label">Si desea omitir esta sección y elegir una respuesta predeterminada para cada pregunta, seleccione una de las opciones de abajo a continuación, presione Proceder, de lo contrario, pulse Cancelar para iniciar sección.</string>
+    <string name="proceed">Proceder</string>
+    <string name="section_number_of_questions">Número de preguntas en esta sección</string>
+    <string name="continue_to_section"> - Pulse el botón Continuar para comenzar la sección</string>
+    <string name="auto_fill_section"> - Seleccione una respuesta de abajo y pulse Continuar para la sección de llenado automático con esa respuesta</string>
+    <string name="section_navigation"> - Para ir a otra sección sin llenado automático, pulse Cancelar y utilice el panel de navegación en la parte superior izquierda</string>
     <string name="SKIP">SP</string>
     <string name="NA">NA</string>
     <string name="DK">NS</string>
