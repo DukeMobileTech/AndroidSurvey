@@ -11,6 +11,9 @@ import com.activeandroid.query.Select;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Table(name = "AdminSettings")
 public class AdminSettings extends Model {
     private static final String TAG = "AdminSettings";
@@ -273,6 +276,15 @@ public class AdminSettings extends Model {
             Log.e(TAG, "JSON exception", je);
         }
         return lastSyncTime;
+    }
+
+    public List<String> getSpecialResponses() {
+        List<String> responses = new ArrayList<String>();
+        if (getShowDK()) responses.add(Response.DK);
+        if (getShowNA()) responses.add(Response.NA);
+        if (getShowRF()) responses.add(Response.RF);
+        if (getShowSkip()) responses.add(Response.SKIP);
+        return responses;
     }
 
 }

@@ -1,7 +1,11 @@
 package org.adaptlab.chpir.android.survey.Models;
 
-import java.util.ArrayList;
-import java.util.List;
+import android.content.Context;
+import android.util.Log;
+
+import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
 import org.adaptlab.chpir.android.survey.AppUtil;
@@ -10,12 +14,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.content.Context;
-import android.util.Log;
-
-import com.activeandroid.annotation.Column;
-import com.activeandroid.annotation.Table;
-import com.activeandroid.query.Select;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "Questions")
 public class Question extends ReceiveModel {
@@ -72,6 +72,8 @@ public class Question extends ReceiveModel {
     private boolean mFirstInGrid;
     @Column(name = "Deleted")
     private boolean mDeleted;
+    @Column(name = "Section")
+    private Section mSection;
 
     public Question() {
         super();
@@ -264,6 +266,9 @@ public class Question extends ReceiveModel {
             	question.setGrid(Grid.findByRemoteId(jsonObject.getLong("grid_id")));
             }
             question.setFirstInGrid(jsonObject.getBoolean("first_in_grid"));
+            if (!jsonObject.isNull("section_id")) {
+                question.setSection(Section.findByRemoteId(jsonObject.getLong("section_id")));
+            }
             question.setRemoteId(remoteId);
             if (!jsonObject.isNull("deleted_at")) {
             	question.setDeleted(true);
@@ -517,6 +522,10 @@ public class Question extends ReceiveModel {
     
     private void setDeleted(boolean deleted) {
     	mDeleted = deleted;
+    }
+
+    private void setSection(Section section) {
+        mSection = section;
     }
  
 }

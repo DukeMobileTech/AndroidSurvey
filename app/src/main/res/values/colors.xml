@@ -10,4 +10,7 @@
     <color name="question_text_border">#C5D7F4</color>
     <color name="response_component_background">#C5D7F4</color>
     <color name="response_component_border">#E1F0D2</color>
+    <color name="red">#FF0000</color>
+    <color name="green">#0C8C00</color>
+    <color name="white">#FFFFFF</color>
 </resources>

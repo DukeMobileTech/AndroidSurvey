@@ -54,6 +54,7 @@
             </LinearLayout>
             
             <LinearLayout
+                android:id="@+id/participant_label_and_question_index"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal" >

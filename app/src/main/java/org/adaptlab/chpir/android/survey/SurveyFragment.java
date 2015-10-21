@@ -60,7 +60,8 @@ import java.util.ArrayList;
 public class SurveyFragment extends Fragment {
     private static final String TAG = "SurveyFragment";
     private static final int REVIEW_CODE = 100;
-    public final static String EXTRA_INSTRUMENT_ID = 
+    private static final int SECTION_CODE = 200;
+    public final static String EXTRA_INSTRUMENT_ID =
             "org.adaptlab.chpir.android.survey.instrument_id";
     public final static String EXTRA_QUESTION_ID = 
             "org.adaptlab.chpir.android.survey.question_id";
@@ -74,6 +75,8 @@ public class SurveyFragment extends Fragment {
             "org.adaptlab.chpir.android.survey.metadata";
     public final static String EXTRA_QUESTIONS_TO_SKIP_IDS =
             "org.adaptlab.chpir.android.survey.questions_to_skip_ids";
+    public final static String EXTRA_SECTION_ID =
+            "org.adaptlab.chpir.android.survey.section_id";
 
     private Question mQuestion;
     private Instrument mInstrument;
@@ -106,7 +109,7 @@ public class SurveyFragment extends Fragment {
     private ArrayList<Section> mSections;
     private String[] mSectionTitles;
     private boolean mNavDrawerSet = false;
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -195,19 +198,36 @@ public class SurveyFragment extends Fragment {
     }
     
     private void selectItem(int position) {
-    	moveToSection(mSections.get(position).getStartQuestionIdentifier());
+    	//moveToSection(mSections.get(position).getFirstQuestion());
+        moveToSection(mSections.get(position));
     	mDrawerList.setItemChecked(position, true);
         getActivity().setTitle(mInstrument.getTitle() + " : " + mSectionTitles[position]);
         mDrawerLayout.closeDrawer(mDrawerList);
     }
     
-    private void moveToSection(String questionIdentifier) {
+    private void moveToSection(Section section) {
     	mPreviousQuestions.add(mQuestionNumber);
-    	mQuestion = Question.findByQuestionIdentifier(questionIdentifier);
-    	mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
-    	createQuestionFragment();
-    	updateQuestionText();
-    	updateQuestionCountLabel();
+//    	mQuestion = question;
+//    	mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
+//    	createQuestionFragment();
+//    	updateQuestionText();
+//    	updateQuestionCountLabel();
+//        mSurveyFragment = SurveyFragment.this;
+//        FragmentTransaction ft = getChildFragmentManager().beginTransaction();
+//        SectionFragment sectionFragment = new SectionFragment();
+//        Bundle args = new Bundle();
+//        args.putLong(EXTRA_SECTION_ID, section.getRemoteId());
+//        args.putLong(EXTRA_SURVEY_ID, mSurvey.getId());
+//        sectionFragment.setArguments(args);
+//        ft.replace(R.id.question_container, sectionFragment);
+//        ft.commit();
+//        getChildFragmentManager().popBackStack();
+        Intent i = new Intent(getActivity(), SectionActivity.class);
+        Bundle args = new Bundle();
+        args.putLong(EXTRA_SECTION_ID, section.getRemoteId());
+        args.putLong(EXTRA_SURVEY_ID, mSurvey.getId());
+        i.putExtras(args);
+        startActivityForResult(i, SECTION_CODE);
     }
     
     private void updateQuestionText() {
@@ -271,17 +291,20 @@ public class SurveyFragment extends Fragment {
     @Override
     public void onResume() {
     	super.onResume();
-    	if (mResumeQuestion == mQuestion) {
-        	mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
-            createQuestionFragment();
-            updateQuestionText();
-            updateQuestionCountLabel();
-    	}
+    	if (mResumeQuestion == mQuestion)
+            mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
+        refreshView();
     }
-    
+
+    private void refreshView() {
+        createQuestionFragment();
+        updateQuestionText();
+        updateQuestionCountLabel();
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (resultCode == Activity.RESULT_OK && requestCode == REVIEW_CODE) {
+        if (resultCode == Activity.RESULT_OK && requestCode == REVIEW_CODE) {
             Long remoteId = data.getExtras().getLong(EXTRA_QUESTION_ID);
             if (remoteId == Long.MIN_VALUE) {
             	getActivity().finish();
@@ -295,6 +318,15 @@ public class SurveyFragment extends Fragment {
 	            }
             }
 		}
+        if (resultCode == Activity.RESULT_OK && requestCode == SECTION_CODE) {
+            Long questionId = data.getExtras().getLong(EXTRA_QUESTION_ID);
+            Long instrumentId = data.getExtras().getLong(EXTRA_INSTRUMENT_ID);
+            Long surveyId = data.getExtras().getLong(EXTRA_SURVEY_ID);
+            mQuestion = Model.load(Question.class, questionId);
+            mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
+            mInstrument = Instrument.findByRemoteId(instrumentId);
+            mSurvey = Model.load(Survey.class, surveyId);
+        }
     }
 
 	@Override
@@ -381,7 +413,7 @@ public class SurveyFragment extends Fragment {
         menu.findItem(R.id.menu_item_finish)
             .setVisible(isLastQuestion())
             .setEnabled(hasValidResponse());
-     
+
         showSpecialResponseSelection(menu);
     }
 	
@@ -404,10 +436,8 @@ public class SurveyFragment extends Fragment {
 	}
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup parent,
-            Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_survey, parent, false);
-
         mQuestionText = (TextView) v.findViewById(R.id.question_text);
         mParticipantLabel = (TextView) v.findViewById(R.id.participant_label);
         mQuestionIndex = (TextView) v.findViewById(R.id.question_index);
@@ -464,7 +494,7 @@ public class SurveyFragment extends Fragment {
      * Place the question fragment for the corresponding mQuestion
      * on the view in the question_container.
      */
-	protected void createQuestionFragment() {        
+	protected void createQuestionFragment() {
         if (mQuestion == null)
         		loadOrCreateQuestion();
         if (mSurvey == null)
@@ -476,7 +506,7 @@ public class SurveyFragment extends Fragment {
 	        mQuestionFragment = (QuestionFragment) QuestionFragmentFactory.createQuestionFragment(mQuestion, mSurvey);
 	        switchOutFragments(fm);
             changeOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        } 
+        }
 	}
 	
 	private void createGridFragment() {

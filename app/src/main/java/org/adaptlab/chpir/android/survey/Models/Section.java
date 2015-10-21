@@ -24,8 +24,10 @@ public class Section extends ReceiveModel {
     private Instrument mInstrument;
 	@Column(name = "Title")
     private String mTitle;
-	@Column(name = "StartQuestionIdentifier")
-    private String mStartQuestionIdentifier;
+	@Column(name = "FirstQuestionNumber")
+	private int mFirstQuestionNumber;
+	@Column(name = "SectionNumber")
+	private int mSectionNumber;
 
 	@Override
 	public void createObjectFromJSON(JSONObject jsonObject) {
@@ -38,7 +40,10 @@ public class Section extends ReceiveModel {
             section.setRemoteId(remoteId);
             section.setInstrument(Instrument.findByRemoteId(jsonObject.getLong("instrument_id")));
             section.setTitle(jsonObject.getString("title"));
-            section.setStartQuestionIdentifier(jsonObject.getString("start_question_identifier"));
+			if (!jsonObject.isNull(jsonObject.getString("first_question_number"))) {
+                section.setFirstQuestionNumber(jsonObject.getInt("first_question_number"));
+            }
+			section.setSectionNumber(jsonObject.getInt("section_number"));
             if (jsonObject.isNull("deleted_at")) {
             	section.save();
             } else {
@@ -83,6 +88,13 @@ public class Section extends ReceiveModel {
     	return getMany(SectionTranslation.class, "Section");
     }
 
+    public List<Question> questions() {
+        return new Select().from(Question.class)
+                .where("Section = ?", getId())
+                .orderBy("NumberInInstrument")
+                .execute();
+    }
+
 	public void setInstrument(Instrument instrument) {
 		mInstrument = instrument;
 	}
@@ -91,22 +103,26 @@ public class Section extends ReceiveModel {
 		return mInstrument;
 	}
 
-	public void setRemoteId(Long remoteId) {
+	private void setRemoteId(Long remoteId) {
 		mRemoteId = remoteId;
 	}
+
+    public Long getRemoteId() {
+        return mRemoteId;
+    }
 	
 	public void setTitle(String title) {
 		mTitle = title;
 	}
-	
-	public void setStartQuestionIdentifier(String beginId) {
-		mStartQuestionIdentifier = beginId;
+
+	private void setFirstQuestionNumber(int questionNumber) {
+		mFirstQuestionNumber = questionNumber;
 	}
-	
-	public String getStartQuestionIdentifier() {
-		return mStartQuestionIdentifier;
+
+	private void setSectionNumber(int sectionNumber) {
+		mSectionNumber = sectionNumber;
 	}
-	
+
 	/*
      * If the language of the instrument is the same as the language setting on the
      * device (or through the Admin settings), then return the section title.

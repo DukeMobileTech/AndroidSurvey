@@ -87,4 +87,7 @@
     <string name="delete_surveys_title">Delete Selected Surveys?</string>
     <string name="delete_surveys_message">You will not be able to recover the surveys once you delete them!</string>
     <string name="skipped_questions">Unanswered Questions</string>
+    <string name="proceed">Proceed</string>
+    <string name="section_number_of_questions">Number of questions in this section</string>
+    <string name="section_default_responses_label">If you want to skip this section and choose a default response for each question, select one of the choices below then press Proceed, otherwise press Cancel to start section.</string>
 </resources>

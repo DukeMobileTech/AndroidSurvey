@@ -101,12 +101,12 @@ public class AppUtil {
         ActiveRecordCloudSync.setVersionCode(AppUtil.getVersionCode(context));
         ActiveRecordCloudSync.setEndPoint(adminSettingsInstance.getApiUrl());
         ActiveRecordCloudSync.addReceiveTable("instruments", Instrument.class);
+        ActiveRecordCloudSync.addReceiveTable("sections", Section.class);
         ActiveRecordCloudSync.addReceiveTable("grids", Grid.class);
         ActiveRecordCloudSync.addReceiveTable("questions", Question.class);
         ActiveRecordCloudSync.addReceiveTable("options", Option.class);
         ActiveRecordCloudSync.addReceiveTable("grid_labels", GridLabel.class);
         ActiveRecordCloudSync.addReceiveTable("images", Image.class);
-        ActiveRecordCloudSync.addReceiveTable("sections", Section.class);
         ActiveRecordCloudSync.addReceiveTable("device_users", DeviceUser.class);
         ActiveRecordCloudSync.addReceiveTable("skips", Skip.class);
         ActiveRecordCloudSync.addReceiveTable("rules", Rule.class);
