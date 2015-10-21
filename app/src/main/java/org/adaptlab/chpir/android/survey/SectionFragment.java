@@ -98,7 +98,8 @@ public class SectionFragment extends Fragment {
 
     private void displayDefaultSpecialResponses(RadioGroup radioGroup, String displayText, int index) {
         RadioButton radioButton = new RadioButton(getActivity());
-        radioButton.setText(displayText);
+        String label = getActivity().getString(getActivity().getResources().getIdentifier(displayText, "string", getActivity().getPackageName()));
+        radioButton.setText(label);
         radioButton.setId(index);
         radioButton.setTypeface(mSection.getInstrument().getTypeFace(getActivity().getApplicationContext()));
         radioButton.setLayoutParams(new RadioGroup.LayoutParams(

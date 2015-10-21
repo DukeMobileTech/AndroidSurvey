@@ -90,4 +90,8 @@
     <string name="proceed">Proceed</string>
     <string name="section_number_of_questions">Number of questions in this section</string>
     <string name="section_default_responses_label">If you want to skip this section and choose a default response for each question, select one of the choices below then press Proceed, otherwise press Cancel to start section.</string>
+    <string name="SKIP">SKIP</string>
+    <string name="NA">NA</string>
+    <string name="DK">DK</string>
+    <string name="RF">RF</string>
 </resources>

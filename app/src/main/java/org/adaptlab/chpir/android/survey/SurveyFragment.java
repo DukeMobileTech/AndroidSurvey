@@ -198,7 +198,7 @@ public class SurveyFragment extends Fragment {
     }
     
     private void selectItem(int position) {
-        moveToSection(mSections.get(position));
+        if (mSections.get(position).questions().size() > 0) moveToSection(mSections.get(position));
     	mDrawerList.setItemChecked(position, true);
         getActivity().setTitle(mInstrument.getTitle() + " : " + mSectionTitles[position]);
         mDrawerLayout.closeDrawer(mDrawerList);
