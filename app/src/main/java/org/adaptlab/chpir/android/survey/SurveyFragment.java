@@ -198,7 +198,6 @@ public class SurveyFragment extends Fragment {
     }
     
     private void selectItem(int position) {
-    	//moveToSection(mSections.get(position).getFirstQuestion());
         moveToSection(mSections.get(position));
     	mDrawerList.setItemChecked(position, true);
         getActivity().setTitle(mInstrument.getTitle() + " : " + mSectionTitles[position]);
@@ -207,21 +206,6 @@ public class SurveyFragment extends Fragment {
     
     private void moveToSection(Section section) {
     	mPreviousQuestions.add(mQuestionNumber);
-//    	mQuestion = question;
-//    	mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
-//    	createQuestionFragment();
-//    	updateQuestionText();
-//    	updateQuestionCountLabel();
-//        mSurveyFragment = SurveyFragment.this;
-//        FragmentTransaction ft = getChildFragmentManager().beginTransaction();
-//        SectionFragment sectionFragment = new SectionFragment();
-//        Bundle args = new Bundle();
-//        args.putLong(EXTRA_SECTION_ID, section.getRemoteId());
-//        args.putLong(EXTRA_SURVEY_ID, mSurvey.getId());
-//        sectionFragment.setArguments(args);
-//        ft.replace(R.id.question_container, sectionFragment);
-//        ft.commit();
-//        getChildFragmentManager().popBackStack();
         Intent i = new Intent(getActivity(), SectionActivity.class);
         Bundle args = new Bundle();
         args.putLong(EXTRA_SECTION_ID, section.getRemoteId());
@@ -322,10 +306,12 @@ public class SurveyFragment extends Fragment {
             Long questionId = data.getExtras().getLong(EXTRA_QUESTION_ID);
             Long instrumentId = data.getExtras().getLong(EXTRA_INSTRUMENT_ID);
             Long surveyId = data.getExtras().getLong(EXTRA_SURVEY_ID);
+            ArrayList<Integer> previousQuestions = data.getExtras().getIntegerArrayList(EXTRA_PREVIOUS_QUESTION_IDS);
             mQuestion = Model.load(Question.class, questionId);
             mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
             mInstrument = Instrument.findByRemoteId(instrumentId);
             mSurvey = Model.load(Survey.class, surveyId);
+            if (previousQuestions != null) mPreviousQuestions.addAll(previousQuestions);
         }
     }
 

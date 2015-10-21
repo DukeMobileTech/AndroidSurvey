@@ -1,20 +1,20 @@
 package org.adaptlab.chpir.android.survey.Models;
 
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
-import org.adaptlab.chpir.android.activerecordcloudsync.SendModel;
-import org.adaptlab.chpir.android.survey.AuthUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.Context;
 import android.util.Log;
 
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
+
+import org.adaptlab.chpir.android.activerecordcloudsync.SendModel;
+import org.adaptlab.chpir.android.survey.AuthUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 @Table(name = "Responses")
 public class Response extends SendModel {
@@ -24,6 +24,7 @@ public class Response extends SendModel {
     public static final String NA = "NA";
     public static final String DK = "DK";
     public static final String LOGICAL_SKIP = "LOGICAL_SKIP";
+	public static final String BLANK = "";
 	
 	@Column(name = "Question")
 	private Question mQuestion;
