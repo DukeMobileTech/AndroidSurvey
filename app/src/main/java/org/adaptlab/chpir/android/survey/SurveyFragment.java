@@ -109,6 +109,7 @@ public class SurveyFragment extends Fragment {
     private ArrayList<Section> mSections;
     private String[] mSectionTitles;
     private boolean mNavDrawerSet = false;
+    private boolean showSectionView = true;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -278,12 +279,18 @@ public class SurveyFragment extends Fragment {
     	if (mResumeQuestion == mQuestion)
             mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
         refreshView();
+        showSectionView = true;
     }
 
     private void refreshView() {
-        createQuestionFragment();
-        updateQuestionText();
+        setParticipantLabel();
         updateQuestionCountLabel();
+        if (mQuestion.belongsToGrid()) {
+            setGridLabelText(mQuestionText);
+        } else {
+            setQuestionText(mQuestionText);
+        }
+        createQuestionFragment();
     }
 
     @Override
@@ -303,6 +310,7 @@ public class SurveyFragment extends Fragment {
             }
 		}
         if (resultCode == Activity.RESULT_OK && requestCode == SECTION_CODE) {
+            Question previousQuestion = mQuestion;
             Long questionId = data.getExtras().getLong(EXTRA_QUESTION_ID);
             Long instrumentId = data.getExtras().getLong(EXTRA_INSTRUMENT_ID);
             Long surveyId = data.getExtras().getLong(EXTRA_SURVEY_ID);
@@ -312,6 +320,7 @@ public class SurveyFragment extends Fragment {
             mInstrument = Instrument.findByRemoteId(instrumentId);
             mSurvey = Model.load(Survey.class, surveyId);
             if (previousQuestions != null) mPreviousQuestions.addAll(previousQuestions);
+            if (previousQuestion == mQuestion) showSectionView = false;
         }
     }
 
@@ -428,16 +437,7 @@ public class SurveyFragment extends Fragment {
         mParticipantLabel = (TextView) v.findViewById(R.id.participant_label);
         mQuestionIndex = (TextView) v.findViewById(R.id.question_index);
         mProgressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
-
-        setParticipantLabel();
-        updateQuestionCountLabel();
-        if (mQuestion.belongsToGrid()) {
-        	setGridLabelText(mQuestionText);
-        } else {
-        	setQuestionText(mQuestionText);
-        }
         mQuestionText.setTypeface(mInstrument.getTypeFace(getActivity().getApplicationContext()));
-        createQuestionFragment();
         ActivityCompat.invalidateOptionsMenu(getActivity());
         getActivity().getActionBar().setTitle(mInstrument.getTitle());
 
@@ -481,17 +481,21 @@ public class SurveyFragment extends Fragment {
      * on the view in the question_container.
      */
 	protected void createQuestionFragment() {
-        if (mQuestion == null)
-        		loadOrCreateQuestion();
-        if (mSurvey == null)
-        		loadOrCreateSurvey();
-        if (mQuestion.belongsToGrid()) {
-        	createGridFragment();
+        if (mQuestion == null || mSurvey == null) {
+            loadOrCreateQuestion();
+            loadOrCreateSurvey();
+        }
+        if (mQuestion.isFirstQuestionInSection() && showSectionView) {
+            moveToSection(mQuestion.getSection());
         } else {
-			FragmentManager fm = getChildFragmentManager();       
-	        mQuestionFragment = (QuestionFragment) QuestionFragmentFactory.createQuestionFragment(mQuestion, mSurvey);
-	        switchOutFragments(fm);
-            changeOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            if (mQuestion.belongsToGrid()) {
+                createGridFragment();
+            } else {
+                FragmentManager fm = getChildFragmentManager();
+                mQuestionFragment = (QuestionFragment) QuestionFragmentFactory.createQuestionFragment(mQuestion, mSurvey);
+                switchOutFragments(fm);
+                changeOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            }
         }
 	}
 	
@@ -680,6 +684,7 @@ public class SurveyFragment extends Fragment {
             if (mQuestion.getGrid() != null) {
             	mGrid = mQuestion.getGrid();
             }
+            showSectionView = false;
             createQuestionFragment();
             if (!setQuestionText(mQuestionText)) {
                 moveToPreviousQuestion();

@@ -456,6 +456,15 @@ public class Question extends ReceiveModel {
     public Grid getGrid() {
     	return mGrid;
     }
+
+    public Section getSection() {
+        return mSection;
+    }
+
+    public boolean isFirstQuestionInSection() {
+        if (getSection() == null || getSection().questions().size() == 0) return false;
+        return (getSection().questions().get(0) == this);
+    }
     
 	public boolean belongsToGrid() {
 		if (getGrid() == null) {

@@ -70,7 +70,7 @@ public class SectionFragment extends Fragment {
         mProceedButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mRadioGroup.getCheckedRadioButtonId() == -1 ) {
+                if (mRadioGroup.getCheckedRadioButtonId() == -1) {
                     displayNextQuestion(mSection.questions().get(0).getId());
                 } else {
                     displayNextQuestion(getNextQuestion().getId());
@@ -140,7 +140,9 @@ public class SectionFragment extends Fragment {
             if (!response.saveWithValidation()) {
                 response.save();
             }
-            mQuestionsToAddToPreviousList.add(question.getNumberInInstrument() - 1);
+            if (question.getNumberInInstrument() <= mSection.getInstrument().questions().size()) {
+                mQuestionsToAddToPreviousList.add(question.getNumberInInstrument() - 1);
+            }
         }
     }
 
