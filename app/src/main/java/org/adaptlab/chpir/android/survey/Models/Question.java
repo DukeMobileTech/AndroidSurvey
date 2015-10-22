@@ -306,7 +306,7 @@ public class Question extends ReceiveModel {
     }
     
     public static Question findByNumberInInstrument(Integer questionNumber, Long instrumentId) {
-    	return new Select().from(Question.class).where("NumberInInstrument = ? AND Instrument = ?", questionNumber, instrumentId).executeSingle();
+    	return new Select().from(Question.class).where("NumberInInstrument = ? AND Instrument = ? AND Deleted != ?", questionNumber, instrumentId, 1).executeSingle();
     }
     
     public boolean isFollowUpQuestion() {
@@ -473,6 +473,10 @@ public class Question extends ReceiveModel {
 			return true;
 		}
 	}
+
+    public boolean isLastQuestion() {
+        return (this == getInstrument().questions().get(getInstrument().getQuestionCount() - 1));
+    }
     
     /*
      * Private

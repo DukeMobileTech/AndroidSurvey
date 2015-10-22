@@ -43,13 +43,15 @@ public class Section extends ReceiveModel {
 			if (!jsonObject.isNull(jsonObject.getString("first_question_number"))) {
                 section.setFirstQuestionNumber(jsonObject.getInt("first_question_number"));
             }
-			section.setSectionNumber(jsonObject.getInt("section_number"));
+			if (!jsonObject.isNull(jsonObject.getString("section_number"))) {
+                section.setSectionNumber(jsonObject.getInt("section_number"));
+            }
             if (jsonObject.isNull("deleted_at")) {
             	section.save();
             } else {
             	Section deletedSection = Section.findByRemoteId(remoteId);
                 if (deletedSection != null) {
-					Section.delete(Section.class, getId());
+					Section.delete(Section.class, deletedSection.getId());
                 }
             }
             
@@ -90,7 +92,7 @@ public class Section extends ReceiveModel {
 
     public List<Question> questions() {
         return new Select().from(Question.class)
-                .where("Section = ?", getId())
+                .where("Section = ? AND Deleted != ?", getId(), 1)
                 .orderBy("NumberInInstrument")
                 .execute();
     }

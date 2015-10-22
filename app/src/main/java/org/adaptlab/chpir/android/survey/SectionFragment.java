@@ -140,7 +140,7 @@ public class SectionFragment extends Fragment {
             if (!response.saveWithValidation()) {
                 response.save();
             }
-            if (question.getNumberInInstrument() <= mSection.getInstrument().questions().size()) {
+            if (question.getNumberInInstrument() <= mSection.getInstrument().questions().size() && !question.isLastQuestion()) {
                 mQuestionsToAddToPreviousList.add(question.getNumberInInstrument() - 1);
             }
         }

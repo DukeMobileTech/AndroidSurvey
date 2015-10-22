@@ -216,7 +216,11 @@ public class SurveyFragment extends Fragment {
     }
     
     private void updateQuestionText() {
-    	setQuestionText(mQuestionText);
+        if (mQuestion.belongsToGrid()) {
+            setGridLabelText(mQuestionText);
+        } else {
+            setQuestionText(mQuestionText);
+        }
         mQuestionText.setTypeface(mInstrument.getTypeFace(getActivity().getApplicationContext()));
     }
        
@@ -285,11 +289,7 @@ public class SurveyFragment extends Fragment {
     private void refreshView() {
         setParticipantLabel();
         updateQuestionCountLabel();
-        if (mQuestion.belongsToGrid()) {
-            setGridLabelText(mQuestionText);
-        } else {
-            setQuestionText(mQuestionText);
-        }
+        updateQuestionText();
         createQuestionFragment();
     }
 
