@@ -2,7 +2,7 @@ package org.adaptlab.chpir.android.survey;
 
 import android.support.v4.app.Fragment;
 
-public class InstrumentActivity extends SingleFragmentActivity {
+public class InstrumentActivity extends AuthorizedActivity {
 
     @Override
     protected Fragment createFragment() {
