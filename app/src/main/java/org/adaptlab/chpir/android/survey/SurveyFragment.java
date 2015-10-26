@@ -152,6 +152,7 @@ public class SurveyFragment extends Fragment {
         if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) {
         	startLocationServices();
         }
+        AppUtil.authorize(); //To take care of login in case Foreground listener has not registered
     }
     
     private void setupNavigationDrawer() {

@@ -1,6 +1,5 @@
 package org.adaptlab.chpir.android.survey;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 public abstract class AuthorizedActivity extends SingleFragmentActivity implements Foreground.Listener {
@@ -29,9 +28,6 @@ public abstract class AuthorizedActivity extends SingleFragmentActivity implemen
     }
 
     private void authorize() {
-        if (AppUtil.getAdminSettingsInstance().getRequirePassword() && !AuthUtils.isSignedIn()) {
-            Intent i = new Intent(this, LoginActivity.class);
-            startActivity(i);
-        }
+        AppUtil.authorize();
     }
 }

@@ -53,7 +53,7 @@ public class InstrumentFragment extends ListFragment {
 		setHasOptionsMenu(true);
 		setListAdapter(new InstrumentAdapter(Instrument.getAll()));     
 		AppUtil.appInit(getActivity());
-	}
+    }
 
 	private void downloadInstrumentImages() {
 		new DownloadImagesTask(getActivity()).execute();
