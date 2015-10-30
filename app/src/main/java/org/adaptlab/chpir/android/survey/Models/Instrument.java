@@ -170,9 +170,9 @@ public class Instrument extends ReceiveModel {
 
     public static List<Instrument> getAllProjectInstruments(Long projectId) {
         return new Select().from(Instrument.class)
-                .where("ProjectID = ? AND Published = ? AND Deleted != ?", projectId, 1, 1)	//sqlite saves booleans as integers
+                .where("ProjectID = ? AND Published = ? AND Deleted != ?", projectId, 1, 1)
                 .orderBy("Title")
-                .execute();
+                .execute(); //sqlite saves booleans as integers
     }
 
     public static Instrument findByRemoteId(Long id) {

@@ -51,9 +51,9 @@ public class InstrumentFragment extends ListFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(true);
-		setListAdapter(new InstrumentAdapter(Instrument.getAll()));     
 		AppUtil.appInit(getActivity());
-    }
+		setListAdapter(new InstrumentAdapter(Instrument.getAllProjectInstruments(getProjectId())));
+	}
 
 	private void downloadInstrumentImages() {
 		new DownloadImagesTask(getActivity()).execute();
@@ -91,7 +91,7 @@ public class InstrumentFragment extends ListFragment {
 	@Override
 	public void onResume() {
 		super.onResume();
-		setListAdapter(new InstrumentAdapter(Instrument.getAll()));
+		setListAdapter(new InstrumentAdapter(Instrument.getAllProjectInstruments(getProjectId())));
 		createTabs();
 	}
 
@@ -114,7 +114,7 @@ public class InstrumentFragment extends ListFragment {
 							mSurveyListView.setMultiChoiceModeListener(mListener);
 						}
 					} else {
-						setListAdapter(new InstrumentAdapter(Instrument.getAllProjectInstruments(Long.parseLong(AppUtil.getAdminSettingsInstance().getProjectId()))));
+						setListAdapter(new InstrumentAdapter(Instrument.getAllProjectInstruments(getProjectId())));
 					}
 				}
 
@@ -129,6 +129,10 @@ public class InstrumentFragment extends ListFragment {
 			actionBar.addTab(actionBar.newTab().setText(getActivity().getResources().getString(R.string.surveys)).setTabListener(tabListener));
 		}
 	}
+
+    private Long getProjectId() {
+        return Long.parseLong(AppUtil.getAdminSettingsInstance().getProjectId());
+    }
 
 	private MultiChoiceModeListener mListener = new MultiChoiceModeListener() {
 		List<Survey> selected = new ArrayList<Survey>();
@@ -372,7 +376,7 @@ public class InstrumentFragment extends ListFragment {
 			if (isAdded()) {
 				downloadInstrumentImages();
 				if (AppUtil.getAdminSettingsInstance().getProjectId() != null) {
-					setListAdapter(new InstrumentAdapter(Instrument.getAllProjectInstruments(Long.parseLong(AppUtil.getAdminSettingsInstance().getProjectId()))));
+					setListAdapter(new InstrumentAdapter(Instrument.getAllProjectInstruments(getProjectId())));
 				}
 				getActivity().setProgressBarIndeterminateVisibility(false);    
 			}

@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReviewPageFragment extends ListFragment {
-	//public final static String EXTRA_REVIEW_QUESTION_IDS = "org.adaptlab.chpir.android.survey.review_question_ids";
 	public final static String EXTRA_REVIEW_SURVEY_ID = "org.adaptlab.chpir.android.survey.review_survey_id";
     private static final String TAG = "ReviewPageFragment";
     private ArrayList<Question> mSkippedQuestions;
