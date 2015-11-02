@@ -3,6 +3,7 @@ package org.adaptlab.chpir.android.survey;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
@@ -47,7 +48,9 @@ public class SectionFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_section, parent, false);
         TextView numQuestionsLabel = (TextView) view.findViewById(R.id.number_of_questions_label);
-        numQuestionsLabel.setText(getActivity().getResources().getString(R.string.section_number_of_questions) + ":  " + mSection.questions().size());
+        numQuestionsLabel.setText(getActivity().getResources().getString(R.string.section_number_of_questions) + ":  "
+                + mSection.questions().size() + " (#" + mSection.questions().get(0).getNumberInInstrument() + " - #"
+                + mSection.questions().get(mSection.questions().size() - 1).getNumberInInstrument() + ")");
         numQuestionsLabel.setTypeface(Typeface.DEFAULT_BOLD);
 
         mRadioGroup = (RadioGroup) view.findViewById(R.id.default_responses_radio_group);
@@ -125,25 +128,7 @@ public class SectionFragment extends Fragment {
 
     private void setDefaultResponses(int checkedId) {
         String specialResponse = AppUtil.getAdminSettingsInstance().getSpecialResponses().get(checkedId);
-        for (Question question : mSection.questions()) {
-            Response response;
-            if (mSurvey.getResponseByQuestion(question) == null) {
-                response = new Response();
-            } else {
-                response = mSurvey.getResponseByQuestion(question);
-            }
-            response.setQuestion(question);
-            response.setSurvey(mSurvey);
-            response.setSpecialResponse(specialResponse);
-            response.setTimeStarted(new Date());
-            response.setTimeEnded(new Date());
-            if (!response.saveWithValidation()) {
-                response.save();
-            }
-            if (question.getNumberInInstrument() <= mSection.getInstrument().questions().size() && !question.isLastQuestion()) {
-                mQuestionsToAddToPreviousList.add(question.getNumberInInstrument() - 1);
-            }
-        }
+        new DefaultResponsesTask().execute(specialResponse);
     }
 
     private boolean unCheckSpecialSpecialResponses() {
@@ -165,6 +150,33 @@ public class SectionFragment extends Fragment {
             return mSection.getInstrument().questions().get(mSection.getInstrument().questions().size() - 1);
         } else {
             return Question.findByNumberInInstrument(lastQuestionNumber + 1, mSection.getInstrument().getRemoteId());
+        }
+    }
+
+    private class DefaultResponsesTask extends AsyncTask<String, Void, Void> {
+
+        @Override
+        protected Void doInBackground(String... params) {
+            for (Question question : mSection.questions()) {
+                Response response;
+                if (mSurvey.getResponseByQuestion(question) == null) {
+                    response = new Response();
+                } else {
+                    response = mSurvey.getResponseByQuestion(question);
+                }
+                response.setQuestion(question);
+                response.setSurvey(mSurvey);
+                response.setSpecialResponse(params[0]);
+                response.setTimeStarted(new Date());
+                response.setTimeEnded(new Date());
+                if (!response.saveWithValidation()) {
+                    response.save();
+                }
+                if (question.getNumberInInstrument() <= mSection.getInstrument().questions().size() && !question.isLastQuestion()) {
+                    mQuestionsToAddToPreviousList.add(question.getNumberInInstrument() - 1);
+                }
+            }
+            return null;
         }
     }
 }

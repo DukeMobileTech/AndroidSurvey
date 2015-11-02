@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
@@ -51,7 +52,7 @@ public class Section extends ReceiveModel {
             } else {
             	Section deletedSection = Section.findByRemoteId(remoteId);
                 if (deletedSection != null) {
-					Section.delete(Section.class, deletedSection.getId());
+                    new Delete().from(Section.class).where("RemoteId = ?", remoteId).execute();
                 }
             }
             

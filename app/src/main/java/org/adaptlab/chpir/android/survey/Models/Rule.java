@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
@@ -90,7 +91,7 @@ public class Rule extends ReceiveModel {
             } else {
                 Rule deletedRule = Rule.findByRemoteId(remoteId);
                 if (deletedRule != null) {
-                    deletedRule.delete();
+                    new Delete().from(Rule.class).where("RemoteId = ?", remoteId).execute();
                 }
             }
         } catch (JSONException je) {

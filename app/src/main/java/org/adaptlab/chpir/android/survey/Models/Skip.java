@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
@@ -36,7 +37,7 @@ public class Skip extends ReceiveModel {
             } else {
             	Skip deletedSkip = Skip.findByRemoteId(remoteId);
             	if (deletedSkip != null) {
-            		Skip.delete(Skip.class, getId());
+					new Delete().from(Skip.class).where("RemoteId = ?", remoteId).execute();
             	}
             }
 		} catch (JSONException je) {
