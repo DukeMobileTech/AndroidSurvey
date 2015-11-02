@@ -85,12 +85,14 @@ public class SurveyFragment extends Fragment {
     private String mMetadata;
     private Question mResumeQuestion = null;
     private Grid mGrid;
+    private Section mSection;
     
     // mPreviousQuestions is a Stack, however Android does not allow you
     // to save a Stack to the savedInstanceState, so it is represented as
     // an Integer array.
     private ArrayList<Integer> mPreviousQuestions;
     private ArrayList<Integer> mQuestionsToSkip;
+    private ArrayList<Section> mSections;
 
     private TextView mQuestionText;
     private TextView mQuestionIndex;
@@ -106,7 +108,6 @@ public class SurveyFragment extends Fragment {
     private ActionBarDrawerToggle mDrawerToggle;
     private String mDrawerTitle;
     private String mTitle;
-    private ArrayList<Section> mSections;
     private String[] mSectionTitles;
     private boolean mNavDrawerSet = false;
     private boolean showSectionView = true;
@@ -207,6 +208,7 @@ public class SurveyFragment extends Fragment {
     }
     
     private void moveToSection(Section section) {
+        mSection = section;
     	mPreviousQuestions.add(mQuestionNumber);
         Intent i = new Intent(getActivity(), SectionActivity.class);
         Bundle args = new Bundle();
@@ -320,6 +322,7 @@ public class SurveyFragment extends Fragment {
             mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
             mInstrument = Instrument.findByRemoteId(instrumentId);
             mSurvey = Model.load(Survey.class, surveyId);
+            if (mQuestion.getSection() != null && mQuestion.getSection() == mSection) showSectionView = false;
             if (previousQuestions != null) mPreviousQuestions.addAll(previousQuestions);
             if (previousQuestion == mQuestion) showSectionView = false;
         }
