@@ -19,15 +19,15 @@ public class Rule extends ReceiveModel {
     
     @Column(name = "RuleType")
     private RuleType mRuleType;
-    @Column(name = "Instrument")
-    private Instrument mInstrument;
     @Column(name = "Params")
     private String mParams;
     @Column(name = "StoredValues")
     private String mStoredValues;
     @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
     private Long mRemoteId;
-    
+    @Column(name = "InstrumentRemoteId")
+    private Long mInstrumentRemoteId;
+
     public static enum RuleType {
       INSTRUMENT_SURVEY_LIMIT_RULE, INSTRUMENT_TIMING_RULE, INSTRUMENT_SURVEY_LIMIT_PER_MINUTE_RULE,
       INSTRUMENT_LAUNCH_RULE, PARTICIPANT_TYPE_RULE, PARTICIPANT_AGE_RULE
@@ -82,7 +82,7 @@ public class Rule extends ReceiveModel {
             
             if (AppUtil.DEBUG) Log.i(TAG, "Creating object from JSON Object: " + jsonObject);
             rule.setRuleType(jsonObject.getString("rule_type"));
-            rule.setInstrument(Instrument.findByRemoteId(jsonObject.getLong("instrument_id")));
+            rule.setInstrumentRemoteId(jsonObject.getLong("instrument_id"));
             rule.setParams(jsonObject.getString("rule_params"));
             rule.setRemoteId(remoteId);
             if (jsonObject.isNull("deleted_at")) {
@@ -116,7 +116,7 @@ public class Rule extends ReceiveModel {
     }
     
     public Instrument getInstrument() {
-        return mInstrument;
+        return Instrument.findByRemoteId(getInstrumentRemoteId());
     }
     
     public <T> void setStoredValue(String key, T value) {
@@ -157,8 +157,12 @@ public class Rule extends ReceiveModel {
         mParams = params;
     }
     
-    private void setInstrument(Instrument instrument) {
-        mInstrument = instrument;
+    private void setInstrumentRemoteId(Long instrumentId) {
+        mInstrumentRemoteId = instrumentId;
+    }
+
+    private Long getInstrumentRemoteId() {
+        return mInstrumentRemoteId;
     }
     
     private void setRemoteId(Long id) {

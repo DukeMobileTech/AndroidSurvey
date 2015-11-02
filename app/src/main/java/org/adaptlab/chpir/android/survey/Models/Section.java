@@ -20,14 +20,14 @@ public class Section extends ReceiveModel {
 	
 	@Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
     private Long mRemoteId;
-	@Column(name = "Instrument", onUpdate = Column.ForeignKeyAction.CASCADE, onDelete = Column.ForeignKeyAction.CASCADE)
-    private Instrument mInstrument;
 	@Column(name = "Title")
     private String mTitle;
 	@Column(name = "FirstQuestionNumber")
 	private int mFirstQuestionNumber;
 	@Column(name = "SectionNumber")
 	private int mSectionNumber;
+    @Column(name = "InstrumentRemoteId")
+    private Long mInstrumentRemoteId;
 
 	@Override
 	public void createObjectFromJSON(JSONObject jsonObject) {
@@ -38,7 +38,7 @@ public class Section extends ReceiveModel {
             	section = this;
             }
             section.setRemoteId(remoteId);
-            section.setInstrument(Instrument.findByRemoteId(jsonObject.getLong("instrument_id")));
+            section.setInstrumentRemoteId(jsonObject.getLong("instrument_id"));
             section.setTitle(jsonObject.getString("title"));
 			if (!jsonObject.isNull(jsonObject.getString("first_question_number"))) {
                 section.setFirstQuestionNumber(jsonObject.getInt("first_question_number"));
@@ -97,12 +97,12 @@ public class Section extends ReceiveModel {
                 .execute();
     }
 
-	public void setInstrument(Instrument instrument) {
-		mInstrument = instrument;
+	public void setInstrumentRemoteId(Long instrumentId) {
+		mInstrumentRemoteId = instrumentId;
 	}
 	
 	public Instrument getInstrument() {
-		return mInstrument;
+		return Instrument.findByRemoteId(getInstrumentRemoteId());
 	}
 
 	private void setRemoteId(Long remoteId) {
@@ -124,6 +124,10 @@ public class Section extends ReceiveModel {
 	private void setSectionNumber(int sectionNumber) {
 		mSectionNumber = sectionNumber;
 	}
+
+    private Long getInstrumentRemoteId() {
+        return mInstrumentRemoteId;
+    }
 
 	/*
      * If the language of the instrument is the same as the language setting on the

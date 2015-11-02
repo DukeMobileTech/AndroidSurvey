@@ -1,13 +1,13 @@
 package org.adaptlab.chpir.android.survey;
 
-import org.adaptlab.chpir.android.survey.Models.Instrument;
-import org.adaptlab.chpir.android.survey.Models.Option;
-import org.adaptlab.chpir.android.survey.Models.Question;
-
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
+
+import org.adaptlab.chpir.android.survey.Models.Instrument;
+import org.adaptlab.chpir.android.survey.Models.Option;
+import org.adaptlab.chpir.android.survey.Models.Question;
 
 public class DatabaseSeed {
     private final static String TAG = "DatabaseSeed";
@@ -59,7 +59,7 @@ public class DatabaseSeed {
     private static Question createQuestion(Instrument i, String qid,
             String qtype, String text, Long remoteId) {
         Question q = new Question();
-        q.setInstrument(i);
+        q.setInstrumentRemoteId(i.getRemoteId());
         q.setQuestionIdentifier(qid);
         q.setQuestionType(qtype);
         q.setText(text);

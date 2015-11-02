@@ -1,16 +1,16 @@
 package org.adaptlab.chpir.android.survey.Models;
 
-import java.util.Date;
-import java.util.List;
-
-import org.adaptlab.chpir.android.survey.R;
-
 import android.content.Context;
 import android.content.res.Resources;
 
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.query.Select;
+
+import org.adaptlab.chpir.android.survey.R;
+
+import java.util.Date;
+import java.util.List;
 
 public class EventLog extends Model {
     private final static String TAG = "EVENT";
@@ -24,10 +24,10 @@ public class EventLog extends Model {
     private EventType mEventType;
     @Column(name = "SurveyIdentifier")
     private String mSurveyIdentifier;
-    @Column(name = "Instrument")
-    private Instrument mInstrument;
     @Column(name = "Timestamp")
-    private Date mTimestamp; 
+    private Date mTimestamp;
+    @Column(name = "InstrumentRemoteId")
+    private Long mInstrumentRemoteId;
     
     public EventLog(EventType eventType, Context context) {
         super();
@@ -40,8 +40,12 @@ public class EventLog extends Model {
         return new Select().from(EventLog.class).orderBy("Id ASC").execute();
     }
     
-    public void setInstrument(Instrument instrument) {
-        mInstrument = instrument;
+    public void setInstrumentRemoteId(Long instrumentId) {
+        mInstrumentRemoteId = instrumentId;
+    }
+
+    private Long getInstrumentRemoteId() {
+        return mInstrumentRemoteId;
     }
     
     public void setSurveyIdentifier(String identifier) {
@@ -49,7 +53,7 @@ public class EventLog extends Model {
     }
     
     public Instrument getInstrument() {
-        return mInstrument;
+        return Instrument.findByRemoteId(getInstrumentRemoteId());
     }
     
     public String getSurveyIdentifier() {
@@ -64,7 +68,7 @@ public class EventLog extends Model {
         Resources r = context.getResources();
         
         if (mEventType == EventType.SENT_SURVEY) {
-            return r.getString(R.string.event_log_sent_survey, mInstrument.getTitle(), mSurveyIdentifier);
+            return r.getString(R.string.event_log_sent_survey, getInstrument().getTitle(), mSurveyIdentifier);
         }
         
         return "";

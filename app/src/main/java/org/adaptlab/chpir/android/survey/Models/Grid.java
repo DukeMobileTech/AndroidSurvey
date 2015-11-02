@@ -1,29 +1,28 @@
 package org.adaptlab.chpir.android.survey.Models;
 
-import java.util.List;
-
-import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
-import org.adaptlab.chpir.android.survey.AppUtil;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.util.Log;
 
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
+import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.List;
+
 @Table(name = "Grids")
 public class Grid extends ReceiveModel {
 	private static final String TAG = "Grid"; 
 	@Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
     private Long mRemoteId;
-	@Column(name = "Instrument")
-    private Instrument mInstrument;
 	@Column(name = "Name")
     private String mName;
 	@Column(name = "QuestionType")
 	private String mQuestionType;
+	@Column(name = "InstrumentRemoteId")
+	private Long mInstrumentRemoteId;
 	
 	@Override
 	public void createObjectFromJSON(JSONObject jsonObject) {
@@ -36,7 +35,7 @@ public class Grid extends ReceiveModel {
 			grid.setRemoteId(remoteId);
 			grid.setQuestionType(jsonObject.getString("question_type"));
 			grid.setName(jsonObject.getString("name"));
-			grid.setInstrument(Instrument.findByRemoteId(jsonObject.getLong("instrument_id")));
+			grid.setInstrumentRemoteId(jsonObject.getLong("instrument_id"));
 			grid.save();
 		} catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);
@@ -70,8 +69,8 @@ public class Grid extends ReceiveModel {
 		return mName;
 	}
 	
-	private void setInstrument(Instrument instrument) {
-		mInstrument = instrument;
+	private void setInstrumentRemoteId(Long instrumentId) {
+		mInstrumentRemoteId = instrumentId;
 	}
 
 	private void setName(String name) {

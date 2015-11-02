@@ -120,7 +120,7 @@ public class AppUtil {
     }
 
     public static void authorize() {
-        if (AppUtil.getAdminSettingsInstance().getRequirePassword() && !AuthUtils.isSignedIn()) {
+        if (AppUtil.getAdminSettingsInstance() != null && AppUtil.getAdminSettingsInstance().getRequirePassword() && !AuthUtils.isSignedIn()) {
             Intent i = new Intent(getContext(), LoginActivity.class);
             getContext().startActivity(i);
         }

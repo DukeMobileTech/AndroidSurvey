@@ -5,16 +5,23 @@ import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.CursorAdapter;
 import android.text.InputType;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -27,8 +34,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.activeandroid.content.ContentProvider;
+
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.activerecordcloudsync.NetworkNotificationUtils;
+import org.adaptlab.chpir.android.survey.Models.AdminSettings;
 import org.adaptlab.chpir.android.survey.Models.Instrument;
 import org.adaptlab.chpir.android.survey.Models.Response;
 import org.adaptlab.chpir.android.survey.Models.Survey;
@@ -42,507 +52,544 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class InstrumentFragment extends ListFragment {
-	public final static String TAG = "InstrumentFragment";
-	private List<Survey> mSurveys;
-	private SurveyAdapter mSurveyAdapter;
-	private ListView mSurveyListView;
+    public final static String TAG = "InstrumentFragment";
+    private List<Survey> mSurveys;
+    private SurveyAdapter mSurveyAdapter;
+    private InstrumentAdapter mInstrumentAdapter;
+    private ListView mSurveyListView;
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setHasOptionsMenu(true);
-		AppUtil.appInit(getActivity());
-		setListAdapter(new InstrumentAdapter(Instrument.getAllProjectInstruments(getProjectId())));
-	}
 
-	private void downloadInstrumentImages() {
-		new DownloadImagesTask(getActivity()).execute();
-	}
-
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		super.onCreateOptionsMenu(menu, inflater);
-		inflater.inflate(R.menu.fragment_instrument, menu);
-	}
-
-	@Override
-	public void onPrepareOptionsMenu(Menu menu) {
-		super.onPrepareOptionsMenu(menu);
-		if (getResources().getBoolean(R.bool.default_admin_settings)) {
-			menu.findItem(R.id.menu_item_admin).setEnabled(false);
-			menu.findItem(R.id.menu_item_admin).setVisible(false);
-		}
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.menu_item_admin:
-			displayPasswordPrompt();
-			return true;
-		case R.id.menu_item_refresh:
-			new RefreshInstrumentsTask().execute();
-			return true;
-		default:
-			return super.onOptionsItemSelected(item);
-		}
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		setListAdapter(new InstrumentAdapter(Instrument.getAllProjectInstruments(getProjectId())));
-		createTabs();
-	}
-
-	public void createTabs() {
-		if (AppUtil.getAdminSettingsInstance().getShowSurveys()) {
-			final ActionBar actionBar = getActivity().getActionBar();     
-			ActionBar.TabListener tabListener = new ActionBar.TabListener() {    
-				@Override
-				public void onTabSelected(Tab tab,
-						android.app.FragmentTransaction ft) {
-					if (tab.getText().equals(getActivity().getResources().getString(R.string.surveys))) {
-						if (Survey.getAll().isEmpty()) {
-							setListAdapter(null);
-						} else {
-							mSurveys = Survey.getAllProjectSurveys(Long.parseLong(AppUtil.getAdminSettingsInstance().getProjectId()));
-							mSurveyAdapter = new SurveyAdapter(mSurveys);
-							setListAdapter(mSurveyAdapter);
-							mSurveyListView = getListView();
-							mSurveyListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-							mSurveyListView.setMultiChoiceModeListener(mListener);
-						}
-					} else {
-						setListAdapter(new InstrumentAdapter(Instrument.getAllProjectInstruments(getProjectId())));
-					}
-				}
-
-				// Required by interface
-				public void onTabUnselected(Tab tab, android.app.FragmentTransaction ft) { }
-				public void onTabReselected(Tab tab, android.app.FragmentTransaction ft) { }
-			};
-
-			actionBar.removeAllTabs();
-			actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-			actionBar.addTab(actionBar.newTab().setText(getActivity().getResources().getString(R.string.instruments)).setTabListener(tabListener));
-			actionBar.addTab(actionBar.newTab().setText(getActivity().getResources().getString(R.string.surveys)).setTabListener(tabListener));
-		}
-	}
-
-    private Long getProjectId() {
-        return Long.parseLong(AppUtil.getAdminSettingsInstance().getProjectId());
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        AppUtil.appInit(getActivity());
+        setHasOptionsMenu(true);
     }
 
-	private MultiChoiceModeListener mListener = new MultiChoiceModeListener() {
-		List<Survey> selected = new ArrayList<Survey>();
-		@Override
-		public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-			Survey survey = mSurveys.get(position);
-			if (checked) {
-				selected.add(survey);
-				mSurveyAdapter.setNewSelection(position, true);
-			} else {
-				selected.remove(survey);
-				mSurveyAdapter.setNewSelection(position, false);
-			}  
-		}
+    private void setInstrumentListViewAdapter() {
+        if (getProjectId() != Long.MAX_VALUE) {
+            Cursor instrumentsCursor = Instrument.getProjectInstrumentsCursor(getProjectId());
+            mInstrumentAdapter = new InstrumentAdapter(getActivity(), instrumentsCursor, 0);
+            setListAdapter(mInstrumentAdapter);
 
-		@Override
-		public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			switch (item.getItemId()) {
-			case R.id.menu_delete_item:
-				showDeleteSurveysWarning();
-				mode.finish();
-				return true;
-			default:
-				return false;
-			}
-		}
+            //Manage cursor loaders across activity lifecycle
+            getActivity().getSupportLoaderManager().initLoader(0, null, new LoaderManager.LoaderCallbacks<Cursor>() {
+                @Override
+                public Loader<Cursor> onCreateLoader(int arg0, Bundle cursor) {
+                    String selection = "ProjectID = ? AND Published = ? AND Deleted = ?";
+                    String[] selectionArgs = {getProjectId().toString(), "1", "0"};
+                    String orderBy = "Title";
+                    return new CursorLoader(
+                            getActivity(),
+                            ContentProvider.createUri(Instrument.class, null),
+                            null,
+                            selection,
+                            selectionArgs,
+                            orderBy
+                    );
+                }
 
-		private void showDeleteSurveysWarning() {
-			new AlertDialog.Builder(getActivity())
-			.setTitle(R.string.delete_surveys_title)
-			.setMessage(R.string.delete_surveys_message)
-			.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int id) {
-					mSurveys.removeAll(selected);
-					deleteSurveys();
-					mSurveyAdapter.notifyDataSetChanged();
-				}
-			})
-			.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int id) {}
-			})
-			.show();
-		}
+                @Override
+                public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
+                    mInstrumentAdapter.swapCursor(cursor);
+                }
 
-		private void deleteSurveys() {
-			for(Survey survey : selected) {
-				for(Response response : survey.responses()) {
-					response.delete();
-				}
-				survey.delete();
-			}
-		}
+                @Override
+                public void onLoaderReset(Loader<Cursor> arg0) {
+                    mInstrumentAdapter.swapCursor(null);
+                }
+            });
+        }
+    }
 
-		@Override
-		public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-			MenuInflater inflater = mode.getMenuInflater();
-			inflater.inflate(R.menu.list_view_item_delete, menu);
-			return true;
-		}
+    private void downloadInstrumentImages() {
+        new DownloadImagesTask(getActivity()).execute();
+    }
 
-		@Override
-		public void onDestroyActionMode(ActionMode mode) {
-			mSurveyAdapter.clearSelection();
-			mSurveyAdapter.notifyDataSetChanged();
-		}
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.fragment_instrument, menu);
+    }
 
-		@Override
-		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			return true;
-		}
-	};
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        if (getResources().getBoolean(R.bool.default_admin_settings)) {
+            menu.findItem(R.id.menu_item_admin).setEnabled(false);
+            menu.findItem(R.id.menu_item_admin).setVisible(false);
+        }
+    }
 
-	private class InstrumentAdapter extends ArrayAdapter<Instrument> {
-		public InstrumentAdapter(List<Instrument> instruments) {
-			super(getActivity(), 0, instruments);
-		}
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_item_admin:
+                displayPasswordPrompt();
+                return true;
+            case R.id.menu_item_refresh:
+                new RefreshInstrumentsTask().execute();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
-		@SuppressLint("InflateParams")
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			if (convertView == null) {
-				convertView = getActivity().getLayoutInflater().inflate(
-						R.layout.list_item_instrument, null);
-			}
-			if (position % 2 == 0) {
-				convertView.setBackgroundResource(R.drawable.list_background_color);
-			} else {
-				convertView.setBackgroundResource(R.drawable.list_background_color_alternate);
-			}
+    @Override
+    public void onResume() {
+        super.onResume();
+        setInstrumentListViewAdapter();
+        createTabs();
+    }
 
-			Instrument instrument = getItem(position);
+    public void createTabs() {
+        if (AppUtil.getAdminSettingsInstance().getShowSurveys()) {
+            final ActionBar actionBar = getActivity().getActionBar();
+            ActionBar.TabListener tabListener = new ActionBar.TabListener() {
+                @Override
+                public void onTabSelected(Tab tab,
+                                          android.app.FragmentTransaction ft) {
+                    if (tab.getText().equals(getActivity().getResources().getString(R.string.surveys))) {
+                        if (Survey.getAll().isEmpty()) {
+                            setListAdapter(null);
+                        } else {
+                            mSurveys = Survey.getAllProjectSurveys(Long.parseLong(AppUtil.getAdminSettingsInstance().getProjectId()));
+                            mSurveyAdapter = new SurveyAdapter(mSurveys);
+                            setListAdapter(mSurveyAdapter);
+                            mSurveyListView = getListView();
+                            mSurveyListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+                            mSurveyListView.setMultiChoiceModeListener(mListener);
+                        }
+                    } else {
+                        setInstrumentListViewAdapter();
+                    }
+                }
 
-			TextView titleTextView = (TextView) convertView
-					.findViewById(R.id.instrument_list_item_titleTextView);
-			titleTextView.setText(instrument.getTitle());
-			titleTextView.setTypeface(instrument.getTypeFace(getActivity().getApplicationContext()));
-			titleTextView.setTextColor(Color.BLACK);
+                // Required by interface
+                public void onTabUnselected(Tab tab, android.app.FragmentTransaction ft) { }
+                public void onTabReselected(Tab tab, android.app.FragmentTransaction ft) { }
+            };
 
-			new SetInstrumentLabelTask().execute(new InstrumentListLabel(instrument, titleTextView));
+            actionBar.removeAllTabs();
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+            actionBar.addTab(actionBar.newTab().setText(getActivity().getResources().getString(R.string.instruments)).setTabListener(tabListener));
+            actionBar.addTab(actionBar.newTab().setText(getActivity().getResources().getString(R.string.surveys)).setTabListener(tabListener));
+        }
+    }
 
-			TextView questionCountTextView = (TextView) convertView
-					.findViewById(R.id.instrument_list_item_questionCountTextView);
+    private Long getProjectId() {
+        AdminSettings adminSettings = AppUtil.getAdminSettingsInstance();
+        if (adminSettings.getProjectId() != null) return Long.parseLong(adminSettings.getProjectId());
+        return Long.MAX_VALUE;
+    }
 
-			int numQuestions = instrument.questions().size();
-			questionCountTextView.setText(numQuestions + " "
-					+ FormatUtils.pluralize(numQuestions, getString(R.string.question), getString(R.string.questions)));
+    private MultiChoiceModeListener mListener = new MultiChoiceModeListener() {
+        List<Survey> selected = new ArrayList<Survey>();
+        @Override
+        public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+            Survey survey = mSurveys.get(position);
+            if (checked) {
+                selected.add(survey);
+                mSurveyAdapter.setNewSelection(position, true);
+            } else {
+                selected.remove(survey);
+                mSurveyAdapter.setNewSelection(position, false);
+            }
+        }
 
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.menu_delete_item:
+                    showDeleteSurveysWarning();
+                    mode.finish();
+                    return true;
+                default:
+                    return false;
+            }
+        }
 
-			TextView instrumentVersionTextView = (TextView) (TextView) convertView.findViewById(R.id.instrument_list_item_instrumentVersionTextView);
-			instrumentVersionTextView.setText(getString(R.string.version) + ": " + instrument.getVersionNumber());
+        private void showDeleteSurveysWarning() {
+            new AlertDialog.Builder(getActivity())
+                    .setTitle(R.string.delete_surveys_title)
+                    .setMessage(R.string.delete_surveys_message)
+                    .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            mSurveys.removeAll(selected);
+                            deleteSurveys();
+                            mSurveyAdapter.notifyDataSetChanged();
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {}
+                    })
+                    .show();
+        }
 
-			return convertView;
-		}
-	}
+        private void deleteSurveys() {
+            for(Survey survey : selected) {
+                for(Response response : survey.responses()) {
+                    response.delete();
+                }
+                survey.delete();
+            }
+        }
 
-	private class SurveyAdapter extends ArrayAdapter<Survey> {
-		private SparseBooleanArray mSelectionViews = new SparseBooleanArray();
-		
-		public SurveyAdapter(List<Survey> surveys) {
-			super(getActivity(), 0, surveys);
-		}
-		
-		public void setNewSelection(int position, boolean value) {
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            MenuInflater inflater = mode.getMenuInflater();
+            inflater.inflate(R.menu.list_view_item_delete, menu);
+            return true;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            mSurveyAdapter.clearSelection();
+            mSurveyAdapter.notifyDataSetChanged();
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return true;
+        }
+    };
+
+    private class InstrumentAdapter extends CursorAdapter {
+
+        public InstrumentAdapter(Context context, Cursor cursor, int flags) {
+            super(context, cursor, 0);
+        }
+
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            return LayoutInflater.from(context).inflate(R.layout.list_item_instrument, parent, false);
+        }
+
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+            if (cursor.getPosition() % 2 == 0) {
+                view.setBackgroundResource(R.drawable.list_background_color);
+            } else {
+                view.setBackgroundResource(R.drawable.list_background_color_alternate);
+            }
+
+            TextView titleTextView = (TextView) view.findViewById(R.id.instrument_list_item_titleTextView);
+            TextView questionCountTextView = (TextView) view.findViewById(R.id.instrument_list_item_questionCountTextView);
+            TextView instrumentVersionTextView = (TextView) view.findViewById(R.id.instrument_list_item_instrumentVersionTextView);
+
+            String title = cursor.getString(cursor.getColumnIndexOrThrow("Title"));
+            Long remoteId = cursor.getLong(cursor.getColumnIndexOrThrow("RemoteId"));
+            Instrument instrument = Instrument.findByRemoteId(remoteId);
+            int numQuestions = instrument.questions().size();
+
+            titleTextView.setText(title);
+            titleTextView.setTypeface(instrument.getTypeFace(getActivity().getApplicationContext()));
+            titleTextView.setTextColor(Color.BLACK);
+            questionCountTextView.setText(numQuestions + " " + FormatUtils.pluralize(numQuestions, getString(R.string.question), getString(R.string.questions)));
+            instrumentVersionTextView.setText(getString(R.string.version) + ": " + instrument.getVersionNumber());
+
+            new SetInstrumentLabelTask().execute(new InstrumentListLabel(instrument, titleTextView));
+        }
+    }
+
+    private class SurveyAdapter extends ArrayAdapter<Survey> {
+        private SparseBooleanArray mSelectionViews = new SparseBooleanArray();
+
+        public SurveyAdapter(List<Survey> surveys) {
+            super(getActivity(), 0, surveys);
+        }
+
+        public void setNewSelection(int position, boolean value) {
             mSelectionViews.put(position, value);
             notifyDataSetChanged();
         }
-  
+
         public boolean isPositionChecked(int position) {
             Boolean result = mSelectionViews.get(position);
             return result == null ? false : result;
         }
-  
+
         public void clearSelection() {
             mSelectionViews.clear();
             notifyDataSetChanged();
         }
 
-		@SuppressLint("InflateParams")
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			if (convertView == null) {
-				convertView = getActivity().getLayoutInflater().inflate(R.layout.list_item_survey, null);
-			}
-			if (position % 2 == 0) {
-				convertView.setBackgroundResource(R.drawable.list_background_color);
-			} else {
-				convertView.setBackgroundResource(R.drawable.list_background_color_alternate);
-			}
-			
-			if (mSelectionViews != null && mSurveyAdapter.isPositionChecked(position) != false) {
-				convertView.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_light));
-			}
+        @SuppressLint("InflateParams")
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                convertView = getActivity().getLayoutInflater().inflate(R.layout.list_item_survey, null);
+            }
+            if (position % 2 == 0) {
+                convertView.setBackgroundResource(R.drawable.list_background_color);
+            } else {
+                convertView.setBackgroundResource(R.drawable.list_background_color_alternate);
+            }
 
-			Survey survey = getItem(position);
+            if (mSelectionViews != null && mSurveyAdapter.isPositionChecked(position) != false) {
+                convertView.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_light));
+            }
 
-			TextView titleTextView = (TextView) convertView
-					.findViewById(R.id.survey_list_item_titleTextView);
-			titleTextView.setText(survey.identifier(getActivity()));
-			titleTextView.setTypeface(survey.getInstrument().getTypeFace(getActivity().getApplicationContext()));
+            Survey survey = getItem(position);
 
-			TextView progressTextView = (TextView) convertView.findViewById(R.id.survey_list_item_progressTextView);            
-			progressTextView.setText(survey.responses().size() + " " + getString(R.string.of) + " " + survey.getInstrument().questions().size());
+            TextView titleTextView = (TextView) convertView
+                    .findViewById(R.id.survey_list_item_titleTextView);
+            titleTextView.setText(survey.identifier(getActivity()));
+            titleTextView.setTypeface(survey.getInstrument().getTypeFace(getActivity().getApplicationContext()));
 
-			if (survey.readyToSend()) {
-				progressTextView.setTextColor(Color.GREEN);
-			} else {
-				progressTextView.setTextColor(Color.RED);
-			}
+            TextView progressTextView = (TextView) convertView.findViewById(R.id.survey_list_item_progressTextView);
+            progressTextView.setText(survey.responses().size() + " " + getString(R.string.of) + " " + survey.getInstrument().questions().size());
 
-			TextView instrumentTitleTextView = (TextView) convertView.findViewById(R.id.survey_list_item_instrumentTextView);
-			instrumentTitleTextView.setText(survey.getInstrument().getTitle());
+            if (survey.readyToSend()) {
+                progressTextView.setTextColor(Color.GREEN);
+            } else {
+                progressTextView.setTextColor(Color.RED);
+            }
 
-			TextView lastUpdatedTextView = (TextView) convertView.findViewById(R.id.survey_list_item_lastUpdatedTextView);
-			SimpleDateFormat df = new SimpleDateFormat("HH:mm yyyy-MM-dd");
-			lastUpdatedTextView.setText(df.format(survey.getLastUpdated()));
+            TextView instrumentTitleTextView = (TextView) convertView.findViewById(R.id.survey_list_item_instrumentTextView);
+            instrumentTitleTextView.setText(survey.getInstrument().getTitle());
 
-			return convertView;
-		}
-	}
+            TextView lastUpdatedTextView = (TextView) convertView.findViewById(R.id.survey_list_item_lastUpdatedTextView);
+            SimpleDateFormat df = new SimpleDateFormat("HH:mm yyyy-MM-dd");
+            lastUpdatedTextView.setText(df.format(survey.getLastUpdated()));
 
-	@Override
-	public void onListItemClick(ListView l, View v, int position, long id) {
-		if (l.getAdapter() instanceof InstrumentAdapter) {
-			Instrument instrument = ((InstrumentAdapter) getListAdapter()).getItem(position);
-			if (instrument == null) return;            
-			new LoadInstrumentTask().execute(instrument);
-		} else if (l.getAdapter() instanceof SurveyAdapter) {
-			Survey survey = ((SurveyAdapter) getListAdapter()).getItem(position);
-			if (survey == null) return;
-			new LoadSurveyTask().execute(survey);            
-		}
-	}
+            return convertView;
+        }
+    }
 
-	/*
-	 * Only display admin area if correct password.
-	 */
-	private void displayPasswordPrompt() {
-		final EditText input = new EditText(getActivity());
-		input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-		new AlertDialog.Builder(getActivity())
-		.setTitle(R.string.password_title)
-		.setMessage(R.string.password_message)
-		.setView(input)
-		.setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() { 
-			public void onClick(DialogInterface dialog, int button) {
-				if (AppUtil.checkAdminPassword(input.getText().toString())) {
-					Intent i = new Intent(getActivity(), AdminActivity.class);
-					startActivity(i);
-				} else {
-					Toast.makeText(getActivity(), R.string.incorrect_password, Toast.LENGTH_LONG).show();
-				}
-			}
-		}).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int button) { }
-		}).show();
-	}
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        if (l.getAdapter() instanceof InstrumentAdapter) {
+            Cursor cursor = ((InstrumentAdapter) l.getAdapter()).getCursor();
+            cursor.moveToPosition(position);
+            Long instrumentRemoteId = cursor.getLong(cursor.getColumnIndexOrThrow("RemoteId"));
+            Instrument instrument = Instrument.findByRemoteId(instrumentRemoteId);
+            if (instrument == null) return;
+            new LoadInstrumentTask().execute(instrument);
+        } else if (l.getAdapter() instanceof SurveyAdapter) {
+            Survey survey = ((SurveyAdapter) getListAdapter()).getItem(position);
+            if (survey == null) return;
+            new LoadSurveyTask().execute(survey);
+        }
+    }
 
-	/*
-	 * Refresh the receive tables from the server
-	 */
-	private class RefreshInstrumentsTask extends AsyncTask<Void, Void, Void> {
+    /*
+     * Only display admin area if correct password.
+     */
+    private void displayPasswordPrompt() {
+        final EditText input = new EditText(getActivity());
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.password_title)
+                .setMessage(R.string.password_message)
+                .setView(input)
+                .setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int button) {
+                        if (AppUtil.checkAdminPassword(input.getText().toString())) {
+                            Intent i = new Intent(getActivity(), AdminActivity.class);
+                            startActivity(i);
+                        } else {
+                            Toast.makeText(getActivity(), R.string.incorrect_password, Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int button) { }
+        }).show();
+    }
 
-		@Override
-		protected void onPreExecute() {
-			getActivity().setProgressBarIndeterminateVisibility(true);
-			setListAdapter(null);            
-		}
+    /*
+     * Refresh the receive tables from the server
+     */
+    private class RefreshInstrumentsTask extends AsyncTask<Void, Void, Void> {
 
-		@Override
-		protected Void doInBackground(Void... params) {
-			if (isAdded() && NetworkNotificationUtils.checkForNetworkErrors(getActivity())) {
-				ActiveRecordCloudSync.syncSendTables(getActivity());
-				ActiveRecordCloudSync.syncReceiveTables(getActivity());
-			}
+        @Override
+        protected void onPreExecute() {
+            getActivity().setProgressBarIndeterminateVisibility(true);
+            setListAdapter(null);
+        }
 
-			return null;
-		}
+        @Override
+        protected Void doInBackground(Void... params) {
+            if (isAdded() && NetworkNotificationUtils.checkForNetworkErrors(getActivity())) {
+                ActiveRecordCloudSync.syncSendTables(getActivity());
+                ActiveRecordCloudSync.syncReceiveTables(getActivity());
+            }
 
-		@Override
-		protected void onPostExecute(Void param) {
-			if (isAdded()) {
-				downloadInstrumentImages();
-				if (AppUtil.getAdminSettingsInstance().getProjectId() != null) {
-					setListAdapter(new InstrumentAdapter(Instrument.getAllProjectInstruments(getProjectId())));
-				}
-				getActivity().setProgressBarIndeterminateVisibility(false);    
-			}
-		}        
-	}
+            return null;
+        }
 
-	/*
-	 * Check that the instrument has been fully loaded from the server before allowing
-	 * user to begin survey.
-	 */
-	private class LoadInstrumentTask extends AsyncTask<Instrument, Void, Long> {
-		ProgressDialog mProgressDialog;
+        @Override
+        protected void onPostExecute(Void param) {
+            if (isAdded()) {
+                downloadInstrumentImages();
+                if (AppUtil.getAdminSettingsInstance().getProjectId() != null) {
+                    setInstrumentListViewAdapter();
+                }
+                getActivity().setProgressBarIndeterminateVisibility(false);
+            }
+        }
+    }
 
-		@Override
-		protected void onPreExecute() {
-			mProgressDialog = ProgressDialog.show(
-					getActivity(),
-					getString(R.string.instrument_loading_progress_header),
-					getString(R.string.instrument_loading_progress_message)
-					); 
-		}
+    /*
+     * Check that the instrument has been fully loaded from the server before allowing
+     * user to begin survey.
+     */
+    private class LoadInstrumentTask extends AsyncTask<Instrument, Void, Long> {
+        ProgressDialog mProgressDialog;
 
-		/*
-		 * If instrument is loaded, return the instrument id.
-		 * If not, return -1.
-		 */
-		@Override
-		protected Long doInBackground(Instrument... params) {
-			Instrument instrument = params[0];
-			if (instrument.loaded()) {
-				return instrument.getRemoteId();
-			} else {
-				return Long.valueOf(-1);
-			}
-		}
+        @Override
+        protected void onPreExecute() {
+            mProgressDialog = ProgressDialog.show(
+                    getActivity(),
+                    getString(R.string.instrument_loading_progress_header),
+                    getString(R.string.instrument_loading_progress_message)
+            );
+        }
 
-		@Override
-		protected void onPostExecute(final Long instrumentId) {
-			try {
-				mProgressDialog.dismiss();  
-			} catch (IllegalArgumentException iae) { 
-				Log.e(TAG, "Tried to close progress dialog that does not exist.");
-			}
-			if (isAdded()){
-				if (instrumentId == Long.valueOf(-1)) {
-					Toast.makeText(getActivity(), R.string.instrument_not_loaded, Toast.LENGTH_LONG).show();
-				} else {
-					new RuleBuilder(getActivity())
-					.addRule(new InstrumentLaunchRule(Instrument.findByRemoteId(instrumentId),
-							getActivity().getString(R.string.rule_failure_instrument_launch)))
-							.showToastOnFailure(true)
-							.setCallbacks(new RuleCallback() {
-								public void onRulesPass() {
-									Intent i = new Intent(getActivity(), SurveyActivity.class);
-									i.putExtra(SurveyFragment.EXTRA_INSTRUMENT_ID, instrumentId);
-									startActivity(i);
-								}
+        /*
+         * If instrument is loaded, return the instrument id.
+         * If not, return -1.
+         */
+        @Override
+        protected Long doInBackground(Instrument... params) {
+            Instrument instrument = params[0];
+            if (instrument.loaded()) {
+                return instrument.getRemoteId();
+            } else {
+                return Long.valueOf(-1);
+            }
+        }
 
-								public void onRulesFail() { }                        
-							})
-							.checkRules();
-				}
-			}
-		}
-	}
+        @Override
+        protected void onPostExecute(final Long instrumentId) {
+            try {
+                mProgressDialog.dismiss();
+            } catch (IllegalArgumentException iae) {
+                Log.e(TAG, "Tried to close progress dialog that does not exist.");
+            }
+            if (isAdded()){
+                if (instrumentId == Long.valueOf(-1)) {
+                    Toast.makeText(getActivity(), R.string.instrument_not_loaded, Toast.LENGTH_LONG).show();
+                } else {
+                    new RuleBuilder(getActivity())
+                            .addRule(new InstrumentLaunchRule(Instrument.findByRemoteId(instrumentId),
+                                    getActivity().getString(R.string.rule_failure_instrument_launch)))
+                            .showToastOnFailure(true)
+                            .setCallbacks(new RuleCallback() {
+                                public void onRulesPass() {
+                                    Intent i = new Intent(getActivity(), SurveyActivity.class);
+                                    i.putExtra(SurveyFragment.EXTRA_INSTRUMENT_ID, instrumentId);
+                                    startActivity(i);
+                                }
 
-	private class LoadSurveyTask extends AsyncTask<Survey, Void, Survey> {
-		ProgressDialog mProgressDialog;
+                                public void onRulesFail() { }
+                            })
+                            .checkRules();
+                }
+            }
+        }
+    }
 
-		@Override
-		protected void onPreExecute() {
-			mProgressDialog = ProgressDialog.show(
-					getActivity(),
-					getString(R.string.instrument_loading_progress_header),
-					getString(R.string.instrument_loading_progress_message)
-					); 
-		}
+    private class LoadSurveyTask extends AsyncTask<Survey, Void, Survey> {
+        ProgressDialog mProgressDialog;
 
-		/*
-		 * If instrument is loaded, return the survey.
-		 * If not, return null.
-		 */
-		@Override
-		protected Survey doInBackground(Survey... params) {
-			Survey survey = params[0];
-			Instrument instrument = survey.getInstrument();
-			if (instrument.loaded()) {
-				return survey;
-			} else {
-				return null;
-			}
-		}
+        @Override
+        protected void onPreExecute() {
+            mProgressDialog = ProgressDialog.show(
+                    getActivity(),
+                    getString(R.string.instrument_loading_progress_header),
+                    getString(R.string.instrument_loading_progress_message)
+            );
+        }
 
-		@Override
-		protected void onPostExecute(Survey survey) {
-			try {
-				mProgressDialog.dismiss();  
-			} catch (IllegalArgumentException iae) { 
-				Log.e(TAG, "Tried to close progress dialog that does not exist.");
-			}
+        /*
+         * If instrument is loaded, return the survey.
+         * If not, return null.
+         */
+        @Override
+        protected Survey doInBackground(Survey... params) {
+            Survey survey = params[0];
+            Instrument instrument = survey.getInstrument();
+            if (instrument.loaded()) {
+                return survey;
+            } else {
+                return null;
+            }
+        }
 
-			if (isAdded()) {
-				if (survey == null) {
-					Toast.makeText(getActivity(), R.string.instrument_not_loaded, Toast.LENGTH_LONG).show();
-				} else {
-					Intent i = new Intent(getActivity(), SurveyActivity.class);
-					i.putExtra(SurveyFragment.EXTRA_INSTRUMENT_ID, survey.getInstrument().getRemoteId());
-					i.putExtra(SurveyFragment.EXTRA_SURVEY_ID, survey.getId());
-					i.putExtra(SurveyFragment.EXTRA_QUESTION_ID, survey.getLastQuestion().getId());
-					startActivity(i);
-				}
-			}
-		}
-	}
+        @Override
+        protected void onPostExecute(Survey survey) {
+            try {
+                mProgressDialog.dismiss();
+            } catch (IllegalArgumentException iae) {
+                Log.e(TAG, "Tried to close progress dialog that does not exist.");
+            }
 
-	/*
-	 * Check that the instrument has been fully loaded from the server and sets
-	 * the color of instrument label red if it has not.
-	 * 
-	 */
-	private class SetInstrumentLabelTask extends AsyncTask<InstrumentListLabel, Void, InstrumentListLabel> {
+            if (isAdded()) {
+                if (survey == null) {
+                    Toast.makeText(getActivity(), R.string.instrument_not_loaded, Toast.LENGTH_LONG).show();
+                } else {
+                    Intent i = new Intent(getActivity(), SurveyActivity.class);
+                    i.putExtra(SurveyFragment.EXTRA_INSTRUMENT_ID, survey.getInstrument().getRemoteId());
+                    i.putExtra(SurveyFragment.EXTRA_SURVEY_ID, survey.getId());
+                    i.putExtra(SurveyFragment.EXTRA_QUESTION_ID, survey.getLastQuestion().getId());
+                    startActivity(i);
+                }
+            }
+        }
+    }
 
-		@Override
-		protected InstrumentListLabel doInBackground(InstrumentListLabel... params) {
-			InstrumentListLabel instrumentListLabel = params[0];
-			Instrument instrument = instrumentListLabel.getInstrument();
-			instrumentListLabel.setLoaded(instrument.loaded());
-			return instrumentListLabel;
-		}
+    /*
+     * Check that the instrument has been fully loaded from the server and sets
+     * the color of instrument label red if it has not.
+     *
+     */
+    private class SetInstrumentLabelTask extends AsyncTask<InstrumentListLabel, Void, InstrumentListLabel> {
 
-		@Override
-		protected void onPostExecute(InstrumentListLabel instrumentListLabel) {
-			if (isAdded()){
-				if (instrumentListLabel.isLoaded()) {
-					instrumentListLabel.getTextView().setTextColor(Color.BLACK);
-				} else {
-					instrumentListLabel.getTextView().setTextColor(Color.RED);                    
-				}
-			}
-		}
-	}
+        @Override
+        protected InstrumentListLabel doInBackground(InstrumentListLabel... params) {
+            InstrumentListLabel instrumentListLabel = params[0];
+            Instrument instrument = instrumentListLabel.getInstrument();
+            instrumentListLabel.setLoaded(instrument.loaded());
+            return instrumentListLabel;
+        }
 
-	private static class InstrumentListLabel {
-		private Instrument mInstrument;
-		private TextView mTextView;
-		private Boolean mLoaded;
+        @Override
+        protected void onPostExecute(InstrumentListLabel instrumentListLabel) {
+            if (isAdded()){
+                if (instrumentListLabel.isLoaded()) {
+                    instrumentListLabel.getTextView().setTextColor(Color.BLACK);
+                } else {
+                    instrumentListLabel.getTextView().setTextColor(Color.RED);
+                }
+            }
+        }
+    }
 
-		public InstrumentListLabel(Instrument instrument, TextView textView) {
-			this.mInstrument = instrument;
-			this.mTextView = textView;
-		}
+    private static class InstrumentListLabel {
+        private Instrument mInstrument;
+        private TextView mTextView;
+        private Boolean mLoaded;
 
-		public Instrument getInstrument() {
-			return mInstrument;
-		}
+        public InstrumentListLabel(Instrument instrument, TextView textView) {
+            this.mInstrument = instrument;
+            this.mTextView = textView;
+        }
 
-		public TextView getTextView() {
-			return mTextView;
-		}
+        public Instrument getInstrument() {
+            return mInstrument;
+        }
 
-		public void setLoaded(boolean loaded) {
-			mLoaded = loaded;
-		}
+        public TextView getTextView() {
+            return mTextView;
+        }
 
-		public Boolean isLoaded() {
-			return mLoaded;
-		}
-	}
+        public void setLoaded(boolean loaded) {
+            mLoaded = loaded;
+        }
+
+        public Boolean isLoaded() {
+            return mLoaded;
+        }
+    }
 }

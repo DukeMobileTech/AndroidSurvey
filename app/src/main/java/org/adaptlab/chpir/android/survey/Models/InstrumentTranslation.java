@@ -15,8 +15,8 @@ public class InstrumentTranslation extends Model {
     private String mLanguage;
     @Column(name = "Alignment")
     private String mAlignment;
-    @Column(name = "Instrument")
-    private Instrument mInstrument;
+    @Column(name = "InstrumentRemoteId")
+    private Long mInstrumentRemoteId;
     
     public InstrumentTranslation() {
         super();
@@ -57,10 +57,14 @@ public class InstrumentTranslation extends Model {
     }
     
     public Instrument getInstrument() {
-        return mInstrument;
+        return Instrument.findByRemoteId(getInstrumentRemoteId());
     }
     
-    public void setInstrument(Instrument instrument) {
-        mInstrument = instrument;
+    public void setInstrumentRemoteId(Long instrumentId) {
+        mInstrumentRemoteId = instrumentId;
+    }
+
+    private Long getInstrumentRemoteId() {
+        return mInstrumentRemoteId;
     }
 }

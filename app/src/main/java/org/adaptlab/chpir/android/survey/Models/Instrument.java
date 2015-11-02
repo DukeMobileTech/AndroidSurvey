@@ -1,12 +1,16 @@
 package org.adaptlab.chpir.android.survey.Models;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Typeface;
+import android.provider.BaseColumns;
 import android.util.Log;
 import android.view.Gravity;
 
+import com.activeandroid.Cache;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.activeandroid.query.From;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
@@ -19,13 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-@Table(name = "Instruments")
+@Table(name = "Instruments", id = BaseColumns._ID) //Android Content Providers need column _id
 public class Instrument extends ReceiveModel {
     private static final String TAG = "Instrument";
-
     public static final String KHMER_LANGUAGE_CODE = "km";
     public static final String KHMER_FONT_LOCATION = "fonts/khmerOS.ttf";
-
     public static final String LEFT_ALIGNMENT = "left";
 
     @Column(name = "Title")
@@ -141,7 +143,9 @@ public class Instrument extends ReceiveModel {
             instrument.setQuestionCount(jsonObject.getInt("question_count"));
             instrument.setProjectId(jsonObject.getLong("project_id"));
             instrument.setPublished(jsonObject.getBoolean("published"));
-            if (!jsonObject.isNull("deleted_at")) {
+            if (jsonObject.isNull("deleted_at")) {
+                instrument.setDeleted(false);
+            } else {
                 instrument.setDeleted(true);
             }
             instrument.save();
@@ -151,7 +155,7 @@ public class Instrument extends ReceiveModel {
             for(int i = 0; i < translationsArray.length(); i++) {
                 JSONObject translationJSON = translationsArray.getJSONObject(i);
                 InstrumentTranslation translation = instrument.getTranslationByLanguage(translationJSON.getString("language"));
-                translation.setInstrument(instrument);
+                translation.setInstrumentRemoteId(instrument.getRemoteId());
                 translation.setAlignment(translationJSON.getString("alignment"));
                 translation.setTitle(translationJSON.getString("title"));
                 translation.save();
@@ -175,7 +179,15 @@ public class Instrument extends ReceiveModel {
                 .execute(); //sqlite saves booleans as integers
     }
 
-    public static Instrument findByRemoteId(Long id) {
+    public static Cursor getProjectInstrumentsCursor(Long projectId) {
+        From instrumentsQuery = new Select("Instruments.*")
+                .from(Instrument.class)
+                .where("ProjectID = ? AND Published = ? AND Deleted = ?", projectId, true, false)
+                .orderBy("Title");
+        return Cache.openDatabase().rawQuery(instrumentsQuery.toSql(), instrumentsQuery.getArguments());
+    }
+
+        public static Instrument findByRemoteId(Long id) {
         return new Select().from(Instrument.class).where("RemoteId = ?", id).executeSingle();
     }
 
@@ -184,22 +196,26 @@ public class Instrument extends ReceiveModel {
      */
     public List<Question> questions() {
         return new Select().from(Question.class)
-                .where("Instrument = ? AND Deleted != ?", getId(), 1)
+                .where("InstrumentRemoteId = ? AND Deleted != ?", getRemoteId(), 1)
                 .orderBy("NumberInInstrument ASC")
                 .execute();
     }
 
     public List<Survey> surveys() {
-        return getMany(Survey.class, "Instrument");
+        return new Select().from(Survey.class)
+                .where("InstrumentRemoteId = ?", getRemoteId())
+                .execute();
     }
 
     public List<InstrumentTranslation> translations() {
-        return getMany(InstrumentTranslation.class, "Instrument");
+        return new Select().from(InstrumentTranslation.class)
+                .where("InstrumentRemoteId = ?", getRemoteId())
+                .execute();
     }
 
     public List<Section> sections() {
         return new Select().from(Section.class)
-                .where("Instrument = ?", getId())
+                .where("InstrumentRemoteId = ?", getRemoteId())
                 .orderBy("SectionNumber")
                 .execute();
     }

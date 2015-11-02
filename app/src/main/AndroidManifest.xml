@@ -35,12 +35,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SurveyActivity"
+        <activity
+            android:name=".SurveyActivity"
             android:uiOptions="splitActionBarWhenNarrow"  />
         <activity android:name=".AdminActivity" />
         <activity android:name=".LoginActivity" android:noHistory="true" />
         <activity android:name=".ReviewPageActivity" />
         <activity android:name=".SectionActivity" />
+        <provider
+            android:authorities="org.adaptlab.chpir.android.survey"
+            android:exported="false"
+            android:name="com.activeandroid.content.ContentProvider" />
         <service android:name="org.adaptlab.chpir.android.activerecordcloudsync.PollService" />
         <receiver android:name="org.adaptlab.chpir.android.survey.Receivers.StartupReceiver">
             <intent-filter>
@@ -75,7 +80,7 @@
         </receiver>
         <receiver android:name="org.adaptlab.chpir.android.survey.Receivers.NotificationReceiver" />
         <meta-data android:name="AA_DB_NAME" android:value="Survey.db" />
-        <meta-data android:name="AA_DB_VERSION" android:value="38" />
+        <meta-data android:name="AA_DB_VERSION" android:value="39" />
         <meta-data android:name="SEED_DB" android:value="false" /> 
         <meta-data android:name="com.crashlytics.ApiKey" android:value="@string/crashlytics_api_key"/>
     </application>

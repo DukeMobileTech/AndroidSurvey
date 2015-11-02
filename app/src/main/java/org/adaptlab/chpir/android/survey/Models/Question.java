@@ -39,8 +39,6 @@ public class Question extends ReceiveModel {
     private QuestionType mQuestionType;
     @Column(name = "QuestionIdentifier")
     private String mQuestionIdentifier;
-    @Column(name = "Instrument")
-    private Instrument mInstrument;
     @Column(name = "FollowingUpQuestion")
     private Question mFollowingUpQuestion;
     @Column(name = "FollowUpPosition")
@@ -74,6 +72,8 @@ public class Question extends ReceiveModel {
     private boolean mDeleted;
     @Column(name = "Section")
     private Section mSection;
+    @Column(name = "InstrumentRemoteId")
+    private Long mInstrumentRemoteId;
 
     public Question() {
         super();
@@ -245,7 +245,7 @@ public class Question extends ReceiveModel {
             question.setText(jsonObject.getString("text"));
             question.setQuestionType(jsonObject.getString("question_type"));
             question.setQuestionIdentifier(jsonObject.getString("question_identifier"));            
-            question.setInstrument(Instrument.findByRemoteId(jsonObject.getLong("instrument_id")));
+            question.setInstrumentRemoteId(jsonObject.getLong("instrument_id"));
             question.setRegExValidation(jsonObject.getString("reg_ex_validation"));
             question.setRegExValidationMessage(jsonObject.getString("reg_ex_validation_message"));
             question.setOptionCount(jsonObject.getInt("option_count"));
@@ -305,8 +305,8 @@ public class Question extends ReceiveModel {
         return new Select().from(Question.class).where("QuestionIdentifier = ?", identifier).executeSingle();
     }
     
-    public static Question findByNumberInInstrument(Integer questionNumber, Long instrumentId) {
-    	return new Select().from(Question.class).where("NumberInInstrument = ? AND Instrument = ? AND Deleted != ?", questionNumber, instrumentId, 1).executeSingle();
+    public static Question findByNumberInInstrument(Integer questionNumber, Long instrumentRemoteId) {
+    	return new Select().from(Question.class).where("NumberInInstrument = ? AND InstrumentRemoteId = ? AND Deleted != ?", questionNumber, instrumentRemoteId, 1).executeSingle();
     }
     
     public boolean isFollowUpQuestion() {
@@ -387,11 +387,15 @@ public class Question extends ReceiveModel {
     }
 
     public Instrument getInstrument() {
-        return mInstrument;
+        return Instrument.findByRemoteId(getInstrumentRemoteId());
     }
 
-    public void setInstrument(Instrument instrument) {
-        mInstrument = instrument;
+    public void setInstrumentRemoteId(Long instrumentId) {
+        mInstrumentRemoteId = instrumentId;
+    }
+
+    public Long getInstrumentRemoteId() {
+        return mInstrumentRemoteId;
     }
     
     public Question getFollowingUpQuestion() {

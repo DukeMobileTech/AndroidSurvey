@@ -26,8 +26,6 @@ import java.util.UUID;
 public class Survey extends SendModel {
     private static final String TAG = "Survey";
 
-    @Column(name = "Instrument")
-    private Instrument mInstrument;
     @Column(name = "UUID")
     private String mUUID;
     @Column(name = "SentToRemote")
@@ -46,6 +44,8 @@ public class Survey extends SendModel {
     private String mMetadata;
     @Column(name = "ProjectId")
     private Long mProjectId;
+    @Column(name = "InstrumentRemoteId")
+    private Long mInstrumentRemoteId;
 
     public Survey() {
         super();
@@ -132,7 +132,7 @@ public class Survey extends SendModel {
         return new Select("Surveys.*")
                 .from(Survey.class)
                 .innerJoin(Instrument.class)
-                .on("Surveys.Instrument=Instruments.Id AND Instruments.Published=" + 1)
+                .on("Surveys.InstrumentRemoteId=Instruments.RemoteId AND Instruments.Published=" + 1)
                 .where("Surveys.ProjectId = ?", projectId)
                 .orderBy("Surveys.LastUpdated DESC")
                 .execute();
@@ -167,11 +167,11 @@ public class Survey extends SendModel {
      */
 
     public Instrument getInstrument() {
-        return mInstrument;
+        return Instrument.findByRemoteId(getInstrumentRemoteId());
     }
 
-    public void setInstrument(Instrument instrument) {
-        mInstrument = instrument;
+    public void setInstrumentRemoteId(Long instrumentId) {
+        mInstrumentRemoteId = instrumentId;
     }
 
     public String getUUID() {
@@ -193,7 +193,7 @@ public class Survey extends SendModel {
         this.save();
 
         EventLog eventLog = new EventLog(EventLog.EventType.SENT_SURVEY, context);
-        eventLog.setInstrument(mInstrument);
+        eventLog.setInstrumentRemoteId(getInstrument().getRemoteId());
         eventLog.setSurveyIdentifier(identifier(context));
         eventLog.save();
 
@@ -271,5 +271,9 @@ public class Survey extends SendModel {
         }
 
         return "";
+    }
+
+    private Long getInstrumentRemoteId() {
+        return mInstrumentRemoteId;
     }
 }

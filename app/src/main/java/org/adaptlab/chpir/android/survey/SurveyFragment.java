@@ -234,7 +234,7 @@ public class SurveyFragment extends Fragment {
         Long surveyId = getActivity().getIntent().getLongExtra(EXTRA_SURVEY_ID, -1);
         if (surveyId == -1) {
             mSurvey = new Survey();
-            mSurvey.setInstrument(mInstrument);
+            mSurvey.setInstrumentRemoteId(mInstrument.getRemoteId());
             mSurvey.setMetadata(mMetadata);
             mSurvey.setProjectId(mInstrument.getProjectId());
             mSurvey.save();

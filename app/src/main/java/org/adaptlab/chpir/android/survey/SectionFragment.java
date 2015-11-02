@@ -164,7 +164,7 @@ public class SectionFragment extends Fragment {
         if (lastQuestionNumber >= mSection.getInstrument().questions().size()) {
             return mSection.getInstrument().questions().get(mSection.getInstrument().questions().size() - 1);
         } else {
-            return Question.findByNumberInInstrument(lastQuestionNumber + 1, mSection.getInstrument().getId());
+            return Question.findByNumberInInstrument(lastQuestionNumber + 1, mSection.getInstrument().getRemoteId());
         }
     }
 }
