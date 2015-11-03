@@ -4,12 +4,16 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.res.Resources;
+import android.database.Cursor;
+import android.provider.BaseColumns;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.activeandroid.Cache;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.activeandroid.query.From;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.SendModel;
@@ -22,7 +26,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-@Table(name = "Surveys")
+/*
+* Content Providers require column _id i.e. BaseColumns._ID which is different from the primary key
+* used by ActiveAndroid. As a result, the expected ActiveAndroid relationships do not work
+* and therefore have to be handled using the custom primary key or another key.
+ */
+@Table(name = "Surveys", id = BaseColumns._ID)
 public class Survey extends SendModel {
     private static final String TAG = "Survey";
 
@@ -39,7 +48,7 @@ public class Survey extends SendModel {
     @Column(name = "LastUpdated")
     private Date mLastUpdated;
     @Column(name = "LastQuestion")
-    private Question mLastQuestion;
+    private Long mLastQuestionRemoteId;
     @Column(name = "Metadata")
     private String mMetadata;
     @Column(name = "ProjectId")
@@ -87,6 +96,11 @@ public class Survey extends SendModel {
         return true;
     }
 
+    @Override
+    public String getPrimaryKey() {
+        return BaseColumns._ID;
+    }
+
     /*
      * The identifier to display to the user to identify a Survey.
      * Return Unidentified Survey string if no response for identifier questions.
@@ -119,13 +133,8 @@ public class Survey extends SendModel {
      */
     public Response getResponseByQuestion(Question question) {
         return new Select().from(Response.class).where(
-                "Question = ? AND Survey = ?",
-                question.getId(),
-                getId()).executeSingle();
-    }
-
-    public static List<Survey> getAll() {
-        return new Select().from(Survey.class).orderBy("LastUpdated DESC").execute();
+                "Question = ? AND SurveyUUID = ?",
+                question.getId(), getUUID()).executeSingle();
     }
 
     public static List<Survey> getAllProjectSurveys(Long projectId) {
@@ -138,6 +147,14 @@ public class Survey extends SendModel {
                 .execute();
     }
 
+    public static Cursor getProjectSurveysCursor(Long projectId) {
+        From query = new Select("Surveys.*")
+                .from(Survey.class)
+                .where("ProjectId = ?", projectId)
+                .orderBy("LastUpdated DESC");
+        return Cache.openDatabase().rawQuery(query.toSql(), query.getArguments());
+    }
+
     public static List<Survey> getCompleted() {
         return new Select().from(Survey.class).where("Complete = ? AND ProjectID = ?", 1,
                 Long.valueOf(AppUtil.getAdminSettingsInstance().getProjectId())).execute();
@@ -148,17 +165,23 @@ public class Survey extends SendModel {
                 Long.valueOf(AppUtil.getAdminSettingsInstance().getProjectId())).execute();
     }
 
+    public static Survey findByUUID(String uuid) {
+        return new Select().from(Survey.class).where("UUID = ?", uuid).executeSingle();
+    }
+
     /*
      * Relationships
      */
     public List<Response> responses() {
-        return getMany(Response.class, "Survey");
+        return new Select().from(Response.class).where("SurveyUUID = ?", getUUID()).execute();
     }
 
     public List<Response> emptyResponses() {
         return new Select()
                 .from(Response.class)
-                .where("Survey = ? AND (Text IS null OR Text = '') AND (SpecialResponse IS null OR SpecialResponse = '') AND (Other_Response IS null OR Other_Response = '')", getId())
+                .where("SurveyUUID = ? AND (Text IS null OR Text = '') " +
+                        "AND (SpecialResponse IS null OR SpecialResponse = '') " +
+                        "AND (Other_Response IS null OR Other_Response = '')", getUUID())
                 .execute();
     }
 
@@ -235,11 +258,11 @@ public class Survey extends SendModel {
     }
 
     public Question getLastQuestion() {
-        return mLastQuestion;
+        return Question.findByRemoteId(mLastQuestionRemoteId);
     }
 
     public void setLastQuestion(Question question) {
-        mLastQuestion = question;
+        mLastQuestionRemoteId = question.getRemoteId();
     }
 
     public void deleteIfComplete() {

@@ -1,7 +1,9 @@
 package org.adaptlab.chpir.android.activerecordcloudsync;
 
-import java.io.InputStream;
-import java.util.List;
+import android.content.Context;
+import android.util.Log;
+
+import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.survey.AppUtil;
 import org.apache.commons.codec.CharEncoding;
@@ -14,10 +16,8 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.protocol.HTTP;
 
-import android.content.Context;
-import android.util.Log;
-
-import com.activeandroid.query.Select;
+import java.io.InputStream;
+import java.util.List;
 
 public class HttpPushr {
     private static final String TAG = "HttpPushr";
@@ -56,8 +56,17 @@ public class HttpPushr {
     }
 
 	public List<? extends SendModel> getElements() {
-        return new Select().from(mSendTableClass).orderBy("Id ASC").execute();
-	}
+        try {
+            return new Select().from(mSendTableClass)
+                    .orderBy(String.format("%s", mSendTableClass.newInstance().getPrimaryKey()) + " ASC")
+                    .execute();
+        } catch (InstantiationException er) {
+            Log.e(TAG, "InstantiationException " + er);
+        } catch (IllegalAccessException er) {
+            Log.e(TAG, "IllegalAccessException " + er);
+        }
+        return new Select().from(mSendTableClass).execute();
+    }
 	
 	private void sendData(SendModel element) {
         HttpClient client = new DefaultHttpClient();

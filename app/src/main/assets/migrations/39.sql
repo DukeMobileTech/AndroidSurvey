@@ -5,3 +5,6 @@ ALTER TABLE Questions ADD COLUMN InstrumentRemoteId LONG;
 ALTER TABLE Rules ADD COLUMN InstrumentRemoteId LONG;
 ALTER TABLE Sections ADD COLUMN InstrumentRemoteId LONG;
 ALTER TABLE Surveys ADD COLUMN InstrumentRemoteId LONG;
+ALTER TABLE Responses ADD COLUMN SurveyUUID STRING;
+ALTER TABLE Instruments ADD COLUMN _id LONG;
+ALTER TABLE Surveys ADD COLUMN _id LONG;

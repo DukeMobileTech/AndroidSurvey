@@ -23,7 +23,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-@Table(name = "Instruments", id = BaseColumns._ID) //Android Content Providers need column _id
+/*
+* Content Providers require column _id i.e. BaseColumns._ID which is different from the primary key
+* used by ActiveAndroid. As a result, the expected ActiveAndroid relationships do not work
+* and therefore have to be handled using the custom primary key or another key.
+ */
+@Table(name = "Instruments", id = BaseColumns._ID)
 public class Instrument extends ReceiveModel {
     private static final String TAG = "Instrument";
     public static final String KHMER_LANGUAGE_CODE = "km";
@@ -66,7 +71,7 @@ public class Instrument extends ReceiveModel {
      */
     public String getTitle() {
         if (getLanguage().equals(getDeviceLanguage())) return mTitle;
-        for(InstrumentTranslation translation : translations()) {
+        for (InstrumentTranslation translation : translations()) {
             if (translation.getLanguage().equals(getDeviceLanguage())
                     && !translation.getTitle().trim().equals("")) {
                 return translation.getTitle();
@@ -79,7 +84,7 @@ public class Instrument extends ReceiveModel {
 
     public String getAlignment() {
         if (getLanguage().equals(getDeviceLanguage())) return mAlignment;
-        for(InstrumentTranslation translation : translations()) {
+        for (InstrumentTranslation translation : translations()) {
             if (translation.getLanguage().equals(getDeviceLanguage())) {
                 return translation.getAlignment();
             }
@@ -90,7 +95,7 @@ public class Instrument extends ReceiveModel {
     }
 
     public InstrumentTranslation getTranslationByLanguage(String language) {
-        for(InstrumentTranslation translation : translations()) {
+        for (InstrumentTranslation translation : translations()) {
             if (translation.getLanguage().equals(language)) {
                 return translation;
             }
@@ -152,7 +157,7 @@ public class Instrument extends ReceiveModel {
 
             // Generate translations
             JSONArray translationsArray = jsonObject.getJSONArray("translations");
-            for(int i = 0; i < translationsArray.length(); i++) {
+            for (int i = 0; i < translationsArray.length(); i++) {
                 JSONObject translationJSON = translationsArray.getJSONObject(i);
                 InstrumentTranslation translation = instrument.getTranslationByLanguage(translationJSON.getString("language"));
                 translation.setInstrumentRemoteId(instrument.getRemoteId());
@@ -187,7 +192,7 @@ public class Instrument extends ReceiveModel {
         return Cache.openDatabase().rawQuery(instrumentsQuery.toSql(), instrumentsQuery.getArguments());
     }
 
-        public static Instrument findByRemoteId(Long id) {
+    public static Instrument findByRemoteId(Long id) {
         return new Select().from(Instrument.class).where("RemoteId = ?", id).executeSingle();
     }
 

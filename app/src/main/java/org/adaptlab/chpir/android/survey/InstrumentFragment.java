@@ -1,6 +1,5 @@
 package org.adaptlab.chpir.android.survey;
 
-import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.AlertDialog;
@@ -28,7 +27,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -47,58 +45,91 @@ import org.adaptlab.chpir.android.survey.Rules.RuleBuilder;
 import org.adaptlab.chpir.android.survey.Rules.RuleCallback;
 import org.adaptlab.chpir.android.survey.Tasks.DownloadImagesTask;
 
-import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 public class InstrumentFragment extends ListFragment {
     public final static String TAG = "InstrumentFragment";
-    private List<Survey> mSurveys;
     private SurveyAdapter mSurveyAdapter;
     private InstrumentAdapter mInstrumentAdapter;
     private ListView mSurveyListView;
-
+    private LoaderManager.LoaderCallbacks mInstrumentCallbacks;
+    private LoaderManager.LoaderCallbacks mSurveyCallbacks;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AppUtil.appInit(getActivity());
         setHasOptionsMenu(true);
+        createLoaderCallbacks();
     }
 
-    private void setInstrumentListViewAdapter() {
+    /*
+    * Used to manage cursor loaders across activity life-cycles
+     */
+    private void createLoaderCallbacks() {
+        mInstrumentCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
+            @Override
+            public Loader<Cursor> onCreateLoader(int arg0, Bundle cursor) {
+                String selection = "ProjectID = ? AND Published = ? AND Deleted = ?";
+                String[] selectionArgs = {getProjectId().toString(), "1", "0"};
+                String orderBy = "Title";
+                return new CursorLoader(
+                        getActivity(),
+                        ContentProvider.createUri(Instrument.class, null),
+                        null,
+                        selection,
+                        selectionArgs,
+                        orderBy
+                );
+            }
+
+            @Override
+            public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
+                mInstrumentAdapter.swapCursor(cursor);
+            }
+
+            @Override
+            public void onLoaderReset(Loader<Cursor> arg0) {
+                mInstrumentAdapter.swapCursor(null);
+            }
+        };
+
+        mSurveyCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
+            @Override
+            public Loader<Cursor> onCreateLoader(int arg0, Bundle cursor) {
+                String selection = "ProjectID = ?";
+                String[] selectionArgs = {getProjectId().toString()};
+                String orderBy = "LastUpdated DESC";
+                return new CursorLoader(
+                        getActivity(),
+                        ContentProvider.createUri(Survey.class, null),
+                        null,
+                        selection,
+                        selectionArgs,
+                        orderBy
+                );
+            }
+
+            @Override
+            public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
+                mSurveyAdapter.swapCursor(cursor);
+            }
+
+            @Override
+            public void onLoaderReset(Loader<Cursor> arg0) {
+                mSurveyAdapter.swapCursor(null);
+            }
+        };
+    }
+
+    private void setInstrumentsListViewAdapter() {
         if (getProjectId() != Long.MAX_VALUE) {
             Cursor instrumentsCursor = Instrument.getProjectInstrumentsCursor(getProjectId());
             mInstrumentAdapter = new InstrumentAdapter(getActivity(), instrumentsCursor, 0);
             setListAdapter(mInstrumentAdapter);
-
-            //Manage cursor loaders across activity lifecycle
-            getActivity().getSupportLoaderManager().initLoader(0, null, new LoaderManager.LoaderCallbacks<Cursor>() {
-                @Override
-                public Loader<Cursor> onCreateLoader(int arg0, Bundle cursor) {
-                    String selection = "ProjectID = ? AND Published = ? AND Deleted = ?";
-                    String[] selectionArgs = {getProjectId().toString(), "1", "0"};
-                    String orderBy = "Title";
-                    return new CursorLoader(
-                            getActivity(),
-                            ContentProvider.createUri(Instrument.class, null),
-                            null,
-                            selection,
-                            selectionArgs,
-                            orderBy
-                    );
-                }
-
-                @Override
-                public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
-                    mInstrumentAdapter.swapCursor(cursor);
-                }
-
-                @Override
-                public void onLoaderReset(Loader<Cursor> arg0) {
-                    mInstrumentAdapter.swapCursor(null);
-                }
-            });
+            getActivity().getSupportLoaderManager().restartLoader(0, null, mInstrumentCallbacks);
         }
     }
 
@@ -138,7 +169,6 @@ public class InstrumentFragment extends ListFragment {
     @Override
     public void onResume() {
         super.onResume();
-        setInstrumentListViewAdapter();
         createTabs();
     }
 
@@ -147,47 +177,60 @@ public class InstrumentFragment extends ListFragment {
             final ActionBar actionBar = getActivity().getActionBar();
             ActionBar.TabListener tabListener = new ActionBar.TabListener() {
                 @Override
-                public void onTabSelected(Tab tab,
-                                          android.app.FragmentTransaction ft) {
+                public void onTabSelected(Tab tab, android.app.FragmentTransaction ft) {
                     if (tab.getText().equals(getActivity().getResources().getString(R.string.surveys))) {
-                        if (Survey.getAll().isEmpty()) {
+                        if (Survey.getAllProjectSurveys(getProjectId()).isEmpty()) {
                             setListAdapter(null);
                         } else {
-                            mSurveys = Survey.getAllProjectSurveys(Long.parseLong(AppUtil.getAdminSettingsInstance().getProjectId()));
-                            mSurveyAdapter = new SurveyAdapter(mSurveys);
-                            setListAdapter(mSurveyAdapter);
+                            setSurveysListViewAdapter();
                             mSurveyListView = getListView();
                             mSurveyListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-                            mSurveyListView.setMultiChoiceModeListener(mListener);
+                            mSurveyListView.setMultiChoiceModeListener(mSurveyMultiChoiceModeListener);
                         }
                     } else {
-                        setInstrumentListViewAdapter();
+                        setInstrumentsListViewAdapter();
                     }
                 }
 
                 // Required by interface
-                public void onTabUnselected(Tab tab, android.app.FragmentTransaction ft) { }
-                public void onTabReselected(Tab tab, android.app.FragmentTransaction ft) { }
+                public void onTabUnselected(Tab tab, android.app.FragmentTransaction ft) {
+                }
+
+                public void onTabReselected(Tab tab, android.app.FragmentTransaction ft) {
+                }
             };
 
             actionBar.removeAllTabs();
             actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
             actionBar.addTab(actionBar.newTab().setText(getActivity().getResources().getString(R.string.instruments)).setTabListener(tabListener));
             actionBar.addTab(actionBar.newTab().setText(getActivity().getResources().getString(R.string.surveys)).setTabListener(tabListener));
+        } else {
+            setInstrumentsListViewAdapter();
+        }
+    }
+
+    private void setSurveysListViewAdapter() {
+        if (getProjectId() != Long.MAX_VALUE) {
+            Cursor surveysCursor = Survey.getProjectSurveysCursor(getProjectId());
+            mSurveyAdapter = new SurveyAdapter(getActivity(), surveysCursor, 0);
+            setListAdapter(mSurveyAdapter);
+            getActivity().getSupportLoaderManager().restartLoader(0, null, mSurveyCallbacks);
         }
     }
 
     private Long getProjectId() {
         AdminSettings adminSettings = AppUtil.getAdminSettingsInstance();
-        if (adminSettings.getProjectId() != null) return Long.parseLong(adminSettings.getProjectId());
+        if (adminSettings.getProjectId() != null)
+            return Long.parseLong(adminSettings.getProjectId());
         return Long.MAX_VALUE;
     }
 
-    private MultiChoiceModeListener mListener = new MultiChoiceModeListener() {
+    private MultiChoiceModeListener mSurveyMultiChoiceModeListener = new MultiChoiceModeListener() {
         List<Survey> selected = new ArrayList<Survey>();
+
         @Override
         public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-            Survey survey = mSurveys.get(position);
+            Survey survey = getSurveyAtPosition(getListView(), position);
             if (checked) {
                 selected.add(survey);
                 mSurveyAdapter.setNewSelection(position, true);
@@ -215,20 +258,20 @@ public class InstrumentFragment extends ListFragment {
                     .setMessage(R.string.delete_surveys_message)
                     .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            mSurveys.removeAll(selected);
                             deleteSurveys();
-                            mSurveyAdapter.notifyDataSetChanged();
+                            setSurveysListViewAdapter();
                         }
                     })
                     .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {}
+                        public void onClick(DialogInterface dialog, int id) {
+                        }
                     })
                     .show();
         }
 
         private void deleteSurveys() {
-            for(Survey survey : selected) {
-                for(Response response : survey.responses()) {
+            for (Survey survey : selected) {
+                for (Response response : survey.responses()) {
                     response.delete();
                 }
                 survey.delete();
@@ -292,11 +335,16 @@ public class InstrumentFragment extends ListFragment {
         }
     }
 
-    private class SurveyAdapter extends ArrayAdapter<Survey> {
+    private class SurveyAdapter extends CursorAdapter {
         private SparseBooleanArray mSelectionViews = new SparseBooleanArray();
 
-        public SurveyAdapter(List<Survey> surveys) {
-            super(getActivity(), 0, surveys);
+        public SurveyAdapter(Context context, Cursor cursor, int flags) {
+            super(context, cursor, 0);
+        }
+
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            return LayoutInflater.from(context).inflate(R.layout.list_item_survey, parent, false);
         }
 
         public void setNewSelection(int position, boolean value) {
@@ -314,46 +362,35 @@ public class InstrumentFragment extends ListFragment {
             notifyDataSetChanged();
         }
 
-        @SuppressLint("InflateParams")
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if (convertView == null) {
-                convertView = getActivity().getLayoutInflater().inflate(R.layout.list_item_survey, null);
-            }
-            if (position % 2 == 0) {
-                convertView.setBackgroundResource(R.drawable.list_background_color);
+        public void bindView(View view, Context context, Cursor cursor) {
+            if (cursor.getPosition() % 2 == 0) {
+                view.setBackgroundResource(R.drawable.list_background_color);
             } else {
-                convertView.setBackgroundResource(R.drawable.list_background_color_alternate);
+                view.setBackgroundResource(R.drawable.list_background_color_alternate);
             }
 
-            if (mSelectionViews != null && mSurveyAdapter.isPositionChecked(position) != false) {
-                convertView.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_light));
+            if (mSelectionViews != null && mSurveyAdapter.isPositionChecked(cursor.getPosition())) {
+                view.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_light));
             }
 
-            Survey survey = getItem(position);
+            TextView titleTextView = (TextView) view.findViewById(R.id.survey_list_item_titleTextView);
+            TextView progressTextView = (TextView) view.findViewById(R.id.survey_list_item_progressTextView);
+            TextView instrumentTitleTextView = (TextView) view.findViewById(R.id.survey_list_item_instrumentTextView);
+            TextView lastUpdatedTextView = (TextView) view.findViewById(R.id.survey_list_item_lastUpdatedTextView);
 
-            TextView titleTextView = (TextView) convertView
-                    .findViewById(R.id.survey_list_item_titleTextView);
+            String surveyUUID = cursor.getString(cursor.getColumnIndexOrThrow("UUID"));
+            Survey survey = Survey.findByUUID(surveyUUID);
+
             titleTextView.setText(survey.identifier(getActivity()));
             titleTextView.setTypeface(survey.getInstrument().getTypeFace(getActivity().getApplicationContext()));
-
-            TextView progressTextView = (TextView) convertView.findViewById(R.id.survey_list_item_progressTextView);
             progressTextView.setText(survey.responses().size() + " " + getString(R.string.of) + " " + survey.getInstrument().questions().size());
-
-            if (survey.readyToSend()) {
-                progressTextView.setTextColor(Color.GREEN);
-            } else {
-                progressTextView.setTextColor(Color.RED);
-            }
-
-            TextView instrumentTitleTextView = (TextView) convertView.findViewById(R.id.survey_list_item_instrumentTextView);
             instrumentTitleTextView.setText(survey.getInstrument().getTitle());
-
-            TextView lastUpdatedTextView = (TextView) convertView.findViewById(R.id.survey_list_item_lastUpdatedTextView);
-            SimpleDateFormat df = new SimpleDateFormat("HH:mm yyyy-MM-dd");
+            DateFormat df = DateFormat.getDateTimeInstance();
             lastUpdatedTextView.setText(df.format(survey.getLastUpdated()));
 
-            return convertView;
+            if (survey.readyToSend()) progressTextView.setTextColor(Color.GREEN);
+            else progressTextView.setTextColor(Color.RED);
         }
     }
 
@@ -367,11 +404,19 @@ public class InstrumentFragment extends ListFragment {
             if (instrument == null) return;
             new LoadInstrumentTask().execute(instrument);
         } else if (l.getAdapter() instanceof SurveyAdapter) {
-            Survey survey = ((SurveyAdapter) getListAdapter()).getItem(position);
+            Survey survey = getSurveyAtPosition(l, position);
             if (survey == null) return;
             new LoadSurveyTask().execute(survey);
         }
     }
+
+    private Survey getSurveyAtPosition(ListView l, int position) {
+        Cursor cursor = ((SurveyAdapter) l.getAdapter()).getCursor();
+        cursor.moveToPosition(position);
+        String surveyUUID = cursor.getString(cursor.getColumnIndexOrThrow("UUID"));
+        return Survey.findByUUID(surveyUUID);
+    }
+
 
     /*
      * Only display admin area if correct password.
@@ -393,7 +438,8 @@ public class InstrumentFragment extends ListFragment {
                         }
                     }
                 }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int button) { }
+            public void onClick(DialogInterface dialog, int button) {
+            }
         }).show();
     }
 
@@ -423,7 +469,7 @@ public class InstrumentFragment extends ListFragment {
             if (isAdded()) {
                 downloadInstrumentImages();
                 if (AppUtil.getAdminSettingsInstance().getProjectId() != null) {
-                    setInstrumentListViewAdapter();
+                    setInstrumentsListViewAdapter();
                 }
                 getActivity().setProgressBarIndeterminateVisibility(false);
             }
@@ -467,7 +513,7 @@ public class InstrumentFragment extends ListFragment {
             } catch (IllegalArgumentException iae) {
                 Log.e(TAG, "Tried to close progress dialog that does not exist.");
             }
-            if (isAdded()){
+            if (isAdded()) {
                 if (instrumentId == Long.valueOf(-1)) {
                     Toast.makeText(getActivity(), R.string.instrument_not_loaded, Toast.LENGTH_LONG).show();
                 } else {
@@ -482,7 +528,8 @@ public class InstrumentFragment extends ListFragment {
                                     startActivity(i);
                                 }
 
-                                public void onRulesFail() { }
+                                public void onRulesFail() {
+                                }
                             })
                             .checkRules();
                 }
@@ -556,7 +603,7 @@ public class InstrumentFragment extends ListFragment {
 
         @Override
         protected void onPostExecute(InstrumentListLabel instrumentListLabel) {
-            if (isAdded()){
+            if (isAdded()) {
                 if (instrumentListLabel.isLoaded()) {
                     instrumentListLabel.getTextView().setTextColor(Color.BLACK);
                 } else {
