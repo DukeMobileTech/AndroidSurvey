@@ -192,15 +192,19 @@ public class SurveyFragment extends Fragment {
     private void setNavigationDrawerItems() {
         mSections = new ArrayList<Section>();
         mSections.addAll(mInstrument.sections());
-        Section reviewSection = Section.findByRemoteId(REVIEW_PAGE_ID);
-        if (reviewSection == null) {
-            reviewSection = new Section();
-            reviewSection.setRemoteId(REVIEW_PAGE_ID);
-            reviewSection.setTitle(getActivity().getString(R.string.review_section_title));
-            reviewSection.setInstrumentRemoteId(mInstrument.getRemoteId());
-            reviewSection.save();
+        if (mInstrument.getDirectReviewNavigation()) {
+            Section reviewSection = Section.findByRemoteId(REVIEW_PAGE_ID);
+            if (reviewSection == null) {
+                reviewSection = new Section();
+                reviewSection.setRemoteId(REVIEW_PAGE_ID);
+                reviewSection.setTitle(getActivity().getString(R.string.review_section_title));
+                reviewSection.setInstrumentRemoteId(mInstrument.getRemoteId());
+                reviewSection.save();
+            }
+            if (!mSections.contains(reviewSection)) {
+                mSections.add(reviewSection);
+            }
         }
-        if (!mSections.contains(reviewSection)) { mSections.add(reviewSection); }
         mSectionTitles = new String[mSections.size()];
         for (int i = 0; i < mSections.size(); i++) {
             mSectionTitles[i] = mSections.get(i).getTitle();
