@@ -158,13 +158,7 @@ public class SurveyFragment extends Fragment {
     }
     
     private void setupNavigationDrawer() {
-    	mSections = new ArrayList<Section>();
-    	mSections = (ArrayList<Section>) mInstrument.sections();
-    	mSectionTitles = new String[mSections.size() + 1];
-    	for (int i = 0; i < mSections.size(); i++) {
-    		mSectionTitles[i] = mSections.get(i).getTitle();
-    	}
-        setReviewFragmentNavigationSection();
+        setNavigationDrawerItems();
     	mTitle = mDrawerTitle = mInstrument.getTitle();
     	mDrawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer);
@@ -195,20 +189,22 @@ public class SurveyFragment extends Fragment {
         mNavDrawerSet = true;
     }
 
-    private void setReviewFragmentNavigationSection() {
-//        Log.i(TAG, "REVIEW_PAGE_ID: " + REVIEW_PAGE_ID);
-//        Section review = Section.findByRemoteId(REVIEW_PAGE_ID);
-//        Log.i(TAG, "review: " + review);
-//        if (review == null) {
-//            review = new Section();
-//            review.setRemoteId(REVIEW_PAGE_ID);
-//            Log.i(TAG, "review ID: " + review.getRemoteId());
-//            review.setTitle(getActivity().getString(R.string.review_section_title));
-//            review.setInstrumentRemoteId(mInstrument.getRemoteId());
-//            review.save();
-//            mSections.add(review);
-//            mSectionTitles[mSectionTitles.length - 1] = review.getTitle();
-//        }
+    private void setNavigationDrawerItems() {
+        mSections = new ArrayList<Section>();
+        mSections.addAll(mInstrument.sections());
+        Section reviewSection = Section.findByRemoteId(REVIEW_PAGE_ID);
+        if (reviewSection == null) {
+            reviewSection = new Section();
+            reviewSection.setRemoteId(REVIEW_PAGE_ID);
+            reviewSection.setTitle(getActivity().getString(R.string.review_section_title));
+            reviewSection.setInstrumentRemoteId(mInstrument.getRemoteId());
+            reviewSection.save();
+        }
+        if (!mSections.contains(reviewSection)) { mSections.add(reviewSection); }
+        mSectionTitles = new String[mSections.size()];
+        for (int i = 0; i < mSections.size(); i++) {
+            mSectionTitles[i] = mSections.get(i).getTitle();
+        }
     }
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
@@ -219,7 +215,6 @@ public class SurveyFragment extends Fragment {
     }
     
     private void selectItem(int position) {
-        Log.i(TAG, "SELECTED: " + position);
         if (mSections.get(position).questions().size() > 0) {
             if (mInstrument.getShowSectionsFragment()) {
                 moveToSection(mSections.get(position));
@@ -233,10 +228,9 @@ public class SurveyFragment extends Fragment {
     	mDrawerList.setItemChecked(position, true);
         getActivity().setTitle(mInstrument.getTitle() + " : " + mSectionTitles[position]);
         mDrawerLayout.closeDrawer(mDrawerList);
-//        if (mSections.get(position).getRemoteId() == REVIEW_PAGE_ID && mSurvey.emptyResponses().size() > 0) {
-//            Log.i(TAG, "GONNA REVIEW ID: " + mSections.get(position).getRemoteId());
-//            finishSurvey();
-//        }
+        if (mSections.get(position).getRemoteId().equals(REVIEW_PAGE_ID)) {
+            goToReviewPage();
+        }
     }
     
     private void moveToSection(Section section) {
@@ -375,9 +369,7 @@ public class SurveyFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.fragment_survey, menu);
-        if (mNavDrawerSet == false) {
-        	setupNavigationDrawer();
-        }
+        if (!mNavDrawerSet) { setupNavigationDrawer(); }
     }
     
     @Override
@@ -743,11 +735,7 @@ public class SurveyFragment extends Fragment {
     		setSurveyLocation();
     	}
         if (mSurvey.emptyResponses().size() > 0) {
-            Intent i = new Intent(getActivity(), ReviewPageActivity.class);
-            Bundle b = new Bundle();
-            b.putLong(ReviewPageFragment.EXTRA_REVIEW_SURVEY_ID, mSurvey.getId());
-            i.putExtras(b);
-            startActivityForResult(i, REVIEW_CODE);
+            goToReviewPage();
         } else {
     		getActivity().finish();
 	        mSurvey.setAsComplete();
@@ -755,7 +743,15 @@ public class SurveyFragment extends Fragment {
 	        new SendResponsesTask(getActivity()).execute();
     	}
     }
-       
+
+    private void goToReviewPage() {
+        Intent i = new Intent(getActivity(), ReviewPageActivity.class);
+        Bundle b = new Bundle();
+        b.putLong(ReviewPageFragment.EXTRA_REVIEW_SURVEY_ID, mSurvey.getId());
+        i.putExtras(b);
+        startActivityForResult(i, REVIEW_CODE);
+    }
+
     public boolean isFirstQuestion() {
         return mQuestionNumber == 0;
     }
