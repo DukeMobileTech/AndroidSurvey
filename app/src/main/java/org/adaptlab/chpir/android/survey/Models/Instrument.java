@@ -54,6 +54,10 @@ public class Instrument extends ReceiveModel {
     private boolean mPublished;
     @Column(name = "Deleted")
     private boolean mDeleted;
+    @Column(name = "ShowSectionsFragment")
+    private boolean mShowSectionsFragment;
+    @Column(name = "DirectReviewNavigation")
+    private boolean mDirectReviewNavigation;
 
     public Instrument() {
         super();
@@ -148,6 +152,8 @@ public class Instrument extends ReceiveModel {
             instrument.setQuestionCount(jsonObject.getInt("question_count"));
             instrument.setProjectId(jsonObject.getLong("project_id"));
             instrument.setPublished(jsonObject.getBoolean("published"));
+            instrument.setShowSectionsFragment(jsonObject.getBoolean("show_sections_page"));
+            instrument.setDirectReviewNavigation(jsonObject.getBoolean("navigate_to_review_page"));
             if (jsonObject.isNull("deleted_at")) {
                 instrument.setDeleted(false);
             } else {
@@ -221,7 +227,7 @@ public class Instrument extends ReceiveModel {
     public List<Section> sections() {
         return new Select().from(Section.class)
                 .where("InstrumentRemoteId = ?", getRemoteId())
-                .orderBy("SectionNumber")
+                .orderBy("FirstQuestionNumber")
                 .execute();
     }
 
@@ -310,4 +316,19 @@ public class Instrument extends ReceiveModel {
         mPublished = published;
     }
 
+    public boolean getShowSectionsFragment() {
+        return mShowSectionsFragment;
+    }
+
+    public boolean getDirectReviewNavigation() {
+        return mDirectReviewNavigation;
+    }
+
+    private void setShowSectionsFragment(boolean showSectionsFragment) {
+        mShowSectionsFragment = showSectionsFragment;
+    }
+
+    private void setDirectReviewNavigation(boolean directReviewNavigation) {
+        mDirectReviewNavigation = directReviewNavigation;
+    }
 }

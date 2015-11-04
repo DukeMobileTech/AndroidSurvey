@@ -61,6 +61,7 @@ public class SurveyFragment extends Fragment {
     private static final String TAG = "SurveyFragment";
     private static final int REVIEW_CODE = 100;
     private static final int SECTION_CODE = 200;
+    private static final Long REVIEW_PAGE_ID = -1L;
     public final static String EXTRA_INSTRUMENT_ID =
             "org.adaptlab.chpir.android.survey.instrument_id";
     public final static String EXTRA_QUESTION_ID = 
@@ -159,10 +160,11 @@ public class SurveyFragment extends Fragment {
     private void setupNavigationDrawer() {
     	mSections = new ArrayList<Section>();
     	mSections = (ArrayList<Section>) mInstrument.sections();
-    	mSectionTitles = new String[mSections.size()];
-    	for (int i=0; i<mSections.size(); i++) {
+    	mSectionTitles = new String[mSections.size() + 1];
+    	for (int i = 0; i < mSections.size(); i++) {
     		mSectionTitles[i] = mSections.get(i).getTitle();
     	}
+        setReviewFragmentNavigationSection();
     	mTitle = mDrawerTitle = mInstrument.getTitle();
     	mDrawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer);
@@ -192,7 +194,23 @@ public class SurveyFragment extends Fragment {
         getActivity().getActionBar().setHomeButtonEnabled(true);
         mNavDrawerSet = true;
     }
-    
+
+    private void setReviewFragmentNavigationSection() {
+//        Log.i(TAG, "REVIEW_PAGE_ID: " + REVIEW_PAGE_ID);
+//        Section review = Section.findByRemoteId(REVIEW_PAGE_ID);
+//        Log.i(TAG, "review: " + review);
+//        if (review == null) {
+//            review = new Section();
+//            review.setRemoteId(REVIEW_PAGE_ID);
+//            Log.i(TAG, "review ID: " + review.getRemoteId());
+//            review.setTitle(getActivity().getString(R.string.review_section_title));
+//            review.setInstrumentRemoteId(mInstrument.getRemoteId());
+//            review.save();
+//            mSections.add(review);
+//            mSectionTitles[mSectionTitles.length - 1] = review.getTitle();
+//        }
+    }
+
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -201,15 +219,29 @@ public class SurveyFragment extends Fragment {
     }
     
     private void selectItem(int position) {
-        if (mSections.get(position).questions().size() > 0) moveToSection(mSections.get(position));
+        Log.i(TAG, "SELECTED: " + position);
+        if (mSections.get(position).questions().size() > 0) {
+            if (mInstrument.getShowSectionsFragment()) {
+                moveToSection(mSections.get(position));
+            } else {
+                mSection = mSections.get(position);
+                mQuestion = mSection.questions().get(0);
+                mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
+                refreshView();
+            }
+        }
     	mDrawerList.setItemChecked(position, true);
         getActivity().setTitle(mInstrument.getTitle() + " : " + mSectionTitles[position]);
         mDrawerLayout.closeDrawer(mDrawerList);
+//        if (mSections.get(position).getRemoteId() == REVIEW_PAGE_ID && mSurvey.emptyResponses().size() > 0) {
+//            Log.i(TAG, "GONNA REVIEW ID: " + mSections.get(position).getRemoteId());
+//            finishSurvey();
+//        }
     }
     
     private void moveToSection(Section section) {
         mSection = section;
-    	mPreviousQuestions.add(mQuestionNumber);
+        mPreviousQuestions.add(mQuestionNumber);
         Intent i = new Intent(getActivity(), SectionActivity.class);
         Bundle args = new Bundle();
         args.putLong(EXTRA_SECTION_ID, section.getRemoteId());
@@ -489,7 +521,7 @@ public class SurveyFragment extends Fragment {
             loadOrCreateQuestion();
             loadOrCreateSurvey();
         }
-        if (mQuestion.isFirstQuestionInSection() && showSectionView) {
+        if (mInstrument.getShowSectionsFragment() && mQuestion.isFirstQuestionInSection() && showSectionView) {
             moveToSection(mQuestion.getSection());
         } else {
             if (mQuestion.belongsToGrid()) {

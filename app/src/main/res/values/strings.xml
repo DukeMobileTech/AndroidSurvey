@@ -96,4 +96,5 @@
     <string name="NA">NA</string>
     <string name="DK">DK</string>
     <string name="RF">RF</string>
+    <string name="review_section_title">Go To Review Page</string>
 </resources>

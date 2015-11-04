@@ -25,8 +25,6 @@ public class Section extends ReceiveModel {
     private String mTitle;
 	@Column(name = "FirstQuestionNumber")
 	private int mFirstQuestionNumber;
-	@Column(name = "SectionNumber")
-	private int mSectionNumber;
     @Column(name = "InstrumentRemoteId")
     private Long mInstrumentRemoteId;
 
@@ -43,9 +41,6 @@ public class Section extends ReceiveModel {
             section.setTitle(jsonObject.getString("title"));
 			if (!jsonObject.isNull(jsonObject.getString("first_question_number"))) {
                 section.setFirstQuestionNumber(jsonObject.getInt("first_question_number"));
-            }
-			if (!jsonObject.isNull(jsonObject.getString("section_number"))) {
-                section.setSectionNumber(jsonObject.getInt("section_number"));
             }
             if (jsonObject.isNull("deleted_at")) {
             	section.save();
@@ -106,7 +101,7 @@ public class Section extends ReceiveModel {
 		return Instrument.findByRemoteId(getInstrumentRemoteId());
 	}
 
-	private void setRemoteId(Long remoteId) {
+	public void setRemoteId(Long remoteId) {
 		mRemoteId = remoteId;
 	}
 
@@ -120,10 +115,6 @@ public class Section extends ReceiveModel {
 
 	private void setFirstQuestionNumber(int questionNumber) {
 		mFirstQuestionNumber = questionNumber;
-	}
-
-	private void setSectionNumber(int sectionNumber) {
-		mSectionNumber = sectionNumber;
 	}
 
     private Long getInstrumentRemoteId() {

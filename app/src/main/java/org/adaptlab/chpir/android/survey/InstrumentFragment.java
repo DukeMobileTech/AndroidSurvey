@@ -73,7 +73,7 @@ public class InstrumentFragment extends ListFragment {
             @Override
             public Loader<Cursor> onCreateLoader(int arg0, Bundle cursor) {
                 String selection = "ProjectID = ? AND Published = ? AND Deleted = ?";
-                String[] selectionArgs = {getProjectId().toString(), "1", "0"};
+                String[] selectionArgs = { AppUtil.getAdminSettingsInstance().getProjectId(), "1", "0" };
                 String orderBy = "Title";
                 return new CursorLoader(
                         getActivity(),
@@ -100,7 +100,7 @@ public class InstrumentFragment extends ListFragment {
             @Override
             public Loader<Cursor> onCreateLoader(int arg0, Bundle cursor) {
                 String selection = "ProjectID = ?";
-                String[] selectionArgs = {getProjectId().toString()};
+                String[] selectionArgs = { AppUtil.getAdminSettingsInstance().getProjectId() };
                 String orderBy = "LastUpdated DESC";
                 return new CursorLoader(
                         getActivity(),
@@ -396,6 +396,7 @@ public class InstrumentFragment extends ListFragment {
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
         if (l.getAdapter() instanceof InstrumentAdapter) {
             Cursor cursor = ((InstrumentAdapter) l.getAdapter()).getCursor();
             cursor.moveToPosition(position);
