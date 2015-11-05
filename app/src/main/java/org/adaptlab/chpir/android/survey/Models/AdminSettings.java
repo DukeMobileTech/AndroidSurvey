@@ -278,13 +278,13 @@ public class AdminSettings extends Model {
         return lastSyncTime;
     }
 
-    public List<String> getSpecialResponses() {
-        List<String> responses = new ArrayList<String>();
-        if (getShowDK()) responses.add(Response.DK);
-        if (getShowNA()) responses.add(Response.NA);
-        if (getShowRF()) responses.add(Response.RF);
-        if (getShowSkip()) responses.add(Response.SKIP);
-        return responses;
+    public List<String> getSpecialOptions() {
+        List<String> options = new ArrayList<String>();
+        if (getShowDK()) options.add(Response.DK);
+        if (getShowNA()) options.add(Response.NA);
+        if (getShowRF()) options.add(Response.RF);
+        if (getShowSkip()) options.add(Response.SKIP);
+        return options;
     }
 
 }

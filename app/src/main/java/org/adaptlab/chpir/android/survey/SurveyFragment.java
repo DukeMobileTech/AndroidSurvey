@@ -56,12 +56,26 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SurveyFragment extends Fragment {
     private static final String TAG = "SurveyFragment";
     private static final int REVIEW_CODE = 100;
     private static final int SECTION_CODE = 200;
     private static final Long REVIEW_PAGE_ID = -1L;
+    private static final Map<String, Integer> mMenuItems;
+    static
+    {
+        Map<String, Integer> menuItems = new HashMap<String, Integer>();
+        menuItems.put(Response.SKIP, R.id.menu_item_skip);
+        menuItems.put(Response.NA, R.id.menu_item_na);
+        menuItems.put(Response.RF, R.id.menu_item_rf);
+        menuItems.put(Response.DK, R.id.menu_item_dk);
+        mMenuItems = Collections.unmodifiableMap(menuItems);
+    }
+
     public final static String EXTRA_INSTRUMENT_ID =
             "org.adaptlab.chpir.android.survey.instrument_id";
     public final static String EXTRA_QUESTION_ID = 
@@ -116,7 +130,6 @@ public class SurveyFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
         getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
 
         if (AppUtil.getContext() == null) AppUtil.setContext(getActivity());
@@ -155,6 +168,7 @@ public class SurveyFragment extends Fragment {
         	startLocationServices();
         }
         AppUtil.authorize(); //To take care of login in case Foreground listener has not registered
+        setHasOptionsMenu(true);
     }
     
     private void setupNavigationDrawer() {
@@ -428,19 +442,20 @@ public class SurveyFragment extends Fragment {
         menu.findItem(R.id.menu_item_next)
             .setVisible(!isLastQuestion())
             .setEnabled(hasValidResponse());
-        menu.findItem(R.id.menu_item_skip)
-        	.setEnabled(hasValidResponse())
-        	.setVisible(AppUtil.getAdminSettingsInstance().getShowSkip());
-        menu.findItem(R.id.menu_item_rf)
-            .setVisible(AppUtil.getAdminSettingsInstance().getShowRF());
-        menu.findItem(R.id.menu_item_na)
-            .setVisible(AppUtil.getAdminSettingsInstance().getShowNA());
-        menu.findItem(R.id.menu_item_dk)
-            .setVisible(AppUtil.getAdminSettingsInstance().getShowDK());
+        for (String key : mMenuItems.keySet()) {
+            if (!mInstrument.getSpecialOptionStrings().contains(key)) {
+                menu.findItem(mMenuItems.get(key))
+                        .setVisible(false)
+                        .setEnabled(false);
+            } else {
+                if (key.equals(Response.SKIP)) {
+                    menu.findItem(mMenuItems.get(key)).setEnabled(hasValidResponse());
+                }
+            }
+        }
         menu.findItem(R.id.menu_item_finish)
-            .setVisible(isLastQuestion())
-            .setEnabled(hasValidResponse());
-
+                .setVisible(isLastQuestion())
+                .setEnabled(hasValidResponse());
         showSpecialResponseSelection(menu);
     }
 	

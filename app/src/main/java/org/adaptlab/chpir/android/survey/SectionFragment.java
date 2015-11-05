@@ -18,7 +18,6 @@ import android.widget.TextView;
 
 import com.activeandroid.Model;
 
-import org.adaptlab.chpir.android.survey.Models.AdminSettings;
 import org.adaptlab.chpir.android.survey.Models.Question;
 import org.adaptlab.chpir.android.survey.Models.Response;
 import org.adaptlab.chpir.android.survey.Models.Section;
@@ -54,9 +53,8 @@ public class SectionFragment extends Fragment {
         numQuestionsLabel.setTypeface(Typeface.DEFAULT_BOLD);
 
         mRadioGroup = (RadioGroup) view.findViewById(R.id.default_responses_radio_group);
-        AdminSettings adminSettings = AppUtil.getAdminSettingsInstance();
-        for (int k = 0; k < adminSettings.getSpecialResponses().size(); k++) {
-            displayDefaultSpecialResponses(mRadioGroup, adminSettings.getSpecialResponses().get(k), k);
+        for (int k = 0; k < mSection.getInstrument().getSpecialOptionStrings().size(); k++) {
+            displayDefaultSpecialResponses(mRadioGroup, mSection.getInstrument().getSpecialOptionStrings().get(k), k);
         }
         showDefaultSpecialResponse();
 
@@ -118,7 +116,7 @@ public class SectionFragment extends Fragment {
         for (Question question : mSection.questions()) {
             Response response = mSurvey.getResponseByQuestion(question);
             if (response != null && !TextUtils.isEmpty(response.getSpecialResponse())) {
-                int indexToCheck = AppUtil.getAdminSettingsInstance().getSpecialResponses().indexOf(response.getSpecialResponse());
+                int indexToCheck = mSection.getInstrument().getSpecialOptionStrings().indexOf(response.getSpecialResponse());
                 mRadioGroup.check(indexToCheck);
                 return true;
             }
@@ -127,7 +125,7 @@ public class SectionFragment extends Fragment {
     }
 
     private void setDefaultResponses(int checkedId) {
-        String specialResponse = AppUtil.getAdminSettingsInstance().getSpecialResponses().get(checkedId);
+        String specialResponse = mSection.getInstrument().getSpecialOptionStrings().get(checkedId);
         new DefaultResponsesTask().execute(specialResponse);
     }
 
