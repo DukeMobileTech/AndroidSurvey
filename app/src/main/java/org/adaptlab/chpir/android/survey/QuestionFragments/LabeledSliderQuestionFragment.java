@@ -1,15 +1,15 @@
 package org.adaptlab.chpir.android.survey.QuestionFragments;
 
-import java.util.List;
-
-import org.adaptlab.chpir.android.survey.Models.Option;
-
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+
+import org.adaptlab.chpir.android.survey.Models.Option;
+
+import java.util.List;
 
 public class LabeledSliderQuestionFragment extends SliderQuestionFragment {
     
@@ -20,7 +20,7 @@ public class LabeledSliderQuestionFragment extends SliderQuestionFragment {
             TableRow tableRow = new TableRow(getActivity());
             tableLayout.setStretchAllColumns(true);
             
-            for (Option option : getQuestion().options()) {
+            for (Option option : getQuestion().defaultOptions()) {
                 TextView optionText = new TextView(getActivity());
                 optionText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
                 optionText.setGravity(getGravityByPosition(option));
@@ -34,7 +34,7 @@ public class LabeledSliderQuestionFragment extends SliderQuestionFragment {
     }
     
     private int getGravityByPosition(Option option) {
-        List<Option> options = getQuestion().options();        
+        List<Option> options = getQuestion().defaultOptions();
         if (options.isEmpty()) return Gravity.START;
         
         if (options.get(0).equals(option)) {

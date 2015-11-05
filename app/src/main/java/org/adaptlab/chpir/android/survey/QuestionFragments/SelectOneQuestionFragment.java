@@ -1,13 +1,13 @@
 package org.adaptlab.chpir.android.survey.QuestionFragments;
 
-import org.adaptlab.chpir.android.survey.QuestionFragment;
-import org.adaptlab.chpir.android.survey.Models.Option;
-
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
+
+import org.adaptlab.chpir.android.survey.Models.Option;
+import org.adaptlab.chpir.android.survey.QuestionFragment;
 
 public class SelectOneQuestionFragment extends QuestionFragment {
     private RadioGroup mRadioGroup;
@@ -24,8 +24,8 @@ public class SelectOneQuestionFragment extends QuestionFragment {
     @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
         mRadioGroup = new RadioGroup(getActivity());
-        for (Option option : getQuestion().options()) {
-            int optionId = getQuestion().options().indexOf(option);
+        for (Option option : getQuestion().defaultOptions()) {
+            int optionId = getQuestion().defaultOptions().indexOf(option);
             RadioButton radioButton = new RadioButton(getActivity());
             radioButton.setText(option.getText());
             radioButton.setId(optionId);

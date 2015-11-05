@@ -29,7 +29,7 @@ public abstract class ListOfItemsQuestionFragment extends QuestionFragment {
     
     protected void createQuestionComponent(ViewGroup questionComponent) {
         mResponses = new ArrayList<EditText>();
-        for (Option option : getQuestion().options()) {
+        for (Option option : getQuestion().defaultOptions()) {
             final TextView optionText = new TextView(getActivity());
             optionText.setText(option.getText());
             questionComponent.addView(optionText);

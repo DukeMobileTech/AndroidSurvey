@@ -58,6 +58,8 @@ public class Instrument extends ReceiveModel {
     private boolean mShowSectionsFragment;
     @Column(name = "DirectReviewNavigation")
     private boolean mDirectReviewNavigation;
+    @Column(name = "SpecialOptions")
+    private String mSpecialOptions;
 
     public Instrument() {
         super();
@@ -154,6 +156,7 @@ public class Instrument extends ReceiveModel {
             instrument.setPublished(jsonObject.getBoolean("published"));
             instrument.setShowSectionsFragment(jsonObject.getBoolean("show_sections_page"));
             instrument.setDirectReviewNavigation(jsonObject.getBoolean("navigate_to_review_page"));
+            instrument.setSpecialOptions(jsonObject.getString("special_options"));
             if (jsonObject.isNull("deleted_at")) {
                 instrument.setDeleted(false);
             } else {
@@ -324,11 +327,19 @@ public class Instrument extends ReceiveModel {
         return mDirectReviewNavigation;
     }
 
+    public String getSpecialOptions() {
+        return mSpecialOptions;
+    }
+
     private void setShowSectionsFragment(boolean showSectionsFragment) {
         mShowSectionsFragment = showSectionsFragment;
     }
 
     private void setDirectReviewNavigation(boolean directReviewNavigation) {
         mDirectReviewNavigation = directReviewNavigation;
+    }
+
+    private void setSpecialOptions(String specialOptions) {
+        mSpecialOptions = specialOptions;
     }
 }

@@ -1,11 +1,11 @@
 package org.adaptlab.chpir.android.survey.QuestionFragments;
 
-import org.adaptlab.chpir.android.survey.R;
-
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+
+import org.adaptlab.chpir.android.survey.R;
 
 public class SelectMultipleWriteOtherQuestionFragment extends
         SelectMultipleQuestionFragment {
@@ -16,7 +16,7 @@ public class SelectMultipleWriteOtherQuestionFragment extends
         final EditText otherText = new EditText(getActivity());
         checkbox.setText(R.string.other_specify);
         checkbox.setTypeface(getInstrument().getTypeFace(getActivity().getApplicationContext()));
-        final int otherId = getQuestion().options().size();
+        final int otherId = getQuestion().defaultOptions().size();
         checkbox.setId(otherId);
         checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

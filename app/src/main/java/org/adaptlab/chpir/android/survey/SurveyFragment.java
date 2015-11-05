@@ -592,30 +592,38 @@ public class SurveyFragment extends Fragment {
      * next question in the sequence.
      */
     private Question getNextQuestion(int questionIndex) {
-    	Question nextQuestion = null;
-        if (mQuestion.hasSkipPattern() && mSurvey.getResponseByQuestion(mQuestion) != null) {
-        	try {
-                int responseIndex = Integer.parseInt(mSurvey.getResponseByQuestion(mQuestion).getText());                
-                if (mQuestion.hasMultiSkipPattern()) {
-            		addQuestionsToSkip(responseIndex);
-                }
-                nextQuestion = getNextQuestionForSkipPattern(questionIndex, responseIndex);   
-            } catch (NumberFormatException nfe) {
-                nextQuestion = getNextQuestionWhenNumberFormatException(questionIndex);
-            }
-        } else if (mQuestion.hasMultiSkipPattern() && mSurvey.getResponseByQuestion(mQuestion) != null) {
-        	try {
-        		int responseIndex = Integer.parseInt(mSurvey.getResponseByQuestion(mQuestion).getText());
-        		addQuestionsToSkip(responseIndex);
-        		nextQuestion = nextQuestionHelper(questionIndex);  
-        	} catch (NumberFormatException nfe) {
-        		nextQuestion = getNextQuestionWhenNumberFormatException(questionIndex);
-        	}
+        Question nextQuestion;
+        Response response = mSurvey.getResponseByQuestion(mQuestion);
+        if (response == null) {
+            nextQuestion = nextQuestionHelper(questionIndex);
         } else {
-        	nextQuestion = nextQuestionHelper(questionIndex);
-        }        
-        Question question = getNextUnskippedQuestion(nextQuestion);
-        return question;
+            if (!TextUtils.isEmpty(response.getSpecialResponse())) {
+                Option specialOption = mQuestion.specialOptionByText(response.getSpecialResponse().trim());
+                if (specialOption != null && specialOption.getNextQuestion() != null) {
+                    nextQuestion = specialOption.getNextQuestion();
+                } else {
+                    nextQuestion = nextQuestionHelper(questionIndex);
+                }
+            } else if (Question.AnyResponseQuestions.contains(mQuestion.getQuestionType())) {
+                Option anyResponseOption = mQuestion.anyResponseOption();
+                if (!TextUtils.isEmpty(response.getText()) && anyResponseOption != null && anyResponseOption.getNextQuestion() != null) {
+                    nextQuestion = anyResponseOption.getNextQuestion();
+                } else {
+                    nextQuestion = nextQuestionHelper(questionIndex);
+                }
+            } else if (mQuestion.hasSkipPattern()) {
+                try {
+                    int responseIndex = Integer.parseInt(response.getText());
+                    addQuestionsToSkip(responseIndex);
+                    nextQuestion = getNextQuestionForSkipPattern(questionIndex, responseIndex);
+                } catch (NumberFormatException nfe) {
+                    nextQuestion = getNextQuestionWhenNumberFormatException(questionIndex);
+                }
+            } else {
+                nextQuestion = nextQuestionHelper(questionIndex);
+            }
+        }
+        return getNextUnskippedQuestion(nextQuestion);
     }
 
 	private Question getNextQuestionWhenNumberFormatException(int questionIndex) {
@@ -626,8 +634,8 @@ public class SurveyFragment extends Fragment {
 	}
 
 	private void addQuestionsToSkip(int responseIndex) {
-		if (responseIndex < mQuestion.options().size()) {
-			Option selectedOption = mQuestion.options().get(responseIndex);
+		if (responseIndex < mQuestion.defaultOptions().size()) {
+			Option selectedOption = mQuestion.defaultOptions().get(responseIndex);
 			for (Question skipQuestion: selectedOption.questionsToSkip()){
 				mQuestionsToSkip.add(skipQuestion.getNumberInInstrument());
 			}
@@ -636,8 +644,8 @@ public class SurveyFragment extends Fragment {
 
 	private Question getNextQuestionForSkipPattern(int questionIndex, int responseIndex) {
 		Question nextQuestion;
-		if (responseIndex < mQuestion.options().size() && mQuestion.options().get(responseIndex).getNextQuestion() != null) {
-		    nextQuestion = mQuestion.options().get(responseIndex).getNextQuestion();
+		if (responseIndex < mQuestion.defaultOptions().size() && mQuestion.defaultOptions().get(responseIndex).getNextQuestion() != null) {
+		    nextQuestion = mQuestion.defaultOptions().get(responseIndex).getNextQuestion();
 		    mQuestionNumber = nextQuestion.getNumberInInstrument() - 1;
 		} else {
 		    nextQuestion = nextQuestionHelper(questionIndex);
@@ -694,6 +702,8 @@ public class SurveyFragment extends Fragment {
         } else if (isLastQuestion() && !setQuestionText(mQuestionText)) {
         	finishSurvey();
         }
+        Log.i(TAG, "Call Update Question Count: " + mQuestion.getNumberInInstrument());
+        mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
         updateQuestionCountLabel();
     }
 
@@ -778,7 +788,7 @@ public class SurveyFragment extends Fragment {
     }
     
     private void setSurveyLocation() {
-    	mSurvey.setLatitude(mLocationServiceManager.getLatitude());
+        mSurvey.setLatitude(mLocationServiceManager.getLatitude());
     	mSurvey.setLongitude(mLocationServiceManager.getLongitude());
     }
     

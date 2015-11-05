@@ -1,6 +1,10 @@
 package org.adaptlab.chpir.android.survey.Models;
 
-import java.util.List;
+import android.util.Log;
+
+import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
 import org.adaptlab.chpir.android.survey.AppUtil;
@@ -8,14 +12,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
-
-import com.activeandroid.annotation.Column;
-import com.activeandroid.annotation.Table;
-import com.activeandroid.query.Select;
+import java.util.List;
 
 @Table(name = "Options")
 public class Option extends ReceiveModel {
+    public static final String ANY_RESPONSE = "ANY RESPONSE";
     private static final String TAG = "Option";
 
     @Column(name = "Question")
@@ -33,6 +34,8 @@ public class Option extends ReceiveModel {
     private int mInstrumentVersion;
     @Column(name = "Deleted")
     private boolean mDeleted;
+    @Column(name = "Special")
+    private boolean mSpecial;
 
     public Option() {
         super();
@@ -102,6 +105,7 @@ public class Option extends ReceiveModel {
             	option.setNumberInQuestion(jsonObject.getInt("number_in_question"));
             }
             option.setInstrumentVersion(jsonObject.getInt("instrument_version"));
+            option.setSpecial(jsonObject.getBoolean("special"));
             if (!jsonObject.isNull("deleted_at")) {
             	option.setDeleted(true);
             }
@@ -190,7 +194,15 @@ public class Option extends ReceiveModel {
     public int getInstrumentVersion() {
         return mInstrumentVersion;
     }
-    
+
+    public boolean getSpecial() {
+        return mSpecial;
+    }
+
+    public boolean getDeleted() {
+        return mDeleted;
+    }
+
     private void setNumberInQuestion(int number) {
         mNumberInQuestion = number;
     }
@@ -202,5 +214,8 @@ public class Option extends ReceiveModel {
     private void setDeleted(boolean deleted) {
     	mDeleted = deleted;
     }
- 
+
+    private void setSpecial(boolean special) {
+        mSpecial = special;
+    }
 }

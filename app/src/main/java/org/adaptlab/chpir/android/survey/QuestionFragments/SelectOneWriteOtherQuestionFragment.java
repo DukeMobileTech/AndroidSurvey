@@ -1,13 +1,13 @@
 package org.adaptlab.chpir.android.survey.QuestionFragments;
 
-import org.adaptlab.chpir.android.survey.R;
-
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
+
+import org.adaptlab.chpir.android.survey.R;
 
 public class SelectOneWriteOtherQuestionFragment extends
         SelectOneQuestionFragment {
@@ -19,7 +19,7 @@ public class SelectOneWriteOtherQuestionFragment extends
         
         radioButton.setText(R.string.other_specify);
         radioButton.setTypeface(getInstrument().getTypeFace(getActivity().getApplicationContext()));
-        final int otherId = getQuestion().options().size();
+        final int otherId = getQuestion().defaultOptions().size();
         radioButton.setId(otherId);
         radioButton.setLayoutParams(new RadioGroup.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,

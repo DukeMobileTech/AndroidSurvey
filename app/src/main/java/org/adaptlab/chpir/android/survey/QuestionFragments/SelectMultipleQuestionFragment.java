@@ -1,13 +1,13 @@
 package org.adaptlab.chpir.android.survey.QuestionFragments;
 
-import java.util.ArrayList;
-
-import org.adaptlab.chpir.android.survey.QuestionFragment;
-import org.adaptlab.chpir.android.survey.Models.Option;
-
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+
+import org.adaptlab.chpir.android.survey.Models.Option;
+import org.adaptlab.chpir.android.survey.QuestionFragment;
+
+import java.util.ArrayList;
 
 public class SelectMultipleQuestionFragment extends QuestionFragment {
     private ArrayList<Integer> mResponseIndices;
@@ -21,8 +21,8 @@ public class SelectMultipleQuestionFragment extends QuestionFragment {
     protected void createQuestionComponent(ViewGroup questionComponent) {
         mCheckBoxes = new ArrayList<CheckBox>();
         mResponseIndices = new ArrayList<Integer>();
-        for (Option option : getQuestion().options()) {
-            final int optionId = getQuestion().options().indexOf(option);
+        for (Option option : getQuestion().defaultOptions()) {
+            final int optionId = getQuestion().defaultOptions().indexOf(option);
             CheckBox checkbox = new CheckBox(getActivity());
             checkbox.setText(option.getText());
             checkbox.setTypeface(getInstrument().getTypeFace(getActivity().getApplicationContext()));

@@ -15,7 +15,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Table(name = "Questions")
 public class Question extends ReceiveModel {
@@ -32,6 +35,13 @@ public class Question extends ReceiveModel {
         PHONE_NUMBER, ADDRESS, SELECT_ONE_IMAGE, SELECT_MULTIPLE_IMAGE,
         LIST_OF_INTEGER_BOXES, LABELED_SLIDER;
     }
+
+    public static Set<QuestionType> AnyResponseQuestions = new HashSet<QuestionType>(Arrays.asList(
+            QuestionType.FREE_RESPONSE, QuestionType.SLIDER, QuestionType.DATE, QuestionType.RATING,
+            QuestionType.TIME, QuestionType.INTEGER, QuestionType.EMAIL_ADDRESS,
+            QuestionType.DECIMAL_NUMBER, QuestionType.INSTRUCTIONS, QuestionType.MONTH_AND_YEAR,
+            QuestionType.YEAR, QuestionType.PHONE_NUMBER, QuestionType.ADDRESS,
+            QuestionType.REAR_PICTURE, QuestionType.FRONT_PICTURE));
 
     @Column(name = "Text")
     private String mText;
@@ -115,22 +125,13 @@ public class Question extends ReceiveModel {
     }
       
     public boolean hasSkipPattern() {
-        for (Option option : options()) {
+        for (Option option : defaultOptions()) {
             if (option.getNextQuestion() != null && 
                     !option.getNextQuestion().getQuestionIdentifier().equals("")) {
                 return true;
             }
         }
         return false;
-    }
-    
-    public boolean hasMultiSkipPattern() {
-    	for (Option option: options()) {
-    		if (option.skips() != null && !option.skips().isEmpty()) {
-    			return true;
-    		}
-    	}
-    	return false;
     }
  
     /*
@@ -143,11 +144,11 @@ public class Question extends ReceiveModel {
         
         try {
             if (hasMultipleResponses()) {
-                return FormatUtils.unformatMultipleResponses(options(), text, context);
-            } else if (Integer.parseInt(text) == options().size()) {
+                return FormatUtils.unformatMultipleResponses(defaultOptions(), text, context);
+            } else if (Integer.parseInt(text) == defaultOptions().size()) {
                 return response.getOtherResponse();
             } else {
-                return options().get(Integer.parseInt(text)).getText();
+                return defaultOptions().get(Integer.parseInt(text)).getText();
             }
         } catch (NumberFormatException nfe) {
             Log.e(TAG, text + " is not an option number");
@@ -318,21 +319,48 @@ public class Question extends ReceiveModel {
     	for (Option option : options()) {
     		for (Question question : option.questionsToSkip()) {
     			toBeSkipped.add(question);
-    		}
-    	}
-    	return toBeSkipped;
+            }
+        }
+        return toBeSkipped;
+    }
+
+    public Option specialOptionByText(String optionText) {
+        return new Select().from(Option.class)
+                .where("Question = ? AND Deleted != ? AND Special = ? AND Text = ?", getId(), 1, 1, optionText)
+                .executeSingle();
+    }
+
+    public Option anyResponseOption() {
+        return new Select().from(Option.class)
+                .where("Question = ? AND Deleted != ? AND Special = ? AND Text = ?",
+                        getId(), 1, 1, Option.ANY_RESPONSE)
+                .executeSingle();
     }
     
     /*
      * Relationships
      */
     public boolean hasOptions() {
-        return !options().isEmpty();
+        return !defaultOptions().isEmpty();
     }
 
     public List<Option> options() {
         return new Select().from(Option.class)
                 .where("Question = ? AND Deleted != ?", getId(), 1)
+                .orderBy("NumberInQuestion ASC")
+                .execute();
+    }
+
+    public List<Option> defaultOptions() {
+        return new Select().from(Option.class)
+                .where("Question = ? AND Deleted != ? AND Special = ?", getId(), 1, 0)
+                .orderBy("NumberInQuestion ASC")
+                .execute();
+    }
+
+    public List<Option> specialOptions() {
+        return new Select().from(Option.class)
+                .where("Question = ? AND Deleted != ? AND Special = ?", getId(), 1, 1)
                 .orderBy("NumberInQuestion ASC")
                 .execute();
     }
@@ -345,7 +373,6 @@ public class Question extends ReceiveModel {
         return getMany(QuestionTranslation.class, "Question");
     }
 
-    
     /*
      * Getters/Setters
      */
