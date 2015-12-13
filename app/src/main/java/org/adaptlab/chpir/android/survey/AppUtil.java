@@ -39,6 +39,8 @@ import org.adaptlab.chpir.android.survey.Vendor.BCrypt;
 
 import java.util.UUID;
 
+import io.fabric.sdk.android.Fabric;
+
 public class AppUtil {
     private final static String TAG = "AppUtil";
     public final static boolean PRODUCTION = !BuildConfig.DEBUG;
@@ -88,7 +90,7 @@ public class AppUtil {
         ACCESS_TOKEN = adminSettingsInstance.getApiKey();
 
         if (PRODUCTION) {
-            Crashlytics.start(context);
+            Fabric.with(context, new Crashlytics());
             Crashlytics.setUserIdentifier(adminSettingsInstance.getDeviceIdentifier());
             Crashlytics.setString("device label", adminSettingsInstance.getDeviceLabel());
         }

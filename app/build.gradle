@@ -1,4 +1,10 @@
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+
+repositories {
+    mavenCentral()
+    maven { url 'https://maven.fabric.io/public' }
+}
 
 android {
     compileSdkVersion 18
@@ -25,10 +31,12 @@ android {
 
 dependencies {
     compile 'com.android.support:support-v4:18.0.0'
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
+        transitive = true;
+    }
     compile files('libs/ActiveAndroid.jar')
     compile files('libs/commons-codec-1.8.jar')
     compile files('libs/core-1.51.0.0.jar')
-    compile files('libs/crashlytics.jar')
     compile files('libs/pg-1.51.0.0.jar')
     compile files('libs/pkix-1.51.0.0.jar')
     compile files('libs/prov-1.51.0.0.jar')

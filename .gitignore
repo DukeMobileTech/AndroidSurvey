@@ -28,6 +28,7 @@ app/src/main/assets/crashlytics-build.properties
 # API Keys
 app/src/main/res/values/keys.xml
 app/src/main/res/values/defaults.xml
+fabric.properties
 
 #Gradle
 build/
