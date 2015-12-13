@@ -44,7 +44,7 @@
     <string name="not_valid_response">Esta no es una respuesta valida para esta pregunta.</string>
     <string name="of">de</string>
     <string name="instrument_loading_progress_header">Cargando</string>
-    <string name="instrument_loading_progress_message">Por favor espere un momento.</string>
+    <string name="background_process_progress_message">Por favor espere un momento.</string>
     <string name="instrument_not_loaded">Hubo un problema al cargar el instrumento. Por favor sincronice nuevamente su equipo e intente de nuevo.</string>
     <string name="and">y</string>
     <string name="comma">,</string>

@@ -42,14 +42,7 @@ public class Section extends ReceiveModel {
 			if (!jsonObject.isNull(jsonObject.getString("first_question_number"))) {
                 section.setFirstQuestionNumber(jsonObject.getInt("first_question_number"));
             }
-            if (jsonObject.isNull("deleted_at")) {
-            	section.save();
-            } else {
-            	Section deletedSection = Section.findByRemoteId(remoteId);
-                if (deletedSection != null) {
-                    new Delete().from(Section.class).where("RemoteId = ?", remoteId).execute();
-                }
-            }
+            section.save();
             
             //Generate translations
             JSONArray translationsArray = jsonObject.getJSONArray("translations");
@@ -60,13 +53,34 @@ public class Section extends ReceiveModel {
                 translation.setText(translationJSON.getString("text"));
                 translation.save();
             }
+            if (!jsonObject.isNull("deleted_at")) {
+                Section deletedSection = Section.findByRemoteId(remoteId);
+                if (deletedSection != null) {
+                    deleteAssociatedRecords();
+                    new Delete().from(Section.class).where("RemoteId = ?", remoteId).execute();
+                }
+            }
             
 		} catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);
         }  
 	}
-	
-	/*
+
+    private void deleteAssociatedRecords() {
+        if (translations() != null && translations().size() > 0) {
+            for (SectionTranslation translation : translations()) {
+                translation.delete();
+            }
+        }
+        if (questions() != null && questions().size() > 0) {
+            for (Question question : questions()) {
+                question.setSection(null);
+                question.save();
+            }
+        }
+    }
+
+    /*
      * Find an existing translation, or return a new SectionTranslation
      * if a translation does not yet exist.
      */

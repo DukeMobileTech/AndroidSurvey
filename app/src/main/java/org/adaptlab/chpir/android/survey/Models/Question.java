@@ -492,6 +492,10 @@ public class Question extends ReceiveModel {
         return mSection;
     }
 
+    public void setSection(Section section) {
+        mSection = section;
+    }
+
     public boolean isFirstQuestionInSection() {
         if (getSection() == null || getSection().questions().size() == 0) return false;
         return (getSection().questions().get(0) == this);
@@ -568,8 +572,4 @@ public class Question extends ReceiveModel {
     	mDeleted = deleted;
     }
 
-    private void setSection(Section section) {
-        mSection = section;
-    }
- 
 }

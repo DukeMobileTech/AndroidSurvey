@@ -2,229 +2,237 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:layout_marginLeft="8dp"
-    android:layout_marginRight="8dp" >
-    
-    <ScrollView android:id="@+id/survey_fragment_scroll_view"
+    android:layout_marginRight="8dp"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:id="@+id/survey_fragment_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">
-        
-       <LinearLayout android:id="@+id/linear_layout_for_scroll_view" 
-            android:orientation="vertical"
+
+        <LinearLayout
+            android:id="@+id/linear_layout_for_scroll_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
-            
-           <TextView
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
                 android:id="@+id/sync_settings_label"
+                style="@style/sectionHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/sync_settings"
-                style="@style/sectionHeader" />
-	
-		    <TextView
-		        android:id="@+id/device_identifier_label"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:text="@string/device_identifier" />
-		
-		    <EditText
-		        android:id="@+id/device_identifier_edit_text"
-		        android:layout_width="match_parent"
-		        android:layout_height="wrap_content"
-		        android:ems="10" >
-		
-		        <requestFocus />
-		    </EditText>
-		    
-		    <TextView
+                android:text="@string/sync_settings" />
+
+            <TextView
+                android:id="@+id/device_identifier_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/device_identifier" />
+
+            <EditText
+                android:id="@+id/device_identifier_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10">
+
+                <requestFocus />
+            </EditText>
+
+            <TextView
                 android:id="@+id/device_label_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/device_label" />
-        
+
             <EditText
                 android:id="@+id/device_label_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10" />
-		
-		    <TextView
-		        android:id="@+id/sync_interval_label"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:text="@string/sync_interval"
-		        android:layout_marginTop="10dp" />
-		
-		    <EditText
-		        android:id="@+id/sync_interval_edit_text"
-		        android:layout_width="match_parent"
-		        android:layout_height="wrap_content"
-		        android:ems="10"
-		        android:inputType="number" />
-		    
-		    <TextView
-		        android:id="@+id/api_endpoint_label"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:text="@string/api_endpoint"
-                android:layout_marginTop="10dp" />
-		
-		    <EditText
-		        android:id="@+id/api_endpoint_text"
-		        android:layout_width="match_parent"
-		        android:layout_height="wrap_content"
-		        android:inputType="textUri"
-		        android:ems="10" />
-            
-		    <TextView
+
+            <TextView
+                android:id="@+id/sync_interval_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/sync_interval" />
+
+            <EditText
+                android:id="@+id/sync_interval_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="number" />
+
+            <TextView
+                android:id="@+id/api_endpoint_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/api_endpoint" />
+
+            <EditText
+                android:id="@+id/api_endpoint_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="textUri" />
+
+            <TextView
                 android:id="@+id/api_version_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/api_version"
-                android:layout_marginTop="10dp" />
-        
+                android:layout_marginTop="10dp"
+                android:text="@string/api_version" />
+
             <EditText
                 android:id="@+id/api_version_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="text"
-                android:ems="10" />
-            
+                android:ems="10"
+                android:inputType="text" />
+
             <TextView
                 android:id="@+id/project_id_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/project_id"
-                android:layout_marginTop="10dp" />
-        
+                android:layout_marginTop="10dp"
+                android:text="@string/project_id" />
+
             <EditText
                 android:id="@+id/project_id_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="number"
-                android:ems="10" />
-         
+                android:ems="10"
+                android:inputType="number" />
+
             <TextView
                 android:id="@+id/api_key_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/api_key"
-                android:layout_marginTop="10dp" />
-        
+                android:layout_marginTop="10dp"
+                android:text="@string/api_key" />
+
             <EditText
                 android:id="@+id/api_key_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="text"
-                android:ems="10" />
-            
+                android:ems="10"
+                android:inputType="text" />
+
             <TextView
                 android:id="@+id/custom_locale_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/custom_locale"
-                android:layout_marginTop="10dp" />
-               
+                android:layout_marginTop="10dp"
+                android:text="@string/custom_locale" />
+
             <EditText
                 android:id="@+id/custom_locale_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10" />
-		    
-		    <TextView
+
+            <TextView
                 android:id="@+id/feature_toggle_label"
+                style="@style/sectionHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/feature_toggle"
                 android:layout_marginTop="30dp"
-                style="@style/sectionHeader" />
-		    
-            <CheckBox android:id="@+id/show_surveys_checkbox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/show_surveys"
-                android:layout_marginTop="5dp" />
-            
-            <CheckBox android:id="@+id/show_skip_checkbox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/show_skip"
-                android:layout_marginTop="5dp" />
-            
-            <CheckBox android:id="@+id/show_na_checkbox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/show_na"
-                android:layout_marginTop="5dp" />
-            
-             <CheckBox android:id="@+id/show_rf_checkbox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/show_rf"
-                android:layout_marginTop="5dp" />
-             
-             <CheckBox android:id="@+id/show_dk_checkbox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/show_dk"
-                android:layout_marginTop="5dp" />
-             
-              <CheckBox android:id="@+id/require_password"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/require_password"
-                android:layout_marginTop="5dp" />
+                android:text="@string/feature_toggle" />
 
-              <CheckBox android:id="@+id/record_survey_location_checkbox"
+            <CheckBox
+                android:id="@+id/show_surveys_checkbox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/record_survey_location"
-                android:layout_marginTop="5dp"  />
+                android:layout_marginTop="5dp"
+                android:text="@string/show_surveys" />
 
-             <TextView
+            <CheckBox
+                android:id="@+id/show_skip_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="@string/show_skip" />
+
+            <CheckBox
+                android:id="@+id/show_na_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="@string/show_na" />
+
+            <CheckBox
+                android:id="@+id/show_rf_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="@string/show_rf" />
+
+            <CheckBox
+                android:id="@+id/show_dk_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="@string/show_dk" />
+
+            <CheckBox
+                android:id="@+id/require_password"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="@string/require_password" />
+
+            <CheckBox
+                android:id="@+id/record_survey_location_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="@string/record_survey_location" />
+
+            <TextView
                 android:id="@+id/system_info_label"
+                style="@style/sectionHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/system_information"
                 android:layout_marginTop="30dp"
-                style="@style/sectionHeader" />
-		    
-		    <TextView
-		        android:id="@+id/last_update_label"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:text="@string/last_update"
-		        android:layout_marginTop="5dp"
-		        android:textStyle="bold" />
-		    
-		     <TextView
+                android:text="@string/system_information" />
+
+            <TextView
+                android:id="@+id/last_update_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="@string/last_update"
+                android:textStyle="bold" />
+
+            <TextView
                 android:id="@+id/version_code_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/version_code"
-                android:layout_marginTop="5dp"
                 android:layout_marginBottom="30dp"
-                android:textStyle="bold"
-                 />
-		
-		    <LinearLayout
-		        android:layout_width="match_parent"
-		        android:layout_height="match_parent"
-		        android:orientation="horizontal"
-		        android:gravity="bottom|center_horizontal" >
-		        
-			    <Button
-			        android:id="@+id/save_admin_settings_button"
-			        android:layout_width="wrap_content"
-			        android:layout_height="wrap_content"
-			        android:text="@string/save_button"
-			        android:layout_marginTop="18dp"
-			        android:width="200dp"
-			        android:layout_gravity="bottom" />
-			    
-		    </LinearLayout>
-		</LinearLayout>
+                android:layout_marginTop="5dp"
+                android:text="@string/version_code"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="bottom|center_horizontal"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/save_admin_settings_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginTop="18dp"
+                    android:width="200dp"
+                    android:text="@string/save_button" />
+
+            </LinearLayout>
+        </LinearLayout>
     </ScrollView>
 </LinearLayout>

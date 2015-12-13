@@ -10,6 +10,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build;
 import android.util.Log;
 
+import com.activeandroid.query.Delete;
 import com.crashlytics.android.Crashlytics;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
@@ -21,12 +22,16 @@ import org.adaptlab.chpir.android.survey.Models.Grid;
 import org.adaptlab.chpir.android.survey.Models.GridLabel;
 import org.adaptlab.chpir.android.survey.Models.Image;
 import org.adaptlab.chpir.android.survey.Models.Instrument;
+import org.adaptlab.chpir.android.survey.Models.InstrumentTranslation;
 import org.adaptlab.chpir.android.survey.Models.Option;
+import org.adaptlab.chpir.android.survey.Models.OptionTranslation;
 import org.adaptlab.chpir.android.survey.Models.Question;
+import org.adaptlab.chpir.android.survey.Models.QuestionTranslation;
 import org.adaptlab.chpir.android.survey.Models.Response;
 import org.adaptlab.chpir.android.survey.Models.ResponsePhoto;
 import org.adaptlab.chpir.android.survey.Models.Rule;
 import org.adaptlab.chpir.android.survey.Models.Section;
+import org.adaptlab.chpir.android.survey.Models.SectionTranslation;
 import org.adaptlab.chpir.android.survey.Models.Skip;
 import org.adaptlab.chpir.android.survey.Models.Survey;
 import org.adaptlab.chpir.android.survey.Tasks.ApkUpdateTask;
@@ -191,6 +196,27 @@ public class AppUtil {
 
     public static String getOsBuildNumber() {
         return Build.DISPLAY;
+    }
+
+    public static void wipeOutData() {
+        AppUtil.getAdminSettingsInstance().resetLastSyncTime();
+        new Delete().from(ResponsePhoto.class).execute();
+        new Delete().from(Response.class).execute();
+        new Delete().from(Survey.class).execute();
+        new Delete().from(Rule.class).execute();
+        new Delete().from(Skip.class).execute();
+        new Delete().from(DeviceUser.class).execute();
+        new Delete().from(Image.class).execute();
+        new Delete().from(GridLabel.class).execute();
+        new Delete().from(Grid.class).execute();
+        new Delete().from(InstrumentTranslation.class).execute();
+        new Delete().from(OptionTranslation.class).execute();
+        new Delete().from(QuestionTranslation.class).execute();
+        new Delete().from(SectionTranslation.class).execute();
+        new Delete().from(Option.class).execute();
+        new Delete().from(Question.class).execute();
+        new Delete().from(Section.class).execute();
+        new Delete().from(Instrument.class).execute();
     }
 
 }

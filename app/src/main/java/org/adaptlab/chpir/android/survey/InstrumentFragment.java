@@ -155,6 +155,9 @@ public class InstrumentFragment extends ListFragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.menu_item_settings:
+                startActivity(new Intent(getActivity(), SettingsActivity.class));
+                return true;
             case R.id.menu_item_admin:
                 displayPasswordPrompt();
                 return true;
@@ -489,7 +492,7 @@ public class InstrumentFragment extends ListFragment {
             mProgressDialog = ProgressDialog.show(
                     getActivity(),
                     getString(R.string.instrument_loading_progress_header),
-                    getString(R.string.instrument_loading_progress_message)
+                    getString(R.string.background_process_progress_message)
             );
         }
 
@@ -546,7 +549,7 @@ public class InstrumentFragment extends ListFragment {
             mProgressDialog = ProgressDialog.show(
                     getActivity(),
                     getString(R.string.instrument_loading_progress_header),
-                    getString(R.string.instrument_loading_progress_message)
+                    getString(R.string.background_process_progress_message)
             );
         }
 

@@ -278,6 +278,11 @@ public class AdminSettings extends Model {
         return lastSyncTime;
     }
 
+    public void resetLastSyncTime() {
+        mLastSyncTime = null;
+        save();
+    }
+
     public List<String> getSpecialOptions() {
         List<String> options = new ArrayList<String>();
         if (getShowDK()) options.add(Response.DK);

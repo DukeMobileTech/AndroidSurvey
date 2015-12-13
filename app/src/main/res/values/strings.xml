@@ -42,7 +42,7 @@
     <string name="not_valid_response">This is not a valid response for this question.</string>
     <string name="of">of</string>
     <string name="instrument_loading_progress_header">Loading</string>
-    <string name="instrument_loading_progress_message">Please wait one moment.</string>
+    <string name="background_process_progress_message">Please wait one moment.</string>
     <string name="instrument_not_loaded">There was an issue loading this instrument.  Please re-sync the device and try again.</string>
     <string name="and">and</string>
     <string name="comma">,</string>
@@ -97,4 +97,9 @@
     <string name="DK">DK</string>
     <string name="RF">RF</string>
     <string name="review_section_title">Review Unanswered Questions</string>
+    <string name="wipe_application_data">Wipe Application Data</string>
+    <string name="wipe_data_warning">This action will wipe out all the data (instruments and un-submitted surveys - both complete and in-complete). If you need to submit completed surveys, press the Refresh button (visible after you press the back button) first before wiping data. Afterwards you can download instruments by pressing the Refresh button.</string>
+    <string name="wiping_data_header">Wiping Data</string>
+    <string name="reset_last_sync_time_label">This action will reset the last sync time to the beginning, result in the subsequent refresh re-downloading everything afresh. Surveys will not be affected by this action.</string>
+    <string name="reset_last_sync_time">Reset Last Sync Time</string>
 </resources>
