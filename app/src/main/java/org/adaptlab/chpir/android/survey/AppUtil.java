@@ -18,6 +18,7 @@ import org.adaptlab.chpir.android.survey.Models.AdminSettings;
 import org.adaptlab.chpir.android.survey.Models.DefaultAdminSettings;
 import org.adaptlab.chpir.android.survey.Models.DeviceSyncEntry;
 import org.adaptlab.chpir.android.survey.Models.DeviceUser;
+import org.adaptlab.chpir.android.survey.Models.EventLog;
 import org.adaptlab.chpir.android.survey.Models.Grid;
 import org.adaptlab.chpir.android.survey.Models.GridLabel;
 import org.adaptlab.chpir.android.survey.Models.Image;
@@ -218,6 +219,7 @@ public class AppUtil {
         new Delete().from(Option.class).execute();
         new Delete().from(Question.class).execute();
         new Delete().from(Section.class).execute();
+        new Delete().from(EventLog.class).execute();
         new Delete().from(Instrument.class).execute();
     }
 
