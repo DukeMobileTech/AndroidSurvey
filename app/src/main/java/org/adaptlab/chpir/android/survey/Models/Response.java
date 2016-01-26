@@ -93,7 +93,7 @@ public class Response extends SendModel {
 
         try {
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("survey_uuid", getSurvey().getUUID());
+            jsonObject.put("survey_uuid", (getSurvey() == null) ? getSurveyUUID() : getSurvey().getUUID());
             jsonObject.put("question_id", getQuestion().getRemoteId());
             jsonObject.put("text", getText());
             jsonObject.put("other_response", getOtherResponse());
@@ -211,7 +211,7 @@ public class Response extends SendModel {
      */
     @Override
     public boolean readyToSend() {
-        return getSurvey().readyToSend();
+        return (getSurvey() == null) || getSurvey().readyToSend();
     }
 
     public boolean hasSpecialResponse() {

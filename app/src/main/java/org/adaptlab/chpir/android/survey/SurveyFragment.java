@@ -60,6 +60,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.fabric.sdk.android.Fabric;
+
 public class SurveyFragment extends Fragment {
     private static final String TAG = "SurveyFragment";
     private static final int REVIEW_CODE = 100;
@@ -161,6 +163,7 @@ public class SurveyFragment extends Fragment {
         }
         
         if (AppUtil.PRODUCTION) {
+            Fabric.with(getActivity(), new Crashlytics());
             Crashlytics.setString("last instrument", mInstrument.getTitle());
         }
         
