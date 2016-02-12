@@ -55,6 +55,8 @@ public class Survey extends SendModel {
     private Long mProjectId;
     @Column(name = "InstrumentRemoteId")
     private Long mInstrumentRemoteId;
+    @Column(name = "CriticalResponses")
+    private boolean mCriticalResponses;
 
     public Survey() {
         super();
@@ -79,6 +81,7 @@ public class Survey extends SendModel {
             jsonObject.put("latitude", mLatitude);
             jsonObject.put("longitude", mLongitude);
             jsonObject.put("metadata", mMetadata);
+            jsonObject.put("has_critical_responses", getCriticalResponses());
 
             json.put("survey", jsonObject);
         } catch (JSONException je) {
@@ -283,6 +286,10 @@ public class Survey extends SendModel {
         mProjectId = id;
     }
 
+    public void setCriticalResponses(boolean status) {
+        mCriticalResponses = status;
+    }
+
     private String getMetadataLabel() {
         try {
             JSONObject metadata = new JSONObject(getMetadata());
@@ -298,5 +305,9 @@ public class Survey extends SendModel {
 
     private Long getInstrumentRemoteId() {
         return mInstrumentRemoteId;
+    }
+
+    private boolean getCriticalResponses() {
+        return mCriticalResponses;
     }
 }

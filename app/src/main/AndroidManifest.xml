@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.adaptlab.chpir.android.survey"
-    android:versionCode="45"
-    android:versionName="1.9.29" >
+    android:versionCode="49"
+    android:versionName="1.9.33" >
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -81,7 +81,7 @@
         </receiver>
         <receiver android:name="org.adaptlab.chpir.android.survey.Receivers.NotificationReceiver" />
         <meta-data android:name="AA_DB_NAME" android:value="Survey.db" />
-        <meta-data android:name="AA_DB_VERSION" android:value="41" />
+        <meta-data android:name="AA_DB_VERSION" android:value="43" />
         <meta-data android:name="SEED_DB" android:value="false" />
         <meta-data android:name="io.fabric.ApiKey" android:value="@string/crashlytics_api_key"/>
     </application>

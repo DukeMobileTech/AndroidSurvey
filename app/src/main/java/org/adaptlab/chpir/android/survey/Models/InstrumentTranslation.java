@@ -17,6 +17,8 @@ public class InstrumentTranslation extends Model {
     private String mAlignment;
     @Column(name = "InstrumentRemoteId")
     private Long mInstrumentRemoteId;
+    @Column(name = "CriticalMessage")
+    private String mCriticalMessage;
     
     public InstrumentTranslation() {
         super();
@@ -66,5 +68,13 @@ public class InstrumentTranslation extends Model {
 
     private Long getInstrumentRemoteId() {
         return mInstrumentRemoteId;
+    }
+
+    public String getCriticalMessage() {
+        return mCriticalMessage;
+    }
+
+    public void setCriticalMessage(String message) {
+        mCriticalMessage = message;
     }
 }

@@ -36,6 +36,8 @@ public class Option extends ReceiveModel {
     private boolean mDeleted;
     @Column(name = "Special")
     private boolean mSpecial;
+    @Column(name = "Critical")
+    private boolean mCritical;
 
     public Option() {
         super();
@@ -106,9 +108,8 @@ public class Option extends ReceiveModel {
             }
             option.setInstrumentVersion(jsonObject.getInt("instrument_version"));
             option.setSpecial(jsonObject.getBoolean("special"));
-            if (!jsonObject.isNull("deleted_at")) {
-            	option.setDeleted(true);
-            }
+            if (!jsonObject.isNull("deleted_at")) { option.setDeleted(true); }
+            if (!jsonObject.isNull("critical")) { option.setCritical(jsonObject.getBoolean("critical")); }
             option.save();
             
             // Generate translations
@@ -157,7 +158,7 @@ public class Option extends ReceiveModel {
     }
     
     public List<Skip> skips() {
-    	return getMany(Skip.class, "Option");
+        return getMany(Skip.class, "Option");
     }
     
     public List<Question> questionsToSkip() {
@@ -203,6 +204,10 @@ public class Option extends ReceiveModel {
         return mDeleted;
     }
 
+    public boolean getCritical() {
+        return mCritical;
+    }
+
     private void setNumberInQuestion(int number) {
         mNumberInQuestion = number;
     }
@@ -217,5 +222,9 @@ public class Option extends ReceiveModel {
 
     private void setSpecial(boolean special) {
         mSpecial = special;
+    }
+
+    private void setCritical(boolean critical) {
+        mCritical = critical;
     }
 }

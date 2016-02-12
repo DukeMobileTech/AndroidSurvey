@@ -84,6 +84,8 @@ public class Question extends ReceiveModel {
     private Section mSection;
     @Column(name = "InstrumentRemoteId")
     private Long mInstrumentRemoteId;
+    @Column(name = "Critical")
+    private boolean mCritical;
 
     public Question() {
         super();
@@ -260,8 +262,8 @@ public class Question extends ReceiveModel {
             question.setInstructions(jsonObject.getString("instructions"));
             question.setQuestionVersion(jsonObject.getInt("question_version"));
             question.setFollowingUpQuestion(Question.findByQuestionIdentifier(
-                    jsonObject.getString("following_up_question_identifier")
-                )
+                            jsonObject.getString("following_up_question_identifier")
+                    )
             );
             if (!jsonObject.isNull("grid_id")) {
             	question.setGrid(Grid.findByRemoteId(jsonObject.getLong("grid_id")));
@@ -274,6 +276,7 @@ public class Question extends ReceiveModel {
             if (!jsonObject.isNull("deleted_at")) {
             	question.setDeleted(true);
             }
+            if (!jsonObject.isNull("critical")) { question.setCritical(jsonObject.getBoolean("critical")); }
             question.save();
             
             // Generate translations
@@ -371,6 +374,13 @@ public class Question extends ReceiveModel {
     
     public List<QuestionTranslation> translations() {
         return getMany(QuestionTranslation.class, "Question");
+    }
+
+    public List<Option> criticalOptions() {
+        return new Select().from(Option.class)
+                .where("Question = ? AND Deleted != ? AND Critical = ?", getId(), 1, 1)
+                .orderBy("NumberInQuestion ASC")
+                .execute();
     }
 
     /*
@@ -512,6 +522,10 @@ public class Question extends ReceiveModel {
     public boolean isLastQuestion() {
         return (this == getInstrument().questions().get(getInstrument().getQuestionCount() - 1));
     }
+
+    public boolean getCritical() {
+        return mCritical;
+    }
     
     /*
      * Private
@@ -572,4 +586,7 @@ public class Question extends ReceiveModel {
     	mDeleted = deleted;
     }
 
+    private void setCritical(boolean critical) {
+        mCritical = critical;
+    }
 }

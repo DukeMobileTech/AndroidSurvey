@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources
-  xmlns:tools="http://schemas.android.com/tools"
-  tools:ignore="MissingTranslation" >
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="MissingTranslation" >
 
     <string name="app_name">Encuesta</string>
     <string name="action_settings">Ajustes</string>
@@ -24,16 +24,16 @@
     <string name="api_version">Api Version</string>
     <string name="project_id">Project Id</string>
     <string name="last_update">Last update:  </string>
-    <string name="sync_notification_text">Sincronizando con el servidor...</string>   
-    <string name="sync_notification_complete_text">Sincronización con el servidor completada.</string>    
-    <string name="network_unavailable">No hay red disponible en este dispositivo.</string> 
-    <string name="api_unavailable">Remoto Api no responde.</string>   
-    <string name="unacceptable_version_code">Debe actualizar su aplicación antes de continuar.</string>   
-    <string name="surveys">encuestas</string>  
+    <string name="sync_notification_text">Sincronizando con el servidor...</string>
+    <string name="sync_notification_complete_text">Sincronización con el servidor completada.</string>
+    <string name="network_unavailable">No hay red disponible en este dispositivo.</string>
+    <string name="api_unavailable">Remoto Api no responde.</string>
+    <string name="unacceptable_version_code">Debe actualizar su aplicación antes de continuar.</string>
+    <string name="surveys">encuestas</string>
     <string name="hello">Hello World</string>
-    <string name="questions">preguntas</string> 
-    <string name="question">pregunta</string> 
-    <string name="encryption_required_title">Codificación requerida.</string> 
+    <string name="questions">preguntas</string>
+    <string name="question">pregunta</string>
+    <string name="encryption_required_title">Codificación requerida.</string>
     <string name="encryption_required_text">Esta aplicación requiere que el dispositivo sea codificado . Por favor codifique su dispositivo para continuar.</string>
     <string name="okay">OK</string>
     <string name="password_title">Introduzca contraseña</string>
@@ -94,4 +94,5 @@
     <string name="NA">NA</string>
     <string name="DK">NS</string>
     <string name="RF">RC</string>
+    <string name="critical_message_title">Respuestas Cruciales en la Encuesta</string>
 </resources>

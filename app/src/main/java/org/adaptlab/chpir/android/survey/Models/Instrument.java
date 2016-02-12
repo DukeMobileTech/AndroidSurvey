@@ -62,6 +62,8 @@ public class Instrument extends ReceiveModel {
     private boolean mDirectReviewNavigation;
     @Column(name = "SpecialOptions")
     private String mSpecialOptions;
+    @Column(name = "CriticalMessage")
+    private String mCriticalMessage;
 
     public Instrument() {
         super();
@@ -100,6 +102,17 @@ public class Instrument extends ReceiveModel {
 
         // Fall back to default
         return mAlignment;
+    }
+
+    public String getCriticalMessage() {
+        if (getLanguage().equals(getDeviceLanguage())) return mCriticalMessage;
+        for (InstrumentTranslation translation : translations()) {
+            if (translation.getLanguage().equals(getDeviceLanguage())
+                    && !translation.getCriticalMessage().trim().equals("")) {
+                return translation.getCriticalMessage();
+            }
+        }
+        return mCriticalMessage;
     }
 
     public InstrumentTranslation getTranslationByLanguage(String language) {
@@ -158,6 +171,7 @@ public class Instrument extends ReceiveModel {
             instrument.setPublished(jsonObject.getBoolean("published"));
             instrument.setShowSectionsFragment(jsonObject.getBoolean("show_sections_page"));
             instrument.setDirectReviewNavigation(jsonObject.getBoolean("navigate_to_review_page"));
+            instrument.setCriticalMessage(jsonObject.getString("critical_message"));
             instrument.setSpecialOptions(jsonObject.getString("special_options"));
             if (jsonObject.isNull("deleted_at")) {
                 instrument.setDeleted(false);
@@ -174,6 +188,7 @@ public class Instrument extends ReceiveModel {
                 translation.setInstrumentRemoteId(instrument.getRemoteId());
                 translation.setAlignment(translationJSON.getString("alignment"));
                 translation.setTitle(translationJSON.getString("title"));
+                translation.setCriticalMessage(translationJSON.getString("critical_message"));
                 translation.save();
             }
         } catch (JSONException je) {
@@ -233,6 +248,13 @@ public class Instrument extends ReceiveModel {
         return new Select().from(Section.class)
                 .where("InstrumentRemoteId = ?", getRemoteId())
                 .orderBy("FirstQuestionNumber")
+                .execute();
+    }
+
+    public List<Question> criticalQuestions() {
+        return new Select().from(Question.class)
+                .where("InstrumentRemoteId = ? AND Deleted != ? AND Critical = ?", getRemoteId(), 1, 1)
+                .orderBy("NumberInInstrument ASC")
                 .execute();
     }
 
@@ -351,5 +373,9 @@ public class Instrument extends ReceiveModel {
 
     private void setSpecialOptions(String specialOptions) {
         mSpecialOptions = specialOptions.replaceAll("[^A-Za-z0-9,]", "");
+    }
+
+    private void setCriticalMessage(String message) {
+        mCriticalMessage = message;
     }
 }

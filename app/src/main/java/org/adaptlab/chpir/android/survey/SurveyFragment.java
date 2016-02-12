@@ -1,7 +1,9 @@
 package org.adaptlab.chpir.android.survey;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
@@ -56,9 +58,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -348,14 +353,14 @@ public class SurveyFragment extends Fragment {
         if (resultCode == Activity.RESULT_OK && requestCode == REVIEW_CODE) {
             Long remoteId = data.getExtras().getLong(EXTRA_QUESTION_ID);
             if (remoteId == Long.MIN_VALUE) {
-            	getActivity().finish();
+            	checkForCriticalResponses();
             } else {
 				Question question = Question.findByRemoteId(remoteId);
 	            if (question != null) {
 	            	mQuestion = question;
 	            	mResumeQuestion = mQuestion;
 	            } else {
-	            	getActivity().finish();
+	            	checkForCriticalResponses();
 	            }
             }
 		}
@@ -720,7 +725,6 @@ public class SurveyFragment extends Fragment {
         } else if (isLastQuestion() && !setQuestionText(mQuestionText)) {
         	finishSurvey();
         }
-        Log.i(TAG, "Call Update Question Count: " + mQuestion.getNumberInInstrument());
         mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
         updateQuestionCountLabel();
     }
@@ -763,17 +767,55 @@ public class SurveyFragment extends Fragment {
     * complete.  Send to server if network is available.
     */
     public void finishSurvey() {
-    	if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) {
-    		setSurveyLocation();
-    	}
+    	if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) { setSurveyLocation(); }
         if (mSurvey.emptyResponses().size() > 0) {
             goToReviewPage();
         } else {
-    		getActivity().finish();
-	        mSurvey.setAsComplete();
-	        mSurvey.save();
-	        new SendResponsesTask(getActivity()).execute();
+    		checkForCriticalResponses();
     	}
+    }
+
+    private void checkForCriticalResponses() {
+        if (hasCriticalResponses()) {
+            new AlertDialog.Builder(getActivity())
+                    .setTitle(R.string.critical_message_title)
+                    .setMessage(mInstrument.getCriticalMessage())
+                    .setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int button) {
+                            mSurvey.setCriticalResponses(true);
+                            completeAndSubmitSurvey();
+                        }
+                    }).show();
+        } else {
+            mSurvey.setCriticalResponses(false);
+            completeAndSubmitSurvey();
+        }
+    }
+
+    private void completeAndSubmitSurvey() {
+        getActivity().finish();
+        mSurvey.setAsComplete();
+        mSurvey.save();
+        new SendResponsesTask(getActivity()).execute();
+    }
+
+    private boolean hasCriticalResponses() {
+        if (mInstrument.criticalQuestions().size() > 0) {
+            for (Question question : mInstrument.criticalQuestions()) {
+                Response response = mSurvey.getResponseByQuestion(question);
+                Set<String> optionSet = new HashSet<String>();
+                Set<String> responseSet = new HashSet<String>();
+                for (Option option : question.criticalOptions()) {
+                    optionSet.add(Integer.toString(question.defaultOptions().indexOf(option)));
+                }
+                if (!TextUtils.isEmpty(response.getText())) {
+                    responseSet.addAll(Arrays.asList(response.getText().split(",")));
+                }
+                optionSet.retainAll(responseSet);
+                if (optionSet.size() > 0) return true;
+            }
+        }
+        return false;
     }
 
     private void goToReviewPage() {
