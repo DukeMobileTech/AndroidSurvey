@@ -103,4 +103,6 @@
     <string name="reset_last_sync_time_label">This action will reset the last sync time to the beginning, result in the subsequent refresh re-downloading everything afresh. Surveys will not be affected by this action.</string>
     <string name="reset_last_sync_time">Reset Last Sync Time</string>
     <string name="critical_message_title">Critical Responses In Survey</string>
+    <string name="submit">SUBMIT</string>
+    <string name="review">REVIEW</string>
 </resources>

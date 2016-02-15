@@ -95,4 +95,6 @@
     <string name="DK">NS</string>
     <string name="RF">RC</string>
     <string name="critical_message_title">Respuestas Cruciales en la Encuesta</string>
+    <string name="review">REVISIÓN</string>
+    <string name="submit">PRESENTAR</string>
 </resources>
