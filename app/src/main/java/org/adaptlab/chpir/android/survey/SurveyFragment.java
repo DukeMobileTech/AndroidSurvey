@@ -74,8 +74,8 @@ public class SurveyFragment extends Fragment {
     private static final int SECTION_CODE = 200;
     private static final Long REVIEW_PAGE_ID = -1L;
     private static final Map<String, Integer> mMenuItems;
-    static
-    {
+
+    static {
         Map<String, Integer> menuItems = new HashMap<String, Integer>();
         menuItems.put(Response.SKIP, R.id.menu_item_skip);
         menuItems.put(Response.NA, R.id.menu_item_na);
@@ -375,7 +375,8 @@ public class SurveyFragment extends Fragment {
             mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
             mInstrument = Instrument.findByRemoteId(instrumentId);
             mSurvey = Model.load(Survey.class, surveyId);
-            if (mQuestion.getSection() != null && mQuestion.getSection() == mSection) showSectionView = false;
+            if (mQuestion.getSection() != null && mQuestion.getSection() == mSection)
+                showSectionView = false;
             if (previousQuestions != null) mPreviousQuestions.addAll(previousQuestions);
             if (previousQuestion == mQuestion) showSectionView = false;
         }
@@ -396,7 +397,9 @@ public class SurveyFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.fragment_survey, menu);
-        if (!mNavDrawerSet) { setupNavigationDrawer(); }
+        if (!mNavDrawerSet) {
+            setupNavigationDrawer();
+        }
     }
 
     @Override
@@ -433,7 +436,8 @@ public class SurveyFragment extends Fragment {
     }
 
     private void proceedToNextQuestion() {
-        if (isLastQuestion()) finishSurvey(); else moveToNextQuestion();
+        if (isLastQuestion()) finishSurvey();
+        else moveToNextQuestion();
     }
 
     private void unSkipAndMoveToNextQuestion() {
@@ -660,7 +664,7 @@ public class SurveyFragment extends Fragment {
     private void addQuestionsToSkip(int responseIndex) {
         if (responseIndex < mQuestion.defaultOptions().size()) {
             Option selectedOption = mQuestion.defaultOptions().get(responseIndex);
-            for (Question skipQuestion: selectedOption.questionsToSkip()){
+            for (Question skipQuestion : selectedOption.questionsToSkip()) {
                 mQuestionsToSkip.add(skipQuestion.getNumberInInstrument());
             }
         }
@@ -755,7 +759,7 @@ public class SurveyFragment extends Fragment {
                 moveToPreviousQuestion();
             }
             if (mSurvey.getResponseByQuestion(mQuestion) != null &&
-                    mSurvey.getResponseByQuestion(mQuestion).getText() != "" ) {
+                    mSurvey.getResponseByQuestion(mQuestion).getText() != "") {
                 clearSkipsForCurrentQuestion();
             }
         }
@@ -768,7 +772,9 @@ public class SurveyFragment extends Fragment {
     * complete.  Send to server if network is available.
     */
     public void finishSurvey() {
-        if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) { setSurveyLocation(); }
+        if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) {
+            setSurveyLocation();
+        }
         if (mSurvey.emptyResponses().size() > 0) {
             goToReviewPage();
         } else {
@@ -779,26 +785,20 @@ public class SurveyFragment extends Fragment {
     private void checkForCriticalResponses() {
         final List<String> criticalResponses = getCriticalResponses();
         if (criticalResponses.size() > 0) {
-            String[] list = new String[criticalResponses.size()];
+            String[] criticalQuestions = new String[criticalResponses.size()];
             for (int k = 0; k < criticalResponses.size(); k++) {
-                list[k] = Question.findByQuestionIdentifier(criticalResponses.get(k)).getNumberInInstrument()
+                criticalQuestions[k] = Question.findByQuestionIdentifier(criticalResponses.get(k)).getNumberInInstrument()
                         + ": " + criticalResponses.get(k);
             }
-            String titleMessage = getResources().getString(R.string.critical_message_title) +
-                    System.getProperty("line.separator") + mInstrument.getCriticalMessage();
-            TextView titleView = new TextView(getActivity());
-            titleView.setText(titleMessage);
 
-            new AlertDialog.Builder(getActivity())
-                    .setCustomTitle(titleView)
-                    .setItems(list, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            mQuestion = Question.findByQuestionIdentifier(criticalResponses.get(which));
-                            mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
-                            refreshView();
-                        }
-                    })
+            final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            View content = LayoutInflater.from(getActivity()).inflate(R.layout.critical_responses_dialog, null);
+            ListView listView = (ListView) content.findViewById(R.id.critical_list);
+            listView.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_selectable_list_item, criticalQuestions));
+
+            builder.setTitle(R.string.critical_message_title)
+                    .setMessage(mInstrument.getCriticalMessage())
+                    .setView(content)
                     .setPositiveButton(R.string.submit, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int button) {
@@ -813,8 +813,27 @@ public class SurveyFragment extends Fragment {
                             mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
                             refreshView();
                         }
-                    })
-                    .show();
+                    });
+            final AlertDialog criticalDialog = builder.create();
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    mQuestion = Question.findByQuestionIdentifier(criticalResponses.get(position));
+                    mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
+                    refreshView();
+                    criticalDialog.dismiss();
+                }
+            });
+            criticalDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+                @Override
+                public void onShow(DialogInterface dialog) {
+                    criticalDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                            .setBackgroundColor(getResources().getColor(R.color.green));
+                    criticalDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                            .setBackgroundColor(getResources().getColor(R.color.red));
+                }
+            });
+            criticalDialog.show();
         } else {
             mSurvey.setCriticalResponses(false);
             completeAndSubmitSurvey();
