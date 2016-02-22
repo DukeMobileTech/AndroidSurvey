@@ -97,4 +97,5 @@
     <string name="critical_message_title">Respuestas Cruciales en la Encuesta</string>
     <string name="review">REVISIÓN</string>
     <string name="submit">PRESENTAR</string>
+    <string name="review_section_title">Preguntas que se Saltaron</string>
 </resources>

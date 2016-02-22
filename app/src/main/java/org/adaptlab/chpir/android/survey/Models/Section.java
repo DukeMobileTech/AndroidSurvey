@@ -127,7 +127,7 @@ public class Section extends ReceiveModel {
 		mTitle = title;
 	}
 
-	private void setFirstQuestionNumber(int questionNumber) {
+	public void setFirstQuestionNumber(int questionNumber) {
 		mFirstQuestionNumber = questionNumber;
 	}
 

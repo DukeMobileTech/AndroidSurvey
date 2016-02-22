@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
 
@@ -38,6 +39,7 @@ import org.adaptlab.chpir.android.survey.Models.Survey;
 import org.adaptlab.chpir.android.survey.Tasks.ApkUpdateTask;
 import org.adaptlab.chpir.android.survey.Vendor.BCrypt;
 
+import java.util.List;
 import java.util.UUID;
 
 import io.fabric.sdk.android.Fabric;
@@ -223,4 +225,22 @@ public class AppUtil {
         new Delete().from(Instrument.class).execute();
     }
 
+    public static void orderInstrumentsSections() {
+        new OrderInstrumentSectionsTask().execute();
+    }
+
+    private static class OrderInstrumentSectionsTask extends AsyncTask <Void, Void, Void> {
+
+        public OrderInstrumentSectionsTask() {}
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            List<Instrument> instruments = Instrument.getAllProjectInstruments(
+                    Long.valueOf(adminSettingsInstance.getProjectId()));
+            for(Instrument instrument : instruments) {
+                instrument.orderSections();
+            }
+            return null;
+        }
+    }
 }

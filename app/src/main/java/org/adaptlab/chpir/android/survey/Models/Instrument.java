@@ -245,9 +245,10 @@ public class Instrument extends ReceiveModel {
     }
 
     public List<Section> sections() {
-        return new Select().from(Section.class)
-                .where("InstrumentRemoteId = ?", getRemoteId())
-                .orderBy("FirstQuestionNumber")
+        return new Select()
+                .from(Section.class)
+                .where("Sections.InstrumentRemoteId = ?", getRemoteId())
+                .orderBy("Sections.FirstQuestionNumber ASC")
                 .execute();
     }
 
@@ -377,5 +378,14 @@ public class Instrument extends ReceiveModel {
 
     private void setCriticalMessage(String message) {
         mCriticalMessage = message;
+    }
+
+    public void orderSections() {
+        for(Section section : sections()) {
+            if (section.questions().size() > 0) {
+                section.setFirstQuestionNumber(section.questions().get(0).getNumberInInstrument());
+                section.save();
+            }
+        }
     }
 }

@@ -854,13 +854,15 @@ public class SurveyFragment extends Fragment {
                 Response response = mSurvey.getResponseByQuestion(question);
                 Set<String> optionSet = new HashSet<String>();
                 Set<String> responseSet = new HashSet<String>();
-                for (Option option : question.criticalOptions()) {
-                    optionSet.add(Integer.toString(question.defaultOptions().indexOf(option)));
+                if (response != null) {
+                    for (Option option : question.criticalOptions()) {
+                        optionSet.add(Integer.toString(question.defaultOptions().indexOf(option)));
+                    }
+                    if (!TextUtils.isEmpty(response.getText())) {
+                        responseSet.addAll(Arrays.asList(response.getText().split(",")));
+                    }
+                    optionSet.retainAll(responseSet);
                 }
-                if (!TextUtils.isEmpty(response.getText())) {
-                    responseSet.addAll(Arrays.asList(response.getText().split(",")));
-                }
-                optionSet.retainAll(responseSet);
                 if (optionSet.size() > 0) {
                     criticalQuestions.add(question.getQuestionIdentifier());
                 }

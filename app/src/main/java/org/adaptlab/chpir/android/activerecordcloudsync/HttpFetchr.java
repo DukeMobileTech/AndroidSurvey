@@ -79,6 +79,7 @@ public class HttpFetchr {
             if (latestSyncTime.equals("")) {
                 new GetReceiveTablesTask(AppUtil.getContext()).execute();
             }
+            AppUtil.orderInstrumentsSections();
         }
     }
 
