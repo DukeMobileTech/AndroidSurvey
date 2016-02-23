@@ -4,7 +4,6 @@ import android.util.Log;
 
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
-import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
@@ -27,6 +26,8 @@ public class Section extends ReceiveModel {
 	private int mFirstQuestionNumber;
     @Column(name = "InstrumentRemoteId")
     private Long mInstrumentRemoteId;
+    @Column(name = "Deleted")
+    private boolean mDeleted;
 
 	@Override
 	public void createObjectFromJSON(JSONObject jsonObject) {
@@ -42,6 +43,11 @@ public class Section extends ReceiveModel {
 			if (!jsonObject.isNull(jsonObject.getString("first_question_number"))) {
                 section.setFirstQuestionNumber(jsonObject.getInt("first_question_number"));
             }
+            if (jsonObject.isNull("deleted_at")) {
+                section.setDeleted(false);
+            } else {
+                section.setDeleted(true);
+            }
             section.save();
             
             //Generate translations
@@ -53,31 +59,14 @@ public class Section extends ReceiveModel {
                 translation.setText(translationJSON.getString("text"));
                 translation.save();
             }
-            if (!jsonObject.isNull("deleted_at")) {
-                Section deletedSection = Section.findByRemoteId(remoteId);
-                if (deletedSection != null) {
-                    deleteAssociatedRecords();
-                    new Delete().from(Section.class).where("RemoteId = ?", remoteId).execute();
-                }
-            }
             
 		} catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);
         }  
 	}
 
-    private void deleteAssociatedRecords() {
-        if (translations() != null && translations().size() > 0) {
-            for (SectionTranslation translation : translations()) {
-                translation.delete();
-            }
-        }
-        if (questions() != null && questions().size() > 0) {
-            for (Question question : questions()) {
-                question.setSection(null);
-                question.save();
-            }
-        }
+    private void setDeleted(boolean deleted) {
+        mDeleted = deleted;
     }
 
     /*

@@ -4,7 +4,6 @@ import android.util.Log;
 
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
-import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
@@ -20,6 +19,8 @@ public class Skip extends ReceiveModel {
 	private Option mOption;
 	@Column(name = "Question", onUpdate = Column.ForeignKeyAction.CASCADE, onDelete = Column.ForeignKeyAction.CASCADE)
 	private Question mQuestion;
+	@Column(name = "Deleted")
+	private boolean mDeleted;
 	
 	@Override
 	public void createObjectFromJSON(JSONObject jsonObject) {
@@ -33,13 +34,11 @@ public class Skip extends ReceiveModel {
             skip.setOption(Option.findByRemoteId(jsonObject.getLong("option_id")));
             skip.setQuestion(Question.findByQuestionIdentifier(jsonObject.getString("question_identifier")));
             if (jsonObject.isNull("deleted_at")) {
-            	skip.save();
+            	skip.setDeleted(false);
             } else {
-            	Skip deletedSkip = Skip.findByRemoteId(remoteId);
-            	if (deletedSkip != null) {
-					new Delete().from(Skip.class).where("RemoteId = ?", remoteId).execute();
-            	}
+            	skip.setDeleted(true);
             }
+			skip.save();
 		} catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);
         }  
@@ -55,6 +54,10 @@ public class Skip extends ReceiveModel {
 
 	private void setRemoteId(Long remoteId) {
 		mRemoteId = remoteId;
+	}
+
+	private void setDeleted(boolean deleted) {
+		mDeleted = deleted;
 	}
 
 	public static Skip findByRemoteId(Long remoteId) {

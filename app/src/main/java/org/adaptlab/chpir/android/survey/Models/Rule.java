@@ -4,7 +4,6 @@ import android.util.Log;
 
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
-import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
@@ -28,6 +27,8 @@ public class Rule extends ReceiveModel {
     private Long mRemoteId;
     @Column(name = "InstrumentRemoteId")
     private Long mInstrumentRemoteId;
+    @Column(name = "Deleted")
+    private boolean mDeleted;
 
     public static enum RuleType {
       INSTRUMENT_SURVEY_LIMIT_RULE, INSTRUMENT_TIMING_RULE, INSTRUMENT_SURVEY_LIMIT_PER_MINUTE_RULE,
@@ -63,7 +64,7 @@ public class Rule extends ReceiveModel {
     }
     
     public static List<Rule> getAll() {
-        return new Select().from(Rule.class).orderBy("Id ASC").execute();
+        return new Select().from(Rule.class).where("Deleted != ?", 1).orderBy("Id ASC").execute();
     }
     
     public static Rule findByRemoteId(Long remoteId) {
@@ -87,13 +88,11 @@ public class Rule extends ReceiveModel {
             rule.setParams(jsonObject.getString("rule_params"));
             rule.setRemoteId(remoteId);
             if (jsonObject.isNull("deleted_at")) {
-                rule.save();
+                rule.setDeleted(false);
             } else {
-                Rule deletedRule = Rule.findByRemoteId(remoteId);
-                if (deletedRule != null) {
-                    new Delete().from(Rule.class).where("RemoteId = ?", remoteId).execute();
-                }
+                rule.setDeleted(true);
             }
+            rule.save();
         } catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);
         }
@@ -168,6 +167,10 @@ public class Rule extends ReceiveModel {
     
     private void setRemoteId(Long id) {
         mRemoteId = id;
+    }
+
+    private void setDeleted(boolean deleted) {
+        mDeleted = deleted;
     }
     
     private void setRuleType(String ruleType) {
