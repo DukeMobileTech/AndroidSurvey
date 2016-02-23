@@ -248,7 +248,7 @@ public class Instrument extends ReceiveModel {
         return new Select()
                 .from(Section.class)
                 .where("Sections.InstrumentRemoteId = ?", getRemoteId())
-                .orderBy("Sections.FirstQuestionNumber ASC")
+                .orderBy("Sections.FirstQuestionNumber IS NULL, Sections.FirstQuestionNumber")
                 .execute();
     }
 
