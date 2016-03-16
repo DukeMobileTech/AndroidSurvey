@@ -6,15 +6,19 @@ import android.util.Log;
 import org.adaptlab.chpir.android.survey.AppUtil;
 import org.adaptlab.chpir.android.survey.R;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ActiveRecordCloudSync {
     private static final String TAG="ActiveRecordCloudSync";
+    private static final int TIME_OUT = 10000;
+    public static final int UPGRADE_CODE = 426;
     private static Map<String, Class<? extends ReceiveModel>> mReceiveTables =
             new LinkedHashMap<String, Class<? extends ReceiveModel>>();
     private static Map<String, Class<? extends SendModel>> mSendTables =
@@ -60,8 +64,7 @@ public class ActiveRecordCloudSync {
 
     public static void syncReceiveTables(Context context) {
         NetworkNotificationUtils.showNotification(context, android.R.drawable.stat_sys_download, R.string.sync_notification_text);
-        Date currentTime = new Date();
-        ActiveRecordCloudSync.setLastSyncTime(Long.toString(currentTime.getTime()));
+        ActiveRecordCloudSync.setLastSyncTime();
         ActiveRecordCloudSync.setFetchCount(0);
         for (Map.Entry<String, Class<? extends ReceiveModel>> entry : mReceiveTables.entrySet()) {
             if (AppUtil.DEBUG) Log.i(TAG, "Syncing " + entry.getValue() + " from remote table " + entry.getKey());
@@ -83,8 +86,8 @@ public class ActiveRecordCloudSync {
 
     public static boolean isApiAvailable() {
         if (getPingAddress() == null) return true;
-        int responseCode = ping(getPingAddress(), 10000);
-        if (responseCode == 426) return true; // Api is available but an app upgrade is required
+        int responseCode = ping(getPingAddress(), TIME_OUT);
+        if (responseCode == UPGRADE_CODE) return true; // Api is available but an app upgrade is required
         return (200 <= responseCode && responseCode < 300);
     }
 
@@ -93,8 +96,8 @@ public class ActiveRecordCloudSync {
      * minimum standard to interact with API.
      */
     public static boolean isVersionAcceptable() {
-        int responseCode = ping(getPingAddress(), 10000);
-        return responseCode != 426;  // Http Status Code 426 = upgrade required     
+        int responseCode = ping(getPingAddress(), TIME_OUT);
+        return responseCode != UPGRADE_CODE;  // Http Status Code 426 = upgrade required
     }
 
     public static void setAccessToken(String token) {
@@ -137,15 +140,37 @@ public class ActiveRecordCloudSync {
         return mLastSyncTime;
     }
 
-    private static void setLastSyncTime(String time) {
-        mLastSyncTime = time;
+    private static void setLastSyncTime() {
+        if (isApiAvailable()) {
+            String url = getPingAddress() + getParams();
+            HttpURLConnection connection = null;
+            try {
+                connection = (HttpURLConnection) new URL(url).openConnection();
+                connection.setConnectTimeout(TIME_OUT);
+                connection.setReadTimeout(TIME_OUT);
+                InputStream in = new BufferedInputStream(connection.getInputStream());
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                int bytesRead;
+                byte[] buffer = new byte[1024];
+                while ((bytesRead = in.read(buffer)) > 0) {
+                    out.write(buffer, 0, bytesRead);
+                }
+                out.close();
+                String lastSyncTime = new String(out.toByteArray());
+                mLastSyncTime = lastSyncTime.replace("\"", "");
+
+            } catch (IOException exception) {
+                Log.e(TAG, exception.getMessage());
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
+            }
+        }
     }
 
     private static String getPingAddress() {
-        if (!getReceiveTables().keySet().isEmpty()) {
-            return getEndPoint() + getReceiveTables().keySet().iterator().next();
-        }
-        return getEndPoint();
+        return getEndPoint() + "current_time";
     }
 
     private static int ping(String url, int timeout) {

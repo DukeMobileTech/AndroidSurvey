@@ -267,6 +267,9 @@ public class AdminSettings extends Model {
     public String getLastSyncTime() {
         String lastSyncTime = "";
         if (mLastSyncTime == null) { return lastSyncTime; }
+        ////TEMPORARY////
+        if (!mLastSyncTime.contains("-")) { resetLastSyncTime(); }
+        ////END////
         try {
             JSONObject projectLastSyncTime = new JSONObject(mLastSyncTime);
             if (!projectLastSyncTime.isNull(getProjectId())) {

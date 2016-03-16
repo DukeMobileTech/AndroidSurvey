@@ -1,5 +1,6 @@
 package org.adaptlab.chpir.android.activerecordcloudsync;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import org.adaptlab.chpir.android.survey.AppUtil;
@@ -76,7 +77,7 @@ public class HttpFetchr {
                 }
             }
             adminSettings.setLastSyncTime(latestSyncTime);
-            if (latestSyncTime.equals("")) {
+            if (TextUtils.isEmpty(latestSyncTime)) {
                 new GetReceiveTablesTask(AppUtil.getContext()).execute();
             }
             AppUtil.orderInstrumentsSections();
