@@ -22,6 +22,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -274,7 +275,18 @@ public class Instrument extends ReceiveModel {
         }
         return true;
     }
-        
+
+    public HashMap<Question, List<Option>> questionOptionsMap() {
+        int capacity = (int) Math.ceil(getQuestionCount()/0.75);
+        HashMap<Question, List<Option>> map = new HashMap<Question, List<Option>>(capacity);
+        for (Question question : questions()) {
+            if (question.hasOptions()) {
+                map.put(question, question.defaultOptions());
+            }
+        }
+        return map;
+    }
+
     /*
      * Getters/Setters
      */
