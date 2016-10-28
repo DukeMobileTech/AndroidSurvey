@@ -2,11 +2,13 @@ package org.adaptlab.chpir.android.survey;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.ActivityCompat;
@@ -69,6 +71,20 @@ import java.util.Set;
 import io.fabric.sdk.android.Fabric;
 
 public class SurveyFragment extends Fragment {
+    public final static String EXTRA_INSTRUMENT_ID =
+            "org.adaptlab.chpir.android.survey.instrument_id";
+    public final static String EXTRA_QUESTION_NUMBER =
+            "org.adaptlab.chpir.android.survey.question_number";
+    public final static String EXTRA_SURVEY_ID =
+            "org.adaptlab.chpir.android.survey.survey_id";
+    public final static String EXTRA_PREVIOUS_QUESTION_IDS =
+            "org.adaptlab.chpir.android.survey.previous_questions";
+    public final static String EXTRA_PARTICIPANT_METADATA =
+            "org.adaptlab.chpir.android.survey.metadata";
+    public final static String EXTRA_QUESTIONS_TO_SKIP_IDS =
+            "org.adaptlab.chpir.android.survey.questions_to_skip_ids";
+    public final static String EXTRA_SECTION_ID =
+            "org.adaptlab.chpir.android.survey.section_id";
     private static final String TAG = "SurveyFragment";
     private static final int REVIEW_CODE = 100;
     private static final int SECTION_CODE = 200;
@@ -84,44 +100,27 @@ public class SurveyFragment extends Fragment {
         mMenuItems = Collections.unmodifiableMap(menuItems);
     }
 
-    public final static String EXTRA_INSTRUMENT_ID =
-            "org.adaptlab.chpir.android.survey.instrument_id";
-    public final static String EXTRA_QUESTION_ID =
-            "org.adaptlab.chpir.android.survey.question_id";
-    public final static String EXTRA_QUESTION_NUMBER =
-            "org.adaptlab.chpir.android.survey.question_number";
-    public final static String EXTRA_SURVEY_ID =
-            "org.adaptlab.chpir.android.survey.survey_id";
-    public final static String EXTRA_PREVIOUS_QUESTION_IDS =
-            "org.adaptlab.chpir.android.survey.previous_questions";
-    public final static String EXTRA_PARTICIPANT_METADATA =
-            "org.adaptlab.chpir.android.survey.metadata";
-    public final static String EXTRA_QUESTIONS_TO_SKIP_IDS =
-            "org.adaptlab.chpir.android.survey.questions_to_skip_ids";
-    public final static String EXTRA_SECTION_ID =
-            "org.adaptlab.chpir.android.survey.section_id";
-
+    QuestionFragment mQuestionFragment;
     private Question mQuestion;
     private Instrument mInstrument;
     private Survey mSurvey;
     private int mQuestionNumber;
+    private int mQuestionCount;
     private String mMetadata;
     private Question mResumeQuestion = null;
     private Grid mGrid;
     private Section mSection;
-
     // mPreviousQuestions is a Stack, however Android does not allow you
     // to save a Stack to the savedInstanceState, so it is represented as
     // an Integer array.
     private ArrayList<Integer> mPreviousQuestions;
     private ArrayList<Integer> mQuestionsToSkip;
     private ArrayList<Section> mSections;
-
+    private List<Question> mQuestions;
     private TextView mQuestionText;
     private TextView mQuestionIndex;
     private TextView mParticipantLabel;
     private ProgressBar mProgressBar;
-    QuestionFragment mQuestionFragment;
     private LocationServiceManager mLocationServiceManager;
     private GestureDetector mGestureDetector;
 
@@ -134,112 +133,6 @@ public class SurveyFragment extends Fragment {
     private String[] mSectionTitles;
     private boolean mNavDrawerSet = false;
     private boolean showSectionView = true;
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-
-        if (AppUtil.getContext() == null) AppUtil.setContext(getActivity());
-
-        if (savedInstanceState != null) {
-            mInstrument = Instrument.findByRemoteId(savedInstanceState.getLong(EXTRA_INSTRUMENT_ID));
-            if (!checkRules()) getActivity().finish();
-            mQuestion = Question.findByRemoteId(savedInstanceState.getLong(EXTRA_QUESTION_ID));
-            mSurvey = Survey.load(Survey.class, savedInstanceState.getLong(EXTRA_SURVEY_ID));
-            mQuestionNumber = savedInstanceState.getInt(EXTRA_QUESTION_NUMBER);
-            mPreviousQuestions = savedInstanceState.getIntegerArrayList(EXTRA_PREVIOUS_QUESTION_IDS);
-            mQuestionsToSkip = savedInstanceState.getIntegerArrayList(EXTRA_QUESTIONS_TO_SKIP_IDS);
-            if (mQuestion.belongsToGrid()) {
-                mGrid = mQuestion.getGrid();
-            }
-        } else {
-            Long instrumentId = getActivity().getIntent().getLongExtra(EXTRA_INSTRUMENT_ID, -1);
-            mMetadata = getActivity().getIntent().getStringExtra(EXTRA_PARTICIPANT_METADATA);
-
-            if (instrumentId == -1) return;
-
-            mInstrument = Instrument.findByRemoteId(instrumentId);
-            if (mInstrument == null) return;
-
-            if (!checkRules()) getActivity().finish();
-
-            loadOrCreateSurvey();
-            loadOrCreateQuestion();
-        }
-
-        if (AppUtil.PRODUCTION) {
-            Fabric.with(getActivity(), new Crashlytics());
-            Crashlytics.setString("last instrument", mInstrument.getTitle());
-        }
-
-        if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) {
-            startLocationServices();
-        }
-        AppUtil.authorize(); //To take care of login in case Foreground listener has not registered
-        setHasOptionsMenu(true);
-    }
-
-    private void setupNavigationDrawer() {
-        setNavigationDrawerItems();
-        mTitle = mDrawerTitle = mInstrument.getTitle();
-        mDrawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer);
-        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-        mDrawerList.setAdapter(new ArrayAdapter<String>(getActivity(), R.layout.drawer_list_item, mSectionTitles));
-        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
-        mDrawerToggle = new ActionBarDrawerToggle(
-                getActivity(),
-                mDrawerLayout,
-                R.drawable.ic_drawer,
-                R.string.drawer_open,
-                R.string.drawer_close
-        ) {
-
-            public void onDrawerClosed(View view) {
-                getActivity().getActionBar().setTitle(mTitle);
-                getActivity().invalidateOptionsMenu();
-            }
-
-            public void onDrawerOpened(View drawerView) {
-                getActivity().getActionBar().setTitle(mDrawerTitle);
-                getActivity().invalidateOptionsMenu();
-            }
-        };
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-        getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActivity().getActionBar().setHomeButtonEnabled(true);
-        mNavDrawerSet = true;
-    }
-
-    private void setNavigationDrawerItems() {
-        mSections = new ArrayList<Section>();
-        mSections.addAll(mInstrument.sections());
-        if (mInstrument.getDirectReviewNavigation()) {
-            Section reviewSection = Section.findByRemoteId(REVIEW_PAGE_ID);
-            if (reviewSection == null) {
-                reviewSection = new Section();
-                reviewSection.setRemoteId(REVIEW_PAGE_ID);
-                reviewSection.setTitle(getActivity().getString(R.string.review_section_title));
-                reviewSection.setInstrumentRemoteId(mInstrument.getRemoteId());
-                reviewSection.save();
-            }
-            if (!mSections.contains(reviewSection)) {
-                mSections.add(reviewSection);
-            }
-        }
-        mSectionTitles = new String[mSections.size()];
-        for (int i = 0; i < mSections.size(); i++) {
-            mSectionTitles[i] = mSections.get(i).getTitle();
-        }
-    }
-
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            selectItem(position);
-        }
-    }
 
     private void selectItem(int position) {
         if (mSections.get(position).questions().size() > 0) {
@@ -280,66 +173,23 @@ public class SurveyFragment extends Fragment {
         mQuestionText.setTypeface(mInstrument.getTypeFace(getActivity().getApplicationContext()));
     }
 
-    private void startLocationServices() {
-        mLocationServiceManager = LocationServiceManager.get(getActivity());
-        mLocationServiceManager.startLocationUpdates();
-    }
-
-    public void loadOrCreateSurvey() {
-        Long surveyId = getActivity().getIntent().getLongExtra(EXTRA_SURVEY_ID, -1);
-        if (surveyId == -1) {
-            mSurvey = new Survey();
-            mSurvey.setInstrumentRemoteId(mInstrument.getRemoteId());
-            mSurvey.setMetadata(mMetadata);
-            mSurvey.setProjectId(mInstrument.getProjectId());
-            mSurvey.save();
-        } else {
-            mSurvey = Model.load(Survey.class, surveyId);
-        }
-    }
-
+    // TODO: 11/1/16 separate instantiation based on whether it is from saved bundle or a new intent??
     public void loadOrCreateQuestion() {
         mPreviousQuestions = new ArrayList<Integer>();
         mQuestionsToSkip = new ArrayList<Integer>();
-        Long questionId = getActivity().getIntent().getLongExtra(EXTRA_QUESTION_ID, -1);
-        if (questionId == -1) {
-            mQuestion = mInstrument.questions().get(0);
+        int questionNum = getActivity().getIntent().getIntExtra(EXTRA_QUESTION_NUMBER, -1);
+        if (questionNum == -1) {
+            mQuestion = mQuestions.get(0);
             mQuestionNumber = 0;
         } else {
-            mQuestion = Model.load(Question.class, questionId);
-            mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
+            mQuestion = mQuestions.get(questionNum);
+            mQuestionNumber = questionNum;
             for (int i = 0; i < mQuestionNumber; i++)
                 mPreviousQuestions.add(i);
         }
         if (mQuestion.belongsToGrid()) {
             mGrid = mQuestion.getGrid();
         }
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) {
-            getActivity().registerReceiver(mLocationServiceManager.mLocationReceiver,
-                    new IntentFilter(LocationServiceManager.ACTION_LOCATION));
-        }
-    }
-
-    @Override
-    public void onStop() {
-        if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) {
-            getActivity().unregisterReceiver(mLocationServiceManager.mLocationReceiver);
-        }
-        super.onStop();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (mResumeQuestion == mQuestion)
-            mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
-        refreshView();
-        showSectionView = true;
     }
 
     private void refreshView() {
@@ -352,14 +202,15 @@ public class SurveyFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK && requestCode == REVIEW_CODE) {
-            Long remoteId = data.getExtras().getLong(EXTRA_QUESTION_ID);
-            if (remoteId == Long.MIN_VALUE) {
+            int questionNum = data.getExtras().getInt(EXTRA_QUESTION_NUMBER);
+            if (questionNum == Integer.MIN_VALUE) {
                 checkForCriticalResponses();
             } else {
-                Question question = Question.findByRemoteId(remoteId);
+                Question question = mQuestions.get(questionNum);
                 if (question != null) {
                     mQuestion = question;
                     mResumeQuestion = mQuestion;
+                    mQuestionNumber = questionNum;
                 } else {
                     checkForCriticalResponses();
                 }
@@ -367,12 +218,13 @@ public class SurveyFragment extends Fragment {
         }
         if (resultCode == Activity.RESULT_OK && requestCode == SECTION_CODE) {
             Question previousQuestion = mQuestion;
-            Long questionId = data.getExtras().getLong(EXTRA_QUESTION_ID);
+            int questionNum = data.getExtras().getInt(EXTRA_QUESTION_NUMBER);
             Long instrumentId = data.getExtras().getLong(EXTRA_INSTRUMENT_ID);
             Long surveyId = data.getExtras().getLong(EXTRA_SURVEY_ID);
-            ArrayList<Integer> previousQuestions = data.getExtras().getIntegerArrayList(EXTRA_PREVIOUS_QUESTION_IDS);
-            mQuestion = Model.load(Question.class, questionId);
-            mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
+            ArrayList<Integer> previousQuestions = data.getExtras().getIntegerArrayList
+                    (EXTRA_PREVIOUS_QUESTION_IDS);
+            mQuestion = mQuestions.get(questionNum);
+            mQuestionNumber = questionNum;
             mInstrument = Instrument.findByRemoteId(instrumentId);
             mSurvey = Model.load(Survey.class, surveyId);
             if (mQuestion.getSection() != null && mQuestion.getSection() == mSection)
@@ -383,14 +235,107 @@ public class SurveyFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+
+        if (AppUtil.getContext() == null) AppUtil.setContext(getActivity());
+
+        if (savedInstanceState != null) {
+            mInstrument = Instrument.findByRemoteId(savedInstanceState.getLong
+                    (EXTRA_INSTRUMENT_ID));
+            if (!checkRules()) getActivity().finish();
+            mSurvey = Survey.load(Survey.class, savedInstanceState.getLong(EXTRA_SURVEY_ID));
+            mQuestionNumber = savedInstanceState.getInt(EXTRA_QUESTION_NUMBER);
+            mPreviousQuestions = savedInstanceState.getIntegerArrayList
+                    (EXTRA_PREVIOUS_QUESTION_IDS);
+            mQuestionsToSkip = savedInstanceState.getIntegerArrayList(EXTRA_QUESTIONS_TO_SKIP_IDS);
+        } else {
+            Long instrumentId = getActivity().getIntent().getLongExtra(EXTRA_INSTRUMENT_ID, -1);
+            mMetadata = getActivity().getIntent().getStringExtra(EXTRA_PARTICIPANT_METADATA);
+            if (instrumentId == -1) return;
+            mInstrument = Instrument.findByRemoteId(instrumentId);
+            if (mInstrument == null) return;
+            if (!checkRules()) getActivity().finish();
+            loadOrCreateSurvey();
+        }
+
+        mQuestionCount = mInstrument.getQuestionCount();
+        mQuestions = new ArrayList<Question>(mInstrument.getQuestionCount());
+        new LoadQuestionsTask().execute(mInstrument);
+
+        if (AppUtil.PRODUCTION) {
+            Fabric.with(getActivity(), new Crashlytics());
+            Crashlytics.setString("last instrument", mInstrument.getTitle());
+        }
+
+        if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) {
+            startLocationServices();
+        }
+        AppUtil.authorize(); //To take care of login in case Foreground listener has not registered
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.fragment_survey, parent, false);
+        mQuestionText = (TextView) v.findViewById(R.id.question_text);
+        mParticipantLabel = (TextView) v.findViewById(R.id.participant_label);
+        mQuestionIndex = (TextView) v.findViewById(R.id.question_index);
+        mProgressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
+        mQuestionText.setTypeface(mInstrument.getTypeFace(getActivity().getApplicationContext()));
+        ActivityCompat.invalidateOptionsMenu(getActivity());
+        getActivity().getActionBar().setTitle(mInstrument.getTitle());
+
+        LinearLayout swipeView = (LinearLayout) v.findViewById(R.id
+                .linear_layout_for_question_index);
+        mGestureDetector = new GestureDetector(getActivity(), new GestureListener());
+        swipeView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return mGestureDetector.onTouchEvent(event);
+            }
+        });
+
+        return v;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) {
+            getActivity().registerReceiver(mLocationServiceManager.mLocationReceiver,
+                    new IntentFilter(LocationServiceManager.ACTION_LOCATION));
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mQuestion != null) {
+            if (mResumeQuestion == mQuestion)
+                mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
+            refreshView();
+            showSectionView = true;
+        }
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putLong(EXTRA_INSTRUMENT_ID, mInstrument.getRemoteId());
-        outState.putLong(EXTRA_QUESTION_ID, mQuestion.getRemoteId());
         outState.putLong(EXTRA_SURVEY_ID, mSurvey.getId());
         outState.putInt(EXTRA_QUESTION_NUMBER, mQuestionNumber);
         outState.putIntegerArrayList(EXTRA_PREVIOUS_QUESTION_IDS, mPreviousQuestions);
         outState.putIntegerArrayList(EXTRA_QUESTIONS_TO_SKIP_IDS, mQuestionsToSkip);
+    }
+
+    @Override
+    public void onStop() {
+        if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) {
+            getActivity().unregisterReceiver(mLocationServiceManager.mLocationReceiver);
+        }
+        super.onStop();
     }
 
     @Override
@@ -399,6 +344,88 @@ public class SurveyFragment extends Fragment {
         inflater.inflate(R.menu.fragment_survey, menu);
         if (!mNavDrawerSet) {
             setupNavigationDrawer();
+        }
+    }
+
+    private void setupNavigationDrawer() {
+        setNavigationDrawerItems();
+        mTitle = mDrawerTitle = mInstrument.getTitle();
+        mDrawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer);
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+        mDrawerList.setAdapter(new ArrayAdapter<String>(getActivity(), R.layout.drawer_list_item,
+                mSectionTitles));
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+        mDrawerToggle = new ActionBarDrawerToggle(
+                getActivity(),
+                mDrawerLayout,
+                R.drawable.ic_drawer,
+                R.string.drawer_open,
+                R.string.drawer_close
+        ) {
+
+            public void onDrawerOpened(View drawerView) {
+                getActivity().getActionBar().setTitle(mDrawerTitle);
+                getActivity().invalidateOptionsMenu();
+            }
+
+            public void onDrawerClosed(View view) {
+                getActivity().getActionBar().setTitle(mTitle);
+                getActivity().invalidateOptionsMenu();
+            }
+        };
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActivity().getActionBar().setHomeButtonEnabled(true);
+        mNavDrawerSet = true;
+    }
+
+    private void setNavigationDrawerItems() {
+        mSections = new ArrayList<Section>();
+        mSections.addAll(mInstrument.sections());
+        if (mInstrument.getDirectReviewNavigation()) {
+            Section reviewSection = Section.findByRemoteId(REVIEW_PAGE_ID);
+            if (reviewSection == null) {
+                reviewSection = new Section();
+                reviewSection.setRemoteId(REVIEW_PAGE_ID);
+                reviewSection.setTitle(getActivity().getString(R.string.review_section_title));
+                reviewSection.setInstrumentRemoteId(mInstrument.getRemoteId());
+                reviewSection.save();
+            }
+            if (!mSections.contains(reviewSection)) {
+                mSections.add(reviewSection);
+            }
+        }
+        mSectionTitles = new String[mSections.size()];
+        for (int i = 0; i < mSections.size(); i++) {
+            mSectionTitles[i] = mSections.get(i).getTitle();
+        }
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        if (mQuestion != null) {
+            menu.findItem(R.id.menu_item_previous)
+                    .setEnabled(!isFirstQuestion());
+            menu.findItem(R.id.menu_item_next)
+                    .setVisible(!isLastQuestion())
+                    .setEnabled(hasValidResponse());
+            for (String key : mMenuItems.keySet()) {
+                if (!mInstrument.getSpecialOptionStrings().contains(key)) {
+                    menu.findItem(mMenuItems.get(key))
+                            .setVisible(false)
+                            .setEnabled(false);
+                } else {
+                    if (key.equals(Response.SKIP)) {
+                        menu.findItem(mMenuItems.get(key)).setEnabled(hasValidResponse());
+                    }
+                }
+            }
+            menu.findItem(R.id.menu_item_finish)
+                    .setVisible(isLastQuestion())
+                    .setEnabled(hasValidResponse());
+            showSpecialResponseSelection(menu);
         }
     }
 
@@ -435,49 +462,30 @@ public class SurveyFragment extends Fragment {
         }
     }
 
-    private void proceedToNextQuestion() {
-        if (isLastQuestion()) finishSurvey();
-        else moveToNextQuestion();
+    public boolean isFirstQuestion() {
+        return mQuestionNumber == 0;
     }
 
-    private void unSkipAndMoveToNextQuestion() {
-        if (mQuestionFragment.getSpecialResponse().equals(Response.SKIP)) {
-            mQuestionFragment.saveSpecialResponse("");
+    public boolean isLastQuestion() {
+        if (mQuestion.belongsToGrid()) {
+            Question lastGridQuestion = mGrid.questions().get(mGrid.questions().size() - 1);
+            return mQuestionCount == lastGridQuestion.getNumberInInstrument();
+        } else {
+            return mQuestionCount == mQuestionNumber + 1;
         }
-        proceedToNextQuestion();
     }
 
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-        menu.findItem(R.id.menu_item_previous)
-                .setEnabled(!isFirstQuestion());
-        menu.findItem(R.id.menu_item_next)
-                .setVisible(!isLastQuestion())
-                .setEnabled(hasValidResponse());
-        for (String key : mMenuItems.keySet()) {
-            if (!mInstrument.getSpecialOptionStrings().contains(key)) {
-                menu.findItem(mMenuItems.get(key))
-                        .setVisible(false)
-                        .setEnabled(false);
-            } else {
-                if (key.equals(Response.SKIP)) {
-                    menu.findItem(mMenuItems.get(key)).setEnabled(hasValidResponse());
-                }
-            }
-        }
-        menu.findItem(R.id.menu_item_finish)
-                .setVisible(isLastQuestion())
-                .setEnabled(hasValidResponse());
-        showSpecialResponseSelection(menu);
+    public boolean hasValidResponse() {
+        return !(mQuestionFragment != null && mQuestionFragment.getResponse() != null) ||
+                mQuestionFragment.getResponse().isValid();
     }
-
 
     /*
      * Give a visual indication when a special response is selected
      */
     public void showSpecialResponseSelection(Menu menu) {
-        if (mQuestionFragment != null && mQuestionFragment.getSpecialResponse() != null && menu != null) {
+        if (mQuestionFragment != null && mQuestionFragment.getSpecialResponse() != null && menu
+                != null) {
             if (mQuestionFragment.getSpecialResponse().equals(Response.SKIP)) {
                 menu.findItem(R.id.menu_item_skip).setIcon(R.drawable.ic_menu_item_sk_selected);
             } else if (mQuestionFragment.getSpecialResponse().equals(Response.RF)) {
@@ -490,50 +498,48 @@ public class SurveyFragment extends Fragment {
         }
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_survey, parent, false);
-        mQuestionText = (TextView) v.findViewById(R.id.question_text);
-        mParticipantLabel = (TextView) v.findViewById(R.id.participant_label);
-        mQuestionIndex = (TextView) v.findViewById(R.id.question_index);
-        mProgressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
-        mQuestionText.setTypeface(mInstrument.getTypeFace(getActivity().getApplicationContext()));
-        ActivityCompat.invalidateOptionsMenu(getActivity());
-        getActivity().getActionBar().setTitle(mInstrument.getTitle());
-
-        LinearLayout swipeView = (LinearLayout) v.findViewById(R.id.linear_layout_for_question_index);
-        mGestureDetector = new GestureDetector(getActivity(), new GestureListener());
-        swipeView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return mGestureDetector.onTouchEvent(event);
-            }
-        });
-
-        return v;
+    private boolean checkRules() {
+        return new RuleBuilder(getActivity())
+                .addRule(new InstrumentSurveyLimitRule(mInstrument,
+                        getActivity().getString(R.string.rule_failure_instrument_survey_limit)))
+                .addRule(new InstrumentTimingRule(mInstrument, getResources().getConfiguration()
+                        .locale,
+                        getActivity().getString(R.string.rule_failure_survey_timing)))
+                .addRule(new InstrumentSurveyLimitPerMinuteRule(mInstrument,
+                        getActivity().getString(R.string.rule_instrument_survey_limit_per_minute)))
+                .showToastOnFailure(true)
+                .checkRules()
+                .getResult();
     }
 
-    public class GestureListener extends GestureDetector.SimpleOnGestureListener {
-        private float MINIMUM_FLING_DISTANCE = 100;
-
-        @Override
-        public boolean onDown(MotionEvent event) {
-            return true;
+    public void loadOrCreateSurvey() {
+        Long surveyId = getActivity().getIntent().getLongExtra(EXTRA_SURVEY_ID, -1);
+        if (surveyId == -1) {
+            mSurvey = new Survey();
+            mSurvey.setInstrumentRemoteId(mInstrument.getRemoteId());
+            mSurvey.setMetadata(mMetadata);
+            mSurvey.setProjectId(mInstrument.getProjectId());
+            mSurvey.save();
+        } else {
+            mSurvey = Model.load(Survey.class, surveyId);
         }
+    }
 
-        @Override
-        public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float velocityY) {
-            float horizontalDifference = event2.getX() - event1.getX();
-            float absoluteHorizontalDifference = Math.abs(horizontalDifference);
-            if (absoluteHorizontalDifference > MINIMUM_FLING_DISTANCE) {
-                if (horizontalDifference > 0) {
-                    moveToPreviousQuestion();
-                } else {
-                    unSkipAndMoveToNextQuestion();
-                }
-            }
-            return true;
+    private void startLocationServices() {
+        mLocationServiceManager = LocationServiceManager.get(getActivity());
+        mLocationServiceManager.startLocationUpdates();
+    }
+
+    private void proceedToNextQuestion() {
+        if (isLastQuestion()) finishSurvey();
+        else moveToNextQuestion();
+    }
+
+    private void unSkipAndMoveToNextQuestion() {
+        if (mQuestionFragment.getSpecialResponse().equals(Response.SKIP)) {
+            mQuestionFragment.saveSpecialResponse("");
         }
+        proceedToNextQuestion();
     }
 
     /*
@@ -545,14 +551,16 @@ public class SurveyFragment extends Fragment {
             loadOrCreateQuestion();
             loadOrCreateSurvey();
         }
-        if (mInstrument.getShowSectionsFragment() && mQuestion.isFirstQuestionInSection() && showSectionView) {
+        if (mInstrument.getShowSectionsFragment() && mQuestion.isFirstQuestionInSection() &&
+                showSectionView) {
             moveToSection(mQuestion.getSection());
         } else {
             if (mQuestion.belongsToGrid()) {
                 createGridFragment();
             } else {
                 FragmentManager fm = getChildFragmentManager();
-                mQuestionFragment = (QuestionFragment) QuestionFragmentFactory.createQuestionFragment(mQuestion, mSurvey);
+                mQuestionFragment = (QuestionFragment) QuestionFragmentFactory
+                        .createQuestionFragment(mQuestion, mSurvey);
                 switchOutFragments(fm);
                 changeOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             }
@@ -606,8 +614,10 @@ public class SurveyFragment extends Fragment {
      */
     private void removeTextFocus() {
         if (getActivity().getCurrentFocus() != null) {
-            InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-            inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+            InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService
+                    (Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken()
+                    , InputMethodManager.HIDE_NOT_ALWAYS);
         }
     }
 
@@ -626,7 +636,8 @@ public class SurveyFragment extends Fragment {
             nextQuestion = nextQuestionHelper(questionIndex);
         } else {
             if (!TextUtils.isEmpty(response.getSpecialResponse())) {
-                Option specialOption = mQuestion.specialOptionByText(response.getSpecialResponse().trim());
+                Option specialOption = mQuestion.specialOptionByText(response.getSpecialResponse
+                        ().trim());
                 if (specialOption != null && specialOption.getNextQuestion() != null) {
                     nextQuestion = specialOption.getNextQuestion();
                 } else {
@@ -634,7 +645,8 @@ public class SurveyFragment extends Fragment {
                 }
             } else if (Question.AnyResponseQuestions.contains(mQuestion.getQuestionType())) {
                 Option anyResponseOption = mQuestion.anyResponseOption();
-                if (!TextUtils.isEmpty(response.getText()) && anyResponseOption != null && anyResponseOption.getNextQuestion() != null) {
+                if (!TextUtils.isEmpty(response.getText()) && anyResponseOption != null &&
+                        anyResponseOption.getNextQuestion() != null) {
                     nextQuestion = anyResponseOption.getNextQuestion();
                 } else {
                     nextQuestion = nextQuestionHelper(questionIndex);
@@ -657,7 +669,8 @@ public class SurveyFragment extends Fragment {
     private Question getNextQuestionWhenNumberFormatException(int questionIndex) {
         Question nextQuestion;
         nextQuestion = nextQuestionHelper(questionIndex);
-        Log.wtf(TAG, "Received a non-numeric skip response index for " + mQuestion.getQuestionIdentifier());
+        Log.wtf(TAG, "Received a non-numeric skip response index for " + mQuestion
+                .getQuestionIdentifier());
         return nextQuestion;
     }
 
@@ -672,7 +685,8 @@ public class SurveyFragment extends Fragment {
 
     private Question getNextQuestionForSkipPattern(int questionIndex, int responseIndex) {
         Question nextQuestion;
-        if (responseIndex < mQuestion.defaultOptions().size() && mQuestion.defaultOptions().get(responseIndex).getNextQuestion() != null) {
+        if (responseIndex < mQuestion.defaultOptions().size() && mQuestion.defaultOptions().get
+                (responseIndex).getNextQuestion() != null) {
             nextQuestion = mQuestion.defaultOptions().get(responseIndex).getNextQuestion();
             mQuestionNumber = nextQuestion.getNumberInInstrument() - 1;
         } else {
@@ -695,7 +709,7 @@ public class SurveyFragment extends Fragment {
 
     private Question nextQuestionHelper(int index) {
         mQuestionNumber = index + 1;
-        return mInstrument.questions().get(mQuestionNumber);
+        return mQuestions.get(mQuestionNumber);
     }
 
     private void clearSkipsForCurrentQuestion() {
@@ -715,8 +729,7 @@ public class SurveyFragment extends Fragment {
         if (mQuestion.firstInGrid()) {
             setQuestionToLastInGrid();
         }
-        int questionsInInstrument = mInstrument.questions().size();
-        if (mQuestionNumber < questionsInInstrument - 1) {
+        if (mQuestionNumber < mQuestionCount - 1) {
             mPreviousQuestions.add(mQuestionNumber);
             mQuestion = getNextQuestion(mQuestionNumber);
             if (mQuestion.getGrid() != null) {
@@ -735,7 +748,8 @@ public class SurveyFragment extends Fragment {
     }
 
     private void setQuestionToLastInGrid() {
-        mQuestionNumber = mGrid.questions().get(mGrid.questions().size() - 1).getNumberInInstrument() - 1;
+        mQuestionNumber = mGrid.questions().get(mGrid.questions().size() - 1)
+                .getNumberInInstrument() - 1;
         mPreviousQuestions.add(mQuestion.getNumberInInstrument() - 1);
         mQuestion = mGrid.questions().get(mGrid.questions().size() - 1);
     }
@@ -747,9 +761,9 @@ public class SurveyFragment extends Fragment {
      * to the previous question in the sequence.
      */
     public void moveToPreviousQuestion() {
-        if (mQuestionNumber > 0 && mQuestionNumber < mInstrument.questions().size()) {
+        if (mQuestionNumber > 0 && mQuestionNumber < mQuestionCount) {
             mQuestionNumber = mPreviousQuestions.remove(mPreviousQuestions.size() - 1);
-            mQuestion = mInstrument.questions().get(mQuestionNumber);
+            mQuestion = mQuestions.get(mQuestionNumber);
             if (mQuestion.getGrid() != null) {
                 mGrid = mQuestion.getGrid();
             }
@@ -759,7 +773,7 @@ public class SurveyFragment extends Fragment {
                 moveToPreviousQuestion();
             }
             if (mSurvey.getResponseByQuestion(mQuestion) != null &&
-                    mSurvey.getResponseByQuestion(mQuestion).getText() != "") {
+                    !mSurvey.getResponseByQuestion(mQuestion).getText().isEmpty()) {
                 clearSkipsForCurrentQuestion();
             }
         }
@@ -787,14 +801,17 @@ public class SurveyFragment extends Fragment {
         if (criticalResponses.size() > 0) {
             String[] criticalQuestions = new String[criticalResponses.size()];
             for (int k = 0; k < criticalResponses.size(); k++) {
-                criticalQuestions[k] = Question.findByQuestionIdentifier(criticalResponses.get(k)).getNumberInInstrument()
+                criticalQuestions[k] = Question.findByQuestionIdentifier(criticalResponses.get(k)
+                ).getNumberInInstrument()
                         + ": " + criticalResponses.get(k);
             }
 
             final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            View content = LayoutInflater.from(getActivity()).inflate(R.layout.critical_responses_dialog, null);
+            View content = LayoutInflater.from(getActivity()).inflate(R.layout
+                    .critical_responses_dialog, null);
             ListView listView = (ListView) content.findViewById(R.id.critical_list);
-            listView.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_selectable_list_item, criticalQuestions));
+            listView.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout
+                    .simple_selectable_list_item, criticalQuestions));
 
             builder.setTitle(R.string.critical_message_title)
                     .setMessage(mInstrument.getCriticalMessage())
@@ -879,27 +896,6 @@ public class SurveyFragment extends Fragment {
         startActivityForResult(i, REVIEW_CODE);
     }
 
-    public boolean isFirstQuestion() {
-        return mQuestionNumber == 0;
-    }
-
-    public boolean isLastQuestion() {
-        if (mQuestion.belongsToGrid()) {
-            Question lastGridQuestion = mGrid.questions().get(mGrid.questions().size() - 1);
-            return mInstrument.questions().size() == lastGridQuestion.getNumberInInstrument();
-        } else {
-            return mInstrument.questions().size() == mQuestionNumber + 1;
-        }
-    }
-
-    public boolean hasValidResponse() {
-        if (mQuestionFragment != null && mQuestionFragment.getResponse() != null) {
-            return mQuestionFragment.getResponse().isValid();
-        } else {
-            return true;
-        }
-    }
-
     private void setSurveyLocation() {
         mSurvey.setLatitude(mLocationServiceManager.getLatitude());
         mSurvey.setLongitude(mLocationServiceManager.getLongitude());
@@ -908,12 +904,12 @@ public class SurveyFragment extends Fragment {
     /*
      * If this question is a follow up question, then attempt
      * to get the response to the question that is being followed up on.
-     * 
+     *
      * If the question being followed up on was skipped by the user,
      * then return false. This gives the calling function an opportunity
      * to handle this accordingly.  Likely this will involve skipping
      * the question that is a follow up question.
-     * 
+     *
      * If this question is not a following up question, then just
      * set the text as normal.
      */
@@ -976,27 +972,76 @@ public class SurveyFragment extends Fragment {
 
     private void updateQuestionCountLabel() {
         if (mQuestion.belongsToGrid()) {
-            mQuestionIndex.setText((mQuestionNumber + 1) + " - " + (mQuestionNumber + mGrid.questions().size()) + " " + getString(R.string.of) + " " + mInstrument.questions().size());
+            mQuestionIndex.setText((mQuestionNumber + 1) + " - " + (mQuestionNumber + mGrid
+                    .questions().size()) + " " + getString(R.string.of) + " " + mQuestionCount);
         } else {
-            mQuestionIndex.setText((mQuestionNumber + 1) + " " + getString(R.string.of) + " " + mInstrument.questions().size());
+            mQuestionIndex.setText((mQuestionNumber + 1) + " " + getString(R.string.of) + " " +
+                    mQuestionCount);
         }
-        mProgressBar.setProgress((int) (100 * (mQuestionNumber + 1) / (float) mInstrument.questions().size()));
+        mProgressBar.setProgress((int) (100 * (mQuestionNumber + 1) / (float) mQuestionCount));
 
         if (isAdded()) {
             ActivityCompat.invalidateOptionsMenu(getActivity());
         }
     }
 
-    private boolean checkRules() {
-        return new RuleBuilder(getActivity())
-                .addRule(new InstrumentSurveyLimitRule(mInstrument,
-                        getActivity().getString(R.string.rule_failure_instrument_survey_limit)))
-                .addRule(new InstrumentTimingRule(mInstrument, getResources().getConfiguration().locale,
-                        getActivity().getString(R.string.rule_failure_survey_timing)))
-                .addRule(new InstrumentSurveyLimitPerMinuteRule(mInstrument,
-                        getActivity().getString(R.string.rule_instrument_survey_limit_per_minute)))
-                .showToastOnFailure(true)
-                .checkRules()
-                .getResult();
+    private class LoadQuestionsTask extends AsyncTask<Instrument, Void, List<Question>> {
+
+        ProgressDialog progressDialog;
+
+        @Override
+        protected List<Question> doInBackground(Instrument... params) {
+            return params[0].questions();
+        }
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog = ProgressDialog.show(getActivity(),
+                    getString(R.string.instrument_loading_progress_header),
+                    getString(R.string.background_process_progress_message)
+            );
+        }
+
+        @Override
+        protected void onPostExecute(List<Question> questions) {
+            mQuestions = questions;
+            loadOrCreateQuestion();
+            ActivityCompat.invalidateOptionsMenu(getActivity());
+            refreshView();
+            if (progressDialog.isShowing()) {
+                progressDialog.dismiss();
+            }
+        }
+    }
+
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            selectItem(position);
+        }
+    }
+
+    public class GestureListener extends GestureDetector.SimpleOnGestureListener {
+        private float MINIMUM_FLING_DISTANCE = 100;
+
+        @Override
+        public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float
+                velocityY) {
+            float horizontalDifference = event2.getX() - event1.getX();
+            float absoluteHorizontalDifference = Math.abs(horizontalDifference);
+            if (absoluteHorizontalDifference > MINIMUM_FLING_DISTANCE) {
+                if (horizontalDifference > 0) {
+                    moveToPreviousQuestion();
+                } else {
+                    unSkipAndMoveToNextQuestion();
+                }
+            }
+            return true;
+        }
+
+        @Override
+        public boolean onDown(MotionEvent event) {
+            return true;
+        }
     }
 }

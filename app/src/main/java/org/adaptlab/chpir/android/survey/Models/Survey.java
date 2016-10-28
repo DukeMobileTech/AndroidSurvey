@@ -23,6 +23,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -188,9 +189,22 @@ public class Survey extends SendModel {
                 .execute();
     }
 
+    public HashMap<Question, Response> questionResponseMap() {
+        int capacity = (int) Math.ceil(responseCount()/0.75);
+        HashMap<Question, Response> map = new HashMap<Question, Response>(capacity);
+        for (Response response : responses()) {
+            map.put(response.getQuestion(), response);
+        }
+        return map;
+    }
+
     /*
      * Getters/Setters
      */
+
+    public int responseCount() {
+        return new Select().from(Response.class).where("SurveyUUID = ?", getUUID()).count();
+    }
 
     public Instrument getInstrument() {
         return Instrument.findByRemoteId(getInstrumentRemoteId());

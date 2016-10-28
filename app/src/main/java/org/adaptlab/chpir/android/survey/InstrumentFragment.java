@@ -583,7 +583,7 @@ public class InstrumentFragment extends ListFragment {
                     Intent i = new Intent(getActivity(), SurveyActivity.class);
                     i.putExtra(SurveyFragment.EXTRA_INSTRUMENT_ID, survey.getInstrument().getRemoteId());
                     i.putExtra(SurveyFragment.EXTRA_SURVEY_ID, survey.getId());
-                    i.putExtra(SurveyFragment.EXTRA_QUESTION_ID, survey.getLastQuestion().getId());
+                    i.putExtra(SurveyFragment.EXTRA_QUESTION_NUMBER, survey.getLastQuestion().getNumberInInstrument() - 1);
                     startActivity(i);
                 }
             }
