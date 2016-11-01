@@ -22,7 +22,7 @@ public class TimeQuestionFragment extends QuestionFragment {
             public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
                 mHour = hourOfDay;
                 mMinute = minute;
-                saveResponse();
+                setResponseText();
             }
         });
         questionComponent.addView(mTimePicker);

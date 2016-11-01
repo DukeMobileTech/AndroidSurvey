@@ -73,7 +73,7 @@ public class SelectMultipleQuestionFragment extends QuestionFragment {
         } else {
             mResponseIndices.add(index);
         }
-        saveResponse();
+        setResponseText();
     }
     
     protected void addCheckBox(CheckBox checkbox) {

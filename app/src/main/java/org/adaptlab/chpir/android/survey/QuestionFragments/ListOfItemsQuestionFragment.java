@@ -39,9 +39,8 @@ public abstract class ListOfItemsQuestionFragment extends QuestionFragment {
             questionComponent.addView(editText);
             mResponses.add(editText);
             editText.addTextChangedListener(new TextWatcher() {
-                public void onTextChanged(CharSequence s, int start, int before,
-                        int count) { 
-                    saveResponse();
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    setResponseText();
                 }
                 
                 // Required by interface

@@ -1,5 +1,6 @@
 package org.adaptlab.chpir.android.survey;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -15,8 +16,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.activeandroid.Model;
-
 import org.adaptlab.chpir.android.survey.Models.Instrument;
 import org.adaptlab.chpir.android.survey.Models.Question;
 import org.adaptlab.chpir.android.survey.Models.Response;
@@ -26,47 +25,51 @@ import org.adaptlab.chpir.android.survey.Models.Survey;
 import java.util.Date;
 
 public abstract class QuestionFragment extends Fragment {
-    private final static String TAG = "QuestionFragment";
     protected final static String LIST_DELIMITER = ",";
-    protected abstract void createQuestionComponent(ViewGroup questionComponent);
-    protected abstract String serialize();
-    protected abstract void deserialize(String responseText);
-
+    private final static String TAG = "QuestionFragment";
     public TextView mValidationTextView;
-
+    public Response mResponse;
     private Question mQuestion;
     private Survey mSurvey;
-    public Response mResponse;
     private Instrument mInstrument;
+    private SurveyFragment mSurveyFragment;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        mSurveyFragment = (SurveyFragment) getParentFragment();
+        if (mSurveyFragment == null) return;
         init();
     }
 
     public void init() {
-        long questionId = getArguments().getLong(QuestionFragmentFactory.EXTRA_QUESTION_ID, -1);
-        long surveyId = getArguments().getLong(QuestionFragmentFactory.EXTRA_SURVEY_ID, -1);
+        mSurvey = mSurveyFragment.getSurvey();
+        mQuestion = mSurveyFragment.getQuestion();
+        if (mSurvey == null || mQuestion == null) return;
+        mResponse = loadOrCreateResponse();
+        mResponse.setQuestion(mQuestion);
+        mResponse.setSurvey(mSurvey);
+        mResponse.setTimeStarted(new Date());
+        mInstrument = mSurvey.getInstrument();
+    }
 
-        if (questionId != -1 && surveyId != -1) {
-            mQuestion = Question.findByRemoteId(questionId);
-            mSurvey = Model.load(Survey.class, surveyId);
-            mResponse = loadOrCreateResponse();
-            mResponse.setQuestion(mQuestion);
-            mResponse.setSurvey(mSurvey);
-            mInstrument = mSurvey.getInstrument();
+    private Response loadOrCreateResponse() {
+        Response response = mSurveyFragment.getResponses().get(mQuestion);
+        if (response == null) {
+            response = new Response();
+            mSurveyFragment.getResponses().put(mQuestion, response);
         }
+        return response;
+    }
 
-        saveTimeStarted();
+    public Question getQuestion() {
+        return mQuestion;
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup parent,
-                             Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_question_factory, parent,
-                false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.fragment_question_factory, parent, false);
 
         ViewGroup questionComponent = (LinearLayout) v.findViewById(R.id.question_component);
         mValidationTextView = (TextView) v.findViewById(R.id.validation_text);
@@ -78,16 +81,28 @@ public abstract class QuestionFragment extends Fragment {
         return v;
     }
 
-    public Question getQuestion() {
-        return mQuestion;
+    @Override
+    public void onPause() {
+        super.onPause();
+        new SaveResponseTask().execute(mResponse);
     }
+
+    private class SaveResponseTask extends AsyncTask<Response, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Response... params) {
+            params[0].save();
+            params[0].getSurvey().save();
+            return null;
+        }
+    }
+
+    protected abstract void createQuestionComponent(ViewGroup questionComponent);
+
+    protected abstract void deserialize(String responseText);
 
     protected Survey getSurvey() {
         return mSurvey;
-    }
-
-    public Response getResponse() {
-        return mResponse;
     }
 
     public Instrument getInstrument() {
@@ -95,15 +110,15 @@ public abstract class QuestionFragment extends Fragment {
     }
 
     public String getSpecialResponse() {
-        if (getResponse() != null) {
-            return getResponse().getSpecialResponse();
-        } else {
-            return "";
-        }
+        return (mResponse == null) ? "" : mResponse.getSpecialResponse();
+    }
+
+    public Response getResponse() {
+        return mResponse;
     }
 
     protected ResponsePhoto getResponsePhoto() {
-        return getResponse().getResponsePhoto();
+        return mResponse.getResponsePhoto();
     }
 
     /*
@@ -117,37 +132,47 @@ public abstract class QuestionFragment extends Fragment {
         otherText.setEnabled(false);
         otherText.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         otherText.addTextChangedListener(new TextWatcher() {
-            public void onTextChanged(CharSequence s, int start, int before,
-                                      int count) {
-                saveOtherResponse(s.toString());
+            // Required by interface
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                setOtherResponse(s.toString());
             }
 
-            // Required by interface
-            public void beforeTextChanged(CharSequence s, int start,
-                                          int count, int after) { }
-            public void afterTextChanged(Editable s) { }
+            public void afterTextChanged(Editable s) {}
         });
 
-        if (getResponse().getOtherResponse() != null) {
-            otherText.setText(getResponse().getOtherResponse());
+        if (mResponse.getOtherResponse() != null) {
+            otherText.setText(mResponse.getOtherResponse());
         }
     }
 
-    public void saveOtherResponse(String response) {
-        getResponse().setOtherResponse(response);
-        getResponse().setDeviceUser(AuthUtils.getCurrentUser());
-        getResponse().save();
+    public void setOtherResponse(String response) {
+        mResponse.setOtherResponse(response);
+        mResponse.setDeviceUser(AuthUtils.getCurrentUser());
     }
 
-    /*
-     * Display warning to user if response does not match regular 
-     * expression in question.  Disable next button if not valid.
-     * Only save if valid.
-     */
-    public void saveResponseWithValidation() {
-        getResponse().setDeviceUser(AuthUtils.getCurrentUser());
+    protected void setResponseText() {
+        mResponse.setResponse(serialize());
+        mResponse.setTimeEnded(new Date());
+        validateResponse();
+        if (isAdded() && !mResponse.getText().equals("")) {
+            mResponse.setSpecialResponse("");
+            ActivityCompat.invalidateOptionsMenu(getActivity());
+        }
+    }
 
-        if (getResponse().saveWithValidation()) {
+    protected abstract String serialize();
+
+    /*
+     * Display warning to user if response does not match regular
+     * expression in question.  Disable next button if not valid.
+     */
+    public void validateResponse() {
+        if (mResponse.isValid()) {
+            mResponse.setDeviceUser(AuthUtils.getCurrentUser());
+            mResponse.setQuestionVersion(mQuestion.getQuestionVersion());
+            mSurvey.setLastUpdated(new Date());
             animateValidationTextView(true);
         } else {
             animateValidationTextView(false);
@@ -156,47 +181,6 @@ public abstract class QuestionFragment extends Fragment {
         // Refresh options menu to reflect response validation status.
         if (isAdded()) {
             ActivityCompat.invalidateOptionsMenu(getActivity());
-        }
-    }
-
-    protected void saveResponse() {
-        getResponse().setResponse(serialize());
-        saveTimeEnded();
-        saveResponseWithValidation();
-        if (isAdded() && !mResponse.getText().equals("")) {
-            mResponse.setSpecialResponse("");
-            ActivityCompat.invalidateOptionsMenu(getActivity());
-        }
-    }
-
-    public void saveSpecialResponse(String specialResponse) {
-        Response response = getResponse();
-        if (response != null) {
-            response.setSpecialResponse(specialResponse);
-            response.setResponse("");
-            response.setDeviceUser(AuthUtils.getCurrentUser());
-            saveTimeEnded();
-            response.save();
-            deserialize(response.getText());
-        }
-    }
-
-    private void saveTimeStarted() {
-        if (getResponse().getTimeStarted() == null) {
-            getResponse().setTimeStarted(new Date());
-            getResponse().save();
-        }
-    }
-
-    private void saveTimeEnded() {
-        getResponse().setTimeEnded(new Date());
-    }
-
-    private Response loadOrCreateResponse() {
-        if (mSurvey.getResponseByQuestion(getQuestion()) != null) {
-            return mSurvey.getResponseByQuestion(getQuestion());
-        } else {
-            return new Response();
         }
     }
 
@@ -222,6 +206,16 @@ public abstract class QuestionFragment extends Fragment {
                 !mValidationTextView.getAnimation().hasStarted()) {
             // Only animate if not currently animating
             mValidationTextView.setAnimation(animation);
+        }
+    }
+
+    public void setSpecialResponse(String specialResponse) {
+        if (mResponse != null) {
+            mResponse.setSpecialResponse(specialResponse);
+            mResponse.setResponse("");
+            mResponse.setDeviceUser(AuthUtils.getCurrentUser());
+            mResponse.setTimeEnded(new Date());
+            deserialize(mResponse.getText());
         }
     }
 }

@@ -189,7 +189,7 @@ public class Survey extends SendModel {
                 .execute();
     }
 
-    public HashMap<Question, Response> questionResponseMap() {
+    public HashMap<Question, Response> responsesMap() {
         int capacity = (int) Math.ceil(responseCount()/0.75);
         HashMap<Question, Response> map = new HashMap<Question, Response>(capacity);
         for (Response response : responses()) {

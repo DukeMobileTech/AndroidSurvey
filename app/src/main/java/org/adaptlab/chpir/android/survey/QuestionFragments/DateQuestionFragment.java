@@ -34,7 +34,7 @@ public class DateQuestionFragment extends QuestionFragment {
                 mDay = newDay;
                 mMonth = newMonth;
                 mYear = newYear;
-                saveResponse();
+                setResponseText();
             }           
         });
         questionComponent.addView(mDatePicker);

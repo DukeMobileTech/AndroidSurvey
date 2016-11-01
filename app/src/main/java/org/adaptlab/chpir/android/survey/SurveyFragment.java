@@ -117,6 +117,7 @@ public class SurveyFragment extends Fragment {
     private ArrayList<Integer> mQuestionsToSkip;
     private ArrayList<Section> mSections;
     private List<Question> mQuestions;
+    private HashMap<Question, Response> mResponses;
     private TextView mQuestionText;
     private TextView mQuestionIndex;
     private TextView mParticipantLabel;
@@ -262,6 +263,7 @@ public class SurveyFragment extends Fragment {
         mQuestionCount = mInstrument.getQuestionCount();
         mQuestions = new ArrayList<Question>(mInstrument.getQuestionCount());
         new LoadQuestionsTask().execute(mInstrument);
+        new LoadResponsesTask().execute(mSurvey);
 
         if (AppUtil.PRODUCTION) {
             Fabric.with(getActivity(), new Crashlytics());
@@ -530,13 +532,16 @@ public class SurveyFragment extends Fragment {
     }
 
     private void proceedToNextQuestion() {
-        if (isLastQuestion()) finishSurvey();
-        else moveToNextQuestion();
+        if (isLastQuestion()) {
+            finishSurvey();
+        } else {
+            moveToNextQuestion();
+        }
     }
 
     private void unSkipAndMoveToNextQuestion() {
         if (mQuestionFragment.getSpecialResponse().equals(Response.SKIP)) {
-            mQuestionFragment.saveSpecialResponse("");
+            mQuestionFragment.setSpecialResponse("");
         }
         proceedToNextQuestion();
     }
@@ -559,7 +564,7 @@ public class SurveyFragment extends Fragment {
             } else {
                 FragmentManager fm = getChildFragmentManager();
                 mQuestionFragment = (QuestionFragment) QuestionFragmentFactory
-                        .createQuestionFragment(mQuestion, mSurvey);
+                        .createQuestionFragment(mQuestion);
                 switchOutFragments(fm);
                 changeOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             }
@@ -599,6 +604,18 @@ public class SurveyFragment extends Fragment {
         mSurvey.setLastQuestion(mQuestion);
         mSurvey.save();
         removeTextFocus();
+    }
+
+    public Question getQuestion() {
+        return mQuestion;
+    }
+
+    public Survey getSurvey() {
+        return mSurvey;
+    }
+
+    public HashMap<Question, Response> getResponses() {
+        return mResponses;
     }
 
     private void setGridLabelText(TextView view) {
@@ -949,7 +966,7 @@ public class SurveyFragment extends Fragment {
      * response if there is one.
      */
     private void setSpecialResponse(String response) {
-        mQuestionFragment.saveSpecialResponse(response);
+        mQuestionFragment.setSpecialResponse(response);
         if (isAdded()) {
             ActivityCompat.invalidateOptionsMenu(getActivity());
         }
@@ -1007,6 +1024,32 @@ public class SurveyFragment extends Fragment {
             loadOrCreateQuestion();
             ActivityCompat.invalidateOptionsMenu(getActivity());
             refreshView();
+            if (progressDialog.isShowing()) {
+                progressDialog.dismiss();
+            }
+        }
+    }
+
+    private class LoadResponsesTask extends AsyncTask<Survey, Void, HashMap<Question, Response>> {
+
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog = ProgressDialog.show(getActivity(),
+                    getString(R.string.instrument_loading_progress_header),
+                    getString(R.string.background_process_progress_message)
+            );
+        }
+
+        @Override
+        protected HashMap<Question, Response> doInBackground(Survey... params) {
+            return params[0].responsesMap();
+        }
+
+        @Override
+        protected void onPostExecute(HashMap<Question, Response> responses) {
+            mResponses = responses;
             if (progressDialog.isShowing()) {
                 progressDialog.dismiss();
             }

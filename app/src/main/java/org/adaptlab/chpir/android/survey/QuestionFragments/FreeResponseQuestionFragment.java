@@ -27,7 +27,7 @@ public class FreeResponseQuestionFragment extends QuestionFragment {
             public void onTextChanged(CharSequence s, int start, int before,
                     int count) {
                 mText = s.toString();
-                saveResponse();
+                setResponseText();
             }
             
             // Required by interface

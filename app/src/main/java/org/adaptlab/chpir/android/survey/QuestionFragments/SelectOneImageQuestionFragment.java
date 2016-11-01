@@ -1,12 +1,5 @@
 package org.adaptlab.chpir.android.survey.QuestionFragments;
 
-import java.util.ArrayList;
-
-import org.adaptlab.chpir.android.survey.PictureUtils;
-import org.adaptlab.chpir.android.survey.QuestionFragment;
-import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.Models.Image;
-
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.view.LayoutInflater;
@@ -18,10 +11,16 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import org.adaptlab.chpir.android.survey.Models.Image;
+import org.adaptlab.chpir.android.survey.PictureUtils;
+import org.adaptlab.chpir.android.survey.QuestionFragment;
+import org.adaptlab.chpir.android.survey.R;
+
+import java.util.ArrayList;
+
 public class SelectOneImageQuestionFragment extends QuestionFragment {
 	private final int SELECTED = Color.GREEN;
-	private final int UNSELECTED = Color.TRANSPARENT;
-    private int mResponseIndex;
+	private int mResponseIndex;
 	private ArrayList<Image> mImages;
 	private Integer mPreviouslySelectedViewIndex = Integer.MAX_VALUE;
 	private GridView mGridView;
@@ -79,13 +78,13 @@ public class SelectOneImageQuestionFragment extends QuestionFragment {
 	
 	private void clearBackgroundColor() {
 		for (int i = 0; i < mGridView.getChildCount(); i++) {
-			mGridView.getChildAt(i).setBackgroundColor(UNSELECTED);
+			mGridView.getChildAt(i).setBackgroundColor(Color.TRANSPARENT);
 		}
 	}
 	
 	private void setResponseIndex(int index) {
 		mResponseIndex = index;
-		saveResponse();
+		setResponseText();
 	}
 
 	@Override

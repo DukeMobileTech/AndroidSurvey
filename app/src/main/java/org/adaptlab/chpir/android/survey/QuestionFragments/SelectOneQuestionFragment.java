@@ -63,7 +63,7 @@ public class SelectOneQuestionFragment extends QuestionFragment {
     
     protected void setResponseIndex(int index) {
         mResponseIndex = index;
-        saveResponse();
+        setResponseText();
     }
   
 }
