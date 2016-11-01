@@ -46,7 +46,7 @@ public class ReviewPageFragment extends ListFragment {
 	@Override
     public void onListItemClick(ListView l, View v, int position, long id) {
 		Question question = ((QuestionAdapter) getListAdapter()).getItem(position);
-		setReturnResults(question.getRemoteId());
+		if (question != null) setReturnResults(question.getNumberInInstrument() - 1);
 	}
 	
 	@Override
@@ -77,19 +77,19 @@ public class ReviewPageFragment extends ListFragment {
 	}
 	
 	private void returnToSurvey() {
-		setReturnResults(mSkippedQuestions.get(0).getRemoteId());
+		setReturnResults(mSkippedQuestions.get(0).getNumberInInstrument() - 1);
 	}
 	
 	private void completeSurvey() {
 		mSurvey.setAsComplete();
 		mSurvey.save();
-		setReturnResults(Long.MIN_VALUE);
+		setReturnResults(Integer.MIN_VALUE);
 		new SendResponsesTask(getActivity()).execute();
 	}
 	
-	private void setReturnResults(Long id) {
+	private void setReturnResults(int num) {
 		Intent i = new Intent();
-		i.putExtra(SurveyFragment.EXTRA_QUESTION_ID, id);
+		i.putExtra(SurveyFragment.EXTRA_QUESTION_NUMBER, num);
 		getActivity().setResult(Activity.RESULT_OK, i);
 		getActivity().finish();
 	}

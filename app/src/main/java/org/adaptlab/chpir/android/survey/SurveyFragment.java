@@ -73,8 +73,6 @@ import io.fabric.sdk.android.Fabric;
 public class SurveyFragment extends Fragment {
     public final static String EXTRA_INSTRUMENT_ID =
             "org.adaptlab.chpir.android.survey.instrument_id";
-    public final static String EXTRA_QUESTION_ID =
-            "org.adaptlab.chpir.android.survey.question_id";
     public final static String EXTRA_QUESTION_NUMBER =
             "org.adaptlab.chpir.android.survey.question_number";
     public final static String EXTRA_SURVEY_ID =
@@ -175,6 +173,7 @@ public class SurveyFragment extends Fragment {
         mQuestionText.setTypeface(mInstrument.getTypeFace(getActivity().getApplicationContext()));
     }
 
+    // TODO: 11/1/16 separate instantiation based on whether it is from saved bundle or a new intent??
     public void loadOrCreateQuestion() {
         mPreviousQuestions = new ArrayList<Integer>();
         mQuestionsToSkip = new ArrayList<Integer>();
@@ -203,14 +202,15 @@ public class SurveyFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK && requestCode == REVIEW_CODE) {
-            Long remoteId = data.getExtras().getLong(EXTRA_QUESTION_ID);
-            if (remoteId == Long.MIN_VALUE) {
+            int questionNum = data.getExtras().getInt(EXTRA_QUESTION_NUMBER);
+            if (questionNum == Integer.MIN_VALUE) {
                 checkForCriticalResponses();
             } else {
-                Question question = Question.findByRemoteId(remoteId);
+                Question question = mQuestions.get(questionNum);
                 if (question != null) {
                     mQuestion = question;
                     mResumeQuestion = mQuestion;
+                    mQuestionNumber = questionNum;
                 } else {
                     checkForCriticalResponses();
                 }
@@ -218,13 +218,13 @@ public class SurveyFragment extends Fragment {
         }
         if (resultCode == Activity.RESULT_OK && requestCode == SECTION_CODE) {
             Question previousQuestion = mQuestion;
-            Long questionId = data.getExtras().getLong(EXTRA_QUESTION_ID);
+            int questionNum = data.getExtras().getInt(EXTRA_QUESTION_NUMBER);
             Long instrumentId = data.getExtras().getLong(EXTRA_INSTRUMENT_ID);
             Long surveyId = data.getExtras().getLong(EXTRA_SURVEY_ID);
             ArrayList<Integer> previousQuestions = data.getExtras().getIntegerArrayList
                     (EXTRA_PREVIOUS_QUESTION_IDS);
-            mQuestion = Model.load(Question.class, questionId);
-            mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
+            mQuestion = mQuestions.get(questionNum);
+            mQuestionNumber = questionNum;
             mInstrument = Instrument.findByRemoteId(instrumentId);
             mSurvey = Model.load(Survey.class, surveyId);
             if (mQuestion.getSection() != null && mQuestion.getSection() == mSection)
@@ -245,7 +245,6 @@ public class SurveyFragment extends Fragment {
             mInstrument = Instrument.findByRemoteId(savedInstanceState.getLong
                     (EXTRA_INSTRUMENT_ID));
             if (!checkRules()) getActivity().finish();
-            mQuestion = Question.findByRemoteId(savedInstanceState.getLong(EXTRA_QUESTION_ID));
             mSurvey = Survey.load(Survey.class, savedInstanceState.getLong(EXTRA_SURVEY_ID));
             mQuestionNumber = savedInstanceState.getInt(EXTRA_QUESTION_NUMBER);
             mPreviousQuestions = savedInstanceState.getIntegerArrayList
@@ -325,7 +324,6 @@ public class SurveyFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putLong(EXTRA_INSTRUMENT_ID, mInstrument.getRemoteId());
-        outState.putLong(EXTRA_QUESTION_ID, mQuestion.getRemoteId());
         outState.putLong(EXTRA_SURVEY_ID, mSurvey.getId());
         outState.putInt(EXTRA_QUESTION_NUMBER, mQuestionNumber);
         outState.putIntegerArrayList(EXTRA_PREVIOUS_QUESTION_IDS, mPreviousQuestions);
@@ -775,7 +773,7 @@ public class SurveyFragment extends Fragment {
                 moveToPreviousQuestion();
             }
             if (mSurvey.getResponseByQuestion(mQuestion) != null &&
-                    mSurvey.getResponseByQuestion(mQuestion).getText() != "") {
+                    !mSurvey.getResponseByQuestion(mQuestion).getText().isEmpty()) {
                 clearSkipsForCurrentQuestion();
             }
         }
