@@ -227,7 +227,7 @@ public class Response extends SendModel {
         mDeviceUser = deviceUser;
     }
 
-    private void setQuestionVersion(int version) {
+    public void setQuestionVersion(int version) {
         mQuestionVersion = version;
     }
 

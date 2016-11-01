@@ -1,7 +1,9 @@
 package org.adaptlab.chpir.android.survey;
 
+import android.support.v4.app.Fragment;
+import android.util.Log;
+
 import org.adaptlab.chpir.android.survey.Models.Question;
-import org.adaptlab.chpir.android.survey.Models.Survey;
 import org.adaptlab.chpir.android.survey.QuestionFragments.AddressQuestionFragment;
 import org.adaptlab.chpir.android.survey.QuestionFragments.DateQuestionFragment;
 import org.adaptlab.chpir.android.survey.QuestionFragments.DecimalNumberQuestionFragment;
@@ -27,20 +29,12 @@ import org.adaptlab.chpir.android.survey.QuestionFragments.SliderQuestionFragmen
 import org.adaptlab.chpir.android.survey.QuestionFragments.TimeQuestionFragment;
 import org.adaptlab.chpir.android.survey.QuestionFragments.YearQuestionFragment;
 
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.util.Log;
-
 public class QuestionFragmentFactory {
     private static final String TAG = "QuestionFragmentFactory";
-    public static final String EXTRA_QUESTION_ID = 
-            "org.adaptlab.chpir.android.survey.question_id";
-    public static final String EXTRA_SURVEY_ID = 
-            "org.adaptlab.chpir.android.survey.survey_id";
 
-    public static Fragment createQuestionFragment(Question question, Survey survey) {
+    public static Fragment createQuestionFragment(Question question) {
         String type = question.getQuestionType().toString();
-        Fragment fragment = null;
+        Fragment fragment;
 
         if (Question.QuestionType.SELECT_ONE.toString().equals(type)) {
             fragment = new SelectOneQuestionFragment();
@@ -83,9 +77,9 @@ public class QuestionFragmentFactory {
         } else if (Question.QuestionType.ADDRESS.toString().equals(type)) {
             fragment = new AddressQuestionFragment();
         } else if (Question.QuestionType.SELECT_ONE_IMAGE.toString().equals(type)) {
-        	fragment = new SelectOneImageQuestionFragment();
+            fragment = new SelectOneImageQuestionFragment();
         } else if (Question.QuestionType.SELECT_MULTIPLE_IMAGE.toString().equals(type)) {
-        	fragment = new SelectMultipleImageQuestionFragment();
+            fragment = new SelectMultipleImageQuestionFragment();
         } else if (Question.QuestionType.LIST_OF_INTEGER_BOXES.toString().equals(type)) {
             fragment = new ListOfIntegerBoxesQuestionFragment();
         } else if (Question.QuestionType.LABELED_SLIDER.toString().equals(type)) {
@@ -96,11 +90,6 @@ public class QuestionFragmentFactory {
             Log.wtf(TAG, "Received unknown question type: " + type);
             fragment = new FreeResponseQuestionFragment();
         }
-
-        Bundle args = new Bundle();
-        args.putLong(EXTRA_QUESTION_ID, question.getRemoteId());
-        args.putLong(EXTRA_SURVEY_ID, survey.getId());
-        fragment.setArguments(args);
 
         return fragment;
     }

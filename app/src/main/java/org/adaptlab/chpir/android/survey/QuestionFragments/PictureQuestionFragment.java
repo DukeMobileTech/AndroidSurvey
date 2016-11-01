@@ -1,11 +1,5 @@
 package org.adaptlab.chpir.android.survey.QuestionFragments;
 
-import java.io.File;
-
-import org.adaptlab.chpir.android.survey.CameraFragment;
-import org.adaptlab.chpir.android.survey.QuestionFragment;
-import org.adaptlab.chpir.android.survey.Models.ResponsePhoto;
-
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -18,6 +12,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
+import org.adaptlab.chpir.android.survey.CameraFragment;
+import org.adaptlab.chpir.android.survey.Models.ResponsePhoto;
+import org.adaptlab.chpir.android.survey.QuestionFragment;
+
+import java.io.File;
 
 public abstract class PictureQuestionFragment extends QuestionFragment {
 	public static final int REAR_CAMERA = 0;
@@ -69,7 +69,7 @@ public abstract class PictureQuestionFragment extends QuestionFragment {
 
 	protected boolean showPhoto() {
 		String filename = mPhoto.getPicturePath();
-		if (filename != null && filename != "") {
+		if (filename != null && !filename.isEmpty()) {
 			String path = getActivity().getFileStreamPath(filename).getAbsolutePath();
 			mBitmap = BitmapFactory.decodeFile(path);
 			mPhotoView.setImageBitmap(mBitmap);
@@ -106,7 +106,7 @@ public abstract class PictureQuestionFragment extends QuestionFragment {
 		deleteButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				String filename = photo.getPicturePath();
-				if (filename != null && filename != "") {
+				if (filename != null && !filename.isEmpty()) {
 					String path = getActivity().getFileStreamPath(filename).getAbsolutePath();
 					File file = new File(path);
 					if (file.exists()) {

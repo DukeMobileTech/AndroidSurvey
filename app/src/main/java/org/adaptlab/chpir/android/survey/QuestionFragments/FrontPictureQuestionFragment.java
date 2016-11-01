@@ -17,7 +17,6 @@ import android.widget.LinearLayout;
 
 public class FrontPictureQuestionFragment extends PictureQuestionFragment {
 	private static final String TAG = "FrontPictureQuestionFragment";
-	private Button mCameraButton;
 	private ResponsePhoto mPhoto;
 	
 	@Override
@@ -25,7 +24,7 @@ public class FrontPictureQuestionFragment extends PictureQuestionFragment {
 		loadOrCreateResponsePhoto();
 		if (isCameraAvailable()) {
 			mPhoto = getResponsePhoto();
-			mCameraButton = new Button(getActivity());
+			Button mCameraButton = new Button(getActivity());
 			mCameraButton.setText(R.string.enable_camera);
 			LinearLayout.LayoutParams buttonLayout = new LinearLayout.LayoutParams(500, 120);
 			buttonLayout.gravity = Gravity.CENTER|Gravity.TOP;
@@ -48,7 +47,7 @@ public class FrontPictureQuestionFragment extends PictureQuestionFragment {
 			boolean picturePresent = showPhoto();
 			questionComponent.addView(mCameraButton);
 			questionComponent.addView(mPhotoView);
-			if (picturePresent == true) {
+			if (picturePresent) {
 				questionComponent.addView(setDeleteButton(mPhoto, mPhotoView));
 			}
 		} else {

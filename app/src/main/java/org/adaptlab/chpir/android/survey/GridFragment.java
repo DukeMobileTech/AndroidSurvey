@@ -77,7 +77,7 @@ public abstract class GridFragment extends QuestionFragment {
 	}
 	
 	@Override
-	public void saveSpecialResponse(String specialResponse) {
+	public void setSpecialResponse(String specialResponse) {
 		for (Question question : mGrid.questions()) {
 			Response response = mSurvey.getResponseByQuestion(question);
 			if (response != null) {

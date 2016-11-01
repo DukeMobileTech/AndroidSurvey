@@ -23,7 +23,7 @@ public class RatingQuestionFragment extends QuestionFragment  {
             public void onRatingChanged(RatingBar ratingBar, float rating,
                     boolean fromUser) {
                 mRating = rating;
-                saveResponse();
+                setResponseText();
             }
         });
         questionComponent.addView(mRatingBar);

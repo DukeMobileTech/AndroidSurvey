@@ -21,7 +21,7 @@ public class SliderQuestionFragment extends QuestionFragment {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 mProgress = progress;
                 if (mProgress > -1) {
-                	saveResponse();
+                	setResponseText();
                 }
             }
 
