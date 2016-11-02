@@ -113,13 +113,16 @@ public class Option extends ReceiveModel {
             option.save();
             
             // Generate translations
-            JSONArray translationsArray = jsonObject.getJSONArray("translations");
-            for(int i = 0; i < translationsArray.length(); i++) {
-                JSONObject translationJSON = translationsArray.getJSONObject(i);
-                OptionTranslation translation = option.getTranslationByLanguage(translationJSON.getString("language"));
-                translation.setOption(option);
-                translation.setText(translationJSON.getString("text"));
-                translation.save();
+            JSONArray translationsArray = jsonObject.optJSONArray("translations");
+            if (translationsArray != null) {
+                for (int i = 0; i < translationsArray.length(); i++) {
+                    JSONObject translationJSON = translationsArray.getJSONObject(i);
+                    OptionTranslation translation = option.getTranslationByLanguage(translationJSON.getString("language"));
+
+                    translation.setOption(option);
+                    translation.setText(translationJSON.getString("text"));
+                    translation.save();
+                }
             }
         } catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);
