@@ -33,11 +33,10 @@ import java.util.Locale;
  */
 @Table(name = "Instruments", id = BaseColumns._ID)
 public class Instrument extends ReceiveModel {
-    private static final String TAG = "Instrument";
     public static final String KHMER_LANGUAGE_CODE = "km";
     public static final String KHMER_FONT_LOCATION = "fonts/khmerOS.ttf";
     public static final String LEFT_ALIGNMENT = "left";
-
+    private static final String TAG = "Instrument";
     @Column(name = "Title")
     private String mTitle;
     // https://github.com/pardom/ActiveAndroid/issues/22
@@ -70,14 +69,78 @@ public class Instrument extends ReceiveModel {
         super();
     }
 
+    public static List<Instrument> getAllProjectInstruments(Long projectId) {
+        return new Select().from(Instrument.class)
+                .where("ProjectID = ? AND Published = ? AND Deleted != ?", projectId, 1, 1)
+                .orderBy("Title")
+                .execute(); //sqlite saves booleans as integers
+    }
+
+    public static Cursor getProjectInstrumentsCursor(Long projectId) {
+        From instrumentsQuery = new Select("Instruments.*")
+                .from(Instrument.class)
+                .where("ProjectID = ? AND Published = ? AND Deleted = ?", projectId, true, false)
+                .orderBy("Title");
+        return Cache.openDatabase().rawQuery(instrumentsQuery.toSql(), instrumentsQuery
+                .getArguments());
+    }
+
+    public static List<Instrument> loadedInstruments() {
+        List<Instrument> instrumentList = new ArrayList<Instrument>();
+        for (Instrument instrument : Instrument.getAll()) {
+            if (instrument.loaded()) instrumentList.add(instrument);
+        }
+        return instrumentList;
+    }
+
+    /*
+     * Finders
+     */
+    public static List<Instrument> getAll() {
+        return new Select().from(Instrument.class).where("Deleted != ?", 1).orderBy("Title")
+                .execute();
+    }
+
+    public boolean loaded() {
+        if (questionCount() != getQuestionCount()) return false;
+        for (Question question : questions()) {
+            if (!question.loaded()) return false;
+        }
+        return true;
+    }
+
+    public int questionCount() {
+        return new Select().from(Question.class)
+                .where("InstrumentRemoteId = ? AND Deleted != ?", getRemoteId(), 1).count();
+    }
+
+    public int getQuestionCount() {
+        return mQuestionCount;
+    }
+
+    /*
+     * Relationships
+     */
+    public List<Question> questions() {
+        return new Select().from(Question.class)
+                .where("InstrumentRemoteId = ? AND Deleted != ?", getRemoteId(), 1)
+                .orderBy("NumberInInstrument ASC")
+                .execute();
+    }
+
+    public void setQuestionCount(int num) {
+        mQuestionCount = num;
+    }
+
     /*
      * If the language of the instrument is the same as the language setting on the
      * device (or through the admin settings), then return the default instrument title.
-     * 
+     *
      * If another language is requested, iterate through instrument translations to
      * find translated title.
-     * 
-     * If the language requested is not available as a translation (or is blank), return the non-translated
+     *
+     * If the language requested is not available as a translation (or is blank), return the
+     * non-translated
      * text for the title.
      */
     public String getTitle() {
@@ -93,16 +156,39 @@ public class Instrument extends ReceiveModel {
         return mTitle;
     }
 
-    public String getAlignment() {
-        if (getLanguage().equals(getDeviceLanguage())) return mAlignment;
-        for (InstrumentTranslation translation : translations()) {
-            if (translation.getLanguage().equals(getDeviceLanguage())) {
-                return translation.getAlignment();
-            }
-        }
+    public void setTitle(String title) {
+        mTitle = title;
+    }
 
-        // Fall back to default
-        return mAlignment;
+    public String getLanguage() {
+        return mLanguage;
+    }
+
+    public static String getDeviceLanguage() {
+        if (AppUtil.getAdminSettingsInstance() != null && AppUtil.getAdminSettingsInstance()
+                .getCustomLocaleCode() != null && !AppUtil.getAdminSettingsInstance()
+                .getCustomLocaleCode().equals("")) {
+            return AppUtil.getAdminSettingsInstance().getCustomLocaleCode();
+        }
+        return Locale.getDefault().getLanguage();
+    }
+
+    public List<InstrumentTranslation> translations() {
+        return new Select().from(InstrumentTranslation.class)
+                .where("InstrumentRemoteId = ?", getRemoteId())
+                .execute();
+    }
+
+    public Long getRemoteId() {
+        return mRemoteId;
+    }
+
+    public void setRemoteId(Long id) {
+        mRemoteId = id;
+    }
+
+    public void setLanguage(String language) {
+        mLanguage = language;
     }
 
     public String getCriticalMessage() {
@@ -116,15 +202,8 @@ public class Instrument extends ReceiveModel {
         return mCriticalMessage;
     }
 
-    public InstrumentTranslation getTranslationByLanguage(String language) {
-        for (InstrumentTranslation translation : translations()) {
-            if (translation.getLanguage().equals(language)) {
-                return translation;
-            }
-        }
-        InstrumentTranslation translation = new InstrumentTranslation();
-        translation.setLanguage(language);
-        return translation;
+    private void setCriticalMessage(String message) {
+        mCriticalMessage = message;
     }
 
     public Typeface getTypeFace(Context context) {
@@ -143,11 +222,24 @@ public class Instrument extends ReceiveModel {
         }
     }
 
-    public static String getDeviceLanguage() {
-        if (AppUtil.getAdminSettingsInstance() != null && AppUtil.getAdminSettingsInstance().getCustomLocaleCode() != null && !AppUtil.getAdminSettingsInstance().getCustomLocaleCode().equals("")) {
-            return AppUtil.getAdminSettingsInstance().getCustomLocaleCode();
+    /*
+     * Getters/Setters
+     */
+
+    public String getAlignment() {
+        if (getLanguage().equals(getDeviceLanguage())) return mAlignment;
+        for (InstrumentTranslation translation : translations()) {
+            if (translation.getLanguage().equals(getDeviceLanguage())) {
+                return translation.getAlignment();
+            }
         }
-        return Locale.getDefault().getLanguage();
+
+        // Fall back to default
+        return mAlignment;
+    }
+
+    private void setAlignment(String alignment) {
+        mAlignment = alignment;
     }
 
     @Override
@@ -185,7 +277,8 @@ public class Instrument extends ReceiveModel {
             JSONArray translationsArray = jsonObject.getJSONArray("translations");
             for (int i = 0; i < translationsArray.length(); i++) {
                 JSONObject translationJSON = translationsArray.getJSONObject(i);
-                InstrumentTranslation translation = instrument.getTranslationByLanguage(translationJSON.getString("language"));
+                InstrumentTranslation translation = instrument.getTranslationByLanguage
+                        (translationJSON.getString("language"));
                 translation.setInstrumentRemoteId(instrument.getRemoteId());
                 translation.setAlignment(translationJSON.getString("alignment"));
                 translation.setTitle(translationJSON.getString("title"));
@@ -197,40 +290,23 @@ public class Instrument extends ReceiveModel {
         }
     }
 
-    /*
-     * Finders
-     */
-    public static List<Instrument> getAll() {
-        return new Select().from(Instrument.class).where("Deleted != ?", 1).orderBy("Title").execute();
-    }
-
-    public static List<Instrument> getAllProjectInstruments(Long projectId) {
-        return new Select().from(Instrument.class)
-                .where("ProjectID = ? AND Published = ? AND Deleted != ?", projectId, 1, 1)
-                .orderBy("Title")
-                .execute(); //sqlite saves booleans as integers
-    }
-
-    public static Cursor getProjectInstrumentsCursor(Long projectId) {
-        From instrumentsQuery = new Select("Instruments.*")
-                .from(Instrument.class)
-                .where("ProjectID = ? AND Published = ? AND Deleted = ?", projectId, true, false)
-                .orderBy("Title");
-        return Cache.openDatabase().rawQuery(instrumentsQuery.toSql(), instrumentsQuery.getArguments());
-    }
-
     public static Instrument findByRemoteId(Long id) {
         return new Select().from(Instrument.class).where("RemoteId = ?", id).executeSingle();
     }
 
-    /*
-     * Relationships
-     */
-    public List<Question> questions() {
-        return new Select().from(Question.class)
-                .where("InstrumentRemoteId = ? AND Deleted != ?", getRemoteId(), 1)
-                .orderBy("NumberInInstrument ASC")
-                .execute();
+    private void setDeleted(boolean deleted) {
+        mDeleted = deleted;
+    }
+
+    public InstrumentTranslation getTranslationByLanguage(String language) {
+        for (InstrumentTranslation translation : translations()) {
+            if (translation.getLanguage().equals(language)) {
+                return translation;
+            }
+        }
+        InstrumentTranslation translation = new InstrumentTranslation();
+        translation.setLanguage(language);
+        return translation;
     }
 
     public List<Survey> surveys() {
@@ -239,45 +315,16 @@ public class Instrument extends ReceiveModel {
                 .execute();
     }
 
-    public List<InstrumentTranslation> translations() {
-        return new Select().from(InstrumentTranslation.class)
-                .where("InstrumentRemoteId = ?", getRemoteId())
-                .execute();
-    }
-
-    public List<Section> sections() {
-        return new Select()
-                .from(Section.class)
-                .where("InstrumentRemoteId = ? AND Deleted != ?", getRemoteId(), 1)
-                .orderBy("FirstQuestionNumber IS NULL, FirstQuestionNumber")
-                .execute();
-    }
-
     public List<Question> criticalQuestions() {
         return new Select().from(Question.class)
-                .where("InstrumentRemoteId = ? AND Deleted != ? AND Critical = ?", getRemoteId(), 1, 1)
+                .where("InstrumentRemoteId = ? AND Deleted != ? AND Critical = ?", getRemoteId(),
+                        1, 1)
                 .orderBy("NumberInInstrument ASC")
                 .execute();
     }
 
-    public static List<Instrument> loadedInstruments() {
-        List<Instrument> instrumentList = new ArrayList<Instrument>();
-        for (Instrument instrument : Instrument.getAll()) {
-            if (instrument.loaded()) instrumentList.add(instrument);
-        }
-        return instrumentList;
-    }
-
-    public boolean loaded() {
-        if (questions().size() != getQuestionCount()) return false;
-        for (Question question : questions()) {
-            if (!question.loaded()) return false;
-        }
-        return true;
-    }
-
     public HashMap<Question, List<Option>> optionsMap() {
-        int capacity = (int) Math.ceil(getQuestionCount()/0.75);
+        int capacity = (int) Math.ceil(getQuestionCount() / 0.75);
         HashMap<Question, List<Option>> map = new HashMap<Question, List<Option>>(capacity);
         for (Question question : questions()) {
             if (question.hasOptions()) {
@@ -287,69 +334,29 @@ public class Instrument extends ReceiveModel {
         return map;
     }
 
-    /*
-     * Getters/Setters
-     */
-
-    public void setTitle(String title) {
-        mTitle = title;
-    }
-
-    public Long getRemoteId() {
-        return mRemoteId;
-    }
-
-    public void setRemoteId(Long id) {
-        mRemoteId = id;
-    }
-
-    public String getLanguage() {
-        return mLanguage;
-    }
-
     @Override
     public String toString() {
         return mTitle;
-    }
-
-    public void setVersionNumber(int version) {
-        mVersionNumber = version;
     }
 
     public int getVersionNumber() {
         return mVersionNumber;
     }
 
-    public int getQuestionCount() {
-        return mQuestionCount;
-    }
-
-    public void setProjectId(Long id) {
-        mProjectId = id;
+    public void setVersionNumber(int version) {
+        mVersionNumber = version;
     }
 
     public Long getProjectId() {
         return mProjectId;
     }
 
+    public void setProjectId(Long id) {
+        mProjectId = id;
+    }
+
     public boolean getPublished() {
         return mPublished;
-    }
-
-    public void setLanguage(String language) {
-        mLanguage = language;
-    }
-
-    private void setAlignment(String alignment) {
-        mAlignment = alignment;
-    }
-
-    private void setDeleted(boolean deleted) {
-        mDeleted = deleted;
-    }
-
-    public void setQuestionCount(int num) {
-        mQuestionCount = num;
     }
 
     public void setPublished(boolean published) {
@@ -360,12 +367,16 @@ public class Instrument extends ReceiveModel {
         return mShowSectionsFragment;
     }
 
+    private void setShowSectionsFragment(boolean showSectionsFragment) {
+        mShowSectionsFragment = showSectionsFragment;
+    }
+
     public boolean getDirectReviewNavigation() {
         return mDirectReviewNavigation;
     }
 
-    public String getSpecialOptions() {
-        return mSpecialOptions;
+    private void setDirectReviewNavigation(boolean directReviewNavigation) {
+        mDirectReviewNavigation = directReviewNavigation;
     }
 
     public List<String> getSpecialOptionStrings() {
@@ -376,28 +387,28 @@ public class Instrument extends ReceiveModel {
         }
     }
 
-    private void setShowSectionsFragment(boolean showSectionsFragment) {
-        mShowSectionsFragment = showSectionsFragment;
-    }
-
-    private void setDirectReviewNavigation(boolean directReviewNavigation) {
-        mDirectReviewNavigation = directReviewNavigation;
+    public String getSpecialOptions() {
+        return mSpecialOptions;
     }
 
     private void setSpecialOptions(String specialOptions) {
         mSpecialOptions = specialOptions.replaceAll("[^A-Za-z0-9,]", "");
     }
 
-    private void setCriticalMessage(String message) {
-        mCriticalMessage = message;
-    }
-
     public void orderSections() {
-        for(Section section : sections()) {
+        for (Section section : sections()) {
             if (section.questions().size() > 0) {
                 section.setFirstQuestionNumber(section.questions().get(0).getNumberInInstrument());
                 section.save();
             }
         }
+    }
+
+    public List<Section> sections() {
+        return new Select()
+                .from(Section.class)
+                .where("InstrumentRemoteId = ? AND Deleted != ?", getRemoteId(), 1)
+                .orderBy("FirstQuestionNumber IS NULL, FirstQuestionNumber")
+                .execute();
     }
 }

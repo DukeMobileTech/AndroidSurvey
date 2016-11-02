@@ -17,7 +17,6 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.text.InputType;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -484,7 +483,7 @@ public class InstrumentFragment extends ListFragment {
      * Check that the instrument has been fully loaded from the server before allowing
      * user to begin survey.
      */
-    private class LoadInstrumentTask extends AsyncTask<Instrument, Void, Long> {
+    private class LoadInstrumentTask extends AsyncTask<Instrument, Void, Instrument> {
         ProgressDialog mProgressDialog;
 
         @Override
@@ -497,38 +496,33 @@ public class InstrumentFragment extends ListFragment {
         }
 
         /*
-         * If instrument is loaded, return the instrument id.
-         * If not, return -1.
+         * If instrument is loaded, return it.
+         * If not, return null.
          */
         @Override
-        protected Long doInBackground(Instrument... params) {
-            Instrument instrument = params[0];
-            if (instrument.loaded()) {
-                return instrument.getRemoteId();
+        protected Instrument doInBackground(Instrument... params) {
+            if (params[0].loaded()) {
+                return params[0];
             } else {
-                return Long.valueOf(-1);
+                return null;
             }
         }
 
         @Override
-        protected void onPostExecute(final Long instrumentId) {
-            try {
-                mProgressDialog.dismiss();
-            } catch (IllegalArgumentException iae) {
-                Log.e(TAG, "Tried to close progress dialog that does not exist.");
-            }
+        protected void onPostExecute(final Instrument instrument) {
+            if (mProgressDialog.isShowing()) mProgressDialog.dismiss();
             if (isAdded()) {
-                if (instrumentId == Long.valueOf(-1)) {
+                if (instrument == null) {
                     Toast.makeText(getActivity(), R.string.instrument_not_loaded, Toast.LENGTH_LONG).show();
                 } else {
                     new RuleBuilder(getActivity())
-                            .addRule(new InstrumentLaunchRule(Instrument.findByRemoteId(instrumentId),
+                            .addRule(new InstrumentLaunchRule(instrument,
                                     getActivity().getString(R.string.rule_failure_instrument_launch)))
                             .showToastOnFailure(true)
                             .setCallbacks(new RuleCallback() {
                                 public void onRulesPass() {
                                     Intent i = new Intent(getActivity(), SurveyActivity.class);
-                                    i.putExtra(SurveyFragment.EXTRA_INSTRUMENT_ID, instrumentId);
+                                    i.putExtra(SurveyFragment.EXTRA_INSTRUMENT_ID, instrument.getRemoteId());
                                     startActivity(i);
                                 }
 
@@ -559,10 +553,8 @@ public class InstrumentFragment extends ListFragment {
          */
         @Override
         protected Survey doInBackground(Survey... params) {
-            Survey survey = params[0];
-            Instrument instrument = survey.getInstrument();
-            if (instrument.loaded()) {
-                return survey;
+            if (params[0].getInstrument().loaded()) {
+                return params[0];
             } else {
                 return null;
             }
@@ -570,12 +562,7 @@ public class InstrumentFragment extends ListFragment {
 
         @Override
         protected void onPostExecute(Survey survey) {
-            try {
-                mProgressDialog.dismiss();
-            } catch (IllegalArgumentException iae) {
-                Log.e(TAG, "Tried to close progress dialog that does not exist.");
-            }
-
+            if (mProgressDialog.isShowing()) mProgressDialog.dismiss();
             if (isAdded()) {
                 if (survey == null) {
                     Toast.makeText(getActivity(), R.string.instrument_not_loaded, Toast.LENGTH_LONG).show();
