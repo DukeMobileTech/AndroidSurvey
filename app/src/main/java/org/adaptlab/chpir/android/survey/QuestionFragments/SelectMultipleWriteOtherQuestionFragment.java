@@ -16,7 +16,7 @@ public class SelectMultipleWriteOtherQuestionFragment extends
         final EditText otherText = new EditText(getActivity());
         checkbox.setText(R.string.other_specify);
         checkbox.setTypeface(getInstrument().getTypeFace(getActivity().getApplicationContext()));
-        final int otherId = getQuestion().defaultOptions().size();
+        final int otherId = getOptions().size();
         checkbox.setId(otherId);
         checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

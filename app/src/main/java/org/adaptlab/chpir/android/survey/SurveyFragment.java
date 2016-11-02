@@ -134,6 +134,7 @@ public class SurveyFragment extends Fragment {
     private String[] mSectionTitles;
     private boolean mNavDrawerSet = false;
     private boolean showSectionView = true;
+    private HashMap<Question, List<Option>> mOptions;
 
     private void selectItem(int position) {
         if (mSections.get(position).questions().size() > 0) {
@@ -174,6 +175,8 @@ public class SurveyFragment extends Fragment {
         mQuestionText.setTypeface(mInstrument.getTypeFace(getActivity().getApplicationContext()));
     }
 
+    // TODO: 11/1/16 separate instantiation based on whether it is from saved bundle or a new
+    // intent??
     public void loadOrCreateQuestion() {
         mPreviousQuestions = new ArrayList<Integer>();
         mQuestionsToSkip = new ArrayList<Integer>();
@@ -263,7 +266,6 @@ public class SurveyFragment extends Fragment {
         mQuestionCount = mInstrument.getQuestionCount();
         mQuestions = new ArrayList<Question>(mInstrument.getQuestionCount());
         new LoadQuestionsTask().execute(mInstrument);
-        new LoadResponsesTask().execute(mSurvey);
 
         if (AppUtil.PRODUCTION) {
             Fabric.with(getActivity(), new Crashlytics());
@@ -616,6 +618,10 @@ public class SurveyFragment extends Fragment {
 
     public HashMap<Question, Response> getResponses() {
         return mResponses;
+    }
+
+    public HashMap<Question, List<Option>> getOptions() {
+        return mOptions;
     }
 
     private void setGridLabelText(TextView view) {
@@ -1021,9 +1027,7 @@ public class SurveyFragment extends Fragment {
         @Override
         protected void onPostExecute(List<Question> questions) {
             mQuestions = questions;
-            loadOrCreateQuestion();
-            ActivityCompat.invalidateOptionsMenu(getActivity());
-            refreshView();
+            new LoadResponsesTask().execute(mSurvey);
             if (progressDialog.isShowing()) {
                 progressDialog.dismiss();
             }
@@ -1050,6 +1054,37 @@ public class SurveyFragment extends Fragment {
         @Override
         protected void onPostExecute(HashMap<Question, Response> responses) {
             mResponses = responses;
+            new LoadOptionsTask().execute(mInstrument);
+            if (progressDialog.isShowing()) {
+                progressDialog.dismiss();
+            }
+        }
+    }
+
+    private class LoadOptionsTask extends AsyncTask<Instrument, Void, HashMap<Question,
+            List<Option>>> {
+
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog = ProgressDialog.show(getActivity(),
+                    getString(R.string.instrument_loading_progress_header),
+                    getString(R.string.background_process_progress_message)
+            );
+        }
+
+        @Override
+        protected HashMap<Question, List<Option>> doInBackground(Instrument... params) {
+            return params[0].optionsMap();
+        }
+
+        @Override
+        protected void onPostExecute(HashMap<Question, List<Option>> options) {
+            mOptions = options;
+            loadOrCreateQuestion();
+            ActivityCompat.invalidateOptionsMenu(getActivity());
+            refreshView();
             if (progressDialog.isShowing()) {
                 progressDialog.dismiss();
             }

@@ -21,8 +21,8 @@ public class SelectMultipleQuestionFragment extends QuestionFragment {
     protected void createQuestionComponent(ViewGroup questionComponent) {
         mCheckBoxes = new ArrayList<CheckBox>();
         mResponseIndices = new ArrayList<Integer>();
-        for (Option option : getQuestion().defaultOptions()) {
-            final int optionId = getQuestion().defaultOptions().indexOf(option);
+        for (Option option : getOptions()) {
+            final int optionId = getOptions().indexOf(option);
             CheckBox checkbox = new CheckBox(getActivity());
             checkbox.setText(option.getText());
             checkbox.setTypeface(getInstrument().getTypeFace(getActivity().getApplicationContext()));

@@ -19,7 +19,7 @@ public class SelectOneWriteOtherQuestionFragment extends
         
         radioButton.setText(R.string.other_specify);
         radioButton.setTypeface(getInstrument().getTypeFace(getActivity().getApplicationContext()));
-        final int otherId = getQuestion().defaultOptions().size();
+        final int otherId = getOptions().size();
         radioButton.setId(otherId);
         radioButton.setLayoutParams(new RadioGroup.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,

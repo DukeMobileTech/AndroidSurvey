@@ -29,7 +29,7 @@ public abstract class ListOfItemsQuestionFragment extends QuestionFragment {
     
     protected void createQuestionComponent(ViewGroup questionComponent) {
         mResponses = new ArrayList<EditText>();
-        for (Option option : getQuestion().defaultOptions()) {
+        for (Option option : getOptions()) {
             final TextView optionText = new TextView(getActivity());
             optionText.setText(option.getText());
             questionComponent.addView(optionText);
@@ -44,8 +44,7 @@ public abstract class ListOfItemsQuestionFragment extends QuestionFragment {
                 }
                 
                 // Required by interface
-                public void beforeTextChanged(CharSequence s, int start,
-                        int count, int after) { }
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
                 public void afterTextChanged(Editable s) { }
             });
         }
