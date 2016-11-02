@@ -1,10 +1,10 @@
 package org.adaptlab.chpir.android.survey.QuestionFragments;
 
-import org.adaptlab.chpir.android.survey.QuestionFragment;
-
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
+
+import org.adaptlab.chpir.android.survey.QuestionFragment;
 
 public class RatingQuestionFragment extends QuestionFragment  {
     private final static int NUM_STARS = 5;
@@ -20,8 +20,7 @@ public class RatingQuestionFragment extends QuestionFragment  {
                 LinearLayout.LayoutParams.WRAP_CONTENT));
         mRatingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {       
             @Override
-            public void onRatingChanged(RatingBar ratingBar, float rating,
-                    boolean fromUser) {
+            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
                 mRating = rating;
                 setResponseText();
             }

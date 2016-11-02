@@ -15,12 +15,12 @@ public class LabeledSliderQuestionFragment extends SliderQuestionFragment {
     
     @Override
     public void beforeAddViewHook(ViewGroup questionComponent) {
-        if (getQuestion().hasOptions()) {
+        if (getOptions() != null) {
             TableLayout tableLayout = new TableLayout(getActivity());
             TableRow tableRow = new TableRow(getActivity());
             tableLayout.setStretchAllColumns(true);
             
-            for (Option option : getQuestion().defaultOptions()) {
+            for (Option option : getOptions()) {
                 TextView optionText = new TextView(getActivity());
                 optionText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
                 optionText.setGravity(getGravityByPosition(option));
@@ -34,7 +34,7 @@ public class LabeledSliderQuestionFragment extends SliderQuestionFragment {
     }
     
     private int getGravityByPosition(Option option) {
-        List<Option> options = getQuestion().defaultOptions();
+        List<Option> options = getOptions();
         if (options.isEmpty()) return Gravity.START;
         
         if (options.get(0).equals(option)) {

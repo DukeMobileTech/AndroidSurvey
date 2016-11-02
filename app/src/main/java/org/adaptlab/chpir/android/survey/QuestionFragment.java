@@ -17,12 +17,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.adaptlab.chpir.android.survey.Models.Instrument;
+import org.adaptlab.chpir.android.survey.Models.Option;
 import org.adaptlab.chpir.android.survey.Models.Question;
 import org.adaptlab.chpir.android.survey.Models.Response;
 import org.adaptlab.chpir.android.survey.Models.ResponsePhoto;
 import org.adaptlab.chpir.android.survey.Models.Survey;
 
 import java.util.Date;
+import java.util.List;
 
 public abstract class QuestionFragment extends Fragment {
     protected final static String LIST_DELIMITER = ",";
@@ -33,6 +35,7 @@ public abstract class QuestionFragment extends Fragment {
     private Survey mSurvey;
     private Instrument mInstrument;
     private SurveyFragment mSurveyFragment;
+    private List<Option> mOptions;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -52,6 +55,9 @@ public abstract class QuestionFragment extends Fragment {
         mResponse.setSurvey(mSurvey);
         mResponse.setTimeStarted(new Date());
         mInstrument = mSurvey.getInstrument();
+        if (mSurveyFragment.getOptions() != null) {
+            mOptions = mSurveyFragment.getOptions().get(mQuestion);
+        }
     }
 
     private Response loadOrCreateResponse() {
@@ -61,10 +67,6 @@ public abstract class QuestionFragment extends Fragment {
             mSurveyFragment.getResponses().put(mQuestion, response);
         }
         return response;
-    }
-
-    public Question getQuestion() {
-        return mQuestion;
     }
 
     @Override
@@ -87,19 +89,17 @@ public abstract class QuestionFragment extends Fragment {
         new SaveResponseTask().execute(mResponse);
     }
 
-    private class SaveResponseTask extends AsyncTask<Response, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Response... params) {
-            params[0].save();
-            params[0].getSurvey().save();
-            return null;
-        }
-    }
-
     protected abstract void createQuestionComponent(ViewGroup questionComponent);
 
     protected abstract void deserialize(String responseText);
+
+    public Question getQuestion() {
+        return mQuestion;
+    }
+
+    public List<Option> getOptions() {
+        return mOptions;
+    }
 
     protected Survey getSurvey() {
         return mSurvey;
@@ -111,6 +111,16 @@ public abstract class QuestionFragment extends Fragment {
 
     public String getSpecialResponse() {
         return (mResponse == null) ? "" : mResponse.getSpecialResponse();
+    }
+
+    public void setSpecialResponse(String specialResponse) {
+        if (mResponse != null) {
+            mResponse.setSpecialResponse(specialResponse);
+            mResponse.setResponse("");
+            mResponse.setDeviceUser(AuthUtils.getCurrentUser());
+            mResponse.setTimeEnded(new Date());
+            deserialize(mResponse.getText());
+        }
     }
 
     public Response getResponse() {
@@ -133,13 +143,15 @@ public abstract class QuestionFragment extends Fragment {
         otherText.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         otherText.addTextChangedListener(new TextWatcher() {
             // Required by interface
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 setOtherResponse(s.toString());
             }
 
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
 
         if (mResponse.getOtherResponse() != null) {
@@ -209,13 +221,13 @@ public abstract class QuestionFragment extends Fragment {
         }
     }
 
-    public void setSpecialResponse(String specialResponse) {
-        if (mResponse != null) {
-            mResponse.setSpecialResponse(specialResponse);
-            mResponse.setResponse("");
-            mResponse.setDeviceUser(AuthUtils.getCurrentUser());
-            mResponse.setTimeEnded(new Date());
-            deserialize(mResponse.getText());
+    private class SaveResponseTask extends AsyncTask<Response, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Response... params) {
+            params[0].save();
+            params[0].getSurvey().save();
+            return null;
         }
     }
 }

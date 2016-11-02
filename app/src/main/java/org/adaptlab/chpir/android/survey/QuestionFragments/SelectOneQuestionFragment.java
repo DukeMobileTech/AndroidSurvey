@@ -24,8 +24,8 @@ public class SelectOneQuestionFragment extends QuestionFragment {
     @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
         mRadioGroup = new RadioGroup(getActivity());
-        for (Option option : getQuestion().defaultOptions()) {
-            int optionId = getQuestion().defaultOptions().indexOf(option);
+        for (Option option : getOptions()) {
+            int optionId = getOptions().indexOf(option);
             RadioButton radioButton = new RadioButton(getActivity());
             radioButton.setText(option.getText());
             radioButton.setId(optionId);

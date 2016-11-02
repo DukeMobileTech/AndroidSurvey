@@ -276,7 +276,7 @@ public class Instrument extends ReceiveModel {
         return true;
     }
 
-    public HashMap<Question, List<Option>> questionOptionsMap() {
+    public HashMap<Question, List<Option>> optionsMap() {
         int capacity = (int) Math.ceil(getQuestionCount()/0.75);
         HashMap<Question, List<Option>> map = new HashMap<Question, List<Option>>(capacity);
         for (Question question : questions()) {
