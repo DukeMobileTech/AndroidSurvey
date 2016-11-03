@@ -74,6 +74,7 @@ public class Question extends ReceiveModel {
     private Long mInstrumentRemoteId;
     @Column(name = "Critical")
     private boolean mCritical;
+
     public Question() {
         super();
     }
@@ -362,16 +363,18 @@ public class Question extends ReceiveModel {
             question.save();
 
             // Generate translations
-            JSONArray translationsArray = jsonObject.getJSONArray("translations");
-            for (int i = 0; i < translationsArray.length(); i++) {
-                JSONObject translationJSON = translationsArray.getJSONObject(i);
-                QuestionTranslation translation = question.getTranslationByLanguage
-                        (translationJSON.getString("language"));
-                translation.setQuestion(question);
-                translation.setText(translationJSON.getString("text"));
-                translation.setRegExValidationMessage(translationJSON.getString
-                        ("reg_ex_validation_message"));
-                translation.save();
+            JSONArray translationsArray = jsonObject.optJSONArray("translations");
+            if (translationsArray != null) {
+                for (int i = 0; i < translationsArray.length(); i++) {
+                    JSONObject translationJSON = translationsArray.getJSONObject(i);
+                    QuestionTranslation translation = question.getTranslationByLanguage
+                            (translationJSON.getString("language"));
+                    translation.setQuestion(question);
+                    translation.setText(translationJSON.getString("text"));
+                    translation.setRegExValidationMessage(translationJSON.getString
+                            ("reg_ex_validation_message"));
+                    translation.save();
+                }
             }
         } catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);

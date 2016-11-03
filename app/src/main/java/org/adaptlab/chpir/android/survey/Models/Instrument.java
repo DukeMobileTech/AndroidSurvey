@@ -64,6 +64,8 @@ public class Instrument extends ReceiveModel {
     private String mSpecialOptions;
     @Column(name = "CriticalMessage")
     private String mCriticalMessage;
+    @Column(name = "Loaded")
+    private boolean mLoaded;
 
     public Instrument() {
         super();
@@ -102,34 +104,7 @@ public class Instrument extends ReceiveModel {
     }
 
     public boolean loaded() {
-        if (questionCount() != getQuestionCount()) return false;
-        for (Question question : questions()) {
-            if (!question.loaded()) return false;
-        }
-        return true;
-    }
-
-    public int questionCount() {
-        return new Select().from(Question.class)
-                .where("InstrumentRemoteId = ? AND Deleted != ?", getRemoteId(), 1).count();
-    }
-
-    public int getQuestionCount() {
-        return mQuestionCount;
-    }
-
-    /*
-     * Relationships
-     */
-    public List<Question> questions() {
-        return new Select().from(Question.class)
-                .where("InstrumentRemoteId = ? AND Deleted != ?", getRemoteId(), 1)
-                .orderBy("NumberInInstrument ASC")
-                .execute();
-    }
-
-    public void setQuestionCount(int num) {
-        mQuestionCount = num;
+        return mLoaded;
     }
 
     /*
@@ -189,6 +164,48 @@ public class Instrument extends ReceiveModel {
 
     public void setLanguage(String language) {
         mLanguage = language;
+    }
+
+    public void sanitize() {
+        if (questionCount() != getQuestionCount()) {
+            setLoaded(false);
+        } else {
+            setLoaded(true);
+        }
+        for (Question question : questions()) {
+            if (!question.loaded()) {
+                setLoaded(false);
+                break;
+            }
+        }
+    }
+
+    public int questionCount() {
+        return new Select().from(Question.class)
+                .where("InstrumentRemoteId = ? AND Deleted != ?", getRemoteId(), 1).count();
+    }
+
+    public int getQuestionCount() {
+        return mQuestionCount;
+    }
+
+    public void setQuestionCount(int num) {
+        mQuestionCount = num;
+    }
+
+    private void setLoaded(boolean status) {
+        mLoaded = status;
+        save();
+    }
+
+    /*
+     * Relationships
+     */
+    public List<Question> questions() {
+        return new Select().from(Question.class)
+                .where("InstrumentRemoteId = ? AND Deleted != ?", getRemoteId(), 1)
+                .orderBy("NumberInInstrument ASC")
+                .execute();
     }
 
     public String getCriticalMessage() {
@@ -261,7 +278,7 @@ public class Instrument extends ReceiveModel {
             instrument.setVersionNumber(jsonObject.getInt("current_version_number"));
             instrument.setQuestionCount(jsonObject.getInt("question_count"));
             instrument.setProjectId(jsonObject.getLong("project_id"));
-            instrument.setPublished(jsonObject.getBoolean("published"));
+            instrument.setPublished(jsonObject.optBoolean("published"));
             instrument.setShowSectionsFragment(jsonObject.getBoolean("show_sections_page"));
             instrument.setDirectReviewNavigation(jsonObject.getBoolean("navigate_to_review_page"));
             instrument.setCriticalMessage(jsonObject.getString("critical_message"));
@@ -274,16 +291,18 @@ public class Instrument extends ReceiveModel {
             instrument.save();
 
             // Generate translations
-            JSONArray translationsArray = jsonObject.getJSONArray("translations");
-            for (int i = 0; i < translationsArray.length(); i++) {
-                JSONObject translationJSON = translationsArray.getJSONObject(i);
-                InstrumentTranslation translation = instrument.getTranslationByLanguage
-                        (translationJSON.getString("language"));
-                translation.setInstrumentRemoteId(instrument.getRemoteId());
-                translation.setAlignment(translationJSON.getString("alignment"));
-                translation.setTitle(translationJSON.getString("title"));
-                translation.setCriticalMessage(translationJSON.getString("critical_message"));
-                translation.save();
+            JSONArray translationsArray = jsonObject.optJSONArray("translations");
+            if (translationsArray != null) {
+                for (int i = 0; i < translationsArray.length(); i++) {
+                    JSONObject translationJSON = translationsArray.getJSONObject(i);
+                    InstrumentTranslation translation = instrument.getTranslationByLanguage
+                            (translationJSON.getString("language"));
+                    translation.setInstrumentRemoteId(instrument.getRemoteId());
+                    translation.setAlignment(translationJSON.getString("alignment"));
+                    translation.setTitle(translationJSON.getString("title"));
+                    translation.setCriticalMessage(translationJSON.getString("critical_message"));
+                    translation.save();
+                }
             }
         } catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);

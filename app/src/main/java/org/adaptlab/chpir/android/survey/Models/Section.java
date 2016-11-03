@@ -52,14 +52,16 @@ public class Section extends ReceiveModel {
             
             //Generate translations
             JSONArray translationsArray = jsonObject.getJSONArray("translations");
-            for(int i = 0; i < translationsArray.length(); i++) {
-                JSONObject translationJSON = translationsArray.getJSONObject(i);
-                SectionTranslation translation = section.getTranslationByLanguage(translationJSON.getString("language"));
-                translation.setSection(section);
-                translation.setText(translationJSON.getString("text"));
-                translation.save();
+            if (translationsArray != null) {
+                for (int i = 0; i < translationsArray.length(); i++) {
+                    JSONObject translationJSON = translationsArray.getJSONObject(i);
+                    SectionTranslation translation = section.getTranslationByLanguage(translationJSON.getString("language"));
+
+                    translation.setSection(section);
+                    translation.setText(translationJSON.getString("text"));
+                    translation.save();
+                }
             }
-            
 		} catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);
         }  
