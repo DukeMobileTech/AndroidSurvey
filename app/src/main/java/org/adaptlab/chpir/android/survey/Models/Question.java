@@ -74,6 +74,7 @@ public class Question extends ReceiveModel {
     private Long mInstrumentRemoteId;
     @Column(name = "Critical")
     private boolean mCritical;
+
     public Question() {
         super();
     }

@@ -81,7 +81,7 @@
         </receiver>
         <receiver android:name="org.adaptlab.chpir.android.survey.Receivers.NotificationReceiver" />
         <meta-data android:name="AA_DB_NAME" android:value="Survey.db" />
-        <meta-data android:name="AA_DB_VERSION" android:value="45" />
+        <meta-data android:name="AA_DB_VERSION" android:value="46" />
         <meta-data android:name="SEED_DB" android:value="false" />
         <meta-data android:name="io.fabric.ApiKey" android:value="${crashlyticsApiKey}"/>
     </application>
