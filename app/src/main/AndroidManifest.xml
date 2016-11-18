@@ -42,7 +42,6 @@
         <activity android:name=".LoginActivity" android:noHistory="true" />
         <activity android:name=".ReviewPageActivity" />
         <activity android:name=".SectionActivity" />
-        <activity android:name=".SettingsActivity"/>
         <provider
             android:authorities="org.adaptlab.chpir.android.survey"
             android:exported="false"

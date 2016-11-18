@@ -28,11 +28,11 @@ android {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
     }
-//
+
 //    productFlavors {
 //        adaptlab {
 //            applicationId "org.adaptlab.android.survey"
-//            resValue "string", "app_name", "iSEE ADAPTlab"
+//            resValue "string", "app_name", "iSEE adaptLAB"
 //            dimension = "adaptlab"
 //        }
 //

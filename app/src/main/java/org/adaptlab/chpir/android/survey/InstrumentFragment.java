@@ -227,17 +227,13 @@ public class InstrumentFragment extends ListFragment {
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         if (getResources().getBoolean(R.bool.default_admin_settings)) {
-            menu.findItem(R.id.menu_item_admin).setEnabled(false);
-            menu.findItem(R.id.menu_item_admin).setVisible(false);
+            menu.findItem(R.id.menu_item_admin).setEnabled(false).setVisible(false);
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_item_settings:
-                startActivity(new Intent(getActivity(), SettingsActivity.class));
-                return true;
             case R.id.menu_item_admin:
                 displayPasswordPrompt();
                 return true;

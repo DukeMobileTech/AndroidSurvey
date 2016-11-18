@@ -203,7 +203,7 @@ public class AppUtil {
         return Build.DISPLAY;
     }
 
-    public static void wipeOutData() {
+    public static void deleteApplicationData() {
         AppUtil.getAdminSettingsInstance().resetLastSyncTime();
         new Delete().from(ResponsePhoto.class).execute();
         new Delete().from(Response.class).execute();
