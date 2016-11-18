@@ -653,7 +653,7 @@ public class SurveyFragment extends Fragment {
      */
     private Question getNextQuestion(int questionIndex) {
         Question nextQuestion;
-        Response response = mSurvey.getResponseByQuestion(mQuestion);
+        Response response = mResponses.get(mQuestion);
         if (response == null) {
             nextQuestion = nextQuestionHelper(questionIndex);
         } else {
@@ -794,8 +794,8 @@ public class SurveyFragment extends Fragment {
             if (!setQuestionText(mQuestionText)) {
                 moveToPreviousQuestion();
             }
-            if (mSurvey.getResponseByQuestion(mQuestion) != null &&
-                    !mSurvey.getResponseByQuestion(mQuestion).getText().isEmpty()) {
+            if (mResponses.get(mQuestion) != null &&
+                    !mResponses.get(mQuestion).getText().isEmpty()) {
                 clearSkipsForCurrentQuestion();
             }
         }
@@ -890,7 +890,7 @@ public class SurveyFragment extends Fragment {
         List<String> criticalQuestions = new ArrayList<String>();
         if (mInstrument.criticalQuestions().size() > 0) {
             for (Question question : mInstrument.criticalQuestions()) {
-                Response response = mSurvey.getResponseByQuestion(question);
+                Response response = mResponses.get(question);
                 Set<String> optionSet = new HashSet<String>();
                 Set<String> responseSet = new HashSet<String>();
                 if (response != null) {
