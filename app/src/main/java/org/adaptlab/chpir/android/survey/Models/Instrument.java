@@ -66,6 +66,8 @@ public class Instrument extends ReceiveModel {
     private String mCriticalMessage;
     @Column(name = "Loaded")
     private boolean mLoaded;
+    @Column(name = "Roster")
+    private boolean mRoster;
 
     public Instrument() {
         super();
@@ -283,6 +285,7 @@ public class Instrument extends ReceiveModel {
             instrument.setDirectReviewNavigation(jsonObject.getBoolean("navigate_to_review_page"));
             instrument.setCriticalMessage(jsonObject.getString("critical_message"));
             instrument.setSpecialOptions(jsonObject.getString("special_options"));
+            instrument.setRoster(jsonObject.optBoolean("roster"));
             if (jsonObject.isNull("deleted_at")) {
                 instrument.setDeleted(false);
             } else {
@@ -429,5 +432,13 @@ public class Instrument extends ReceiveModel {
                 .where("InstrumentRemoteId = ? AND Deleted != ?", getRemoteId(), 1)
                 .orderBy("FirstQuestionNumber IS NULL, FirstQuestionNumber")
                 .execute();
+    }
+
+    private void setRoster(boolean isRoster) {
+        mRoster = isRoster;
+    }
+
+    public boolean isRoster() {
+        return mRoster;
     }
 }

@@ -58,6 +58,8 @@ public class Survey extends SendModel {
     private Long mInstrumentRemoteId;
     @Column(name = "CriticalResponses")
     private boolean mCriticalResponses;
+    @Column(name = "RosterUUID")
+    private String mRosterUUID;
 
     public Survey() {
         super();
@@ -130,6 +132,15 @@ public class Survey extends SendModel {
             return context.getString(R.string.unidentified_survey) + " " + getId();
         else
             return identifier;
+    }
+
+    public String getIdentifier() {
+        for (Response response : responses()) {
+            if (response.getQuestion().identifiesSurvey()) {
+                return response.getText();
+            }
+        }
+        return "";
     }
 
     /*
@@ -324,4 +335,13 @@ public class Survey extends SendModel {
     private boolean getCriticalResponses() {
         return mCriticalResponses;
     }
+
+    public void setRosterUUID(String uuid) {
+        mRosterUUID = uuid;
+    }
+
+    public Roster getRoster() {
+        return new Select().from(Roster.class).where("UUID = ?", mRosterUUID).executeSingle();
+    }
+
 }

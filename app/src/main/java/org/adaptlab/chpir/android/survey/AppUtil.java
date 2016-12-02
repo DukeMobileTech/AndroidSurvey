@@ -31,6 +31,7 @@ import org.adaptlab.chpir.android.survey.Models.Question;
 import org.adaptlab.chpir.android.survey.Models.QuestionTranslation;
 import org.adaptlab.chpir.android.survey.Models.Response;
 import org.adaptlab.chpir.android.survey.Models.ResponsePhoto;
+import org.adaptlab.chpir.android.survey.Models.Roster;
 import org.adaptlab.chpir.android.survey.Models.Rule;
 import org.adaptlab.chpir.android.survey.Models.Section;
 import org.adaptlab.chpir.android.survey.Models.SectionTranslation;
@@ -125,6 +126,7 @@ public class AppUtil {
         ActiveRecordCloudSync.addSendTable("responses", Response.class);
         ActiveRecordCloudSync.addSendTable("response_images", ResponsePhoto.class);
         ActiveRecordCloudSync.addSendTable("device_sync_entries", DeviceSyncEntry.class);
+        ActiveRecordCloudSync.addSendTable("rosters", Roster.class);
 
         new ApkUpdateTask(mContext).execute();
     }
@@ -208,6 +210,7 @@ public class AppUtil {
         new Delete().from(ResponsePhoto.class).execute();
         new Delete().from(Response.class).execute();
         new Delete().from(Survey.class).execute();
+        new Delete().from(Roster.class).execute();
         new Delete().from(Rule.class).execute();
         new Delete().from(Skip.class).execute();
         new Delete().from(DeviceUser.class).execute();

@@ -51,6 +51,7 @@ import org.adaptlab.chpir.android.survey.Models.Section;
 import org.adaptlab.chpir.android.survey.Models.Survey;
 import org.adaptlab.chpir.android.survey.QuestionFragments.MultipleSelectGridFragment;
 import org.adaptlab.chpir.android.survey.QuestionFragments.SingleSelectGridFragment;
+import org.adaptlab.chpir.android.survey.Roster.RosterActivity;
 import org.adaptlab.chpir.android.survey.Rules.InstrumentSurveyLimitPerMinuteRule;
 import org.adaptlab.chpir.android.survey.Rules.InstrumentSurveyLimitRule;
 import org.adaptlab.chpir.android.survey.Rules.InstrumentTimingRule;
@@ -248,6 +249,7 @@ public class SurveyFragment extends Fragment {
             mInstrument = Instrument.findByRemoteId(savedInstanceState.getLong
                     (EXTRA_INSTRUMENT_ID));
             if (!checkRules()) getActivity().finish();
+            checkInstrumentType();
             mSurvey = Survey.load(Survey.class, savedInstanceState.getLong(EXTRA_SURVEY_ID));
             mQuestionNumber = savedInstanceState.getInt(EXTRA_QUESTION_NUMBER);
             mPreviousQuestions = savedInstanceState.getIntegerArrayList
@@ -260,23 +262,35 @@ public class SurveyFragment extends Fragment {
             mInstrument = Instrument.findByRemoteId(instrumentId);
             if (mInstrument == null) return;
             if (!checkRules()) getActivity().finish();
+            checkInstrumentType();
             loadOrCreateSurvey();
         }
-
-        mQuestionCount = mInstrument.getQuestionCount();
-        mQuestions = new ArrayList<Question>(mInstrument.getQuestionCount());
-        new LoadQuestionsTask().execute(mInstrument);
 
         if (AppUtil.PRODUCTION) {
             Fabric.with(getActivity(), new Crashlytics());
             Crashlytics.setString("last instrument", mInstrument.getTitle());
         }
 
+        mQuestionCount = mInstrument.getQuestionCount();
+        mQuestions = new ArrayList<Question>(mInstrument.getQuestionCount());
+        new LoadQuestionsTask().execute(mInstrument);
+
         if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) {
             startLocationServices();
         }
         AppUtil.authorize(); //To take care of login in case Foreground listener has not registered
         setHasOptionsMenu(true);
+    }
+
+    private void checkInstrumentType() {
+        Log.i(TAG, "Instrument Type: " + mInstrument.isRoster());
+        if (mInstrument.isRoster()) {
+            Intent i = new Intent(getActivity(), RosterActivity.class);
+            i.putExtra(RosterActivity.EXTRA_INSTRUMENT_ID, mInstrument.getRemoteId());
+            i.putExtra(RosterActivity.EXTRA_PARTICIPANT_METADATA, mMetadata);
+            getActivity().startActivity(i);
+            getActivity().finish();
+        }
     }
 
     @Override

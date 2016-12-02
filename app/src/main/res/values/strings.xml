@@ -106,4 +106,9 @@
     <string name="data_settings">Data Settings</string>
     <string name="confirmation">Are you sure? All un-synced surveys will be lost!</string>
     <string name="yes_sure">Yes, I am sure!</string>
+    <string name="new_participant">New Participant</string>
+    <string name="previous">PREV</string>
+    <string name="next">NEXT</string>
+    <string name="save">SAVE</string>
+    <string name="edit">EDIT</string>
 </resources>
