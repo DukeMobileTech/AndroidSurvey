@@ -10,12 +10,14 @@ import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -176,11 +178,9 @@ public class SurveyFragment extends Fragment {
         mQuestionText.setTypeface(mInstrument.getTypeFace(getActivity().getApplicationContext()));
     }
 
-    // TODO: 11/1/16 separate instantiation based on whether it is from saved bundle or a new
-    // intent??
     public void loadOrCreateQuestion() {
-        mPreviousQuestions = new ArrayList<Integer>();
-        mQuestionsToSkip = new ArrayList<Integer>();
+        mPreviousQuestions = new ArrayList<>();
+        mQuestionsToSkip = new ArrayList<>();
         int questionNum = getActivity().getIntent().getIntExtra(EXTRA_QUESTION_NUMBER, -1);
         if (questionNum == -1) {
             mQuestion = mQuestions.get(0);
@@ -283,7 +283,6 @@ public class SurveyFragment extends Fragment {
     }
 
     private void checkInstrumentType() {
-        Log.i(TAG, "Instrument Type: " + mInstrument.isRoster());
         if (mInstrument.isRoster()) {
             Intent i = new Intent(getActivity(), RosterActivity.class);
             i.putExtra(RosterActivity.EXTRA_INSTRUMENT_ID, mInstrument.getRemoteId());
@@ -302,10 +301,10 @@ public class SurveyFragment extends Fragment {
         mProgressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
         mQuestionText.setTypeface(mInstrument.getTypeFace(getActivity().getApplicationContext()));
         ActivityCompat.invalidateOptionsMenu(getActivity());
-        getActivity().getActionBar().setTitle(mInstrument.getTitle());
-
-        LinearLayout swipeView = (LinearLayout) v.findViewById(R.id
-                .linear_layout_for_question_index);
+        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (actionBar != null) actionBar.setTitle(mInstrument.getTitle());
+        LinearLayout swipeView = (LinearLayout) v.findViewById(
+                R.id.linear_layout_for_question_index);
         mGestureDetector = new GestureDetector(getActivity(), new GestureListener());
         swipeView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -370,35 +369,34 @@ public class SurveyFragment extends Fragment {
         mDrawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer);
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-        mDrawerList.setAdapter(new ArrayAdapter<String>(getActivity(), R.layout.drawer_list_item,
+        mDrawerList.setAdapter(new ArrayAdapter<>(getActivity(), R.layout.drawer_list_item,
                 mSectionTitles));
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
         mDrawerToggle = new ActionBarDrawerToggle(
                 getActivity(),
                 mDrawerLayout,
-                R.drawable.ic_drawer,
                 R.string.drawer_open,
                 R.string.drawer_close
         ) {
 
             public void onDrawerOpened(View drawerView) {
-                getActivity().getActionBar().setTitle(mDrawerTitle);
+                ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+                if (actionBar != null) { actionBar.setTitle(mDrawerTitle); }
                 getActivity().invalidateOptionsMenu();
             }
 
             public void onDrawerClosed(View view) {
-                getActivity().getActionBar().setTitle(mTitle);
+                ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+                if (actionBar != null) { actionBar.setTitle(mTitle); }
                 getActivity().invalidateOptionsMenu();
             }
         };
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-        getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActivity().getActionBar().setHomeButtonEnabled(true);
+        mDrawerLayout.addDrawerListener(mDrawerToggle);
         mNavDrawerSet = true;
     }
 
     private void setNavigationDrawerItems() {
-        mSections = new ArrayList<Section>();
+        mSections = new ArrayList<>();
         mSections.addAll(mInstrument.sections());
         if (mInstrument.getDirectReviewNavigation()) {
             Section reviewSection = Section.findByRemoteId(REVIEW_PAGE_ID);
@@ -423,24 +421,19 @@ public class SurveyFragment extends Fragment {
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         if (mQuestion != null) {
-            menu.findItem(R.id.menu_item_previous)
-                    .setEnabled(!isFirstQuestion());
-            menu.findItem(R.id.menu_item_next)
-                    .setVisible(!isLastQuestion())
+            menu.findItem(R.id.menu_item_previous).setEnabled(!isFirstQuestion());
+            menu.findItem(R.id.menu_item_next).setVisible(!isLastQuestion())
                     .setEnabled(hasValidResponse());
             for (String key : mMenuItems.keySet()) {
                 if (!mInstrument.getSpecialOptionStrings().contains(key)) {
-                    menu.findItem(mMenuItems.get(key))
-                            .setVisible(false)
-                            .setEnabled(false);
+                    menu.findItem(mMenuItems.get(key)).setVisible(false).setEnabled(false);
                 } else {
                     if (key.equals(Response.SKIP)) {
                         menu.findItem(mMenuItems.get(key)).setEnabled(hasValidResponse());
                     }
                 }
             }
-            menu.findItem(R.id.menu_item_finish)
-                    .setVisible(isLastQuestion())
+            menu.findItem(R.id.menu_item_finish).setVisible(isLastQuestion())
                     .setEnabled(hasValidResponse());
             showSpecialResponseSelection(menu);
         }
@@ -608,13 +601,9 @@ public class SurveyFragment extends Fragment {
 
     private void switchOutFragments(FragmentManager fm) {
         if (fm.findFragmentById(R.id.question_container) == null) {
-            fm.beginTransaction()
-                    .add(R.id.question_container, mQuestionFragment)
-                    .commit();
+            fm.beginTransaction().add(R.id.question_container, mQuestionFragment).commit();
         } else {
-            fm.beginTransaction()
-                    .replace(R.id.question_container, mQuestionFragment)
-                    .commit();
+            fm.beginTransaction().replace(R.id.question_container, mQuestionFragment).commit();
         }
 
         mSurvey.setLastQuestion(mQuestion);

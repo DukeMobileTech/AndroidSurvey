@@ -1,7 +1,5 @@
 package org.adaptlab.chpir.android.survey;
 
-import android.app.ActionBar;
-import android.app.ActionBar.Tab;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -11,11 +9,15 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBar.Tab;
+import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.util.Log;
 import android.util.SparseBooleanArray;
@@ -64,6 +66,7 @@ public class InstrumentFragment extends ListFragment {
     private ListView mSurveyListView;
     private LoaderManager.LoaderCallbacks mInstrumentCallbacks;
     private LoaderManager.LoaderCallbacks mSurveyCallbacks;
+
     private MultiChoiceModeListener mSurveyMultiChoiceModeListener = new MultiChoiceModeListener() {
         List<Survey> selected = new ArrayList<Survey>();
 
@@ -274,40 +277,39 @@ public class InstrumentFragment extends ListFragment {
 
     public void createTabs() {
         if (AppUtil.getAdminSettingsInstance().getShowSurveys()) {
-            final ActionBar actionBar = getActivity().getActionBar();
-            ActionBar.TabListener tabListener = new ActionBar.TabListener() {
-                @Override
-                public void onTabSelected(Tab tab, android.app.FragmentTransaction ft) {
-                    if (tab.getText().equals(getActivity().getResources().getString(R.string
-                            .surveys))) {
-                        if (Survey.getAllProjectSurveys(getProjectId()).isEmpty()) {
-                            setListAdapter(null);
+            final ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+            if (actionBar != null) { // TODO: 12/6/16 Use TabLayout
+                ActionBar.TabListener tabListener = new ActionBar.TabListener() {
+                    @Override
+                    public void onTabSelected(Tab tab, FragmentTransaction ft) {
+                        if (tab.getText().equals(getActivity().getResources().getString(R.string.surveys))) {
+                            if (Survey.getAllProjectSurveys(getProjectId()).isEmpty()) {
+                                setListAdapter(null);
+                            } else {
+                                setSurveysListViewAdapter();
+                                mSurveyListView = getListView();
+                                mSurveyListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+                                mSurveyListView.setMultiChoiceModeListener(mSurveyMultiChoiceModeListener);
+                            }
                         } else {
-                            setSurveysListViewAdapter();
-                            mSurveyListView = getListView();
-                            mSurveyListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-                            mSurveyListView.setMultiChoiceModeListener
-                                    (mSurveyMultiChoiceModeListener);
+                            setInstrumentsListViewAdapter();
                         }
-                    } else {
-                        setInstrumentsListViewAdapter();
                     }
-                }
 
-                // Required by interface
-                public void onTabUnselected(Tab tab, android.app.FragmentTransaction ft) {
-                }
+                    @Override
+                    public void onTabUnselected(Tab tab, FragmentTransaction ft) {}
 
-                public void onTabReselected(Tab tab, android.app.FragmentTransaction ft) {
-                }
-            };
+                    @Override
+                    public void onTabReselected(Tab tab, FragmentTransaction ft) {}
+                };
 
-            actionBar.removeAllTabs();
-            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-            actionBar.addTab(actionBar.newTab().setText(getActivity().getResources().getString(R
-                    .string.instruments)).setTabListener(tabListener));
-            actionBar.addTab(actionBar.newTab().setText(getActivity().getResources().getString(R
-                    .string.surveys)).setTabListener(tabListener));
+                actionBar.removeAllTabs();
+                actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+                actionBar.addTab(actionBar.newTab().setText(getActivity().getResources().getString(R
+                        .string.instruments)).setTabListener(tabListener));
+                actionBar.addTab(actionBar.newTab().setText(getActivity().getResources().getString(R
+                        .string.surveys)).setTabListener(tabListener));
+            }
         } else {
             setInstrumentsListViewAdapter();
         }
@@ -451,8 +453,7 @@ public class InstrumentFragment extends ListFragment {
 
 
         public boolean isPositionChecked(int position) {
-            Boolean result = mSelectionViews.get(position);
-            return result == null ? false : result;
+            return mSelectionViews.get(position);
         }
 
         @Override
