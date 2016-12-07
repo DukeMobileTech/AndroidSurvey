@@ -1,8 +1,6 @@
-package org.adaptlab.chpir.android.survey.Rules;
+package org.adaptlab.chpir.android.survey.rules;
 
 import java.util.ArrayList;
-
-import org.adaptlab.chpir.android.survey.Rules.RuleCallback;
 
 import android.content.Context;
 import android.widget.Toast;

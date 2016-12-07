@@ -18,10 +18,10 @@ import android.widget.TextView;
 
 import com.activeandroid.Model;
 
-import org.adaptlab.chpir.android.survey.Models.Question;
-import org.adaptlab.chpir.android.survey.Models.Response;
-import org.adaptlab.chpir.android.survey.Models.Section;
-import org.adaptlab.chpir.android.survey.Models.Survey;
+import org.adaptlab.chpir.android.survey.models.Question;
+import org.adaptlab.chpir.android.survey.models.Response;
+import org.adaptlab.chpir.android.survey.models.Section;
+import org.adaptlab.chpir.android.survey.models.Survey;
 
 import java.util.ArrayList;
 import java.util.Date;

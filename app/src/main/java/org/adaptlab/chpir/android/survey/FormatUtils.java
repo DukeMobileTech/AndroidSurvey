@@ -1,11 +1,12 @@
 package org.adaptlab.chpir.android.survey;
 
+import android.content.Context;
+import android.text.Html;
+
+import org.adaptlab.chpir.android.survey.models.Option;
+
 import java.util.GregorianCalendar;
 import java.util.List;
-
-import org.adaptlab.chpir.android.survey.Models.Option;
-
-import android.content.Context;
 
 public class FormatUtils {
     public static String pluralize(int number, String singular, String plural) {
@@ -75,4 +76,9 @@ public class FormatUtils {
         }
         return multipleText;
     }
+
+    public static String stripHtml(String withHtml) {
+        return Html.fromHtml(withHtml).toString().trim();
+    }
+
 }

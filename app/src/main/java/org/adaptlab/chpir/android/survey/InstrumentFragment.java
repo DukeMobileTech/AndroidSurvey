@@ -38,15 +38,15 @@ import com.activeandroid.content.ContentProvider;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.activerecordcloudsync.NetworkNotificationUtils;
-import org.adaptlab.chpir.android.survey.Models.AdminSettings;
-import org.adaptlab.chpir.android.survey.Models.Image;
-import org.adaptlab.chpir.android.survey.Models.Instrument;
-import org.adaptlab.chpir.android.survey.Models.Response;
-import org.adaptlab.chpir.android.survey.Models.Survey;
-import org.adaptlab.chpir.android.survey.Rules.InstrumentLaunchRule;
-import org.adaptlab.chpir.android.survey.Rules.RuleBuilder;
-import org.adaptlab.chpir.android.survey.Rules.RuleCallback;
-import org.adaptlab.chpir.android.survey.Tasks.SendResponsesTask;
+import org.adaptlab.chpir.android.survey.models.AdminSettings;
+import org.adaptlab.chpir.android.survey.models.Image;
+import org.adaptlab.chpir.android.survey.models.Instrument;
+import org.adaptlab.chpir.android.survey.models.Response;
+import org.adaptlab.chpir.android.survey.models.Survey;
+import org.adaptlab.chpir.android.survey.rules.InstrumentLaunchRule;
+import org.adaptlab.chpir.android.survey.rules.RuleBuilder;
+import org.adaptlab.chpir.android.survey.rules.RuleCallback;
+import org.adaptlab.chpir.android.survey.tasks.SendResponsesTask;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;

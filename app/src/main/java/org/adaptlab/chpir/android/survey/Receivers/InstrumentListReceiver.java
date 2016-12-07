@@ -1,14 +1,14 @@
-package org.adaptlab.chpir.android.survey.Receivers;
+package org.adaptlab.chpir.android.survey.receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import org.adaptlab.chpir.android.survey.Models.AdminSettings;
-import org.adaptlab.chpir.android.survey.Models.Instrument;
-import org.adaptlab.chpir.android.survey.Models.Rule;
-import org.adaptlab.chpir.android.survey.Models.Rule.RuleType;
+import org.adaptlab.chpir.android.survey.models.AdminSettings;
+import org.adaptlab.chpir.android.survey.models.Instrument;
+import org.adaptlab.chpir.android.survey.models.Rule;
+import org.adaptlab.chpir.android.survey.models.Rule.RuleType;
 
 public class InstrumentListReceiver extends BroadcastReceiver {
 

@@ -23,7 +23,7 @@
 
         </LinearLayout>
 
-        <org.adaptlab.chpir.android.survey.Roster.Views.OHScrollView
+        <org.adaptlab.chpir.android.survey.roster.views.OHScrollView
             android:id="@+id/header_scroll"
             android:layout_width="wrap_content"
             android:layout_height="match_parent">
@@ -37,7 +37,7 @@
                 android:background="@android:color/black">
 
             </TableLayout>
-        </org.adaptlab.chpir.android.survey.Roster.Views.OHScrollView>
+        </org.adaptlab.chpir.android.survey.roster.views.OHScrollView>
     </LinearLayout>
 
     <ScrollView
@@ -61,7 +61,7 @@
 
             </TableLayout>
 
-            <org.adaptlab.chpir.android.survey.Roster.Views.OHScrollView
+            <org.adaptlab.chpir.android.survey.roster.views.OHScrollView
                 android:id="@+id/content_scroll"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
@@ -75,7 +75,7 @@
                     android:background="@android:color/black">
 
                 </TableLayout>
-            </org.adaptlab.chpir.android.survey.Roster.Views.OHScrollView>
+            </org.adaptlab.chpir.android.survey.roster.views.OHScrollView>
         </LinearLayout>
     </ScrollView>
 

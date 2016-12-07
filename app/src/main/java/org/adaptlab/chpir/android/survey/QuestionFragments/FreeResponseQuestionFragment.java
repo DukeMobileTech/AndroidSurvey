@@ -1,4 +1,4 @@
-package org.adaptlab.chpir.android.survey.QuestionFragments;
+package org.adaptlab.chpir.android.survey.questionfragments;
 
 import org.adaptlab.chpir.android.survey.QuestionFragment;
 import org.adaptlab.chpir.android.survey.R;

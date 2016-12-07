@@ -1,4 +1,4 @@
-package org.adaptlab.chpir.android.survey.Receivers;
+package org.adaptlab.chpir.android.survey.receivers;
 
 import org.adaptlab.chpir.android.survey.SurveyActivity;
 import org.adaptlab.chpir.android.survey.SurveyFragment;

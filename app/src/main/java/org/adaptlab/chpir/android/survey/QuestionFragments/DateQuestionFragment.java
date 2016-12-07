@@ -1,4 +1,4 @@
-package org.adaptlab.chpir.android.survey.QuestionFragments;
+package org.adaptlab.chpir.android.survey.questionfragments;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;

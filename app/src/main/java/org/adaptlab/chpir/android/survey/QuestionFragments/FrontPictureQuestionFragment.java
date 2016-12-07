@@ -1,8 +1,8 @@
-package org.adaptlab.chpir.android.survey.QuestionFragments;
+package org.adaptlab.chpir.android.survey.questionfragments;
 
 import org.adaptlab.chpir.android.survey.CameraFragment;
 import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.Models.ResponsePhoto;
+import org.adaptlab.chpir.android.survey.models.ResponsePhoto;
 
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;

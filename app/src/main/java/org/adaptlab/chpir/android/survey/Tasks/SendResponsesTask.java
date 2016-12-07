@@ -1,4 +1,4 @@
-package org.adaptlab.chpir.android.survey.Tasks;
+package org.adaptlab.chpir.android.survey.tasks;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.activerecordcloudsync.NetworkNotificationUtils;

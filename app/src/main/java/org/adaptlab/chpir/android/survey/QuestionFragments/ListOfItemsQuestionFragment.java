@@ -1,4 +1,4 @@
-package org.adaptlab.chpir.android.survey.QuestionFragments;
+package org.adaptlab.chpir.android.survey.questionfragments;
 
 import android.annotation.SuppressLint;
 import android.text.Editable;
@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.opencsv.CSVReader;
 
-import org.adaptlab.chpir.android.survey.Models.Option;
+import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.QuestionFragment;
 import org.adaptlab.chpir.android.survey.R;
 import org.apache.commons.codec.Charsets;

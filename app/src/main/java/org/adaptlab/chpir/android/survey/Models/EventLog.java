@@ -1,4 +1,4 @@
-package org.adaptlab.chpir.android.survey.Models;
+package org.adaptlab.chpir.android.survey.models;
 
 import android.content.Context;
 import android.content.res.Resources;

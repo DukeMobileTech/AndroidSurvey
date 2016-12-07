@@ -1,4 +1,4 @@
-package org.adaptlab.chpir.android.survey.Location;
+package org.adaptlab.chpir.android.survey.location;
 
 import org.adaptlab.chpir.android.survey.R;
 
@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
-import android.util.Log;
 import android.widget.Toast;
 
 public class LocationServiceManager {

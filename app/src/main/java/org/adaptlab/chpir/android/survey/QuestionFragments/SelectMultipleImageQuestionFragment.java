@@ -1,4 +1,4 @@
-package org.adaptlab.chpir.android.survey.QuestionFragments;
+package org.adaptlab.chpir.android.survey.questionfragments;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,7 +6,7 @@ import java.util.List;
 import org.adaptlab.chpir.android.survey.PictureUtils;
 import org.adaptlab.chpir.android.survey.QuestionFragment;
 import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.Models.Image;
+import org.adaptlab.chpir.android.survey.models.Image;
 
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;

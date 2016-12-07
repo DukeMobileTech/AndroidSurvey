@@ -1,4 +1,4 @@
-package org.adaptlab.chpir.android.survey.Rules;
+package org.adaptlab.chpir.android.survey.rules;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -7,8 +7,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import org.adaptlab.chpir.android.survey.Models.Instrument;
-import org.adaptlab.chpir.android.survey.Models.Rule;
+import org.adaptlab.chpir.android.survey.models.Instrument;
+import org.adaptlab.chpir.android.survey.models.Rule;
 import org.json.JSONException;
 
 import android.util.Log;

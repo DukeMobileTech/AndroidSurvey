@@ -2,11 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:tools="http://schemas.android.com/tools"
-      tools:context=".Roster.RosterActivity">
+      tools:context=".roster.RosterActivity">
 
     <item
         android:id="@+id/add_participant"
         android:title="@string/new_participant"
+        android:icon="@drawable/ic_person_add"
         app:showAsAction="ifRoom|withText" />
 
 </menu>

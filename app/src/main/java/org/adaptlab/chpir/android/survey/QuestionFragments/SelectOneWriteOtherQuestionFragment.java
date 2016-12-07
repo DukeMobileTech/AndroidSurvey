@@ -1,4 +1,4 @@
-package org.adaptlab.chpir.android.survey.QuestionFragments;
+package org.adaptlab.chpir.android.survey.questionfragments;
 
 import android.view.ViewGroup;
 import android.widget.EditText;

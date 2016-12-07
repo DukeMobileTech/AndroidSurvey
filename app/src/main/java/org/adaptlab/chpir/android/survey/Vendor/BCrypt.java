@@ -1,4 +1,4 @@
-package org.adaptlab.chpir.android.survey.Vendor;
+package org.adaptlab.chpir.android.survey.vendor;
 
 //Copyright (c) 2006 Damien Miller <djm@mindrot.org>
 //

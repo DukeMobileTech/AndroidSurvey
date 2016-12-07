@@ -1,6 +1,6 @@
-package org.adaptlab.chpir.android.survey.Roster.RosterFragments;
+package org.adaptlab.chpir.android.survey.roster.rosterfragments;
 
-import org.adaptlab.chpir.android.survey.Models.Question;
+import org.adaptlab.chpir.android.survey.models.Question;
 
 public class RosterFragmentGenerator {
 

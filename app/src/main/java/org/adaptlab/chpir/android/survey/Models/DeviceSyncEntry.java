@@ -1,11 +1,11 @@
-package org.adaptlab.chpir.android.survey.Models;
+package org.adaptlab.chpir.android.survey.models;
 
 import android.content.Context;
 import android.util.Log;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.SendModel;
 import org.adaptlab.chpir.android.survey.AppUtil;
-import org.adaptlab.chpir.android.survey.Location.LocationServiceManager;
+import org.adaptlab.chpir.android.survey.location.LocationServiceManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,7 +18,7 @@ public class DeviceSyncEntry extends SendModel {
 
     public DeviceSyncEntry() {
         mLocationServiceManager = LocationServiceManager.get(AppUtil.getContext());
-        mLocationServiceManager.startLocationUpdates();
+//        mLocationServiceManager.startLocationUpdates(); // TODO: 12/6/16 Upgrade to api 23
     }
 
     @Override

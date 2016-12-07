@@ -1,6 +1,6 @@
 package org.adaptlab.chpir.android.survey;
 
-import org.adaptlab.chpir.android.survey.Models.DeviceUser;
+import org.adaptlab.chpir.android.survey.models.DeviceUser;
 
 public class AuthUtils {
     private static DeviceUser sCurrentUser = null;

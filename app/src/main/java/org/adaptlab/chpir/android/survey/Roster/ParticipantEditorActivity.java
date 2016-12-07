@@ -1,45 +1,41 @@
-package org.adaptlab.chpir.android.survey.Roster;
+package org.adaptlab.chpir.android.survey.roster;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Window;
 
-import org.adaptlab.chpir.android.survey.Models.Question;
-import org.adaptlab.chpir.android.survey.Models.Response;
-import org.adaptlab.chpir.android.survey.Models.Roster;
-import org.adaptlab.chpir.android.survey.Models.Survey;
+import org.adaptlab.chpir.android.survey.models.Question;
+import org.adaptlab.chpir.android.survey.models.Response;
+import org.adaptlab.chpir.android.survey.models.Roster;
+import org.adaptlab.chpir.android.survey.models.Survey;
 import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.Roster.RosterFragments.RosterFragment;
-import org.adaptlab.chpir.android.survey.Roster.RosterFragments.RosterFragmentGenerator;
+import org.adaptlab.chpir.android.survey.roster.rosterfragments.RosterFragment;
+import org.adaptlab.chpir.android.survey.roster.rosterfragments.RosterFragmentGenerator;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-public class ParticipantEditorActivity extends FragmentActivity {
-    public final static String EXTRA_QUESTION_ID =
-            "org.adaptlab.chpir.android.survey.question_id";
+public class ParticipantEditorActivity extends AppCompatActivity {
+    public final static String EXTRA_QUESTION_NUMBER =
+            "org.adaptlab.chpir.android.survey.roster.question_number";
     public final static String EXTRA_SURVEY_ID =
-            "org.adaptlab.chpir.android.survey.survey_id";
+            "org.adaptlab.chpir.android.survey.roster.survey_id";
     public final static String EXTRA_RESPONSE_ID =
-            "org.adaptlab.chpir.android.survey.response_id";
+            "org.adaptlab.chpir.android.survey.roster.response_id";
     private static final String TAG = "ParticipantEditorActivity";
     private DrawerLayout mDrawer;
     private NavigationView navigationView;
     private int currentMenuItem = 0;
-//    private Participant mParticipant;
     private List<Question> mQuestions;
-    private RosterFragment mRosterFragment;
     private Roster mRoster;
     private Survey mSurvey;
     private int mQuestionCount;
@@ -48,13 +44,11 @@ public class ParticipantEditorActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         setContentView(R.layout.activity_participant_editor);
-//        if (getSupportActionBar() != null) {
-//            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//            getSupportActionBar().setHomeButtonEnabled(true);
-//        }
-        setTitle(getString(R.string.new_participant));
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeButtonEnabled(true);
+        }
 
         mDrawer = (DrawerLayout) findViewById(R.id.roster_drawer_layout);
         navigationView = (NavigationView) findViewById(R.id.roster_drawer_view);
@@ -62,27 +56,13 @@ public class ParticipantEditorActivity extends FragmentActivity {
         Long rosterId = getIntent().getLongExtra(RosterActivity.EXTRA_ROSTER_ID, -1);
         if (rosterId != -1) {
             mRoster = Roster.load(Roster.class, rosterId);
+            setTitle(getString(R.string.new_participant) + " for " + mRoster.getIdentifier());
         }
+        if (mRoster == null) return;
         Long surveyId = getIntent().getLongExtra(ParticipantViewerActivity.EXTRA_SURVEY_ID, -1);
         loadOrCreateSurvey(surveyId);
         mQuestions = new ArrayList<>();
         new QuestionLoaderTask().execute(mSurvey);
-
-//        String participantId = getIntent().getStringExtra(ParticipantViewerActivity
-//                .EXTRA_PARTICIPANT_ID);
-//        if (participantId == null && rosterId != -1) {
-//            Log.i(TAG, "Number of questions: " + Question.findAll().size());
-//            new NewParticipantTask().execute(centerId);
-//        } else {
-//            mParticipant = Participant.findByIdentifier(participantId);
-//        }
-
-//        mQuestions = Question.findAll();
-
-//        mDrawer = (DrawerLayout) findViewById(R.id.roster_drawer_layout);
-//        navigationView = (NavigationView) findViewById(R.id.roster_drawer_view);
-//        setNavigationViewMenu();
-//        setNavigationViewListener(navigationView);
     }
 
     private void loadOrCreateSurvey(Long surveyId) {
@@ -93,16 +73,8 @@ public class ParticipantEditorActivity extends FragmentActivity {
             mSurvey.setRosterUUID(mRoster.getUUID());
             mSurvey.save();
         } else {
-            mSurvey = Survey.load(Survey.class, -1);
+            mSurvey = Survey.load(Survey.class, surveyId);
         }
-        if (mRoster == null) {
-            mRoster = mSurvey.getRoster();
-        }
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
     }
 
     private void setNavigationViewMenu() {
@@ -120,7 +92,6 @@ public class ParticipantEditorActivity extends FragmentActivity {
         return Html.fromHtml(withHtml).toString().trim();
     }
 
-
     private void setNavigationViewListener(final NavigationView navigationView) {
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
@@ -135,21 +106,15 @@ public class ParticipantEditorActivity extends FragmentActivity {
     }
 
     private void updateFragment(int position) {
-        if (mSurvey != null) {
+        if (mSurvey != null && !mQuestions.isEmpty()) {
             currentMenuItem = position;
-            mRosterFragment = RosterFragmentGenerator.createQuestionFragment(
+            RosterFragment rosterFragment = RosterFragmentGenerator.createQuestionFragment(
                     mQuestions.get(position).getQuestionType());
             Bundle bundle = new Bundle();
-            bundle.putString(EXTRA_QUESTION_ID, mQuestions.get(position).getQuestionIdentifier());
+            bundle.putInt(EXTRA_QUESTION_NUMBER, position);
             bundle.putLong(EXTRA_SURVEY_ID, mSurvey.getId());
-            Response response = mQuestionResponseList.get(mQuestions.get(position));
-            if (response == null) {
-                bundle.putLong(EXTRA_RESPONSE_ID, Long.parseLong(null));
-            } else {
-                bundle.putLong(EXTRA_RESPONSE_ID, response.getId());
-            }
-            mRosterFragment.setArguments(bundle);
-            switchOutFragment(mRosterFragment);
+            rosterFragment.setArguments(bundle);
+            switchOutFragment(rosterFragment);
             invalidateOptionsMenu();
             checkMenuItem(navigationView.getMenu().getItem(currentMenuItem));
         }
@@ -202,15 +167,10 @@ public class ParticipantEditorActivity extends FragmentActivity {
             case android.R.id.home:
                 mDrawer.openDrawer(GravityCompat.START);
                 return true;
-            case R.id.save_new_participant:
-                saveParticipant();
-                return true;
             case R.id.menu_item_next:
-                mRosterFragment.getResponse().save();
                 updateFragment(currentMenuItem + 1);
                 return true;
             case R.id.menu_item_previous:
-                mRosterFragment.getResponse().save();
                 updateFragment(currentMenuItem - 1);
                 return true;
             default:
@@ -218,22 +178,18 @@ public class ParticipantEditorActivity extends FragmentActivity {
         }
     }
 
-    private void saveParticipant() {
-        mRosterFragment.getResponse().save();
-        Class callingClass = RosterActivity.class;
-        if (getCallingActivity() != null) {
-            callingClass = getCallingActivity().getClass();
-        }
-        Intent intent = new Intent(ParticipantEditorActivity.this, callingClass);
-        intent.putExtra(EXTRA_SURVEY_ID, mSurvey.getId());
-        setResult(100, intent);
-        finish();
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
         updateFragment(currentMenuItem);
+    }
+
+    public LinkedHashMap<Question, Response> getQuestionResponses() {
+        return mQuestionResponseList;
+    }
+
+    public List<Question> getQuestions() {
+        return mQuestions;
     }
 
     private class QuestionLoaderTask extends AsyncTask<Survey, Void,
@@ -259,12 +215,14 @@ public class ParticipantEditorActivity extends FragmentActivity {
 
         @Override
         protected void onPostExecute(LinkedHashMap<Question, Response> map) {
+            mQuestions.clear();
             mQuestions.addAll(map.keySet());
             mQuestionCount = mQuestions.size();
             mQuestionResponseList = map;
             setNavigationViewMenu();
             setNavigationViewListener(navigationView);
             if (dialog.isShowing()) dialog.dismiss();
+            updateFragment(0);
         }
 
     }

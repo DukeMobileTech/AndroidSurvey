@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
-import org.adaptlab.chpir.android.survey.Models.ResponsePhoto;
+import org.adaptlab.chpir.android.survey.models.ResponsePhoto;
 
 import android.app.Activity;
 import android.content.Context;

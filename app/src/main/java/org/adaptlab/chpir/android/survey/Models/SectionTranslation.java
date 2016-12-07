@@ -1,4 +1,4 @@
-package org.adaptlab.chpir.android.survey.Models;
+package org.adaptlab.chpir.android.survey.models;
 
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;

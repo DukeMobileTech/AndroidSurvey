@@ -1,4 +1,4 @@
-package org.adaptlab.chpir.android.survey.Tasks;
+package org.adaptlab.chpir.android.survey.tasks;
 
 import android.app.Activity;
 import android.app.AlertDialog;

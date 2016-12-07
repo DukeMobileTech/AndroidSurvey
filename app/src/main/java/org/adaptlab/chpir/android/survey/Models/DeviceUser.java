@@ -1,8 +1,8 @@
-package org.adaptlab.chpir.android.survey.Models;
+package org.adaptlab.chpir.android.survey.models;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
 import org.adaptlab.chpir.android.survey.AppUtil;
-import org.adaptlab.chpir.android.survey.Vendor.BCrypt;
+import org.adaptlab.chpir.android.survey.vendor.BCrypt;
 import org.json.JSONException;
 import org.json.JSONObject;
 

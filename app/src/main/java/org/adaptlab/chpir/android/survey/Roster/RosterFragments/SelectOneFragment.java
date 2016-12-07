@@ -1,4 +1,4 @@
-package org.adaptlab.chpir.android.survey.Roster.RosterFragments;
+package org.adaptlab.chpir.android.survey.roster.rosterfragments;
 
 import android.view.ViewGroup;
 import android.widget.LinearLayout;

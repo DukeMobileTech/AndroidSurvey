@@ -1,4 +1,4 @@
-package org.adaptlab.chpir.android.survey.QuestionFragments;
+package org.adaptlab.chpir.android.survey.questionfragments;
 
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -7,7 +7,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import org.adaptlab.chpir.android.survey.Models.Option;
+import org.adaptlab.chpir.android.survey.models.Option;
 
 import java.util.List;
 

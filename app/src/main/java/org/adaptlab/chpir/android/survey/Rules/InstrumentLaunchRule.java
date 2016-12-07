@@ -1,7 +1,7 @@
-package org.adaptlab.chpir.android.survey.Rules;
+package org.adaptlab.chpir.android.survey.rules;
 
-import org.adaptlab.chpir.android.survey.Models.Instrument;
-import org.adaptlab.chpir.android.survey.Models.Rule;
+import org.adaptlab.chpir.android.survey.models.Instrument;
+import org.adaptlab.chpir.android.survey.models.Rule;
 
 public class InstrumentLaunchRule extends PassableRule {
     private static final String TAG = "InstrumetLaunchRule";

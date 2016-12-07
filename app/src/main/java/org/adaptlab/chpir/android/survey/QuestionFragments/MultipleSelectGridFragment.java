@@ -1,4 +1,4 @@
-package org.adaptlab.chpir.android.survey.QuestionFragments;
+package org.adaptlab.chpir.android.survey.questionfragments;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -13,9 +13,9 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import org.adaptlab.chpir.android.survey.GridFragment;
-import org.adaptlab.chpir.android.survey.Models.GridLabel;
-import org.adaptlab.chpir.android.survey.Models.Question;
-import org.adaptlab.chpir.android.survey.Models.Response;
+import org.adaptlab.chpir.android.survey.models.GridLabel;
+import org.adaptlab.chpir.android.survey.models.Question;
+import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.R;
 
 import java.util.ArrayList;

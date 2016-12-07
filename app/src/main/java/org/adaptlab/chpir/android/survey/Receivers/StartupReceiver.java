@@ -1,4 +1,4 @@
-package org.adaptlab.chpir.android.survey.Receivers;
+package org.adaptlab.chpir.android.survey.receivers;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

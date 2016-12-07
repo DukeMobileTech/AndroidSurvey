@@ -1,6 +1,6 @@
-package org.adaptlab.chpir.android.survey.Receivers;
+package org.adaptlab.chpir.android.survey.receivers;
 
-import org.adaptlab.chpir.android.survey.Tasks.SendResponsesTask;
+import org.adaptlab.chpir.android.survey.tasks.SendResponsesTask;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

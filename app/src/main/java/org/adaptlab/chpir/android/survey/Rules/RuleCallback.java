@@ -1,4 +1,4 @@
-package org.adaptlab.chpir.android.survey.Rules;
+package org.adaptlab.chpir.android.survey.rules;
 
 public interface RuleCallback {
     // Called by RuleBuilder if all rules pass.

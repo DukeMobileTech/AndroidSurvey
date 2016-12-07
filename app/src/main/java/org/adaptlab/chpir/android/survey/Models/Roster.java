@@ -1,4 +1,4 @@
-package org.adaptlab.chpir.android.survey.Models;
+package org.adaptlab.chpir.android.survey.models;
 
 import android.content.Context;
 
@@ -20,10 +20,10 @@ public class Roster extends SendModel {
     private boolean mSent;
     @Column(name = "Complete")
     private boolean mComplete;
-    @Column(name = "Identifier")
+    @Column(name = "Identifier", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
     private String mIdentifier;
-    @Column(name = "Instrument")
-    private Instrument mInstrument;
+    @Column(name = "InstrumentRemoteId")
+    private Long mInstrumentRemoteId;
 
     public Roster() {
         super();
@@ -33,11 +33,11 @@ public class Roster extends SendModel {
     }
 
     public void setInstrument(Instrument instrument) {
-        mInstrument = instrument;
+        mInstrumentRemoteId = instrument.getRemoteId();
     }
 
     public Instrument getInstrument() {
-        return mInstrument;
+        return Instrument.findByRemoteId(mInstrumentRemoteId);
     }
 
     public String getIdentifier() {

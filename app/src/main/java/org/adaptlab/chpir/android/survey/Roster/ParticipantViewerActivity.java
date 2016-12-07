@@ -1,4 +1,4 @@
-package org.adaptlab.chpir.android.survey.Roster;
+package org.adaptlab.chpir.android.survey.roster;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,18 +15,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import org.adaptlab.chpir.android.survey.Models.Instrument;
-import org.adaptlab.chpir.android.survey.Models.Question;
-import org.adaptlab.chpir.android.survey.Models.Response;
-import org.adaptlab.chpir.android.survey.Models.Survey;
 import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.models.Instrument;
+import org.adaptlab.chpir.android.survey.models.Question;
+import org.adaptlab.chpir.android.survey.models.Response;
+import org.adaptlab.chpir.android.survey.models.Survey;
 
 import java.util.List;
 
 public class ParticipantViewerActivity extends AppCompatActivity {
-    public final static String EXTRA_SURVEY_ID = "org.adaptlab.chpir.android.survey.survey_id";
+    public final static String EXTRA_SURVEY_ID =
+            "org.adaptlab.chpir.android.survey.roster.survey_id";
+    public final static String EXTRA_ROSTER_ID =
+            "org.adaptlab.chpir.android.survey.roster.roster_id";
     private static final String TAG = "ParticipantViewerActivity";
-    public final int EDIT_SURVEY_REQUEST_CODE = 100;
     private Survey mSurvey;
     private RecyclerView mRecyclerView;
     private List<Response> mResponses;
@@ -37,7 +40,8 @@ public class ParticipantViewerActivity extends AppCompatActivity {
         mRecyclerView = (RecyclerView) findViewById(R.id.participant_recycler_view);
         Long surveyId = getIntent().getLongExtra(RosterActivity.EXTRA_SURVEY_ID, -1);
         if (surveyId != -1) {
-            mSurvey = Survey.load(Survey.class, -1);
+            mSurvey = Survey.load(Survey.class, surveyId);
+            if (mSurvey == null) return;
             new ResponseLoaderTask().execute(mSurvey);
         }
     }
@@ -63,40 +67,28 @@ public class ParticipantViewerActivity extends AppCompatActivity {
     private void editParticipant() {
         Intent intent = new Intent(ParticipantViewerActivity.this, ParticipantEditorActivity.class);
         intent.putExtra(EXTRA_SURVEY_ID, mSurvey.getId());
-        startActivityForResult(intent, EDIT_SURVEY_REQUEST_CODE);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == EDIT_SURVEY_REQUEST_CODE && data != null) {
-            Long surveyId = getIntent().getLongExtra(ParticipantEditorActivity.EXTRA_SURVEY_ID, -1);
-            if (surveyId != -1) {
-                mSurvey = Survey.load(Survey.class, surveyId);
-                new ResponseLoaderTask().execute(mSurvey);
-            }
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        Intent intent = new Intent(this, RosterActivity.class);
-        intent.putExtra(RosterActivity.EXTRA_SURVEY_ID, mSurvey.getId());
-        setResult(200, intent);
-        finish();
+        intent.putExtra(EXTRA_ROSTER_ID, mSurvey.getRoster().getId());
+        startActivity(intent);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        showParticipantDetails();
+        if (mSurvey != null) new ResponseLoaderTask().execute(mSurvey);
     }
 
     private void showParticipantDetails() {
-        ResponseAdapter adapter = new ResponseAdapter(mResponses);
-        if (mRecyclerView != null) {
-            mRecyclerView.setAdapter(adapter);
-            mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        if (mResponses != null) {
+            ResponseAdapter adapter = new ResponseAdapter(mResponses);
+            if (mRecyclerView != null) {
+                mRecyclerView.setAdapter(adapter);
+                mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+            }
         }
+    }
+
+    private String stripHtml(String withHtml) {
+        return Html.fromHtml(withHtml).toString().trim();
     }
 
     private class ResponseAdapter extends RecyclerView.Adapter<ResponseAdapter.QuestionViewHolder> {
@@ -116,7 +108,8 @@ public class ParticipantViewerActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(QuestionViewHolder holder, int position) {
-            holder.questionText.setText(responses.get(position).getQuestion().getText());
+            holder.questionText.setText(stripHtml(responses.get(position).getQuestion()
+                    .getText()));
             holder.questionResponse.setText(mResponses.get(position).getText());
         }
 
@@ -178,7 +171,7 @@ public class ParticipantViewerActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Response response) {
-           setTitle(response.getText());
+            if (response != null) setTitle(response.getText());
         }
     }
 

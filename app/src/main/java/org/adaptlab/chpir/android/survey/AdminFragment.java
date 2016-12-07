@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.activerecordcloudsync.PollService;
-import org.adaptlab.chpir.android.survey.Models.AdminSettings;
+import org.adaptlab.chpir.android.survey.models.AdminSettings;
 
 public class AdminFragment extends Fragment {
 

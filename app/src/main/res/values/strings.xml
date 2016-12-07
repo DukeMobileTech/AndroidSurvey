@@ -111,4 +111,5 @@
     <string name="next">NEXT</string>
     <string name="save">SAVE</string>
     <string name="edit">EDIT</string>
+    <string name="participant_id_response">dummy</string>
 </resources>

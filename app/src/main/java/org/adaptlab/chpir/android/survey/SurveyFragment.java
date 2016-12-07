@@ -42,23 +42,23 @@ import android.widget.TextView;
 import com.activeandroid.Model;
 import com.crashlytics.android.Crashlytics;
 
-import org.adaptlab.chpir.android.survey.Location.LocationServiceManager;
-import org.adaptlab.chpir.android.survey.Models.Grid;
-import org.adaptlab.chpir.android.survey.Models.Instrument;
-import org.adaptlab.chpir.android.survey.Models.Option;
-import org.adaptlab.chpir.android.survey.Models.Question;
-import org.adaptlab.chpir.android.survey.Models.Question.QuestionType;
-import org.adaptlab.chpir.android.survey.Models.Response;
-import org.adaptlab.chpir.android.survey.Models.Section;
-import org.adaptlab.chpir.android.survey.Models.Survey;
-import org.adaptlab.chpir.android.survey.QuestionFragments.MultipleSelectGridFragment;
-import org.adaptlab.chpir.android.survey.QuestionFragments.SingleSelectGridFragment;
-import org.adaptlab.chpir.android.survey.Roster.RosterActivity;
-import org.adaptlab.chpir.android.survey.Rules.InstrumentSurveyLimitPerMinuteRule;
-import org.adaptlab.chpir.android.survey.Rules.InstrumentSurveyLimitRule;
-import org.adaptlab.chpir.android.survey.Rules.InstrumentTimingRule;
-import org.adaptlab.chpir.android.survey.Rules.RuleBuilder;
-import org.adaptlab.chpir.android.survey.Tasks.SendResponsesTask;
+import org.adaptlab.chpir.android.survey.location.LocationServiceManager;
+import org.adaptlab.chpir.android.survey.models.Grid;
+import org.adaptlab.chpir.android.survey.models.Instrument;
+import org.adaptlab.chpir.android.survey.models.Option;
+import org.adaptlab.chpir.android.survey.models.Question;
+import org.adaptlab.chpir.android.survey.models.Question.QuestionType;
+import org.adaptlab.chpir.android.survey.models.Response;
+import org.adaptlab.chpir.android.survey.models.Section;
+import org.adaptlab.chpir.android.survey.models.Survey;
+import org.adaptlab.chpir.android.survey.questionfragments.MultipleSelectGridFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.SingleSelectGridFragment;
+import org.adaptlab.chpir.android.survey.roster.RosterActivity;
+import org.adaptlab.chpir.android.survey.rules.InstrumentSurveyLimitPerMinuteRule;
+import org.adaptlab.chpir.android.survey.rules.InstrumentSurveyLimitRule;
+import org.adaptlab.chpir.android.survey.rules.InstrumentTimingRule;
+import org.adaptlab.chpir.android.survey.rules.RuleBuilder;
+import org.adaptlab.chpir.android.survey.tasks.SendResponsesTask;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -276,7 +276,7 @@ public class SurveyFragment extends Fragment {
         new LoadQuestionsTask().execute(mInstrument);
 
         if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) {
-            startLocationServices();
+//            startLocationServices(); // TODO: 12/6/16 Migrate to api 23
         }
         AppUtil.authorize(); //To take care of login in case Foreground listener has not registered
         setHasOptionsMenu(true);
@@ -688,7 +688,7 @@ public class SurveyFragment extends Fragment {
                 nextQuestion = nextQuestionHelper(questionIndex);
             }
         }
-        return getNextUnskippedQuestion(nextQuestion);
+        return getNextUnSkippedQuestion(nextQuestion);
     }
 
     private Question getNextQuestionWhenNumberFormatException(int questionIndex) {
@@ -720,13 +720,13 @@ public class SurveyFragment extends Fragment {
         return nextQuestion;
     }
 
-    private Question getNextUnskippedQuestion(Question nextQuestion) {
+    private Question getNextUnSkippedQuestion(Question nextQuestion) {
         if (mQuestionsToSkip.contains(nextQuestion.getNumberInInstrument())) {
             if (isLastQuestion()) {
                 finishSurvey();
             } else {
                 nextQuestion = nextQuestionHelper(nextQuestion.getNumberInInstrument() - 1);
-                nextQuestion = getNextUnskippedQuestion(nextQuestion);
+                nextQuestion = getNextUnSkippedQuestion(nextQuestion);
             }
         }
         return nextQuestion;
