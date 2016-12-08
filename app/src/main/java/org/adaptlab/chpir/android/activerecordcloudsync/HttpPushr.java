@@ -67,9 +67,15 @@ public class HttpPushr {
     private void sendData(SendModel element) {
         if (!element.isSent() && element.readyToSend()) {
             HttpURLConnection connection = null;
-            try {
-                String endPoint = ActiveRecordCloudSync.getEndPoint() + mRemoteTableName +
+            String endPoint;
+            if (element.belongsToRoster() && AppUtil.getAdminSettingsInstance().useEndpoint2()) {
+                endPoint = ActiveRecordCloudSync.getEndPoint2() + mRemoteTableName +
+                        ActiveRecordCloudSync.getParams2();
+            } else {
+                endPoint = ActiveRecordCloudSync.getEndPoint() + mRemoteTableName +
                         ActiveRecordCloudSync.getParams();
+            }
+            try {
                 connection = (HttpURLConnection) new URL(endPoint).openConnection();
                 connection.setRequestMethod("POST");
                 connection.setRequestProperty("Content-Type", "application/json");

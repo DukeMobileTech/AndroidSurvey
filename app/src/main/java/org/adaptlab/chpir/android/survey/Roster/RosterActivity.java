@@ -152,13 +152,13 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
     }
 
     private void setLinearLayoutHeaderTextViewAttrs(TextView view, int colWidth) {
-        setTextViewAttributes(view, ContextCompat.getColor(this, R.color.frozenColumnBackground),
-                Color.WHITE, HEADER_TEXT_SIZE, colWidth, Typeface.BOLD);
+        setTextViewAttributes(view, ContextCompat.getColor(this, R.color.primary_light),
+                HEADER_TEXT_SIZE, colWidth, Typeface.BOLD);
     }
 
     private void setTableRowLayoutHeaderTextViewAttrs(TextView view, int colWidth) {
-        setTextViewAttributes(view, ContextCompat.getColor(this, R.color.frozenColumnBackground),
-                Color.WHITE, HEADER_TEXT_SIZE, colWidth, Typeface.BOLD);
+        setTextViewAttributes(view, ContextCompat.getColor(this, R.color.primary_light),
+                HEADER_TEXT_SIZE, colWidth, Typeface.BOLD);
     }
 
     private void setFirstRowListener(TextView headerView, final Question question) {
@@ -173,8 +173,8 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         });
     }
 
-    private void setTextViewAttributes(TextView view, int backgroundColor, int textColor,
-                                       int textSize, int colWidth, int typeface) {
+    private void setTextViewAttributes(TextView view, int backgroundColor, int textSize,
+                                       int colWidth, int typeface) {
         int minimumHeight = 75;
         int margin = 1;
         int padding = 5;
@@ -182,8 +182,8 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
 
         view.setMinimumHeight(minimumHeight);
         view.setEms(colWidth);
-        view.setTextColor(textColor);
-        view.setGravity(Gravity.CENTER_HORIZONTAL);
+        view.setTextColor(Color.BLACK);
+        view.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
         view.setPadding(padding, padding, padding, padding);
         view.setTypeface(view.getTypeface(), typeface);
         view.setTextSize(textSize);
@@ -214,21 +214,21 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
                 if (response.getQuestion() == surveyIdentifier) {
                     TextView idView = new TextView(this);
                     setTextViewAttributes(idView, ContextCompat.getColor(this,
-                            R.color.frozenColumnBackground), Color.WHITE, NON_HEADER_TEXT_SIZE,
-                            colWidthList.get(k), Typeface.NORMAL);
+                            R.color.primary_light), NON_HEADER_TEXT_SIZE,
+                            colWidthList.get(k), Typeface.BOLD);
                     idView.setText(response.getText());
                     idRow.addView(idView);
                     setSurveyListener(survey, idView);
                 } else {
                     TextView view = new TextView(this);
-                    setTextViewAttributes(view, Color.WHITE, Color.BLACK, NON_HEADER_TEXT_SIZE,
+                    setTextViewAttributes(view, Color.WHITE, NON_HEADER_TEXT_SIZE,
                             colWidthList.get(k), Typeface.NORMAL);
                     view.setText(response.getText());
                     responseRow.addView(view);
                 }
             } else {
                 TextView defaultView = new TextView(this);
-                setTextViewAttributes(defaultView, Color.WHITE, Color.BLACK, NON_HEADER_TEXT_SIZE,
+                setTextViewAttributes(defaultView, Color.WHITE, NON_HEADER_TEXT_SIZE,
                         colWidthList.get(k), Typeface.NORMAL);
                 defaultView.setText("");
                 responseRow.addView(defaultView);

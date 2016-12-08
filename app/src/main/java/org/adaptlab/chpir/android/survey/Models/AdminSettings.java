@@ -8,6 +8,7 @@ import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
+import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -45,42 +46,84 @@ public class AdminSettings extends Model {
     private String mApiKey;
     @Column(name = "RequirePassword")
     private boolean mRequirePassword;
-    @Column(name= "RecordSurveyLocation")
+    @Column(name = "RecordSurveyLocation")
     private boolean mRecordSurveyLocation;
     @Column(name = "LastSyncTimes")
     private String mLastSyncTime;
-
-    private static AdminSettings adminSettings;
-
-    /**
-     * This maintains a single row in the database for the admin settings, and
-     * effectively is a Singleton.  This is done to piggy-back on the
-     * ReceiveModel functionality.
-     *
-     */
-    public static AdminSettings getInstance() {
-        adminSettings = new Select().from(AdminSettings.class).orderBy("Id asc").executeSingle();
-        if (adminSettings == null) {
-            Log.i(TAG, "Creating new admin settings instance");
-            adminSettings = new AdminSettings();
-            adminSettings.save();
-        }
-        return adminSettings;
-    }
+    @Column(name = "SecondEndpoint")
+    private boolean mSecondEndpoint;
+    @Column(name = "Api2Url")
+    private String mApi2Url;
+    @Column(name = "Api2Version")
+    private String mApi2Version;
+    @Column(name = "Api2Key")
+    private String mApi2Key;
+    @Column(name = "ShowRosters")
+    private boolean mShowRosters;
 
     /**
      * Typically a Singleton constructor is private, but in this case the constructor
      * must be public for ActiveAndroid to function properly.  Do not use this
      * constructor, use getInstance() instead.
-     *
      */
     public AdminSettings() {
         super();
         mShowSurveys = false;
     }
 
-    public void setDeviceIdentifier(String id) {
-        mDeviceIdentifier = id;
+    /**
+     * This maintains a single row in the database for the admin settings, and
+     * effectively is a Singleton.  This is done to piggy-back on the
+     * ReceiveModel functionality.
+     */
+    public static AdminSettings getInstance() {
+        AdminSettings adminSettings = new Select().from(AdminSettings.class).orderBy("Id asc")
+                .executeSingle();
+        if (adminSettings == null) {
+            if (BuildConfig.DEBUG) Log.i(TAG, "Creating new admin settings instance");
+            adminSettings = new AdminSettings();
+            adminSettings.save();
+        }
+        return adminSettings;
+    }
+
+    public void setUseEndpoint2(boolean status) {
+        mSecondEndpoint = status;
+        save();
+    }
+
+    public boolean useEndpoint2() {
+        return mSecondEndpoint;
+    }
+
+    public String getApi2DomainName() {
+        return mApi2Url;
+    }
+
+    public void setApi2DomainName(String url) {
+        if (!TextUtils.isEmpty(url)) {
+            char lastChar = url.charAt(url.length() - 1);
+            if (lastChar != '/') url = url + "/";
+            mApi2Url = url;
+            save();
+        }
+    }
+
+    public String getApi2Version() {
+        return mApi2Version;
+    }
+
+    public void setApi2Version(String version) {
+        mApi2Version = version;
+        save();
+    }
+
+    public String getApi2Key() {
+        return mApi2Key;
+    }
+
+    public void setApi2Key(String key) {
+        mApi2Key = key;
         save();
     }
 
@@ -88,13 +131,18 @@ public class AdminSettings extends Model {
         return mDeviceIdentifier;
     }
 
-    public void setDeviceLabel(String label) {
-        mDeviceLabel = label;
+    public void setDeviceIdentifier(String id) {
+        mDeviceIdentifier = id;
         save();
     }
 
     public String getDeviceLabel() {
         return mDeviceLabel;
+    }
+
+    public void setDeviceLabel(String label) {
+        mDeviceLabel = label;
+        save();
     }
 
     /**
@@ -105,32 +153,23 @@ public class AdminSettings extends Model {
     }
 
     /**
+     * Set the interval in minutes, it is converted to milliseconds
+     */
+    public void setSyncInterval(int interval) {
+        if (BuildConfig.DEBUG) Log.i(TAG, "Setting set interval: " + (interval * 1000 * 60));
+        mSyncInterval = interval * 1000 * 60;
+        save();
+    }
+
+    /**
      * Second sync interval
      */
     public int getSyncIntervalInMinutes() {
         return mSyncInterval / (60 * 1000);
     }
 
-    /**
-     * Set the interval in minutes, it is converted to milliseconds
-     */
-    public void setSyncInterval(int interval) {
-        Log.i(TAG, "Setting set interval: " + (interval * 1000 * 60));
-        mSyncInterval = interval * 1000 * 60;
-        save();
-    }
-
-    public void setApiDomainName(String apiUrl) {
-        if (!TextUtils.isEmpty(apiUrl)) {
-            char lastChar = apiUrl.charAt(apiUrl.length() - 1);
-            if (lastChar != '/') apiUrl = apiUrl + "/";
-            mApiUrl = apiUrl;
-            save();
-        }
-    }
-
-    public String getApiDomainName() {
-        return mApiUrl;
+    public String getCustomLocaleCode() {
+        return mCustomLocaleCode;
     }
 
     public void setCustomLocaleCode(String code) {
@@ -138,8 +177,8 @@ public class AdminSettings extends Model {
         save();
     }
 
-    public String getCustomLocaleCode() {
-        return mCustomLocaleCode;
+    public boolean getShowSurveys() {
+        return mShowSurveys;
     }
 
     public void setShowSurveys(boolean showSurveys) {
@@ -147,83 +186,13 @@ public class AdminSettings extends Model {
         save();
     }
 
-    public boolean getShowSurveys() {
-        return mShowSurveys;
-    }
-
-    public void setShowSkip(boolean showSkip) {
-        mShowSkip = showSkip;
-        save();
-    }
-
-    /*
-     * Show SKIP special response for each question if true
-     */
-    public boolean getShowSkip() {
-        return mShowSkip;
-    }
-
-    public void setShowNA(boolean showNA) {
-        mShowNA = showNA;
-        save();
-    }
-
-    /*
-     * Show NOT APPLICABLE special response for each question if true
-     */
-    public boolean getShowNA() {
-        return mShowNA;
-    }
-
-    public void setShowRF(boolean showRF) {
-        mShowRF = showRF;
-        save();
-    }
-
-    /*
-     * Show REFUSED special response for each question if true
-     */
-    public boolean getShowRF() {
-        return mShowRF;
-    }
-
-    public void setShowDK(boolean showDK) {
-        mShowDK = showDK;
-        save();
-    }
-
-    /*
-     * Show DONT KNOW special response for each question if true
-     */
-    public boolean getShowDK() {
-        return mShowDK;
-    }
-
-    public void setApiVersion(String apiVersion) {
-        mApiVersion = apiVersion;
-        save();
-    }
-
-    public String getApiVersion() {
-        return mApiVersion;
-    }
-
-    public void setProjectId(String projectId) {
-        mProjectId = projectId;
-        save();
-    }
-
-    public String getProjectId() {
-        return mProjectId;
+    public String getApiKey() {
+        return mApiKey;
     }
 
     public void setApiKey(String apiKey) {
         mApiKey = apiKey;
         save();
-    }
-
-    public String getApiKey() {
-        return mApiKey;
     }
 
     public boolean getRequirePassword() {
@@ -235,17 +204,69 @@ public class AdminSettings extends Model {
         save();
     }
 
+    public boolean getRecordSurveyLocation() {
+        return mRecordSurveyLocation;
+    }
+
     public void setRecordSurveyLocation(boolean recordSurveyLocation) {
         mRecordSurveyLocation = recordSurveyLocation;
         save();
     }
 
-    public boolean getRecordSurveyLocation() {
-        return mRecordSurveyLocation;
+    public String getApiUrl() {
+        return getApiDomainName() + "api/" + getApiVersion() + "/" + "projects/" + getProjectId()
+                + "/";
     }
 
-    public String getApiUrl() {
-        return getApiDomainName() + "api/" + getApiVersion() + "/" + "projects/" + getProjectId() + "/";
+    public String getApi2url() {
+        return getApi2DomainName() + "api/" + getApi2Version() + "/";
+    }
+
+    public String getApiDomainName() {
+        return mApiUrl;
+    }
+
+    public void setApiDomainName(String apiUrl) {
+        if (!TextUtils.isEmpty(apiUrl)) {
+            char lastChar = apiUrl.charAt(apiUrl.length() - 1);
+            if (lastChar != '/') apiUrl = apiUrl + "/";
+            mApiUrl = apiUrl;
+            save();
+        }
+    }
+
+    public String getApiVersion() {
+        return mApiVersion;
+    }
+
+    public void setApiVersion(String apiVersion) {
+        mApiVersion = apiVersion;
+        save();
+    }
+
+    public String getProjectId() {
+        return mProjectId;
+    }
+
+    public void setProjectId(String projectId) {
+        mProjectId = projectId;
+        save();
+    }
+
+    public String getLastSyncTime() {
+        String lastSyncTime = "";
+        if (mLastSyncTime == null) {
+            return lastSyncTime;
+        }
+        try {
+            JSONObject projectLastSyncTime = new JSONObject(mLastSyncTime);
+            if (!projectLastSyncTime.isNull(getProjectId())) {
+                lastSyncTime = projectLastSyncTime.getString(getProjectId());
+            }
+        } catch (JSONException je) {
+            if (BuildConfig.DEBUG) Log.e(TAG, "JSON exception", je);
+        }
+        return lastSyncTime;
     }
 
     public void setLastSyncTime(String syncTime) {
@@ -257,25 +278,11 @@ public class AdminSettings extends Model {
                 projectTime = new JSONObject(mLastSyncTime);
             }
             projectTime.put(getProjectId(), syncTime);
-        } catch (JSONException je ) {
-            Log.e(TAG, "JSON exception", je);
+        } catch (JSONException je) {
+            if (BuildConfig.DEBUG) Log.e(TAG, "JSON exception", je);
         }
         mLastSyncTime = projectTime.toString();
         save();
-    }
-
-    public String getLastSyncTime() {
-        String lastSyncTime = "";
-        if (mLastSyncTime == null) { return lastSyncTime; }
-        try {
-            JSONObject projectLastSyncTime = new JSONObject(mLastSyncTime);
-            if (!projectLastSyncTime.isNull(getProjectId())) {
-                lastSyncTime = projectLastSyncTime.getString(getProjectId());
-            }
-        } catch (JSONException je) {
-            Log.e(TAG, "JSON exception", je);
-        }
-        return lastSyncTime;
     }
 
     public void resetLastSyncTime() {
@@ -290,6 +297,63 @@ public class AdminSettings extends Model {
         if (getShowRF()) options.add(Response.RF);
         if (getShowSkip()) options.add(Response.SKIP);
         return options;
+    }
+
+    /*
+     * Show DONT KNOW special response for each question if true
+     */
+    public boolean getShowDK() {
+        return mShowDK;
+    }
+
+    /*
+     * Show NOT APPLICABLE special response for each question if true
+     */
+    public boolean getShowNA() {
+        return mShowNA;
+    }
+
+    public void setShowNA(boolean showNA) {
+        mShowNA = showNA;
+        save();
+    }
+
+    /*
+     * Show REFUSED special response for each question if true
+     */
+    public boolean getShowRF() {
+        return mShowRF;
+    }
+
+    /*
+     * Show SKIP special response for each question if true
+     */
+    public boolean getShowSkip() {
+        return mShowSkip;
+    }
+
+    public void setShowSkip(boolean showSkip) {
+        mShowSkip = showSkip;
+        save();
+    }
+
+    public void setShowRF(boolean showRF) {
+        mShowRF = showRF;
+        save();
+    }
+
+    public void setShowDK(boolean showDK) {
+        mShowDK = showDK;
+        save();
+    }
+
+    public boolean getShowRosters() {
+        return mShowRosters;
+    }
+
+    public void setShowRosters(boolean showRosters) {
+        mShowRosters = showRosters;
+        save();
     }
 
 }

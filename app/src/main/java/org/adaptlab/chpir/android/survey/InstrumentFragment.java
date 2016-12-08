@@ -305,53 +305,61 @@ public class InstrumentFragment extends ListFragment {
     }
 
     public void createTabs() {
-        if (AppUtil.getAdminSettingsInstance().getShowSurveys()) {
+        if (showTabs()) {
             final ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
             if (actionBar != null) { // TODO: 12/6/16 Use TabLayout
                 ActionBar.TabListener tabListener = new ActionBar.TabListener() {
                     @Override
                     public void onTabSelected(Tab tab, FragmentTransaction ft) {
-                        if (tab.getText().equals(getActivity().getResources().getString(R.string.surveys))) {
+                        if (tab.getText().equals(getActivity().getResources().getString(
+                                R.string.surveys))) {
                             if (Survey.getAllProjectSurveys(getProjectId()).isEmpty()) {
                                 setListAdapter(null);
                             } else {
                                 setSurveysListViewAdapter();
                                 mSurveyListView = getListView();
                                 mSurveyListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-                                mSurveyListView.setMultiChoiceModeListener(mSurveyMultiChoiceModeListener);
+                                mSurveyListView.setMultiChoiceModeListener
+                                        (mSurveyMultiChoiceModeListener);
                             }
-                        } else if (tab.getText().equals(getActivity().getResources().getString(R.string.rosters))) {
-                            setRostersListViewAdapter(); // TODO: 12/7/16 Add check option in admin 
-                        } else  {
+                        } else if (tab.getText().equals(getActivity().getResources().getString(
+                                R.string.rosters))) {
+                            setRostersListViewAdapter();
+                        } else {
                             setInstrumentsListViewAdapter();
                         }
                     }
 
                     @Override
-                    public void onTabUnselected(Tab tab, FragmentTransaction ft) {}
+                    public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+                    }
 
                     @Override
-                    public void onTabReselected(Tab tab, FragmentTransaction ft) {}
+                    public void onTabReselected(Tab tab, FragmentTransaction ft) {
+                    }
                 };
 
                 actionBar.removeAllTabs();
                 actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-                actionBar.addTab(actionBar.newTab().setText(getActivity().getResources().getString(R
-                        .string.instruments)).setTabListener(tabListener));
-                actionBar.addTab(actionBar.newTab().setText(getActivity().getResources().getString(R
-                        .string.surveys)).setTabListener(tabListener));
-                actionBar.addTab(actionBar.newTab().setText(R.string.rosters).setTabListener(tabListener));
+                actionBar.addTab(actionBar.newTab().setText(getActivity().getResources().getString(
+                        R.string.instruments)).setTabListener(tabListener));
+                if (AppUtil.getAdminSettingsInstance().getShowSurveys()) {
+                    actionBar.addTab(actionBar.newTab().setText(getActivity().getResources()
+                            .getString(R.string.surveys)).setTabListener(tabListener));
+                }
+                if (AppUtil.getAdminSettingsInstance().getShowRosters()) {
+                    actionBar.addTab(actionBar.newTab().setText(getActivity().getResources()
+                            .getString(R.string.rosters)).setTabListener(tabListener));
+                }
             }
         } else {
             setInstrumentsListViewAdapter();
         }
     }
 
-    private void setRostersListViewAdapter() {
-        Cursor rostersCursor = Roster.getCursor();
-        mRosterAdapter = new RosterAdapter(getActivity(), rostersCursor, 0);
-        setListAdapter(mRosterAdapter);
-        getActivity().getSupportLoaderManager().restartLoader(0, null, mRosterCallbacks);
+    private boolean showTabs() {
+        return AppUtil.getAdminSettingsInstance().getShowSurveys() ||
+                AppUtil.getAdminSettingsInstance().getShowRosters();
     }
 
     private void setSurveysListViewAdapter() {
@@ -361,6 +369,13 @@ public class InstrumentFragment extends ListFragment {
             setListAdapter(mSurveyAdapter);
             getActivity().getSupportLoaderManager().restartLoader(0, null, mSurveyCallbacks);
         }
+    }
+
+    private void setRostersListViewAdapter() {
+        Cursor rostersCursor = Roster.getCursor();
+        mRosterAdapter = new RosterAdapter(getActivity(), rostersCursor, 0);
+        setListAdapter(mRosterAdapter);
+        getActivity().getSupportLoaderManager().restartLoader(0, null, mRosterCallbacks);
     }
 
     private void setInstrumentsListViewAdapter() {
@@ -386,7 +401,7 @@ public class InstrumentFragment extends ListFragment {
             Survey survey = getSurveyAtPosition(l, position);
             if (survey == null) return;
             new LoadSurveyTask().execute(survey);
-        } else if (l.getAdapter() instanceof RosterAdapter){
+        } else if (l.getAdapter() instanceof RosterAdapter) {
             Roster roster = getRosterAtPosition(l, position);
             if (roster == null) return;
             Intent i = new Intent(getActivity(), RosterActivity.class);
@@ -451,12 +466,6 @@ public class InstrumentFragment extends ListFragment {
 
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
-            if (cursor.getPosition() % 2 == 0) {
-                view.setBackgroundResource(R.drawable.list_background_color);
-            } else {
-                view.setBackgroundResource(R.drawable.list_background_color_alternate);
-            }
-
             TextView titleTextView = (TextView) view.findViewById(R.id
                     .instrument_list_item_titleTextView);
             TextView questionCountTextView = (TextView) view.findViewById(R.id
@@ -470,9 +479,8 @@ public class InstrumentFragment extends ListFragment {
             int numQuestions = instrument.questions().size();
 
             titleTextView.setText(title);
-            titleTextView.setTypeface(instrument.getTypeFace(getActivity().getApplicationContext
-                    ()));
-            titleTextView.setTextColor(Color.BLACK);
+            titleTextView.setTypeface(instrument.getTypeFace(
+                    getActivity().getApplicationContext()));
             questionCountTextView.setText(numQuestions + " " + FormatUtils.pluralize
                     (numQuestions, getString(R.string.question), getString(R.string.questions)));
             instrumentVersionTextView.setText(getString(R.string.version) + ": " + instrument
@@ -498,11 +506,12 @@ public class InstrumentFragment extends ListFragment {
         public void clearSelection() {
             mSelectionViews.clear();
             notifyDataSetChanged();
-        }        @Override
+        }
+
+        @Override
         public View newView(Context context, Cursor cursor, ViewGroup parent) {
             return LayoutInflater.from(context).inflate(R.layout.list_item_survey, parent, false);
         }
-
 
 
         public boolean isPositionChecked(int position) {
@@ -511,12 +520,6 @@ public class InstrumentFragment extends ListFragment {
 
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
-            if (cursor.getPosition() % 2 == 0) {
-                view.setBackgroundResource(R.drawable.list_background_color);
-            } else {
-                view.setBackgroundResource(R.drawable.list_background_color_alternate);
-            }
-
             if (mSelectionViews != null && mSurveyAdapter.isPositionChecked(cursor.getPosition())) {
                 view.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_light));
             }
@@ -536,8 +539,8 @@ public class InstrumentFragment extends ListFragment {
             titleTextView.setText(survey.identifier(getActivity()));
             titleTextView.setTypeface(survey.getInstrument().getTypeFace(getActivity()
                     .getApplicationContext()));
-            progressTextView.setText(survey.responses().size() + " " + getString(R.string.of) + "" +
-                    " " + survey.getInstrument().questions().size());
+            progressTextView.setText(survey.responses().size() + " " + getString(R.string.of)
+                    + "" + " " + survey.getInstrument().questions().size());
             instrumentTitleTextView.setText(survey.getInstrument().getTitle());
             DateFormat df = DateFormat.getDateTimeInstance();
             lastUpdatedTextView.setText(df.format(survey.getLastUpdated()));
@@ -560,12 +563,6 @@ public class InstrumentFragment extends ListFragment {
 
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
-            if (cursor.getPosition() % 2 == 0) {
-                view.setBackgroundResource(R.drawable.list_background_color);
-            } else {
-                view.setBackgroundResource(R.drawable.list_background_color_alternate);
-            }
-
             TextView titleTextView = (TextView) view.findViewById(R.id
                     .roster_list_item_titleTextView);
             TextView surveyCountTextView = (TextView) view.findViewById(R.id
@@ -579,7 +576,6 @@ public class InstrumentFragment extends ListFragment {
             titleTextView.setText(title);
             titleTextView.setTypeface(roster.getInstrument().getTypeFace(getActivity()
                     .getApplicationContext()));
-            titleTextView.setTextColor(Color.BLACK);
             surveyCountTextView.setText(numSurveys + " " + FormatUtils.pluralize
                     (numSurveys, getString(R.string.survey), getString(R.string.surveys)));
         }

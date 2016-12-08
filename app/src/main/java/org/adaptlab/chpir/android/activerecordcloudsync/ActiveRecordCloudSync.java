@@ -125,6 +125,15 @@ public class ActiveRecordCloudSync {
         return "?access_token=" + getAccessToken() + "&version_code=" + getVersionCode() + "&last_sync_time=" + AppUtil.getAdminSettingsInstance().getLastSyncTime() ;
     }
 
+    public static String getEndPoint2() {
+        return AppUtil.getAdminSettingsInstance().getApi2url();
+    }
+
+    public static String getParams2() {
+        return "?access_token=" + AppUtil.getAdminSettingsInstance().getApi2Key() +
+                "&version_code=" + getVersionCode();
+    }
+
     public static void setFetchCount(int count) {
         mFetchCount = count;
     }

@@ -344,4 +344,9 @@ public class Survey extends SendModel {
         return new Select().from(Roster.class).where("UUID = ?", mRosterUUID).executeSingle();
     }
 
+    @Override
+    public boolean belongsToRoster() {
+        return getRoster() == null;
+    }
+
 }

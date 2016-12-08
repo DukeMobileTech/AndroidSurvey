@@ -5,11 +5,6 @@
           android:icon="@drawable/ic_menu_item_previous_item"
           android:title="@string/previous"
           app:showAsAction="ifRoom|withText" />
-    <!--<item-->
-        <!--android:id="@+id/save_new_participant"-->
-        <!--android:icon="@drawable/ic_save"-->
-        <!--android:title="@string/save"-->
-        <!--app:showAsAction="ifRoom"/>-->
     <item android:id="@+id/menu_item_next"
           android:icon="@drawable/ic_menu_item_next_item"
           android:title="@string/next"

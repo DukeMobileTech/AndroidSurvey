@@ -345,7 +345,7 @@ public class SurveyFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putLong(EXTRA_INSTRUMENT_ID, mInstrument.getRemoteId());
-        outState.putLong(EXTRA_SURVEY_ID, mSurvey.getId());
+        if (mSurvey != null) outState.putLong(EXTRA_SURVEY_ID, mSurvey.getId());
         outState.putInt(EXTRA_QUESTION_NUMBER, mQuestionNumber);
         outState.putIntegerArrayList(EXTRA_PREVIOUS_QUESTION_IDS, mPreviousQuestions);
         outState.putIntegerArrayList(EXTRA_QUESTIONS_TO_SKIP_IDS, mQuestionsToSkip);

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/activity_main"
+<RelativeLayout android:id="@+id/activity_main"
+                xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="@drawable/fragments_background"
                 android:orientation="horizontal">
 
     <LinearLayout
@@ -16,8 +17,8 @@
             android:id="@+id/header_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="2dp"
             android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
             android:background="@android:color/black"
             android:orientation="horizontal">
 
@@ -31,9 +32,9 @@
             <TableLayout
                 android:id="@+id/header_2"
                 android:layout_width="wrap_content"
-                android:layout_marginRight="2dp"
-                android:layout_marginLeft="2dp"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
                 android:background="@android:color/black">
 
             </TableLayout>
@@ -55,8 +56,8 @@
                 android:id="@+id/participant_id"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="2dp"
                 android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
                 android:background="@android:color/black">
 
             </TableLayout>
@@ -69,9 +70,9 @@
                 <TableLayout
                     android:id="@+id/content_table"
                     android:layout_width="wrap_content"
-                    android:layout_marginRight="2dp"
-                    android:layout_marginLeft="2dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="2dp"
                     android:background="@android:color/black">
 
                 </TableLayout>

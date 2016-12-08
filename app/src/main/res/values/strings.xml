@@ -14,7 +14,7 @@
     <string name="free_response_edittext">Answer here</string>
     <string name="refresh">Refresh</string>
     <string name="device_identifier">Device Identifier</string>
-    <string name="sync_interval">Sync Interval (minutes)</string>
+    <string name="sync_interval">Sync Interval (min)</string>
     <string name="save_button">Save</string>
     <string name="admin_settings">Admin</string>
     <string name="api_endpoint">Api Domain Name</string>
@@ -38,7 +38,7 @@
     <string name="password_message">This action requires a password.  Please enter the password below.</string>
     <string name="cancel">Cancel</string>
     <string name="incorrect_password">This password is incorrect.</string>
-    <string name="custom_locale">Custom ISO-639-1 Code</string>
+    <string name="custom_locale">ISO-639-1 Code</string>
     <string name="not_valid_response">This is not a valid response for this question.</string>
     <string name="of">of</string>
     <string name="instrument_loading_progress_header">Loading</string>
@@ -117,4 +117,12 @@
     <string name="roster_title">Roster title</string>
     <string name="roster">roster</string>
     <string name="survey">survey</string>
+    <string name="show_rosters">Show Rosters</string>
+    <string name="roster_sync_settings">Roster Sync Settings</string>
+    <string name="custom_code_hint">Enter custom ISO code for language name</string>
+    <string name="roster_api_endpoint">Sync Rosters To Different Endpoint</string>
+    <string name="api2_key">Roster Api Key</string>
+    <string name="api2_version">Roster Api Version</string>
+    <string name="url_hint">https://example.com/</string>
+    <string name="api2_endpoint">Roster Api Endpoint</string>
 </resources>

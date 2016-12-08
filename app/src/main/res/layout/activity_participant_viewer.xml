@@ -3,9 +3,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:layout_margin="5dp">
+    android:layout_margin="5dp"
+    android:background="@drawable/fragments_background"
+    android:orientation="vertical">
 
+    <!--TODO Change background to correspond to others N/B Cardview does not allow using drawable-->
     <android.support.v7.widget.RecyclerView
         android:id="@+id/participant_recycler_view"
         android:layout_width="match_parent"

@@ -238,4 +238,9 @@ public class Response extends SendModel {
     private String getSurveyUUID() {
         return mSurveyUUID;
     }
+
+    @Override
+    public boolean belongsToRoster() {
+        return getSurvey().getRoster() == null;
+    }
 }

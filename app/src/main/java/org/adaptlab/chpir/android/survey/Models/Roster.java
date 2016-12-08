@@ -111,4 +111,9 @@ public class Roster extends SendModel {
         return true;
     }
 
+    @Override
+    public boolean belongsToRoster() {
+        return true;
+    }
+
 }

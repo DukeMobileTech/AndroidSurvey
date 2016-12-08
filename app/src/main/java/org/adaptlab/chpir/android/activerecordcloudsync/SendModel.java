@@ -16,4 +16,9 @@ public abstract class SendModel extends Model {
     public String getPrimaryKey() {
         return "Id";
     }
+
+    public boolean belongsToRoster() {
+        return false;
+    }
+
 }

@@ -7,6 +7,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -18,6 +21,8 @@ import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.activerecordcloudsync.PollService;
 import org.adaptlab.chpir.android.survey.models.AdminSettings;
 
+import java.util.Locale;
+
 public class AdminFragment extends Fragment {
 
     private EditText mDeviceIdentifierEditText;
@@ -28,36 +33,36 @@ public class AdminFragment extends Fragment {
     private EditText mProjectIdEditText;
     private EditText mApiKeyEditText;
     private EditText mCustomLocaleEditText;
-    private TextView mLastUpdateTextView;
+    private EditText mApi2DomainNameEditText;
+    private EditText mApi2VersionEditText;
+    private EditText mApi2KeyEditText;
+    private CheckBox mUseSecondEndpoint;
     private CheckBox mShowSurveysCheckBox;
+    private CheckBox mShowRostersCheckBox;
     private CheckBox mShowSkipCheckBox;
     private CheckBox mShowNACheckBox;
     private CheckBox mShowRFCheckBox;
     private CheckBox mShowDKCheckBox;
     private CheckBox mRequirePasswordCheckBox;
     private CheckBox mRecordSurveyLocationCheckBox;
-    private TextView mVersionCodeTextView;
-    private Button mSaveButton;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent,
                              Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_admin_settings, parent,
-                false);
-        mDeviceIdentifierEditText = (EditText) v
-                .findViewById(R.id.device_identifier_edit_text);
+        View v = inflater.inflate(R.layout.fragment_admin_settings, parent, false);
+        mDeviceIdentifierEditText = (EditText) v.findViewById(R.id.device_identifier_edit_text);
         mDeviceIdentifierEditText.setText(getAdminSettingsInstanceDeviceId());
 
         mDeviceLabelEditText = (EditText) v.findViewById(R.id.device_label_edit_text);
         mDeviceLabelEditText.setText(AdminSettings.getInstance().getDeviceLabel());
 
-        mSyncIntervalEditText = (EditText) v
-                .findViewById(R.id.sync_interval_edit_text);
+        mSyncIntervalEditText = (EditText) v.findViewById(R.id.sync_interval_edit_text);
         mSyncIntervalEditText.setText(getAdminSettingsInstanceSyncInterval());
 
         mApiDomainNameEditText = (EditText) v.findViewById(R.id.api_endpoint_text);
@@ -75,8 +80,23 @@ public class AdminFragment extends Fragment {
         mCustomLocaleEditText = (EditText) v.findViewById(R.id.custom_locale_edit_text);
         mCustomLocaleEditText.setText(getAdminSettingsInstanceCustomLocaleCode());
 
+        mUseSecondEndpoint = (CheckBox) v.findViewById(R.id.api2_endpoint);
+        mUseSecondEndpoint.setChecked(AdminSettings.getInstance().useEndpoint2());
+
+        mApi2DomainNameEditText = (EditText) v.findViewById(R.id.api2_endpoint_text);
+        mApi2DomainNameEditText.setText(getAdminSettingsInstanceApi2DomainName());
+
+        mApi2VersionEditText = (EditText) v.findViewById(R.id.api2_version_text);
+        mApi2VersionEditText.setText(getAdminSettingsInstanceApi2Version());
+
+        mApi2KeyEditText = (EditText) v.findViewById(R.id.api2_key_text);
+        mApi2KeyEditText.setText(getAdminSettingsInstanceApi2Key());
+
         mShowSurveysCheckBox = (CheckBox) v.findViewById(R.id.show_surveys_checkbox);
         mShowSurveysCheckBox.setChecked(AdminSettings.getInstance().getShowSurveys());
+
+        mShowRostersCheckBox = (CheckBox) v.findViewById(R.id.show_rosters_checkbox);
+        mShowRostersCheckBox.setChecked(AdminSettings.getInstance().getShowRosters());
 
         mShowSkipCheckBox = (CheckBox) v.findViewById(R.id.show_skip_checkbox);
         mShowSkipCheckBox.setChecked(AdminSettings.getInstance().getShowSkip());
@@ -98,51 +118,13 @@ public class AdminFragment extends Fragment {
         mRecordSurveyLocationCheckBox.setChecked(AdminSettings.getInstance()
                 .getRecordSurveyLocation());
 
-        mLastUpdateTextView = (TextView) v.findViewById(R.id.last_update_label);
-        mLastUpdateTextView.setText(mLastUpdateTextView.getText().toString() + getLastUpdateTime());
+        TextView mLastUpdateTextView = (TextView) v.findViewById(R.id.last_update_label);
+        mLastUpdateTextView.setText(String.format(Locale.getDefault(), "%s%s",
+                mLastUpdateTextView.getText().toString(), getLastUpdateTime()));
 
-        mVersionCodeTextView = (TextView) v.findViewById(R.id.version_code_label);
-        mVersionCodeTextView.setText(getString(R.string.version_code) + AppUtil.getVersionCode
-                (getActivity()));
-
-        mSaveButton = (Button) v.findViewById(R.id.save_admin_settings_button);
-        mSaveButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                AdminSettings.getInstance().setDeviceIdentifier(mDeviceIdentifierEditText.getText
-                        ().toString());
-                AdminSettings.getInstance().setDeviceLabel(mDeviceLabelEditText.getText()
-                        .toString());
-                AdminSettings.getInstance().setSyncInterval(Integer.parseInt
-                        (mSyncIntervalEditText.getText().toString()));
-                AdminSettings.getInstance().setApiDomainName(mApiDomainNameEditText.getText()
-                        .toString());
-                AdminSettings.getInstance().setApiVersion(mApiVersionEditText.getText().toString());
-                AdminSettings.getInstance().setProjectId(mProjectIdEditText.getText().toString());
-                AdminSettings.getInstance().setApiKey(mApiKeyEditText.getText().toString());
-
-                // If this code is set, it will override the language selection on the device
-                // for all instrument translations.
-                AdminSettings.getInstance().setCustomLocaleCode(mCustomLocaleEditText.getText()
-                        .toString());
-
-                PollService.setPollInterval(AdminSettings.getInstance().getSyncInterval());
-                ActiveRecordCloudSync.setAccessToken(getAdminSettingsInstanceApiKey());
-                ActiveRecordCloudSync.setEndPoint(getAdminSettingsInstanceApiUrl());
-                AppUtil.appInit(getActivity());
-
-                AdminSettings.getInstance().setShowSurveys(mShowSurveysCheckBox.isChecked());
-                AdminSettings.getInstance().setShowSkip(mShowSkipCheckBox.isChecked());
-                AdminSettings.getInstance().setShowNA(mShowNACheckBox.isChecked());
-                AdminSettings.getInstance().setShowRF(mShowRFCheckBox.isChecked());
-                AdminSettings.getInstance().setShowDK(mShowDKCheckBox.isChecked());
-                AdminSettings.getInstance().setRequirePassword(mRequirePasswordCheckBox.isChecked
-                        ());
-                AdminSettings.getInstance().setRecordSurveyLocation(mRecordSurveyLocationCheckBox
-                        .isChecked());
-
-                getActivity().finish();
-            }
-        });
+        TextView mVersionCodeTextView = (TextView) v.findViewById(R.id.version_code_label);
+        mVersionCodeTextView.setText(String.format(Locale.getDefault(), "%s%d",
+                getString(R.string.version_code), AppUtil.getVersionCode(getActivity())));
 
         Button deleteData = (Button) v.findViewById(R.id.delete_data_button);
         deleteData.setOnClickListener(new View.OnClickListener() {
@@ -181,6 +163,61 @@ public class AdminFragment extends Fragment {
         return v;
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.admin_setting_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.save_admin_settings_button:
+                saveAdminSettings();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void saveAdminSettings() {
+        AdminSettings.getInstance().setDeviceIdentifier(mDeviceIdentifierEditText.getText()
+                .toString());
+        AdminSettings.getInstance().setDeviceLabel(mDeviceLabelEditText.getText().toString());
+        AdminSettings.getInstance().setSyncInterval(Integer.parseInt(mSyncIntervalEditText
+                .getText().toString()));
+        AdminSettings.getInstance().setApiDomainName(mApiDomainNameEditText.getText().toString());
+        AdminSettings.getInstance().setApiVersion(mApiVersionEditText.getText().toString());
+        AdminSettings.getInstance().setProjectId(mProjectIdEditText.getText().toString());
+        AdminSettings.getInstance().setApiKey(mApiKeyEditText.getText().toString());
+        // If this code is set, it will override the language selection on the device
+        // for all instrument translations.
+        AdminSettings.getInstance().setCustomLocaleCode(mCustomLocaleEditText.getText().toString());
+
+        PollService.setPollInterval(AdminSettings.getInstance().getSyncInterval());
+        ActiveRecordCloudSync.setAccessToken(getAdminSettingsInstanceApiKey());
+        ActiveRecordCloudSync.setEndPoint(getAdminSettingsInstanceApiUrl());
+        AppUtil.appInit(getActivity());
+
+        AdminSettings.getInstance().setShowSurveys(mShowSurveysCheckBox.isChecked());
+        AdminSettings.getInstance().setShowRosters(mShowRostersCheckBox.isChecked());
+        AdminSettings.getInstance().setShowSkip(mShowSkipCheckBox.isChecked());
+        AdminSettings.getInstance().setShowNA(mShowNACheckBox.isChecked());
+        AdminSettings.getInstance().setShowRF(mShowRFCheckBox.isChecked());
+        AdminSettings.getInstance().setShowDK(mShowDKCheckBox.isChecked());
+        AdminSettings.getInstance().setRequirePassword(mRequirePasswordCheckBox.isChecked());
+        AdminSettings.getInstance().setRecordSurveyLocation(mRecordSurveyLocationCheckBox
+                .isChecked());
+
+        //Roster settings
+        AdminSettings.getInstance().setUseEndpoint2(mUseSecondEndpoint.isChecked());
+        AdminSettings.getInstance().setApi2DomainName(mApi2DomainNameEditText.getText().toString());
+        AdminSettings.getInstance().setApi2Version(mApi2VersionEditText.getText().toString());
+        AdminSettings.getInstance().setApi2Key(mApi2KeyEditText.getText().toString());
+
+        getActivity().finish();
+    }
+
     public String getAdminSettingsInstanceDeviceId() {
         return AdminSettings.getInstance().getDeviceIdentifier();
     }
@@ -193,8 +230,16 @@ public class AdminFragment extends Fragment {
         return AdminSettings.getInstance().getApiDomainName();
     }
 
+    public String getAdminSettingsInstanceApi2DomainName() {
+        return AdminSettings.getInstance().getApi2DomainName();
+    }
+
     public String getAdminSettingsInstanceApiVersion() {
         return AdminSettings.getInstance().getApiVersion();
+    }
+
+    public String getAdminSettingsInstanceApi2Version() {
+        return AdminSettings.getInstance().getApi2Version();
     }
 
     public String getAdminSettingsInstanceProjectId() {
@@ -203,6 +248,10 @@ public class AdminFragment extends Fragment {
 
     public String getAdminSettingsInstanceApiKey() {
         return AdminSettings.getInstance().getApiKey();
+    }
+
+    public String getAdminSettingsInstanceApi2Key() {
+        return AdminSettings.getInstance().getApi2Key();
     }
 
     public String getAdminSettingsInstanceCustomLocaleCode() {
