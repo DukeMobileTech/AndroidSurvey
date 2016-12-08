@@ -28,7 +28,7 @@
     <string name="api_unavailable">Remote api is not responsive.</string>
     <string name="unacceptable_version_code">You must upgrade your application before continuing.</string>
     <string name="surveys">surveys</string>
-    <string name="hello">Hello World</string>
+    <string name="rosters">rosters</string>
     <string name="questions">questions</string>
     <string name="question">question</string>
     <string name="encryption_required_title">Encryption required</string>
@@ -112,4 +112,9 @@
     <string name="save">SAVE</string>
     <string name="edit">EDIT</string>
     <string name="participant_id_response">dummy</string>
+    <string name="survey_identifier">Survey identifier</string>
+    <string name="instrument_title">Instrument title</string>
+    <string name="roster_title">Roster title</string>
+    <string name="roster">roster</string>
+    <string name="survey">survey</string>
 </resources>

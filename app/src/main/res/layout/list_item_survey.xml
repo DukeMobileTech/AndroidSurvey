@@ -11,7 +11,7 @@
         android:paddingLeft="4dp"
         android:paddingRight="4dp"
         android:paddingTop="10dp"
-        android:text="Survey identifier"
+        android:text="@string/survey_identifier"
         android:textSize="22sp" />  
         
     <TextView
@@ -48,7 +48,7 @@
 	        android:id="@+id/survey_list_item_progressTextView"
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
-	        android:gravity="right"
+	        android:gravity="end"
 	        android:paddingLeft="4dp"
 	        android:paddingRight="4dp"
 	        android:paddingBottom="10dp"

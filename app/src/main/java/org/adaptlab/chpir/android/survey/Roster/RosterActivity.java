@@ -47,8 +47,8 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
             "org.adaptlab.chpir.android.survey.roster.instrument_id";
     public final static String EXTRA_PARTICIPANT_METADATA =
             "org.adaptlab.chpir.android.survey.roster.metadata";
-    public static final String EXTRA_QUESTION_ID =
-            "org.adaptlab.chpir.android.survey.roster.question_id";
+    public static final String EXTRA_ROSTER_UUID =
+            "org.adaptlab.chpir.android.survey.roster.roster_uuid";
     private final String TAG = "RosterActivity";
     private final int HEADER_TEXT_SIZE = 15;
     private final int NON_HEADER_TEXT_SIZE = 15;
@@ -69,11 +69,11 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_roster);
 
-        String metadata = getIntent().getStringExtra(EXTRA_PARTICIPANT_METADATA);
         Long instrumentId = getIntent().getLongExtra(EXTRA_INSTRUMENT_ID, -1);
         if (instrumentId == -1) return;
-
         Instrument instrument = Instrument.findByRemoteId(instrumentId);
+
+        String metadata = getIntent().getStringExtra(EXTRA_PARTICIPANT_METADATA);
         if (!TextUtils.isEmpty(metadata)) {
             try {
                 JSONObject json = new JSONObject(metadata);
@@ -87,12 +87,17 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
                     mRoster.setInstrument(instrument);
                     mRoster.save();
                 }
-                setTitle(mRoster.getIdentifier());
             } catch (JSONException e) {
                 if (BuildConfig.DEBUG) Log.e(TAG, "Error parsing object json", e);
             }
         }
 
+        String rosterUUID = getIntent().getStringExtra(EXTRA_ROSTER_UUID);
+        if (rosterUUID != null) {
+            mRoster = Roster.findByUUID(rosterUUID);
+        }
+
+        setTitle(mRoster.getIdentifier());
         mQuestions = new ArrayList<>();
         mSurveys = new ArrayList<>();
         new QuestionLoaderTask().execute(instrument);

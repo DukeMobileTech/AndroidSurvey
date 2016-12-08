@@ -1,9 +1,13 @@
 package org.adaptlab.chpir.android.survey.models;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.provider.BaseColumns;
 
+import com.activeandroid.Cache;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.activeandroid.query.From;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.SendModel;
@@ -12,7 +16,7 @@ import org.json.JSONObject;
 import java.util.List;
 import java.util.UUID;
 
-@Table(name = "Rosters")
+@Table(name = "Rosters", id = BaseColumns._ID)
 public class Roster extends SendModel {
     @Column(name = "UUID")
     private String mUUID;
@@ -30,6 +34,11 @@ public class Roster extends SendModel {
         mSent = false;
         mComplete = false;
         mUUID = UUID.randomUUID().toString();
+    }
+
+    public static Cursor getCursor() {
+        From query = new Select("Rosters.*").from(Roster.class);
+        return Cache.openDatabase().rawQuery(query.toSql(), query.getArguments());
     }
 
     public void setInstrument(Instrument instrument) {
@@ -62,6 +71,15 @@ public class Roster extends SendModel {
 
     public static Roster findByIdentifier(String identifier) {
         return new Select().from(Roster.class).where("Identifier = ?", identifier).executeSingle();
+    }
+
+    public static Roster findByUUID(String uuid) {
+        return new Select().from(Roster.class).where("UUID = ?", uuid).executeSingle();
+    }
+
+    @Override
+    public String getPrimaryKey() {
+        return BaseColumns._ID;
     }
 
     @Override

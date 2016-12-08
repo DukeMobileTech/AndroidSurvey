@@ -165,7 +165,7 @@ public class Survey extends SendModel {
     public static Cursor getProjectSurveysCursor(Long projectId) {
         From query = new Select("Surveys.*")
                 .from(Survey.class)
-                .where("ProjectId = ?", projectId)
+                .where("ProjectId = ? AND RosterUUID IS null", projectId)
                 .orderBy("LastUpdated DESC");
         return Cache.openDatabase().rawQuery(query.toSql(), query.getArguments());
     }

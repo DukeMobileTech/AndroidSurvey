@@ -242,19 +242,23 @@ public class SurveyFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-
+        AppUtil.authorize();
+        setHasOptionsMenu(true);
         if (AppUtil.getContext() == null) AppUtil.setContext(getActivity());
 
         if (savedInstanceState != null) {
             mInstrument = Instrument.findByRemoteId(savedInstanceState.getLong
                     (EXTRA_INSTRUMENT_ID));
             if (!checkRules()) getActivity().finish();
-            checkInstrumentType();
-            mSurvey = Survey.load(Survey.class, savedInstanceState.getLong(EXTRA_SURVEY_ID));
-            mQuestionNumber = savedInstanceState.getInt(EXTRA_QUESTION_NUMBER);
-            mPreviousQuestions = savedInstanceState.getIntegerArrayList
-                    (EXTRA_PREVIOUS_QUESTION_IDS);
-            mQuestionsToSkip = savedInstanceState.getIntegerArrayList(EXTRA_QUESTIONS_TO_SKIP_IDS);
+            launchRosterSurvey();
+            if (!mInstrument.isRoster()) {
+                mSurvey = Survey.load(Survey.class, savedInstanceState.getLong(EXTRA_SURVEY_ID));
+                mQuestionNumber = savedInstanceState.getInt(EXTRA_QUESTION_NUMBER);
+                mPreviousQuestions = savedInstanceState.getIntegerArrayList
+                        (EXTRA_PREVIOUS_QUESTION_IDS);
+                mQuestionsToSkip = savedInstanceState.getIntegerArrayList(
+                        EXTRA_QUESTIONS_TO_SKIP_IDS);
+            }
         } else {
             Long instrumentId = getActivity().getIntent().getLongExtra(EXTRA_INSTRUMENT_ID, -1);
             mMetadata = getActivity().getIntent().getStringExtra(EXTRA_PARTICIPANT_METADATA);
@@ -262,8 +266,10 @@ public class SurveyFragment extends Fragment {
             mInstrument = Instrument.findByRemoteId(instrumentId);
             if (mInstrument == null) return;
             if (!checkRules()) getActivity().finish();
-            checkInstrumentType();
-            loadOrCreateSurvey();
+            launchRosterSurvey();
+            if (!mInstrument.isRoster()) {
+                loadOrCreateSurvey();
+            }
         }
 
         if (AppUtil.PRODUCTION) {
@@ -271,24 +277,23 @@ public class SurveyFragment extends Fragment {
             Crashlytics.setString("last instrument", mInstrument.getTitle());
         }
 
-        mQuestionCount = mInstrument.getQuestionCount();
-        mQuestions = new ArrayList<Question>(mInstrument.getQuestionCount());
-        new LoadQuestionsTask().execute(mInstrument);
+        if (!mInstrument.isRoster()) {
+            mQuestionCount = mInstrument.getQuestionCount();
+            mQuestions = new ArrayList<>(mInstrument.getQuestionCount());
+            new LoadQuestionsTask().execute(mInstrument);
+        }
 
         if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) {
 //            startLocationServices(); // TODO: 12/6/16 Migrate to api 23
         }
-        AppUtil.authorize(); //To take care of login in case Foreground listener has not registered
-        setHasOptionsMenu(true);
     }
 
-    private void checkInstrumentType() {
+    private void launchRosterSurvey() {
         if (mInstrument.isRoster()) {
             Intent i = new Intent(getActivity(), RosterActivity.class);
             i.putExtra(RosterActivity.EXTRA_INSTRUMENT_ID, mInstrument.getRemoteId());
             i.putExtra(RosterActivity.EXTRA_PARTICIPANT_METADATA, mMetadata);
             getActivity().startActivity(i);
-            getActivity().finish();
         }
     }
 

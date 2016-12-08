@@ -42,7 +42,9 @@ import org.adaptlab.chpir.android.survey.models.AdminSettings;
 import org.adaptlab.chpir.android.survey.models.Image;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.Response;
+import org.adaptlab.chpir.android.survey.models.Roster;
 import org.adaptlab.chpir.android.survey.models.Survey;
+import org.adaptlab.chpir.android.survey.roster.RosterActivity;
 import org.adaptlab.chpir.android.survey.rules.InstrumentLaunchRule;
 import org.adaptlab.chpir.android.survey.rules.RuleBuilder;
 import org.adaptlab.chpir.android.survey.rules.RuleCallback;
@@ -63,9 +65,11 @@ public class InstrumentFragment extends ListFragment {
     public final static String TAG = "InstrumentFragment";
     private SurveyAdapter mSurveyAdapter;
     private InstrumentAdapter mInstrumentAdapter;
+    private RosterAdapter mRosterAdapter;
     private ListView mSurveyListView;
     private LoaderManager.LoaderCallbacks mInstrumentCallbacks;
     private LoaderManager.LoaderCallbacks mSurveyCallbacks;
+    private LoaderManager.LoaderCallbacks mRosterCallbacks;
 
     private MultiChoiceModeListener mSurveyMultiChoiceModeListener = new MultiChoiceModeListener() {
         List<Survey> selected = new ArrayList<Survey>();
@@ -182,7 +186,7 @@ public class InstrumentFragment extends ListFragment {
         mSurveyCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
             @Override
             public Loader<Cursor> onCreateLoader(int arg0, Bundle cursor) {
-                String selection = "ProjectID = ?";
+                String selection = "ProjectID = ? AND RosterUUID IS null";
                 String[] selectionArgs = {getProjectId().toString()};
                 String orderBy = "LastUpdated DESC";
                 return new CursorLoader(
@@ -203,6 +207,31 @@ public class InstrumentFragment extends ListFragment {
             @Override
             public void onLoaderReset(Loader<Cursor> arg0) {
                 mSurveyAdapter.swapCursor(null);
+            }
+        };
+
+        mRosterCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
+
+            @Override
+            public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+                return new CursorLoader(
+                        getActivity(),
+                        ContentProvider.createUri(Roster.class, null),
+                        null,
+                        null,
+                        null,
+                        null
+                );
+            }
+
+            @Override
+            public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+                mRosterAdapter.swapCursor(data);
+            }
+
+            @Override
+            public void onLoaderReset(Loader<Cursor> loader) {
+                mRosterAdapter.swapCursor(null);
             }
         };
     }
@@ -291,7 +320,9 @@ public class InstrumentFragment extends ListFragment {
                                 mSurveyListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
                                 mSurveyListView.setMultiChoiceModeListener(mSurveyMultiChoiceModeListener);
                             }
-                        } else {
+                        } else if (tab.getText().equals(getActivity().getResources().getString(R.string.rosters))) {
+                            setRostersListViewAdapter(); // TODO: 12/7/16 Add check option in admin 
+                        } else  {
                             setInstrumentsListViewAdapter();
                         }
                     }
@@ -309,10 +340,18 @@ public class InstrumentFragment extends ListFragment {
                         .string.instruments)).setTabListener(tabListener));
                 actionBar.addTab(actionBar.newTab().setText(getActivity().getResources().getString(R
                         .string.surveys)).setTabListener(tabListener));
+                actionBar.addTab(actionBar.newTab().setText(R.string.rosters).setTabListener(tabListener));
             }
         } else {
             setInstrumentsListViewAdapter();
         }
+    }
+
+    private void setRostersListViewAdapter() {
+        Cursor rostersCursor = Roster.getCursor();
+        mRosterAdapter = new RosterAdapter(getActivity(), rostersCursor, 0);
+        setListAdapter(mRosterAdapter);
+        getActivity().getSupportLoaderManager().restartLoader(0, null, mRosterCallbacks);
     }
 
     private void setSurveysListViewAdapter() {
@@ -347,6 +386,13 @@ public class InstrumentFragment extends ListFragment {
             Survey survey = getSurveyAtPosition(l, position);
             if (survey == null) return;
             new LoadSurveyTask().execute(survey);
+        } else if (l.getAdapter() instanceof RosterAdapter){
+            Roster roster = getRosterAtPosition(l, position);
+            if (roster == null) return;
+            Intent i = new Intent(getActivity(), RosterActivity.class);
+            i.putExtra(RosterActivity.EXTRA_ROSTER_UUID, roster.getUUID());
+            i.putExtra(RosterActivity.EXTRA_INSTRUMENT_ID, roster.getInstrument().getRemoteId());
+            startActivity(i);
         }
     }
 
@@ -355,6 +401,13 @@ public class InstrumentFragment extends ListFragment {
         cursor.moveToPosition(position);
         String surveyUUID = cursor.getString(cursor.getColumnIndexOrThrow("UUID"));
         return Survey.findByUUID(surveyUUID);
+    }
+
+    private Roster getRosterAtPosition(ListView l, int position) {
+        Cursor cursor = ((RosterAdapter) l.getAdapter()).getCursor();
+        cursor.moveToPosition(position);
+        String rosterUUID = cursor.getString(cursor.getColumnIndexOrThrow("UUID"));
+        return Roster.findByUUID(rosterUUID);
     }
 
     private static class InstrumentListLabel {
@@ -491,6 +544,44 @@ public class InstrumentFragment extends ListFragment {
 
             if (survey.readyToSend()) progressTextView.setTextColor(Color.GREEN);
             else progressTextView.setTextColor(Color.RED);
+        }
+    }
+
+    private class RosterAdapter extends CursorAdapter {
+
+        public RosterAdapter(Context context, Cursor c, int flags) {
+            super(context, c, 0);
+        }
+
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            return LayoutInflater.from(context).inflate(R.layout.list_item_roster, parent, false);
+        }
+
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+            if (cursor.getPosition() % 2 == 0) {
+                view.setBackgroundResource(R.drawable.list_background_color);
+            } else {
+                view.setBackgroundResource(R.drawable.list_background_color_alternate);
+            }
+
+            TextView titleTextView = (TextView) view.findViewById(R.id
+                    .roster_list_item_titleTextView);
+            TextView surveyCountTextView = (TextView) view.findViewById(R.id
+                    .roster_list_item_surveyCountTextView);
+
+            String title = cursor.getString(cursor.getColumnIndexOrThrow("Identifier"));
+            String id = cursor.getString(cursor.getColumnIndexOrThrow("UUID"));
+            Roster roster = Roster.findByUUID(id);
+            int numSurveys = roster.surveys().size();
+
+            titleTextView.setText(title);
+            titleTextView.setTypeface(roster.getInstrument().getTypeFace(getActivity()
+                    .getApplicationContext()));
+            titleTextView.setTextColor(Color.BLACK);
+            surveyCountTextView.setText(numSurveys + " " + FormatUtils.pluralize
+                    (numSurveys, getString(R.string.survey), getString(R.string.surveys)));
         }
     }
 
