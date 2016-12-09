@@ -3,21 +3,21 @@ package org.adaptlab.chpir.android.survey.roster.rosterfragments;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.Html;
-import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Survey;
-import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.roster.ParticipantEditorActivity;
 
 import java.util.Date;
+
+import static org.adaptlab.chpir.android.survey.FormatUtils.styleTextWithHtml;
 
 public abstract class RosterFragment extends Fragment {
     public final int MINIMUM_WIDTH = 250;
@@ -67,10 +67,6 @@ public abstract class RosterFragment extends Fragment {
 
     public Response getResponse() {
         return mResponse;
-    }
-
-    private Spanned styleTextWithHtml(String text) {
-        return Html.fromHtml(text);
     }
 
     private class SaveResponseTask extends AsyncTask<Response, Void, Void> {

@@ -4,7 +4,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/fragments_background"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin">
 
     <LinearLayout
         android:id="@+id/header"
@@ -17,9 +19,6 @@
             android:id="@+id/header_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="2dp"
-            android:background="@android:color/black"
             android:orientation="horizontal">
 
         </LinearLayout>
@@ -32,10 +31,7 @@
             <TableLayout
                 android:id="@+id/header_2"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="2dp"
-                android:layout_marginRight="2dp"
-                android:background="@android:color/black">
+                android:layout_height="wrap_content">
 
             </TableLayout>
         </org.adaptlab.chpir.android.survey.roster.views.OHScrollView>
@@ -55,10 +51,7 @@
             <TableLayout
                 android:id="@+id/participant_id"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="2dp"
-                android:layout_marginRight="2dp"
-                android:background="@android:color/black">
+                android:layout_height="wrap_content">
 
             </TableLayout>
 
@@ -70,10 +63,7 @@
                 <TableLayout
                     android:id="@+id/content_table"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="2dp"
-                    android:layout_marginRight="2dp"
-                    android:background="@android:color/black">
+                    android:layout_height="wrap_content">
 
                 </TableLayout>
             </org.adaptlab.chpir.android.survey.roster.views.OHScrollView>

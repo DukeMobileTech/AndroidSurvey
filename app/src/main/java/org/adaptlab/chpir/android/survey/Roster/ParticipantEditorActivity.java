@@ -29,8 +29,6 @@ public class ParticipantEditorActivity extends AppCompatActivity {
             "org.adaptlab.chpir.android.survey.roster.question_number";
     public final static String EXTRA_SURVEY_ID =
             "org.adaptlab.chpir.android.survey.roster.survey_id";
-    public final static String EXTRA_RESPONSE_ID =
-            "org.adaptlab.chpir.android.survey.roster.response_id";
     private static final String TAG = "ParticipantEditorActivity";
     private DrawerLayout mDrawer;
     private NavigationView navigationView;

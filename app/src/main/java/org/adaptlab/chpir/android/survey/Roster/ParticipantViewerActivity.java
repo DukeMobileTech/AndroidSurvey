@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,6 +21,8 @@ import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Survey;
 
 import java.util.List;
+
+import static org.adaptlab.chpir.android.survey.FormatUtils.stripHtml;
 
 public class ParticipantViewerActivity extends AppCompatActivity {
     public final static String EXTRA_SURVEY_ID =
@@ -85,10 +86,6 @@ public class ParticipantViewerActivity extends AppCompatActivity {
                 mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
             }
         }
-    }
-
-    private String stripHtml(String withHtml) {
-        return Html.fromHtml(withHtml).toString().trim();
     }
 
     private class ResponseAdapter extends RecyclerView.Adapter<ResponseAdapter.QuestionViewHolder> {

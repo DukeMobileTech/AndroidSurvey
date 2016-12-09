@@ -50,14 +50,12 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
     public static final String EXTRA_ROSTER_UUID =
             "org.adaptlab.chpir.android.survey.roster.roster_uuid";
     private final String TAG = "RosterActivity";
-    private final int HEADER_TEXT_SIZE = 15;
-    private final int NON_HEADER_TEXT_SIZE = 15;
     private boolean interceptScroll = true;
     private OHScrollView headerScrollView;
     private OHScrollView contentScrollView;
     private TableLayout dataLayout;
     private TableLayout identifierLayout;
-    private List<Integer> colWidthList;
+    private Integer[] columnWidths;
     private LinkedHashMap<Survey, List<Response>> mSurveyResponsesMap;
     private Roster mRoster;
     private Question surveyIdentifier;
@@ -112,23 +110,24 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
 
     private void setHeaders() {
         setSurveyIdentifier();
-        colWidthList = new ArrayList<>();
         TableRow row = new TableRow(this);
         row.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams
                 .MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT));
-        for (Question question : mQuestions) {
-            int colWidth = stripHtml(question.getText()).length();
-            colWidthList.add(colWidth);
+        for (int k = 0; k < mQuestions.size(); k++) {
+            Question question = mQuestions.get(k);
             TextView headerView = new TextView(this);
+            setColumnWidths(headerView, k);
             headerView.setText(stripHtml(question.getText()));
             if (question == surveyIdentifier) {
-                setLinearLayoutHeaderTextViewAttrs(headerView, colWidth);
+                setTextViewAttributes(headerView, ContextCompat.getColor(this,
+                        R.color.primary_light), Typeface.BOLD);
                 LinearLayout participantIDLayout = (LinearLayout) findViewById(R.id.header_1);
                 if (participantIDLayout != null) {
                     participantIDLayout.addView(headerView);
                 }
             } else {
-                setTableRowLayoutHeaderTextViewAttrs(headerView, colWidth);
+                setTextViewAttributes(headerView, ContextCompat.getColor(this,
+                        R.color.primary_light), Typeface.BOLD);
                 setFirstRowListener(headerView, question);
                 row.addView(headerView);
             }
@@ -151,14 +150,36 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         }
     }
 
-    private void setLinearLayoutHeaderTextViewAttrs(TextView view, int colWidth) {
-        setTextViewAttributes(view, ContextCompat.getColor(this, R.color.primary_light),
-                HEADER_TEXT_SIZE, colWidth, Typeface.BOLD);
+    private void setColumnWidths(final TextView view, final int position) {
+        view.post(new Runnable() {
+            @Override
+            public void run() {
+                columnWidths[position] = view.getWidth();
+            }
+        });
     }
 
-    private void setTableRowLayoutHeaderTextViewAttrs(TextView view, int colWidth) {
-        setTextViewAttributes(view, ContextCompat.getColor(this, R.color.primary_light),
-                HEADER_TEXT_SIZE, colWidth, Typeface.BOLD);
+    private void setTextViewAttributes(TextView view, int color, int typeface) {
+        int minimumHeight = 100;
+        int minimumWidth = 100;
+        int paddingBottomTop = 10;
+        int paddingLeftRight = 20;
+        int maxLinesPerRow = 1;
+        int textSize = 15;
+
+        view.setMinimumHeight(minimumHeight);
+        view.setMinimumWidth(minimumWidth);
+        view.setTextColor(ContextCompat.getColor(this, R.color.primary_text));
+        view.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
+        view.setPadding(paddingLeftRight, paddingBottomTop, paddingLeftRight, paddingBottomTop);
+        view.setTypeface(view.getTypeface(), typeface);
+        view.setTextSize(textSize);
+        view.setMaxLines(maxLinesPerRow);
+        view.setBackgroundColor(color);
+        view.setEllipsize(TextUtils.TruncateAt.END);
+        TableRow.LayoutParams params = new TableRow.LayoutParams(
+                TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        view.setLayoutParams(params);
     }
 
     private void setFirstRowListener(TextView headerView, final Question question) {
@@ -171,29 +192,6 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
 //                startActivity(intent);
             }
         });
-    }
-
-    private void setTextViewAttributes(TextView view, int backgroundColor, int textSize,
-                                       int colWidth, int typeface) {
-        int minimumHeight = 75;
-        int margin = 1;
-        int padding = 5;
-        int maxLinesPerRow = 5;
-
-        view.setMinimumHeight(minimumHeight);
-        view.setEms(colWidth);
-        view.setTextColor(Color.BLACK);
-        view.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.CENTER_VERTICAL);
-        view.setPadding(padding, padding, padding, padding);
-        view.setTypeface(view.getTypeface(), typeface);
-        view.setTextSize(textSize);
-        view.setMaxLines(maxLinesPerRow);
-        view.setBackgroundColor(backgroundColor);
-        view.setEllipsize(TextUtils.TruncateAt.END);
-        TableRow.LayoutParams params = new TableRow.LayoutParams(
-                TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
-        params.setMargins(margin, margin, margin, margin);
-        view.setLayoutParams(params);
     }
 
     private void drawTableView() {
@@ -209,33 +207,38 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         TableRow responseRow = new TableRow(this);
         List<Response> responseList = mSurveyResponsesMap.get(survey);
         for (int k = 0; k < responseList.size(); k++) {
+            TextView view = new TextView(this);
+            adjustColumnWidths(view, k);
             Response response = responseList.get(k);
             if (response != null) {
                 if (response.getQuestion() == surveyIdentifier) {
-                    TextView idView = new TextView(this);
-                    setTextViewAttributes(idView, ContextCompat.getColor(this,
-                            R.color.primary_light), NON_HEADER_TEXT_SIZE,
-                            colWidthList.get(k), Typeface.BOLD);
-                    idView.setText(response.getText());
-                    idRow.addView(idView);
-                    setSurveyListener(survey, idView);
+                    setTextViewAttributes(view, ContextCompat.getColor(this,
+                            R.color.primary_light), Typeface.BOLD);
+                    view.setText(response.getText());
+                    idRow.addView(view);
+                    setSurveyListener(survey, view);
                 } else {
-                    TextView view = new TextView(this);
-                    setTextViewAttributes(view, Color.WHITE, NON_HEADER_TEXT_SIZE,
-                            colWidthList.get(k), Typeface.NORMAL);
+                    setTextViewAttributes(view, Color.TRANSPARENT, Typeface.NORMAL);
                     view.setText(response.getText());
                     responseRow.addView(view);
                 }
             } else {
-                TextView defaultView = new TextView(this);
-                setTextViewAttributes(defaultView, Color.WHITE, NON_HEADER_TEXT_SIZE,
-                        colWidthList.get(k), Typeface.NORMAL);
-                defaultView.setText("");
-                responseRow.addView(defaultView);
+                setTextViewAttributes(view, Color.TRANSPARENT, Typeface.NORMAL);
+                view.setText("");
+                responseRow.addView(view);
             }
         }
         identifierLayout.addView(idRow);
         dataLayout.addView(responseRow);
+    }
+
+    private void adjustColumnWidths(final TextView view, final int pos) {
+        view.post(new Runnable() {
+            @Override
+            public void run() {
+                view.setWidth(columnWidths[pos]);
+            }
+        });
     }
 
     private void setSurveyListener(final Survey survey, TextView textView) {
@@ -308,6 +311,7 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         @Override
         protected void onPostExecute(List<Question> questions) {
             mQuestions = questions;
+            columnWidths = new Integer[mQuestions.size()];
             setHeaders();
             if (dialog.isShowing()) dialog.dismiss();
             new RosterLoaderTask().execute(mRoster);

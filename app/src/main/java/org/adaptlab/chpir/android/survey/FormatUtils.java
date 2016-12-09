@@ -2,6 +2,7 @@ package org.adaptlab.chpir.android.survey;
 
 import android.content.Context;
 import android.text.Html;
+import android.text.Spanned;
 
 import org.adaptlab.chpir.android.survey.models.Option;
 
@@ -79,6 +80,10 @@ public class FormatUtils {
 
     public static String stripHtml(String withHtml) {
         return Html.fromHtml(withHtml).toString().trim();
+    }
+
+    public static Spanned styleTextWithHtml(String text) {
+        return Html.fromHtml(text);
     }
 
 }
