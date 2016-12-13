@@ -2,7 +2,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 
     <string name="app_name">iSEE CHPIR</string>
-    <string name="action_settings">Settings</string>
     <string name="start_survey">Start Survey</string>
     <string name="survey_title_label">Choose instrument</string>
     <string name="next_button">Next</string>
@@ -84,8 +83,8 @@
     <string name="record_survey_location">Record Survey Location</string>
     <string name="event_log_sent_survey">Sent %1$s for %2$s.</string>
     <string name="delete">Delete</string>
-    <string name="delete_surveys_title">Delete Selected Surveys?</string>
-    <string name="delete_surveys_message">You will not be able to recover the surveys once you delete them!</string>
+    <string name="delete_title">Delete Selected Items?</string>
+    <string name="delete_message">You will not be able to recover them once deleted!</string>
     <string name="skipped_questions">Unanswered Questions</string>
     <string name="proceed">Continue</string>
     <string name="section_number_of_questions">Number of questions in this section</string>
@@ -101,16 +100,13 @@
     <string name="wiping_data_header">Wiping Data</string>
     <string name="reset_last_sync_time">Reset Last Sync Time</string>
     <string name="critical_message_title">Critical Responses In Survey</string>
-    <string name="submit">SUBMIT</string>
-    <string name="review">REVIEW</string>
+    <string name="submit">Submit</string>
+    <string name="review">Review</string>
     <string name="data_settings">Data Settings</string>
     <string name="confirmation">Are you sure? All un-synced surveys will be lost!</string>
     <string name="yes_sure">Yes, I am sure!</string>
     <string name="new_participant">New Participant</string>
-    <string name="previous">PREV</string>
-    <string name="next">NEXT</string>
-    <string name="save">SAVE</string>
-    <string name="edit">EDIT</string>
+    <string name="edit">Edit</string>
     <string name="participant_id_response">dummy</string>
     <string name="survey_identifier">Survey identifier</string>
     <string name="instrument_title">Instrument title</string>
@@ -125,4 +121,7 @@
     <string name="api2_version">Roster Api Version</string>
     <string name="url_hint">https://example.com/</string>
     <string name="api2_endpoint">Roster Api Endpoint</string>
+    <string name="completed">Completed</string>
+    <string name="sent">Sent</string>
+    <string name="un_submit">Unsubmit</string>
 </resources>

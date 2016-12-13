@@ -82,8 +82,8 @@
     <string name="record_survey_location">Indicar lugar de encuesta</string>
     <string name="event_log_sent_survey">Enviado %1$s por %2$s.</string>
     <string name="delete">Borrar</string>
-    <string name="delete_surveys_title">¿Desea borrar las encuestas seleccionadas?</string>
-    <string name="delete_surveys_message">¡No podrá restablecer las encuestas una vez que las borres!</string>
+    <string name="delete_title">¿Desea borrar las encuestas seleccionadas?</string>
+    <string name="delete_message">¡No podrá restablecer las encuestas una vez que las borres!</string>
     <string name="skipped_questions">Las preguntas que se saltaron</string>
     <string name="proceed">Proceder</string>
     <string name="section_number_of_questions">Número de preguntas en esta sección</string>

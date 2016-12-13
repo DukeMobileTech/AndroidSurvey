@@ -3,6 +3,7 @@ package org.adaptlab.chpir.android.survey.models;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.BaseColumns;
+import android.util.Log;
 
 import com.activeandroid.Cache;
 import com.activeandroid.annotation.Column;
@@ -11,6 +12,8 @@ import com.activeandroid.query.From;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.SendModel;
+import org.adaptlab.chpir.android.survey.BuildConfig;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -28,6 +31,8 @@ public class Roster extends SendModel {
     private String mIdentifier;
     @Column(name = "InstrumentRemoteId")
     private Long mInstrumentRemoteId;
+
+    private final String TAG = "Roster";
 
     public Roster() {
         super();
@@ -84,7 +89,21 @@ public class Roster extends SendModel {
 
     @Override
     public JSONObject toJSON() {
-        return null;
+        JSONObject json = new JSONObject();
+
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("instrument_id", getInstrument().getRemoteId());
+            jsonObject.put("instrument_version_number", getInstrument().getVersionNumber());
+            jsonObject.put("instrument_title", getInstrument().getTitle());
+            jsonObject.put("uuid", mUUID);
+            jsonObject.put("identifier", mIdentifier);
+
+            json.put("roster", jsonObject);
+        } catch (JSONException je) {
+            if (BuildConfig.DEBUG) Log.e(TAG, "JSON exception", je);
+        }
+        return json;
     }
 
     @Override

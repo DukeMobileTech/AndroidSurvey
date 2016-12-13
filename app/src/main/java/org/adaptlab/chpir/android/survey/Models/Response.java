@@ -198,12 +198,14 @@ public class Response extends SendModel {
     public void setAsSent(Context context) {
         mSent = true;
         this.save();
+// TODO: 12/12/16 Undo the check
+        if (!getSurvey().belongsToRoster()) {
+            if (getResponsePhoto() == null) {
+                this.delete();
+            }
 
-        if (getResponsePhoto() == null) {
-            this.delete();
+            getSurvey().deleteIfComplete();
         }
-
-        getSurvey().deleteIfComplete();
     }
 
     /*
@@ -241,6 +243,7 @@ public class Response extends SendModel {
 
     @Override
     public boolean belongsToRoster() {
-        return getSurvey().getRoster() == null;
+        return getSurvey().belongsToRoster();
     }
+
 }

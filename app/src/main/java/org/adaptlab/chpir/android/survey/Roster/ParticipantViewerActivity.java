@@ -48,6 +48,19 @@ public class ParticipantViewerActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (!mSurvey.readyToSend() || mSurvey.isSent()) {
+            menu.findItem(R.id.completed_participant).setVisible(false).setEnabled(false);
+        }
+        if (mSurvey.isSent()) {
+            menu.findItem(R.id.edit_participant).setVisible(false).setEnabled(false);
+        } else {
+            menu.findItem(R.id.submitted_participant).setVisible(false).setEnabled(false);
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.participant_viewer_menu, menu);
@@ -60,9 +73,17 @@ public class ParticipantViewerActivity extends AppCompatActivity {
             case R.id.edit_participant:
                 editParticipant();
                 return true;
+            case R.id.delete_participant:
+                deleteParticipant();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void deleteParticipant() {
+        mSurvey.destroy();
+        finish();
     }
 
     private void editParticipant() {
@@ -75,6 +96,7 @@ public class ParticipantViewerActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        invalidateOptionsMenu();
         if (mSurvey != null) new ResponseLoaderTask().execute(mSurvey);
     }
 
@@ -105,8 +127,7 @@ public class ParticipantViewerActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(QuestionViewHolder holder, int position) {
-            holder.questionText.setText(stripHtml(responses.get(position).getQuestion()
-                    .getText()));
+            holder.questionText.setText(stripHtml(responses.get(position).getQuestion().getText()));
             holder.questionResponse.setText(mResponses.get(position).getText());
         }
 

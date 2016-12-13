@@ -889,7 +889,7 @@ public class SurveyFragment extends Fragment {
 
     private void completeAndSubmitSurvey() {
         getActivity().finish();
-        mSurvey.setAsComplete();
+        mSurvey.setAsComplete(true);
         mSurvey.save();
         new SendResponsesTask(getActivity()).execute();
     }

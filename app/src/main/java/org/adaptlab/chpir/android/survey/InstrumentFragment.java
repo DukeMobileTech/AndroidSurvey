@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
@@ -34,7 +35,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.activeandroid.ActiveAndroid;
 import com.activeandroid.content.ContentProvider;
+import com.activeandroid.query.Delete;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.activerecordcloudsync.NetworkNotificationUtils;
@@ -67,82 +70,133 @@ public class InstrumentFragment extends ListFragment {
     private InstrumentAdapter mInstrumentAdapter;
     private RosterAdapter mRosterAdapter;
     private ListView mSurveyListView;
+    private ListView mRosterListView;
     private LoaderManager.LoaderCallbacks mInstrumentCallbacks;
     private LoaderManager.LoaderCallbacks mSurveyCallbacks;
     private LoaderManager.LoaderCallbacks mRosterCallbacks;
+    private MultiChoiceModeListener choiceModeListener;
 
-    private MultiChoiceModeListener mSurveyMultiChoiceModeListener = new MultiChoiceModeListener() {
-        List<Survey> selected = new ArrayList<Survey>();
+    private void setMultiChoiceModeListener() {
+        choiceModeListener = new MultiChoiceModeListener() {
+            List<Survey> surveys = new ArrayList<>();
+            List<Roster> rosters = new ArrayList<>();
 
-        @Override
-        public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean
-                checked) {
-            Survey survey = getSurveyAtPosition(getListView(), position);
-            if (checked) {
-                selected.add(survey);
-                mSurveyAdapter.setNewSelection(position, true);
-            } else {
-                selected.remove(survey);
-                mSurveyAdapter.setNewSelection(position, false);
-            }
-        }
-
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.list_view_item_delete, menu);
-            return true;
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return true;
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.menu_delete_item:
-                    showDeleteSurveysWarning();
-                    mode.finish();
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
-        private void showDeleteSurveysWarning() {
-            new AlertDialog.Builder(getActivity())
-                    .setTitle(R.string.delete_surveys_title)
-                    .setMessage(R.string.delete_surveys_message)
-                    .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            deleteSurveys();
-                            setSurveysListViewAdapter();
-                        }
-                    })
-                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                        }
-                    })
-                    .show();
-        }
-
-        private void deleteSurveys() {
-            for (Survey survey : selected) {
-                for (Response response : survey.responses()) {
-                    response.delete();
+            @Override
+            public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
+                                                  boolean checked) {
+                if (getListView().getAdapter() == mSurveyAdapter) {
+                    Survey survey = getSurveyAtPosition(getListView(), position);
+                    if (checked) {
+                        surveys.add(survey);
+                        mSurveyAdapter.setNewSelection(position, true);
+                    } else {
+                        surveys.remove(survey);
+                        mSurveyAdapter.setNewSelection(position, false);
+                    }
+                } else if (getListView().getAdapter() == mRosterAdapter) {
+                    Roster roster = getRosterAtPosition(getListView(), position);
+                    if (checked) {
+                        rosters.add(roster);
+                        mRosterAdapter.setNewSelection(position, true);
+                    } else {
+                        rosters.remove(roster);
+                        mRosterAdapter.setNewSelection(position, false);
+                    }
                 }
-                survey.delete();
             }
-        }
 
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            mSurveyAdapter.clearSelection();
-            mSurveyAdapter.notifyDataSetChanged();
-        }
-    };
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                if (getListView().getAdapter() != mInstrumentAdapter) {
+                    MenuInflater inflater = mode.getMenuInflater();
+                    inflater.inflate(R.menu.list_view_item_delete, menu);
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                return true;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.menu_delete_item:
+                        showDeleteWarning((CursorAdapter) getListView().getAdapter());
+                        mode.finish();
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+
+            private void showDeleteWarning(final CursorAdapter adapter) {
+                new AlertDialog.Builder(getActivity())
+                        .setTitle(R.string.delete_title)
+                        .setMessage(R.string.delete_message)
+                        .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                if (adapter == mSurveyAdapter) {
+                                    deleteSurveys();
+                                    setSurveysListViewAdapter();
+                                } else if (adapter == mRosterAdapter) {
+                                    deleteRosters();
+                                    setRostersListViewAdapter();
+                                }
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                            }
+                        })
+                        .show();
+            }
+
+            private void deleteSurveys() {
+                ActiveAndroid.beginTransaction();
+                try {
+                    deleteHelper(surveys);
+                    ActiveAndroid.setTransactionSuccessful();
+                } finally {
+                    ActiveAndroid.endTransaction();
+                }
+            }
+
+            private void deleteHelper(List<Survey> surveys) {
+                for (Survey survey : surveys) {
+                    new Delete().from(Response.class).where("SurveyUUID = ?",
+                            survey.getUUID()).execute();
+                    survey.delete();
+                }
+            }
+
+            private void deleteRosters() {
+                ActiveAndroid.beginTransaction();
+                try {
+                    for (Roster roster : rosters) {
+                        deleteHelper(roster.surveys());
+                        roster.delete();
+                    }
+                    ActiveAndroid.setTransactionSuccessful();
+                } finally {
+                    ActiveAndroid.endTransaction();
+                }
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+                if (getListView().getAdapter() == mSurveyAdapter) {
+                    mSurveyAdapter.clearSelection();
+                    mSurveyAdapter.notifyDataSetChanged();
+                } else if(getListView().getAdapter() == mRosterAdapter) {
+                    mRosterAdapter.clearSelection();
+                    mRosterAdapter.notifyDataSetChanged();
+                }
+            }
+        };
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -150,6 +204,7 @@ public class InstrumentFragment extends ListFragment {
         AppUtil.appInit(getActivity());
         setHasOptionsMenu(true);
         createLoaderCallbacks();
+        setMultiChoiceModeListener();
     }
 
     /*
@@ -320,11 +375,14 @@ public class InstrumentFragment extends ListFragment {
                                 mSurveyListView = getListView();
                                 mSurveyListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
                                 mSurveyListView.setMultiChoiceModeListener
-                                        (mSurveyMultiChoiceModeListener);
+                                        (choiceModeListener);
                             }
                         } else if (tab.getText().equals(getActivity().getResources().getString(
                                 R.string.rosters))) {
                             setRostersListViewAdapter();
+                            mRosterListView = getListView();
+                            mRosterListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+                            mRosterListView.setMultiChoiceModeListener(choiceModeListener);
                         } else {
                             setInstrumentsListViewAdapter();
                         }
@@ -520,8 +578,10 @@ public class InstrumentFragment extends ListFragment {
 
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
-            if (mSelectionViews != null && mSurveyAdapter.isPositionChecked(cursor.getPosition())) {
-                view.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_light));
+            if (mSelectionViews != null && isPositionChecked(cursor.getPosition())) {
+                view.setBackgroundColor(ContextCompat.getColor(context, R.color.item_selected));
+            } else {
+                view.setBackgroundColor(ContextCompat.getColor(context, R.color.transparent));
             }
 
             TextView titleTextView = (TextView) view.findViewById(R.id
@@ -551,6 +611,21 @@ public class InstrumentFragment extends ListFragment {
     }
 
     private class RosterAdapter extends CursorAdapter {
+        private SparseBooleanArray selectionViews = new SparseBooleanArray();
+
+        public boolean isPositionChecked(int position) {
+            return selectionViews.get(position);
+        }
+
+        public void setNewSelection(int position, boolean value) {
+            selectionViews.put(position, value);
+            notifyDataSetChanged();
+        }
+
+        public void clearSelection() {
+            selectionViews.clear();
+            notifyDataSetChanged();
+        }
 
         public RosterAdapter(Context context, Cursor c, int flags) {
             super(context, c, 0);
@@ -563,6 +638,12 @@ public class InstrumentFragment extends ListFragment {
 
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
+            if (selectionViews != null && isPositionChecked(cursor.getPosition())) {
+                view.setBackgroundColor(ContextCompat.getColor(context, R.color.item_selected));
+            } else {
+                view.setBackgroundColor(ContextCompat.getColor(context, R.color.transparent));
+            }
+
             TextView titleTextView = (TextView) view.findViewById(R.id
                     .roster_list_item_titleTextView);
             TextView surveyCountTextView = (TextView) view.findViewById(R.id

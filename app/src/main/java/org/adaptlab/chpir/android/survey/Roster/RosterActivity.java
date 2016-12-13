@@ -206,30 +206,48 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         TableRow idRow = new TableRow(this);
         TableRow responseRow = new TableRow(this);
         List<Response> responseList = mSurveyResponsesMap.get(survey);
+        boolean isSurveyIdSet = false;
         for (int k = 0; k < responseList.size(); k++) {
             TextView view = new TextView(this);
             adjustColumnWidths(view, k);
             Response response = responseList.get(k);
             if (response != null) {
                 if (response.getQuestion() == surveyIdentifier) {
-                    setTextViewAttributes(view, ContextCompat.getColor(this,
-                            R.color.primary_light), Typeface.BOLD);
-                    view.setText(response.getText());
-                    idRow.addView(view);
-                    setSurveyListener(survey, view);
+                    setIdView(view, idRow, survey, response.getText());
+                    isSurveyIdSet = true;
                 } else {
-                    setTextViewAttributes(view, Color.TRANSPARENT, Typeface.NORMAL);
-                    view.setText(response.getText());
-                    responseRow.addView(view);
+                    showCell(responseRow, view, Color.TRANSPARENT, Typeface.NORMAL,
+                            response.getText());
                 }
             } else {
-                setTextViewAttributes(view, Color.TRANSPARENT, Typeface.NORMAL);
-                view.setText("");
-                responseRow.addView(view);
+                if (k == responseList.size() - 1 && !isSurveyIdSet) {
+                    setIdView(view, idRow, survey, "");
+                    isSurveyIdSet = true;
+                } else {
+                    showCell(responseRow, view, Color.TRANSPARENT, Typeface.NORMAL, "");
+                }
             }
         }
         identifierLayout.addView(idRow);
         dataLayout.addView(responseRow);
+    }
+
+    private void showCell(TableRow row, TextView view, int color, int typeface, String text) {
+        setTextViewAttributes(view, color, typeface);
+        view.setText(text);
+        row.addView(view);
+    }
+
+    private void setIdView(TextView view, TableRow row, final Survey survey, String text) {
+        showCell(row, view, ContextCompat.getColor(this, R.color.primary_light), Typeface.BOLD, text);
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(RosterActivity.this, ParticipantViewerActivity.class);
+                intent.putExtra(EXTRA_SURVEY_ID, survey.getId());
+                startActivity(intent);
+            }
+        });
     }
 
     private void adjustColumnWidths(final TextView view, final int pos) {
@@ -237,17 +255,6 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
             @Override
             public void run() {
                 view.setWidth(columnWidths[pos]);
-            }
-        });
-    }
-
-    private void setSurveyListener(final Survey survey, TextView textView) {
-        textView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(RosterActivity.this, ParticipantViewerActivity.class);
-                intent.putExtra(EXTRA_SURVEY_ID, survey.getId());
-                startActivity(intent);
             }
         });
     }

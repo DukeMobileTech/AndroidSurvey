@@ -13,6 +13,7 @@ import android.util.Log;
 import com.activeandroid.Cache;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Delete;
 import com.activeandroid.query.From;
 import com.activeandroid.query.Select;
 
@@ -85,7 +86,9 @@ public class Survey extends SendModel {
             jsonObject.put("longitude", mLongitude);
             jsonObject.put("metadata", mMetadata);
             jsonObject.put("has_critical_responses", getCriticalResponses());
-
+            if (mRosterUUID != null) {
+                jsonObject.put("roster_uuid", mRosterUUID);
+            }
             json.put("survey", jsonObject);
         } catch (JSONException je) {
             Log.e(TAG, "JSON exception", je);
@@ -229,8 +232,8 @@ public class Survey extends SendModel {
         return mUUID;
     }
 
-    public void setAsComplete() {
-        mComplete = true;
+    public void setAsComplete(boolean status) {
+        mComplete = status;
     }
 
     @Override
@@ -299,6 +302,11 @@ public class Survey extends SendModel {
         }
     }
 
+    public void destroy() {
+        new Delete().from(Response.class).where("SurveyUUID = ?", mUUID).execute();
+        this.delete();
+    }
+
     public void setMetadata(String metadata) {
         mMetadata = metadata;
     }
@@ -346,7 +354,7 @@ public class Survey extends SendModel {
 
     @Override
     public boolean belongsToRoster() {
-        return getRoster() == null;
+        return mRosterUUID != null;
     }
 
 }

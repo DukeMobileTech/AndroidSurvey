@@ -81,7 +81,7 @@ public class ReviewPageFragment extends ListFragment {
 	}
 	
 	private void completeSurvey() {
-		mSurvey.setAsComplete();
+		mSurvey.setAsComplete(true);
 		mSurvey.save();
 		setReturnResults(Integer.MIN_VALUE);
 		new SendResponsesTask(getActivity()).execute();

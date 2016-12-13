@@ -151,10 +151,17 @@ public class ParticipantEditorActivity extends AppCompatActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.submit_participant).setVisible(false).setEnabled(false);
+        menu.findItem(R.id.un_submit_participant).setVisible(false).setEnabled(false);
         if (currentMenuItem == 0) {
             menu.findItem(R.id.menu_item_previous).setVisible(false);
         } else if (currentMenuItem == mQuestionCount - 1) {
             menu.findItem(R.id.menu_item_next).setVisible(false);
+            if (mSurvey.readyToSend()) {
+                menu.findItem(R.id.un_submit_participant).setEnabled(true).setVisible(true);
+            } else {
+                menu.findItem(R.id.submit_participant).setEnabled(true).setVisible(true);
+            }
         }
         return super.onPrepareOptionsMenu(menu);
     }
@@ -171,9 +178,29 @@ public class ParticipantEditorActivity extends AppCompatActivity {
             case R.id.menu_item_previous:
                 updateFragment(currentMenuItem - 1);
                 return true;
+            case R.id.submit_participant:
+                markSurveyAsReady();
+                return true;
+            case R.id.un_submit_participant:
+                markSurveyAsNotReady();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void markSurveyAsReady() {
+        mSurvey.setAsComplete(true);
+        mSurvey.save();
+        mRoster.setComplete(true);
+        mRoster.save();
+        finish();
+    }
+
+    private void markSurveyAsNotReady() {
+        mSurvey.setAsComplete(false);
+        mSurvey.save();
+        invalidateOptionsMenu();
     }
 
     @Override
