@@ -54,6 +54,8 @@
         <activity android:name=".roster.RosterActivity"/>
         <activity android:name=".roster.ParticipantEditorActivity"/>
         <activity android:name=".roster.ParticipantViewerActivity"/>
+        <activity android:name=".roster.ResponseViewerActivity"/>
+        <activity android:name=".roster.ResponseEditorActivity"/>
 
         <provider
             android:name="com.activeandroid.content.ContentProvider"
@@ -112,7 +114,6 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="${crashlyticsApiKey}"/>
-
     </application>
 
 </manifest>

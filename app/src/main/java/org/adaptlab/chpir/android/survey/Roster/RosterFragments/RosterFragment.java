@@ -14,6 +14,7 @@ import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Survey;
 import org.adaptlab.chpir.android.survey.roster.ParticipantEditorActivity;
+import org.adaptlab.chpir.android.survey.roster.ResponseEditorActivity;
 
 import java.util.Date;
 
@@ -21,6 +22,7 @@ import static org.adaptlab.chpir.android.survey.FormatUtils.styleTextWithHtml;
 
 public abstract class RosterFragment extends Fragment {
     public final int MINIMUM_WIDTH = 250;
+    private final String TAG = "RosterFragment";
     private Question mQuestion;
     private Response mResponse;
 
@@ -28,6 +30,37 @@ public abstract class RosterFragment extends Fragment {
             savedInstanceState) {
         View view = inflater.inflate(R.layout.roster_item_fragment, container, false);
         ViewGroup responseComponent = (LinearLayout) view.findViewById(R.id.response_component);
+        if (getActivity().getClass().getSimpleName().equals(
+                ParticipantEditorActivity.class.getSimpleName())) {
+            editSurvey(responseComponent);
+        } else if (getActivity().getClass().getSimpleName().equals(
+                ResponseEditorActivity.class.getSimpleName())) {
+            editQuestionResponses(responseComponent);
+        }
+        return view;
+    }
+
+    private void editQuestionResponses(ViewGroup responseComponent) {
+        ResponseEditorActivity parentActivity = (ResponseEditorActivity) getActivity();
+        int questionNum = getArguments().getInt(ResponseEditorActivity.EXTRA_QUESTION_NUMBER, -1);
+        Long surveyId = getArguments().getLong(ResponseEditorActivity.EXTRA_SURVEY_ID, -1);
+        if (questionNum != -1 && surveyId != -1 && parentActivity != null) {
+            mQuestion = parentActivity.getQuestion();
+            Survey survey = Survey.load(Survey.class, surveyId);
+            mResponse = parentActivity.getResponse(questionNum);
+            if (mResponse == null) {
+                mResponse = new Response();
+                mResponse.setQuestion(mQuestion);
+                mResponse.setSurvey(survey);
+                parentActivity.updateResponses(parentActivity.getIdentifierResponse(questionNum),
+                        mResponse);
+            }
+            parentActivity.setTitle(parentActivity.getIdentifierResponse(questionNum).getText());
+            createResponseComponent(responseComponent);
+        }
+    }
+
+    private void editSurvey(ViewGroup responseComponent) {
         ParticipantEditorActivity parentActivity = (ParticipantEditorActivity) getActivity();
         int questionNum = getArguments().getInt(ParticipantEditorActivity.EXTRA_QUESTION_NUMBER, -1);
         Long surveyId = getArguments().getLong(ParticipantEditorActivity.EXTRA_SURVEY_ID, -1);
@@ -43,7 +76,6 @@ public abstract class RosterFragment extends Fragment {
             }
             createResponseComponent(responseComponent);
         }
-        return view;
     }
 
     protected abstract void createResponseComponent(ViewGroup responseComponent);
@@ -80,5 +112,5 @@ public abstract class RosterFragment extends Fragment {
             return null;
         }
     }
-// TODO: 12/7/16 Add way for interviewer to mark survey/roster as completed
+// TODO: 12/7/16 Add way for interviewer to mark roster as completed
 }

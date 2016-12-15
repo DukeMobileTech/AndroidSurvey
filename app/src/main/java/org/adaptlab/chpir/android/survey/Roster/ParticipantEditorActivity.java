@@ -8,21 +8,22 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Roster;
 import org.adaptlab.chpir.android.survey.models.Survey;
-import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.roster.rosterfragments.RosterFragment;
 import org.adaptlab.chpir.android.survey.roster.rosterfragments.RosterFragmentGenerator;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+
+import static org.adaptlab.chpir.android.survey.FormatUtils.stripHtml;
 
 public class ParticipantEditorActivity extends AppCompatActivity {
     public final static String EXTRA_QUESTION_NUMBER =
@@ -84,10 +85,6 @@ public class ParticipantEditorActivity extends AppCompatActivity {
             index++;
         }
         menu.getItem(currentMenuItem).setChecked(true);
-    }
-
-    private String stripHtml(String withHtml) {
-        return Html.fromHtml(withHtml).toString().trim();
     }
 
     private void setNavigationViewListener(final NavigationView navigationView) {

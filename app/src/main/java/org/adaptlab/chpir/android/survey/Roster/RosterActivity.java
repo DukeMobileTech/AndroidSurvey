@@ -49,6 +49,10 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
             "org.adaptlab.chpir.android.survey.roster.metadata";
     public static final String EXTRA_ROSTER_UUID =
             "org.adaptlab.chpir.android.survey.roster.roster_uuid";
+    public static final String EXTRA_QUESTION_ID =
+            "org.adaptlab.chpir.android.survey.roster.question_id";
+    public final static String EXTRA_SURVEY_IDENTIFIER =
+            "org.adaptlab.chpir.android.survey.roster.survey_identifier";
     private final String TAG = "RosterActivity";
     private boolean interceptScroll = true;
     private OHScrollView headerScrollView;
@@ -185,11 +189,12 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
     private void setFirstRowListener(TextView headerView, final Question question) {
         headerView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {// TODO: 12/7/16 Implement
-//                Intent intent = new Intent(RosterActivity.this, ResponseViewerActivity.class);
-//                intent.putExtra(EXTRA_ROSTER_ID, mRoster.getId());
-//                intent.putExtra(EXTRA_QUESTION_ID, question.getId());
-//                startActivity(intent);
+            public void onClick(View v) {
+                Intent intent = new Intent(RosterActivity.this, ResponseViewerActivity.class);
+                intent.putExtra(EXTRA_ROSTER_ID, mRoster.getId());
+                intent.putExtra(EXTRA_QUESTION_ID, question.getId());
+                intent.putExtra(EXTRA_SURVEY_IDENTIFIER, surveyIdentifier.getId());
+                startActivity(intent);
             }
         });
     }
