@@ -124,4 +124,5 @@
     <string name="completed">Completed</string>
     <string name="sent">Sent</string>
     <string name="un_submit">Unsubmit</string>
+    <string name="last_instrument">last instrument</string>
 </resources>

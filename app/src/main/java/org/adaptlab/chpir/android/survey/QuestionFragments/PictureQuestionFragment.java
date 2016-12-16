@@ -48,13 +48,15 @@ public abstract class PictureQuestionFragment extends QuestionFragment {
 	}
 	
 	protected void loadOrCreateResponsePhoto() {
-		if (getResponse().getResponsePhoto() == null) {
-    		mPhoto = new ResponsePhoto();
-    		mPhoto.setResponse(getResponse());
-    		mPhoto.save();
-        } else {
-        	mPhoto = getResponse().getResponsePhoto();
-        }
+		if (getResponse() != null) {
+			if (getResponse().getResponsePhoto() == null) {
+				mPhoto = new ResponsePhoto();
+				mPhoto.setResponse(getResponse());
+				mPhoto.save();
+			} else {
+				mPhoto = getResponse().getResponsePhoto();
+			}
+		}
 	}
 
 	protected boolean isCameraAvailable() {

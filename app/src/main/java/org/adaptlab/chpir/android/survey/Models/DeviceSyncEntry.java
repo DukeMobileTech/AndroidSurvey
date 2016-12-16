@@ -5,6 +5,7 @@ import android.util.Log;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.SendModel;
 import org.adaptlab.chpir.android.survey.AppUtil;
+import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.location.LocationServiceManager;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,12 +19,11 @@ public class DeviceSyncEntry extends SendModel {
 
     public DeviceSyncEntry() {
         mLocationServiceManager = LocationServiceManager.get(AppUtil.getContext());
-//        mLocationServiceManager.startLocationUpdates(); // TODO: 12/6/16 Upgrade to api 23
+        mLocationServiceManager.startLocationUpdates();
     }
 
     @Override
     public JSONObject toJSON() {
-        Log.i(TAG, "Creating JSON for " + TAG);
         JSONObject json = new JSONObject();
 
         try {
@@ -39,14 +39,15 @@ public class DeviceSyncEntry extends SendModel {
             jsonObject.put("instrument_versions", instrumentVersions().toString());
             jsonObject.put("device_uuid", AdminSettings.getInstance().getDeviceIdentifier());
             jsonObject.put("api_key", AdminSettings.getInstance().getApiKey());
-            jsonObject.put("timezone", TimeZone.getDefault().getDisplayName() + " " + TimeZone.getDefault().getID());
+            jsonObject.put("timezone", TimeZone.getDefault().getDisplayName() + " " +
+                    TimeZone.getDefault().getID());
             jsonObject.put("project_id", AdminSettings.getInstance().getProjectId());
             jsonObject.put("device_label", AdminSettings.getInstance().getDeviceLabel());
             jsonObject.put("os_build_number", AppUtil.getOsBuildNumber());
 
             json.put("device_sync_entry", jsonObject);
         } catch (JSONException je) {
-            Log.e(TAG, "JSON exception", je);
+            if (BuildConfig.DEBUG) Log.e(TAG, "JSON exception", je);
         }
 
         return json;
@@ -83,7 +84,7 @@ public class DeviceSyncEntry extends SendModel {
 
             json.put("instrument_versions", jsonObject);
         } catch (JSONException je) {
-            Log.e(TAG, "JSON exception", je);
+            if (BuildConfig.DEBUG) Log.e(TAG, "JSON exception", je);
         }
 
         return json;

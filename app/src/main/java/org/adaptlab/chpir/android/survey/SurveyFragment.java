@@ -1,5 +1,6 @@
 package org.adaptlab.chpir.android.survey;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -8,11 +9,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -274,7 +277,7 @@ public class SurveyFragment extends Fragment {
 
         if (AppUtil.PRODUCTION) {
             Fabric.with(getActivity(), new Crashlytics());
-            Crashlytics.setString("last instrument", mInstrument.getTitle());
+            Crashlytics.setString(getString(R.string.last_instrument), mInstrument.getTitle());
         }
 
         if (!mInstrument.isRoster()) {
@@ -284,16 +287,10 @@ public class SurveyFragment extends Fragment {
         }
 
         if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) {
-//            startLocationServices(); // TODO: 12/6/16 Migrate to api 23
-        }
-    }
-
-    private void launchRosterSurvey() {
-        if (mInstrument.isRoster()) {
-            Intent i = new Intent(getActivity(), RosterActivity.class);
-            i.putExtra(RosterActivity.EXTRA_INSTRUMENT_ID, mInstrument.getRemoteId());
-            i.putExtra(RosterActivity.EXTRA_PARTICIPANT_METADATA, mMetadata);
-            getActivity().startActivity(i);
+            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission
+                    .ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                startLocationServices();
+            }
         }
     }
 
@@ -324,7 +321,13 @@ public class SurveyFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) {
+        registerLocationReceiver();
+    }
+
+    private void registerLocationReceiver() {
+        if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation() &&
+                ContextCompat.checkSelfPermission(getActivity(), Manifest.permission
+                        .ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             getActivity().registerReceiver(mLocationServiceManager.mLocationReceiver,
                     new IntentFilter(LocationServiceManager.ACTION_LOCATION));
         }
@@ -353,7 +356,11 @@ public class SurveyFragment extends Fragment {
 
     @Override
     public void onStop() {
-        if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) {
+        if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()
+                && ContextCompat.checkSelfPermission(getActivity(), Manifest.permission
+                .ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                && mLocationServiceManager != null
+                && mLocationServiceManager.mLocationReceiver != null) {
             getActivity().unregisterReceiver(mLocationServiceManager.mLocationReceiver);
         }
         super.onStop();
@@ -386,13 +393,17 @@ public class SurveyFragment extends Fragment {
 
             public void onDrawerOpened(View drawerView) {
                 ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-                if (actionBar != null) { actionBar.setTitle(mDrawerTitle); }
+                if (actionBar != null) {
+                    actionBar.setTitle(mDrawerTitle);
+                }
                 getActivity().invalidateOptionsMenu();
             }
 
             public void onDrawerClosed(View view) {
                 ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-                if (actionBar != null) { actionBar.setTitle(mTitle); }
+                if (actionBar != null) {
+                    actionBar.setTitle(mTitle);
+                }
                 getActivity().invalidateOptionsMenu();
             }
         };
@@ -527,6 +538,15 @@ public class SurveyFragment extends Fragment {
                 .getResult();
     }
 
+    private void launchRosterSurvey() {
+        if (mInstrument.isRoster()) {
+            Intent i = new Intent(getActivity(), RosterActivity.class);
+            i.putExtra(RosterActivity.EXTRA_INSTRUMENT_ID, mInstrument.getRemoteId());
+            i.putExtra(RosterActivity.EXTRA_PARTICIPANT_METADATA, mMetadata);
+            getActivity().startActivity(i);
+        }
+    }
+
     public void loadOrCreateSurvey() {
         Long surveyId = getActivity().getIntent().getLongExtra(EXTRA_SURVEY_ID, -1);
         if (surveyId == -1) {
@@ -610,7 +630,6 @@ public class SurveyFragment extends Fragment {
         } else {
             fm.beginTransaction().replace(R.id.question_container, mQuestionFragment).commit();
         }
-
         mSurvey.setLastQuestion(mQuestion);
         mSurvey.save();
         removeTextFocus();
@@ -699,8 +718,8 @@ public class SurveyFragment extends Fragment {
     private Question getNextQuestionWhenNumberFormatException(int questionIndex) {
         Question nextQuestion;
         nextQuestion = nextQuestionHelper(questionIndex);
-        Log.wtf(TAG, "Received a non-numeric skip response index for " + mQuestion
-                .getQuestionIdentifier());
+        Log.wtf(TAG, "Received a non-numeric skip response index for " +
+                mQuestion.getQuestionIdentifier());
         return nextQuestion;
     }
 

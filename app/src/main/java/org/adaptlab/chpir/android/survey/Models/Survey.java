@@ -289,7 +289,11 @@ public class Survey extends SendModel {
     }
 
     public Question getLastQuestion() {
-        return Question.findByRemoteId(mLastQuestionRemoteId);
+        if (mLastQuestionRemoteId == null) {
+            return getInstrument().questions().get(0);
+        } else {
+            return Question.findByRemoteId(mLastQuestionRemoteId);
+        }
     }
 
     public void setLastQuestion(Question question) {

@@ -1,14 +1,17 @@
 package org.adaptlab.chpir.android.survey;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
@@ -205,6 +208,22 @@ public class InstrumentFragment extends ListFragment {
         setHasOptionsMenu(true);
         createLoaderCallbacks();
         setMultiChoiceModeListener();
+        requestNeededPermissions();
+    }
+
+    private void requestNeededPermissions() {
+        if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) {
+            if (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission
+                    .ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED) {
+                ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+            }
+            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission
+                    .CAMERA) == PackageManager.PERMISSION_DENIED) {
+                ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{Manifest.permission.CAMERA}, 2);
+            }
+        }
     }
 
     /*
