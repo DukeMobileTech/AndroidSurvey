@@ -30,7 +30,7 @@
         <item name="android:textSize">20sp</item>
     </style>
 
-    <style name="ActionBar.ActionMode"  parent="@style/Widget.AppCompat.ActionMode">
+    <style name="ActionBar.ActionMode" parent="@style/Widget.AppCompat.ActionMode">
         <item name="background">@color/transparent</item>
     </style>
 

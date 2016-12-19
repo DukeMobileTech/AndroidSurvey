@@ -78,6 +78,7 @@ public class InstrumentFragment extends ListFragment {
     private LoaderManager.LoaderCallbacks mSurveyCallbacks;
     private LoaderManager.LoaderCallbacks mRosterCallbacks;
     private MultiChoiceModeListener choiceModeListener;
+    private ProgressDialog mProgressDialog;
 
     private void setMultiChoiceModeListener() {
         choiceModeListener = new MultiChoiceModeListener() {
@@ -209,6 +210,7 @@ public class InstrumentFragment extends ListFragment {
         createLoaderCallbacks();
         setMultiChoiceModeListener();
         requestNeededPermissions();
+        mProgressDialog = new ProgressDialog(getActivity());
     }
 
     private void requestNeededPermissions() {
@@ -696,8 +698,14 @@ public class InstrumentFragment extends ListFragment {
 
         @Override
         protected void onPreExecute() {
-            getActivity().setProgressBarIndeterminateVisibility(true);
-            setListAdapter(null);
+            if (mProgressDialog != null) {
+                mProgressDialog.setTitle(getResources().getString(
+                        R.string.instrument_loading_progress_header));
+                mProgressDialog.setMessage(getResources().getString(
+                        R.string.background_process_progress_message));
+                mProgressDialog.setCancelable(false);
+                mProgressDialog.show();
+            }
         }
 
         @Override
@@ -722,11 +730,13 @@ public class InstrumentFragment extends ListFragment {
                 if (AppUtil.getAdminSettingsInstance().getProjectId() != null) {
                     setInstrumentsListViewAdapter();
                 }
-                getActivity().setProgressBarIndeterminateVisibility(false);
             }
             AppUtil.getAdminSettingsInstance().setLastSyncTime(ActiveRecordCloudSync
                     .getLastSyncTime());
             AppUtil.orderInstrumentsSections();
+            if (mProgressDialog != null) {
+                mProgressDialog.dismiss();
+            }
         }
     }
 

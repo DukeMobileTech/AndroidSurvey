@@ -24,7 +24,6 @@ public class ActiveRecordCloudSync {
     private static String mAccessToken;     // API Access Key
     private static int mVersionCode;        // App version code from Manifest
     private static String mLastSyncTime;
-    private static int mFetchCount;
 
     /**
      * Add a ReceiveTable.  A ReceiveTable is an active record model class that extends the
@@ -62,7 +61,6 @@ public class ActiveRecordCloudSync {
         NetworkNotificationUtils.showNotification(context, android.R.drawable.stat_sys_download, R.string.sync_notification_text);
         Date currentTime = new Date();
         ActiveRecordCloudSync.setLastSyncTime(Long.toString(currentTime.getTime()));
-        ActiveRecordCloudSync.setFetchCount(0);
         for (Map.Entry<String, Class<? extends ReceiveModel>> entry : mReceiveTables.entrySet()) {
             if (AppUtil.DEBUG) Log.i(TAG, "Syncing " + entry.getValue() + " from remote table " + entry.getKey());
             HttpFetchr httpFetchr = new HttpFetchr(entry.getKey(), entry.getValue());
@@ -132,14 +130,6 @@ public class ActiveRecordCloudSync {
     public static String getParams2() {
         return "?access_token=" + AppUtil.getAdminSettingsInstance().getApi2Key() +
                 "&version_code=" + getVersionCode();
-    }
-
-    public static void setFetchCount(int count) {
-        mFetchCount = count;
-    }
-
-    public static int getFetchCount() {
-        return mFetchCount;
     }
 
     public static String getLastSyncTime() {

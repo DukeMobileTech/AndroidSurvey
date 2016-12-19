@@ -31,7 +31,6 @@ public class HttpFetchr {
             return;
         }
 
-        ActiveRecordCloudSync.setFetchCount(ActiveRecordCloudSync.getFetchCount() + 1);
         try {
             String url = ActiveRecordCloudSync.getEndPoint() + mRemoteTableName +
                     ActiveRecordCloudSync.getParams();
