@@ -544,6 +544,7 @@ public class SurveyFragment extends Fragment {
             i.putExtra(RosterActivity.EXTRA_INSTRUMENT_ID, mInstrument.getRemoteId());
             i.putExtra(RosterActivity.EXTRA_PARTICIPANT_METADATA, mMetadata);
             getActivity().startActivity(i);
+            getActivity().finish();
         }
     }
 

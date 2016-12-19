@@ -4,7 +4,6 @@
     tools:ignore="MissingTranslation" >
 
     <string name="app_name">Encuesta</string>
-    <string name="action_settings">Ajustes</string>
     <string name="start_survey">Estudio de inicio</string>
     <string name="survey_title_label">Escoja instrumento</string>
     <string name="next_button">Siguiente</string>

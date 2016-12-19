@@ -39,6 +39,7 @@ public class ParticipantEditorActivity extends AppCompatActivity {
     private Survey mSurvey;
     private int mQuestionCount;
     private LinkedHashMap<Question, Response> mQuestionResponseList;
+    private Question mSurveyIdentifierQuestion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -206,6 +207,21 @@ public class ParticipantEditorActivity extends AppCompatActivity {
         updateFragment(currentMenuItem);
     }
 
+    @Override
+    protected void onPause () {
+        if (mSurveyIdentifierQuestion != null) {
+            Response idResponse = mQuestionResponseList.get(mSurveyIdentifierQuestion);
+            if (idResponse == null) {
+                idResponse = new Response();
+                idResponse.setQuestion(mSurveyIdentifierQuestion);
+                idResponse.setSurvey(mSurvey);
+                idResponse.save();
+                mQuestionResponseList.put(mSurveyIdentifierQuestion, idResponse);
+            }
+        }
+        super.onPause();
+    }
+
     public LinkedHashMap<Question, Response> getQuestionResponses() {
         return mQuestionResponseList;
     }
@@ -245,8 +261,20 @@ public class ParticipantEditorActivity extends AppCompatActivity {
             setNavigationViewListener(navigationView);
             if (dialog.isShowing()) dialog.dismiss();
             updateFragment(0);
+            if (mSurveyIdentifierQuestion == null) {
+                setIdentifierQuestion();
+            }
         }
 
+    }
+
+    private void setIdentifierQuestion() {
+         for (Question question : mQuestions) {
+                if (question.identifiesSurvey()) {
+                    mSurveyIdentifierQuestion = question;
+                    break;
+                }
+         }
     }
 
 }
