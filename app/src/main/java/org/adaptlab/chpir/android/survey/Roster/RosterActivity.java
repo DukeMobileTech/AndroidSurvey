@@ -92,14 +92,17 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
             } catch (JSONException e) {
                 if (BuildConfig.DEBUG) Log.e(TAG, "Error parsing object json", e);
             }
+        } else {
+            String rosterUUID = getIntent().getStringExtra(EXTRA_ROSTER_UUID);
+            if (rosterUUID != null) {
+                mRoster = Roster.findByUUID(rosterUUID);
+            } else {
+                mRoster = new Roster();
+                mRoster.setInstrument(instrument);
+                mRoster.save();
+            }
         }
-
-        String rosterUUID = getIntent().getStringExtra(EXTRA_ROSTER_UUID);
-        if (rosterUUID != null) {
-            mRoster = Roster.findByUUID(rosterUUID);
-        }
-
-        setTitle(mRoster.getIdentifier());
+        setTitle(mRoster.identifier(this));
         mQuestions = new ArrayList<>();
         mSurveys = new ArrayList<>();
         new QuestionLoaderTask().execute(instrument);

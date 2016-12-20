@@ -13,6 +13,7 @@ import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.SendModel;
 import org.adaptlab.chpir.android.survey.BuildConfig;
+import org.adaptlab.chpir.android.survey.R;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -68,6 +69,13 @@ public class Roster extends SendModel {
 
     public void setComplete(boolean status) {
         mComplete = status;
+    }
+
+    public String identifier(Context context) {
+        if (getIdentifier() == null || getIdentifier().trim().isEmpty())
+            return context.getString(R.string.unidentified_roster) + " " + getId();
+        else
+            return getIdentifier();
     }
 
     public List<Survey> surveys() {

@@ -29,7 +29,6 @@
     <string name="api_unavailable">Remoto Api no responde.</string>
     <string name="unacceptable_version_code">Debe actualizar su aplicación antes de continuar.</string>
     <string name="surveys">encuestas</string>
-    <string name="hello">Hello World</string>
     <string name="questions">preguntas</string>
     <string name="question">pregunta</string>
     <string name="encryption_required_title">Codificación requerida.</string>

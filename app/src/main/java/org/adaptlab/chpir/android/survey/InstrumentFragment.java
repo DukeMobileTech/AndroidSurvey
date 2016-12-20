@@ -670,12 +670,11 @@ public class InstrumentFragment extends ListFragment {
             TextView surveyCountTextView = (TextView) view.findViewById(R.id
                     .roster_list_item_surveyCountTextView);
 
-            String title = cursor.getString(cursor.getColumnIndexOrThrow("Identifier"));
             String id = cursor.getString(cursor.getColumnIndexOrThrow("UUID"));
             Roster roster = Roster.findByUUID(id);
             int numSurveys = roster.surveys().size();
 
-            titleTextView.setText(title);
+            titleTextView.setText(roster.identifier(context));
             titleTextView.setTypeface(roster.getInstrument().getTypeFace(getActivity()
                     .getApplicationContext()));
             surveyCountTextView.setText(numSurveys + " " + FormatUtils.pluralize
