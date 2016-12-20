@@ -1,14 +1,16 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import android.view.Gravity;
+import android.view.ViewGroup;
+import android.widget.DatePicker;
+import android.widget.DatePicker.OnDateChangedListener;
+import android.widget.LinearLayout;
 
 import org.adaptlab.chpir.android.survey.FormatUtils;
 import org.adaptlab.chpir.android.survey.QuestionFragment;
 
-import android.view.ViewGroup;
-import android.widget.DatePicker;
-import android.widget.DatePicker.OnDateChangedListener;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 public class DateQuestionFragment extends QuestionFragment {
     protected int mDay;
@@ -24,6 +26,10 @@ public class DateQuestionFragment extends QuestionFragment {
     @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
         mDatePicker = new DatePicker(getActivity());
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        params.gravity = Gravity.CENTER;
+        mDatePicker.setLayoutParams(params);
         mDatePicker.setCalendarViewShown(false);
         Calendar c = Calendar.getInstance();
         mDatePicker.init(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH),
