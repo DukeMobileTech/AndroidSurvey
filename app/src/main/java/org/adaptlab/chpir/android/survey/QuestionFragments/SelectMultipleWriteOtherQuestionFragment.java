@@ -20,13 +20,18 @@ public class SelectMultipleWriteOtherQuestionFragment extends
         checkbox.setId(otherId);
         checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                otherText.setEnabled(isChecked);
-                toggleResponseIndex(otherId);
-                if (!isChecked) {
+                if (isChecked) {
+                    otherText.setEnabled(true);
+                    otherText.requestFocus();
+                    showKeyBoard();
+                } else {
+                    otherText.setEnabled(false);
+                    hideKeyBoard();
                     otherText.getText().clear();
                 }
+                toggleResponseIndex(otherId);
             }
-         });
+        });
         questionComponent.addView(checkbox, otherId);
         addOtherResponseView(otherText);
         addCheckBox(checkbox);

@@ -1,10 +1,13 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
-import java.lang.reflect.Field;
-
-import android.util.Log;
+import android.content.res.Resources;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.DatePicker;
+
+import org.adaptlab.chpir.android.survey.R;
+
+import java.util.Calendar;
 
 public class YearQuestionFragment extends DateQuestionFragment {
     private static final String TAG = "YearQuestionFragment";
@@ -12,29 +15,25 @@ public class YearQuestionFragment extends DateQuestionFragment {
     private DatePicker mDatePicker;
     
     @Override
-    protected void beforeAddViewHook(DatePicker datePicker) {     
-        mDatePicker = datePicker;
-        
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
-            // Honeycomb +
-            findAndHideField(datePicker, "mDaySpinner");
-            findAndHideField(datePicker, "mMonthSpinner");
-        } else {
-            // Before Honeycomb
-            findAndHideField(datePicker, "mDayPicker");
-            findAndHideField(datePicker, "mMonthPicker");
-        }
-    }
-    
-    private void findAndHideField(DatePicker datePicker, String name) {
-        try {
-            Field field = DatePicker.class.getDeclaredField(name);
-            field.setAccessible(true);
-            View fieldInstance = (View) field.get(datePicker);
-            fieldInstance.setVisibility(View.GONE);
-        } catch (Exception e) {
-            Log.e(TAG, "Error removing day or month field: " + e);
-        }
+    protected DatePicker beforeAddViewHook(ViewGroup component) {
+        mDatePicker = (DatePicker) component.findViewById(R.id.date_picker);
+        mDatePicker.setVisibility(View.VISIBLE);
+        Calendar c = Calendar.getInstance();
+        mDatePicker.init(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH),
+            new DatePicker.OnDateChangedListener() {
+                @Override
+                public void onDateChanged(DatePicker view, int newYear, int newMonth, int newDay) {
+                    mDay = newDay;
+                    mMonth = newMonth;
+                    mYear = newYear;
+                    setResponseText();
+                }
+            });
+        mDatePicker.findViewById(Resources.getSystem().getIdentifier("day", "id", "android"))
+                .setVisibility(View.GONE);
+        mDatePicker.findViewById(Resources.getSystem().getIdentifier("month", "id", "android"))
+                .setVisibility(View.GONE);
+        return mDatePicker;
     }
     
     @Override

@@ -1,14 +1,19 @@
 package org.adaptlab.chpir.android.survey.roster.rosterfragments;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
@@ -91,6 +96,29 @@ public abstract class RosterFragment extends Fragment {
     public void onPause() {
         super.onPause();
         new SaveResponseTask().execute(mResponse);
+        hideKeyBoard();
+    }
+
+    protected void showKeyBoard() {
+        InputMethodManager manager = (InputMethodManager) getActivity().getSystemService(Context
+                .INPUT_METHOD_SERVICE);
+        manager.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager
+                .HIDE_IMPLICIT_ONLY);
+    }
+
+    protected void hideKeyBoard() {
+        try {
+            getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams
+                    .SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+            if (getActivity().getCurrentFocus() != null && getActivity().getCurrentFocus()
+                    .getWindowToken() != null) {
+                ((InputMethodManager) getActivity().getSystemService(Context
+                        .INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(getActivity()
+                        .getCurrentFocus().getWindowToken(), 0);
+            }
+        } catch (Exception ex) {
+            if (BuildConfig.DEBUG) Log.e(TAG, "Input Method Exception " + ex.getMessage());
+        }
     }
 
     public Question getQuestion() {

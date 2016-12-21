@@ -1,5 +1,6 @@
 package org.adaptlab.chpir.android.survey;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -7,11 +8,14 @@ import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -89,11 +93,34 @@ public abstract class QuestionFragment extends Fragment {
     public void onPause() {
         super.onPause();
         new SaveResponseTask().execute(mResponse);
+        hideKeyBoard();
+    }
+
+    protected void hideKeyBoard() {
+        try {
+            getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams
+                    .SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+            if (getActivity().getCurrentFocus() != null && getActivity().getCurrentFocus()
+                    .getWindowToken() != null) {
+                ((InputMethodManager) getActivity().getSystemService(Context
+                        .INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(getActivity()
+                        .getCurrentFocus().getWindowToken(), 0);
+            }
+        } catch (Exception ex) {
+            if (BuildConfig.DEBUG) Log.e(TAG, "Input Method Exception " + ex.getMessage());
+        }
     }
 
     protected abstract void createQuestionComponent(ViewGroup questionComponent);
 
     protected abstract void deserialize(String responseText);
+
+    protected void showKeyBoard() {
+        InputMethodManager manager = (InputMethodManager) getActivity().getSystemService(Context
+                .INPUT_METHOD_SERVICE);
+        manager.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager
+                .HIDE_IMPLICIT_ONLY);
+    }
 
     public Question getQuestion() {
         return mQuestion;

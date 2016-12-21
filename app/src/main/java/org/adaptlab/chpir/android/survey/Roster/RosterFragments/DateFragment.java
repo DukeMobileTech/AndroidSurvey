@@ -1,8 +1,10 @@
 package org.adaptlab.chpir.android.survey.roster.rosterfragments;
 
+import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.DatePicker.OnDateChangedListener;
+import android.widget.LinearLayout;
 
 import java.util.Calendar;
 
@@ -12,6 +14,10 @@ public class DateFragment extends RosterFragment {
     @Override
     protected void createResponseComponent(ViewGroup responseComponent) {
         datePicker = new DatePicker(getActivity());
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        params.gravity = Gravity.CENTER;
+        datePicker.setLayoutParams(params);
         Calendar c = Calendar.getInstance();
         datePicker.init(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH),
                 new OnDateChangedListener() {

@@ -26,11 +26,16 @@ public class SelectOneWriteOtherQuestionFragment extends
                 LinearLayout.LayoutParams.WRAP_CONTENT));
         getRadioGroup().setOnCheckedChangeListener(new OnCheckedChangeListener() {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                otherText.setEnabled(checkedId == otherId);
-                setResponseIndex(checkedId);
-                if (checkedId != otherId) {
+                if (checkedId == otherId) {
+                    otherText.setEnabled(true);
+                    otherText.requestFocus();
+                    showKeyBoard();
+                } else {
+                    otherText.setEnabled(false);
+                    hideKeyBoard();
                     otherText.getText().clear();
                 }
+                setResponseIndex(checkedId);
             }
         });
         getRadioGroup().addView(radioButton, otherId);

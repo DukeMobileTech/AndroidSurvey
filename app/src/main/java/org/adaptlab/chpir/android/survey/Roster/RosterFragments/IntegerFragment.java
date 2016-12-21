@@ -26,6 +26,7 @@ public class IntegerFragment extends RosterFragment {
             }
         });
         editText.requestFocus();
+        showKeyBoard();
         responseComponent.addView(editText);
     }
 }

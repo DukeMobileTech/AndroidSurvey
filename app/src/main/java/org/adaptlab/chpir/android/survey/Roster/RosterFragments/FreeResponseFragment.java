@@ -26,6 +26,7 @@ public class FreeResponseFragment extends RosterFragment {
             }
         });
         editText.requestFocus();
+        showKeyBoard();
         responseComponent.addView(editText);
     }
 }

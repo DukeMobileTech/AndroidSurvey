@@ -19,32 +19,32 @@ public class DateQuestionFragment extends QuestionFragment {
     
     private DatePicker mDatePicker;
     
-    // This is used to hide various date fields in subclasses.
-    protected void beforeAddViewHook(DatePicker datePicker) {
+    protected DatePicker beforeAddViewHook(ViewGroup component) {
+        DatePicker datePicker = new DatePicker(getActivity());
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        params.gravity = Gravity.CENTER;
+        datePicker.setLayoutParams(params);
+        datePicker.setCalendarViewShown(false);
+        Calendar c = Calendar.getInstance();
+        datePicker.init(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH),
+                new OnDateChangedListener() {
+                    @Override
+                    public void onDateChanged(DatePicker view, int newYear,
+                                              int newMonth, int newDay) {
+                        mDay = newDay;
+                        mMonth = newMonth;
+                        mYear = newYear;
+                        setResponseText();
+                    }
+                });
+        component.addView(datePicker);
+        return datePicker;
     }
 
     @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
-        mDatePicker = new DatePicker(getActivity());
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT);
-        params.gravity = Gravity.CENTER;
-        mDatePicker.setLayoutParams(params);
-        mDatePicker.setCalendarViewShown(false);
-        Calendar c = Calendar.getInstance();
-        mDatePicker.init(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH),
-                new OnDateChangedListener() {
-            @Override
-            public void onDateChanged(DatePicker view, int newYear,
-                    int newMonth, int newDay) {
-                mDay = newDay;
-                mMonth = newMonth;
-                mYear = newYear;
-                setResponseText();
-            }           
-        });
-        questionComponent.addView(mDatePicker);
-        beforeAddViewHook(mDatePicker);
+        mDatePicker = beforeAddViewHook(questionComponent);
     }
 
     @Override

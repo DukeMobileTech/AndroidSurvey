@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.opencsv.CSVReader;
 
+import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.QuestionFragment;
 import org.adaptlab.chpir.android.survey.R;
@@ -28,7 +29,8 @@ public abstract class ListOfItemsQuestionFragment extends QuestionFragment {
     protected abstract EditText createEditText();
     
     protected void createQuestionComponent(ViewGroup questionComponent) {
-        mResponses = new ArrayList<EditText>();
+        mResponses = new ArrayList<>();
+        int index = 0;
         for (Option option : getOptions()) {
             final TextView optionText = new TextView(getActivity());
             optionText.setText(option.getText());
@@ -47,6 +49,11 @@ public abstract class ListOfItemsQuestionFragment extends QuestionFragment {
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
                 public void afterTextChanged(Editable s) { }
             });
+            if (index == 0) {
+                editText.requestFocus();
+                showKeyBoard();
+            }
+            index++;
         }
     }
 
@@ -75,7 +82,7 @@ public abstract class ListOfItemsQuestionFragment extends QuestionFragment {
                     mResponses.get(i).setText(listOfResponses[i]);
             }
         } catch (IOException e) {
-            Log.e(TAG, "IOException " + e.getMessage());
+            if(BuildConfig.DEBUG) Log.e(TAG, "IOException " + e.getMessage());
         }
     }
 }

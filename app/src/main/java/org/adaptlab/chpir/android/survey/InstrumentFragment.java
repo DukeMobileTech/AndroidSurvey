@@ -685,19 +685,21 @@ public class InstrumentFragment extends ListFragment {
     /*
      * Refresh the receive tables from the server
      */
-    private class RefreshInstrumentsTask extends AsyncTask<Void, Void, Void> {
+    private class RefreshInstrumentsTask extends AsyncTask<Void, Void, Integer> {
 
         @Override
-        protected Void doInBackground(Void... params) {
+        protected Integer doInBackground(Void... params) {
             if (isAdded() && NetworkNotificationUtils.checkForNetworkErrors(getActivity())) {
                 ActiveRecordCloudSync.syncReceiveTables(getActivity());
+                return 0;
+            } else {
+                return -1;
             }
-            return null;
         }
 
         @Override
         protected void onPreExecute() {
-            if (mProgressDialog != null) {
+            if (mProgressDialog != null ) {
                 mProgressDialog.setTitle(getResources().getString(
                         R.string.instrument_loading_progress_header));
                 mProgressDialog.setMessage(getResources().getString(
@@ -708,9 +710,12 @@ public class InstrumentFragment extends ListFragment {
         }
 
         @Override
-        protected void onPostExecute(Void param) {
+        protected void onPostExecute(Integer code) {
             if (isAdded()) {
                 new RefreshImagesTask().execute();
+            }
+            if (code == -1 && mProgressDialog != null) {
+                mProgressDialog.dismiss();
             }
         }
     }
@@ -824,11 +829,11 @@ public class InstrumentFragment extends ListFragment {
      * user to begin survey.
      */
     private class LoadInstrumentTask extends AsyncTask<Instrument, Void, Instrument> {
-        ProgressDialog mProgressDialog;
+        ProgressDialog progressDialog;
 
         @Override
         protected void onPreExecute() {
-            mProgressDialog = ProgressDialog.show(
+            progressDialog = ProgressDialog.show(
                     getActivity(),
                     getString(R.string.instrument_loading_progress_header),
                     getString(R.string.background_process_progress_message)
@@ -850,7 +855,7 @@ public class InstrumentFragment extends ListFragment {
 
         @Override
         protected void onPostExecute(final Instrument instrument) {
-            if (mProgressDialog.isShowing()) mProgressDialog.dismiss();
+            if (progressDialog.isShowing()) progressDialog.dismiss();
             if (isAdded()) {
                 if (instrument == null) {
                     Toast.makeText(getActivity(), R.string.instrument_not_loaded, Toast
@@ -879,11 +884,11 @@ public class InstrumentFragment extends ListFragment {
     }
 
     private class LoadSurveyTask extends AsyncTask<Survey, Void, Survey> {
-        ProgressDialog mProgressDialog;
+        ProgressDialog progressDialog;
 
         @Override
         protected void onPreExecute() {
-            mProgressDialog = ProgressDialog.show(
+            progressDialog = ProgressDialog.show(
                     getActivity(),
                     getString(R.string.instrument_loading_progress_header),
                     getString(R.string.background_process_progress_message)
@@ -905,7 +910,7 @@ public class InstrumentFragment extends ListFragment {
 
         @Override
         protected void onPostExecute(Survey survey) {
-            if (mProgressDialog.isShowing()) mProgressDialog.dismiss();
+            if (progressDialog.isShowing()) progressDialog.dismiss();
             if (isAdded()) {
                 if (survey == null) {
                     Toast.makeText(getActivity(), R.string.instrument_not_loaded, Toast

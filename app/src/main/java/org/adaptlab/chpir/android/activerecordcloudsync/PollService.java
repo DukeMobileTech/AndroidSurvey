@@ -11,7 +11,7 @@ import java.util.Date;
 
 public class PollService extends IntentService {
     private static final String TAG = "PollService";
-    private static int DEFAULT_POLL_INTERVAL = 1000 * 120;
+    private static int DEFAULT_POLL_INTERVAL = 1000 * 900;
     public static final String PREF_IS_ALARM_ON = "isAlarmOn";
     private static int sPollInterval;
     private static Date lastUpdate;
@@ -48,7 +48,7 @@ public class PollService extends IntentService {
         PreferenceManager.getDefaultSharedPreferences(context)
                 .edit()
                 .putBoolean(PollService.PREF_IS_ALARM_ON, isOn)
-                .commit();
+                .apply();
     }
 
     public static boolean isServiceAlarmOn(Context context) {
@@ -59,7 +59,11 @@ public class PollService extends IntentService {
     }
 
     public static void setPollInterval(int interval) {
-        sPollInterval = interval;
+        if (interval == 0) {
+            sPollInterval = DEFAULT_POLL_INTERVAL;
+        } else {
+            sPollInterval = interval;
+        }
     }
 
     public static void restartServiceAlarm(Context context) {
