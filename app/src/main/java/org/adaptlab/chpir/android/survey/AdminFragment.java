@@ -12,7 +12,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -21,10 +20,12 @@ import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.activerecordcloudsync.PollService;
 import org.adaptlab.chpir.android.survey.models.AdminSettings;
 
+import java.text.DateFormat;
+import java.util.Calendar;
 import java.util.Locale;
 
 public class AdminFragment extends Fragment {
-
+    private final String TAG = "AdminFragment";
     private EditText mDeviceIdentifierEditText;
     private EditText mDeviceLabelEditText;
     private EditText mSyncIntervalEditText;
@@ -126,40 +127,6 @@ public class AdminFragment extends Fragment {
         mVersionCodeTextView.setText(String.format(Locale.getDefault(), "%s%d",
                 getString(R.string.version_code), AppUtil.getVersionCode(getActivity())));
 
-        Button deleteData = (Button) v.findViewById(R.id.delete_data_button);
-        deleteData.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setTitle(R.string.delete_application_data)
-                        .setMessage(R.string.confirmation)
-                        .setPositiveButton(R.string.yes_sure, new DialogInterface.OnClickListener
-                                () {
-                            @Override
-                            public void onClick(DialogInterface dialog, int button) {
-                                new WipeDataTask().execute();
-                            }
-                        })
-                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        })
-                        .create().show();
-            }
-        });
-
-        Button resetLastSyncTime = (Button) v.findViewById(R.id.reset_last_sync_time_button);
-        resetLastSyncTime.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                AppUtil.getAdminSettingsInstance().resetLastSyncTime();
-                getActivity().finish();
-            }
-        });
-
         return v;
     }
 
@@ -174,6 +141,12 @@ public class AdminFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.save_admin_settings_button:
                 saveAdminSettings();
+                return true;
+            case R.id.reset_last_sync_time_button:
+                resetLastSyncTime();
+                return true;
+            case R.id.delete_data_button:
+                deleteData();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -218,6 +191,53 @@ public class AdminFragment extends Fragment {
         getActivity().finish();
     }
 
+    private void resetLastSyncTime() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.reset_header)
+                .setMessage(R.string.reset_confirmation)
+                .setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int button) {
+                        AppUtil.getAdminSettingsInstance().resetLastSyncTime();
+                        getActivity().finish();
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .create().show();
+    }
+
+    private void deleteData() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.delete_application_data)
+                .setMessage(R.string.delete_confirmation)
+                .setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int button) {
+                        new WipeDataTask().execute();
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .create().show();
+    }
+
+    public String getAdminSettingsInstanceApiUrl() {
+        // Append forward slash to domain name if does not exist
+        String domainName = AdminSettings.getInstance().getApiDomainName();
+        char lastChar = domainName.charAt(domainName.length() - 1);
+        if (lastChar != '/') domainName = domainName + "/";
+
+        return domainName + "api/" + AdminSettings.getInstance().getApiVersion() + "/" +
+                "projects/" + AdminSettings.getInstance().getProjectId() + "/";
+    }
+
     public String getAdminSettingsInstanceDeviceId() {
         return AdminSettings.getInstance().getDeviceIdentifier();
     }
@@ -230,16 +250,8 @@ public class AdminFragment extends Fragment {
         return AdminSettings.getInstance().getApiDomainName();
     }
 
-    public String getAdminSettingsInstanceApi2DomainName() {
-        return AdminSettings.getInstance().getApi2DomainName();
-    }
-
     public String getAdminSettingsInstanceApiVersion() {
         return AdminSettings.getInstance().getApiVersion();
-    }
-
-    public String getAdminSettingsInstanceApi2Version() {
-        return AdminSettings.getInstance().getApi2Version();
     }
 
     public String getAdminSettingsInstanceProjectId() {
@@ -250,31 +262,33 @@ public class AdminFragment extends Fragment {
         return AdminSettings.getInstance().getApiKey();
     }
 
-    public String getAdminSettingsInstanceApi2Key() {
-        return AdminSettings.getInstance().getApi2Key();
-    }
-
     public String getAdminSettingsInstanceCustomLocaleCode() {
         return AdminSettings.getInstance().getCustomLocaleCode();
     }
 
-    public String getLastUpdateTime() {
-        return (PollService.getLastUpdate()) + "";
+    public String getAdminSettingsInstanceApi2DomainName() {
+        return AdminSettings.getInstance().getApi2DomainName();
     }
 
-    public String getAdminSettingsInstanceApiUrl() {
+    public String getAdminSettingsInstanceApi2Version() {
+        return AdminSettings.getInstance().getApi2Version();
+    }
 
-        // Append forward slash to domain name if does not exist
-        String domainName = AdminSettings.getInstance().getApiDomainName();
-        char lastChar = domainName.charAt(domainName.length() - 1);
-        if (lastChar != '/') domainName = domainName + "/";
+    public String getAdminSettingsInstanceApi2Key() {
+        return AdminSettings.getInstance().getApi2Key();
+    }
 
-        return domainName + "api/" + AdminSettings.getInstance().getApiVersion() + "/" +
-                "projects/" + AdminSettings.getInstance().getProjectId() + "/";
+    public String getLastUpdateTime() {
+        String last = AdminSettings.getInstance().getLastSyncTime();
+        if (last.isEmpty()) return last;
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(Long.parseLong(last));
+        DateFormat dateFormat = DateFormat.getDateTimeInstance();
+        return dateFormat.format(calendar.getTime());
     }
 
     private class WipeDataTask extends AsyncTask<Void, Void, Void> {
-        ProgressDialog mProgressDialog;
+        ProgressDialog progressDialog;
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -284,7 +298,7 @@ public class AdminFragment extends Fragment {
 
         @Override
         protected void onPreExecute() {
-            mProgressDialog = ProgressDialog.show(
+            progressDialog = ProgressDialog.show(
                     getActivity(),
                     getString(R.string.wiping_data_header),
                     getString(R.string.background_process_progress_message)
@@ -293,7 +307,7 @@ public class AdminFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Void params) {
-            mProgressDialog.dismiss();
+            progressDialog.dismiss();
             getActivity().finish();
         }
     }

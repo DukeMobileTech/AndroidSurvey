@@ -26,7 +26,7 @@
                 android:text="@string/sync_settings"/>
 
             <LinearLayout
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
@@ -34,7 +34,9 @@
                     android:id="@+id/device_identifier_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="fill"
                     android:layout_weight="1"
+                    android:maxLines="2"
                     android:text="@string/device_identifier"/>
 
                 <EditText
@@ -42,7 +44,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:ems="10">
+                    android:ems="10"
+                    android:inputType="textMultiLine">
 
                     <requestFocus/>
                 </EditText>
@@ -50,7 +53,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
@@ -58,7 +61,9 @@
                     android:id="@+id/device_label_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="fill"
                     android:layout_weight="1"
+                    android:maxLines="2"
                     android:text="@string/device_label"/>
 
                 <EditText
@@ -66,11 +71,11 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:ems="10"/>
+                    android:inputType="textMultiLine|textCapWords"/>
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
@@ -78,8 +83,9 @@
                     android:id="@+id/sync_interval_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_gravity="fill"
                     android:layout_weight="1"
+                    android:maxLines="2"
                     android:text="@string/sync_interval"/>
 
                 <EditText
@@ -87,12 +93,11 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:ems="10"
                     android:inputType="number"/>
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
@@ -100,8 +105,10 @@
                     android:id="@+id/api_endpoint_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="fill"
                     android:layout_marginTop="10dp"
                     android:layout_weight="1"
+                    android:maxLines="2"
                     android:text="@string/api_endpoint"/>
 
                 <EditText
@@ -109,12 +116,12 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:ems="10"
+                    android:hint="@string/url_hint"
                     android:inputType="textUri"/>
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
@@ -122,8 +129,9 @@
                     android:id="@+id/api_version_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_gravity="fill"
                     android:layout_weight="1"
+                    android:maxLines="2"
                     android:text="@string/api_version"/>
 
                 <EditText
@@ -131,12 +139,11 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:ems="10"
                     android:inputType="text"/>
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
@@ -144,8 +151,9 @@
                     android:id="@+id/project_id_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_gravity="fill"
                     android:layout_weight="1"
+                    android:maxLines="2"
                     android:text="@string/project_id"/>
 
                 <EditText
@@ -153,12 +161,11 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:ems="10"
                     android:inputType="number"/>
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
@@ -166,8 +173,9 @@
                     android:id="@+id/api_key_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_gravity="fill"
                     android:layout_weight="1"
+                    android:maxLines="2"
                     android:text="@string/api_key"/>
 
                 <EditText
@@ -175,12 +183,11 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:ems="10"
                     android:inputType="text"/>
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
@@ -188,8 +195,9 @@
                     android:id="@+id/custom_locale_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_gravity="fill"
                     android:layout_weight="1"
+                    android:maxLines="2"
                     android:text="@string/custom_locale"/>
 
                 <EditText
@@ -197,9 +205,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:ems="10"
-                    android:inputType="text"
-                    android:hint="@string/custom_code_hint"/>
+                    android:hint="@string/custom_code_hint"
+                    android:inputType="text"/>
             </LinearLayout>
 
             <TextView
@@ -217,7 +224,7 @@
                 android:text="@string/roster_api_endpoint"/>
 
             <LinearLayout
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
@@ -225,22 +232,22 @@
                     android:id="@+id/api2_endpoint_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_gravity="fill"
                     android:layout_weight="1"
-                    android:text="@string/api2_endpoint"/>
+                    android:maxLines="2"
+                    android:text="@string/api_endpoint"/>
 
                 <EditText
                     android:id="@+id/api2_endpoint_text"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:ems="10"
-                    android:inputType="textUri"
-                    android:hint="@string/url_hint"/>
+                    android:hint="@string/url_hint"
+                    android:inputType="textUri"/>
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
@@ -248,21 +255,21 @@
                     android:id="@+id/api2_version_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_gravity="fill"
                     android:layout_weight="1"
-                    android:text="@string/api2_version"/>
+                    android:maxLines="2"
+                    android:text="@string/api_version"/>
 
                 <EditText
                     android:id="@+id/api2_version_text"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:ems="10"
                     android:inputType="text"/>
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
@@ -270,16 +277,16 @@
                     android:id="@+id/api2_key_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_gravity="fill"
                     android:layout_weight="1"
-                    android:text="@string/api2_key"/>
+                    android:maxLines="2"
+                    android:text="@string/api_key"/>
 
                 <EditText
                     android:id="@+id/api2_key_text"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
-                    android:ems="10"
                     android:inputType="text"/>
             </LinearLayout>
 
@@ -371,41 +378,6 @@
                 android:layout_marginTop="5dp"
                 android:text="@string/version_code"
                 android:textStyle="bold"/>
-
-
-            <TextView
-                android:id="@+id/data_settings_label"
-                style="@style/sectionHeader"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/data_settings"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <Button
-                    android:id="@+id/delete_data_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_margin="20dp"
-                    android:background="@color/red"
-                    android:padding="10dp"
-                    android:text="@string/delete_application_data"/>
-
-                <Button
-                    android:id="@+id/reset_last_sync_time_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_margin="20dp"
-                    android:background="@color/red"
-                    android:padding="10dp"
-                    android:text="@string/reset_last_sync_time"/>
-
-            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>

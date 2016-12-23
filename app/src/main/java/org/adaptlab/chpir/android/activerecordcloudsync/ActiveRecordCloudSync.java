@@ -14,7 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ActiveRecordCloudSync {
-    private static final String TAG="ActiveRecordCloudSync";
+    private static final String TAG = "ActiveRecordCloudSync";
     private static Map<String, Class<? extends ReceiveModel>> mReceiveTables =
             new LinkedHashMap<String, Class<? extends ReceiveModel>>();
     private static Map<String, Class<? extends SendModel>> mSendTables =
@@ -32,7 +32,8 @@ public class ActiveRecordCloudSync {
      * @param tableName
      * @param receiveTable
      */
-    public static void addReceiveTable(String tableName, Class<? extends ReceiveModel> receiveTable) {
+    public static void addReceiveTable(String tableName, Class<? extends ReceiveModel>
+            receiveTable) {
         mReceiveTables.put(tableName, receiveTable);
     }
 
@@ -58,25 +59,31 @@ public class ActiveRecordCloudSync {
     }
 
     public static void syncReceiveTables(Context context) {
-        NetworkNotificationUtils.showNotification(context, android.R.drawable.stat_sys_download, R.string.sync_notification_text);
+        NetworkNotificationUtils.showNotification(context, android.R.drawable.stat_sys_download,
+                R.string.sync_notification_text);
         Date currentTime = new Date();
         ActiveRecordCloudSync.setLastSyncTime(Long.toString(currentTime.getTime()));
         for (Map.Entry<String, Class<? extends ReceiveModel>> entry : mReceiveTables.entrySet()) {
-            if (AppUtil.DEBUG) Log.i(TAG, "Syncing " + entry.getValue() + " from remote table " + entry.getKey());
+            if (AppUtil.DEBUG)
+                Log.i(TAG, "Syncing " + entry.getValue() + " from remote table " + entry.getKey());
             HttpFetchr httpFetchr = new HttpFetchr(entry.getKey(), entry.getValue());
             httpFetchr.fetch();
         }
-        NetworkNotificationUtils.showNotification(context, android.R.drawable.stat_sys_download_done, R.string.sync_notification_complete_text);
+        NetworkNotificationUtils.showNotification(context, android.R.drawable
+                .stat_sys_download_done, R.string.sync_notification_complete_text);
     }
 
     public static void syncSendTables(Context context) {
-        NetworkNotificationUtils.showNotification(context, android.R.drawable.stat_sys_download, R.string.sync_notification_text);
+        NetworkNotificationUtils.showNotification(context, android.R.drawable.stat_sys_download,
+                R.string.sync_notification_text);
         for (Map.Entry<String, Class<? extends SendModel>> entry : mSendTables.entrySet()) {
-            if (AppUtil.DEBUG) Log.i(TAG, "Syncing " + entry.getValue() + " to remote table " + entry.getKey());
+            if (AppUtil.DEBUG)
+                Log.i(TAG, "Syncing " + entry.getValue() + " to remote table " + entry.getKey());
             HttpPushr httpPushr = new HttpPushr(entry.getKey(), entry.getValue(), context);
             httpPushr.push();
         }
-        NetworkNotificationUtils.showNotification(context, android.R.drawable.stat_sys_download_done, R.string.sync_notification_complete_text);
+        NetworkNotificationUtils.showNotification(context, android.R.drawable
+                .stat_sys_download_done, R.string.sync_notification_complete_text);
     }
 
     public static boolean isApiAvailable() {
@@ -120,7 +127,8 @@ public class ActiveRecordCloudSync {
      * before allowing an update.
      */
     public static String getParams() {
-        return "?access_token=" + getAccessToken() + "&version_code=" + getVersionCode() + "&last_sync_time=" + AppUtil.getAdminSettingsInstance().getLastSyncTime() ;
+        return "?access_token=" + getAccessToken() + "&version_code=" + getVersionCode() +
+                "&last_sync_time=" + AppUtil.getAdminSettingsInstance().getLastSyncTime();
     }
 
     public static String getEndPoint2() {
@@ -156,7 +164,8 @@ public class ActiveRecordCloudSync {
             connection.setReadTimeout(timeout);
             connection.setRequestMethod("HEAD");
             int responseCode = connection.getResponseCode();
-            if (AppUtil.DEBUG) Log.i(TAG, "Received response code " + responseCode + " for api endpoint");
+            if (AppUtil.DEBUG)
+                Log.i(TAG, "Received response code " + responseCode + " for api endpoint");
             return responseCode;
         } catch (IOException exception) {
             return -1;
