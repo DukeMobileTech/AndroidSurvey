@@ -17,7 +17,7 @@ import java.util.Collections;
  * Created by Harry on 1/19/17.
  */
 public class SelectMultipleFragment extends RosterFragment {
-    ArrayList<Integer> mResponseIndices = new ArrayList<>();
+    private ArrayList<Integer> mResponseIndices = new ArrayList<>();
     private ArrayList<CheckBox> mCheckBoxes = new ArrayList<>();
     @Override
     protected void createResponseComponent(ViewGroup responseComponent) {

@@ -8,14 +8,16 @@ public class RosterFragmentGenerator {
         switch (type) {
             case FREE_RESPONSE:
                 return new FreeResponseFragment();
-            case SELECT_MULTIPLE:
-                return new SelectMultipleFragment();
             case INTEGER:
                 return new IntegerFragment();
             case DATE:
                 return new DateFragment();
             case SELECT_ONE:
                 return new SelectOneFragment();
+            case SELECT_MULTIPLE:
+                return new SelectMultipleFragment();
+            case SELECT_ONE_WRITE_OTHER:
+                return new SelectOneWriteOtherFragment();
             default:
                 return new FreeResponseFragment();
         }
