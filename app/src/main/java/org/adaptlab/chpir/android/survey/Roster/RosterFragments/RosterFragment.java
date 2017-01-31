@@ -27,6 +27,7 @@ import static org.adaptlab.chpir.android.survey.FormatUtils.styleTextWithHtml;
 
 public abstract class RosterFragment extends Fragment {
     public final int MINIMUM_WIDTH = 250;
+    protected static final String LIST_DELIMITER = ",";
     private final String TAG = "RosterFragment";
     private Question mQuestion;
     private Response mResponse;
