@@ -7,9 +7,10 @@ import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 
 public class SelectOneFragment extends RosterFragment {
+    private RadioGroup mRadioGroup;
     @Override
     protected void createResponseComponent(ViewGroup responseComponent) {
-        RadioGroup mRadioGroup = new RadioGroup(getActivity());
+        mRadioGroup = new RadioGroup(getActivity());
 
         for (int i = 0; i < getQuestion().defaultOptions().size(); i++) {
             String option = getQuestion().defaultOptions().get(i).getText();
@@ -31,5 +32,9 @@ public class SelectOneFragment extends RosterFragment {
             }
         });
         responseComponent.addView(mRadioGroup);
+    }
+
+    protected RadioGroup getRadioGroup(){
+        return mRadioGroup;
     }
 }

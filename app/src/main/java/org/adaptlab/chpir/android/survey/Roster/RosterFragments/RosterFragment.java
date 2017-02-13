@@ -4,15 +4,20 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.adaptlab.chpir.android.survey.AuthUtils;
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.Question;
@@ -27,6 +32,7 @@ import static org.adaptlab.chpir.android.survey.FormatUtils.styleTextWithHtml;
 
 public abstract class RosterFragment extends Fragment {
     public final int MINIMUM_WIDTH = 250;
+    protected static final String LIST_DELIMITER = ",";
     private final String TAG = "RosterFragment";
     private Question mQuestion;
     private Response mResponse;
@@ -97,6 +103,33 @@ public abstract class RosterFragment extends Fragment {
         super.onPause();
         new SaveResponseTask().execute(mResponse);
         hideKeyBoard();
+    }
+
+    public void addOtherResponseView(EditText otherText) {
+        otherText.setHint(R.string.other_specify_edittext);
+        otherText.setEnabled(false);
+        otherText.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        otherText.addTextChangedListener(new TextWatcher() {
+            // Required by interface
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                setOtherResponse(s.toString());
+            }
+
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+        if (mResponse.getOtherResponse() != null) {
+            otherText.setText(mResponse.getOtherResponse());
+        }
+    }
+
+    public void setOtherResponse(String response) {
+        mResponse.setOtherResponse(response);
+        mResponse.setDeviceUser(AuthUtils.getCurrentUser());
     }
 
     protected void showKeyBoard() {
