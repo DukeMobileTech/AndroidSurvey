@@ -61,7 +61,6 @@ import org.adaptlab.chpir.android.survey.rules.InstrumentSurveyLimitPerMinuteRul
 import org.adaptlab.chpir.android.survey.rules.InstrumentSurveyLimitRule;
 import org.adaptlab.chpir.android.survey.rules.InstrumentTimingRule;
 import org.adaptlab.chpir.android.survey.rules.RuleBuilder;
-import org.adaptlab.chpir.android.survey.tasks.SendResponsesTask;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -870,7 +869,7 @@ public class SurveyFragment extends Fragment {
                         @Override
                         public void onClick(DialogInterface dialog, int button) {
                             mSurvey.setCriticalResponses(true);
-                            completeAndSubmitSurvey();
+                            completeSurvey();
                         }
                     })
                     .setNegativeButton(R.string.review, new DialogInterface.OnClickListener() {
@@ -903,15 +902,14 @@ public class SurveyFragment extends Fragment {
             criticalDialog.show();
         } else {
             mSurvey.setCriticalResponses(false);
-            completeAndSubmitSurvey();
+            completeSurvey();
         }
     }
 
-    private void completeAndSubmitSurvey() {
-        getActivity().finish();
+    private void completeSurvey() {
         mSurvey.setAsComplete(true);
         mSurvey.save();
-        new SendResponsesTask(getActivity()).execute();
+        getActivity().finish();
     }
 
     private List<String> getCriticalResponses() {

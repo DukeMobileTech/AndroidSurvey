@@ -26,6 +26,7 @@ import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.ResponsePhoto;
 import org.adaptlab.chpir.android.survey.models.Survey;
+import org.adaptlab.chpir.android.survey.tasks.SendResponsesTask;
 
 import java.util.Date;
 import java.util.List;
@@ -250,13 +251,20 @@ public abstract class QuestionFragment extends Fragment {
         }
     }
 
-    private class SaveResponseTask extends AsyncTask<Response, Void, Void> {
+    private class SaveResponseTask extends AsyncTask<Response, Void, Survey> {
 
         @Override
-        protected Void doInBackground(Response... params) {
+        protected Survey doInBackground(Response... params) {
             params[0].save();
             params[0].getSurvey().save();
-            return null;
+            return params[0].getSurvey();
+        }
+
+        @Override
+        protected void onPostExecute(Survey survey){
+            if (survey.readyToSend()) {
+                new SendResponsesTask(getActivity()).execute();
+            }
         }
     }
 }
