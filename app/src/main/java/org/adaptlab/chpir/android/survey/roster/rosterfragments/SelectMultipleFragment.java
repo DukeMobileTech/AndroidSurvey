@@ -19,6 +19,11 @@ import java.util.Collections;
 public class SelectMultipleFragment extends RosterFragment {
     private ArrayList<Integer> mResponseIndices = new ArrayList<>();
     private ArrayList<CheckBox> mCheckBoxes = new ArrayList<>();
+
+    // This is used to add additional UI components in subclasses.
+    protected void beforeAddViewHook(ViewGroup responseComponent) {
+    }
+
     @Override
     protected void createResponseComponent(ViewGroup responseComponent) {
         for (int i = 0; i < getQuestion().defaultOptions().size(); i++) {
@@ -74,5 +79,9 @@ public class SelectMultipleFragment extends RosterFragment {
         }
         Collections.sort(mResponseIndices);
         getResponse().setResponse(serialize());
+    }
+
+    protected void addCheckBox(CheckBox checkbox) {
+        mCheckBoxes.add(checkbox);
     }
 }

@@ -18,6 +18,8 @@ public class RosterFragmentGenerator {
                 return new SelectMultipleFragment();
             case SELECT_ONE_WRITE_OTHER:
                 return new SelectOneWriteOtherFragment();
+            case SELECT_MULTIPLE_WRITE_OTHER:
+                return new SelectMultipleWriteOtherFragment();
             default:
                 return new FreeResponseFragment();
         }
