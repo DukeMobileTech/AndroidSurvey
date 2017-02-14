@@ -16,6 +16,7 @@ import org.adaptlab.chpir.android.survey.questionfragments.SelectOneQuestionFrag
 public class SelectOneWriteOtherFragment extends
         SelectOneFragment {
 
+    @Override
     protected void beforeAddViewHook(ViewGroup responseComponent) {
         RadioButton radioButton = new RadioButton(getActivity());
         final EditText otherText = new EditText(getActivity());
@@ -33,12 +34,13 @@ public class SelectOneWriteOtherFragment extends
                     otherText.setEnabled(true);
                     otherText.requestFocus();
                     showKeyBoard();
+                    getResponse().setOtherResponse(otherText.toString());
                 } else {
                     otherText.setEnabled(false);
                     hideKeyBoard();
                     otherText.getText().clear();
                 }
-                //setResponseIndex(checkedId);
+                getResponse().setResponse(checkedId + "");
             }
         });
         getRadioGroup().addView(radioButton, otherId);

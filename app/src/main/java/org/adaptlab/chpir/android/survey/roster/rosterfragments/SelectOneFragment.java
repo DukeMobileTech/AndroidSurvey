@@ -8,6 +8,10 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 
 public class SelectOneFragment extends RosterFragment {
     private RadioGroup mRadioGroup;
+    // This is used to add additional UI components in subclasses.
+    protected void beforeAddViewHook(ViewGroup responseComponent) {
+    }
+
     @Override
     protected void createResponseComponent(ViewGroup responseComponent) {
         mRadioGroup = new RadioGroup(getActivity());
@@ -32,6 +36,7 @@ public class SelectOneFragment extends RosterFragment {
             }
         });
         responseComponent.addView(mRadioGroup);
+        beforeAddViewHook(responseComponent);
     }
 
     protected RadioGroup getRadioGroup(){
