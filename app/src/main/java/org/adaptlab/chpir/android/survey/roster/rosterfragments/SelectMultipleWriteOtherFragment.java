@@ -18,6 +18,7 @@ public class SelectMultipleWriteOtherFragment extends
     protected void beforeAddViewHook(ViewGroup responseComponent) {
         CheckBox checkbox = new CheckBox(getActivity());
         final EditText otherText = new EditText(getActivity());
+
         checkbox.setText(R.string.other_specify);
         checkbox.setTypeface(getQuestion().getInstrument().getTypeFace(getActivity().getApplicationContext()));
         final int otherId = getQuestion().defaultOptions().size();
@@ -28,7 +29,6 @@ public class SelectMultipleWriteOtherFragment extends
                     otherText.setEnabled(true);
                     otherText.requestFocus();
                     showKeyBoard();
-                    getResponse().setOtherResponse(otherText.toString());
                 } else {
                     otherText.setEnabled(false);
                     hideKeyBoard();

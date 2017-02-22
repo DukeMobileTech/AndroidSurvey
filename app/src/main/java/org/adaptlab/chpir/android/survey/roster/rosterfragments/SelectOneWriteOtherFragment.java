@@ -28,13 +28,15 @@ public class SelectOneWriteOtherFragment extends
         radioButton.setLayoutParams(new RadioGroup.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT));
+        if (getResponse().getText() != null && getResponse().getText().equals(otherId+"")) {
+            radioButton.setChecked(true);
+        }
         getRadioGroup().setOnCheckedChangeListener(new OnCheckedChangeListener() {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 if (checkedId == otherId) {
                     otherText.setEnabled(true);
                     otherText.requestFocus();
                     showKeyBoard();
-                    getResponse().setOtherResponse(otherText.toString());
                 } else {
                     otherText.setEnabled(false);
                     hideKeyBoard();

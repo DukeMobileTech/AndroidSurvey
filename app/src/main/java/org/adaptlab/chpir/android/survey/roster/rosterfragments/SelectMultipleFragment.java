@@ -40,6 +40,7 @@ public class SelectMultipleFragment extends RosterFragment {
             mCheckBoxes.add(checkbox);
             responseComponent.addView(checkbox,i);
         }
+        beforeAddViewHook(responseComponent);
         Log.i("Response",getResponse().getText());
         deserialize(getResponse().getText());
     }
