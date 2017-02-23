@@ -6,6 +6,12 @@ public class RosterFragmentGenerator {
 
     public static RosterFragment createQuestionFragment(Question.QuestionType type) {
         switch (type) {
+            case ADDRESS:
+                return new AddressFragment();
+            case DECIMAL_NUMBER:
+                return new DecimalNumberFragment();
+            case EMAIL_ADDRESS:
+                return new EmailAddressFragment();
             case FREE_RESPONSE:
                 return new FreeResponseFragment();
             case INTEGER:
