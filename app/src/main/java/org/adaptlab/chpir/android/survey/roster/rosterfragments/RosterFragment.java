@@ -3,6 +3,7 @@ package org.adaptlab.chpir.android.survey.roster.rosterfragments;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.InputType;
@@ -12,6 +13,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -48,6 +51,7 @@ public abstract class RosterFragment extends Fragment {
                 ResponseEditorActivity.class.getSimpleName())) {
             editQuestionResponses(responseComponent);
         }
+        deserialize(mResponse.getText());
         return view;
     }
 
@@ -173,5 +177,19 @@ public abstract class RosterFragment extends Fragment {
             return null;
         }
     }
+
+    protected void setResponseText() {
+        mResponse.setResponse(serialize());
+        mResponse.setTimeEnded(new Date());
+        if (isAdded() && !mResponse.getText().equals("")) {
+            mResponse.setSpecialResponse("");
+            ActivityCompat.invalidateOptionsMenu(getActivity());
+        }
+    }
+
+    protected abstract String serialize();
+
+    protected abstract void deserialize(String responseText);
+
 // TODO: 12/7/16 Add way for interviewer to mark roster as completed
 }

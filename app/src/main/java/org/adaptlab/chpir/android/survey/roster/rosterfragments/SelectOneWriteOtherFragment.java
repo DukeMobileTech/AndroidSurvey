@@ -42,7 +42,7 @@ public class SelectOneWriteOtherFragment extends
                     hideKeyBoard();
                     otherText.getText().clear();
                 }
-                getResponse().setResponse(checkedId + "");
+                setResponseIndex(checkedId);
             }
         });
         getRadioGroup().addView(radioButton, otherId);

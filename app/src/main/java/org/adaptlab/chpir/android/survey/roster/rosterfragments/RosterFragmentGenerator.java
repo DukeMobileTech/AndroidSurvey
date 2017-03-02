@@ -18,6 +18,10 @@ public class RosterFragmentGenerator {
                 return new IntegerFragment();
             case DATE:
                 return new DateFragment();
+            case LIST_OF_INTEGER_BOXES:
+                return new ListOfIntegerBoxesFragment();
+            case LIST_OF_TEXT_BOXES:
+                return new ListOfTextBoxesFragment();
             case SELECT_ONE:
                 return new SelectOneFragment();
             case SELECT_MULTIPLE:

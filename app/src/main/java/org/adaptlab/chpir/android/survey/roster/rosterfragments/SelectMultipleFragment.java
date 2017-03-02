@@ -45,6 +45,7 @@ public class SelectMultipleFragment extends RosterFragment {
         deserialize(getResponse().getText());
     }
 
+    @Override
     protected String serialize() {
         String serialized = "";
         for (int i = 0; i < mResponseIndices.size(); i++) {
@@ -54,6 +55,7 @@ public class SelectMultipleFragment extends RosterFragment {
         return serialized;
     }
 
+    @Override
     protected void deserialize(String responseText) {
         if (responseText.equals("")) {
             for (CheckBox box : mCheckBoxes) {

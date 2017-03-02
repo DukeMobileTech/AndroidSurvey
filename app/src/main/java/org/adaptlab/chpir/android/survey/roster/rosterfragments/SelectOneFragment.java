@@ -8,6 +8,8 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 
 public class SelectOneFragment extends RosterFragment {
     private RadioGroup mRadioGroup;
+    private int mResponseIndex;
+
     // This is used to add additional UI components in subclasses.
     protected void beforeAddViewHook(ViewGroup responseComponent) {
     }
@@ -32,14 +34,35 @@ public class SelectOneFragment extends RosterFragment {
 
         mRadioGroup.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                getResponse().setResponse(checkedId+"");
+                setResponseIndex(checkedId);
             }
         });
         responseComponent.addView(mRadioGroup);
         beforeAddViewHook(responseComponent);
     }
 
+    @Override
+    protected String serialize() {
+        return String.valueOf(mResponseIndex);
+    }
+
+    @Override
+    protected void deserialize(String responseText) {
+        if (responseText.equals("")) {
+            int checked = getRadioGroup().getCheckedRadioButtonId();
+            if (checked > -1)
+                ((RadioButton) getRadioGroup().getChildAt(checked)).setChecked(false);
+        } else {
+            ((RadioButton) getRadioGroup().getChildAt(Integer.parseInt(responseText))).setChecked(true);
+        }
+    }
+
     protected RadioGroup getRadioGroup(){
         return mRadioGroup;
+    }
+
+    protected void setResponseIndex(int index) {
+        mResponseIndex = index;
+        setResponseText();
     }
 }

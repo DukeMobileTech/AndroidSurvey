@@ -6,10 +6,16 @@ import android.widget.DatePicker;
 import android.widget.DatePicker.OnDateChangedListener;
 import android.widget.LinearLayout;
 
+import org.adaptlab.chpir.android.survey.FormatUtils;
+
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 public class DateFragment extends RosterFragment {
     private DatePicker datePicker;
+    protected int mDay;
+    protected int mMonth;
+    protected int mYear;
 
     @Override
     protected void createResponseComponent(ViewGroup responseComponent) {
@@ -23,6 +29,9 @@ public class DateFragment extends RosterFragment {
                 new OnDateChangedListener() {
                     @Override
                     public void onDateChanged(DatePicker view, int newYear, int newMonth, int newDay) {
+                        mDay = newDay;
+                        mMonth = newMonth;
+                        mYear = newYear;
                         getResponse().setResponse((newMonth + 1) + "-" + newDay + "-" + newYear);
                     }
                 });
@@ -40,6 +49,23 @@ public class DateFragment extends RosterFragment {
                 year = Integer.parseInt(dateComponents[2]);
                 datePicker.updateDate(year, month, day);
             }
+        }
+    }
+
+
+    @Override
+    protected String serialize() {
+        return FormatUtils.formatDate(mMonth, mDay, mYear);
+    }
+
+    @Override
+    protected void deserialize(String responseText) {
+        GregorianCalendar dateComponents = FormatUtils.unformatDate(responseText);
+        if(dateComponents != null) {
+            mDay = dateComponents.get(GregorianCalendar.DAY_OF_MONTH);
+            mMonth = dateComponents.get(GregorianCalendar.MONTH);
+            mYear = dateComponents.get(GregorianCalendar.YEAR);
+            datePicker.updateDate(mYear, mMonth, mDay);
         }
     }
 }
