@@ -1,46 +1,40 @@
 package org.adaptlab.chpir.android.survey;
 
-import org.adaptlab.chpir.android.survey.Models.Question;
-import org.adaptlab.chpir.android.survey.Models.Survey;
-import org.adaptlab.chpir.android.survey.QuestionFragments.AddressQuestionFragment;
-import org.adaptlab.chpir.android.survey.QuestionFragments.DateQuestionFragment;
-import org.adaptlab.chpir.android.survey.QuestionFragments.DecimalNumberQuestionFragment;
-import org.adaptlab.chpir.android.survey.QuestionFragments.EmailAddressQuestionFragment;
-import org.adaptlab.chpir.android.survey.QuestionFragments.FreeResponseQuestionFragment;
-import org.adaptlab.chpir.android.survey.QuestionFragments.FrontPictureQuestionFragment;
-import org.adaptlab.chpir.android.survey.QuestionFragments.InstructionsQuestionFragment;
-import org.adaptlab.chpir.android.survey.QuestionFragments.IntegerQuestionFragment;
-import org.adaptlab.chpir.android.survey.QuestionFragments.LabeledSliderQuestionFragment;
-import org.adaptlab.chpir.android.survey.QuestionFragments.ListOfIntegerBoxesQuestionFragment;
-import org.adaptlab.chpir.android.survey.QuestionFragments.ListOfTextBoxesQuestionFragment;
-import org.adaptlab.chpir.android.survey.QuestionFragments.MonthAndYearQuestionFragment;
-import org.adaptlab.chpir.android.survey.QuestionFragments.PhoneNumberQuestionFragment;
-import org.adaptlab.chpir.android.survey.QuestionFragments.RatingQuestionFragment;
-import org.adaptlab.chpir.android.survey.QuestionFragments.RearPictureQuestionFragment;
-import org.adaptlab.chpir.android.survey.QuestionFragments.SelectMultipleImageQuestionFragment;
-import org.adaptlab.chpir.android.survey.QuestionFragments.SelectMultipleQuestionFragment;
-import org.adaptlab.chpir.android.survey.QuestionFragments.SelectMultipleWriteOtherQuestionFragment;
-import org.adaptlab.chpir.android.survey.QuestionFragments.SelectOneImageQuestionFragment;
-import org.adaptlab.chpir.android.survey.QuestionFragments.SelectOneQuestionFragment;
-import org.adaptlab.chpir.android.survey.QuestionFragments.SelectOneWriteOtherQuestionFragment;
-import org.adaptlab.chpir.android.survey.QuestionFragments.SliderQuestionFragment;
-import org.adaptlab.chpir.android.survey.QuestionFragments.TimeQuestionFragment;
-import org.adaptlab.chpir.android.survey.QuestionFragments.YearQuestionFragment;
-
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 
+import org.adaptlab.chpir.android.survey.models.Question;
+import org.adaptlab.chpir.android.survey.questionfragments.AddressQuestionFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.DateQuestionFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.DecimalNumberQuestionFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.EmailAddressQuestionFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.FreeResponseQuestionFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.FrontPictureQuestionFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.InstructionsQuestionFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.IntegerQuestionFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.LabeledSliderQuestionFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.ListOfIntegerBoxesQuestionFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.ListOfTextBoxesQuestionFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.MonthAndYearQuestionFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.PhoneNumberQuestionFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.RatingQuestionFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.RearPictureQuestionFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.SelectMultipleImageQuestionFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.SelectMultipleQuestionFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.SelectMultipleWriteOtherQuestionFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.SelectOneImageQuestionFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.SelectOneQuestionFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.SelectOneWriteOtherQuestionFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.SliderQuestionFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.TimeQuestionFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.YearQuestionFragment;
+
 public class QuestionFragmentFactory {
     private static final String TAG = "QuestionFragmentFactory";
-    public static final String EXTRA_QUESTION_ID = 
-            "org.adaptlab.chpir.android.survey.question_id";
-    public static final String EXTRA_SURVEY_ID = 
-            "org.adaptlab.chpir.android.survey.survey_id";
 
-    public static Fragment createQuestionFragment(Question question, Survey survey) {
+    public static Fragment createQuestionFragment(Question question) {
         String type = question.getQuestionType().toString();
-        Fragment fragment = null;
+        Fragment fragment;
 
         if (Question.QuestionType.SELECT_ONE.toString().equals(type)) {
             fragment = new SelectOneQuestionFragment();
@@ -83,9 +77,9 @@ public class QuestionFragmentFactory {
         } else if (Question.QuestionType.ADDRESS.toString().equals(type)) {
             fragment = new AddressQuestionFragment();
         } else if (Question.QuestionType.SELECT_ONE_IMAGE.toString().equals(type)) {
-        	fragment = new SelectOneImageQuestionFragment();
+            fragment = new SelectOneImageQuestionFragment();
         } else if (Question.QuestionType.SELECT_MULTIPLE_IMAGE.toString().equals(type)) {
-        	fragment = new SelectMultipleImageQuestionFragment();
+            fragment = new SelectMultipleImageQuestionFragment();
         } else if (Question.QuestionType.LIST_OF_INTEGER_BOXES.toString().equals(type)) {
             fragment = new ListOfIntegerBoxesQuestionFragment();
         } else if (Question.QuestionType.LABELED_SLIDER.toString().equals(type)) {
@@ -96,11 +90,6 @@ public class QuestionFragmentFactory {
             Log.wtf(TAG, "Received unknown question type: " + type);
             fragment = new FreeResponseQuestionFragment();
         }
-
-        Bundle args = new Bundle();
-        args.putLong(EXTRA_QUESTION_ID, question.getRemoteId());
-        args.putLong(EXTRA_SURVEY_ID, survey.getId());
-        fragment.setArguments(args);
 
         return fragment;
     }

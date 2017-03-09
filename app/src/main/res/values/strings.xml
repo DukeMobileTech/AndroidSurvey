@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 
-    <string name="app_name">Survey</string>
-    <string name="action_settings">Settings</string>
+    <string name="app_name">iSEE CHPIR</string>
     <string name="start_survey">Start Survey</string>
     <string name="survey_title_label">Choose instrument</string>
     <string name="next_button">Next</string>
@@ -14,7 +13,7 @@
     <string name="free_response_edittext">Answer here</string>
     <string name="refresh">Refresh</string>
     <string name="device_identifier">Device Identifier</string>
-    <string name="sync_interval">Sync Interval (minutes)</string>
+    <string name="sync_interval">Sync Interval (min)</string>
     <string name="save_button">Save</string>
     <string name="admin_settings">Admin</string>
     <string name="api_endpoint">Api Domain Name</string>
@@ -28,7 +27,7 @@
     <string name="api_unavailable">Remote api is not responsive.</string>
     <string name="unacceptable_version_code">You must upgrade your application before continuing.</string>
     <string name="surveys">surveys</string>
-    <string name="hello">Hello World</string>
+    <string name="rosters">rosters</string>
     <string name="questions">questions</string>
     <string name="question">question</string>
     <string name="encryption_required_title">Encryption required</string>
@@ -38,7 +37,7 @@
     <string name="password_message">This action requires a password.  Please enter the password below.</string>
     <string name="cancel">Cancel</string>
     <string name="incorrect_password">This password is incorrect.</string>
-    <string name="custom_locale">Custom ISO-639-1 Code</string>
+    <string name="custom_locale">ISO-639-1 Code</string>
     <string name="not_valid_response">This is not a valid response for this question.</string>
     <string name="of">of</string>
     <string name="instrument_loading_progress_header">Loading</string>
@@ -53,6 +52,7 @@
     <string name="show_surveys">Show Surveys</string>
     <string name="version_code">Version Code: </string>
     <string name="unidentified_survey">Unidentified Survey </string>
+    <string name="unidentified_roster">Unidentified Roster </string>
     <string name="system_information">System Information</string>
     <string name="feature_toggle">Feature Toggle</string>
     <string name="sync_settings">Sync Settings</string>
@@ -84,8 +84,8 @@
     <string name="record_survey_location">Record Survey Location</string>
     <string name="event_log_sent_survey">Sent %1$s for %2$s.</string>
     <string name="delete">Delete</string>
-    <string name="delete_surveys_title">Delete Selected Surveys?</string>
-    <string name="delete_surveys_message">You will not be able to recover the surveys once you delete them!</string>
+    <string name="delete_title">Delete Selected Items?</string>
+    <string name="delete_message">You will not be able to recover them once deleted!</string>
     <string name="skipped_questions">Unanswered Questions</string>
     <string name="proceed">Continue</string>
     <string name="section_number_of_questions">Number of questions in this section</string>
@@ -97,12 +97,32 @@
     <string name="DK">DK</string>
     <string name="RF">RF</string>
     <string name="review_section_title">Review Unanswered Questions</string>
-    <string name="wipe_application_data">Wipe Application Data</string>
-    <string name="wipe_data_warning">This action will wipe out all the data (instruments and un-submitted surveys - both complete and in-complete). If you need to submit completed surveys, press the Refresh button (visible after you press the back button) first before wiping data. Afterwards you can download instruments by pressing the Refresh button.</string>
+    <string name="delete_application_data">Delete Instruments and Surveys</string>
     <string name="wiping_data_header">Wiping Data</string>
-    <string name="reset_last_sync_time_label">This action will reset the last sync time to the beginning, result in the subsequent refresh re-downloading everything afresh. Surveys will not be affected by this action.</string>
-    <string name="reset_last_sync_time">Reset Last Sync Time</string>
+    <string name="reset">Reset</string>
+    <string name="reset_header">Reset Last Sync Time</string>
     <string name="critical_message_title">Critical Responses In Survey</string>
-    <string name="submit">SUBMIT</string>
-    <string name="review">REVIEW</string>
+    <string name="submit">Submit</string>
+    <string name="review">Review</string>
+    <string name="data_settings">Data Settings</string>
+    <string name="delete_confirmation">Are you sure? All un-synced surveys will be lost</string>
+    <string name="reset_confirmation">Are you sure? Next refresh will re-download all instruments</string>
+    <string name="new_participant">New Participant</string>
+    <string name="edit">Edit</string>
+    <string name="participant_id_response">dummy</string>
+    <string name="survey_identifier">Survey identifier</string>
+    <string name="instrument_title">Instrument title</string>
+    <string name="roster_title">Roster title</string>
+    <string name="roster">roster</string>
+    <string name="survey">survey</string>
+    <string name="show_rosters">Show Rosters</string>
+    <string name="roster_sync_settings">Roster Sync Settings</string>
+    <string name="custom_code_hint">Enter custom ISO code for language name</string>
+    <string name="roster_api_endpoint">Sync Rosters To Different Endpoint</string>
+    <string name="url_hint">https://example.com/</string>
+    <string name="completed">Completed</string>
+    <string name="sent">Sent</string>
+    <string name="un_submit">Unsubmit</string>
+    <string name="last_instrument">last instrument</string>
+    <string name="crashlytics_device_label">device label</string>
 </resources>

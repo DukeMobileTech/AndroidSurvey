@@ -18,10 +18,10 @@ import android.widget.TextView;
 
 import com.activeandroid.Model;
 
-import org.adaptlab.chpir.android.survey.Models.Question;
-import org.adaptlab.chpir.android.survey.Models.Response;
-import org.adaptlab.chpir.android.survey.Models.Section;
-import org.adaptlab.chpir.android.survey.Models.Survey;
+import org.adaptlab.chpir.android.survey.models.Question;
+import org.adaptlab.chpir.android.survey.models.Response;
+import org.adaptlab.chpir.android.survey.models.Section;
+import org.adaptlab.chpir.android.survey.models.Survey;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -63,7 +63,7 @@ public class SectionFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 unCheckSpecialSpecialResponses();
-                displayNextQuestion(mSection.questions().get(0).getId());
+                displayNextQuestion(mSection.questions().get(0).getNumberInInstrument() - 1);
             }
         });
 
@@ -72,9 +72,9 @@ public class SectionFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (mRadioGroup.getCheckedRadioButtonId() == -1) {
-                    displayNextQuestion(mSection.questions().get(0).getId());
+                    displayNextQuestion(mSection.questions().get(0).getNumberInInstrument() - 1);
                 } else {
-                    displayNextQuestion(getNextQuestion().getId());
+                    displayNextQuestion(getNextQuestion().getNumberInInstrument() - 1);
                 }
             }
         });
@@ -82,10 +82,10 @@ public class SectionFragment extends Fragment {
         return view;
     }
 
-    private void displayNextQuestion(Long questionId) {
+    private void displayNextQuestion(int num) {
         Intent i = new Intent(getActivity(), SurveyActivity.class);
         i.putExtra(SurveyFragment.EXTRA_INSTRUMENT_ID, mSection.getInstrument().getRemoteId());
-        i.putExtra(SurveyFragment.EXTRA_QUESTION_ID, questionId);
+        i.putExtra(SurveyFragment.EXTRA_QUESTION_NUMBER, num);
         i.putExtra(SurveyFragment.EXTRA_SURVEY_ID, mSurvey.getId());
         i.putIntegerArrayListExtra(SurveyFragment.EXTRA_PREVIOUS_QUESTION_IDS, mQuestionsToAddToPreviousList);
         getActivity().setResult(Activity.RESULT_OK, i);

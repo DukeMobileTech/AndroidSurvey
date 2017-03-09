@@ -1,89 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.adaptlab.chpir.android.survey"
-    android:versionCode="51"
-    android:versionName="1.9.35" >
+<manifest package="org.adaptlab.chpir.android.survey"
+          xmlns:android="http://schemas.android.com/apk/res/android"
+          android:versionCode="65"
+          android:versionName="2.0.1">
 
-    <uses-sdk
-        android:minSdkVersion="14"
-        android:targetSdkVersion="18" />
-    <permission android:name="org.adaptlab.chpir.android.survey.LAUNCH_SURVEY" android:protectionLevel="signature" />
-    <permission android:name="org.adaptlab.chpir.android.survey.LIST_INSTRUMENTS" android:protectionLevel="signature" />
-    
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-feature android:required="true" android:name="android.hardware.location.gps"/>
-    <uses-feature android:name="android.hardware.camera" />
+    <permission
+        android:name="org.adaptlab.chpir.android.survey.LAUNCH_SURVEY"
+        android:protectionLevel="signature"/>
+    <permission
+        android:name="org.adaptlab.chpir.android.survey.LIST_INSTRUMENTS"
+        android:protectionLevel="signature"/>
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+
+    <uses-feature
+        android:name="android.hardware.location.gps"
+        android:required="true"/>
+    <uses-feature android:name="android.hardware.camera"/>
 
     <application
+        android:name="com.activeandroid.app.Application"
         android:allowBackup="false"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/Theme.Survey"
-        android:name="com.activeandroid.app.Application" >
+        android:theme="@style/Theme.Survey">
         <activity
-            android:name="org.adaptlab.chpir.android.survey.InstrumentActivity"
+            android:name=".InstrumentActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/app_name"
-            android:screenOrientation="portrait"
-            android:configChanges="keyboardHidden|orientation|screenSize">
+            android:screenOrientation="portrait">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
         <activity
             android:name=".SurveyActivity"
-            android:uiOptions="splitActionBarWhenNarrow"  />
-        <activity android:name=".AdminActivity" />
-        <activity android:name=".LoginActivity" android:noHistory="true" />
-        <activity android:name=".ReviewPageActivity" />
-        <activity android:name=".SectionActivity" />
-        <activity android:name=".SettingsActivity"/>
+            android:uiOptions="splitActionBarWhenNarrow"/>
+        <activity android:name=".AdminActivity"/>
+        <activity
+            android:name=".LoginActivity"
+            android:noHistory="true"/>
+        <activity android:name=".ReviewPageActivity"/>
+        <activity android:name=".SectionActivity"/>
+        <activity android:name=".roster.RosterActivity"/>
+        <activity android:name=".roster.ParticipantEditorActivity"/>
+        <activity android:name=".roster.ParticipantViewerActivity"/>
+        <activity android:name=".roster.ResponseViewerActivity"/>
+        <activity android:name=".roster.ResponseEditorActivity"/>
+
         <provider
+            android:name="com.activeandroid.content.ContentProvider"
             android:authorities="org.adaptlab.chpir.android.survey"
-            android:exported="false"
-            android:name="com.activeandroid.content.ContentProvider" />
-        <service android:name="org.adaptlab.chpir.android.activerecordcloudsync.PollService" />
-        <receiver android:name="org.adaptlab.chpir.android.survey.Receivers.StartupReceiver">
+            android:exported="false"/>
+
+        <service android:name="org.adaptlab.chpir.android.activerecordcloudsync.PollService"/>
+        <service android:name="org.adaptlab.chpir.android.activerecordcloudsync.NotificationService"/>
+
+        <receiver android:name=".receivers.StartupReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
-        <receiver android:name="org.adaptlab.chpir.android.survey.Receivers.SurveyLaunchReceiver"
-            android:permission="org.adaptlab.chpir.android.survey.LAUNCH_SURVEY">
-            <intent-filter>
-                <action android:name="org.adaptlab.chpir.android.survey.start_survey" />
-            </intent-filter>
-        </receiver>
-        <receiver android:name="org.adaptlab.chpir.android.survey.Receivers.InstrumentListReceiver"
-            android:permission="org.adaptlab.chpir.android.survey.LIST_INSTRUMENTS">
-            <intent-filter>
-                <action android:name="org.adaptlab.chpir.android.survey.get_instrument_list" />
-                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
         <receiver
-            android:name="org.adaptlab.chpir.android.survey.Receivers.NetworkStateChangeReceiver"
-            android:label="NetworkChangeReceiver" >
+            android:name=".receivers.SurveyLaunchReceiver"
+            android:permission="org.adaptlab.chpir.android.survey.LAUNCH_SURVEY">
             <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
+                <action android:name="org.adaptlab.chpir.android.survey.start_survey"/>
             </intent-filter>
         </receiver>
-        <receiver android:name="org.adaptlab.chpir.android.survey.Location.LocationReceiver" android:exported="false">
+        <receiver
+            android:name=".receivers.InstrumentListReceiver"
+            android:permission="org.adaptlab.chpir.android.survey.LIST_INSTRUMENTS">
+            <intent-filter>
+                <action android:name="org.adaptlab.chpir.android.survey.get_instrument_list"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".receivers.NetworkStateChangeReceiver"
+            android:label="NetworkChangeReceiver">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+                <action android:name="android.net.wifi.WIFI_STATE_CHANGED"/>
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".location.LocationReceiver"
+            android:exported="false">
             <intent-filter>
                 <action android:name="org.adaptlab.chpir.android.survey.Location.ACTION_LOCATION"/>
             </intent-filter>
         </receiver>
-        <receiver android:name="org.adaptlab.chpir.android.survey.Receivers.NotificationReceiver" />
-        <meta-data android:name="AA_DB_NAME" android:value="Survey.db" />
-        <meta-data android:name="AA_DB_VERSION" android:value="45" />
-        <meta-data android:name="SEED_DB" android:value="false" />
-        <meta-data android:name="io.fabric.ApiKey" android:value="${crashlyticsApiKey}"/>
+        <receiver android:name=".receivers.NotificationReceiver"/>
+
+        <meta-data
+            android:name="AA_DB_NAME"
+            android:value="Survey.db"/>
+        <meta-data
+            android:name="AA_DB_VERSION"
+            android:value="48"/>
+        <meta-data
+            android:name="SEED_DB"
+            android:value="false"/>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="${crashlyticsApiKey}"/>
     </application>
 
 </manifest>

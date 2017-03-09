@@ -4,7 +4,6 @@
     tools:ignore="MissingTranslation" >
 
     <string name="app_name">Encuesta</string>
-    <string name="action_settings">Ajustes</string>
     <string name="start_survey">Estudio de inicio</string>
     <string name="survey_title_label">Escoja instrumento</string>
     <string name="next_button">Siguiente</string>
@@ -30,7 +29,6 @@
     <string name="api_unavailable">Remoto Api no responde.</string>
     <string name="unacceptable_version_code">Debe actualizar su aplicación antes de continuar.</string>
     <string name="surveys">encuestas</string>
-    <string name="hello">Hello World</string>
     <string name="questions">preguntas</string>
     <string name="question">pregunta</string>
     <string name="encryption_required_title">Codificación requerida.</string>
@@ -82,8 +80,8 @@
     <string name="record_survey_location">Indicar lugar de encuesta</string>
     <string name="event_log_sent_survey">Enviado %1$s por %2$s.</string>
     <string name="delete">Borrar</string>
-    <string name="delete_surveys_title">¿Desea borrar las encuestas seleccionadas?</string>
-    <string name="delete_surveys_message">¡No podrá restablecer las encuestas una vez que las borres!</string>
+    <string name="delete_title">¿Desea borrar las encuestas seleccionadas?</string>
+    <string name="delete_message">¡No podrá restablecer las encuestas una vez que las borres!</string>
     <string name="skipped_questions">Las preguntas que se saltaron</string>
     <string name="proceed">Proceder</string>
     <string name="section_number_of_questions">Número de preguntas en esta sección</string>

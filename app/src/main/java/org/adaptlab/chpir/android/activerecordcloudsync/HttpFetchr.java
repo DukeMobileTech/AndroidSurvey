@@ -1,12 +1,10 @@
 package org.adaptlab.chpir.android.activerecordcloudsync;
 
-import android.text.TextUtils;
 import android.util.Log;
 
-import org.adaptlab.chpir.android.survey.AppUtil;
-import org.adaptlab.chpir.android.survey.Models.AdminSettings;
-import org.adaptlab.chpir.android.survey.Models.Instrument;
-import org.adaptlab.chpir.android.survey.Tasks.GetReceiveTablesTask;
+import com.activeandroid.ActiveAndroid;
+
+import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -16,7 +14,6 @@ import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.List;
 
 public class HttpFetchr {
     private static final String TAG = "HttpFetchr";
@@ -28,27 +25,28 @@ public class HttpFetchr {
         mRemoteTableName = remoteTableName;
     }
 
-    public String getUrl(String urlSpec) throws IOException {
-        return new String(getUrlBytes(urlSpec));
-    }
-
     public void fetch() {
         if (ActiveRecordCloudSync.getEndPoint() == null) {
-            Log.i(TAG, "ActiveRecordCloudSync end point is not set!");
+            if (BuildConfig.DEBUG) Log.i(TAG, "ActiveRecordCloudSync end point is not set!");
             return;
         }
 
-        ActiveRecordCloudSync.setFetchCount(ActiveRecordCloudSync.getFetchCount() + 1);
         try {
-            String url = ActiveRecordCloudSync.getEndPoint() + mRemoteTableName + ActiveRecordCloudSync.getParams();
+            String url = ActiveRecordCloudSync.getEndPoint() + mRemoteTableName +
+                    ActiveRecordCloudSync.getParams();
             String jsonString = getUrl(url);
             JSONArray jsonArray = new JSONArray(jsonString);
 
-            for (int i = 0; i < jsonArray.length(); i++) {
-                ReceiveModel tableInstance = mReceiveTableClass.newInstance();
-                tableInstance.createObjectFromJSON(jsonArray.getJSONObject(i));
+            ActiveAndroid.beginTransaction();
+            try {
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    ReceiveModel tableInstance = mReceiveTableClass.newInstance();
+                    tableInstance.createObjectFromJSON(jsonArray.getJSONObject(i));
+                }
+                ActiveAndroid.setTransactionSuccessful();
+            } finally {
+                ActiveAndroid.endTransaction();
             }
-            recordLastSyncTime();
 
         } catch (ConnectException cre) {
             Log.e(TAG, "Connection was refused", cre);
@@ -65,23 +63,8 @@ public class HttpFetchr {
         }
     }
 
-    private void recordLastSyncTime() {
-        if (ActiveRecordCloudSync.getFetchCount() == ActiveRecordCloudSync.getReceiveTables().size()) {
-            String latestSyncTime = ActiveRecordCloudSync.getLastSyncTime();
-            AdminSettings adminSettings = AppUtil.getAdminSettingsInstance();
-            String projectId = adminSettings.getProjectId();
-            List<Instrument> instruments = Instrument.getAllProjectInstruments(Long.valueOf(projectId));
-            for (Instrument instrument : instruments) {
-                if (!instrument.loaded()) {
-                    latestSyncTime = "";
-                }
-            }
-            adminSettings.setLastSyncTime(latestSyncTime);
-            if (TextUtils.isEmpty(latestSyncTime)) {
-                new GetReceiveTablesTask(AppUtil.getContext()).execute();
-            }
-            AppUtil.orderInstrumentsSections();
-        }
+    public String getUrl(String urlSpec) throws IOException {
+        return new String(getUrlBytes(urlSpec));
     }
 
     private byte[] getUrlBytes(String urlSpec) throws IOException {

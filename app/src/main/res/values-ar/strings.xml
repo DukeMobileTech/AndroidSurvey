@@ -2,7 +2,6 @@
 <resources>
 
     <string name="app_name">مسح</string>
-    <string name="action_settings">إعدادات</string>
     <string name="start_survey">مسح البداية</string>
     <string name="survey_title_label">اختيار الأسئلة</string>
     <string name="next_button">التالي</string>

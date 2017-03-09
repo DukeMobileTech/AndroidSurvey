@@ -8,10 +8,10 @@ import android.view.ViewGroup;
 
 import com.activeandroid.Model;
 
-import org.adaptlab.chpir.android.survey.Models.Grid;
-import org.adaptlab.chpir.android.survey.Models.Question;
-import org.adaptlab.chpir.android.survey.Models.Response;
-import org.adaptlab.chpir.android.survey.Models.Survey;
+import org.adaptlab.chpir.android.survey.models.Grid;
+import org.adaptlab.chpir.android.survey.models.Question;
+import org.adaptlab.chpir.android.survey.models.Response;
+import org.adaptlab.chpir.android.survey.models.Survey;
 
 import java.util.List;
 
@@ -77,7 +77,7 @@ public abstract class GridFragment extends QuestionFragment {
 	}
 	
 	@Override
-	public void saveSpecialResponse(String specialResponse) {
+	public void setSpecialResponse(String specialResponse) {
 		for (Question question : mGrid.questions()) {
 			Response response = mSurvey.getResponseByQuestion(question);
 			if (response != null) {

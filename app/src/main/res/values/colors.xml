@@ -2,15 +2,20 @@
 <resources>
     <color name="emphasis">#31b6e7</color>
     <color name="bg_gray">#cecbce</color>
-    <color name="list_background_one">#C5D7F4</color>
-    <color name="list_background_two">#E1F0D2</color>
     <color name="item_selected">#1C939D</color>
-    <color name="actionbar_tabs">#FFFFFF</color>
-    <color name="question_text_background">#E1F0D2</color>
-    <color name="question_text_border">#C5D7F4</color>
-    <color name="response_component_background">#C5D7F4</color>
-    <color name="response_component_border">#E1F0D2</color>
     <color name="red">#FF0000</color>
     <color name="green">#0C8C00</color>
     <color name="white">#FFFFFF</color>
+    <color name="colorControlHighlight">#009587</color>
+    <color name="colorButtonNormal">#2095F2</color>
+    <color name="primary">#006A4E</color>
+    <color name="primary_dark">#0D4D42</color>
+    <color name="primary_light">#C8E6C9</color>
+    <color name="secondary_light">#C5D7F4</color>
+    <color name="accent">#009587</color>
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#757575</color>
+    <color name="icons">#FFFFFF</color>
+    <color name="divider">#BDBDBD</color>
+    <color name="transparent">#00000000</color>
 </resources>
