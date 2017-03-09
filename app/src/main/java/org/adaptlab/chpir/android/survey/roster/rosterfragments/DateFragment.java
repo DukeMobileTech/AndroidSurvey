@@ -12,13 +12,12 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 public class DateFragment extends RosterFragment {
-    private DatePicker datePicker;
+    protected DatePicker datePicker;
     protected int mDay;
     protected int mMonth;
     protected int mYear;
 
-    @Override
-    protected void createResponseComponent(ViewGroup responseComponent) {
+    protected void beforeAddViewHook(ViewGroup responseComponent) {
         datePicker = new DatePicker(getActivity());
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT);
@@ -37,6 +36,11 @@ public class DateFragment extends RosterFragment {
                 });
         responseComponent.addView(datePicker);
         updateDate(getResponse().getText());
+    }
+
+    @Override
+    protected void createResponseComponent(ViewGroup responseComponent) {
+        beforeAddViewHook(responseComponent);
     }
 
     private void updateDate(String date) {
