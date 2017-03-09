@@ -1,8 +1,12 @@
 package org.adaptlab.chpir.android.survey.models;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.provider.BaseColumns;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.activeandroid.Cache;
@@ -90,6 +94,10 @@ public class Roster extends SendModel {
         return new Select().from(Roster.class).where("UUID = ?", uuid).executeSingle();
     }
 
+    public List<RosterLog> rosterLogs() {
+        return new Select().from(RosterLog.class).where("RosterUUID = ?", mUUID).execute();
+    }
+
     @Override
     public String getPrimaryKey() {
         return BaseColumns._ID;
@@ -128,9 +136,25 @@ public class Roster extends SendModel {
     public void setAsSent(Context context) {
         mSent = true;
         this.save();
-        // TODO: 12/1/16 Show notifications
-        // TODO: 12/1/16 Do not send roster surveys until Roster is complete
-        // TODO: 12/1/16 Remove Roster surveys from the Surveys tab
+        EventLog eventLog = new EventLog(EventLog.EventType.SENT_ROSTER, context);
+        eventLog.setInstrumentRemoteId(getInstrument().getRemoteId());
+        eventLog.setSurveyIdentifier(identifier(context));
+        eventLog.save();
+
+        Resources r = context.getResources();
+
+        Notification notification = new NotificationCompat.Builder(context)
+                .setTicker(r.getString(R.string.app_name))
+                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setContentTitle(r.getString(R.string.app_name))
+                .setContentText(eventLog.getLogMessage(context))
+                .setAutoCancel(true)
+                .build();
+
+        NotificationManager notificationManager = (NotificationManager)
+                context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        notificationManager.notify(eventLog.getLogMessage(context), 1, notification);
     }
 
     @Override

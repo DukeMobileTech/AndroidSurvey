@@ -17,7 +17,7 @@ public class EventLog extends Model {
     private Context mContext;
     
     public static enum EventType {
-        SENT_SURVEY
+        SENT_SURVEY, SENT_ROSTER
     }
     
     @Column(name = "EventType")

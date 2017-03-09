@@ -68,7 +68,8 @@ public class Response extends SendModel {
      * declare it a match and return true.
      */
     public boolean isValid() {
-        return mQuestion.getRegExValidation() == null || getText().matches(mQuestion.getRegExValidation());
+        return mQuestion.getRegExValidation() == null || getText().matches(mQuestion
+                .getRegExValidation());
     }
 
     /*
@@ -93,7 +94,8 @@ public class Response extends SendModel {
 
         try {
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("survey_uuid", (getSurvey() == null) ? getSurveyUUID() : getSurvey().getUUID());
+            jsonObject.put("survey_uuid", (getSurvey() == null) ? getSurveyUUID() : getSurvey()
+                    .getUUID());
             jsonObject.put("question_id", getQuestion().getRemoteId());
             jsonObject.put("text", getText());
             jsonObject.put("other_response", getOtherResponse());
@@ -186,7 +188,8 @@ public class Response extends SendModel {
     }
 
     public ResponsePhoto getResponsePhoto() {
-        return new Select().from(ResponsePhoto.class).where("Response = ?", getId()).executeSingle();
+        return new Select().from(ResponsePhoto.class).where("Response = ?", getId())
+                .executeSingle();
     }
 
     @Override
@@ -198,14 +201,10 @@ public class Response extends SendModel {
     public void setAsSent(Context context) {
         mSent = true;
         this.save();
-// TODO: 12/12/16 Undo the check
-        if (!getSurvey().belongsToRoster()) {
-            if (getResponsePhoto() == null) {
-                this.delete();
-            }
-
-            getSurvey().deleteIfComplete();
+        if (getResponsePhoto() == null) {
+            this.delete();
         }
+        getSurvey().deleteIfComplete();
     }
 
     /*

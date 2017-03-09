@@ -120,7 +120,7 @@
     <string name="custom_code_hint">Enter custom ISO code for language name</string>
     <string name="roster_api_endpoint">Sync Rosters To Different Endpoint</string>
     <string name="url_hint">https://example.com/</string>
-    <string name="completed">Completed</string>
+    <string name="completed">completed</string>
     <string name="sent">Sent</string>
     <string name="un_submit">Unsubmit</string>
     <string name="last_instrument">last instrument</string>

@@ -11,10 +11,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.adaptlab.chpir.android.survey.AppUtil;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Roster;
+import org.adaptlab.chpir.android.survey.models.RosterLog;
 import org.adaptlab.chpir.android.survey.models.Survey;
 import org.adaptlab.chpir.android.survey.roster.rosterfragments.RosterFragment;
 import org.adaptlab.chpir.android.survey.roster.rosterfragments.RosterFragmentGenerator;
@@ -190,9 +192,22 @@ public class ParticipantEditorActivity extends AppCompatActivity {
     private void markSurveyAsReady() {
         mSurvey.setAsComplete(true);
         mSurvey.save();
+        logRosterItemCompletion();
         mRoster.setComplete(true);
         mRoster.save();
         finish();
+    }
+
+    private void logRosterItemCompletion() {
+        RosterLog log = RosterLog.findByRosterAndSurvey(mRoster.getUUID(), mSurvey.getUUID());
+        if (log == null) {
+            log = new RosterLog();
+            log.setRosterUUID(mRoster.getUUID());
+            log.setSurveyUUID(mSurvey.getUUID());
+        }
+        log.setComplete(true);
+        log.setIdentifier(mSurvey.identifier(AppUtil.getContext()));
+        log.save();
     }
 
     private void markSurveyAsNotReady() {

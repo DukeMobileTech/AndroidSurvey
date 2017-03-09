@@ -672,13 +672,14 @@ public class InstrumentFragment extends ListFragment {
 
             String id = cursor.getString(cursor.getColumnIndexOrThrow("UUID"));
             Roster roster = Roster.findByUUID(id);
-            int numSurveys = roster.surveys().size();
+            int numSurveys = roster.rosterLogs().size();
 
             titleTextView.setText(roster.identifier(context));
             titleTextView.setTypeface(roster.getInstrument().getTypeFace(getActivity()
                     .getApplicationContext()));
             surveyCountTextView.setText(numSurveys + " " + FormatUtils.pluralize
-                    (numSurveys, getString(R.string.survey), getString(R.string.surveys)));
+                    (numSurveys, getString(R.string.survey), getString(R.string.surveys)) + " " +
+                    getString(R.string.completed));
         }
     }
 

@@ -187,6 +187,11 @@ public class SurveyFragment extends Fragment {
         if (questionNum == -1) {
             mQuestion = mQuestions.get(0);
             mQuestionNumber = 0;
+        } else if (questionNum >= mQuestions.size()) {
+            mQuestion = mQuestions.get(mQuestions.size() - 1);
+            mQuestionNumber = mQuestions.size() - 1;
+            for (int i = 0; i < mQuestionNumber; i++)
+                mPreviousQuestions.add(i);
         } else {
             mQuestion = mQuestions.get(questionNum);
             mQuestionNumber = questionNum;

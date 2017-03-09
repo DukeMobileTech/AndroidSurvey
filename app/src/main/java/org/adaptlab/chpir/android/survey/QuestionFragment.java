@@ -70,6 +70,7 @@ public abstract class QuestionFragment extends Fragment {
         if (response == null) {
             response = new Response();
             response.setQuestion(mQuestion);
+            response.setSurvey(mSurvey);
             response.save();
             mSurveyFragment.getResponses().put(mQuestion, response);
         }
