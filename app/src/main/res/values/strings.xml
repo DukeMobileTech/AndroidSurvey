@@ -16,6 +16,7 @@
     <string name="sync_interval">Sync Interval (min)</string>
     <string name="save_button">Save</string>
     <string name="admin_settings">Admin</string>
+    <string name="settings">Settings</string>
     <string name="api_endpoint">Api Domain Name</string>
     <string name="api_key">Api Key</string>
     <string name="api_version">Api Version</string>
@@ -70,7 +71,8 @@
     <string name="device_label">Device Label</string>
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
-    <string name="new_apk">This application has a newer version. Would you like to update it to the newer version?</string>
+    <string name="new_apk_title">Newer version available</string>
+    <string name="new_apk_message">Would you like to update the application to the newer version?</string>
     <string name="require_password">Require Password To Enter Survey</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
@@ -125,4 +127,7 @@
     <string name="un_submit">Unsubmit</string>
     <string name="last_instrument">last instrument</string>
     <string name="crashlytics_device_label">device label</string>
+    <string name="check_for_updates">Check For Updates</string>
+    <string name="up_to_date">Your application is up to date</string>
+    <string name="re_check_for_updates">Recheck for updates after granting storage permission</string>
 </resources>

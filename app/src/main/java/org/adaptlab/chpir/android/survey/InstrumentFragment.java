@@ -214,17 +214,23 @@ public class InstrumentFragment extends ListFragment {
     }
 
     private void requestNeededPermissions() {
+
         if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) {
             if (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission
                     .ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED) {
                 ActivityCompat.requestPermissions(getActivity(),
                         new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
             }
-            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission
-                    .CAMERA) == PackageManager.PERMISSION_DENIED) {
-                ActivityCompat.requestPermissions(getActivity(),
-                        new String[]{Manifest.permission.CAMERA}, 2);
-            }
+        }
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission
+                .CAMERA) == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.CAMERA}, 2);
+        }
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission
+                .WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 3);
         }
     }
 
@@ -348,6 +354,9 @@ public class InstrumentFragment extends ListFragment {
             case R.id.menu_item_refresh:
                 new RefreshInstrumentsTask().execute();
                 new SendResponsesTask(getActivity()).execute();
+                return true;
+            case R.id.menu_item_settings:
+                startActivity(new Intent(getActivity(), SettingsActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
