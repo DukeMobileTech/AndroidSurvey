@@ -561,12 +561,11 @@ public class InstrumentFragment extends ListFragment {
             TextView instrumentVersionTextView = (TextView) view.findViewById(R.id
                     .instrument_list_item_instrumentVersionTextView);
 
-            String title = cursor.getString(cursor.getColumnIndexOrThrow("Title"));
             Long remoteId = cursor.getLong(cursor.getColumnIndexOrThrow("RemoteId"));
             Instrument instrument = Instrument.findByRemoteId(remoteId);
             int numQuestions = instrument.questions().size();
 
-            titleTextView.setText(title);
+            titleTextView.setText(instrument.getTitle());
             titleTextView.setTypeface(instrument.getTypeFace(
                     getActivity().getApplicationContext()));
             questionCountTextView.setText(numQuestions + " " + FormatUtils.pluralize

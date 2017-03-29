@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+<resources>
 
     <string name="app_name">iSEE CHPIR</string>
     <string name="start_survey">Start Survey</string>
@@ -130,4 +130,7 @@
     <string name="check_for_updates">Check For Updates</string>
     <string name="up_to_date">Your application is up to date</string>
     <string name="re_check_for_updates">Recheck for updates after granting storage permission</string>
+    <string name="reset_last_sync_time">Reset Last Sync Time</string>
+    <string name="last_sync_time">Last Sync Time: </string>
+    <string name="version_name">Version Name: </string>
 </resources>

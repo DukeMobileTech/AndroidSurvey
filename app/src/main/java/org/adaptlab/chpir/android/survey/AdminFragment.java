@@ -142,9 +142,6 @@ public class AdminFragment extends Fragment {
             case R.id.save_admin_settings_button:
                 saveAdminSettings();
                 return true;
-            case R.id.reset_last_sync_time_button:
-                resetLastSyncTime();
-                return true;
             case R.id.delete_data_button:
                 deleteData();
                 return true;
@@ -189,25 +186,6 @@ public class AdminFragment extends Fragment {
         AdminSettings.getInstance().setApi2Key(mApi2KeyEditText.getText().toString());
 
         getActivity().finish();
-    }
-
-    private void resetLastSyncTime() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(R.string.reset_header)
-                .setMessage(R.string.reset_confirmation)
-                .setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int button) {
-                        AppUtil.getAdminSettingsInstance().resetLastSyncTime();
-                        getActivity().finish();
-                    }
-                })
-                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                })
-                .create().show();
     }
 
     private void deleteData() {

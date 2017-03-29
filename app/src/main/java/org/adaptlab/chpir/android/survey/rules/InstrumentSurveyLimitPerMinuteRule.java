@@ -1,17 +1,17 @@
 package org.adaptlab.chpir.android.survey.rules;
 
+import android.util.Log;
+
+import org.adaptlab.chpir.android.survey.models.Instrument;
+import org.adaptlab.chpir.android.survey.models.Rule;
+import org.json.JSONException;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-
-import org.adaptlab.chpir.android.survey.models.Instrument;
-import org.adaptlab.chpir.android.survey.models.Rule;
-import org.json.JSONException;
-
-import android.util.Log;
 
 /*
  * Limit the number of surveys that can be created for a given

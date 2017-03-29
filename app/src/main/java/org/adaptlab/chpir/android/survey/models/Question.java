@@ -363,7 +363,7 @@ public class Question extends ReceiveModel {
             question.save();
 
             // Generate translations
-            JSONArray translationsArray = jsonObject.optJSONArray("translations");
+            JSONArray translationsArray = jsonObject.optJSONArray("question_translations");
             if (translationsArray != null) {
                 for (int i = 0; i < translationsArray.length(); i++) {
                     JSONObject translationJSON = translationsArray.getJSONObject(i);

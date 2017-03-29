@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:ignore="MissingTranslation" >
+<resources>
 
     <string name="app_name">Encuesta</string>
     <string name="start_survey">Estudio de inicio</string>
@@ -18,6 +16,7 @@
     <string name="sync_interval">Sync Interval (minutes)</string>
     <string name="save_button">Guardar</string>
     <string name="admin_settings">Admin</string>
+    <string name="settings">Settings</string>
     <string name="api_endpoint">Api Domain Name</string>
     <string name="api_key">Api Key</string>
     <string name="api_version">Api Version</string>
@@ -96,4 +95,42 @@
     <string name="review">REVISIÓN</string>
     <string name="submit">PRESENTAR</string>
     <string name="review_section_title">Preguntas que se Saltaron</string>
+    <string name="reset_last_sync_time">Reset Last Sync Time</string>
+    <string name="rosters">rosters</string>
+    <string name="up_to_date">Your application is up to date</string>
+    <string name="check_for_updates">Check For Updates</string>
+    <string name="survey">survey</string>
+    <string name="show_rosters">Show Rosters</string>
+    <string name="roster_sync_settings">Roster Sync Settings</string>
+    <string name="custom_code_hint">Enter custom ISO code for language name</string>
+    <string name="roster_api_endpoint">Sync Rosters To Different Endpoint</string>
+    <string name="url_hint">https://example.com/</string>
+    <string name="completed">completed</string>
+    <string name="sent">Sent</string>
+    <string name="un_submit">Unsubmit</string>
+    <string name="last_instrument">last instrument</string>
+    <string name="crashlytics_device_label">device label</string>
+    <string name="re_check_for_updates">Recheck for updates after granting storage permission</string>
+    <string name="last_sync_time">Last Sync Time: </string>
+    <string name="version_name">Version Name: </string>
+    <string name="new_apk_title">Newer version available</string>
+    <string name="require_password">Require Password To Enter Survey</string>
+    <string name="rule_failure_survey_timing">You cannot take a survey for this instrument at this time.</string>
+    <string name="rule_failure_instrument_survey_limit">You cannot take a survey for this instrument.  You have taken the maximum number of surveys allowed.</string>
+    <string name="rule_instrument_survey_limit_per_minute">You cannot take a survey for this instrument. You have taken the maximum number of surveys allowed for this time interval.</string>
+    <string name="delete_application_data">Delete Instruments and Surveys</string>
+    <string name="wiping_data_header">Wiping Data</string>
+    <string name="reset">Reset</string>
+    <string name="reset_header">Reset Last Sync Time</string>
+    <string name="data_settings">Data Settings</string>
+    <string name="delete_confirmation">Are you sure? All un-synced surveys will be lost</string>
+    <string name="reset_confirmation">Are you sure? Next refresh will re-download all instruments</string>
+    <string name="new_participant">New Participant</string>
+    <string name="edit">Edit</string>
+    <string name="participant_id_response">dummy</string>
+    <string name="survey_identifier">Survey identifier</string>
+    <string name="roster_title">Roster title</string>
+    <string name="roster">roster</string>
+    <string name="unidentified_roster">Unidentified Roster </string>
+    <string name="instrument_title">Instrument title</string>
 </resources>

@@ -113,7 +113,7 @@ public class Option extends ReceiveModel {
             option.save();
             
             // Generate translations
-            JSONArray translationsArray = jsonObject.optJSONArray("translations");
+            JSONArray translationsArray = jsonObject.optJSONArray("option_translations");
             if (translationsArray != null) {
                 for (int i = 0; i < translationsArray.length(); i++) {
                     JSONObject translationJSON = translationsArray.getJSONObject(i);

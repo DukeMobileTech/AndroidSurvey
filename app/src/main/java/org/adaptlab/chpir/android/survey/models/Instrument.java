@@ -294,7 +294,7 @@ public class Instrument extends ReceiveModel {
             instrument.save();
 
             // Generate translations
-            JSONArray translationsArray = jsonObject.optJSONArray("translations");
+            JSONArray translationsArray = jsonObject.optJSONArray("instrument_translations");
             if (translationsArray != null) {
                 for (int i = 0; i < translationsArray.length(); i++) {
                     JSONObject translationJSON = translationsArray.getJSONObject(i);

@@ -56,7 +56,8 @@ public class Rule extends ReceiveModel {
     public static Rule findByRuleTypeAndInstrument(RuleType ruleType, Instrument instrument) {
         for (Rule rule : getAll()) {
             if (rule.getRuleType() != null && rule.getRuleType().equals(ruleType) &&
-                    rule.getInstrument() != null && rule.getInstrument().equals(instrument)) {
+                    rule.getInstrument() != null && rule.getInstrument().equals(instrument) &&
+                    rule.getParamJSON() != null) {
                 return rule;
             }
         }
@@ -148,7 +149,7 @@ public class Rule extends ReceiveModel {
             return null;
         }
     }
-    
+
     /*
      * Private
      */

@@ -1,9 +1,9 @@
 package org.adaptlab.chpir.android.survey.rules;
 
-import java.util.ArrayList;
-
 import android.content.Context;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 public class RuleBuilder {
     private Context mContext;

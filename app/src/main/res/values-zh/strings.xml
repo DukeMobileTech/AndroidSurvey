@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+<resources>
 
     <string name="app_name">iSEE CHPIR</string>
     <string name="start_survey">开始调查</string>
@@ -130,4 +130,7 @@
     <string name="check_for_updates">检查更新</string>
     <string name="up_to_date">您的应用已是最新版本</string>
     <string name="re_check_for_updates">获得存储许可后，请再次检查更新</string>
+    <string name="reset_last_sync_time">重置上次同步时间</string>
+    <string name="last_sync_time">上次同步时间： </string>
+    <string name="version_name">版本名称： </string>
 </resources>

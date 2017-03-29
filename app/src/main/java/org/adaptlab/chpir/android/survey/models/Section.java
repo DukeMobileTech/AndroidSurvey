@@ -51,7 +51,7 @@ public class Section extends ReceiveModel {
             section.save();
             
             //Generate translations
-            JSONArray translationsArray = jsonObject.optJSONArray("translations");
+            JSONArray translationsArray = jsonObject.optJSONArray("section_translations");
             if (translationsArray != null) {
                 for (int i = 0; i < translationsArray.length(); i++) {
                     JSONObject translationJSON = translationsArray.getJSONObject(i);
