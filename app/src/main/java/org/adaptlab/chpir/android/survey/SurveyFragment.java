@@ -123,6 +123,7 @@ public class SurveyFragment extends Fragment {
     private ArrayList<Section> mSections;
     private List<Question> mQuestions;
     private HashMap<Question, Response> mResponses;
+    private HashMap<Question, List<Option>> mOptions;
     private TextView mQuestionText;
     private TextView mQuestionIndex;
     private TextView mParticipantLabel;
@@ -139,7 +140,6 @@ public class SurveyFragment extends Fragment {
     private String[] mSectionTitles;
     private boolean mNavDrawerSet = false;
     private boolean showSectionView = true;
-    private HashMap<Question, List<Option>> mOptions;
 
     private void selectItem(int position) {
         if (mSections.get(position).questions().size() > 0) {
@@ -248,6 +248,7 @@ public class SurveyFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
         getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         AppUtil.authorize();
         setHasOptionsMenu(true);
@@ -625,6 +626,7 @@ public class SurveyFragment extends Fragment {
         changeOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
 
+    // TODO: 5/4/17 Fix background tasks on orientation change
     private void changeOrientation(int orientation) {
         getActivity().setRequestedOrientation(orientation);
     }
@@ -657,7 +659,7 @@ public class SurveyFragment extends Fragment {
     }
 
     private void setGridLabelText(TextView view) {
-        view.append(styleTextWithHtml(mGrid.getText()));
+        view.setText(styleTextWithHtml(mGrid.getText()));
     }
 
     /*
@@ -780,32 +782,29 @@ public class SurveyFragment extends Fragment {
      * the next question.
      */
     public void moveToNextQuestion() {
-        if (mQuestion.firstInGrid()) {
-            setQuestionToLastInGrid();
-        }
-        if (mQuestionNumber < mQuestionCount - 1) {
-            mPreviousQuestions.add(mQuestionNumber);
-            mQuestion = getNextQuestion(mQuestionNumber);
-            if (mQuestion.getGrid() != null) {
-                mGrid = mQuestion.getGrid();
-            }
+        if (mQuestion.belongsToGrid()) {
+            mPreviousQuestions.add(mQuestion.getNumberInInstrument() - 1);
+            Question lastQuestion = mGrid.questions().get(mGrid.questions().size() - 1);
+            mQuestion = nextQuestionHelper(lastQuestion.getNumberInInstrument());
+            mGrid = mQuestion.getGrid();
             createQuestionFragment();
-            if (!setQuestionText(mQuestionText)) {
-                setSpecialResponse(Response.LOGICAL_SKIP);
-                moveToNextQuestion();
+            updateQuestionText();
+            updateQuestionCountLabel();
+        } else {
+            if (mQuestionNumber < mQuestionCount - 1) {
+                mPreviousQuestions.add(mQuestionNumber);
+                mQuestion = getNextQuestion(mQuestionNumber);
+                createQuestionFragment();
+                if (!setQuestionText(mQuestionText)) {
+                    setSpecialResponse(Response.LOGICAL_SKIP);
+                    moveToNextQuestion();
+                }
+            } else if (isLastQuestion() && !setQuestionText(mQuestionText)) {
+                finishSurvey();
             }
-        } else if (isLastQuestion() && !setQuestionText(mQuestionText)) {
-            finishSurvey();
+            mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
+            updateQuestionCountLabel();
         }
-        mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
-        updateQuestionCountLabel();
-    }
-
-    private void setQuestionToLastInGrid() {
-        mQuestionNumber = mGrid.questions().get(mGrid.questions().size() - 1)
-                .getNumberInInstrument() - 1;
-        mPreviousQuestions.add(mQuestion.getNumberInInstrument() - 1);
-        mQuestion = mGrid.questions().get(mGrid.questions().size() - 1);
     }
 
     /*
@@ -818,13 +817,15 @@ public class SurveyFragment extends Fragment {
         if (mQuestionNumber > 0 && mQuestionNumber < mQuestionCount) {
             mQuestionNumber = mPreviousQuestions.remove(mPreviousQuestions.size() - 1);
             mQuestion = mQuestions.get(mQuestionNumber);
-            if (mQuestion.getGrid() != null) {
-                mGrid = mQuestion.getGrid();
-            }
             showSectionView = false;
             createQuestionFragment();
-            if (!setQuestionText(mQuestionText)) {
-                moveToPreviousQuestion();
+            if (mQuestion.belongsToGrid()) {
+                mGrid = mQuestion.getGrid();
+                updateQuestionText();
+            } else {
+                if (!setQuestionText(mQuestionText)) {
+                    moveToPreviousQuestion();
+                }
             }
             if (mResponses.get(mQuestion) != null &&
                     !mResponses.get(mQuestion).getText().isEmpty()) {
@@ -1152,4 +1153,5 @@ public class SurveyFragment extends Fragment {
             return true;
         }
     }
+
 }

@@ -1,26 +1,26 @@
 package org.adaptlab.chpir.android.survey.models;
 
-import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.util.Log;
 
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
+import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 @Table(name = "GridLabels")
 public class GridLabel extends ReceiveModel {
 	private static final String TAG = "GridLabel"; 
 	@Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
     private Long mRemoteId;
-	@Column(name = "Option")
-	private Option mOption;
 	@Column(name = "Grid")
 	private Grid mGrid;
 	@Column(name = "Label")
 	private String mLabel;
+	@Column(name = "Deleted")
+	private boolean mDeleted;
 	
 	@Override
 	public void createObjectFromJSON(JSONObject jsonObject) {
@@ -32,10 +32,10 @@ public class GridLabel extends ReceiveModel {
 			}
 			gridLabel.setRemoteId(remoteId);
 			gridLabel.setLabel(jsonObject.getString("label"));
-			if (!jsonObject.isNull("option_id")) {
-				gridLabel.setOption(Option.findByRemoteId(jsonObject.getLong("option_id")));
-			}
 			gridLabel.setGrid(Grid.findByRemoteId(jsonObject.getLong("grid_id")));
+            if (!jsonObject.isNull("deleted_at")) {
+                gridLabel.setDeleted(true);
+            }
 			gridLabel.save();
 		} catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);
@@ -53,10 +53,6 @@ public class GridLabel extends ReceiveModel {
 	private void setLabel(String label) {
 		mLabel = label;
 	}
-	
-	private void setOption(Option option) {
-		mOption = option;
-	}
 
 	private void setGrid(Grid grid) {
 		mGrid = grid;
@@ -65,5 +61,8 @@ public class GridLabel extends ReceiveModel {
 	private void setRemoteId(Long remoteId) {
 		mRemoteId = remoteId;
 	}
-	
+
+    private void setDeleted(boolean deleted) {
+        mDeleted = deleted;
+    }
 }

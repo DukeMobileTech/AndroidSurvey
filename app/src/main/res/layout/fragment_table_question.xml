@@ -1,33 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/grid_scroll_view"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content" >
+<RelativeLayout
+    android:id="@+id/grid_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/response_component_layout"
+    android:orientation="horizontal">
 
-    <HorizontalScrollView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
+    <LinearLayout
+        android:id="@+id/table_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2.0">
+
+        <TextView
+            android:id="@+id/table_header_question_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.0"
+            android:gravity="start"
+            android:text="@string/question_text_header"
+            android:textStyle="bold"/>
+
+        <!-- Important!!! fillViewPort allows child views to stretch and fill the view -->
+        <org.adaptlab.chpir.android.survey.roster.views.OHScrollView
+            android:id="@+id/table_options_header_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.0"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:id="@+id/table_options_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"/>
+
+        </org.adaptlab.chpir.android.survey.roster.views.OHScrollView>
+    </LinearLayout>
+
+    <ScrollView
+        android:id="@+id/grid_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/table_header">
 
         <LinearLayout
-            android:id="@+id/scrollable_table_layout"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="horizontal"
+            android:weightSum="2.0">
 
-            <TableLayout
-                android:id="@+id/header_table_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
-            </TableLayout>
+            <LinearLayout
+                android:id="@+id/table_body_question_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.0"
+                android:orientation="vertical"/>
 
-            <TableLayout
-                android:id="@+id/body_table_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
-            </TableLayout>
-            
+            <org.adaptlab.chpir.android.survey.roster.views.OHScrollView
+                android:id="@+id/table_body_options_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.0"
+                android:fillViewport="true">
+
+                <LinearLayout
+                    android:id="@+id/table_body_options_choice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"/>
+
+            </org.adaptlab.chpir.android.survey.roster.views.OHScrollView>
         </LinearLayout>
-        
-    </HorizontalScrollView>
+    </ScrollView>
 
-</ScrollView>
+</RelativeLayout>

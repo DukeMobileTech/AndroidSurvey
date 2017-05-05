@@ -108,7 +108,7 @@
             android:value="Survey.db"/>
         <meta-data
             android:name="AA_DB_VERSION"
-            android:value="49"/>
+            android:value="50"/>
         <meta-data
             android:name="SEED_DB"
             android:value="false"/>

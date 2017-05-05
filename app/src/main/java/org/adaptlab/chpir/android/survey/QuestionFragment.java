@@ -94,7 +94,9 @@ public abstract class QuestionFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        new SaveResponseTask().execute(mResponse);
+        if (mResponse != null) {
+            new SaveResponseTask().execute(mResponse);
+        }
         hideKeyBoard();
     }
 
@@ -262,8 +264,8 @@ public abstract class QuestionFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(Survey survey){
-            if (survey.readyToSend()) {
+        protected void onPostExecute(Survey survey) {
+            if (survey != null && survey.readyToSend()) {
                 new SendResponsesTask(getActivity()).execute();
             }
         }

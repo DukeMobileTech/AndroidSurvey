@@ -64,8 +64,6 @@ public class Question extends ReceiveModel {
     private int mQuestionVersion;
     @Column(name = "Grid")
     private Grid mGrid;
-    @Column(name = "FirstInGrid")
-    private boolean mFirstInGrid;
     @Column(name = "Deleted")
     private boolean mDeleted;
     @Column(name = "Section")
@@ -74,6 +72,8 @@ public class Question extends ReceiveModel {
     private Long mInstrumentRemoteId;
     @Column(name = "Critical")
     private boolean mCritical;
+    @Column(name = "NumberInGrid")
+    private int mNumberInGrid;
 
     public Question() {
         super();
@@ -349,7 +349,9 @@ public class Question extends ReceiveModel {
             if (!jsonObject.isNull("grid_id")) {
                 question.setGrid(Grid.findByRemoteId(jsonObject.getLong("grid_id")));
             }
-            question.setFirstInGrid(jsonObject.getBoolean("first_in_grid"));
+            if (!jsonObject.isNull("number_in_grid")) {
+                question.setNumberInGrid(jsonObject.getInt("number_in_grid"));
+            }
             if (!jsonObject.isNull("section_id")) {
                 question.setSection(Section.findByRemoteId(jsonObject.getLong("section_id")));
             }
@@ -394,8 +396,8 @@ public class Question extends ReceiveModel {
                 .executeSingle();
     }
 
-    private void setFirstInGrid(boolean firstInGrid) {
-        mFirstInGrid = firstInGrid;
+    private void setNumberInGrid(int num) {
+        mNumberInGrid = num;
     }
 
     private void setDeleted(boolean deleted) {
@@ -556,8 +558,12 @@ public class Question extends ReceiveModel {
         mQuestionVersion = version;
     }
 
+    public int getNumberInGrid() {
+        return mNumberInGrid;
+    }
+
     public boolean firstInGrid() {
-        return mFirstInGrid;
+        return belongsToGrid() && getNumberInGrid() == 1;
     }
 
     public boolean isFirstQuestionInSection() {
@@ -574,11 +580,7 @@ public class Question extends ReceiveModel {
     }
 
     public boolean belongsToGrid() {
-        if (getGrid() == null) {
-            return false;
-        } else {
-            return true;
-        }
+        return getGrid() != null;
     }
 
     public Grid getGrid() {

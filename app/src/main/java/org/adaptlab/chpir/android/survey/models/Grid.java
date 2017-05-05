@@ -1,5 +1,6 @@
 package org.adaptlab.chpir.android.survey.models;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.activeandroid.annotation.Column;
@@ -23,6 +24,10 @@ public class Grid extends ReceiveModel {
 	private String mQuestionType;
 	@Column(name = "InstrumentRemoteId")
 	private Long mInstrumentRemoteId;
+	@Column(name = "Deleted")
+	private boolean mDeleted;
+    @Column(name = "Instructions")
+    private String mInstructions;
 	
 	@Override
 	public void createObjectFromJSON(JSONObject jsonObject) {
@@ -36,6 +41,10 @@ public class Grid extends ReceiveModel {
 			grid.setQuestionType(jsonObject.getString("question_type"));
 			grid.setName(jsonObject.getString("name"));
 			grid.setInstrumentRemoteId(jsonObject.getLong("instrument_id"));
+            grid.setInstructions(jsonObject.getString("instructions"));
+            if (!jsonObject.isNull("deleted_at")) {
+                grid.setDeleted(true);
+            }
 			grid.save();
 		} catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);
@@ -53,20 +62,25 @@ public class Grid extends ReceiveModel {
 	public List<Question> questions() {
 		return new Select()
 			.from(Question.class)
-			.where("Grid = ?", getId())
-			.orderBy("NumberInInstrument ASC")
+			.where("Grid = ? AND Deleted != ?", getId(), 1)
+			.orderBy("NumberInGrid ASC")
 			.execute();
 	}
 	
 	public List<GridLabel> labels() {
 		return new Select()
 			.from(GridLabel.class)
-			.where("Grid = ?", getId())
+			.where("Grid = ? AND Deleted != ?", getId(), 1)
 			.execute();
 	}
-	
-	public String getText() {
-		return mName;
+
+    // TODO: 5/3/17 Add support for translations
+    public String getText() {
+        if (TextUtils.isEmpty(mInstructions) || mInstructions.equals("null")) {
+            return mName;
+        } else {
+            return mName + "<p> </p>" + mInstructions;
+        }
 	}
 	
 	private void setInstrumentRemoteId(Long instrumentId) {
@@ -84,5 +98,12 @@ public class Grid extends ReceiveModel {
 	private void setRemoteId(Long remoteId) {
 		mRemoteId = remoteId;
 	}
-	
+
+    private void setDeleted(boolean deleted) {
+        mDeleted = deleted;
+    }
+
+    private void setInstructions(String instructions) {
+        mInstructions = instructions;
+    }
 }
