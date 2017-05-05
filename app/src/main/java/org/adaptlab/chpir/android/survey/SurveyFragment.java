@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -445,12 +444,19 @@ public class SurveyFragment extends Fragment {
             menu.findItem(R.id.menu_item_previous).setEnabled(!isFirstQuestion());
             menu.findItem(R.id.menu_item_next).setVisible(!isLastQuestion())
                     .setEnabled(hasValidResponse());
-            for (String key : mMenuItems.keySet()) {
-                if (!mInstrument.getSpecialOptionStrings().contains(key)) {
-                    menu.findItem(mMenuItems.get(key)).setVisible(false).setEnabled(false);
-                } else {
-                    if (key.equals(Response.SKIP)) {
-                        menu.findItem(mMenuItems.get(key)).setEnabled(hasValidResponse());
+            if (mQuestion.belongsToGrid()) {
+                menu.findItem(R.id.menu_item_skip).setVisible(false);
+                menu.findItem(R.id.menu_item_rf).setVisible(false);
+                menu.findItem(R.id.menu_item_na).setVisible(false);
+                menu.findItem(R.id.menu_item_dk).setVisible(false);
+            } else {
+                for (String key : mMenuItems.keySet()) {
+                    if (!mInstrument.getSpecialOptionStrings().contains(key)) {
+                        menu.findItem(mMenuItems.get(key)).setVisible(false).setEnabled(false);
+                    } else {
+                        if (key.equals(Response.SKIP)) {
+                            menu.findItem(mMenuItems.get(key)).setEnabled(hasValidResponse());
+                        }
                     }
                 }
             }
@@ -606,7 +612,6 @@ public class SurveyFragment extends Fragment {
                 mQuestionFragment = (QuestionFragment) QuestionFragmentFactory
                         .createQuestionFragment(mQuestion);
                 switchOutFragments(fm);
-                changeOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             }
         }
     }
@@ -623,12 +628,6 @@ public class SurveyFragment extends Fragment {
         mQuestionFragment.setArguments(bundle);
         FragmentManager fm = getChildFragmentManager();
         switchOutFragments(fm);
-        changeOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-    }
-
-    // TODO: 5/4/17 Fix background tasks on orientation change
-    private void changeOrientation(int orientation) {
-        getActivity().setRequestedOrientation(orientation);
     }
 
     private void switchOutFragments(FragmentManager fm) {

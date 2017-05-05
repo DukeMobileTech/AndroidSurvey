@@ -1,5 +1,6 @@
 package org.adaptlab.chpir.android.survey;
 
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -38,6 +39,8 @@ public abstract class GridFragment extends QuestionFragment implements ScrollVie
 		init();
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        // Allow both portrait and landscape orientations
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
 	}
 	
 	@Override
