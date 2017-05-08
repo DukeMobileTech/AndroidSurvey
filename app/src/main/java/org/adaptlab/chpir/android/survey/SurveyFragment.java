@@ -606,6 +606,7 @@ public class SurveyFragment extends Fragment {
             moveToSection(mQuestion.getSection());
         } else {
             if (mQuestion.belongsToGrid()) {
+                mGrid = mQuestion.getGrid();
                 createGridFragment();
             } else {
                 FragmentManager fm = getChildFragmentManager();
@@ -785,7 +786,6 @@ public class SurveyFragment extends Fragment {
             mPreviousQuestions.add(mQuestion.getNumberInInstrument() - 1);
             Question lastQuestion = mGrid.questions().get(mGrid.questions().size() - 1);
             mQuestion = nextQuestionHelper(lastQuestion.getNumberInInstrument());
-            mGrid = mQuestion.getGrid();
             createQuestionFragment();
             updateQuestionText();
             updateQuestionCountLabel();

@@ -25,6 +25,7 @@ import org.json.JSONObject;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -195,12 +196,20 @@ public class Survey extends SendModel {
     }
 
     public List<Response> emptyResponses() {
-        return new Select()
+        List<Response> responses = new Select()
                 .from(Response.class)
                 .where("SurveyUUID = ? AND (Text IS null OR Text = '') " +
                         "AND (SpecialResponse IS null OR SpecialResponse = '') " +
                         "AND (Other_Response IS null OR Other_Response = '')", getUUID())
                 .execute();
+        Iterator<Response> responseIterator = responses.iterator();
+        while (responseIterator.hasNext()) {
+            Response response = responseIterator.next();
+            if (response.getQuestion().getQuestionType() == Question.QuestionType.INSTRUCTIONS) {
+                responseIterator.remove();
+            }
+        }
+        return responses;
     }
 
     public HashMap<Question, Response> responsesMap() {
