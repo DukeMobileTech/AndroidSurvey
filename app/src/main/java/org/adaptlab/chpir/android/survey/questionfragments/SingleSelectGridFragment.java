@@ -32,6 +32,7 @@ public class SingleSelectGridFragment extends GridFragment {
     private int mIndex;
     private List<RadioGroup> mRadioGroups;
     private Integer[] rowHeights;
+    private Integer[] rowWidths;
     private boolean interceptScroll = true;
     private OHScrollView headerScrollView;
     private OHScrollView contentScrollView;
@@ -85,16 +86,18 @@ public class SingleSelectGridFragment extends GridFragment {
                 RadioGroup.LayoutParams.MATCH_PARENT, MIN_HEIGHT);
         radioButtons.setLayoutParams(buttonParams);
         adjustRowHeight(radioButtons, k);
-        for (GridLabel label : getGrid().labels()) {
-            int id = getGrid().labels().indexOf(label);
+        List<GridLabel> gridLabels = getGrid().labels();
+        for (int i = 0; i < gridLabels.size(); i++) {
             RadioButton button = new RadioButton(getActivity());
             button.setSaveEnabled(false);
-            button.setId(id);
+            button.setId(i);
             button.setMinimumWidth(MIN_WIDTH);
-            RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(0, MIN_HEIGHT, 1f);
-            params.setMargins(MARGIN_0, MARGIN_0, MARGIN_50, MARGIN_0);
+            RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(
+                    RadioGroup.LayoutParams.WRAP_CONTENT, MIN_HEIGHT);
+            params.setMargins(MARGIN_50, MARGIN_0, MARGIN_0, MARGIN_0);
             button.setLayoutParams(params);
-            radioButtons.addView(button, id);
+            adjustRowWidth(button, i);
+            radioButtons.addView(button, i);
         }
         choiceRow.addView(radioButtons);
         optionsListLinearLayout.addView(choiceRow, k);
@@ -134,19 +137,42 @@ public class SingleSelectGridFragment extends GridFragment {
         TextView questionTextHeader = (TextView) v.findViewById(R.id.table_header_question_text);
         questionTextHeader.setMinHeight(MIN_HEIGHT);
         LinearLayout headerTableLayout = (LinearLayout) v.findViewById(R.id.table_options_header);
-        for (GridLabel label : getGrid().labels()) {
+        List<GridLabel> gridLabels = getGrid().labels();
+        rowWidths = new Integer[gridLabels.size()];
+        for (int k = 0; k < gridLabels.size(); k++) {
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             params.setMargins(MARGIN_0, MARGIN_0, MARGIN_50, MARGIN_0);
             TextView textView = new TextView(getActivity());
             textView.setLayoutParams(params);
-            textView.setText(label.getLabelText());
+            textView.setText(gridLabels.get(k).getLabelText());
             textView.setTypeface(Typeface.DEFAULT_BOLD);
             textView.setMinimumWidth(MIN_WIDTH);
             textView.setMinHeight(MIN_HEIGHT);
-            textView.setGravity(Gravity.START);
+            textView.setGravity(Gravity.CENTER);
             headerTableLayout.addView(textView);
+            setRowWidth(textView, k);
         }
+    }
+
+    private void setRowWidth(final TextView view, final int position) {
+        view.post(new Runnable() {
+            @Override
+            public void run() {
+                rowWidths[position] = view.getWidth();
+            }
+        });
+    }
+
+    private void adjustRowWidth(final RadioButton view, final int position) {
+        view.post(new Runnable() {
+            @Override
+            public void run() {
+                RadioGroup.LayoutParams params = (RadioGroup.LayoutParams) view.getLayoutParams();
+                params.width = rowWidths[position];
+                view.setLayoutParams(params);
+            }
+        });
     }
 
     private void setRowHeight(final LinearLayout view, final int position) {
