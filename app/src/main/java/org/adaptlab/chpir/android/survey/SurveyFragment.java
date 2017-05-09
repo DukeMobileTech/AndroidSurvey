@@ -787,8 +787,6 @@ public class SurveyFragment extends Fragment {
             Question lastQuestion = mGrid.questions().get(mGrid.questions().size() - 1);
             mQuestion = nextQuestionHelper(lastQuestion.getNumberInInstrument());
             createQuestionFragment();
-            updateQuestionText();
-            updateQuestionCountLabel();
         } else {
             if (mQuestionNumber < mQuestionCount - 1) {
                 mPreviousQuestions.add(mQuestionNumber);
@@ -802,8 +800,9 @@ public class SurveyFragment extends Fragment {
                 finishSurvey();
             }
             mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
-            updateQuestionCountLabel();
         }
+        updateQuestionText();
+        updateQuestionCountLabel();
     }
 
     /*
@@ -1025,8 +1024,10 @@ public class SurveyFragment extends Fragment {
 
     private void updateQuestionCountLabel() {
         if (mQuestion.belongsToGrid()) {
-            mQuestionIndex.setText((mQuestionNumber + 1) + " - " + (mQuestionNumber + mGrid
-                    .questions().size()) + " " + getString(R.string.of) + " " + mQuestionCount);
+            Question first = mGrid.questions().get(0);
+            Question last = mGrid.questions().get(mGrid.questions().size() - 1);
+            mQuestionIndex.setText((first.getNumberInInstrument()) + " - " + (
+                    last.getNumberInInstrument()) + " " + getString(R.string.of) + " " + mQuestionCount);
         } else {
             mQuestionIndex.setText((mQuestionNumber + 1) + " " + getString(R.string.of) + " " +
                     mQuestionCount);
