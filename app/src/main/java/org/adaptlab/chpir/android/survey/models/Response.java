@@ -48,6 +48,8 @@ public class Response extends SendModel {
     private int mQuestionVersion;
     @Column(name = "SurveyUUID")
     private String mSurveyUUID;
+    @Column(name = "RandomizedData")
+    private String mRandomizedData;
 
     public Response() {
         super();
@@ -105,6 +107,7 @@ public class Response extends SendModel {
             jsonObject.put("question_identifier", getQuestion().getQuestionIdentifier());
             jsonObject.put("uuid", getUUID());
             jsonObject.put("question_version", getQuestionVersion());
+            jsonObject.put("randomized_data", getRandomizedData());
             if (getDeviceUser() != null) {
                 jsonObject.put("device_user_id", getDeviceUser().getRemoteId());
             }
@@ -243,6 +246,14 @@ public class Response extends SendModel {
     @Override
     public boolean belongsToRoster() {
         return getSurvey().belongsToRoster();
+    }
+
+    public void setRandomizedData(String data) {
+        mRandomizedData = data;
+    }
+
+    public String getRandomizedData() {
+        return mRandomizedData;
     }
 
 }

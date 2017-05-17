@@ -1,6 +1,7 @@
 package org.adaptlab.chpir.android.survey.models;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.activeandroid.annotation.Column;
@@ -9,6 +10,7 @@ import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
 import org.adaptlab.chpir.android.survey.AppUtil;
+import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.FormatUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,14 +18,17 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 @Table(name = "Questions")
 public class Question extends ReceiveModel {
 
     public static final String FOLLOW_UP_TRIGGER_STRING = "\\[followup\\]";
+    private static final String RANDOMIZATION_TRIGGER = "\\[RANDOMIZED_FACTOR\\]";
     private static final String TAG = "QuestionModel";
     public static Set<QuestionType> AnyResponseQuestions = new HashSet<QuestionType>(Arrays.asList(
             QuestionType.FREE_RESPONSE, QuestionType.SLIDER, QuestionType.DATE, QuestionType.RATING,
@@ -165,8 +170,9 @@ public class Question extends ReceiveModel {
      * If the question that is being followed up on was skipped by the user,
      * then return nothing.  This question will be skipped in that case.
      */
-    public String getFollowingUpText(Survey survey, Context context) {
-        Response followUpResponse = survey.getResponseByQuestion(getFollowingUpQuestion());
+    public String getFollowingUpText(HashMap<Question, Response> responses, Context context) {
+
+        Response followUpResponse = responses.get(getFollowingUpQuestion());
         if (followUpResponse == null ||
                 followUpResponse.getText().equals("") ||
                 followUpResponse.hasSpecialResponse()) {
@@ -181,6 +187,44 @@ public class Question extends ReceiveModel {
         } else {
             return getText().replaceAll(FOLLOW_UP_TRIGGER_STRING, followUpResponse.getText());
         }
+    }
+
+    /*
+    * position in QuestionRandomizedFactor starts from 1, hence k + 1
+    * save response at the end as a fallback for INSTRUCTIONS questions type which has no questionComponent - saving to db happens here
+     */
+    public String getRandomizedText(Response response) {
+        JSONObject randomizedData;
+        String text = getText();
+        if (response == null) return text;
+        if (!TextUtils.isEmpty(response.getRandomizedData())) {
+            try {
+                randomizedData = new JSONObject(response.getRandomizedData());
+                for (int k = 0; k < questionRandomizedFactors().size(); k++) {
+                    text = text.replaceFirst(RANDOMIZATION_TRIGGER, randomizedData.getString(String.valueOf(k + 1)));
+                }
+            } catch (JSONException e) {
+                if (BuildConfig.DEBUG) Log.e(TAG, "JSON exception", e);
+            }
+        } else {
+            Random random = new Random();
+            randomizedData = new JSONObject();
+            for (int k = 0; k < questionRandomizedFactors().size(); k++) {
+                List<RandomizedOption> randomizedOptions = questionRandomizedFactors().get(k)
+                        .getRandomizedFactor().randomizedOptions();
+                int index = random.nextInt(randomizedOptions.size());
+                String optionText = randomizedOptions.get(index).getText();
+                text = text.replaceFirst(RANDOMIZATION_TRIGGER, optionText);
+                try {
+                    randomizedData.put(String.valueOf(k + 1), optionText);
+                } catch (JSONException e) {
+                    if (BuildConfig.DEBUG) Log.e(TAG, "JSON exception", e);
+                }
+            }
+            response.setRandomizedData(randomizedData.toString());
+            response.save(); // fallback when INSTRUCTIONS question type
+        }
+        return text;
     }
 
     public Question getFollowingUpQuestion() {
@@ -343,9 +387,7 @@ public class Question extends ReceiveModel {
             question.setInstructions(jsonObject.getString("instructions"));
             question.setQuestionVersion(jsonObject.getInt("question_version"));
             question.setFollowingUpQuestion(Question.findByQuestionIdentifier(
-                    jsonObject.getString("following_up_question_identifier")
-                    )
-            );
+                    jsonObject.getString("following_up_question_identifier")));
             if (!jsonObject.isNull("grid_id")) {
                 question.setGrid(Grid.findByRemoteId(jsonObject.getLong("grid_id")));
             }
@@ -492,6 +534,12 @@ public class Question extends ReceiveModel {
                 .execute();
     }
 
+    public List<QuestionRandomizedFactor> questionRandomizedFactors() {
+        return new Select().from(QuestionRandomizedFactor.class).where("Question = ?", getId())
+                .orderBy("Position ASC")
+                .execute();
+    }
+
     public String getRegExValidation() {
         if (mRegExValidation.equals("") || mRegExValidation.equals("null"))
             return null;
@@ -603,13 +651,17 @@ public class Question extends ReceiveModel {
         mCritical = critical;
     }
 
-    public static enum QuestionType {
+    public boolean hasRandomizedFactors() {
+        return questionRandomizedFactors().size() > 0;
+    }
+
+    public enum QuestionType {
         SELECT_ONE, SELECT_MULTIPLE, SELECT_ONE_WRITE_OTHER,
         SELECT_MULTIPLE_WRITE_OTHER, FREE_RESPONSE, SLIDER,
         FRONT_PICTURE, REAR_PICTURE, DATE, RATING, TIME,
         LIST_OF_TEXT_BOXES, INTEGER, EMAIL_ADDRESS,
         DECIMAL_NUMBER, INSTRUCTIONS, MONTH_AND_YEAR, YEAR,
         PHONE_NUMBER, ADDRESS, SELECT_ONE_IMAGE, SELECT_MULTIPLE_IMAGE,
-        LIST_OF_INTEGER_BOXES, LABELED_SLIDER;
+        LIST_OF_INTEGER_BOXES, LABELED_SLIDER
     }
 }

@@ -73,6 +73,7 @@ public abstract class QuestionFragment extends Fragment {
             response.setSurvey(mSurvey);
             response.save();
             mSurveyFragment.getResponses().put(mQuestion, response);
+            mSurveyFragment.refreshView();
         }
         return response;
     }
@@ -94,9 +95,6 @@ public abstract class QuestionFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        if (mResponse != null) {
-            new SaveResponseTask().execute(mResponse);
-        }
         hideKeyBoard();
     }
 
@@ -205,6 +203,7 @@ public abstract class QuestionFragment extends Fragment {
             mResponse.setSpecialResponse("");
             ActivityCompat.invalidateOptionsMenu(getActivity());
         }
+        new SaveResponseTask().execute(mResponse);
     }
 
     protected abstract String serialize();

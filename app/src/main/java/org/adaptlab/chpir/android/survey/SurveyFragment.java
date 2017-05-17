@@ -129,6 +129,7 @@ public class SurveyFragment extends Fragment {
     private ProgressBar mProgressBar;
     private LocationServiceManager mLocationServiceManager;
     private GestureDetector mGestureDetector;
+    private ProgressDialog mProgressDialog;
 
     //drawer vars
     private DrawerLayout mDrawerLayout;
@@ -202,7 +203,7 @@ public class SurveyFragment extends Fragment {
         }
     }
 
-    private void refreshView() {
+    public void refreshView() {
         setParticipantLabel();
         updateQuestionCountLabel();
         updateQuestionText();
@@ -967,15 +968,16 @@ public class SurveyFragment extends Fragment {
      */
     private boolean setQuestionText(TextView text) {
         appendInstructions(text);
-
         if (mQuestion.isFollowUpQuestion()) {
-            String followUpText = mQuestion.getFollowingUpText(mSurvey, getActivity());
+            String followUpText = mQuestion.getFollowingUpText(mResponses, getActivity());
 
             if (followUpText == null) {
                 return false;
             } else {
                 text.append(styleTextWithHtml(followUpText));
             }
+        } else if (mQuestion.hasRandomizedFactors()) {
+            text.append(styleTextWithHtml(mQuestion.getRandomizedText(mResponses.get(mQuestion))));
         } else {
             text.append(styleTextWithHtml(mQuestion.getText()));
         }
@@ -1041,8 +1043,6 @@ public class SurveyFragment extends Fragment {
 
     private class LoadQuestionsTask extends AsyncTask<Instrument, Void, List<Question>> {
 
-        ProgressDialog progressDialog;
-
         @Override
         protected List<Question> doInBackground(Instrument... params) {
             return params[0].questions();
@@ -1050,7 +1050,7 @@ public class SurveyFragment extends Fragment {
 
         @Override
         protected void onPreExecute() {
-            progressDialog = ProgressDialog.show(getActivity(),
+            mProgressDialog = ProgressDialog.show(getActivity(),
                     getString(R.string.instrument_loading_progress_header),
                     getString(R.string.background_process_progress_message)
             );
@@ -1060,23 +1060,10 @@ public class SurveyFragment extends Fragment {
         protected void onPostExecute(List<Question> questions) {
             mQuestions = questions;
             new LoadResponsesTask().execute(mSurvey);
-            if (progressDialog.isShowing()) {
-                progressDialog.dismiss();
-            }
         }
     }
 
     private class LoadResponsesTask extends AsyncTask<Survey, Void, HashMap<Question, Response>> {
-
-        ProgressDialog progressDialog;
-
-        @Override
-        protected void onPreExecute() {
-            progressDialog = ProgressDialog.show(getActivity(),
-                    getString(R.string.instrument_loading_progress_header),
-                    getString(R.string.background_process_progress_message)
-            );
-        }
 
         @Override
         protected HashMap<Question, Response> doInBackground(Survey... params) {
@@ -1087,24 +1074,11 @@ public class SurveyFragment extends Fragment {
         protected void onPostExecute(HashMap<Question, Response> responses) {
             mResponses = responses;
             new LoadOptionsTask().execute(mInstrument);
-            if (progressDialog.isShowing()) {
-                progressDialog.dismiss();
-            }
         }
     }
 
     private class LoadOptionsTask extends AsyncTask<Instrument, Void, HashMap<Question,
             List<Option>>> {
-
-        ProgressDialog progressDialog;
-
-        @Override
-        protected void onPreExecute() {
-            progressDialog = ProgressDialog.show(getActivity(),
-                    getString(R.string.instrument_loading_progress_header),
-                    getString(R.string.background_process_progress_message)
-            );
-        }
 
         @Override
         protected HashMap<Question, List<Option>> doInBackground(Instrument... params) {
@@ -1117,8 +1091,8 @@ public class SurveyFragment extends Fragment {
             loadOrCreateQuestion();
             ActivityCompat.invalidateOptionsMenu(getActivity());
             refreshView();
-            if (progressDialog.isShowing()) {
-                progressDialog.dismiss();
+            if (mProgressDialog.isShowing()) {
+                mProgressDialog.dismiss();
             }
         }
     }
