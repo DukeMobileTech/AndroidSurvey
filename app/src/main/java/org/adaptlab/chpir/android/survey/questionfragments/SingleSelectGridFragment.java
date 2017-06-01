@@ -2,7 +2,6 @@ package org.adaptlab.chpir.android.survey.questionfragments;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +15,6 @@ import org.adaptlab.chpir.android.survey.GridFragment;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.GridLabel;
 import org.adaptlab.chpir.android.survey.models.Question;
-import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.roster.views.OHScrollView;
 
 import java.util.ArrayList;
@@ -200,16 +198,6 @@ public class SingleSelectGridFragment extends GridFragment {
     @Override
     protected String serialize() {
         return null;
-    }
-
-    private void setResponseIndex(Question q, int checkedId) {
-        Response response = getSurvey().getResponseByQuestion(q);
-        response.setResponse(String.valueOf(checkedId));
-        if (isAdded() && !response.getText().equals("")) {
-            response.setSpecialResponse("");
-            ActivityCompat.invalidateOptionsMenu(getActivity());
-        }
-        response.save();
     }
 
     @Override

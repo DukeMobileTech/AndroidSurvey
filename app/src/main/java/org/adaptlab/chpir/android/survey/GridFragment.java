@@ -1,6 +1,7 @@
 package org.adaptlab.chpir.android.survey;
 
 import android.content.pm.ActivityInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Survey;
 import org.adaptlab.chpir.android.survey.roster.listeners.ScrollViewListener;
+import org.adaptlab.chpir.android.survey.tasks.SendResponsesTask;
 
 import java.util.List;
 
@@ -114,4 +116,36 @@ public abstract class GridFragment extends QuestionFragment implements ScrollVie
 		return mSurvey;
 	}
 
+    protected void setResponseIndex(Question q, int checkedId) {
+        new SaveResponseTask(mSurvey, q, checkedId).execute();
+    }
+
+	private class SaveResponseTask extends AsyncTask<Void, Void, Void> {
+		private int id;
+		private Question question;
+		private Survey survey;
+
+		private SaveResponseTask(Survey s, Question q, int checkedId) {
+			question = q;
+			id = checkedId;
+			survey = s;
+		}
+
+		@Override
+		protected Void doInBackground(Void... params) {
+	        Response response = survey.getResponseByQuestion(question);
+        	response.setResponse(String.valueOf(id));
+        	response.save();
+            survey.save();
+            return null;
+		}
+
+        @Override
+		protected void onPostExecute(Void params) {
+			if (survey != null && survey.readyToSend()) {
+				new SendResponsesTask(getActivity()).execute();
+			}
+		}
+
+	}
 }
