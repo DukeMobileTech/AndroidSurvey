@@ -38,141 +38,52 @@ public class Option extends ReceiveModel {
     private boolean mSpecial;
     @Column(name = "Critical")
     private boolean mCritical;
+    @Column(name = "CompleteSurvey")
+    private boolean mCompleteSurvey;
 
     public Option() {
         super();
     }
-    
+
+    public static List<Option> getAll() {
+        return new Select().from(Option.class).where("Deleted != ?", 1).orderBy("Id ASC").execute();
+    }
+
     /*
      * If the language of the instrument is the same as the language setting on the
      * device (or through the admin settings), then return the default option text.
-     * 
+     *
      * If another language is requested, iterate through option translations to
      * find translated text.
-     * 
+     *
      * If the language requested is not available as a translation, return the non-translated
      * text for the option.
      */
     public String getText() {
         if (getQuestion().getInstrument().getLanguage().equals(getDeviceLanguage())) return mText;
-        for(OptionTranslation translation : translations()) {
+        for (OptionTranslation translation : translations()) {
             if (translation.getLanguage().equals(getDeviceLanguage())) {
                 return translation.getText();
             }
         }
-        
+
         // Fall back to default
         return mText;
     }
 
-	public String getDeviceLanguage() {
-		return Instrument.getDeviceLanguage();
-	}
-    
-    
-    /*
-     * Find an exisiting translation, or return a new OptionTranslation
-     * if a translation does not yet exist.
-     */ 
-    public OptionTranslation getTranslationByLanguage(String language) {
-        for(OptionTranslation translation : translations()) {
-            if (translation.getLanguage().equals(language)) {
-                return translation;
-            }
-        }
-        
-        OptionTranslation translation = new OptionTranslation();
-        translation.setLanguage(language);
-        return translation;
-    }
-    
-
-    @Override
-    public void createObjectFromJSON(JSONObject jsonObject) {
-        try {
-            Long remoteId = jsonObject.getLong("id");
-            
-            // If an option already exists, update it from the remote
-            Option option = Option.findByRemoteId(remoteId);
-            if (option == null) {
-                option = this;
-            }
-            
-            if (AppUtil.DEBUG) Log.i(TAG, "Creating object from JSON Object: " + jsonObject);
-            option.setText(jsonObject.getString("text"));
-            option.setQuestion(Question.findByRemoteId(jsonObject.getLong("question_id")));
-            option.setRemoteId(remoteId);
-            option.setNextQuestion(jsonObject.getString("next_question"));
-            if (!jsonObject.isNull("number_in_question")) {
-            	option.setNumberInQuestion(jsonObject.getInt("number_in_question"));
-            }
-            option.setInstrumentVersion(jsonObject.getInt("instrument_version"));
-            option.setSpecial(jsonObject.getBoolean("special"));
-            if (!jsonObject.isNull("deleted_at")) { option.setDeleted(true); }
-            if (!jsonObject.isNull("critical")) { option.setCritical(jsonObject.getBoolean("critical")); }
-            option.save();
-            
-            // Generate translations
-            JSONArray translationsArray = jsonObject.optJSONArray("option_translations");
-            if (translationsArray != null) {
-                for (int i = 0; i < translationsArray.length(); i++) {
-                    JSONObject translationJSON = translationsArray.getJSONObject(i);
-                    OptionTranslation translation = option.getTranslationByLanguage(translationJSON.getString("language"));
-
-                    translation.setOption(option);
-                    translation.setText(translationJSON.getString("text"));
-                    translation.save();
-                }
-            }
-        } catch (JSONException je) {
-            Log.e(TAG, "Error parsing object json", je);
-        }   
-    }    
-    
-    // Used for skip patterns
-    public Question getNextQuestion() {
-        return findByQuestionIdentifier(mNextQuestion);
-    }
-
-	public Question findByQuestionIdentifier(String question) {
-		return Question.findByQuestionIdentifier(question);
-	}
-    
-    private void setNextQuestion(String nextQuestion) {
-        mNextQuestion = nextQuestion;
-    }
-    
-    /*
-     * Finders
-     */
-    public static List<Option> getAll() {
-        return new Select().from(Option.class).where("Deleted != ?", 1).orderBy("Id ASC").execute();
-    }
-    
-    public static Option findByRemoteId(Long id) {
-        return new Select().from(Option.class).where("RemoteId = ?", id).executeSingle();
-    }
-      
-    /*
-     * Relationships
-     */ 
-    public List<OptionTranslation> translations() {
-        return getMany(OptionTranslation.class, "Option");
-    }
-    
-    public List<Skip> skips() {
-        return getMany(Skip.class, "Option");
-    }
-    
-    public List<Question> questionsToSkip() {
-    	return new Select("Questions.*").from(Question.class).innerJoin(Skip.class).on("Questions.Id = Skips.Question AND Skips.Option =?", getId()).execute();
-    }
-    
-    /*
-     * Getters/Setters
-     */
     public Question getQuestion() {
         return mQuestion;
+    }
+
+    public String getDeviceLanguage() {
+        return Instrument.getDeviceLanguage();
+    }
+
+    /*
+     * Relationships
+     */
+    public List<OptionTranslation> translations() {
+        return getMany(OptionTranslation.class, "Option");
     }
 
     public void setQuestion(Question question) {
@@ -182,52 +93,150 @@ public class Option extends ReceiveModel {
     public void setText(String text) {
         mText = text;
     }
-    
+
+    @Override
+    public void createObjectFromJSON(JSONObject jsonObject) {
+        try {
+            Long remoteId = jsonObject.getLong("id");
+
+            // If an option already exists, update it from the remote
+            Option option = Option.findByRemoteId(remoteId);
+            if (option == null) {
+                option = this;
+            }
+
+            if (AppUtil.DEBUG) Log.i(TAG, "Creating object from JSON Object: " + jsonObject);
+            option.setText(jsonObject.getString("text"));
+            option.setQuestion(Question.findByRemoteId(jsonObject.getLong("question_id")));
+            option.setRemoteId(remoteId);
+            option.setNextQuestion(jsonObject.getString("next_question"));
+            if (!jsonObject.isNull("number_in_question")) {
+                option.setNumberInQuestion(jsonObject.getInt("number_in_question"));
+            }
+            option.setInstrumentVersion(jsonObject.getInt("instrument_version"));
+            option.setSpecial(jsonObject.getBoolean("special"));
+            if (!jsonObject.isNull("deleted_at")) {
+                option.setDeleted(true);
+            }
+            if (!jsonObject.isNull("critical")) {
+                option.setCritical(jsonObject.getBoolean("critical"));
+            }
+            option.setCompleteSurvey(jsonObject.optBoolean("complete_survey"));
+            option.save();
+
+            // Generate translations
+            JSONArray translationsArray = jsonObject.optJSONArray("option_translations");
+            if (translationsArray != null) {
+                for (int i = 0; i < translationsArray.length(); i++) {
+                    JSONObject translationJSON = translationsArray.getJSONObject(i);
+                    OptionTranslation translation = option.getTranslationByLanguage
+                            (translationJSON.getString("language"));
+
+                    translation.setOption(option);
+                    translation.setText(translationJSON.getString("text"));
+                    translation.save();
+                }
+            }
+        } catch (JSONException je) {
+            Log.e(TAG, "Error parsing object json", je);
+        }
+    }
+
+    public static Option findByRemoteId(Long id) {
+        return new Select().from(Option.class).where("RemoteId = ?", id).executeSingle();
+    }
+
+    /*
+     * Find an existing translation, or return a new OptionTranslation
+     * if a translation does not yet exist.
+     */
+    public OptionTranslation getTranslationByLanguage(String language) {
+        for (OptionTranslation translation : translations()) {
+            if (translation.getLanguage().equals(language)) {
+                return translation;
+            }
+        }
+
+        OptionTranslation translation = new OptionTranslation();
+        translation.setLanguage(language);
+        return translation;
+    }
+
+    // Used for skip patterns
+    public Question getNextQuestion() {
+        return findByQuestionIdentifier(mNextQuestion);
+    }
+
+    public Question findByQuestionIdentifier(String question) {
+        return Question.findByQuestionIdentifier(question);
+    }
+
+    private void setNextQuestion(String nextQuestion) {
+        mNextQuestion = nextQuestion;
+    }
+
+    public List<Skip> skips() {
+        return getMany(Skip.class, "Option");
+    }
+
+    public List<Question> questionsToSkip() {
+        return new Select("Questions.*").from(Question.class).innerJoin(Skip.class).on("Questions" +
+                ".Id = Skips.Question AND Skips.Option =?", getId()).execute();
+    }
+
     public Long getRemoteId() {
         return mRemoteId;
     }
-    
+
     public void setRemoteId(Long id) {
         mRemoteId = id;
     }
-    
+
     public int getNumberInQuestion() {
         return mNumberInQuestion;
     }
-    
+
+    private void setNumberInQuestion(int number) {
+        mNumberInQuestion = number;
+    }
+
     public int getInstrumentVersion() {
         return mInstrumentVersion;
+    }
+
+    private void setInstrumentVersion(int version) {
+        mInstrumentVersion = version;
     }
 
     public boolean getSpecial() {
         return mSpecial;
     }
 
+    private void setSpecial(boolean special) {
+        mSpecial = special;
+    }
+
     public boolean getDeleted() {
         return mDeleted;
+    }
+
+    private void setDeleted(boolean deleted) {
+        mDeleted = deleted;
     }
 
     public boolean getCritical() {
         return mCritical;
     }
 
-    private void setNumberInQuestion(int number) {
-        mNumberInQuestion = number;
-    }
-    
-    private void setInstrumentVersion(int version) {
-        mInstrumentVersion = version;
-    }
-    
-    private void setDeleted(boolean deleted) {
-    	mDeleted = deleted;
-    }
-
-    private void setSpecial(boolean special) {
-        mSpecial = special;
-    }
-
     private void setCritical(boolean critical) {
         mCritical = critical;
+    }
+
+    public boolean getCompleteSurvey() {
+        return mCompleteSurvey;
+    }
+
+    private void setCompleteSurvey(boolean completeSurvey) {
+        mCompleteSurvey = completeSurvey;
     }
 }

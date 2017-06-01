@@ -133,4 +133,5 @@
     <string name="roster">roster</string>
     <string name="unidentified_roster">Unidentified Roster </string>
     <string name="instrument_title">Instrument title</string>
+    <string name="question_text_header">Texto de la pregunta</string>
 </resources>

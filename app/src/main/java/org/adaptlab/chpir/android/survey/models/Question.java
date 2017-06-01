@@ -145,6 +145,14 @@ public class Question extends ReceiveModel {
         return false;
     }
 
+    public boolean hasCompleteSurveyOption() {
+        Option completeSurveyOption = new Select().from(Option.class)
+                .where("Question = ? AND Deleted != ? AND Special = ? AND CompleteSurvey = ?",
+                        getId(), 1, 0, 1)
+                .executeSingle();
+        return completeSurveyOption != null;
+    }
+
     public List<Option> defaultOptions() {
         return new Select().from(Option.class)
                 .where("Question = ? AND Deleted != ? AND Special = ?", getId(), 1, 0)
@@ -382,7 +390,9 @@ public class Question extends ReceiveModel {
             if (!jsonObject.isNull("number_in_instrument")) {
                 question.setNumberInInstrument(jsonObject.getInt("number_in_instrument"));
             }
-            question.setFollowUpPosition(jsonObject.getInt("follow_up_position"));
+            if (!jsonObject.isNull("follow_up_position")) {
+                question.setFollowUpPosition(jsonObject.getInt("follow_up_position"));
+            }
             question.setIdentifiesSurvey(jsonObject.getBoolean("identifies_survey"));
             question.setInstructions(jsonObject.getString("instructions"));
             question.setQuestionVersion(jsonObject.getInt("question_version"));

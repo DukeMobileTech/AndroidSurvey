@@ -133,4 +133,5 @@
     <string name="reset_last_sync_time">Reset Last Sync Time</string>
     <string name="last_sync_time">Last Sync Time: </string>
     <string name="version_name">Version Name: </string>
+    <string name="question_text_header">نص السؤال</string>
 </resources>

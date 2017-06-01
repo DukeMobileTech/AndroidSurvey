@@ -25,17 +25,16 @@ import java.util.List;
 public class SingleSelectGridFragment extends GridFragment {
     private static final String TAG = "SingleSelectGridFragment";
     private static final int MIN_HEIGHT = 80;
-    private static final int MIN_WIDTH = 200;
     private static final int MARGIN_10 = 10;
-    private static final int MARGIN_50 = 50;
     private static final int MARGIN_0 = 0;
     private int mIndex;
     private List<RadioGroup> mRadioGroups;
+    private List<TextView> mHeaderViews;
     private Integer[] rowHeights;
-    private Integer[] rowWidths;
     private boolean interceptScroll = true;
     private OHScrollView headerScrollView;
     private OHScrollView contentScrollView;
+    private int minimumWidth = 100;
 
     @Override
     protected void deserialize(String responseText) {
@@ -91,10 +90,8 @@ public class SingleSelectGridFragment extends GridFragment {
             RadioButton button = new RadioButton(getActivity());
             button.setSaveEnabled(false);
             button.setId(i);
-            button.setMinimumWidth(MIN_WIDTH);
             RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(
                     RadioGroup.LayoutParams.WRAP_CONTENT, MIN_HEIGHT);
-            params.setMargins(MARGIN_50, MARGIN_0, MARGIN_0, MARGIN_0);
             button.setLayoutParams(params);
             adjustRowWidth(button, i);
             radioButtons.addView(button, i);
@@ -138,20 +135,19 @@ public class SingleSelectGridFragment extends GridFragment {
         questionTextHeader.setMinHeight(MIN_HEIGHT);
         LinearLayout headerTableLayout = (LinearLayout) v.findViewById(R.id.table_options_header);
         List<GridLabel> gridLabels = getGrid().labels();
-        rowWidths = new Integer[gridLabels.size()];
+        mHeaderViews = new ArrayList<>();
         for (int k = 0; k < gridLabels.size(); k++) {
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            params.setMargins(MARGIN_0, MARGIN_0, MARGIN_50, MARGIN_0);
             TextView textView = new TextView(getActivity());
             textView.setLayoutParams(params);
             textView.setText(gridLabels.get(k).getLabelText());
             textView.setTypeface(Typeface.DEFAULT_BOLD);
-            textView.setMinimumWidth(MIN_WIDTH);
             textView.setMinHeight(MIN_HEIGHT);
             textView.setGravity(Gravity.CENTER);
             headerTableLayout.addView(textView);
             setRowWidth(textView, k);
+            mHeaderViews.add(textView);
         }
     }
 
@@ -159,7 +155,9 @@ public class SingleSelectGridFragment extends GridFragment {
         view.post(new Runnable() {
             @Override
             public void run() {
-                rowWidths[position] = view.getWidth();
+                if (view.getWidth() > minimumWidth) {
+                    minimumWidth = view.getWidth();
+                }
             }
         });
     }
@@ -169,8 +167,10 @@ public class SingleSelectGridFragment extends GridFragment {
             @Override
             public void run() {
                 RadioGroup.LayoutParams params = (RadioGroup.LayoutParams) view.getLayoutParams();
-                params.width = rowWidths[position];
+                int totalMargin = minimumWidth - view.getWidth();
+                params.setMargins(totalMargin/2, 0, totalMargin/2, 0);
                 view.setLayoutParams(params);
+                mHeaderViews.get(position).setWidth(minimumWidth);
             }
         });
     }

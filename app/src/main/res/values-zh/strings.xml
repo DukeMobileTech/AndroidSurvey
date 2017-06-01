@@ -133,4 +133,5 @@
     <string name="reset_last_sync_time">重置上次同步时间</string>
     <string name="last_sync_time">上次同步时间： </string>
     <string name="version_name">版本名称： </string>
+    <string name="question_text_header">问题文本</string>
 </resources>

@@ -25,12 +25,12 @@ public class DefaultAdminSettings extends AdminSettings {
 
     @Override
     public boolean getShowSurveys() {
-        return true;
+        return AppUtil.getContext().getResources().getBoolean(R.bool.default_show_surveys);
     }
 
     @Override
     public boolean getShowSkip() {
-        return true;
+        return AppUtil.getContext().getResources().getBoolean(R.bool.default_show_sk);
     }
 
     @Override
@@ -61,6 +61,21 @@ public class DefaultAdminSettings extends AdminSettings {
     @Override
     public String getProjectId() {
         return AppUtil.getContext().getResources().getString(R.string.default_project_id);
+    }
+
+    @Override
+    public boolean getShowDK() {
+        return AppUtil.getContext().getResources().getBoolean(R.bool.default_show_dk);
+    }
+
+    @Override
+    public boolean getShowNA() {
+        return AppUtil.getContext().getResources().getBoolean(R.bool.default_show_na);
+    }
+
+    @Override
+    public boolean getShowRF() {
+        return AppUtil.getContext().getResources().getBoolean(R.bool.default_show_rf);
     }
 
     @Override
