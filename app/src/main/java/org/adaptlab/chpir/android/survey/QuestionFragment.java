@@ -124,6 +124,10 @@ public abstract class QuestionFragment extends Fragment {
                 .HIDE_IMPLICIT_ONLY);
     }
 
+    protected SurveyFragment getSurveyFragment() {
+        return mSurveyFragment;
+    }
+
     public Question getQuestion() {
         return mQuestion;
     }

@@ -653,6 +653,10 @@ public class SurveyFragment extends Fragment {
         return mQuestion;
     }
 
+    public List<Question> getQuestions() {
+        return mQuestions;
+    }
+
     public Survey getSurvey() {
         return mSurvey;
     }

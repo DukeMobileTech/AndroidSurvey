@@ -71,7 +71,9 @@ public class SingleSelectGridFragment extends GridFragment {
             setQuestionText(questionTextLayout, k, q);
             setRadioButtons(optionsListLinearLayout, k, q);
             mIndex = k;
-            deserialize(getSurvey().getResponseByQuestion(q).getText());
+            if (getSurvey().getResponseByQuestion(q) != null) {
+                deserialize(getSurvey().getResponseByQuestion(q).getText());
+            }
         }
     }
 
