@@ -54,6 +54,16 @@
             android:padding="10dp"
             android:text="@string/reset_last_sync_time"/>
 
+        <Button
+            android:id="@+id/view_survey_scores"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="10dp"
+            android:background="@color/primary"
+            android:padding="10dp"
+            android:text="@string/scores"/>
+
 
     </LinearLayout>
 

@@ -134,4 +134,14 @@
     <string name="last_sync_time">Last Sync Time: </string>
     <string name="version_name">Version Name: </string>
     <string name="question_text_header">نص السؤال</string>
+    <string name="scores">Scores</string>
+    <string name="score_type">Score Type:</string>
+    <string name="unit_questions">Question Ids</string>
+    <string name="minimum_score">Minimum Score:</string>
+    <string name="maximum_score">Maximum Score:</string>
+    <string name="score_weight">Unit Score Weight:</string>
+    <string name="unit_raw_score">Raw Score:</string>
+    <string name="weighted_score">Weighted Score:</string>
+    <string name="total_raw_score">Total Raw Score:</string>
+    <string name="total_weighted_score">Total Weighted Score:</string>
 </resources>

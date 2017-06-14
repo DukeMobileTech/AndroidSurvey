@@ -81,7 +81,7 @@ public class GridLabel extends ReceiveModel {
         return mRemoteId;
     }
 
-    private void setRemoteId(Long remoteId) {
+    public void setRemoteId(Long remoteId) {
         mRemoteId = remoteId;
     }
 

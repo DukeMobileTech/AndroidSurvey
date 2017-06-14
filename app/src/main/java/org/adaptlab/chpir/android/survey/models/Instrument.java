@@ -68,6 +68,8 @@ public class Instrument extends ReceiveModel {
     private boolean mLoaded;
     @Column(name = "Roster")
     private boolean mRoster;
+    @Column(name = "Scorable")
+    private boolean mScorable;
 
     public Instrument() {
         super();
@@ -286,6 +288,7 @@ public class Instrument extends ReceiveModel {
             instrument.setCriticalMessage(jsonObject.getString("critical_message"));
             instrument.setSpecialOptions(jsonObject.getString("special_options"));
             instrument.setRoster(jsonObject.optBoolean("roster"));
+            instrument.setScorable(jsonObject.optBoolean("scorable"));
             if (jsonObject.isNull("deleted_at")) {
                 instrument.setDeleted(false);
             } else {
@@ -347,7 +350,7 @@ public class Instrument extends ReceiveModel {
 
     public HashMap<Question, List<Option>> optionsMap() {
         int capacity = (int) Math.ceil(getQuestionCount() / 0.75);
-        HashMap<Question, List<Option>> map = new HashMap<Question, List<Option>>(capacity);
+        HashMap<Question, List<Option>> map = new HashMap<>(capacity);
         for (Question question : questions()) {
             if (question.hasOptions()) {
                 map.put(question, question.defaultOptions());
@@ -440,5 +443,19 @@ public class Instrument extends ReceiveModel {
 
     public boolean isRoster() {
         return mRoster;
+    }
+
+    public List<ScoreScheme> scoreSchemes() {
+        return new Select().from(ScoreScheme.class)
+                .where("InstrumentRemoteId = ? AND Deleted != ?", getRemoteId(), 1)
+                .execute();
+    }
+
+    private void setScorable(boolean status) {
+        mScorable = status;
+    }
+
+    public boolean isScorable() {
+        return mScorable;
     }
 }

@@ -472,10 +472,7 @@ public class Question extends ReceiveModel {
         return translation;
     }
 
-    /*
-     * Private
-     */
-    private static boolean validQuestionType(String questionType) {
+    public static boolean validQuestionType(String questionType) {
         for (QuestionType type : QuestionType.values()) {
             if (type.name().equals(questionType)) {
                 return true;

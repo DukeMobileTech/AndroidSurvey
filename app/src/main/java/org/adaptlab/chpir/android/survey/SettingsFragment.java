@@ -69,6 +69,14 @@ public class SettingsFragment extends Fragment {
             }
         });
 
+        Button surveyScores = (Button) v.findViewById(R.id.view_survey_scores);
+        surveyScores.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getActivity(), ScoreActivity.class));
+            }
+        });
+
         return v;
     }
 

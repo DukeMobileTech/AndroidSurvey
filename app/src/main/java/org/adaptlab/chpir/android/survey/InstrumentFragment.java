@@ -54,6 +54,7 @@ import org.adaptlab.chpir.android.survey.roster.RosterActivity;
 import org.adaptlab.chpir.android.survey.rules.InstrumentLaunchRule;
 import org.adaptlab.chpir.android.survey.rules.RuleBuilder;
 import org.adaptlab.chpir.android.survey.rules.RuleCallback;
+import org.adaptlab.chpir.android.survey.tasks.SetScoreUnitOrderingQuestionTask;
 import org.adaptlab.chpir.android.survey.tasks.SendResponsesTask;
 
 import java.io.ByteArrayOutputStream;
@@ -722,6 +723,7 @@ public class InstrumentFragment extends ListFragment {
         protected void onPostExecute(Integer code) {
             if (isAdded()) {
                 new RefreshImagesTask().execute();
+                new SetScoreUnitOrderingQuestionTask().execute();
             }
             if (code == -1 && mProgressDialog != null) {
                 mProgressDialog.dismiss();
@@ -786,22 +788,25 @@ public class InstrumentFragment extends ListFragment {
                         + ActiveRecordCloudSync.getParams();
                 if (BuildConfig.DEBUG) Log.i(TAG, "Image url: " + url);
                 String filename = UUID.randomUUID().toString() + ".jpg";
-                FileOutputStream filewriter = null;
+                FileOutputStream fileWriter = null;
                 try {
                     byte[] imageBytes = getUrlBytes(url);
-                    filewriter = getActivity().openFileOutput(filename, Context.MODE_PRIVATE);
-                    filewriter.write(imageBytes);
-                    img.setBitmapPath(filename);
-                    img.save();
+                    if (imageBytes != null) {
+                        fileWriter = getActivity().openFileOutput(filename, Context.MODE_PRIVATE);
+                        fileWriter.write(imageBytes);
+                        img.setBitmapPath(filename);
+                        img.save();
+                    }
                     if (BuildConfig.DEBUG) Log.i(TAG, "image saved in " + filename);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    if (BuildConfig.DEBUG) Log.e(TAG, "IOException ", e);
                 } finally {
                     try {
-                        if (filewriter != null)
-                            filewriter.close();
+                        if (fileWriter != null) {
+                            fileWriter.close();
+                        }
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        if (BuildConfig.DEBUG) Log.e(TAG, "Exception ", e);
                     }
                 }
             }
@@ -813,12 +818,8 @@ public class InstrumentFragment extends ListFragment {
 
             try {
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
+                if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) return null;
                 InputStream in = connection.getInputStream();
-
-                if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                    return null;
-                }
-
                 int bytesRead = 0;
                 byte[] buffer = new byte[1024];
                 while ((bytesRead = in.read(buffer)) > 0) {

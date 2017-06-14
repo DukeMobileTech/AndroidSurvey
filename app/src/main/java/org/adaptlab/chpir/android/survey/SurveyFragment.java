@@ -51,6 +51,8 @@ import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Question.QuestionType;
 import org.adaptlab.chpir.android.survey.models.Response;
+import org.adaptlab.chpir.android.survey.models.Score;
+import org.adaptlab.chpir.android.survey.models.ScoreScheme;
 import org.adaptlab.chpir.android.survey.models.Section;
 import org.adaptlab.chpir.android.survey.models.Survey;
 import org.adaptlab.chpir.android.survey.questionfragments.MultipleSelectGridFragment;
@@ -370,7 +372,11 @@ public class SurveyFragment extends Fragment {
                 .ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                 && mLocationServiceManager != null
                 && mLocationServiceManager.mLocationReceiver != null) {
-            getActivity().unregisterReceiver(mLocationServiceManager.mLocationReceiver);
+            try {
+                getActivity().unregisterReceiver(mLocationServiceManager.mLocationReceiver);
+            } catch (IllegalArgumentException e) {
+                Log.e(TAG, "Illegal Argument Exception ", e);
+            }
         }
         super.onStop();
     }
@@ -703,15 +709,16 @@ public class SurveyFragment extends Fragment {
         if (response == null) {
             nextQuestion = nextQuestionHelper(questionIndex);
         } else {
-            if (mQuestion.hasOptions() && !TextUtils.isEmpty(response.getText())) {
-                int index = Integer.parseInt(response.getText());
-                if (index < mQuestion.defaultOptions().size())
-                    responseOption = mQuestion.defaultOptions().get(index);
-            }
-            if (mQuestion.hasCompleteSurveyOption() && responseOption != null && responseOption
-                    .getCompleteSurvey()) {
-                completeSurvey();
-                return null;
+            if (mQuestion.hasCompleteSurveyOption()) {
+                if (mQuestion.hasOptions() && !TextUtils.isEmpty(response.getText())) {
+                    int index = Integer.parseInt(response.getText());
+                    if (index < mQuestion.defaultOptions().size())
+                        responseOption = mQuestion.defaultOptions().get(index);
+                }
+                if (responseOption != null && responseOption.getCompleteSurvey()) {
+                    completeSurvey();
+                    return null;
+                }
             } else if (!TextUtils.isEmpty(response.getSpecialResponse())) {
                 Option specialOption = mQuestion.specialOptionByText(response.getSpecialResponse
                         ().trim());
@@ -935,9 +942,13 @@ public class SurveyFragment extends Fragment {
 
     private void completeSurvey() {
         isActivityFinished = true;
-        mSurvey.setAsComplete(true);
-        mSurvey.save();
-        getActivity().finish();
+        if (mInstrument.isScorable()) {
+            new ScoreSurveyTask().execute(mSurvey);
+        } else {
+            mSurvey.setAsComplete(true);
+            mSurvey.save();
+            getActivity().finish();
+        }
     }
 
     private List<String> getCriticalResponses() {
@@ -973,8 +984,18 @@ public class SurveyFragment extends Fragment {
     }
 
     private void setSurveyLocation() {
-        mSurvey.setLatitude(mLocationServiceManager.getLatitude());
-        mSurvey.setLongitude(mLocationServiceManager.getLongitude());
+        if (mLocationServiceManager == null) {
+            if (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission
+                    .ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED) {
+                ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+            } else {
+                startLocationServices();
+            }
+        } else {
+            mSurvey.setLatitude(mLocationServiceManager.getLatitude());
+            mSurvey.setLongitude(mLocationServiceManager.getLongitude());
+        }
     }
 
     /*
@@ -1120,6 +1141,34 @@ public class SurveyFragment extends Fragment {
             if (mProgressDialog.isShowing()) {
                 mProgressDialog.dismiss();
             }
+        }
+    }
+
+    private class ScoreSurveyTask extends AsyncTask<Survey, Void, Survey> {
+
+        @Override
+        protected Survey doInBackground(Survey... params) {
+            Survey survey = params[0];
+            for (ScoreScheme scheme : survey.getInstrument().scoreSchemes()) {
+                Score score = Score.findBySurveyAndScheme(survey, scheme);
+                if (score == null) {
+                    score = new Score();
+                    score.setSurvey(survey);
+                    score.setScoreScheme(scheme);
+                    score.setSurveyIdentifier(survey.identifier(AppUtil.getContext()));
+                    score.save();
+                }
+                score.score();
+            }
+            return survey;
+        }
+
+        @Override
+        protected void onPostExecute(Survey survey) {
+            survey.setAsComplete(true);
+            survey.save();
+            startActivity(new Intent(getActivity(), ScoreActivity.class));
+            getActivity().finish();
         }
     }
 

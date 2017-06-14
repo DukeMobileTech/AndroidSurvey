@@ -28,6 +28,7 @@ import org.adaptlab.chpir.android.survey.models.Image;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.InstrumentTranslation;
 import org.adaptlab.chpir.android.survey.models.Option;
+import org.adaptlab.chpir.android.survey.models.OptionScore;
 import org.adaptlab.chpir.android.survey.models.OptionTranslation;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.QuestionRandomizedFactor;
@@ -38,6 +39,9 @@ import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.ResponsePhoto;
 import org.adaptlab.chpir.android.survey.models.Roster;
 import org.adaptlab.chpir.android.survey.models.Rule;
+import org.adaptlab.chpir.android.survey.models.ScoreScheme;
+import org.adaptlab.chpir.android.survey.models.ScoreUnit;
+import org.adaptlab.chpir.android.survey.models.ScoreUnitQuestion;
 import org.adaptlab.chpir.android.survey.models.Section;
 import org.adaptlab.chpir.android.survey.models.SectionTranslation;
 import org.adaptlab.chpir.android.survey.models.Skip;
@@ -132,11 +136,16 @@ public class AppUtil {
         ActiveRecordCloudSync.addReceiveTable("device_users", DeviceUser.class);
         ActiveRecordCloudSync.addReceiveTable("skips", Skip.class);
         ActiveRecordCloudSync.addReceiveTable("rules", Rule.class);
+        ActiveRecordCloudSync.addReceiveTable("score_schemes", ScoreScheme.class);
+        ActiveRecordCloudSync.addReceiveTable("score_units", ScoreUnit.class);
+        ActiveRecordCloudSync.addReceiveTable("option_scores", OptionScore.class);
+        ActiveRecordCloudSync.addReceiveTable("score_unit_questions", ScoreUnitQuestion.class);
         ActiveRecordCloudSync.addSendTable("surveys", Survey.class);
         ActiveRecordCloudSync.addSendTable("responses", Response.class);
         ActiveRecordCloudSync.addSendTable("response_images", ResponsePhoto.class);
         ActiveRecordCloudSync.addSendTable("device_sync_entries", DeviceSyncEntry.class);
         ActiveRecordCloudSync.addSendTable("rosters", Roster.class);
+//        ActiveRecordCloudSync.addSendTable("scores", Score.class);
 
         PollService.setServiceAlarm(context.getApplicationContext(), true);
     }

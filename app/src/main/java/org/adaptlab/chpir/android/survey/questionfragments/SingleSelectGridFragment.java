@@ -168,6 +168,7 @@ public class SingleSelectGridFragment extends GridFragment {
             public void run() {
                 RadioGroup.LayoutParams params = (RadioGroup.LayoutParams) view.getLayoutParams();
                 int totalMargin = minimumWidth - view.getWidth();
+                if (totalMargin < 10) totalMargin = 10;
                 params.setMargins(totalMargin/2, 0, totalMargin/2, 0);
                 view.setLayoutParams(params);
                 mHeaderViews.get(position).setWidth(minimumWidth);
