@@ -124,6 +124,9 @@ public class Instrument extends ReceiveModel {
      */
     public String getTitle() {
         if (getLanguage().equals(getDeviceLanguage())) return mTitle;
+        if (activeTranslation() != null && !activeTranslation().getTitle().trim().equals("")) {
+            return activeTranslation().getTitle();
+        }
         for (InstrumentTranslation translation : translations()) {
             if (translation.getLanguage().equals(getDeviceLanguage())
                     && !translation.getTitle().trim().equals("")) {
@@ -133,6 +136,12 @@ public class Instrument extends ReceiveModel {
 
         // Fall back to default
         return mTitle;
+    }
+
+    public InstrumentTranslation activeTranslation() {
+        return new Select().from(InstrumentTranslation.class)
+                .where("InstrumentRemoteId = ? AND Language = ? AND Active = ?",
+                        mRemoteId, getDeviceLanguage(), 1).executeSingle();
     }
 
     public void setTitle(String title) {
@@ -214,6 +223,9 @@ public class Instrument extends ReceiveModel {
 
     public String getCriticalMessage() {
         if (getLanguage().equals(getDeviceLanguage())) return mCriticalMessage;
+        if (activeTranslation() != null && !activeTranslation().getCriticalMessage().trim().equals("")) {
+            return activeTranslation().getCriticalMessage();
+        }
         for (InstrumentTranslation translation : translations()) {
             if (translation.getLanguage().equals(getDeviceLanguage())
                     && !translation.getCriticalMessage().trim().equals("")) {
@@ -249,6 +261,7 @@ public class Instrument extends ReceiveModel {
 
     public String getAlignment() {
         if (getLanguage().equals(getDeviceLanguage())) return mAlignment;
+        if (activeTranslation() != null) return activeTranslation().getAlignment();
         for (InstrumentTranslation translation : translations()) {
             if (translation.getLanguage().equals(getDeviceLanguage())) {
                 return translation.getAlignment();
@@ -301,12 +314,18 @@ public class Instrument extends ReceiveModel {
             if (translationsArray != null) {
                 for (int i = 0; i < translationsArray.length(); i++) {
                     JSONObject translationJSON = translationsArray.getJSONObject(i);
-                    InstrumentTranslation translation = instrument.getTranslationByLanguage
-                            (translationJSON.getString("language"));
+                    Long translationRemoteId = translationJSON.getLong("id");
+                    InstrumentTranslation translation = InstrumentTranslation.findByRemoteId(translationRemoteId);
+                    if (translation == null) {
+                        translation = new InstrumentTranslation();
+                    }
+                    translation.setRemoteId(translationRemoteId);
+                    translation.setLanguage(translationJSON.getString("language"));
                     translation.setInstrumentRemoteId(instrument.getRemoteId());
                     translation.setAlignment(translationJSON.getString("alignment"));
                     translation.setTitle(translationJSON.getString("title"));
                     translation.setCriticalMessage(translationJSON.getString("critical_message"));
+                    translation.setActive(translationJSON.optBoolean("active"));
                     translation.save();
                 }
             }

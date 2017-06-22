@@ -19,6 +19,11 @@ public class InstrumentTranslation extends Model {
     private Long mInstrumentRemoteId;
     @Column(name = "CriticalMessage")
     private String mCriticalMessage;
+    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    private Long mRemoteId;
+    @Column(name = "Active")
+    private boolean mActive;
+
     
     public InstrumentTranslation() {
         super();
@@ -29,6 +34,10 @@ public class InstrumentTranslation extends Model {
      */   
     public static InstrumentTranslation findByLanguage(String language) {
         return new Select().from(InstrumentTranslation.class).where("Language = ?", language).executeSingle();
+    }
+
+    public static InstrumentTranslation findByRemoteId(Long id) {
+        return new Select().from(InstrumentTranslation.class).where("RemoteId = ?", id).executeSingle();
     }
     
     /*
@@ -76,5 +85,17 @@ public class InstrumentTranslation extends Model {
 
     public void setCriticalMessage(String message) {
         mCriticalMessage = message;
+    }
+
+    public void setActive(boolean active) {
+        mActive = active;
+    }
+
+    public boolean getActive() {
+        return mActive;
+    }
+
+    public void setRemoteId(Long id) {
+        mRemoteId = id;
     }
 }

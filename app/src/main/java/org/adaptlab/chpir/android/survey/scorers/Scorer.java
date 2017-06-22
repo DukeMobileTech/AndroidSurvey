@@ -1,5 +1,7 @@
 package org.adaptlab.chpir.android.survey.scorers;
 
+import android.text.TextUtils;
+
 import org.adaptlab.chpir.android.survey.models.GridLabel;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.OptionScore;
@@ -19,16 +21,18 @@ public abstract class Scorer {
 
     List<Option> getSortedSelectedOptions(Response response) {
         List<Option> options = new ArrayList<>();
-        String[] optionIds = response.getText().split(",");
-        for(String id : optionIds) {
-            options.add(response.getQuestion().defaultOptions().get(Integer.valueOf(id)));
-        }
-        Collections.sort(options, new Comparator<Option>() {
-            @Override
-            public int compare(Option lhs, Option rhs) {
-                return lhs.getRemoteId().compareTo(rhs.getRemoteId());
+        if (!TextUtils.isEmpty(response.getText())) {
+            String[] optionIds = response.getText().split(",");
+            for (String id : optionIds) {
+                options.add(response.getQuestion().defaultOptions().get(Integer.valueOf(id)));
             }
-        });
+            Collections.sort(options, new Comparator<Option>() {
+                @Override
+                public int compare(Option lhs, Option rhs) {
+                    return lhs.getRemoteId().compareTo(rhs.getRemoteId());
+                }
+            });
+        }
         return options;
     }
 

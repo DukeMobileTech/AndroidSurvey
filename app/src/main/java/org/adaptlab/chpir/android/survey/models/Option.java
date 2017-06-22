@@ -60,7 +60,8 @@ public class Option extends ReceiveModel {
      * text for the option.
      */
     public String getText() {
-        if (getQuestion().getInstrument().getLanguage().equals(getDeviceLanguage())) return mText;
+        if (getInstrument().getLanguage().equals(getDeviceLanguage())) return mText;
+        if (activeTranslation() != null) return activeTranslation().getText();
         for (OptionTranslation translation : translations()) {
             if (translation.getLanguage().equals(getDeviceLanguage())) {
                 return translation.getText();
@@ -69,6 +70,17 @@ public class Option extends ReceiveModel {
 
         // Fall back to default
         return mText;
+    }
+
+    public OptionTranslation activeTranslation() {
+        if (getInstrument().activeTranslation() == null) return null;
+        return new Select().from(OptionTranslation.class)
+                .where("InstrumentTranslation = ? AND Option = ?",
+                        getInstrument().activeTranslation().getId(), getId()).executeSingle();
+    }
+
+    private Instrument getInstrument() {
+        return getQuestion().getInstrument();
     }
 
     public Question getQuestion() {
@@ -129,11 +141,17 @@ public class Option extends ReceiveModel {
             if (translationsArray != null) {
                 for (int i = 0; i < translationsArray.length(); i++) {
                     JSONObject translationJSON = translationsArray.getJSONObject(i);
-                    OptionTranslation translation = option.getTranslationByLanguage
-                            (translationJSON.getString("language"));
-
+                    Long translationRemoteId = translationJSON.getLong("id");
+                    OptionTranslation translation = OptionTranslation.findByRemoteId(translationRemoteId);
+                    if (translation == null) {
+                        translation = new OptionTranslation();
+                    }
+                    translation.setRemoteId(translationRemoteId);
+                    translation.setLanguage(translationJSON.getString("language"));
                     translation.setOption(option);
                     translation.setText(translationJSON.getString("text"));
+                    translation.setInstrumentTranslation(InstrumentTranslation.findByRemoteId(
+                            translationJSON.optLong("instrument_translation_id")));
                     translation.save();
                 }
             }

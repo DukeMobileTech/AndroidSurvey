@@ -102,6 +102,7 @@ public class Question extends ReceiveModel {
     public String getRegExValidationMessage() {
         if (getInstrument().getLanguage().equals(Instrument.getDeviceLanguage()))
             return mRegExValidationMessage;
+        if (activeTranslation() != null) return activeTranslation().getRegExValidationMessage();
         for (QuestionTranslation translation : translations()) {
             if (translation.getLanguage().equals(Instrument.getDeviceLanguage())) {
                 return translation.getRegExValidationMessage();
@@ -264,6 +265,7 @@ public class Question extends ReceiveModel {
      */
     public String getText() {
         if (getInstrument().getLanguage().equals(Instrument.getDeviceLanguage())) return mText;
+        if (activeTranslation() != null) return activeTranslation().getText();
         for (QuestionTranslation translation : translations()) {
             if (translation.getLanguage().equals(Instrument.getDeviceLanguage())) {
                 return translation.getText();
@@ -272,6 +274,13 @@ public class Question extends ReceiveModel {
 
         // Fall back to default
         return mText;
+    }
+
+    public QuestionTranslation activeTranslation() {
+        if (getInstrument().activeTranslation() == null) return null;
+        return new Select().from(QuestionTranslation.class)
+                .where("InstrumentTranslation = ? AND Question = ?",
+                        getInstrument().activeTranslation().getId(), getId()).executeSingle();
     }
 
     /*
@@ -421,12 +430,22 @@ public class Question extends ReceiveModel {
             if (translationsArray != null) {
                 for (int i = 0; i < translationsArray.length(); i++) {
                     JSONObject translationJSON = translationsArray.getJSONObject(i);
-                    QuestionTranslation translation = question.getTranslationByLanguage
-                            (translationJSON.getString("language"));
+                    Long translationRemoteId = translationJSON.getLong("id");
+                    QuestionTranslation translation = QuestionTranslation.findByRemoteId(translationRemoteId);
+                    if (translation == null) {
+                        translation = new QuestionTranslation();
+                    }
+                    translation.setRemoteId(translationRemoteId);
+                    translation.setLanguage(translationJSON.getString("language"));
                     translation.setQuestion(question);
                     translation.setText(translationJSON.getString("text"));
                     translation.setRegExValidationMessage(translationJSON.getString
                             ("reg_ex_validation_message"));
+                    translation.setInstrumentTranslation(InstrumentTranslation.findByRemoteId(
+                            translationJSON.optLong("instrument_translation_id")));
+                    if (!translationJSON.isNull("instructions")) {
+                        translation.setInstructions(translationJSON.getString("instructions"));
+                    }
                     translation.save();
                 }
             }
@@ -595,10 +614,15 @@ public class Question extends ReceiveModel {
     }
 
     public String getInstructions() {
-        if (mInstructions == null || mInstructions.equals("") || mInstructions.equals("null"))
-            return null;
-        else
-            return mInstructions;
+        if (getInstrument().getLanguage().equals(Instrument.getDeviceLanguage())) return mInstructions;
+        if (activeTranslation() != null) return activeTranslation().getInstructions();
+        for (QuestionTranslation translation : translations()) {
+            if (translation.getLanguage().equals(Instrument.getDeviceLanguage())) {
+                return translation.getInstructions();
+            }
+        }
+        // Fall back to default
+        return mInstructions;
     }
 
     private void setInstructions(String instructions) {

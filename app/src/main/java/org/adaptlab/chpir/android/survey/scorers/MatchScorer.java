@@ -1,5 +1,6 @@
 package org.adaptlab.chpir.android.survey.scorers;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import org.adaptlab.chpir.android.survey.BuildConfig;
@@ -21,7 +22,7 @@ public class MatchScorer extends Scorer {
         double value = 0;
         for (ScoreUnitQuestion suq : unit.scoreUnitQuestions()) {
             Response response = survey.getResponseByQuestion(suq.getQuestion());
-            if (response != null && response.getText() != null) {
+            if (response != null && !TextUtils.isEmpty(response.getText())) {
                 OptionScore optionScore = getOptionScore(unit, suq.getQuestion(), response);
                 if (optionScore != null) {
                     if (optionScore.getValue() > value) {

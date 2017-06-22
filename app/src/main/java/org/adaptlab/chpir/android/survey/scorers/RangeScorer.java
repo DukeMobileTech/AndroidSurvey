@@ -1,5 +1,6 @@
 package org.adaptlab.chpir.android.survey.scorers;
 
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.Range;
 
@@ -24,12 +25,14 @@ public class RangeScorer extends Scorer {
         double scoreVal = 0;
         for (Question question : unit.questions()) {
             Response response = survey.getResponseByQuestion(question);
-            Double responseText = Double.parseDouble(response.getText());
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                HashMap<Range<Double>, Double> map = rangeScoreOptionsMap(unit);
-                for (Map.Entry<Range<Double>, Double> entry : map.entrySet()) {
-                    if (entry.getKey().contains(responseText) && entry.getValue() > scoreVal) {
-                        scoreVal = entry.getValue();
+            if (!TextUtils.isEmpty(response.getText())) {
+                Double responseText = Double.parseDouble(response.getText());
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                    HashMap<Range<Double>, Double> map = rangeScoreOptionsMap(unit);
+                    for (Map.Entry<Range<Double>, Double> entry : map.entrySet()) {
+                        if (entry.getKey().contains(responseText) && entry.getValue() > scoreVal) {
+                            scoreVal = entry.getValue();
+                        }
                     }
                 }
             }

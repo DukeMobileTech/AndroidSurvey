@@ -13,7 +13,6 @@ import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Survey;
 import org.adaptlab.chpir.android.survey.roster.listeners.ScrollViewListener;
-import org.adaptlab.chpir.android.survey.tasks.SendResponsesTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -137,13 +136,6 @@ public abstract class GridFragment extends QuestionFragment implements ScrollVie
         	response.save();
             survey.save();
             return null;
-		}
-
-        @Override
-		protected void onPostExecute(Void params) {
-			if (survey != null && survey.readyToSend()) {
-				new SendResponsesTask(getActivity()).execute();
-			}
 		}
 
 	}

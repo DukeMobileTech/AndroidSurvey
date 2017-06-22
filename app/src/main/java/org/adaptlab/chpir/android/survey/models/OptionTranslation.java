@@ -13,6 +13,10 @@ public class OptionTranslation extends Model {
     private String mLanguage;
     @Column(name = "Text")
     private String mText;
+    @Column(name = "InstrumentTranslation")
+    private InstrumentTranslation mInstrumentTranslation;
+    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    private Long mRemoteId;
     
     public OptionTranslation() {
         super();
@@ -23,6 +27,10 @@ public class OptionTranslation extends Model {
      */    
     public static OptionTranslation findByLanguage(String language) {
         return new Select().from(OptionTranslation.class).where("Language = ?", language).executeSingle();
+    }
+
+    public static OptionTranslation findByRemoteId(Long id) {
+        return new Select().from(OptionTranslation.class).where("RemoteId = ?", id).executeSingle();
     }
     
     /*
@@ -45,5 +53,13 @@ public class OptionTranslation extends Model {
     }
     public void setText(String text) {
         mText = text;
+    }
+
+    public void setRemoteId(Long id) {
+        mRemoteId = id;
+    }
+
+    public void setInstrumentTranslation(InstrumentTranslation translation) {
+        mInstrumentTranslation = translation;
     }
 }

@@ -18,7 +18,6 @@ import android.widget.TextView;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Survey;
-import org.adaptlab.chpir.android.survey.tasks.SendResponsesTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,14 +26,14 @@ public class ReviewPageFragment extends ListFragment {
 	public final static String EXTRA_REVIEW_SURVEY_ID = "org.adaptlab.chpir.android.survey.review_survey_id";
     private static final String TAG = "ReviewPageFragment";
     private ArrayList<Question> mSkippedQuestions;
-	private Survey mSurvey;
-	
-	@Override
+
+    @Override
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        mSkippedQuestions = new ArrayList<Question>();
-    	mSurvey = Survey.load(Survey.class, getActivity().getIntent().getExtras().getLong(EXTRA_REVIEW_SURVEY_ID));
+        mSkippedQuestions = new ArrayList<>();
+        Survey mSurvey = Survey.load(Survey.class, getActivity().getIntent().getExtras().getLong
+                (EXTRA_REVIEW_SURVEY_ID));
 		List<Response> emptyResponses = mSurvey.emptyResponses();
 		for (Response response : emptyResponses) {
 			mSkippedQuestions.add(response.getQuestion());
@@ -66,25 +65,14 @@ public class ReviewPageFragment extends ListFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_item_back:
-			returnToSurvey();
-			return true;
+            setReturnResults(mSkippedQuestions.get(0).getNumberInInstrument() - 1);
+            return true;
 		case R.id.menu_item_complete:
-			completeSurvey();
+			setReturnResults(Integer.MIN_VALUE);
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);		
 		}
-	}
-	
-	private void returnToSurvey() {
-		setReturnResults(mSkippedQuestions.get(0).getNumberInInstrument() - 1);
-	}
-	
-	private void completeSurvey() {
-		mSurvey.setAsComplete(true);
-		mSurvey.save();
-		setReturnResults(Integer.MIN_VALUE);
-		new SendResponsesTask(getActivity()).execute();
 	}
 	
 	private void setReturnResults(int num) {

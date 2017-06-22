@@ -26,7 +26,6 @@ import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.ResponsePhoto;
 import org.adaptlab.chpir.android.survey.models.Survey;
-import org.adaptlab.chpir.android.survey.tasks.SendResponsesTask;
 
 import java.util.Date;
 import java.util.List;
@@ -266,11 +265,5 @@ public abstract class QuestionFragment extends Fragment {
             return params[0].getSurvey();
         }
 
-        @Override
-        protected void onPostExecute(Survey survey) {
-            if (survey != null && survey.readyToSend()) {
-                new SendResponsesTask(getActivity()).execute();
-            }
-        }
     }
 }

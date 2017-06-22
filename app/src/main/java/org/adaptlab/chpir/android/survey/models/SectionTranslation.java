@@ -13,6 +13,10 @@ public class SectionTranslation extends Model {
     private String mLanguage;
     @Column(name = "Text")
     private String mText;
+    @Column(name = "InstrumentTranslation")
+    private InstrumentTranslation mInstrumentTranslation;
+    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    private Long mRemoteId;
     
     public SectionTranslation() {
         super();
@@ -20,6 +24,10 @@ public class SectionTranslation extends Model {
     
     public static SectionTranslation findByLanguage(String language) {
         return new Select().from(SectionTranslation.class).where("Language = ?", language).executeSingle();
+    }
+
+    public static SectionTranslation findByRemoteId(Long id) {
+        return new Select().from(SectionTranslation.class).where("RemoteId = ?", id).executeSingle();
     }
     
     public Section getSection() {
@@ -45,5 +53,12 @@ public class SectionTranslation extends Model {
     public void setText(String text) {
         mText = text;
     }
-    
+
+    public void setRemoteId(Long id) {
+        mRemoteId = id;
+    }
+
+    public void setInstrumentTranslation(InstrumentTranslation translation) {
+        mInstrumentTranslation = translation;
+    }
 }

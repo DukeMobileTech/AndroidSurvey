@@ -55,10 +55,17 @@ public class Section extends ReceiveModel {
             if (translationsArray != null) {
                 for (int i = 0; i < translationsArray.length(); i++) {
                     JSONObject translationJSON = translationsArray.getJSONObject(i);
-                    SectionTranslation translation = section.getTranslationByLanguage(translationJSON.getString("language"));
-
+                    Long translationRemoteId = translationJSON.getLong("id");
+                    SectionTranslation translation = SectionTranslation.findByRemoteId(translationRemoteId);
+                    if (translation == null) {
+                        translation = new SectionTranslation();
+                    }
+                    translation.setRemoteId(translationRemoteId);
+                    translation.setLanguage(translationJSON.getString("language"));
                     translation.setSection(section);
                     translation.setText(translationJSON.getString("text"));
+                    translation.setInstrumentTranslation(InstrumentTranslation.findByRemoteId(
+                            translationJSON.optLong("instrument_translation_id")));
                     translation.save();
                 }
             }
@@ -138,6 +145,7 @@ public class Section extends ReceiveModel {
      */
 	public String getTitle() {
 		if (getInstrument().getLanguage().equals(Instrument.getDeviceLanguage())) return mTitle;
+        if (activeTranslation() != null) return activeTranslation().getText();
         for (SectionTranslation translation : translations()) {
             if (translation.getLanguage().equals(Instrument.getDeviceLanguage())) {
                 return translation.getText();
@@ -146,6 +154,13 @@ public class Section extends ReceiveModel {
 		//Default
 		return mTitle;
 	}
+
+    private SectionTranslation activeTranslation() {
+        if (getInstrument().activeTranslation() == null) return null;
+        return new Select().from(SectionTranslation.class)
+                .where("InstrumentTranslation = ? AND Section = ?",
+                getInstrument().activeTranslation().getId(), getId()).executeSingle();
+    }
 
 	public static Section findByRemoteId(Long remoteId) {
 		return new Select().from(Section.class).where("RemoteId = ?", remoteId).executeSingle();

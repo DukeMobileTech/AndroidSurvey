@@ -62,6 +62,7 @@ import org.adaptlab.chpir.android.survey.rules.InstrumentSurveyLimitPerMinuteRul
 import org.adaptlab.chpir.android.survey.rules.InstrumentSurveyLimitRule;
 import org.adaptlab.chpir.android.survey.rules.InstrumentTimingRule;
 import org.adaptlab.chpir.android.survey.rules.RuleBuilder;
+import org.adaptlab.chpir.android.survey.tasks.SendResponsesTask;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -716,7 +717,7 @@ public class SurveyFragment extends Fragment {
                         responseOption = mQuestion.defaultOptions().get(index);
                 }
                 if (responseOption != null && responseOption.getCompleteSurvey()) {
-                    completeSurvey();
+                    scoreAndCompleteSurvey();
                     return null;
                 }
             } else if (!TextUtils.isEmpty(response.getSpecialResponse())) {
@@ -903,7 +904,7 @@ public class SurveyFragment extends Fragment {
                         @Override
                         public void onClick(DialogInterface dialog, int button) {
                             mSurvey.setCriticalResponses(true);
-                            completeSurvey();
+                            scoreAndCompleteSurvey();
                         }
                     })
                     .setNegativeButton(R.string.review, new DialogInterface.OnClickListener() {
@@ -936,18 +937,25 @@ public class SurveyFragment extends Fragment {
             criticalDialog.show();
         } else {
             mSurvey.setCriticalResponses(false);
-            completeSurvey();
+            scoreAndCompleteSurvey();
         }
     }
 
-    private void completeSurvey() {
+    private void scoreAndCompleteSurvey() {
         isActivityFinished = true;
         if (mInstrument.isScorable()) {
             new ScoreSurveyTask().execute(mSurvey);
         } else {
-            mSurvey.setAsComplete(true);
-            mSurvey.save();
+            completeAndSendSurvey(mSurvey);
             getActivity().finish();
+        }
+    }
+
+    private void completeAndSendSurvey(Survey survey) {
+        survey.setAsComplete(true);
+        survey.save();
+        if (survey.readyToSend()) {
+            new SendResponsesTask(getActivity()).execute();
         }
     }
 
@@ -1165,8 +1173,7 @@ public class SurveyFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Survey survey) {
-            survey.setAsComplete(true);
-            survey.save();
+            completeAndSendSurvey(survey);
             startActivity(new Intent(getActivity(), ScoreActivity.class));
             getActivity().finish();
         }
