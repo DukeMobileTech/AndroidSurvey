@@ -62,6 +62,8 @@ public class Survey extends SendModel {
     private boolean mCriticalResponses;
     @Column(name = "RosterUUID")
     private String mRosterUUID;
+    @Column(name = "Language")
+    private String mLanguage;
 
     public Survey() {
         super();
@@ -90,6 +92,7 @@ public class Survey extends SendModel {
             if (mRosterUUID != null) {
                 jsonObject.put("roster_uuid", mRosterUUID);
             }
+            jsonObject.put("language", mLanguage);
             json.put("survey", jsonObject);
         } catch (JSONException je) {
             Log.e(TAG, "JSON exception", je);
@@ -370,4 +373,7 @@ public class Survey extends SendModel {
         return mRosterUUID != null;
     }
 
+    public void setLanguage(String language) {
+        mLanguage = language;
+    }
 }

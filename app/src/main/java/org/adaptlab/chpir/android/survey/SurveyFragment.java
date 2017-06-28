@@ -578,6 +578,7 @@ public class SurveyFragment extends Fragment {
             mSurvey.setInstrumentRemoteId(mInstrument.getRemoteId());
             mSurvey.setMetadata(mMetadata);
             mSurvey.setProjectId(mInstrument.getProjectId());
+            mSurvey.setLanguage(Instrument.getDeviceLanguage());
             mSurvey.save();
         } else {
             mSurvey = Model.load(Survey.class, surveyId);

@@ -8,6 +8,7 @@ import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -46,6 +47,28 @@ public class Grid extends ReceiveModel {
                 grid.setDeleted(true);
             }
             grid.save();
+
+            JSONArray translationsArray = jsonObject.optJSONArray("grid_translations");
+            if (translationsArray != null) {
+                for (int i = 0; i < translationsArray.length(); i++) {
+                    JSONObject translationJSON = translationsArray.getJSONObject(i);
+                    Long translationRemoteId = translationJSON.getLong("id");
+                    GridTranslation translation = GridTranslation.findByRemoteId
+                            (translationRemoteId);
+                    if (translation == null) {
+                        translation = new GridTranslation();
+                    }
+                    translation.setRemoteId(translationRemoteId);
+                    translation.setGrid(grid);
+                    translation.setName(translationJSON.getString("name"));
+                    translation.setInstrumentTranslation(InstrumentTranslation.findByRemoteId(
+                            translationJSON.optLong("instrument_translation_id")));
+                    if (!translationJSON.isNull("instructions")) {
+                        translation.setInstructions(translationJSON.getString("instructions"));
+                    }
+                    translation.save();
+                }
+            }
         } catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);
         }
@@ -99,12 +122,46 @@ public class Grid extends ReceiveModel {
                 .execute();
     }
 
-    // TODO: 5/3/17 Add support for translations
     public String getText() {
-        if (TextUtils.isEmpty(mInstructions) || mInstructions.equals("null")) {
-            return mName;
+        if (getInstrument().getLanguage().equals(Instrument.getDeviceLanguage())) {
+            if (TextUtils.isEmpty(mInstructions) || mInstructions.equals("null")) {
+                return mName;
+            } else {
+                return mName + "<p> </p>" + mInstructions;
+            }
         } else {
-            return mName + "<p> </p>" + mInstructions;
+            if (activeTranslation() != null) {
+                if (TextUtils.isEmpty(activeTranslation().getInstructions()) ||
+                        activeTranslation().getInstructions().equals("null")) {
+                    return activeTranslation().getName();
+                }
+                return activeTranslation().getName() + "<p> </p>" + activeTranslation()
+                        .getInstructions();
+            } else {
+                for (GridTranslation translation : translations()) {
+                    if (translation.getLanguage().equals(Instrument.getDeviceLanguage())) {
+                        return translation.getName() + "<p> </p>" + translation.getInstructions();
+                    }
+                }
+            }
         }
+        //fallback
+        return mName + "<p> </p>" + mInstructions;
     }
+
+    public Instrument getInstrument() {
+        return Instrument.findByRemoteId(mInstrumentRemoteId);
+    }
+
+    private GridTranslation activeTranslation() {
+        if (getInstrument().activeTranslation() == null) return null;
+        return new Select().from(GridTranslation.class)
+                .where("InstrumentTranslation = ? AND Grid = ?",
+                        getInstrument().activeTranslation().getId(), getId()).executeSingle();
+    }
+
+    private List<GridTranslation> translations() {
+        return getMany(GridTranslation.class, "Grid");
+    }
+
 }

@@ -7,8 +7,11 @@ import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.List;
 
 @Table(name = "GridLabels")
 public class GridLabel extends ReceiveModel {
@@ -40,6 +43,24 @@ public class GridLabel extends ReceiveModel {
                 gridLabel.setDeleted(true);
             }
             gridLabel.save();
+
+            JSONArray translationsArray = jsonObject.optJSONArray("grid_label_translations");
+            if (translationsArray != null) {
+                for (int i = 0; i < translationsArray.length(); i++) {
+                    JSONObject translationJSON = translationsArray.getJSONObject(i);
+                    Long translationRemoteId = translationJSON.getLong("id");
+                    GridLabelTranslation translation = GridLabelTranslation.findByRemoteId(translationRemoteId);
+                    if (translation == null) {
+                        translation = new GridLabelTranslation();
+                    }
+                    translation.setRemoteId(translationRemoteId);
+                    translation.setGridLabel(gridLabel);
+                    translation.setLabel(translationJSON.getString("label"));
+                    translation.setInstrumentTranslation(InstrumentTranslation.findByRemoteId(
+                            translationJSON.optLong("instrument_translation_id")));
+                    translation.save();
+                }
+            }
         } catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);
         }
@@ -69,7 +90,7 @@ public class GridLabel extends ReceiveModel {
         mDeleted = deleted;
     }
 
-    public Grid getGrid() {
+    private Grid getGrid() {
         return mGrid;
     }
 
@@ -86,6 +107,30 @@ public class GridLabel extends ReceiveModel {
     }
 
     public String getLabelText() {
+        if (getInstrument().getLanguage().equals(Instrument.getDeviceLanguage())) return mLabel;
+        if (activeTranslation() != null) {
+            return activeTranslation().getLabel();
+        }
+        for (GridLabelTranslation translation : translations()) {
+            if (translation.getLanguage().equals(Instrument.getDeviceLanguage())) {
+                return translation.getLabel();
+            }
+        }
         return mLabel;
+    }
+
+    private GridLabelTranslation activeTranslation() {
+        if (getInstrument().activeTranslation() == null) return null;
+        return new Select().from(GridLabelTranslation.class)
+                .where("InstrumentTranslation = ? AND GridLabel = ?",
+                        getInstrument().activeTranslation().getId(), getId()).executeSingle();
+    }
+
+    private Instrument getInstrument() {
+        return getGrid().getInstrument();
+    }
+
+    private List<GridLabelTranslation> translations() {
+        return getMany(GridLabelTranslation.class, "GridLabel");
     }
 }
