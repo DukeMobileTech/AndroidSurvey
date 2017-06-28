@@ -8,14 +8,14 @@ import org.adaptlab.chpir.android.survey.R;
 
 @Table(name = "DefaultAdminSettings")
 public class DefaultAdminSettings extends AdminSettings {
-    private static DefaultAdminSettings adminSettings;
 
     public DefaultAdminSettings() {
         super();
     }
 
     public static DefaultAdminSettings getInstance() {
-        adminSettings = new Select().from(DefaultAdminSettings.class).orderBy("Id asc").executeSingle();
+        DefaultAdminSettings adminSettings = new Select().from(DefaultAdminSettings.class)
+                .orderBy("Id asc").executeSingle();
         if (adminSettings == null) {
             adminSettings = new DefaultAdminSettings();
             adminSettings.save();
@@ -36,16 +36,6 @@ public class DefaultAdminSettings extends AdminSettings {
     @Override
     public boolean getRequirePassword() {
         return false;
-    }
-
-    @Override
-    public int getSyncInterval() {
-        return getSyncIntervalInMinutes() * 1000 * 60;
-    }
-
-    @Override
-    public int getSyncIntervalInMinutes() {
-        return Integer.parseInt(AppUtil.getContext().getResources().getString(R.string.default_sync_interval_minutes));
     }
 
     @Override
@@ -90,11 +80,7 @@ public class DefaultAdminSettings extends AdminSettings {
 
     @Override
     public String getCustomLocaleCode() {
-        String customLocaleCode = AppUtil.getContext().getResources().getString(R.string.default_custom_locale);
-        if (customLocaleCode == null) {
-            customLocaleCode = "";
-        }
-        return customLocaleCode;
+        return AppUtil.getContext().getResources().getString(R.string.default_custom_locale);
     }
 
     @Override

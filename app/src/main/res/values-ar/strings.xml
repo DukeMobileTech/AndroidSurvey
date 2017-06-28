@@ -11,7 +11,6 @@
     <string name="free_response_edittext">الإجابة هنا</string>
     <string name="refresh">تحديث</string>
     <string name="device_identifier">Device Identifier</string>
-    <string name="sync_interval">Sync Interval (minutes)</string>
     <string name="save_button">Save</string>
     <string name="admin_settings">مدير</string>
     <string name="api_endpoint">Api Endpoint Url</string>

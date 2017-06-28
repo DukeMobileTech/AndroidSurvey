@@ -13,7 +13,6 @@
     <string name="free_response_edittext">请将回答写在此处</string>
     <string name="refresh">刷新</string>
     <string name="device_identifier">设备身份识别号</string>
-    <string name="sync_interval">同步间隔（分）</string>
     <string name="save_button">保存</string>
     <string name="admin_settings">管理员</string>
     <string name="settings">设置</string>

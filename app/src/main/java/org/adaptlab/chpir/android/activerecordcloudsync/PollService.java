@@ -7,24 +7,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.preference.PreferenceManager;
 
-import java.util.Date;
-
 public class PollService extends IntentService {
     private static final String TAG = "PollService";
-    private static int DEFAULT_POLL_INTERVAL = 1000 * 900;
     public static final String PREF_IS_ALARM_ON = "isAlarmOn";
-    private static int sPollInterval;
-    private static Date lastUpdate;
 
     public PollService() {
         super(TAG);
-        sPollInterval = DEFAULT_POLL_INTERVAL;
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
         if (NetworkNotificationUtils.checkForNetworkErrors(getApplicationContext())) {
-            lastUpdate = new Date();
             ActiveRecordCloudSync.syncSendTables(getApplicationContext());
         }
     }
@@ -38,8 +31,9 @@ public class PollService extends IntentService {
                 .getSystemService(Context.ALARM_SERVICE);
 
         if (isOn) {
+            int DEFAULT_POLL_INTERVAL = 1000 * 24 * 60 * 60;
             alarmManager.setRepeating(AlarmManager.RTC,
-                    System.currentTimeMillis(), sPollInterval, pi);
+                    System.currentTimeMillis(), DEFAULT_POLL_INTERVAL, pi);
         } else {
             alarmManager.cancel(pi);
             pi.cancel();
@@ -51,27 +45,4 @@ public class PollService extends IntentService {
                 .apply();
     }
 
-    public static boolean isServiceAlarmOn(Context context) {
-        Intent i = new Intent(context, PollService.class);
-        PendingIntent pi = PendingIntent.getService(context, 0, i,
-                PendingIntent.FLAG_NO_CREATE);
-        return pi != null;
-    }
-
-    public static void setPollInterval(int interval) {
-        if (interval == 0) {
-            sPollInterval = DEFAULT_POLL_INTERVAL;
-        } else {
-            sPollInterval = interval;
-        }
-    }
-
-    public static void restartServiceAlarm(Context context) {
-        setServiceAlarm(context, false);
-        setServiceAlarm(context, true);
-    }
-
-    public static Date getLastUpdate() {
-        return lastUpdate;
-    }
 }

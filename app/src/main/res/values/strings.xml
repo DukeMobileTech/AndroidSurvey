@@ -13,7 +13,6 @@
     <string name="free_response_edittext">Answer here</string>
     <string name="refresh">Refresh</string>
     <string name="device_identifier">Device Identifier</string>
-    <string name="sync_interval">Sync Interval (min)</string>
     <string name="save_button">Save</string>
     <string name="admin_settings">Admin</string>
     <string name="settings">Settings</string>
@@ -21,7 +20,7 @@
     <string name="api_key">Api Key</string>
     <string name="api_version">Api Version</string>
     <string name="project_id">Project Id</string>
-    <string name="last_update">Last update:  </string>
+    <string name="last_update">Last Update:  </string>
     <string name="sync_notification_text">Syncing with server...</string>
     <string name="sync_notification_complete_text">Syncing with server complete.</string>
     <string name="network_unavailable">No network available on the device.</string>
@@ -54,9 +53,11 @@
     <string name="version_code">Version Code: </string>
     <string name="unidentified_survey">Unidentified Survey </string>
     <string name="unidentified_roster">Unidentified Roster </string>
-    <string name="system_information">System Information</string>
+    <string name="system_information">App Information</string>
     <string name="feature_toggle">Feature Toggle</string>
     <string name="sync_settings">Sync Settings</string>
+    <string name="api_endpoint_settings">API Endpoint Settings</string>
+    <string name="device_settings">Device Settings</string>
     <string name="enable_camera">Enable Camera</string>
     <string name="take">Take</string>
     <string name="show_skip">Show Skip</string>

@@ -12,13 +12,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
-import org.adaptlab.chpir.android.activerecordcloudsync.PollService;
 import org.adaptlab.chpir.android.survey.models.AdminSettings;
+import org.adaptlab.chpir.android.survey.tasks.ApkUpdateTask;
 
 import java.text.DateFormat;
 import java.util.Calendar;
@@ -28,7 +30,6 @@ public class AdminFragment extends Fragment {
     private final String TAG = "AdminFragment";
     private EditText mDeviceIdentifierEditText;
     private EditText mDeviceLabelEditText;
-    private EditText mSyncIntervalEditText;
     private EditText mApiDomainNameEditText;
     private EditText mApiVersionEditText;
     private EditText mProjectIdEditText;
@@ -37,7 +38,11 @@ public class AdminFragment extends Fragment {
     private EditText mApi2DomainNameEditText;
     private EditText mApi2VersionEditText;
     private EditText mApi2KeyEditText;
-    private CheckBox mUseSecondEndpoint;
+    private TextView mApi2DomainNameLabel;
+    private TextView mApi2VersionLabel;
+    private TextView mApi2KeyLabel;
+    private TextView mRosterSyncSettingsLabel;
+    private CheckBox mRosterEndPointCheckBox;
     private CheckBox mShowSurveysCheckBox;
     private CheckBox mShowRostersCheckBox;
     private CheckBox mShowSkipCheckBox;
@@ -63,9 +68,6 @@ public class AdminFragment extends Fragment {
         mDeviceLabelEditText = (EditText) v.findViewById(R.id.device_label_edit_text);
         mDeviceLabelEditText.setText(AdminSettings.getInstance().getDeviceLabel());
 
-        mSyncIntervalEditText = (EditText) v.findViewById(R.id.sync_interval_edit_text);
-        mSyncIntervalEditText.setText(getAdminSettingsInstanceSyncInterval());
-
         mApiDomainNameEditText = (EditText) v.findViewById(R.id.api_endpoint_text);
         mApiDomainNameEditText.setText(getAdminSettingsInstanceApiDomainName());
 
@@ -81,17 +83,27 @@ public class AdminFragment extends Fragment {
         mCustomLocaleEditText = (EditText) v.findViewById(R.id.custom_locale_edit_text);
         mCustomLocaleEditText.setText(getAdminSettingsInstanceCustomLocaleCode());
 
-        mUseSecondEndpoint = (CheckBox) v.findViewById(R.id.api2_endpoint);
-        mUseSecondEndpoint.setChecked(AdminSettings.getInstance().useEndpoint2());
+        mRosterEndPointCheckBox = (CheckBox) v.findViewById(R.id.api2_endpoint);
+        mRosterEndPointCheckBox.setChecked(AdminSettings.getInstance().useEndpoint2());
+        mRosterEndPointCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                buttonView.setChecked(isChecked);
+                toggleRosterSettingsVisibility(isChecked);
+            }
+        });
 
+        mRosterSyncSettingsLabel = (TextView) v.findViewById(R.id.roster_sync_settings_label);
+        mApi2DomainNameLabel = (TextView) v.findViewById(R.id.api2_endpoint_label);
+        mApi2VersionLabel = (TextView) v.findViewById(R.id.api2_version_label);
+        mApi2KeyLabel = (TextView) v.findViewById(R.id.api2_key_label);
         mApi2DomainNameEditText = (EditText) v.findViewById(R.id.api2_endpoint_text);
         mApi2DomainNameEditText.setText(getAdminSettingsInstanceApi2DomainName());
-
         mApi2VersionEditText = (EditText) v.findViewById(R.id.api2_version_text);
         mApi2VersionEditText.setText(getAdminSettingsInstanceApi2Version());
-
         mApi2KeyEditText = (EditText) v.findViewById(R.id.api2_key_text);
         mApi2KeyEditText.setText(getAdminSettingsInstanceApi2Key());
+        toggleRosterSettingsVisibility(AdminSettings.getInstance().useEndpoint2());
 
         mShowSurveysCheckBox = (CheckBox) v.findViewById(R.id.show_surveys_checkbox);
         mShowSurveysCheckBox.setChecked(AdminSettings.getInstance().getShowSurveys());
@@ -119,15 +131,58 @@ public class AdminFragment extends Fragment {
         mRecordSurveyLocationCheckBox.setChecked(AdminSettings.getInstance()
                 .getRecordSurveyLocation());
 
-        TextView mLastUpdateTextView = (TextView) v.findViewById(R.id.last_update_label);
-        mLastUpdateTextView.setText(String.format(Locale.getDefault(), "%s%s",
-                mLastUpdateTextView.getText().toString(), getLastUpdateTime()));
+        final TextView lastUpdateTextView = (TextView) v.findViewById(R.id.last_update_label);
+        lastUpdateTextView.setText(String.format(Locale.getDefault(), "%s%s%s",
+                getString(R.string.last_update), " ", getLastUpdateTime()));
 
-        TextView mVersionCodeTextView = (TextView) v.findViewById(R.id.version_code_label);
-        mVersionCodeTextView.setText(String.format(Locale.getDefault(), "%s%d",
-                getString(R.string.version_code), AppUtil.getVersionCode(getActivity())));
+        Button resetLastSyncTime = (Button) v.findViewById(R.id.reset_last_sync_time_button);
+        resetLastSyncTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AdminSettings.getInstance().setLastSyncTime(null);
+                lastUpdateTextView.setText(String.format(Locale.getDefault(), "%s%s%s",
+                        getString(R.string.last_update), " ", getLastUpdateTime()));
+            }
+        });
+
+        TextView versionCodeTextView = (TextView) v.findViewById(R.id.version_code_label);
+        versionCodeTextView.setText(String.format(Locale.getDefault(), "%s%s%d",
+                getString(R.string.version_code), " ", AppUtil.getVersionCode(getActivity())));
+
+        TextView versionNameTextView = (TextView) v.findViewById(R.id.version_name_label);
+        versionNameTextView.setText(String.format(Locale.getDefault(), "%s%s%s",
+                getString(R.string.version_name), " ", AppUtil.getVersionName(getActivity())));
+
+        Button updatesCheck = (Button) v.findViewById(R.id.updates_check_button);
+        updatesCheck.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                new ApkUpdateTask(getActivity()).execute();
+            }
+        });
 
         return v;
+    }
+
+    private void toggleRosterSettingsVisibility(boolean isChecked) {
+        if (isChecked) {
+            mRosterSyncSettingsLabel.setVisibility(View.VISIBLE);
+            mApi2DomainNameLabel.setVisibility(View.VISIBLE);
+            mApi2VersionLabel.setVisibility(View.VISIBLE);
+            mApi2KeyLabel.setVisibility(View.VISIBLE);
+            mApi2DomainNameEditText.setVisibility(View.VISIBLE);
+            mApi2VersionEditText.setVisibility(View.VISIBLE);
+            mApi2KeyEditText.setVisibility(View.VISIBLE);
+        } else {
+            mRosterSyncSettingsLabel.setVisibility(View.GONE);
+            mApi2DomainNameEditText.setVisibility(View.GONE);
+            mApi2VersionEditText.setVisibility(View.GONE);
+            mApi2KeyEditText.setVisibility(View.GONE);
+            mApi2DomainNameLabel.setVisibility(View.GONE);
+            mApi2VersionLabel.setVisibility(View.GONE);
+            mApi2KeyLabel.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -154,8 +209,6 @@ public class AdminFragment extends Fragment {
         AdminSettings.getInstance().setDeviceIdentifier(mDeviceIdentifierEditText.getText()
                 .toString());
         AdminSettings.getInstance().setDeviceLabel(mDeviceLabelEditText.getText().toString());
-        AdminSettings.getInstance().setSyncInterval(Integer.parseInt(mSyncIntervalEditText
-                .getText().toString()));
         AdminSettings.getInstance().setApiDomainName(mApiDomainNameEditText.getText().toString());
         AdminSettings.getInstance().setApiVersion(mApiVersionEditText.getText().toString());
         AdminSettings.getInstance().setProjectId(mProjectIdEditText.getText().toString());
@@ -164,7 +217,6 @@ public class AdminFragment extends Fragment {
         // for all instrument translations.
         AdminSettings.getInstance().setCustomLocaleCode(mCustomLocaleEditText.getText().toString());
 
-        PollService.setPollInterval(AdminSettings.getInstance().getSyncInterval());
         ActiveRecordCloudSync.setAccessToken(getAdminSettingsInstanceApiKey());
         ActiveRecordCloudSync.setEndPoint(getAdminSettingsInstanceApiUrl());
         AppUtil.appInit(getActivity());
@@ -180,7 +232,7 @@ public class AdminFragment extends Fragment {
                 .isChecked());
 
         //Roster settings
-        AdminSettings.getInstance().setUseEndpoint2(mUseSecondEndpoint.isChecked());
+        AdminSettings.getInstance().setUseEndpoint2(mRosterEndPointCheckBox.isChecked());
         AdminSettings.getInstance().setApi2DomainName(mApi2DomainNameEditText.getText().toString());
         AdminSettings.getInstance().setApi2Version(mApi2VersionEditText.getText().toString());
         AdminSettings.getInstance().setApi2Key(mApi2KeyEditText.getText().toString());
@@ -218,10 +270,6 @@ public class AdminFragment extends Fragment {
 
     public String getAdminSettingsInstanceDeviceId() {
         return AdminSettings.getInstance().getDeviceIdentifier();
-    }
-
-    public String getAdminSettingsInstanceSyncInterval() {
-        return String.valueOf(AdminSettings.getInstance().getSyncIntervalInMinutes());
     }
 
     public String getAdminSettingsInstanceApiDomainName() {

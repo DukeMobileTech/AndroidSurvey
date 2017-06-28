@@ -22,8 +22,6 @@ public class AdminSettings extends Model {
     private String mDeviceIdentifier;
     @Column(name = "DeviceLabel")
     private String mDeviceLabel;
-    @Column(name = "SyncInterval")
-    private int mSyncInterval;
     @Column(name = "ApiUrl")
     private String mApiUrl;
     @Column(name = "CustomLocaleCode")
@@ -143,29 +141,6 @@ public class AdminSettings extends Model {
     public void setDeviceLabel(String label) {
         mDeviceLabel = label;
         save();
-    }
-
-    /**
-     * Millisecond sync interval
-     */
-    public int getSyncInterval() {
-        return mSyncInterval;
-    }
-
-    /**
-     * Set the interval in minutes, it is converted to milliseconds
-     */
-    public void setSyncInterval(int interval) {
-        if (BuildConfig.DEBUG) Log.i(TAG, "Setting set interval: " + (interval * 1000 * 60));
-        mSyncInterval = interval * 1000 * 60;
-        save();
-    }
-
-    /**
-     * Second sync interval
-     */
-    public int getSyncIntervalInMinutes() {
-        return mSyncInterval / (60 * 1000);
     }
 
     public String getCustomLocaleCode() {

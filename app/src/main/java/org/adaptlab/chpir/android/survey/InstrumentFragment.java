@@ -350,7 +350,9 @@ public class InstrumentFragment extends ListFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_item_admin:
-                displayPasswordPrompt();
+//                displayPasswordPrompt();
+                Intent i = new Intent(getActivity(), AdminActivity.class);
+                startActivity(i);
                 return true;
             case R.id.menu_item_refresh:
                 new RefreshInstrumentsTask().execute();
