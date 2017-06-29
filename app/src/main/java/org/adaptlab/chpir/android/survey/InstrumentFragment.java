@@ -22,7 +22,6 @@ import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBar.Tab;
 import android.support.v7.app.AppCompatActivity;
-import android.text.InputType;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
@@ -33,7 +32,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView.MultiChoiceModeListener;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,13 +47,14 @@ import org.adaptlab.chpir.android.survey.models.Image;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Roster;
+import org.adaptlab.chpir.android.survey.models.Score;
 import org.adaptlab.chpir.android.survey.models.Survey;
 import org.adaptlab.chpir.android.survey.roster.RosterActivity;
 import org.adaptlab.chpir.android.survey.rules.InstrumentLaunchRule;
 import org.adaptlab.chpir.android.survey.rules.RuleBuilder;
 import org.adaptlab.chpir.android.survey.rules.RuleCallback;
-import org.adaptlab.chpir.android.survey.tasks.SetScoreUnitOrderingQuestionTask;
 import org.adaptlab.chpir.android.survey.tasks.SendResponsesTask;
+import org.adaptlab.chpir.android.survey.tasks.SetScoreUnitOrderingQuestionTask;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
@@ -66,6 +65,7 @@ import java.net.URL;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public class InstrumentFragment extends ListFragment {
@@ -73,11 +73,13 @@ public class InstrumentFragment extends ListFragment {
     private SurveyAdapter mSurveyAdapter;
     private InstrumentAdapter mInstrumentAdapter;
     private RosterAdapter mRosterAdapter;
+    private ScoreAdapter mScoreAdapter;
     private ListView mSurveyListView;
     private ListView mRosterListView;
     private LoaderManager.LoaderCallbacks mInstrumentCallbacks;
     private LoaderManager.LoaderCallbacks mSurveyCallbacks;
     private LoaderManager.LoaderCallbacks mRosterCallbacks;
+    private LoaderManager.LoaderCallbacks mScoreCallbacks;
     private MultiChoiceModeListener choiceModeListener;
     private ProgressDialog mProgressDialog;
 
@@ -317,6 +319,31 @@ public class InstrumentFragment extends ListFragment {
                 mRosterAdapter.swapCursor(null);
             }
         };
+
+        mScoreCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
+
+            @Override
+            public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+                return new CursorLoader(
+                        getActivity(),
+                        ContentProvider.createUri(Score.class, null),
+                        null,
+                        null,
+                        null,
+                        null
+                );
+            }
+
+            @Override
+            public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+                mScoreAdapter.swapCursor(data);
+            }
+
+            @Override
+            public void onLoaderReset(Loader<Cursor> loader) {
+                mScoreAdapter.swapCursor(null);
+            }
+        };
     }
 
     private Long getProjectId() {
@@ -342,15 +369,14 @@ public class InstrumentFragment extends ListFragment {
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         if (getResources().getBoolean(R.bool.default_hide_admin_button)) {
-            menu.findItem(R.id.menu_item_admin).setEnabled(false).setVisible(false);
+            menu.findItem(R.id.menu_item_settings).setEnabled(false).setVisible(false);
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_item_admin:
-//                displayPasswordPrompt();
+            case R.id.menu_item_settings:
                 Intent i = new Intent(getActivity(), AdminActivity.class);
                 startActivity(i);
                 return true;
@@ -358,43 +384,14 @@ public class InstrumentFragment extends ListFragment {
                 new RefreshInstrumentsTask().execute();
                 new SendResponsesTask(getActivity()).execute();
                 return true;
-            case R.id.menu_item_settings:
-                startActivity(new Intent(getActivity(), SettingsActivity.class));
-                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    /*
-     * Only display admin area if correct password.
-     */
-    private void displayPasswordPrompt() {
-        final EditText input = new EditText(getActivity());
-        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        new AlertDialog.Builder(getActivity())
-                .setTitle(R.string.password_title)
-                .setMessage(R.string.password_message)
-                .setView(input)
-                .setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int button) {
-                        if (AppUtil.checkAdminPassword(input.getText().toString())) {
-                            Intent i = new Intent(getActivity(), AdminActivity.class);
-                            startActivity(i);
-                        } else {
-                            Toast.makeText(getActivity(), R.string.incorrect_password, Toast
-                                    .LENGTH_LONG).show();
-                        }
-                    }
-                }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int button) {
-            }
-        }).show();
-    }
-
     public void createTabs() {
+        final ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (showTabs()) {
-            final ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
             if (actionBar != null) { // TODO: 12/6/16 Use TabLayout
                 ActionBar.TabListener tabListener = new ActionBar.TabListener() {
                     @Override
@@ -416,6 +413,9 @@ public class InstrumentFragment extends ListFragment {
                             mRosterListView = getListView();
                             mRosterListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
                             mRosterListView.setMultiChoiceModeListener(choiceModeListener);
+                        } else if (tab.getText().equals(getActivity().getResources().getString(
+                                R.string.scores))) {
+                            setScoresListViewAdapter();
                         } else {
                             setInstrumentsListViewAdapter();
                         }
@@ -442,15 +442,21 @@ public class InstrumentFragment extends ListFragment {
                     actionBar.addTab(actionBar.newTab().setText(getActivity().getResources()
                             .getString(R.string.rosters)).setTabListener(tabListener));
                 }
+                if (AppUtil.getAdminSettingsInstance().getShowScores()) {
+                    actionBar.addTab(actionBar.newTab().setText(getActivity().getResources()
+                            .getString(R.string.scores)).setTabListener(tabListener));
+                }
             }
         } else {
+            actionBar.removeAllTabs();
             setInstrumentsListViewAdapter();
         }
     }
 
     private boolean showTabs() {
         return AppUtil.getAdminSettingsInstance().getShowSurveys() ||
-                AppUtil.getAdminSettingsInstance().getShowRosters();
+                AppUtil.getAdminSettingsInstance().getShowRosters() ||
+                AppUtil.getAdminSettingsInstance().getShowScores();
     }
 
     private void setSurveysListViewAdapter() {
@@ -478,6 +484,13 @@ public class InstrumentFragment extends ListFragment {
         }
     }
 
+    private void setScoresListViewAdapter() {
+        Cursor scoresCursor = Score.getCursor();
+        mScoreAdapter = new ScoreAdapter(getActivity(), scoresCursor, 0);
+        setListAdapter(mScoreAdapter);
+        getActivity().getSupportLoaderManager().restartLoader(0, null, mScoreCallbacks);
+    }
+
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
@@ -499,6 +512,12 @@ public class InstrumentFragment extends ListFragment {
             i.putExtra(RosterActivity.EXTRA_ROSTER_UUID, roster.getUUID());
             i.putExtra(RosterActivity.EXTRA_INSTRUMENT_ID, roster.getInstrument().getRemoteId());
             startActivity(i);
+        } else if (l.getAdapter() instanceof ScoreAdapter) {
+            Score score = getScoreAtPosition(l, position);
+            if (score == null) return;
+            Intent intent = new Intent(getActivity(), ScoreUnitActivity.class);
+            intent.putExtra(ScoreUnitFragment.EXTRA_SCORE_ID, score.getId());
+            startActivity(intent);
         }
     }
 
@@ -514,6 +533,12 @@ public class InstrumentFragment extends ListFragment {
         cursor.moveToPosition(position);
         String rosterUUID = cursor.getString(cursor.getColumnIndexOrThrow("UUID"));
         return Roster.findByUUID(rosterUUID);
+    }
+
+    private Score getScoreAtPosition(ListView l, int position) {
+        Cursor cursor = ((ScoreAdapter) l.getAdapter()).getCursor();
+        cursor.moveToPosition(position);
+        return Score.findByUUID(cursor.getString(cursor.getColumnIndexOrThrow("UUID")));
     }
 
     private static class InstrumentListLabel {
@@ -691,6 +716,36 @@ public class InstrumentFragment extends ListFragment {
             surveyCountTextView.setText(numSurveys + " " + FormatUtils.pluralize
                     (numSurveys, getString(R.string.survey), getString(R.string.surveys)) + " " +
                     getString(R.string.completed));
+        }
+    }
+
+    private class ScoreAdapter extends CursorAdapter {
+        public ScoreAdapter(Context context, Cursor cursor, int flags) {
+            super(context, cursor, 0);
+        }
+
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            return LayoutInflater.from(context).inflate(R.layout.list_item_score, parent, false);
+        }
+
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+            String uuid = cursor.getString(cursor.getColumnIndexOrThrow("UUID"));
+            Score score = Score.findByUUID(uuid);
+            if (score != null) {
+                TextView surveyIdentifier = (TextView) view.findViewById(R.id.survey_identifier);
+                surveyIdentifier.setText(String.format(Locale.getDefault(), "%s%s%s", score.getSurveyIdentifier(), " - ", score.getScoreScheme().getInstrument().getTitle()));
+
+                TextView schemeTitle = (TextView) view.findViewById(R.id.scheme_name_text);
+                schemeTitle.setText(String.valueOf(score.getScoreScheme().getTitle()));
+
+                TextView totalRawScore = (TextView) view.findViewById(R.id.total_raw_score_value);
+                totalRawScore.setText(String.valueOf(score.getRawScoreSum()));
+
+                TextView totalWeightedScore = (TextView) view.findViewById(R.id.total_weighted_score_value);
+                totalWeightedScore.setText(String.valueOf(score.getWeightedScoreSum()));
+            }
         }
     }
 

@@ -9,6 +9,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.activeandroid.ActiveAndroid;
@@ -112,12 +113,12 @@ public class AppUtil {
 
         DatabaseSeed.seed(context);
 
-        if (adminSettingsInstance.getDeviceIdentifier() == null) {
+        if (TextUtils.isEmpty(adminSettingsInstance.getDeviceIdentifier())) {
             adminSettingsInstance.setDeviceIdentifier(UUID.randomUUID().toString());
         }
 
-        if (adminSettingsInstance.getDeviceLabel() == null) {
-            adminSettingsInstance.setDeviceLabel("");
+        if (TextUtils.isEmpty(adminSettingsInstance.getDeviceLabel())) {
+            adminSettingsInstance.setDeviceLabel(getBuildName());
         }
 
         ActiveRecordCloudSync.setAccessToken(ACCESS_TOKEN);
@@ -224,6 +225,10 @@ public class AppUtil {
 
     public static String getOsBuildNumber() {
         return Build.DISPLAY;
+    }
+
+    public static String getBuildName() {
+        return Build.MODEL;
     }
 
     public static void deleteApplicationData() {

@@ -78,4 +78,13 @@ public class ScoreScheme extends ReceiveModel {
                 .orderBy("QuestionNumberInInstrument")
                 .execute();
     }
+
+    public Long getRemoteId() {
+        return mRemoteId;
+    }
+
+    public Instrument getInstrument() {
+        return new Select().from(Instrument.class).where("RemoteId = ?", mInstrumentRemoteId).executeSingle();
+    }
+
 }

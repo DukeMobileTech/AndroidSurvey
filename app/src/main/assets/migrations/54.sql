@@ -1,1 +1,2 @@
 ALTER TABLE Surveys ADD COLUMN Language STRING;
+ALTER TABLE AdminSettings ADD COLUMN ShowScores BOOLEAN;

@@ -6,11 +6,6 @@
           android:title="@string/settings"
           app:showAsAction="ifRoom|withText"/>
     <item
-        android:id="@+id/menu_item_admin"
-        android:icon="@drawable/ic_menu_item_secure"
-        android:title="@string/admin_settings"
-        app:showAsAction="ifRoom|withText"/>
-    <item
         android:id="@+id/menu_item_refresh"
         android:icon="@drawable/ic_menu_item_refresh"
         android:title="@string/refresh"

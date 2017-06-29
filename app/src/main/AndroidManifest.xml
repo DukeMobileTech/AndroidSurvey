@@ -50,13 +50,11 @@
             android:noHistory="true"/>
         <activity android:name=".ReviewPageActivity"/>
         <activity android:name=".SectionActivity"/>
-        <activity android:name=".SettingsActivity"/>
         <activity android:name=".roster.RosterActivity"/>
         <activity android:name=".roster.ParticipantEditorActivity"/>
         <activity android:name=".roster.ParticipantViewerActivity"/>
         <activity android:name=".roster.ResponseViewerActivity"/>
         <activity android:name=".roster.ResponseEditorActivity"/>
-        <activity android:name=".ScoreActivity"/>
         <activity android:name=".ScoreUnitActivity"/>
 
         <provider

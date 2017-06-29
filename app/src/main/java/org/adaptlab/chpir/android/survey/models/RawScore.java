@@ -21,8 +21,8 @@ public class RawScore extends SendModel {
     private boolean mSent;
     @Column(name = "ScoreUnit")
     private ScoreUnit mScoreUnit;
-    @Column(name = "Score")
-    private Score mScore;
+    @Column(name = "ScoreUUID")
+    private String mScoreUUID;
     @Column(name = "Value")
     private double mValue;
 
@@ -58,12 +58,12 @@ public class RawScore extends SendModel {
     }
 
     public static RawScore findByScoreUnitAndScore(ScoreUnit scoreUnit, Score score) {
-        return new Select().from(RawScore.class).where("ScoreUnit = ? AND Score = ?",
-                scoreUnit.getId(), score.getId()).executeSingle();
+        return new Select().from(RawScore.class).where("ScoreUnit = ? AND ScoreUUID = ?",
+                scoreUnit.getId(), score.getUUID()).executeSingle();
     }
 
     public void setScore(Score score) {
-        mScore = score;
+        mScoreUUID = score.getUUID();
     }
 
     public void setScoreUnit(ScoreUnit scoreUnit) {
@@ -79,7 +79,7 @@ public class RawScore extends SendModel {
     }
 
     public Score getScore() {
-        return mScore;
+        return new Select().from(Score.class).where("UUID = ?", mScoreUUID).executeSingle();
     }
 
     public ScoreUnit getScoreUnit() {

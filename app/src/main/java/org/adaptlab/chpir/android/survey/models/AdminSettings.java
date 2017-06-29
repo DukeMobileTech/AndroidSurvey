@@ -58,6 +58,8 @@ public class AdminSettings extends Model {
     private String mApi2Key;
     @Column(name = "ShowRosters")
     private boolean mShowRosters;
+    @Column(name = "ShowScores")
+    private boolean mShowScores;
 
     /**
      * Typically a Singleton constructor is private, but in this case the constructor
@@ -328,6 +330,15 @@ public class AdminSettings extends Model {
 
     public void setShowRosters(boolean showRosters) {
         mShowRosters = showRosters;
+        save();
+    }
+
+    public boolean getShowScores() {
+        return mShowScores;
+    }
+
+    public void setShowScores(boolean showScores) {
+        mShowScores = showScores;
         save();
     }
 

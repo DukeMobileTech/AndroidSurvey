@@ -1175,7 +1175,6 @@ public class SurveyFragment extends Fragment {
         @Override
         protected void onPostExecute(Survey survey) {
             completeAndSendSurvey(survey);
-            startActivity(new Intent(getActivity(), ScoreActivity.class));
             getActivity().finish();
         }
     }

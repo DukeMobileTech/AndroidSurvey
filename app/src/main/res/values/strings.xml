@@ -14,7 +14,7 @@
     <string name="refresh">Refresh</string>
     <string name="device_identifier">Device Identifier</string>
     <string name="save_button">Save</string>
-    <string name="admin_settings">Admin</string>
+    <string name="admin_settings">Admin Settings</string>
     <string name="settings">Settings</string>
     <string name="api_endpoint">Api Domain Name</string>
     <string name="api_key">Api Key</string>
@@ -121,7 +121,7 @@
     <string name="show_rosters">Show Rosters</string>
     <string name="roster_sync_settings">Roster Sync Settings</string>
     <string name="custom_code_hint">Enter custom ISO code for language name</string>
-    <string name="roster_api_endpoint">Sync Rosters To Different Endpoint</string>
+    <string name="roster_api_endpoint">Sync Roster Data To Different Endpoint</string>
     <string name="url_hint">https://example.com/</string>
     <string name="completed">completed</string>
     <string name="sent">Sent</string>
@@ -135,7 +135,7 @@
     <string name="last_sync_time">Last Sync Time: </string>
     <string name="version_name">Version Name: </string>
     <string name="question_text_header">Question Text</string>
-    <string name="scores">Scores</string>
+    <string name="scores">scores</string>
     <string name="score_type">Score Type:</string>
     <string name="unit_questions">Question Identifiers:</string>
     <string name="minimum_score">Minimum Score:</string>
@@ -145,4 +145,5 @@
     <string name="weighted_score">Weighted Score:</string>
     <string name="total_raw_score">Total Raw Score:</string>
     <string name="total_weighted_score">Total Weighted Score:</string>
+    <string name="show_scores">Show Scores</string>
 </resources>

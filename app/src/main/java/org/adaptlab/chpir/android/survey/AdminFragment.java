@@ -6,6 +6,9 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.InputType;
+import android.text.TextUtils;
+import android.text.method.PasswordTransformationMethod;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,12 +20,15 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.survey.models.AdminSettings;
 import org.adaptlab.chpir.android.survey.tasks.ApkUpdateTask;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -45,22 +51,24 @@ public class AdminFragment extends Fragment {
     private CheckBox mRosterEndPointCheckBox;
     private CheckBox mShowSurveysCheckBox;
     private CheckBox mShowRostersCheckBox;
+    private CheckBox mShowScoresCheckBox;
     private CheckBox mShowSkipCheckBox;
     private CheckBox mShowNACheckBox;
     private CheckBox mShowRFCheckBox;
     private CheckBox mShowDKCheckBox;
     private CheckBox mRequirePasswordCheckBox;
     private CheckBox mRecordSurveyLocationCheckBox;
+    private ArrayList<EditText> transformableFields;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        getActivity().setTitle(R.string.admin_settings);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup parent,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_admin_settings, parent, false);
         mDeviceIdentifierEditText = (EditText) v.findViewById(R.id.device_identifier_edit_text);
         mDeviceIdentifierEditText.setText(getAdminSettingsInstanceDeviceId());
@@ -68,20 +76,21 @@ public class AdminFragment extends Fragment {
         mDeviceLabelEditText = (EditText) v.findViewById(R.id.device_label_edit_text);
         mDeviceLabelEditText.setText(AdminSettings.getInstance().getDeviceLabel());
 
-        mApiDomainNameEditText = (EditText) v.findViewById(R.id.api_endpoint_text);
-        mApiDomainNameEditText.setText(getAdminSettingsInstanceApiDomainName());
-
-        mApiVersionEditText = (EditText) v.findViewById(R.id.api_version_text);
-        mApiVersionEditText.setText(getAdminSettingsInstanceApiVersion());
-
-        mProjectIdEditText = (EditText) v.findViewById(R.id.project_id_text);
-        mProjectIdEditText.setText(getAdminSettingsInstanceProjectId());
-
-        mApiKeyEditText = (EditText) v.findViewById(R.id.api_key_text);
-        mApiKeyEditText.setText(getAdminSettingsInstanceApiKey());
-
         mCustomLocaleEditText = (EditText) v.findViewById(R.id.custom_locale_edit_text);
         mCustomLocaleEditText.setText(getAdminSettingsInstanceCustomLocaleCode());
+
+        mApiDomainNameEditText = (EditText) v.findViewById(R.id.api_endpoint_text);
+        mApiDomainNameEditText.setText(getAdminSettingsInstanceApiDomainName());
+        if (!TextUtils.isEmpty(getAdminSettingsInstanceApiDomainName())) setOnClickListener(mApiDomainNameEditText);
+        mApiVersionEditText = (EditText) v.findViewById(R.id.api_version_text);
+        mApiVersionEditText.setText(getAdminSettingsInstanceApiVersion());
+        if (!TextUtils.isEmpty(getAdminSettingsInstanceApiVersion())) setOnClickListener(mApiVersionEditText);
+        mProjectIdEditText = (EditText) v.findViewById(R.id.project_id_text);
+        mProjectIdEditText.setText(getAdminSettingsInstanceProjectId());
+        if (!TextUtils.isEmpty(getAdminSettingsInstanceProjectId())) setOnClickListener(mProjectIdEditText);
+        mApiKeyEditText = (EditText) v.findViewById(R.id.api_key_text);
+        mApiKeyEditText.setText(getAdminSettingsInstanceApiKey());
+        if (!TextUtils.isEmpty(getAdminSettingsInstanceApiKey())) setOnClickListener(mApiKeyEditText);
 
         mRosterEndPointCheckBox = (CheckBox) v.findViewById(R.id.api2_endpoint);
         mRosterEndPointCheckBox.setChecked(AdminSettings.getInstance().useEndpoint2());
@@ -93,23 +102,31 @@ public class AdminFragment extends Fragment {
             }
         });
 
+        // TODO: 6/29/17 Add project id to end point
         mRosterSyncSettingsLabel = (TextView) v.findViewById(R.id.roster_sync_settings_label);
         mApi2DomainNameLabel = (TextView) v.findViewById(R.id.api2_endpoint_label);
         mApi2VersionLabel = (TextView) v.findViewById(R.id.api2_version_label);
         mApi2KeyLabel = (TextView) v.findViewById(R.id.api2_key_label);
         mApi2DomainNameEditText = (EditText) v.findViewById(R.id.api2_endpoint_text);
         mApi2DomainNameEditText.setText(getAdminSettingsInstanceApi2DomainName());
+        if (!TextUtils.isEmpty(getAdminSettingsInstanceApi2DomainName())) setOnClickListener(mApi2DomainNameEditText);
         mApi2VersionEditText = (EditText) v.findViewById(R.id.api2_version_text);
         mApi2VersionEditText.setText(getAdminSettingsInstanceApi2Version());
+        if (!TextUtils.isEmpty(getAdminSettingsInstanceApi2Version())) setOnClickListener(mApi2VersionEditText);
         mApi2KeyEditText = (EditText) v.findViewById(R.id.api2_key_text);
         mApi2KeyEditText.setText(getAdminSettingsInstanceApi2Key());
+        if (!TextUtils.isEmpty(getAdminSettingsInstanceApi2Key())) setOnClickListener(mApi2KeyEditText);
         toggleRosterSettingsVisibility(AdminSettings.getInstance().useEndpoint2());
+        transformableFields = new ArrayList<>(Arrays.asList(mApiDomainNameEditText, mApiVersionEditText, mProjectIdEditText, mApiKeyEditText, mApi2VersionEditText, mApi2KeyEditText, mApi2DomainNameEditText));
 
         mShowSurveysCheckBox = (CheckBox) v.findViewById(R.id.show_surveys_checkbox);
         mShowSurveysCheckBox.setChecked(AdminSettings.getInstance().getShowSurveys());
 
         mShowRostersCheckBox = (CheckBox) v.findViewById(R.id.show_rosters_checkbox);
         mShowRostersCheckBox.setChecked(AdminSettings.getInstance().getShowRosters());
+
+        mShowScoresCheckBox = (CheckBox) v.findViewById(R.id.show_scores_checkbox);
+        mShowScoresCheckBox.setChecked(AdminSettings.getInstance().getShowScores());
 
         mShowSkipCheckBox = (CheckBox) v.findViewById(R.id.show_skip_checkbox);
         mShowSkipCheckBox.setChecked(AdminSettings.getInstance().getShowSkip());
@@ -206,8 +223,7 @@ public class AdminFragment extends Fragment {
     }
 
     private void saveAdminSettings() {
-        AdminSettings.getInstance().setDeviceIdentifier(mDeviceIdentifierEditText.getText()
-                .toString());
+        AdminSettings.getInstance().setDeviceIdentifier(mDeviceIdentifierEditText.getText().toString());
         AdminSettings.getInstance().setDeviceLabel(mDeviceLabelEditText.getText().toString());
         AdminSettings.getInstance().setApiDomainName(mApiDomainNameEditText.getText().toString());
         AdminSettings.getInstance().setApiVersion(mApiVersionEditText.getText().toString());
@@ -223,6 +239,7 @@ public class AdminFragment extends Fragment {
 
         AdminSettings.getInstance().setShowSurveys(mShowSurveysCheckBox.isChecked());
         AdminSettings.getInstance().setShowRosters(mShowRostersCheckBox.isChecked());
+        AdminSettings.getInstance().setShowScores(mShowScoresCheckBox.isChecked());
         AdminSettings.getInstance().setShowSkip(mShowSkipCheckBox.isChecked());
         AdminSettings.getInstance().setShowNA(mShowNACheckBox.isChecked());
         AdminSettings.getInstance().setShowRF(mShowRFCheckBox.isChecked());
@@ -311,6 +328,42 @@ public class AdminFragment extends Fragment {
         calendar.setTimeInMillis(Long.parseLong(last));
         DateFormat dateFormat = DateFormat.getDateTimeInstance();
         return dateFormat.format(calendar.getTime());
+    }
+
+    private void setOnClickListener(final EditText editText) {
+        editText.setTransformationMethod(new PasswordTransformationMethod());
+        editText.setFocusable(false);
+        editText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                displayPasswordPrompt();
+            }
+        });
+    }
+
+    private void displayPasswordPrompt() {
+        final EditText input = new EditText(getActivity());
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        new AlertDialog.Builder(getActivity())
+                .setTitle(R.string.password_title)
+                .setMessage(R.string.password_message)
+                .setView(input)
+                .setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int button) {
+                        if (AppUtil.checkAdminPassword(input.getText().toString())) {
+                            for (EditText editText : transformableFields) {
+                                editText.setTransformationMethod(null);
+                                editText.setFocusableInTouchMode(true);
+                                editText.setClickable(false);
+                            }
+                        } else {
+                            Toast.makeText(getActivity(), R.string.incorrect_password, Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }).setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int button) {
+            }
+        }).show();
     }
 
     private class WipeDataTask extends AsyncTask<Void, Void, Void> {

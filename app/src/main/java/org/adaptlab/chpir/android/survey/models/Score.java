@@ -1,9 +1,13 @@
 package org.adaptlab.chpir.android.survey.models;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.provider.BaseColumns;
 
+import com.activeandroid.Cache;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.activeandroid.query.From;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.SendModel;
@@ -14,7 +18,7 @@ import org.json.JSONObject;
 import java.util.List;
 import java.util.UUID;
 
-@Table(name = "Scores")
+@Table(name = "Scores", id = BaseColumns._ID)
 public class Score extends SendModel {
     private static final String TAG = "Score";
 
@@ -24,8 +28,8 @@ public class Score extends SendModel {
     private boolean mSent;
     @Column(name = "SurveyUUID")
     private String mSurveyUUID;
-    @Column(name = "ScoreScheme")
-    private ScoreScheme mScoreScheme;
+    @Column(name = "ScoreSchemeRemoteId")
+    private Long mScoreSchemeRemoteId;
     @Column(name = "ScoreSum")
     private double mScoreSum;
     @Column(name = "SurveyIdentifier")
@@ -35,6 +39,15 @@ public class Score extends SendModel {
         super();
         mSent = false;
         mUUID = UUID.randomUUID().toString();
+    }
+
+    public static Score findByUUID(String uuid) {
+        return new Select().from(Score.class).where("UUID = ?", uuid).executeSingle();
+    }
+
+    public static Cursor getCursor() {
+        From query = new Select("Scores.*").from(Score.class);
+        return Cache.openDatabase().rawQuery(query.toSql(), query.getArguments());
     }
 
     public String getUUID() {
@@ -54,7 +67,7 @@ public class Score extends SendModel {
     }
 
     public ScoreScheme getScoreScheme() {
-        return mScoreScheme;
+        return new Select().from(ScoreScheme.class).where("RemoteId = ?", mScoreSchemeRemoteId).executeSingle();
     }
 
     public double getRawScoreSum() {
@@ -62,7 +75,7 @@ public class Score extends SendModel {
     }
 
     public void setScoreScheme(ScoreScheme scheme) {
-        mScoreScheme = scheme;
+        mScoreSchemeRemoteId = scheme.getRemoteId();
     }
 
     public void setSurveyIdentifier(String identifier) {
@@ -89,17 +102,17 @@ public class Score extends SendModel {
     }
 
     public List<RawScore> rawScores() {
-        return new Select().from(RawScore.class).where("Score = ?", this.getId()).execute();
+        return new Select().from(RawScore.class).where("ScoreUUID = ?", mUUID).execute();
     }
 
     public static Score findBySurveyAndScheme(Survey survey, ScoreScheme scheme) {
-        return new Select().from(Score.class).where("SurveyUUID = ? AND ScoreScheme = ?",
-                survey.getUUID(), scheme.getId()).executeSingle();
+        return new Select().from(Score.class).where("SurveyUUID = ? AND ScoreSchemeRemoteId = ?",
+                survey.getUUID(), scheme.getRemoteId()).executeSingle();
     }
 
     public RawScore findRawScoreByScoreUnit(ScoreUnit unit) {
-        return new Select().from(RawScore.class).where("ScoreUnit = ? AND Score = ?",
-                unit.getId(), getId()).executeSingle();
+        return new Select().from(RawScore.class).where("ScoreUnit = ? AND ScoreUUID = ?",
+                unit.getId(), mUUID).executeSingle();
     }
 
     public void score() {
@@ -145,5 +158,10 @@ public class Score extends SendModel {
     @Override
     public boolean isPersistent() {
         return false;
+    }
+
+    @Override
+    public String getPrimaryKey() {
+        return BaseColumns._ID;
     }
 }
