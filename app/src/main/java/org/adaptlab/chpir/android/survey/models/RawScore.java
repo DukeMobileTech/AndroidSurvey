@@ -1,12 +1,14 @@
 package org.adaptlab.chpir.android.survey.models;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.SendModel;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.UUID;
@@ -34,7 +36,18 @@ public class RawScore extends SendModel {
 
     @Override
     public JSONObject toJSON() {
-        return null;
+        JSONObject json = new JSONObject();
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("uuid", mUUID);
+            jsonObject.put("score_uuid", mScoreUUID);
+            jsonObject.put("score_unit_id", mScoreUnit.getRemoteId());
+            jsonObject.put("value", mValue);
+            json.put("raw_score", jsonObject);
+        } catch (JSONException je) {
+            Log.e(TAG, "JSON exception", je);
+        }
+        return json;
     }
 
     @Override
@@ -44,17 +57,21 @@ public class RawScore extends SendModel {
 
     @Override
     public boolean readyToSend() {
-        return false;
+        return (getScore() != null) && getScore().readyToSend();
     }
 
     @Override
     public void setAsSent(Context context) {
-
+        mSent = true;
+        this.save();
+        // TODO: 6/30/17 Decide how long to keep the scores around
+//        this.delete();
+//        getScore().deleteIfComplete();
     }
 
     @Override
     public boolean isPersistent() {
-        return false;
+        return true;
     }
 
     public static RawScore findByScoreUnitAndScore(ScoreUnit scoreUnit, Score score) {
@@ -79,6 +96,7 @@ public class RawScore extends SendModel {
     }
 
     public Score getScore() {
+        if (mScoreUUID == null) return null;
         return new Select().from(Score.class).where("UUID = ?", mScoreUUID).executeSingle();
     }
 

@@ -201,6 +201,10 @@ public class ScoreUnit extends ReceiveModel {
         return mQuestionNumberInInstrument;
     }
 
+    public Long getRemoteId() {
+        return mRemoteId;
+    }
+
     public enum ScoreType {
         single_select, multiple_select, multiple_select_sum, range, simple_search
     }

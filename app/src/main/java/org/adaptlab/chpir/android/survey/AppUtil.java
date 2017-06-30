@@ -36,10 +36,12 @@ import org.adaptlab.chpir.android.survey.models.QuestionRandomizedFactor;
 import org.adaptlab.chpir.android.survey.models.QuestionTranslation;
 import org.adaptlab.chpir.android.survey.models.RandomizedFactor;
 import org.adaptlab.chpir.android.survey.models.RandomizedOption;
+import org.adaptlab.chpir.android.survey.models.RawScore;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.ResponsePhoto;
 import org.adaptlab.chpir.android.survey.models.Roster;
 import org.adaptlab.chpir.android.survey.models.Rule;
+import org.adaptlab.chpir.android.survey.models.Score;
 import org.adaptlab.chpir.android.survey.models.ScoreScheme;
 import org.adaptlab.chpir.android.survey.models.ScoreUnit;
 import org.adaptlab.chpir.android.survey.models.ScoreUnitQuestion;
@@ -146,7 +148,8 @@ public class AppUtil {
         ActiveRecordCloudSync.addSendTable("response_images", ResponsePhoto.class);
         ActiveRecordCloudSync.addSendTable("device_sync_entries", DeviceSyncEntry.class);
         ActiveRecordCloudSync.addSendTable("rosters", Roster.class);
-//        ActiveRecordCloudSync.addSendTable("scores", Score.class);
+        ActiveRecordCloudSync.addSendTable("scores", Score.class);
+        ActiveRecordCloudSync.addSendTable("raw_scores", RawScore.class);
 
         PollService.setServiceAlarm(context.getApplicationContext(), true);
     }

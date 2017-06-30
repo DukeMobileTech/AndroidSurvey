@@ -1,8 +1,13 @@
 package org.adaptlab.chpir.android.survey.models;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.provider.BaseColumns;
+import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.activeandroid.Cache;
 import com.activeandroid.annotation.Column;
@@ -11,8 +16,11 @@ import com.activeandroid.query.From;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.SendModel;
+import org.adaptlab.chpir.android.survey.AppUtil;
+import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.scorers.Scorer;
 import org.adaptlab.chpir.android.survey.scorers.ScorerFactory;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -34,6 +42,8 @@ public class Score extends SendModel {
     private double mScoreSum;
     @Column(name = "SurveyIdentifier")
     private String mSurveyIdentifier;
+    @Column(name = "Complete")
+    private boolean mComplete;
 
     public Score() {
         super();
@@ -128,6 +138,7 @@ public class Score extends SendModel {
             rawScore.save();
         }
         setRawScoreSum();
+        setComplete(true);
         save();
     }
 
@@ -137,7 +148,30 @@ public class Score extends SendModel {
 
     @Override
     public JSONObject toJSON() {
-        return null;
+        JSONObject json = new JSONObject();
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("device_uuid", AppUtil.getAdminSettingsInstance().getDeviceIdentifier());
+            jsonObject.put("device_label", AppUtil.getAdminSettingsInstance().getDeviceLabel());
+            jsonObject.put("uuid", mUUID);
+            jsonObject.put("survey_uuid", mSurveyUUID);
+            jsonObject.put("score_scheme_id", mScoreSchemeRemoteId);
+            jsonObject.put("score_sum", mScoreSum);
+            json.put("score", jsonObject);
+        } catch (JSONException je) {
+            Log.e(TAG, "JSON exception", je);
+        }
+        return json;
+    }
+
+    private void setComplete(boolean status) {
+        mComplete = status;
+    }
+
+    public void deleteIfComplete() {
+        if (this.rawScores().size() == 0) {
+            this.delete();
+        }
     }
 
     @Override
@@ -147,17 +181,38 @@ public class Score extends SendModel {
 
     @Override
     public boolean readyToSend() {
-        return false;
+        return mComplete;
     }
 
     @Override
     public void setAsSent(Context context) {
+        mSent = true;
+        this.save();
 
+        EventLog eventLog = new EventLog(EventLog.EventType.SENT_SURVEY, context);
+        eventLog.setInstrumentRemoteId(getScoreScheme().getInstrument().getRemoteId());
+        eventLog.setSurveyIdentifier(mSurveyIdentifier);
+        eventLog.save();
+
+        Resources r = context.getResources();
+
+        Notification notification = new NotificationCompat.Builder(context)
+                .setTicker(r.getString(R.string.app_name))
+                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setContentTitle(r.getString(R.string.app_name))
+                .setContentText(eventLog.getLogMessage(context))
+                .setAutoCancel(true)
+                .build();
+
+        NotificationManager notificationManager = (NotificationManager)
+                context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        notificationManager.notify(eventLog.getLogMessage(context), 1, notification);
     }
 
     @Override
     public boolean isPersistent() {
-        return false;
+        return true;
     }
 
     @Override
