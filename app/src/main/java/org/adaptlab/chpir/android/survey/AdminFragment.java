@@ -23,7 +23,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
-import org.adaptlab.chpir.android.survey.models.AdminSettings;
 import org.adaptlab.chpir.android.survey.tasks.ApkUpdateTask;
 
 import java.text.DateFormat;
@@ -74,7 +73,7 @@ public class AdminFragment extends Fragment {
         mDeviceIdentifierEditText.setText(getAdminSettingsInstanceDeviceId());
 
         mDeviceLabelEditText = (EditText) v.findViewById(R.id.device_label_edit_text);
-        mDeviceLabelEditText.setText(AdminSettings.getInstance().getDeviceLabel());
+        mDeviceLabelEditText.setText(AppUtil.getAdminSettingsInstance().getDeviceLabel());
 
         mCustomLocaleEditText = (EditText) v.findViewById(R.id.custom_locale_edit_text);
         mCustomLocaleEditText.setText(getAdminSettingsInstanceCustomLocaleCode());
@@ -93,7 +92,7 @@ public class AdminFragment extends Fragment {
         if (!TextUtils.isEmpty(getAdminSettingsInstanceApiKey())) setOnClickListener(mApiKeyEditText);
 
         mRosterEndPointCheckBox = (CheckBox) v.findViewById(R.id.api2_endpoint);
-        mRosterEndPointCheckBox.setChecked(AdminSettings.getInstance().useEndpoint2());
+        mRosterEndPointCheckBox.setChecked(AppUtil.getAdminSettingsInstance().useEndpoint2());
         mRosterEndPointCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -116,37 +115,57 @@ public class AdminFragment extends Fragment {
         mApi2KeyEditText = (EditText) v.findViewById(R.id.api2_key_text);
         mApi2KeyEditText.setText(getAdminSettingsInstanceApi2Key());
         if (!TextUtils.isEmpty(getAdminSettingsInstanceApi2Key())) setOnClickListener(mApi2KeyEditText);
-        toggleRosterSettingsVisibility(AdminSettings.getInstance().useEndpoint2());
+        toggleRosterSettingsVisibility(AppUtil.getAdminSettingsInstance().useEndpoint2());
         transformableFields = new ArrayList<>(Arrays.asList(mApiDomainNameEditText, mApiVersionEditText, mProjectIdEditText, mApiKeyEditText, mApi2VersionEditText, mApi2KeyEditText, mApi2DomainNameEditText));
 
         mShowSurveysCheckBox = (CheckBox) v.findViewById(R.id.show_surveys_checkbox);
-        mShowSurveysCheckBox.setChecked(AdminSettings.getInstance().getShowSurveys());
+        mShowSurveysCheckBox.setChecked(AppUtil.getAdminSettingsInstance().getShowSurveys());
 
         mShowRostersCheckBox = (CheckBox) v.findViewById(R.id.show_rosters_checkbox);
-        mShowRostersCheckBox.setChecked(AdminSettings.getInstance().getShowRosters());
+        mShowRostersCheckBox.setChecked(AppUtil.getAdminSettingsInstance().getShowRosters());
 
         mShowScoresCheckBox = (CheckBox) v.findViewById(R.id.show_scores_checkbox);
-        mShowScoresCheckBox.setChecked(AdminSettings.getInstance().getShowScores());
+        mShowScoresCheckBox.setChecked(AppUtil.getAdminSettingsInstance().getShowScores());
 
         mShowSkipCheckBox = (CheckBox) v.findViewById(R.id.show_skip_checkbox);
-        mShowSkipCheckBox.setChecked(AdminSettings.getInstance().getShowSkip());
+        mShowSkipCheckBox.setChecked(AppUtil.getAdminSettingsInstance().getShowSkip());
 
         mShowNACheckBox = (CheckBox) v.findViewById(R.id.show_na_checkbox);
-        mShowNACheckBox.setChecked(AdminSettings.getInstance().getShowNA());
+        mShowNACheckBox.setChecked(AppUtil.getAdminSettingsInstance().getShowNA());
 
         mShowRFCheckBox = (CheckBox) v.findViewById(R.id.show_rf_checkbox);
-        mShowRFCheckBox.setChecked(AdminSettings.getInstance().getShowRF());
+        mShowRFCheckBox.setChecked(AppUtil.getAdminSettingsInstance().getShowRF());
 
         mShowDKCheckBox = (CheckBox) v.findViewById(R.id.show_dk_checkbox);
-        mShowDKCheckBox.setChecked(AdminSettings.getInstance().getShowDK());
+        mShowDKCheckBox.setChecked(AppUtil.getAdminSettingsInstance().getShowDK());
 
         mRequirePasswordCheckBox = (CheckBox) v.findViewById(R.id.require_password);
-        mRequirePasswordCheckBox.setChecked(AdminSettings.getInstance().getRequirePassword());
+        mRequirePasswordCheckBox.setChecked(AppUtil.getAdminSettingsInstance().getRequirePassword());
 
         mRecordSurveyLocationCheckBox = (CheckBox) v.findViewById(R.id
                 .record_survey_location_checkbox);
-        mRecordSurveyLocationCheckBox.setChecked(AdminSettings.getInstance()
+        mRecordSurveyLocationCheckBox.setChecked(AppUtil.getAdminSettingsInstance()
                 .getRecordSurveyLocation());
+
+        // Disable edits if using default settings
+        if (getActivity().getResources().getBoolean(R.bool.default_admin_settings)) {
+            mDeviceIdentifierEditText.setEnabled(false);
+            mDeviceLabelEditText.setEnabled(false);
+            mCustomLocaleEditText.setEnabled(false);
+            mRecordSurveyLocationCheckBox.setEnabled(false);
+            mRequirePasswordCheckBox.setEnabled(false);
+            mShowDKCheckBox.setEnabled(false);
+            mShowRFCheckBox.setEnabled(false);
+            mShowNACheckBox.setEnabled(false);
+            mShowSkipCheckBox.setEnabled(false);
+            mShowScoresCheckBox.setEnabled(false);
+            mShowRostersCheckBox.setEnabled(false);
+            mShowSurveysCheckBox.setEnabled(false);
+            mRosterEndPointCheckBox.setEnabled(false);
+            for (EditText editText : transformableFields) {
+                editText.setEnabled(false);
+            }
+        }
 
         final TextView lastUpdateTextView = (TextView) v.findViewById(R.id.last_update_label);
         lastUpdateTextView.setText(String.format(Locale.getDefault(), "%s%s%s",
@@ -156,7 +175,7 @@ public class AdminFragment extends Fragment {
         resetLastSyncTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AdminSettings.getInstance().setLastSyncTime(null);
+                AppUtil.getAdminSettingsInstance().setLastSyncTime(null);
                 lastUpdateTextView.setText(String.format(Locale.getDefault(), "%s%s%s",
                         getString(R.string.last_update), " ", getLastUpdateTime()));
             }
@@ -209,6 +228,15 @@ public class AdminFragment extends Fragment {
     }
 
     @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        if (getActivity().getResources().getBoolean(R.bool.default_admin_settings)) {
+            menu.findItem(R.id.save_admin_settings_button).setEnabled(false).setVisible(false);
+            menu.findItem(R.id.delete_data_button).setEnabled(false).setVisible(false);
+        }
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.save_admin_settings_button:
@@ -223,36 +251,36 @@ public class AdminFragment extends Fragment {
     }
 
     private void saveAdminSettings() {
-        AdminSettings.getInstance().setDeviceIdentifier(mDeviceIdentifierEditText.getText().toString());
-        AdminSettings.getInstance().setDeviceLabel(mDeviceLabelEditText.getText().toString());
-        AdminSettings.getInstance().setApiDomainName(mApiDomainNameEditText.getText().toString());
-        AdminSettings.getInstance().setApiVersion(mApiVersionEditText.getText().toString());
-        AdminSettings.getInstance().setProjectId(mProjectIdEditText.getText().toString());
-        AdminSettings.getInstance().setApiKey(mApiKeyEditText.getText().toString());
+        AppUtil.getAdminSettingsInstance().setDeviceIdentifier(mDeviceIdentifierEditText.getText().toString());
+        AppUtil.getAdminSettingsInstance().setDeviceLabel(mDeviceLabelEditText.getText().toString());
+        AppUtil.getAdminSettingsInstance().setApiDomainName(mApiDomainNameEditText.getText().toString());
+        AppUtil.getAdminSettingsInstance().setApiVersion(mApiVersionEditText.getText().toString());
+        AppUtil.getAdminSettingsInstance().setProjectId(mProjectIdEditText.getText().toString());
+        AppUtil.getAdminSettingsInstance().setApiKey(mApiKeyEditText.getText().toString());
         // If this code is set, it will override the language selection on the device
         // for all instrument translations.
-        AdminSettings.getInstance().setCustomLocaleCode(mCustomLocaleEditText.getText().toString());
+        AppUtil.getAdminSettingsInstance().setCustomLocaleCode(mCustomLocaleEditText.getText().toString());
 
         ActiveRecordCloudSync.setAccessToken(getAdminSettingsInstanceApiKey());
         ActiveRecordCloudSync.setEndPoint(getAdminSettingsInstanceApiUrl());
         AppUtil.appInit(getActivity());
 
-        AdminSettings.getInstance().setShowSurveys(mShowSurveysCheckBox.isChecked());
-        AdminSettings.getInstance().setShowRosters(mShowRostersCheckBox.isChecked());
-        AdminSettings.getInstance().setShowScores(mShowScoresCheckBox.isChecked());
-        AdminSettings.getInstance().setShowSkip(mShowSkipCheckBox.isChecked());
-        AdminSettings.getInstance().setShowNA(mShowNACheckBox.isChecked());
-        AdminSettings.getInstance().setShowRF(mShowRFCheckBox.isChecked());
-        AdminSettings.getInstance().setShowDK(mShowDKCheckBox.isChecked());
-        AdminSettings.getInstance().setRequirePassword(mRequirePasswordCheckBox.isChecked());
-        AdminSettings.getInstance().setRecordSurveyLocation(mRecordSurveyLocationCheckBox
+        AppUtil.getAdminSettingsInstance().setShowSurveys(mShowSurveysCheckBox.isChecked());
+        AppUtil.getAdminSettingsInstance().setShowRosters(mShowRostersCheckBox.isChecked());
+        AppUtil.getAdminSettingsInstance().setShowScores(mShowScoresCheckBox.isChecked());
+        AppUtil.getAdminSettingsInstance().setShowSkip(mShowSkipCheckBox.isChecked());
+        AppUtil.getAdminSettingsInstance().setShowNA(mShowNACheckBox.isChecked());
+        AppUtil.getAdminSettingsInstance().setShowRF(mShowRFCheckBox.isChecked());
+        AppUtil.getAdminSettingsInstance().setShowDK(mShowDKCheckBox.isChecked());
+        AppUtil.getAdminSettingsInstance().setRequirePassword(mRequirePasswordCheckBox.isChecked());
+        AppUtil.getAdminSettingsInstance().setRecordSurveyLocation(mRecordSurveyLocationCheckBox
                 .isChecked());
 
         //Roster settings
-        AdminSettings.getInstance().setUseEndpoint2(mRosterEndPointCheckBox.isChecked());
-        AdminSettings.getInstance().setApi2DomainName(mApi2DomainNameEditText.getText().toString());
-        AdminSettings.getInstance().setApi2Version(mApi2VersionEditText.getText().toString());
-        AdminSettings.getInstance().setApi2Key(mApi2KeyEditText.getText().toString());
+        AppUtil.getAdminSettingsInstance().setUseEndpoint2(mRosterEndPointCheckBox.isChecked());
+        AppUtil.getAdminSettingsInstance().setApi2DomainName(mApi2DomainNameEditText.getText().toString());
+        AppUtil.getAdminSettingsInstance().setApi2Version(mApi2VersionEditText.getText().toString());
+        AppUtil.getAdminSettingsInstance().setApi2Key(mApi2KeyEditText.getText().toString());
 
         getActivity().finish();
     }
@@ -277,52 +305,52 @@ public class AdminFragment extends Fragment {
 
     public String getAdminSettingsInstanceApiUrl() {
         // Append forward slash to domain name if does not exist
-        String domainName = AdminSettings.getInstance().getApiDomainName();
+        String domainName = AppUtil.getAdminSettingsInstance().getApiDomainName();
         char lastChar = domainName.charAt(domainName.length() - 1);
         if (lastChar != '/') domainName = domainName + "/";
 
-        return domainName + "api/" + AdminSettings.getInstance().getApiVersion() + "/" +
-                "projects/" + AdminSettings.getInstance().getProjectId() + "/";
+        return domainName + "api/" + AppUtil.getAdminSettingsInstance().getApiVersion() + "/" +
+                "projects/" + AppUtil.getAdminSettingsInstance().getProjectId() + "/";
     }
 
     public String getAdminSettingsInstanceDeviceId() {
-        return AdminSettings.getInstance().getDeviceIdentifier();
+        return AppUtil.getAdminSettingsInstance().getDeviceIdentifier();
     }
 
     public String getAdminSettingsInstanceApiDomainName() {
-        return AdminSettings.getInstance().getApiDomainName();
+        return AppUtil.getAdminSettingsInstance().getApiDomainName();
     }
 
     public String getAdminSettingsInstanceApiVersion() {
-        return AdminSettings.getInstance().getApiVersion();
+        return AppUtil.getAdminSettingsInstance().getApiVersion();
     }
 
     public String getAdminSettingsInstanceProjectId() {
-        return AdminSettings.getInstance().getProjectId();
+        return AppUtil.getAdminSettingsInstance().getProjectId();
     }
 
     public String getAdminSettingsInstanceApiKey() {
-        return AdminSettings.getInstance().getApiKey();
+        return AppUtil.getAdminSettingsInstance().getApiKey();
     }
 
     public String getAdminSettingsInstanceCustomLocaleCode() {
-        return AdminSettings.getInstance().getCustomLocaleCode();
+        return AppUtil.getAdminSettingsInstance().getCustomLocaleCode();
     }
 
     public String getAdminSettingsInstanceApi2DomainName() {
-        return AdminSettings.getInstance().getApi2DomainName();
+        return AppUtil.getAdminSettingsInstance().getApi2DomainName();
     }
 
     public String getAdminSettingsInstanceApi2Version() {
-        return AdminSettings.getInstance().getApi2Version();
+        return AppUtil.getAdminSettingsInstance().getApi2Version();
     }
 
     public String getAdminSettingsInstanceApi2Key() {
-        return AdminSettings.getInstance().getApi2Key();
+        return AppUtil.getAdminSettingsInstance().getApi2Key();
     }
 
     public String getLastUpdateTime() {
-        String last = AdminSettings.getInstance().getLastSyncTime();
+        String last = AppUtil.getAdminSettingsInstance().getLastSyncTime();
         if (last.isEmpty()) return last;
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(Long.parseLong(last));

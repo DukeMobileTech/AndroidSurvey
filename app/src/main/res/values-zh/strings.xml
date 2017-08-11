@@ -143,4 +143,7 @@
     <string name="weighted_score">Weighted Score:</string>
     <string name="total_raw_score">Total Raw Score:</string>
     <string name="total_weighted_score">Total Weighted Score:</string>
+    <string name="api_endpoint_settings">API Endpoint Settings</string>
+    <string name="device_settings">Device Settings</string>
+    <string name="show_scores">Show Scores</string>
 </resources>

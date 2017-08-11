@@ -24,18 +24,35 @@ public class DefaultAdminSettings extends AdminSettings {
     }
 
     @Override
+    public String getCustomLocaleCode() {
+        return AppUtil.getContext().getResources().getString(R.string.default_custom_locale);
+    }
+
+    @Override
     public boolean getShowSurveys() {
         return AppUtil.getContext().getResources().getBoolean(R.bool.default_show_surveys);
     }
 
     @Override
-    public boolean getShowSkip() {
-        return AppUtil.getContext().getResources().getBoolean(R.bool.default_show_sk);
+    public String getApiKey() {
+        return AppUtil.getContext().getResources().getString(R.string.default_backend_api_key);
     }
 
     @Override
     public boolean getRequirePassword() {
         return false;
+    }
+
+    @Override
+    public boolean getRecordSurveyLocation() {
+        return AppUtil.getContext().getResources().getBoolean(R.bool
+                .default_record_survey_location);
+    }
+
+    @Override
+    public String getApiUrl() {
+        return getApiDomainName() + "api/" + getApiVersion() + "/" + "projects/" + getProjectId()
+                + "/";
     }
 
     @Override
@@ -69,23 +86,18 @@ public class DefaultAdminSettings extends AdminSettings {
     }
 
     @Override
-    public String getApiKey() {
-        return AppUtil.getContext().getResources().getString(R.string.default_backend_api_key);
+    public boolean getShowSkip() {
+        return AppUtil.getContext().getResources().getBoolean(R.bool.default_show_sk);
     }
 
     @Override
-    public String getApiUrl() {
-        return getApiDomainName() + "api/" + getApiVersion() + "/" + "projects/" + getProjectId() + "/";
+    public boolean getShowRosters() {
+        return AppUtil.getContext().getResources().getBoolean(R.bool.default_show_rosters);
     }
 
     @Override
-    public String getCustomLocaleCode() {
-        return AppUtil.getContext().getResources().getString(R.string.default_custom_locale);
-    }
-
-    @Override
-    public boolean getRecordSurveyLocation() {
-        return AppUtil.getContext().getResources().getBoolean(R.bool.default_record_survey_location);
+    public boolean getShowScores() {
+        return AppUtil.getContext().getResources().getBoolean(R.bool.default_show_scores);
     }
 
 }

@@ -53,7 +53,7 @@ public class SumScorer extends Scorer {
 
         // TODO: 6/8/17 Filter using ScoreUnit
         return new Select().from(OptionScore.class)
-                .where("Option IN (" + TextUtils.join(",", placeholdersArray) + ")", optionIds)
+                .where("Option IN (" + TextUtils.join(",", placeholdersArray) + ")", (Object[]) optionIds)
                 .execute();
     }
 
