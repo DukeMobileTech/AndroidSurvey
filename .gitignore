@@ -21,9 +21,10 @@ local.properties
 .settings/
 proguard/
 
-# Crashlytics
+# Crashlytics/Fabric
 app/src/main/res/values/com_crashlytics_export_strings.xml
 app/src/main/assets/crashlytics-build.properties\
+app/fabric.properties
 
 # API Keys
 app/src/main/res/values/keys.xml
@@ -35,7 +36,6 @@ build/
 .idea/
 gradle/
 *.iml
-app/build.gradle
 
 # Ignore Mac DS_Store files
 .DS_Store
