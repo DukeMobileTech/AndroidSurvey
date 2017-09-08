@@ -22,9 +22,6 @@ import java.util.List;
 
 public class SingleSelectGridFragment extends GridFragment {
     private static final String TAG = "SingleSelectGridFragment";
-    private static final int MIN_HEIGHT = 80;
-    private static final int MARGIN_10 = 10;
-    private static final int MARGIN_0 = 0;
     private int mIndex;
     private List<RadioGroup> mRadioGroups;
     private List<TextView> mHeaderViews;
@@ -32,7 +29,6 @@ public class SingleSelectGridFragment extends GridFragment {
     private boolean interceptScroll = true;
     private OHScrollView headerScrollView;
     private OHScrollView contentScrollView;
-    private int minimumWidth = 100;
 
     @Override
     protected void deserialize(String responseText) {

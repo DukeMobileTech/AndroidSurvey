@@ -22,6 +22,11 @@ public abstract class GridFragment extends QuestionFragment implements ScrollVie
             "org.adaptlab.chpir.android.survey.grid_id";
 	public final static String EXTRA_SURVEY_ID =
 			"org.adaptlab.chpir.android.survey.survey_id";
+	public static final int MIN_HEIGHT = 80;
+	public static final int MARGIN_10 = 10;
+    public static final int MARGIN_5 = 5;
+	public static final int MARGIN_0 = 0;
+	public int minimumWidth = 100;
 
 	protected void createQuestionComponent(ViewGroup questionComponent){};
 	

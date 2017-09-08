@@ -1,30 +1,42 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
+import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import org.adaptlab.chpir.android.survey.GridFragment;
 import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.models.GridLabel;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
+import org.adaptlab.chpir.android.survey.models.Survey;
 import org.adaptlab.chpir.android.survey.roster.views.OHScrollView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 public class MultipleSelectGridFragment extends GridFragment {
 
-	private Map<String, List<CheckBox>> mCheckBoxes;
-	private Question mQuestion;
-	private Map<String, List<Integer>> mResponseIndices;
+    private static final String TAG = "MultipleSelectGridFragment";
+    private List<List<CheckBox>> mCheckBoxes;
 	private boolean interceptScroll = true;
 	private OHScrollView headerScrollView;
 	private OHScrollView contentScrollView;
+    private Integer[] rowHeights;
+    private Integer[] rowWidths;
+    private int mIndex;
 
     @Override
     public void onScrollChanged(OHScrollView scrollView, int x, int y, int oldX, int oldY) {
@@ -41,121 +53,241 @@ public class MultipleSelectGridFragment extends GridFragment {
     
 	@Override
 	protected void deserialize(String responseText) {
-		if (responseText.equals("")) {
-			for (List<CheckBox> checkBoxList : mCheckBoxes.values()) {
-				for (CheckBox box : checkBoxList) {
-					if (box.isChecked()) {
-						box.setChecked(false);
-					}
-				}
-			}
+        List<CheckBox> checkBoxes = mCheckBoxes.get(mIndex);
+        if (responseText.equals("")) {
+            for (CheckBox box : checkBoxes) {
+                if (box.isChecked()) {
+                    box.setChecked(false);
+                }
+            }
 		} else {
 	        String[] listOfIndices = responseText.split(LIST_DELIMITER);
 	        for (String index : listOfIndices) {
 	            if (!index.equals("")) {
 	                Integer indexInteger = Integer.parseInt(index);
-	                mCheckBoxes.get(mQuestion.getQuestionIdentifier()).get(indexInteger).setChecked(true);
+	                checkBoxes.get(indexInteger).setChecked(true);
 	            }
 	        }
 		}
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.fragment_table_question, parent, false);
-//		headerScrollView = (OHScrollView) getActivity().findViewById(R.id.table_options_header_view);
-//		contentScrollView = (OHScrollView) getActivity().findViewById(R.id.table_body_options_view);
-//		headerScrollView.setScrollViewListener(this);
-//		contentScrollView.setScrollViewListener(this);
-////		TableLayout headerTable = (TableLayout) v.findViewById(R.id.table_options_header);
-//		TableRow headerRow = new TableRow(getActivity());
-////		headerRow.setBackground(getResources().getDrawable(R.drawable.table_border));
-//		TextView questionTextHeader = new TextView(getActivity());
-//		questionTextHeader.setText("Question Text");
-//		questionTextHeader.setWidth(getQuestionColumnWidth());
-//		questionTextHeader.setTypeface(Typeface.DEFAULT_BOLD);
-//		headerRow.addView(questionTextHeader);
-//		for (GridLabel label : getGrid().labels()) {
-//        	TextView textView = new TextView(getActivity());
-//        	textView.setText(label.getLabelText());
-//        	textView.setWidth(getOptionColumnWidth());
-//        	textView.setTypeface(Typeface.DEFAULT_BOLD);
-//        	headerRow.addView(textView);
-//        }
-//        headerTable.addView(headerRow, 0);
-		
-//		TableLayout gridTableLayout = (TableLayout) v.findViewById(R.id.table_body_options_choice);
-//		List<Question> questionList = getQuestions();
-//		mResponseIndices = new HashMap<String, List<Integer>>();
-//		mCheckBoxes = new HashMap<String, List<CheckBox>>();
-//		for (int k = 0; k < questionList.size(); k++) {
-//			final Question q = questionList.get(k);
-//			TableRow questionRow = new TableRow(getActivity());
-////			questionRow.setBackground(getResources().getDrawable(R.drawable.table_border));
-//			TextView questionText = new TextView(getActivity());
-//			questionText.setText(q.getText());
-//			questionText.setWidth(getQuestionColumnWidth());
-//			questionRow.addView(questionText);
-//
-//			List<CheckBox> checkBoxes =  new ArrayList<CheckBox>();
-//			for (GridLabel label : getGrid().labels()) {
-//				final int id = getGrid().labels().indexOf(label);
-//				CheckBox checkbox = new CheckBox(getActivity());
-//				checkbox.setSaveEnabled(false);
-//				checkbox.setId(id);
-//				checkbox.setWidth(getOptionColumnWidth());
-//				checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//					@Override
-//					public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//						setResponses(q, id);
-//					}
-//				});
-//				questionRow.addView(checkbox);
-//				checkBoxes.add(checkbox);
-//			}
-//			mQuestion = q;
-//			mCheckBoxes.put(q.getQuestionIdentifier(), checkBoxes);
-//			deserialize(getSurvey().getResponseByQuestion(q).getText());
-//			gridTableLayout.addView(questionRow, k);
-//		}
+        View v = inflater.inflate(R.layout.fragment_table_question, parent, false);
 
+		headerScrollView = (OHScrollView) v.findViewById(R.id.table_options_header_view);
+		contentScrollView = (OHScrollView) v.findViewById(R.id.table_body_options_view);
+		headerScrollView.setScrollViewListener(this);
+		contentScrollView.setScrollViewListener(this);
+
+		setTableHeaderOptions(v);
+		setTableBodyContent(v);
 		return v;
 	}
-	
-	private void saveResponses(Question question, List<Integer> responseIndices) {
-		String serialized = "";
-		for (int i = 0; i < responseIndices.size(); i++) {
-			serialized += responseIndices.get(i);
-			if (i < responseIndices.size() - 1)
-				serialized += LIST_DELIMITER;
+
+	private void setTableHeaderOptions(View v) {
+		TextView questionTextHeader = (TextView) v.findViewById(R.id.table_header_question_text);
+		questionTextHeader.setMinHeight(MIN_HEIGHT);
+		final LinearLayout headerTableLayout = (LinearLayout) v.findViewById(R.id.table_options_header);
+		final List<GridLabel> gridLabels = getGrid().labels();
+        rowWidths = new Integer[gridLabels.size()];
+        final List<TextView> headers = new ArrayList<>();
+		for (int k = 0; k < gridLabels.size(); k++) {
+			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+					LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            TextView textView = new TextView(getActivity());
+			textView.setLayoutParams(params);
+			textView.setText(gridLabels.get(k).getLabelText());
+			textView.setTypeface(Typeface.DEFAULT_BOLD);
+			textView.setMinHeight(MIN_HEIGHT);
+			textView.setGravity(Gravity.CENTER_VERTICAL);
+//            textView.setBackground(getBorder());
+            textView.setPadding(MARGIN_10, MARGIN_0, MARGIN_10, MARGIN_0);
+			headerTableLayout.addView(textView);
+			setRowWidth(textView, k);
+            headers.add(textView);
 		}
-		Response response = getSurvey().getResponseByQuestion(question);
-		response.setResponse(serialized);
-		if (isAdded() && !response.getText().equals("")) {
-			response.setSpecialResponse("");
-			ActivityCompat.invalidateOptionsMenu(getActivity());
-		}
-		response.save();
+        headerTableLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                int numOfHeaders = gridLabels.size();
+                int headerBorders = numOfHeaders * 2;
+                int paddingLeftRight = 20;
+                Integer width = (headerTableLayout.getWidth() - headerBorders) / numOfHeaders;
+                for (int k = 0; k < headers.size(); k++) {
+                    TextView view = headers.get(k);
+                    view.setMinimumWidth(width + paddingLeftRight);
+                    rowWidths[k] = width + paddingLeftRight;
+                }
+                for (List<CheckBox> checkBoxes : mCheckBoxes) {
+                    for (int i = 0; i < checkBoxes.size(); i++) {
+                        CheckBox checkBox = checkBoxes.get(i);
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(rowWidths[i], LinearLayout.LayoutParams.WRAP_CONTENT);
+                        params.gravity = Gravity.CENTER_VERTICAL;
+                        checkBox.setLayoutParams(params);
+                        checkBox.setPadding(MARGIN_10, MARGIN_0, MARGIN_10, MARGIN_0);
+                        checkBox.setMinimumWidth(rowWidths[i]);
+//                        checkBox.setBackground(getBorder());
+                    }
+                }
+            }
+        });
 	}
+
+	private void setRowWidth(final TextView view, final int position) {
+		view.post(new Runnable() {
+			@Override
+			public void run() {
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
+                rowWidths[position] = view.getWidth() + params.leftMargin + params.rightMargin;
+            }
+		});
+	}
+
+	private GradientDrawable getBorder() {
+        GradientDrawable border = new GradientDrawable();
+        border.setStroke(1, 0xFF000000);
+        return border;
+    }
+
+    private void setTableBodyContent(View v) {
+        LinearLayout questionTextLayout = (LinearLayout) v.findViewById(R.id.table_body_question_text);
+        LinearLayout optionsListLinearLayout = (LinearLayout) v.findViewById(R.id.table_body_options_choice);
+        mCheckBoxes = new ArrayList<>();
+        List<Question> questionList = getQuestions();
+        rowHeights = new Integer[questionList.size()];
+        for (int k = 0; k < questionList.size(); k++) {
+            final Question q = questionList.get(k);
+            setQuestionText(questionTextLayout, k, q);
+            setCheckBoxes(optionsListLinearLayout, k, q);
+            mIndex = k;
+            Response response = getSurvey().getResponseByQuestion(q);
+            if (response != null) {
+                deserialize(response.getText());
+            }
+        }
+    }
+
+    private void setQuestionText(LinearLayout questionTextLayout, int k, Question q) {
+        LinearLayout questionRow = new LinearLayout(getActivity());
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(MARGIN_0, MARGIN_0, MARGIN_10, MARGIN_10);
+        questionRow.setLayoutParams(params);
+        TextView questionNumber = new TextView(getActivity());
+        questionNumber.setText(String.valueOf(q.getNumberInGrid() + "."));
+        questionNumber.setMinHeight(MIN_HEIGHT);
+        questionNumber.setTypeface(Typeface.DEFAULT_BOLD);
+        LinearLayout.LayoutParams questionNumberParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        questionNumberParams.setMargins(MARGIN_0, MARGIN_0, MARGIN_10, MARGIN_0);
+        questionNumber.setLayoutParams(questionNumberParams);
+        questionRow.addView(questionNumber);
+        TextView questionText = new TextView(getActivity());
+        questionText.setText(q.getText());
+        questionText.setMinHeight(MIN_HEIGHT);
+        questionRow.addView(questionText);
+        questionTextLayout.addView(questionRow, k);
+        setRowHeight(questionRow, k);
+    }
+
+    private void setRowHeight(final LinearLayout view, final int position) {
+        view.post(new Runnable() {
+            @Override
+            public void run() {
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
+                rowHeights[position] = view.getHeight() + params.topMargin + params.bottomMargin;
+            }
+        });
+    }
+
+    private void setCheckBoxes(LinearLayout optionsListLinearLayout, int k, final Question q) {
+        LinearLayout choiceRow = new LinearLayout(getActivity());
+        List<CheckBox> checkBoxes = new ArrayList<>();
+        List<GridLabel> gridLabels = getGrid().labels();
+        for (int i = 0; i < gridLabels.size(); i++) {
+            CheckBox checkBox = new CheckBox(getActivity());
+            checkBox.setSaveEnabled(false);
+            checkBox.setId(i);
+            adjustRowHeight(checkBox, k);
+            checkBoxes.add(checkBox);
+            final int id = i;
+            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    setResponseIndexes(q, id, isChecked);
+                }
+            });
+            choiceRow.addView(checkBox);
+        }
+        optionsListLinearLayout.addView(choiceRow, k);
+        mCheckBoxes.add(checkBoxes);
+    }
+
+    private void adjustRowHeight(final CheckBox view, final int pos) {
+        view.post(new Runnable() {
+            @Override
+            public void run() {
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
+                params.height = rowHeights[pos];
+                view.setLayoutParams(params);
+            }
+        });
+    }
 
 	@Override
 	protected String serialize() { return null; }
 
-	private void setResponses(Question question, Integer responseIndex) {
-		if (mResponseIndices.containsKey(question.getQuestionIdentifier())) {
-			List<Integer> responses = mResponseIndices.get(question.getQuestionIdentifier());
-			if (responses.contains(responseIndex)) {
-				responses.remove(responseIndex);
-			} else {
-				responses.add(responseIndex);
-			}
-			mResponseIndices.put(question.getQuestionIdentifier(), responses);
-		} else {
-			List<Integer> list = new ArrayList<Integer>();
-			list.add(responseIndex);
-			mResponseIndices.put(question.getQuestionIdentifier(), list);
-		}
-		saveResponses(question, mResponseIndices.get(question.getQuestionIdentifier()));
-	}
+    protected void setResponseIndexes(Question q, int checkedId, boolean isChecked) {
+        new SaveResponseTask(getSurvey(), q, checkedId, isChecked).execute();
+    }
+
+    private class SaveResponseTask extends AsyncTask<Void, Void, Void> {
+        private String id;
+        private Question question;
+        private Survey survey;
+        private boolean isChecked;
+
+        private SaveResponseTask(Survey s, Question q, int checkedId, boolean status) {
+            question = q;
+            id = String.valueOf(checkedId);
+            survey = s;
+            isChecked = status;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            Response response = survey.getResponseByQuestion(question);
+            if (response == null) {
+                response = new Response();
+                response.setQuestion(question);
+                response.setSurvey(survey);
+            }
+            String serialized = "";
+            if (!response.getText().equals("")) {
+                String[] listOfIndices = response.getText().split(LIST_DELIMITER);
+                Set<String> responses = new HashSet<>(Arrays.asList(listOfIndices));
+                if (responses.contains(id) && !isChecked) {
+                    responses.remove(id);
+                } else {
+                    responses.add(id);
+                }
+                int size = 0;
+                for (String str : responses) {
+                    serialized += str;
+                    if (size < responses.size() - 1)
+                        serialized += LIST_DELIMITER;
+                    size +=1;
+                }
+            } else {
+                serialized = id;
+            }
+            response.setResponse(serialized);
+            response.save();
+            survey.save();
+            return null;
+        }
+
+    }
 	
 }
