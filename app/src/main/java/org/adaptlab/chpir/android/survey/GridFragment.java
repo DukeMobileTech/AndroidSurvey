@@ -1,10 +1,15 @@
 package org.adaptlab.chpir.android.survey;
 
 import android.content.pm.ActivityInfo;
+import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.activeandroid.Model;
 
@@ -24,9 +29,7 @@ public abstract class GridFragment extends QuestionFragment implements ScrollVie
 			"org.adaptlab.chpir.android.survey.survey_id";
 	public static final int MIN_HEIGHT = 80;
 	public static final int MARGIN_10 = 10;
-    public static final int MARGIN_5 = 5;
 	public static final int MARGIN_0 = 0;
-	public int minimumWidth = 100;
 
 	protected void createQuestionComponent(ViewGroup questionComponent){};
 	
@@ -101,6 +104,25 @@ public abstract class GridFragment extends QuestionFragment implements ScrollVie
         outState.putLong(EXTRA_GRID_ID, mGrid.getRemoteId());
         outState.putLong(EXTRA_SURVEY_ID, mSurvey.getId());
 	}
+
+    protected GradientDrawable getBorder() {
+        GradientDrawable border = new GradientDrawable();
+        border.setStroke(1, 0xFF000000);
+        return border;
+    }
+
+    protected TextView getHeaderTextView(String text) {
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        TextView textView = new TextView(getActivity());
+        textView.setLayoutParams(params);
+        textView.setText(text);
+        textView.setTypeface(Typeface.DEFAULT_BOLD);
+        textView.setMinHeight(MIN_HEIGHT);
+        textView.setGravity(Gravity.CENTER_VERTICAL);
+        textView.setPadding(MARGIN_10, MARGIN_0, MARGIN_10, MARGIN_0);
+        return textView;
+    }
 	
 	protected List<Question> getQuestions() {
 		return mQuestions;

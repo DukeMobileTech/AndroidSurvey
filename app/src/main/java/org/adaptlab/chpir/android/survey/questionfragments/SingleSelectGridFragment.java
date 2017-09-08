@@ -24,7 +24,6 @@ public class SingleSelectGridFragment extends GridFragment {
     private static final String TAG = "SingleSelectGridFragment";
     private int mIndex;
     private List<RadioGroup> mRadioGroups;
-    private List<TextView> mHeaderViews;
     private Integer[] rowHeights;
     private boolean interceptScroll = true;
     private OHScrollView headerScrollView;
@@ -89,7 +88,6 @@ public class SingleSelectGridFragment extends GridFragment {
             RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(
                     RadioGroup.LayoutParams.WRAP_CONTENT, MIN_HEIGHT);
             button.setLayoutParams(params);
-            adjustRowWidth(button, i);
             radioButtons.addView(button, i);
         }
         choiceRow.addView(radioButtons);
@@ -129,45 +127,35 @@ public class SingleSelectGridFragment extends GridFragment {
     private void setTableHeaderOptions(View v) {
         TextView questionTextHeader = (TextView) v.findViewById(R.id.table_header_question_text);
         questionTextHeader.setMinHeight(MIN_HEIGHT);
-        LinearLayout headerTableLayout = (LinearLayout) v.findViewById(R.id.table_options_header);
-        List<GridLabel> gridLabels = getGrid().labels();
-        mHeaderViews = new ArrayList<>();
+        final LinearLayout headerTableLayout = (LinearLayout) v.findViewById(R.id.table_options_header);
+        final List<GridLabel> gridLabels = getGrid().labels();
+        final List<TextView> headerViews = new ArrayList<>();
+        final Integer[] rowWidths = new Integer[gridLabels.size()];
         for (int k = 0; k < gridLabels.size(); k++) {
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            TextView textView = new TextView(getActivity());
-            textView.setLayoutParams(params);
-            textView.setText(gridLabels.get(k).getLabelText());
-            textView.setTypeface(Typeface.DEFAULT_BOLD);
-            textView.setMinHeight(MIN_HEIGHT);
-            textView.setGravity(Gravity.CENTER);
+            TextView textView = getHeaderTextView(gridLabels.get(k).getLabelText());
             headerTableLayout.addView(textView);
-            setRowWidth(textView, k);
-            mHeaderViews.add(textView);
+            headerViews.add(textView);
         }
-    }
 
-    private void setRowWidth(final TextView view, final int position) {
-        view.post(new Runnable() {
+        headerTableLayout.post(new Runnable() {
             @Override
             public void run() {
-                if (view.getWidth() > minimumWidth) {
-                    minimumWidth = view.getWidth();
+                int width = (headerTableLayout.getWidth()) / gridLabels.size();
+                for (int k = 0; k < headerViews.size(); k++) {
+                    TextView view = headerViews.get(k);
+                    view.setMinimumWidth(width + 20);
+                    rowWidths[k] = width + 20;
                 }
-            }
-        });
-    }
-
-    private void adjustRowWidth(final RadioButton view, final int position) {
-        view.post(new Runnable() {
-            @Override
-            public void run() {
-                RadioGroup.LayoutParams params = (RadioGroup.LayoutParams) view.getLayoutParams();
-                int totalMargin = minimumWidth - view.getWidth();
-                if (totalMargin < 10) totalMargin = 10;
-                params.setMargins(totalMargin/2, 0, totalMargin/2, 0);
-                view.setLayoutParams(params);
-                mHeaderViews.get(position).setWidth(minimumWidth);
+                for (RadioGroup radioGroup : mRadioGroups) {
+                    for (int i = 0; i < gridLabels.size(); i++) {
+                        RadioButton radioButton = (RadioButton) radioGroup.getChildAt(i);
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(rowWidths[i], LinearLayout.LayoutParams.WRAP_CONTENT);
+                        params.gravity = Gravity.CENTER_VERTICAL;
+                        radioButton.setLayoutParams(params);
+                        radioButton.setPadding(MARGIN_10, MARGIN_0, MARGIN_10, MARGIN_0);
+                        radioButton.setMinimumWidth(rowWidths[i]);
+                    }
+                }
             }
         });
     }

@@ -1,7 +1,6 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
 import android.graphics.Typeface;
-import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -93,16 +92,7 @@ public class MultipleSelectGridFragment extends GridFragment {
         rowWidths = new Integer[gridLabels.size()];
         final List<TextView> headers = new ArrayList<>();
 		for (int k = 0; k < gridLabels.size(); k++) {
-			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-					LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            TextView textView = new TextView(getActivity());
-			textView.setLayoutParams(params);
-			textView.setText(gridLabels.get(k).getLabelText());
-			textView.setTypeface(Typeface.DEFAULT_BOLD);
-			textView.setMinHeight(MIN_HEIGHT);
-			textView.setGravity(Gravity.CENTER_VERTICAL);
-//            textView.setBackground(getBorder());
-            textView.setPadding(MARGIN_10, MARGIN_0, MARGIN_10, MARGIN_0);
+            TextView textView = getHeaderTextView(gridLabels.get(k).getLabelText());
 			headerTableLayout.addView(textView);
 			setRowWidth(textView, k);
             headers.add(textView);
@@ -113,7 +103,7 @@ public class MultipleSelectGridFragment extends GridFragment {
                 int numOfHeaders = gridLabels.size();
                 int headerBorders = numOfHeaders * 2;
                 int paddingLeftRight = 20;
-                Integer width = (headerTableLayout.getWidth() - headerBorders) / numOfHeaders;
+                int width = (headerTableLayout.getWidth() - headerBorders) / numOfHeaders;
                 for (int k = 0; k < headers.size(); k++) {
                     TextView view = headers.get(k);
                     view.setMinimumWidth(width + paddingLeftRight);
@@ -127,7 +117,6 @@ public class MultipleSelectGridFragment extends GridFragment {
                         checkBox.setLayoutParams(params);
                         checkBox.setPadding(MARGIN_10, MARGIN_0, MARGIN_10, MARGIN_0);
                         checkBox.setMinimumWidth(rowWidths[i]);
-//                        checkBox.setBackground(getBorder());
                     }
                 }
             }
@@ -143,12 +132,6 @@ public class MultipleSelectGridFragment extends GridFragment {
             }
 		});
 	}
-
-	private GradientDrawable getBorder() {
-        GradientDrawable border = new GradientDrawable();
-        border.setStroke(1, 0xFF000000);
-        return border;
-    }
 
     private void setTableBodyContent(View v) {
         LinearLayout questionTextLayout = (LinearLayout) v.findViewById(R.id.table_body_question_text);
