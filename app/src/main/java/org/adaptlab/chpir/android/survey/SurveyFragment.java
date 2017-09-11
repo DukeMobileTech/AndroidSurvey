@@ -1041,8 +1041,8 @@ public class SurveyFragment extends Fragment {
      * If this question has instructions, append and add new line
      */
     private void appendInstructions(TextView text) {
-        if (mQuestion.getInstructions() != null) {
-            text.setText(styleTextWithHtml(mQuestion.getInstructions() + "<br /><br />"));
+        if (mQuestion.getInstructions() != null && !mQuestion.getInstructions().equals("")) {
+            text.setText(styleTextWithHtml(mQuestion.getInstructions() + "<br />"));
         } else {
             text.setText("");
         }

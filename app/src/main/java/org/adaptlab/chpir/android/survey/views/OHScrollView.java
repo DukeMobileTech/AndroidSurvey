@@ -1,10 +1,10 @@
-package org.adaptlab.chpir.android.survey.roster.views;
+package org.adaptlab.chpir.android.survey.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.HorizontalScrollView;
 
-import org.adaptlab.chpir.android.survey.roster.listeners.ScrollViewListener;
+import org.adaptlab.chpir.android.survey.listeners.ScrollViewListener;
 
 public class OHScrollView extends HorizontalScrollView {
 

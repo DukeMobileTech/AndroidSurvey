@@ -1,4 +1,4 @@
-package org.adaptlab.chpir.android.survey.roster.views;
+package org.adaptlab.chpir.android.survey.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -6,7 +6,7 @@ import android.view.MotionEvent;
 import android.widget.ScrollView;
 
 public class LockableScrollView extends ScrollView {
-
+    private static final String TAG = "LockableScrollView";
     private boolean scrollingEnabled = true;
 
     public LockableScrollView(Context context) {
@@ -33,6 +33,7 @@ public class LockableScrollView extends ScrollView {
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         return isScrollingEnabled() && super.onInterceptTouchEvent(ev);
     }
+
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
         return isScrollingEnabled() && super.onTouchEvent(ev);

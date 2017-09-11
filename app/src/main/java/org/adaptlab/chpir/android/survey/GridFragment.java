@@ -1,23 +1,26 @@
 package org.adaptlab.chpir.android.survey;
 
 import android.content.pm.ActivityInfo;
+import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.widget.NestedScrollView;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.activeandroid.Model;
 
+import org.adaptlab.chpir.android.survey.listeners.ScrollViewListener;
 import org.adaptlab.chpir.android.survey.models.Grid;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Survey;
-import org.adaptlab.chpir.android.survey.roster.listeners.ScrollViewListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -104,6 +107,40 @@ public abstract class GridFragment extends QuestionFragment implements ScrollVie
         outState.putLong(EXTRA_GRID_ID, mGrid.getRemoteId());
         outState.putLong(EXTRA_SURVEY_ID, mSurvey.getId());
 	}
+
+	@Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        final NestedScrollView nestedScrollView = (NestedScrollView) getActivity().findViewById(R.id.grid_scroll_view);
+        nestedScrollView.post(new Runnable() {
+            @Override
+            public void run() {
+                final int screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
+                int tableHeaderHeight = getActivity().findViewById(R.id.table_header).getHeight();
+                int tableBodyHeight = getActivity().findViewById(R.id.table_body_question_text).getHeight();
+                NestedScrollView tableScrollView = (NestedScrollView) getActivity().findViewById(R.id.grid_scroll_view);
+                int scrollViewHeight = tableScrollView.getHeight();
+                int activityVerticalMargin = (int) getActivity().getResources().getDimension(R.dimen.activity_vertical_margin);
+                final int questionTextHeight = getActivity().findViewById(R.id.linear_layout_for_question_text_view).getHeight();
+                int questionIndexLabelHeight = getActivity().findViewById(R.id.participant_label_and_question_index).getHeight();
+                int progressBarHeight = getActivity().findViewById(R.id.progress_bar).getHeight();
+                int remainingScreenHeight = screenHeight - activityVerticalMargin - questionTextHeight - questionIndexLabelHeight - progressBarHeight;
+                int viewHeight = tableScrollView.getHeight();
+                if (scrollViewHeight < tableBodyHeight && remainingScreenHeight > tableBodyHeight) {
+                    viewHeight = tableBodyHeight;
+                } else if (scrollViewHeight < tableBodyHeight && remainingScreenHeight > scrollViewHeight) {
+                    viewHeight = remainingScreenHeight;
+                } else if (remainingScreenHeight < 0 && scrollViewHeight < tableBodyHeight && tableBodyHeight < screenHeight) {
+                    viewHeight = tableBodyHeight;
+                } else if (remainingScreenHeight < 0 && scrollViewHeight < tableBodyHeight && tableBodyHeight > screenHeight) {
+                    viewHeight = screenHeight - activityVerticalMargin - questionIndexLabelHeight - progressBarHeight - tableHeaderHeight;
+                }
+                ViewGroup.LayoutParams params = tableScrollView.getLayoutParams();
+                params.height = viewHeight;
+                tableScrollView.setLayoutParams(params);
+            }
+        });
+    }
 
     protected GradientDrawable getBorder() {
         GradientDrawable border = new GradientDrawable();

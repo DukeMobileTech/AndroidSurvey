@@ -18,7 +18,7 @@ import org.adaptlab.chpir.android.survey.models.GridLabel;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Survey;
-import org.adaptlab.chpir.android.survey.roster.views.OHScrollView;
+import org.adaptlab.chpir.android.survey.views.OHScrollView;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <ScrollView
+    <android.support.v4.widget.NestedScrollView
         android:id="@+id/survey_fragment_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -33,6 +33,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
+                    android:scrollbars="vertical"
                     android:textStyle="bold"
                     android:textColor="@color/primary_text"/>
 
@@ -87,7 +88,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"/>
         </LinearLayout>
-    </ScrollView>
+    </android.support.v4.widget.NestedScrollView>
 
     <ListView
         android:id="@+id/left_drawer"

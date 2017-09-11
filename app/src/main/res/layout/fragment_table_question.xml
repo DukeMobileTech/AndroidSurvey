@@ -24,7 +24,7 @@
             android:textStyle="bold"/>
 
         <!-- Important!!! fillViewPort allows child views to stretch and fill the view -->
-        <org.adaptlab.chpir.android.survey.roster.views.OHScrollView
+        <org.adaptlab.chpir.android.survey.views.OHScrollView
             android:id="@+id/table_options_header_view"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -37,13 +37,14 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"/>
 
-        </org.adaptlab.chpir.android.survey.roster.views.OHScrollView>
+        </org.adaptlab.chpir.android.survey.views.OHScrollView>
     </LinearLayout>
 
-    <ScrollView
+    <!--The layout_height has to be specified in order for the NestedScrollView to scroll-->
+    <android.support.v4.widget.NestedScrollView
         android:id="@+id/grid_scroll_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="200dp"
         android:layout_below="@+id/table_header">
 
         <LinearLayout
@@ -59,7 +60,7 @@
                 android:layout_weight="1.0"
                 android:orientation="vertical"/>
 
-            <org.adaptlab.chpir.android.survey.roster.views.OHScrollView
+            <org.adaptlab.chpir.android.survey.views.OHScrollView
                 android:id="@+id/table_body_options_view"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -72,8 +73,8 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"/>
 
-            </org.adaptlab.chpir.android.survey.roster.views.OHScrollView>
+            </org.adaptlab.chpir.android.survey.views.OHScrollView>
         </LinearLayout>
-    </ScrollView>
+    </android.support.v4.widget.NestedScrollView>
 
 </RelativeLayout>
