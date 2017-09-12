@@ -8,13 +8,13 @@ repositories {
 }
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 25
     buildToolsVersion '25.0.0'
 
     defaultConfig {
         applicationId "org.adaptlab.chpir.android.survey"
         minSdkVersion 14
-        targetSdkVersion 23
+        targetSdkVersion 25
     }
 
     buildTypes {
@@ -32,13 +32,14 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:23.4.0'
-    compile 'com.android.support:support-v4:23.4.0'
-    compile 'com.android.support:design:23.4.0'
-    compile 'com.android.support:recyclerview-v7:23.4.0'
-    compile 'com.android.support:cardview-v7:23.4.0'
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.android.support:support-v4:25.3.1'
+    compile 'com.android.support:design:25.3.1'
+    compile 'com.android.support:recyclerview-v7:25.3.1'
+    compile 'com.android.support:cardview-v7:25.3.1'
     compile('com.crashlytics.sdk.android:crashlytics:2.6.8@aar') { transitive = true; }
     compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
+    compile 'com.google.android.gms:play-services-location:11.0.4'
     compile files('libs/core-1.51.0.0.jar')
     compile files('libs/pg-1.51.0.0.jar')
     compile files('libs/pkix-1.51.0.0.jar')

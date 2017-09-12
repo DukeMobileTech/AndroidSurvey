@@ -218,12 +218,10 @@ public class InstrumentFragment extends ListFragment {
 
     private void requestNeededPermissions() {
 
-        if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) {
-            if (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission
-                    .ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED) {
-                ActivityCompat.requestPermissions(getActivity(),
-                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-            }
+        if (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission
+                .ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission
                 .CAMERA) == PackageManager.PERMISSION_DENIED) {

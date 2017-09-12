@@ -1,16 +1,15 @@
 package org.adaptlab.chpir.android.survey;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -44,7 +43,7 @@ import android.widget.TextView;
 import com.activeandroid.Model;
 import com.crashlytics.android.Crashlytics;
 
-import org.adaptlab.chpir.android.survey.location.LocationServiceManager;
+import org.adaptlab.chpir.android.survey.location.LocationManager;
 import org.adaptlab.chpir.android.survey.models.Grid;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.Option;
@@ -97,6 +96,7 @@ public class SurveyFragment extends Fragment {
     private static final int SECTION_CODE = 200;
     private static final Long REVIEW_PAGE_ID = -1L;
     private static final Map<String, Integer> mMenuItems;
+    private static final int ACCESS_FINE_LOCATION_CODE = 1;
 
     static {
         Map<String, Integer> menuItems = new HashMap<String, Integer>();
@@ -130,9 +130,9 @@ public class SurveyFragment extends Fragment {
     private TextView mQuestionIndex;
     private TextView mParticipantLabel;
     private ProgressBar mProgressBar;
-    private LocationServiceManager mLocationServiceManager;
     private GestureDetector mGestureDetector;
     private ProgressDialog mProgressDialog;
+    private LocationManager mLocationManager;
 
     //drawer vars
     private DrawerLayout mDrawerLayout;
@@ -299,9 +299,30 @@ public class SurveyFragment extends Fragment {
         }
 
         if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) {
-            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission
-                    .ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                startLocationServices();
+            if (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission
+                    .ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, ACCESS_FINE_LOCATION_CODE);
+            } else {
+                startLocationUpdates();
+            }
+        }
+    }
+
+    private void startLocationUpdates() {
+        if (mLocationManager == null){
+            mLocationManager = new LocationManager(getActivity());
+            mLocationManager.startLocationUpdates();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case ACCESS_FINE_LOCATION_CODE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    startLocationUpdates();
+                }
             }
         }
     }
@@ -333,16 +354,7 @@ public class SurveyFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        registerLocationReceiver();
-    }
-
-    private void registerLocationReceiver() {
-        if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation() &&
-                ContextCompat.checkSelfPermission(getActivity(), Manifest.permission
-                        .ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            getActivity().registerReceiver(mLocationServiceManager.mLocationReceiver,
-                    new IntentFilter(LocationServiceManager.ACTION_LOCATION));
-        }
+        startLocationUpdates();
     }
 
     @Override
@@ -368,16 +380,8 @@ public class SurveyFragment extends Fragment {
 
     @Override
     public void onStop() {
-        if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()
-                && ContextCompat.checkSelfPermission(getActivity(), Manifest.permission
-                .ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                && mLocationServiceManager != null
-                && mLocationServiceManager.mLocationReceiver != null) {
-            try {
-                getActivity().unregisterReceiver(mLocationServiceManager.mLocationReceiver);
-            } catch (IllegalArgumentException e) {
-                Log.e(TAG, "Illegal Argument Exception ", e);
-            }
+        if (mLocationManager != null) {
+            mLocationManager.stopLocationUpdates();
         }
         super.onStop();
     }
@@ -583,11 +587,6 @@ public class SurveyFragment extends Fragment {
         } else {
             mSurvey = Model.load(Survey.class, surveyId);
         }
-    }
-
-    private void startLocationServices() {
-        mLocationServiceManager = LocationServiceManager.get(getActivity());
-        mLocationServiceManager.startLocationUpdates();
     }
 
     private void proceedToNextQuestion() {
@@ -993,17 +992,11 @@ public class SurveyFragment extends Fragment {
     }
 
     private void setSurveyLocation() {
-        if (mLocationServiceManager == null) {
-            if (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission
-                    .ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED) {
-                ActivityCompat.requestPermissions(getActivity(),
-                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-            } else {
-                startLocationServices();
-            }
+        if (mLocationManager == null) {
+            startLocationUpdates();
         } else {
-            mSurvey.setLatitude(mLocationServiceManager.getLatitude());
-            mSurvey.setLongitude(mLocationServiceManager.getLongitude());
+            mSurvey.setLatitude(mLocationManager.getLatitude());
+            mSurvey.setLongitude(mLocationManager.getLongitude());
         }
     }
 
