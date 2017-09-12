@@ -316,6 +316,11 @@ public class SurveyFragment extends Fragment {
         }
     }
 
+    public LocationManager getLocationManager() {
+        if (mLocationManager == null) startLocationUpdates();
+        return mLocationManager;
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         switch (requestCode) {

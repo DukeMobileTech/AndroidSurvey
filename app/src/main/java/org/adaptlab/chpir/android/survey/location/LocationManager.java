@@ -129,6 +129,11 @@ public class LocationManager {
         return Double.toString(mCurrentLocation.getLongitude());
     }
 
+    public String getAltitude() {
+        if (getCurrentLocation() == null) return null;
+        return Double.toString(mCurrentLocation.getAltitude());
+    }
+
     public void stopLocationUpdates() {
         mFusedLocationClient.removeLocationUpdates(mLocationCallback).addOnCompleteListener((Activity) mContext, new OnCompleteListener<Void>() {
             @Override

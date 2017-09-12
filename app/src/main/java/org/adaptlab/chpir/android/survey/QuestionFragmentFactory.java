@@ -10,6 +10,7 @@ import org.adaptlab.chpir.android.survey.questionfragments.DecimalNumberQuestion
 import org.adaptlab.chpir.android.survey.questionfragments.EmailAddressQuestionFragment;
 import org.adaptlab.chpir.android.survey.questionfragments.FreeResponseQuestionFragment;
 import org.adaptlab.chpir.android.survey.questionfragments.FrontPictureQuestionFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.GeoLocationFragment;
 import org.adaptlab.chpir.android.survey.questionfragments.InstructionsQuestionFragment;
 import org.adaptlab.chpir.android.survey.questionfragments.IntegerQuestionFragment;
 import org.adaptlab.chpir.android.survey.questionfragments.LabeledSliderQuestionFragment;
@@ -84,6 +85,8 @@ public class QuestionFragmentFactory {
             fragment = new ListOfIntegerBoxesQuestionFragment();
         } else if (Question.QuestionType.LABELED_SLIDER.toString().equals(type)) {
             fragment = new LabeledSliderQuestionFragment();
+        } else if (Question.QuestionType.GEO_LOCATION.toString().equals(type)) {
+            fragment = new GeoLocationFragment();
         } else {
             // Return free response fragment if unknown question type
             // This should never happen
