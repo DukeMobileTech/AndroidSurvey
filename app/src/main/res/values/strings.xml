@@ -150,4 +150,5 @@
     <string name="longitude">Longitude</string>
     <string name="altitude">Altitude</string>
     <string name="update_location">Update Location</string>
+    <string name="required_field">Field should not be empty!</string>
 </resources>

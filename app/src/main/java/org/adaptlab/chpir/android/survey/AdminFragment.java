@@ -57,7 +57,8 @@ public class AdminFragment extends Fragment {
     private CheckBox mShowDKCheckBox;
     private CheckBox mRequirePasswordCheckBox;
     private CheckBox mRecordSurveyLocationCheckBox;
-    private ArrayList<EditText> transformableFields;
+    private ArrayList<EditText> mTransformableFields;
+    private ArrayList<EditText> mRequiredFields;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -90,6 +91,7 @@ public class AdminFragment extends Fragment {
         mApiKeyEditText = (EditText) v.findViewById(R.id.api_key_text);
         mApiKeyEditText.setText(getAdminSettingsInstanceApiKey());
         if (!TextUtils.isEmpty(getAdminSettingsInstanceApiKey())) setOnClickListener(mApiKeyEditText);
+        mRequiredFields = new ArrayList<>(Arrays.asList(mApiDomainNameEditText, mApiVersionEditText, mProjectIdEditText, mApiKeyEditText));
 
         mRosterEndPointCheckBox = (CheckBox) v.findViewById(R.id.api2_endpoint);
         mRosterEndPointCheckBox.setChecked(AppUtil.getAdminSettingsInstance().useEndpoint2());
@@ -116,7 +118,7 @@ public class AdminFragment extends Fragment {
         mApi2KeyEditText.setText(getAdminSettingsInstanceApi2Key());
         if (!TextUtils.isEmpty(getAdminSettingsInstanceApi2Key())) setOnClickListener(mApi2KeyEditText);
         toggleRosterSettingsVisibility(AppUtil.getAdminSettingsInstance().useEndpoint2());
-        transformableFields = new ArrayList<>(Arrays.asList(mApiDomainNameEditText, mApiVersionEditText, mProjectIdEditText, mApiKeyEditText, mApi2VersionEditText, mApi2KeyEditText, mApi2DomainNameEditText));
+        mTransformableFields = new ArrayList<>(Arrays.asList(mApiDomainNameEditText, mApiVersionEditText, mProjectIdEditText, mApiKeyEditText, mApi2VersionEditText, mApi2KeyEditText, mApi2DomainNameEditText));
 
         mShowSurveysCheckBox = (CheckBox) v.findViewById(R.id.show_surveys_checkbox);
         mShowSurveysCheckBox.setChecked(AppUtil.getAdminSettingsInstance().getShowSurveys());
@@ -162,7 +164,7 @@ public class AdminFragment extends Fragment {
             mShowRostersCheckBox.setEnabled(false);
             mShowSurveysCheckBox.setEnabled(false);
             mRosterEndPointCheckBox.setEnabled(false);
-            for (EditText editText : transformableFields) {
+            for (EditText editText : mTransformableFields) {
                 editText.setEnabled(false);
             }
         }
@@ -251,38 +253,52 @@ public class AdminFragment extends Fragment {
     }
 
     private void saveAdminSettings() {
-        AppUtil.getAdminSettingsInstance().setDeviceIdentifier(mDeviceIdentifierEditText.getText().toString());
-        AppUtil.getAdminSettingsInstance().setDeviceLabel(mDeviceLabelEditText.getText().toString());
-        AppUtil.getAdminSettingsInstance().setApiDomainName(mApiDomainNameEditText.getText().toString());
-        AppUtil.getAdminSettingsInstance().setApiVersion(mApiVersionEditText.getText().toString());
-        AppUtil.getAdminSettingsInstance().setProjectId(mProjectIdEditText.getText().toString());
-        AppUtil.getAdminSettingsInstance().setApiKey(mApiKeyEditText.getText().toString());
-        // If this code is set, it will override the language selection on the device
-        // for all instrument translations.
-        AppUtil.getAdminSettingsInstance().setCustomLocaleCode(mCustomLocaleEditText.getText().toString());
+        if (!requiredFieldIsEmpty()) {
+            AppUtil.getAdminSettingsInstance().setDeviceIdentifier(mDeviceIdentifierEditText.getText().toString());
 
-        ActiveRecordCloudSync.setAccessToken(getAdminSettingsInstanceApiKey());
-        ActiveRecordCloudSync.setEndPoint(getAdminSettingsInstanceApiUrl());
-        AppUtil.appInit(getActivity());
+            AppUtil.getAdminSettingsInstance().setDeviceLabel(mDeviceLabelEditText.getText().toString());
+            AppUtil.getAdminSettingsInstance().setApiDomainName(mApiDomainNameEditText.getText().toString());
+            AppUtil.getAdminSettingsInstance().setApiVersion(mApiVersionEditText.getText().toString());
+            AppUtil.getAdminSettingsInstance().setProjectId(mProjectIdEditText.getText().toString
+                    ());
+            AppUtil.getAdminSettingsInstance().setApiKey(mApiKeyEditText.getText().toString());
+            // If this code is set, it will override the language selection on the device
+            // for all instrument translations.
+            AppUtil.getAdminSettingsInstance().setCustomLocaleCode(mCustomLocaleEditText.getText().toString());
 
-        AppUtil.getAdminSettingsInstance().setShowSurveys(mShowSurveysCheckBox.isChecked());
-        AppUtil.getAdminSettingsInstance().setShowRosters(mShowRostersCheckBox.isChecked());
-        AppUtil.getAdminSettingsInstance().setShowScores(mShowScoresCheckBox.isChecked());
-        AppUtil.getAdminSettingsInstance().setShowSkip(mShowSkipCheckBox.isChecked());
-        AppUtil.getAdminSettingsInstance().setShowNA(mShowNACheckBox.isChecked());
-        AppUtil.getAdminSettingsInstance().setShowRF(mShowRFCheckBox.isChecked());
-        AppUtil.getAdminSettingsInstance().setShowDK(mShowDKCheckBox.isChecked());
-        AppUtil.getAdminSettingsInstance().setRequirePassword(mRequirePasswordCheckBox.isChecked());
-        AppUtil.getAdminSettingsInstance().setRecordSurveyLocation(mRecordSurveyLocationCheckBox
-                .isChecked());
+            ActiveRecordCloudSync.setAccessToken(getAdminSettingsInstanceApiKey());
+            ActiveRecordCloudSync.setEndPoint(getAdminSettingsInstanceApiUrl());
+            AppUtil.appInit(getActivity());
 
-        //Roster settings
-        AppUtil.getAdminSettingsInstance().setUseEndpoint2(mRosterEndPointCheckBox.isChecked());
-        AppUtil.getAdminSettingsInstance().setApi2DomainName(mApi2DomainNameEditText.getText().toString());
-        AppUtil.getAdminSettingsInstance().setApi2Version(mApi2VersionEditText.getText().toString());
-        AppUtil.getAdminSettingsInstance().setApi2Key(mApi2KeyEditText.getText().toString());
+            AppUtil.getAdminSettingsInstance().setShowSurveys(mShowSurveysCheckBox.isChecked());
+            AppUtil.getAdminSettingsInstance().setShowRosters(mShowRostersCheckBox.isChecked());
+            AppUtil.getAdminSettingsInstance().setShowScores(mShowScoresCheckBox.isChecked());
+            AppUtil.getAdminSettingsInstance().setShowSkip(mShowSkipCheckBox.isChecked());
+            AppUtil.getAdminSettingsInstance().setShowNA(mShowNACheckBox.isChecked());
+            AppUtil.getAdminSettingsInstance().setShowRF(mShowRFCheckBox.isChecked());
+            AppUtil.getAdminSettingsInstance().setShowDK(mShowDKCheckBox.isChecked());
+            AppUtil.getAdminSettingsInstance().setRequirePassword(mRequirePasswordCheckBox.isChecked());
+            AppUtil.getAdminSettingsInstance().setRecordSurveyLocation(mRecordSurveyLocationCheckBox
+                    .isChecked());
 
-        getActivity().finish();
+            //Roster settings
+            AppUtil.getAdminSettingsInstance().setUseEndpoint2(mRosterEndPointCheckBox.isChecked());
+            AppUtil.getAdminSettingsInstance().setApi2DomainName(mApi2DomainNameEditText.getText().toString());
+            AppUtil.getAdminSettingsInstance().setApi2Version(mApi2VersionEditText.getText().toString());
+            AppUtil.getAdminSettingsInstance().setApi2Key(mApi2KeyEditText.getText().toString());
+
+            getActivity().finish();
+        }
+    }
+
+    private boolean requiredFieldIsEmpty() {
+        for (EditText editText : mRequiredFields) {
+            if (TextUtils.isEmpty(editText.getText())) {
+                editText.setError(getString(R.string.required_field));
+                return true;
+            }
+        }
+        return false;
     }
 
     private void deleteData() {
@@ -379,7 +395,7 @@ public class AdminFragment extends Fragment {
                 .setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int button) {
                         if (AppUtil.checkAdminPassword(input.getText().toString())) {
-                            for (EditText editText : transformableFields) {
+                            for (EditText editText : mTransformableFields) {
                                 editText.setTransformationMethod(null);
                                 editText.setFocusableInTouchMode(true);
                                 editText.setClickable(false);
