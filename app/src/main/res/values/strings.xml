@@ -146,4 +146,5 @@
     <string name="total_raw_score">Total Raw Score:</string>
     <string name="total_weighted_score">Total Weighted Score:</string>
     <string name="show_scores">Show Scores</string>
+    <string name="required_field">Field should not be empty!</string>
 </resources>

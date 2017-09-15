@@ -766,7 +766,7 @@ public class InstrumentFragment extends ListFragment {
 
         @Override
         protected void onPreExecute() {
-            if (mProgressDialog != null ) {
+            if (mProgressDialog != null) {
                 mProgressDialog.setTitle(getResources().getString(
                         R.string.instrument_loading_progress_header));
                 mProgressDialog.setMessage(getResources().getString(
@@ -782,7 +782,7 @@ public class InstrumentFragment extends ListFragment {
                 new RefreshImagesTask().execute();
                 new SetScoreUnitOrderingQuestionTask().execute();
             }
-            if (code == -1 && mProgressDialog != null) {
+            if (code == -1 && mProgressDialog != null && mProgressDialog.isShowing()) {
                 mProgressDialog.dismiss();
             }
         }
@@ -806,7 +806,7 @@ public class InstrumentFragment extends ListFragment {
             AppUtil.getAdminSettingsInstance().setLastSyncTime(ActiveRecordCloudSync
                     .getLastSyncTime());
             AppUtil.orderInstrumentsSections();
-            if (mProgressDialog != null) {
+            if (mProgressDialog != null && mProgressDialog.isShowing()) {
                 mProgressDialog.dismiss();
             }
         }
@@ -830,8 +830,7 @@ public class InstrumentFragment extends ListFragment {
         protected void onPostExecute(Void param) {
             List<Instrument> instruments = Instrument.getAllProjectInstruments(getProjectId());
             for (int k = 0; k < instruments.size(); k++) {
-                new InstrumentSanitizerTask().execute(instruments.get(k), (k == instruments.size
-                        () - 1));
+                new InstrumentSanitizerTask().execute(instruments.get(k), (k == instruments.size() - 1));
             }
         }
 
@@ -922,7 +921,7 @@ public class InstrumentFragment extends ListFragment {
 
         @Override
         protected void onPostExecute(final Instrument instrument) {
-            if (progressDialog.isShowing()) progressDialog.dismiss();
+            if (progressDialog != null && progressDialog.isShowing()) progressDialog.dismiss();
             if (isAdded()) {
                 if (instrument == null) {
                     Toast.makeText(getActivity(), R.string.instrument_not_loaded, Toast
@@ -936,8 +935,7 @@ public class InstrumentFragment extends ListFragment {
                             .setCallbacks(new RuleCallback() {
                                 public void onRulesPass() {
                                     Intent i = new Intent(getActivity(), SurveyActivity.class);
-                                    i.putExtra(SurveyFragment.EXTRA_INSTRUMENT_ID, instrument
-                                            .getRemoteId());
+                                    i.putExtra(SurveyFragment.EXTRA_INSTRUMENT_ID, instrument.getRemoteId());
                                     startActivity(i);
                                 }
 
@@ -977,7 +975,7 @@ public class InstrumentFragment extends ListFragment {
 
         @Override
         protected void onPostExecute(Survey survey) {
-            if (progressDialog.isShowing()) progressDialog.dismiss();
+            if (progressDialog != null && progressDialog.isShowing()) progressDialog.dismiss();
             if (isAdded()) {
                 if (survey == null) {
                     Toast.makeText(getActivity(), R.string.instrument_not_loaded, Toast

@@ -1145,10 +1145,12 @@ public class SurveyFragment extends Fragment {
         protected void onPostExecute(HashMap<Question, List<Option>> options) {
             mOptions = options;
             loadOrCreateQuestion();
-            ActivityCompat.invalidateOptionsMenu(getActivity());
-            refreshView();
-            if (mProgressDialog.isShowing()) {
-                mProgressDialog.dismiss();
+            if (isAdded()) {
+                ActivityCompat.invalidateOptionsMenu(getActivity());
+                refreshView();
+                if (mProgressDialog != null && mProgressDialog.isShowing()) {
+                    mProgressDialog.dismiss();
+                }
             }
         }
     }
