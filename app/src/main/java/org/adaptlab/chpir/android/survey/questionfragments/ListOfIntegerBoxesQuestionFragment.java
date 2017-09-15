@@ -11,4 +11,9 @@ public class ListOfIntegerBoxesQuestionFragment extends ListOfItemsQuestionFragm
         editText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);
         return editText;
     }
+
+    @Override
+    protected void unSetResponse() {
+
+    }
 }

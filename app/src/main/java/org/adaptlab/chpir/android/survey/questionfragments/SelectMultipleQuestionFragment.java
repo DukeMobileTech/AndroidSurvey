@@ -1,15 +1,16 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 
-import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.QuestionFragment;
+import org.adaptlab.chpir.android.survey.models.Option;
 
 import java.util.ArrayList;
 
 public class SelectMultipleQuestionFragment extends QuestionFragment {
+    private static final String TAG = "SelectMultipleQuestionFragment";
     private ArrayList<Integer> mResponseIndices;
     private ArrayList<CheckBox> mCheckBoxes;
     
@@ -19,17 +20,18 @@ public class SelectMultipleQuestionFragment extends QuestionFragment {
 
     @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
-        mCheckBoxes = new ArrayList<CheckBox>();
-        mResponseIndices = new ArrayList<Integer>();
+        mCheckBoxes = new ArrayList<>();
+        mResponseIndices = new ArrayList<>();
         for (Option option : getOptions()) {
             final int optionId = getOptions().indexOf(option);
             CheckBox checkbox = new CheckBox(getActivity());
             checkbox.setText(option.getText());
             checkbox.setTypeface(getInstrument().getTypeFace(getActivity().getApplicationContext()));
-            checkbox.setId(optionId);     
-            checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    toggleResponseIndex(optionId);
+            checkbox.setId(optionId);
+            checkbox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    toggleResponseIndex(v.getId());
                 }
             });
             mCheckBoxes.add(checkbox);
@@ -48,7 +50,15 @@ public class SelectMultipleQuestionFragment extends QuestionFragment {
         return serialized;
     }
 
-	@Override
+    @Override
+    protected void unSetResponse() {
+        for (CheckBox checkBox : mCheckBoxes) {
+            if (checkBox.isChecked()) checkBox.setChecked(false);
+        }
+        mResponseIndices.clear();
+    }
+
+    @Override
 	protected void deserialize(String responseText) {
 		if (responseText.equals("")) {
 			for (CheckBox box : mCheckBoxes) {
@@ -68,10 +78,10 @@ public class SelectMultipleQuestionFragment extends QuestionFragment {
 	}
     
     protected void toggleResponseIndex(int index) {
-        if (mResponseIndices.contains(index)) {
-            mResponseIndices.remove((Integer) index);
-        } else {
-            mResponseIndices.add(index);
+        clearSpecialResponseSelection();
+        mResponseIndices.clear();
+        for (CheckBox checkbox : mCheckBoxes) {
+            if (checkbox.isChecked()) mResponseIndices.add(checkbox.getId());
         }
         setResponseText();
     }

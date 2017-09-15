@@ -10,15 +10,18 @@ import org.adaptlab.chpir.android.survey.FormatUtils;
 import org.adaptlab.chpir.android.survey.QuestionFragment;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 public class DateQuestionFragment extends QuestionFragment {
+    private static final String TAG = "DateQuestionFragment";
     protected int mDay;
     protected int mMonth;
     protected int mYear;
-    
+    protected boolean hasBeenReset = false;
+
     private DatePicker mDatePicker;
-    
+
     protected DatePicker beforeAddViewHook(ViewGroup component) {
         DatePicker datePicker = new DatePicker(getActivity());
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -30,11 +33,13 @@ public class DateQuestionFragment extends QuestionFragment {
         datePicker.init(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH),
                 new OnDateChangedListener() {
                     @Override
-                    public void onDateChanged(DatePicker view, int newYear,
-                                              int newMonth, int newDay) {
+                    public void onDateChanged(DatePicker view, int newYear, int newMonth, int newDay) {
                         mDay = newDay;
                         mMonth = newMonth;
                         mYear = newYear;
+                        if (!hasBeenReset) {
+                            clearSpecialResponseSelection();
+                        }
                         setResponseText();
                     }
                 });
@@ -49,13 +54,27 @@ public class DateQuestionFragment extends QuestionFragment {
 
     @Override
     protected String serialize() {
+        if (hasBeenReset) {
+            hasBeenReset = false;
+            return "";
+        }
         return FormatUtils.formatDate(mMonth, mDay, mYear);
+    }
+
+    @Override
+    protected void unSetResponse() {
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(new Date());
+        mMonth = cal.get(Calendar.DAY_OF_MONTH);
+        mDay = cal.get(Calendar.MONTH);
+        mYear = cal.get(Calendar.YEAR);
+        hasBeenReset = true;
     }
 
     @Override
     protected void deserialize(String responseText) {
         GregorianCalendar dateComponents = FormatUtils.unformatDate(responseText);
-        if(dateComponents != null) {
+        if (dateComponents != null) {
             mDay = dateComponents.get(GregorianCalendar.DAY_OF_MONTH);
             mMonth = dateComponents.get(GregorianCalendar.MONTH);
             mYear = dateComponents.get(GregorianCalendar.YEAR);

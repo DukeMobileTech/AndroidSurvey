@@ -1,9 +1,5 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
-import org.adaptlab.chpir.android.survey.CameraFragment;
-import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.models.ResponsePhoto;
-
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -13,6 +9,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
+import org.adaptlab.chpir.android.survey.CameraFragment;
+import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.models.ResponsePhoto;
 
 public class RearPictureQuestionFragment extends PictureQuestionFragment {
 	private static final String TAG = "RearPictureQuestionFragment";
@@ -48,6 +48,11 @@ public class RearPictureQuestionFragment extends PictureQuestionFragment {
 		} else {
 			Log.i(TAG, "Camera Not Available");
 		}
+	}
+
+	@Override
+	protected void unSetResponse() {
+
 	}
 
 }

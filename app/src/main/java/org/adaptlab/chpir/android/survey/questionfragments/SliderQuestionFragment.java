@@ -1,18 +1,17 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
-import org.adaptlab.chpir.android.survey.QuestionFragment;
-
 import android.view.ViewGroup;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
+import org.adaptlab.chpir.android.survey.QuestionFragment;
+
 public class SliderQuestionFragment extends QuestionFragment {
+    private static final String TAG = "SliderQuestionFragment";
     private int mProgress;
     private SeekBar mSlider;
     
-    protected void beforeAddViewHook(ViewGroup questionComponent) {
-        
-    }
+    protected void beforeAddViewHook(ViewGroup questionComponent) {}
 
     @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
@@ -22,6 +21,9 @@ public class SliderQuestionFragment extends QuestionFragment {
                 mProgress = progress;
                 if (mProgress > -1) {
                 	setResponseText();
+                }
+                if (fromUser) {
+                    clearSpecialResponseSelection();
                 }
             }
 
@@ -35,7 +37,13 @@ public class SliderQuestionFragment extends QuestionFragment {
 
     @Override
     protected String serialize() {
+        if (mProgress == -1) return "";
         return String.valueOf(mProgress);
+    }
+
+    @Override
+    protected void unSetResponse() {
+        mProgress = -1;
     }
 
     @Override

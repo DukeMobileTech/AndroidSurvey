@@ -7,6 +7,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,8 +17,11 @@ import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import org.adaptlab.chpir.android.survey.models.Instrument;
@@ -40,6 +44,7 @@ public abstract class QuestionFragment extends Fragment {
     private Instrument mInstrument;
     private SurveyFragment mSurveyFragment;
     private List<Option> mOptions;
+    private RadioGroup mSpecialResponses;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -88,7 +93,42 @@ public abstract class QuestionFragment extends Fragment {
         createQuestionComponent(questionComponent);
         deserialize(mResponse.getText());
 
+        mSpecialResponses = (RadioGroup) v.findViewById(R.id.special_responses_container);
+        final List<String> responses = AppUtil.getAdminSettingsInstance().getSpecialOptions();
+        for (String response : responses) {
+            int responseId = responses.indexOf(response);
+            Button button = new RadioButton(getActivity());
+            button.setText(response);
+            button.setId(responseId);
+            button.setTypeface(getInstrument().getTypeFace(getActivity().getApplicationContext()));
+            mSpecialResponses.addView(button, responseId);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    unSetResponse();
+                    setSpecialResponse(responses.get(v.getId()));
+                    setResponseText();
+                }
+            });
+        }
+        deserializeSpecialResponse();
         return v;
+    }
+
+    public void setSpecialResponse(String specialResponse) {
+        if (mResponse != null) {
+            mResponse.setSpecialResponse(specialResponse);
+            mResponse.setResponse("");
+            mResponse.setDeviceUser(AuthUtils.getCurrentUser());
+            mResponse.setTimeEnded(new Date());
+            deserialize(mResponse.getText());
+        }
+    }
+
+    private void deserializeSpecialResponse() {
+        if (TextUtils.isEmpty(mResponse.getSpecialResponse())) return;
+        int id = AppUtil.getAdminSettingsInstance().getSpecialOptions().indexOf(mResponse.getSpecialResponse());
+        mSpecialResponses.check(id);
     }
 
     @Override
@@ -115,6 +155,10 @@ public abstract class QuestionFragment extends Fragment {
     protected abstract void createQuestionComponent(ViewGroup questionComponent);
 
     protected abstract void deserialize(String responseText);
+
+    protected abstract String serialize();
+
+    protected abstract void unSetResponse();
 
     protected void showKeyBoard() {
         InputMethodManager manager = (InputMethodManager) getActivity().getSystemService(Context
@@ -147,16 +191,6 @@ public abstract class QuestionFragment extends Fragment {
         return (mResponse == null) ? "" : mResponse.getSpecialResponse();
     }
 
-    public void setSpecialResponse(String specialResponse) {
-        if (mResponse != null) {
-            mResponse.setSpecialResponse(specialResponse);
-            mResponse.setResponse("");
-            mResponse.setDeviceUser(AuthUtils.getCurrentUser());
-            mResponse.setTimeEnded(new Date());
-            deserialize(mResponse.getText());
-        }
-    }
-
     public Response getResponse() {
         return mResponse;
     }
@@ -177,19 +211,21 @@ public abstract class QuestionFragment extends Fragment {
         otherText.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         otherText.addTextChangedListener(new TextWatcher() {
             // Required by interface
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 setOtherResponse(s.toString());
+                new SaveResponseTask().execute(mResponse);
             }
 
-            public void afterTextChanged(Editable s) {
-            }
+            public void afterTextChanged(Editable s) {}
         });
 
-        if (mResponse.getOtherResponse() != null) {
+        if (!TextUtils.isEmpty(mResponse.getOtherResponse())) {
             otherText.setText(mResponse.getOtherResponse());
+            otherText.setEnabled(true);
+            otherText.requestFocus();
+            showKeyBoard();
         }
     }
 
@@ -198,18 +234,17 @@ public abstract class QuestionFragment extends Fragment {
         mResponse.setDeviceUser(AuthUtils.getCurrentUser());
     }
 
+    protected void clearSpecialResponseSelection() {
+        mResponse.setSpecialResponse(Response.BLANK);
+        if(mSpecialResponses != null) mSpecialResponses.clearCheck();
+    }
+
     protected void setResponseText() {
         mResponse.setResponse(serialize());
         mResponse.setTimeEnded(new Date());
         validateResponse();
-        if (isAdded() && !mResponse.getText().equals("")) {
-            mResponse.setSpecialResponse("");
-            ActivityCompat.invalidateOptionsMenu(getActivity());
-        }
         new SaveResponseTask().execute(mResponse);
     }
-
-    protected abstract String serialize();
 
     /*
      * Display warning to user if response does not match regular

@@ -221,6 +221,11 @@ public class MultipleSelectGridFragment extends GridFragment {
 	@Override
 	protected String serialize() { return null; }
 
+    @Override
+    protected void unSetResponse() {
+
+    }
+
     protected void setResponseIndexes(Question q, int checkedId, boolean isChecked) {
         new SaveResponseTask(getSurvey(), q, checkedId, isChecked).execute();
     }

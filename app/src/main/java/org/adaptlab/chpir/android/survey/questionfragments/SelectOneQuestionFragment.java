@@ -1,21 +1,22 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.RadioGroup.OnCheckedChangeListener;
 
-import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.QuestionFragment;
+import org.adaptlab.chpir.android.survey.models.Option;
 
 public class SelectOneQuestionFragment extends QuestionFragment {
+    private static final String TAG = "SelectOneQuestionFragment";
     private RadioGroup mRadioGroup;
     private int mResponseIndex;
 
     // This is used to add additional UI components in subclasses.
-    protected void beforeAddViewHook(ViewGroup questionComponent) {
-    }
+    protected void beforeAddViewHook(ViewGroup questionComponent) {}
+    protected void disableOtherTextButton() {};
 
     protected RadioGroup getRadioGroup() {
         return mRadioGroup;
@@ -34,20 +35,27 @@ public class SelectOneQuestionFragment extends QuestionFragment {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT));
             mRadioGroup.addView(radioButton, optionId);
+            radioButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    setResponseIndex(v.getId());
+                    disableOtherTextButton();
+                }
+            });
         }
-        
-        getRadioGroup().setOnCheckedChangeListener(new OnCheckedChangeListener() {
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                setResponseIndex(checkedId);
-            }
-        });
         questionComponent.addView(mRadioGroup);
         beforeAddViewHook(questionComponent);
     }
 
     @Override
     protected String serialize() {
+        if (mResponseIndex == -1) return "";
         return String.valueOf(mResponseIndex);
+    }
+
+    @Override
+    protected void unSetResponse() {
+        mResponseIndex = -1;
     }
 
     @Override
@@ -63,6 +71,7 @@ public class SelectOneQuestionFragment extends QuestionFragment {
     
     protected void setResponseIndex(int index) {
         mResponseIndex = index;
+        clearSpecialResponseSelection();
         setResponseText();
     }
   

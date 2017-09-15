@@ -188,6 +188,11 @@ public class SingleSelectGridFragment extends GridFragment {
     }
 
     @Override
+    protected void unSetResponse() {
+
+    }
+
+    @Override
     public void onScrollChanged(OHScrollView scrollView, int x, int y, int oldX, int oldY) {
         if (interceptScroll) {
             interceptScroll = false;

@@ -26,6 +26,9 @@ public class YearQuestionFragment extends DateQuestionFragment {
                     mDay = newDay;
                     mMonth = newMonth;
                     mYear = newYear;
+                    if (!hasBeenReset) {
+                        clearSpecialResponseSelection();
+                    }
                     setResponseText();
                 }
             });
@@ -38,6 +41,10 @@ public class YearQuestionFragment extends DateQuestionFragment {
     
     @Override
     protected String serialize() {
+        if (hasBeenReset) {
+            hasBeenReset = false;
+            return "";
+        }
         return String.valueOf(mYear);
     }
 
@@ -45,5 +52,10 @@ public class YearQuestionFragment extends DateQuestionFragment {
     protected void deserialize(String responseText) {
       if (responseText.equals("")) return;
       mDatePicker.updateDate(Integer.parseInt(responseText), 1, 1);
+    }
+
+    @Override
+    protected void unSetResponse() {
+        super.unSetResponse();
     }
 }

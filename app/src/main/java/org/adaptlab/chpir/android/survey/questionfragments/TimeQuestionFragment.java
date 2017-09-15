@@ -1,15 +1,16 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
-import org.adaptlab.chpir.android.survey.FormatUtils;
-import org.adaptlab.chpir.android.survey.QuestionFragment;
-
 import android.view.ViewGroup;
 import android.widget.TimePicker;
+
+import org.adaptlab.chpir.android.survey.FormatUtils;
+import org.adaptlab.chpir.android.survey.QuestionFragment;
 
 public class TimeQuestionFragment extends QuestionFragment {
     private int mHour;
     private int mMinute;
     private TimePicker mTimePicker;
+    private boolean mHasBeenReset = false;
 
     @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
@@ -22,6 +23,9 @@ public class TimeQuestionFragment extends QuestionFragment {
             public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
                 mHour = hourOfDay;
                 mMinute = minute;
+                if (!mHasBeenReset) {
+                    clearSpecialResponseSelection();
+                }
                 setResponseText();
             }
         });
@@ -30,7 +34,18 @@ public class TimeQuestionFragment extends QuestionFragment {
 
     @Override
     protected String serialize() {
+        if (mHasBeenReset) {
+            mHasBeenReset = false;
+            return "";
+        }
         return FormatUtils.formatTime(mHour, mMinute);
+    }
+
+    @Override
+    protected void unSetResponse() {
+        mHour = 0;
+        mMinute = 0;
+        mHasBeenReset = true;
     }
 
     @Override

@@ -70,4 +70,9 @@ public class GeoLocationFragment extends QuestionFragment {
         return jsonObject.toString();
     }
 
+    @Override
+    protected void unSetResponse() {
+
+    }
+
 }

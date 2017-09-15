@@ -1,13 +1,5 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.adaptlab.chpir.android.survey.PictureUtils;
-import org.adaptlab.chpir.android.survey.QuestionFragment;
-import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.models.Image;
-
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
@@ -19,6 +11,14 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+
+import org.adaptlab.chpir.android.survey.PictureUtils;
+import org.adaptlab.chpir.android.survey.QuestionFragment;
+import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.models.Image;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SelectMultipleImageQuestionFragment extends QuestionFragment {
 	private final int SELECTED = Color.GREEN;
@@ -74,6 +74,11 @@ public class SelectMultipleImageQuestionFragment extends QuestionFragment {
 			}
 		}
 		return serialized;
+	}
+
+	@Override
+	protected void unSetResponse() {
+
 	}
 
 	@Override

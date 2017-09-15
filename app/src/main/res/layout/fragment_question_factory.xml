@@ -26,6 +26,14 @@
 
     </LinearLayout>
 
+    <RadioGroup
+        android:id="@+id/special_responses_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="@drawable/response_component_layout"/>
+
     <TextView
         android:id="@+id/validation_text"
         android:layout_width="match_parent"
@@ -37,5 +45,6 @@
         android:gravity="center_horizontal"
         android:textColor="@color/red"
         android:visibility="invisible"/>
+
 
 </LinearLayout>

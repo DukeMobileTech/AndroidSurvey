@@ -3,16 +3,21 @@ package org.adaptlab.chpir.android.survey.questionfragments;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
 import org.adaptlab.chpir.android.survey.QuestionFragment;
 import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.models.Response;
 
 public class FreeResponseQuestionFragment extends QuestionFragment {
     private static final String TAG = "FreeResponseQuestionFragment";
-    private String mText = "";
+    private String mText = Response.BLANK;
     private EditText mFreeText;
+    private TextWatcher mTextWatcher;
+    private boolean initialState;
+
 
     @Override
     public void createQuestionComponent(ViewGroup questionComponent) {
@@ -21,17 +26,29 @@ public class FreeResponseQuestionFragment extends QuestionFragment {
                 InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         beforeAddViewHook(mFreeText);
         mFreeText.setHint(R.string.free_response_edittext);
-        mFreeText.addTextChangedListener(new TextWatcher() {
+        initialState = true;
+        mTextWatcher = new TextWatcher() {
             // Required by interface
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
 
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 mText = s.toString();
+                if (!initialState) {
+                    clearSpecialResponseSelection();
+                }
+                initialState = false;
                 setResponseText();
             }
 
             public void afterTextChanged(Editable s) {
+            }
+        };
+        mFreeText.addTextChangedListener(mTextWatcher);
+        mFreeText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mFreeText.addTextChangedListener(mTextWatcher);
             }
         });
         mFreeText.requestFocus();
@@ -51,6 +68,12 @@ public class FreeResponseQuestionFragment extends QuestionFragment {
     @Override
     protected String serialize() {
         return mText;
+    }
+
+    @Override
+    protected void unSetResponse() {
+        mText = Response.BLANK;
+        mFreeText.removeTextChangedListener(mTextWatcher);
     }
 
 }

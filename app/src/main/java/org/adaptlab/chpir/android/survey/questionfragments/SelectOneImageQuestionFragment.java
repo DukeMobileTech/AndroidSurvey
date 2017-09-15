@@ -93,6 +93,11 @@ public class SelectOneImageQuestionFragment extends QuestionFragment {
 	}
 
 	@Override
+	protected void unSetResponse() {
+
+	}
+
+	@Override
 	protected void deserialize(String responseText) {
 		if (!responseText.equals("")) {
 			mPreviouslySelectedViewIndex = Integer.parseInt(responseText);

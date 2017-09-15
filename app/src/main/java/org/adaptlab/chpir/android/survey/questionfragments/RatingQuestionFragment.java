@@ -23,6 +23,7 @@ public class RatingQuestionFragment extends QuestionFragment  {
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
                 mRating = rating;
                 setResponseText();
+                if (fromUser) clearSpecialResponseSelection();
             }
         });
         questionComponent.addView(mRatingBar);
@@ -30,7 +31,14 @@ public class RatingQuestionFragment extends QuestionFragment  {
 
     @Override
     protected String serialize() {
+        if (mRating == 0) return "";
         return String.valueOf(mRating);
+    }
+
+    @Override
+    protected void unSetResponse() {
+        mRating = 0;
+        mRatingBar.setRating(mRating);
     }
 
     @Override

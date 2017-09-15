@@ -146,6 +146,7 @@
     <string name="api_endpoint_settings">API Endpoint Settings</string>
     <string name="device_settings">Device Settings</string>
     <string name="show_scores">Show Scores</string>
+    <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
     <string name="altitude">Altitude</string>
     <string name="update_location">Update Location</string>

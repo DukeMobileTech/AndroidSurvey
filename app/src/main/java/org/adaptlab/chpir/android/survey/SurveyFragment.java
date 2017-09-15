@@ -465,22 +465,26 @@ public class SurveyFragment extends Fragment {
             menu.findItem(R.id.menu_item_previous).setEnabled(!isFirstQuestion());
             menu.findItem(R.id.menu_item_next).setVisible(!isLastQuestion())
                     .setEnabled(hasValidResponse());
-            if (mQuestion.belongsToGrid()) {
-                menu.findItem(R.id.menu_item_skip).setVisible(false);
-                menu.findItem(R.id.menu_item_rf).setVisible(false);
-                menu.findItem(R.id.menu_item_na).setVisible(false);
-                menu.findItem(R.id.menu_item_dk).setVisible(false);
-            } else {
-                for (String key : mMenuItems.keySet()) {
-                    if (!mInstrument.getSpecialOptionStrings().contains(key)) {
-                        menu.findItem(mMenuItems.get(key)).setVisible(false).setEnabled(false);
-                    } else {
-                        if (key.equals(Response.SKIP)) {
-                            menu.findItem(mMenuItems.get(key)).setEnabled(hasValidResponse());
-                        }
-                    }
-                }
-            }
+//            if (mQuestion.belongsToGrid()) {
+//                menu.findItem(R.id.menu_item_skip).setVisible(false);
+//                menu.findItem(R.id.menu_item_rf).setVisible(false);
+//                menu.findItem(R.id.menu_item_na).setVisible(false);
+//                menu.findItem(R.id.menu_item_dk).setVisible(false);
+//            } else {
+//                for (String key : mMenuItems.keySet()) {
+//                    if (!mInstrument.getSpecialOptionStrings().contains(key)) {
+//                        menu.findItem(mMenuItems.get(key)).setVisible(false).setEnabled(false);
+//                    } else {
+//                        if (key.equals(Response.SKIP)) {
+//                            menu.findItem(mMenuItems.get(key)).setEnabled(hasValidResponse());
+//                        }
+//                    }
+//                }
+//            }
+            menu.findItem(R.id.menu_item_skip).setVisible(false);
+            menu.findItem(R.id.menu_item_rf).setVisible(false);
+            menu.findItem(R.id.menu_item_na).setVisible(false);
+            menu.findItem(R.id.menu_item_dk).setVisible(false);
             menu.findItem(R.id.menu_item_finish).setVisible(isLastQuestion())
                     .setEnabled(hasValidResponse());
             showSpecialResponseSelection(menu);

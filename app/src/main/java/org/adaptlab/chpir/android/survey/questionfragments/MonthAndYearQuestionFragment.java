@@ -25,19 +25,29 @@ public class MonthAndYearQuestionFragment extends DateQuestionFragment {
                         mDay = newDay;
                         mMonth = newMonth;
                         mYear = newYear;
+                        if (!hasBeenReset) {
+                            clearSpecialResponseSelection();
+                        }
                         setResponseText();
                     }
                 });
 
-        datePicker.findViewById(Resources.getSystem().getIdentifier("day", "id", "android"))
-                .setVisibility(View.GONE);
+        datePicker.findViewById(Resources.getSystem().getIdentifier("day", "id", "android")).setVisibility(View.GONE);
 
         return datePicker;
     }
     
     @Override
     protected String serialize() {
+        if (hasBeenReset) {
+            hasBeenReset = false;
+            return "";
+        }
         return FormatUtils.formatDate(mMonth, mYear);
     }
 
+    @Override
+    protected void unSetResponse() {
+        super.unSetResponse();
+    }
 }
