@@ -70,6 +70,8 @@ import java.util.UUID;
 
 public class InstrumentFragment extends ListFragment {
     public final static String TAG = "InstrumentFragment";
+    public final static String EXTRA_AUTHORIZE_SURVEY =
+            "org.adaptlab.chpir.android.survey.authorize_survey_bool";
     private SurveyAdapter mSurveyAdapter;
     private InstrumentAdapter mInstrumentAdapter;
     private RosterAdapter mRosterAdapter;
@@ -82,6 +84,7 @@ public class InstrumentFragment extends ListFragment {
     private LoaderManager.LoaderCallbacks mScoreCallbacks;
     private MultiChoiceModeListener choiceModeListener;
     private ProgressDialog mProgressDialog;
+    private boolean mAuthorizeSurvey;
 
     private void setMultiChoiceModeListener() {
         choiceModeListener = new MultiChoiceModeListener() {
@@ -210,6 +213,9 @@ public class InstrumentFragment extends ListFragment {
         super.onCreate(savedInstanceState);
         AppUtil.appInit(getActivity());
         setHasOptionsMenu(true);
+        if (getActivity().getIntent() != null) {
+            mAuthorizeSurvey = getActivity().getIntent().getBooleanExtra(EXTRA_AUTHORIZE_SURVEY, false);
+        }
         createLoaderCallbacks();
         setMultiChoiceModeListener();
         requestNeededPermissions();
@@ -576,8 +582,7 @@ public class InstrumentFragment extends ListFragment {
 
         @Override
         public View newView(Context context, Cursor cursor, ViewGroup parent) {
-            return LayoutInflater.from(context).inflate(R.layout.list_item_instrument, parent,
-                    false);
+            return LayoutInflater.from(context).inflate(R.layout.list_item_instrument, parent, false);
         }
 
         @Override
@@ -598,11 +603,9 @@ public class InstrumentFragment extends ListFragment {
                     getActivity().getApplicationContext()));
             questionCountTextView.setText(numQuestions + " " + FormatUtils.pluralize
                     (numQuestions, getString(R.string.question), getString(R.string.questions)));
-            instrumentVersionTextView.setText(getString(R.string.version) + ": " + instrument
-                    .getVersionNumber());
+            instrumentVersionTextView.setText(getString(R.string.version) + ": " + instrument.getVersionNumber());
 
-            new SetInstrumentLabelTask().execute(new InstrumentListLabel(instrument,
-                    titleTextView));
+            new SetInstrumentLabelTask().execute(new InstrumentListLabel(instrument, titleTextView));
         }
     }
 
@@ -978,15 +981,13 @@ public class InstrumentFragment extends ListFragment {
             if (progressDialog != null && progressDialog.isShowing()) progressDialog.dismiss();
             if (isAdded()) {
                 if (survey == null) {
-                    Toast.makeText(getActivity(), R.string.instrument_not_loaded, Toast
-                            .LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), R.string.instrument_not_loaded, Toast.LENGTH_LONG).show();
                 } else {
                     Intent i = new Intent(getActivity(), SurveyActivity.class);
-                    i.putExtra(SurveyFragment.EXTRA_INSTRUMENT_ID, survey.getInstrument()
-                            .getRemoteId());
+                    i.putExtra(SurveyFragment.EXTRA_INSTRUMENT_ID, survey.getInstrument().getRemoteId());
                     i.putExtra(SurveyFragment.EXTRA_SURVEY_ID, survey.getId());
-                    i.putExtra(SurveyFragment.EXTRA_QUESTION_NUMBER, survey.getLastQuestion()
-                            .getNumberInInstrument() - 1);
+                    i.putExtra(SurveyFragment.EXTRA_QUESTION_NUMBER, survey.getLastQuestion().getNumberInInstrument() - 1);
+                    i.putExtra(SurveyFragment.EXTRA_AUTHORIZE_SURVEY, mAuthorizeSurvey);
                     startActivity(i);
                 }
             }

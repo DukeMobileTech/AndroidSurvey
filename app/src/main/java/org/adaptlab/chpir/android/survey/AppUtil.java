@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.AsyncTask;
@@ -152,14 +151,6 @@ public class AppUtil {
         ActiveRecordCloudSync.addSendTable("raw_scores", RawScore.class);
 
         PollService.setServiceAlarm(context.getApplicationContext(), true);
-    }
-
-    public static void authorize() {
-        if (AppUtil.getAdminSettingsInstance() != null && AppUtil.getAdminSettingsInstance()
-                .getRequirePassword() && !AuthUtils.isSignedIn()) {
-            Intent i = new Intent(getContext(), LoginActivity.class);
-            getContext().startActivity(i);
-        }
     }
 
     private static void setAdminSettingsInstance() {

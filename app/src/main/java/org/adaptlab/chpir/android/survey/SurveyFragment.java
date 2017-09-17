@@ -11,6 +11,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -78,25 +79,22 @@ import java.util.Set;
 import io.fabric.sdk.android.Fabric;
 
 public class SurveyFragment extends Fragment {
-    public final static String EXTRA_INSTRUMENT_ID =
-            "org.adaptlab.chpir.android.survey.instrument_id";
-    public final static String EXTRA_QUESTION_NUMBER =
-            "org.adaptlab.chpir.android.survey.question_number";
-    public final static String EXTRA_SURVEY_ID =
-            "org.adaptlab.chpir.android.survey.survey_id";
-    public final static String EXTRA_PREVIOUS_QUESTION_IDS =
-            "org.adaptlab.chpir.android.survey.previous_questions";
-    public final static String EXTRA_PARTICIPANT_METADATA =
-            "org.adaptlab.chpir.android.survey.metadata";
-    public final static String EXTRA_QUESTIONS_TO_SKIP_IDS =
-            "org.adaptlab.chpir.android.survey.questions_to_skip_ids";
-    public final static String EXTRA_SECTION_ID =
-            "org.adaptlab.chpir.android.survey.section_id";
+    public final static String EXTRA_INSTRUMENT_ID = "org.adaptlab.chpir.android.survey.instrument_id";
+    public final static String EXTRA_QUESTION_NUMBER = "org.adaptlab.chpir.android.survey.question_number";
+    public final static String EXTRA_SURVEY_ID = "org.adaptlab.chpir.android.survey.survey_id";
+    public final static String EXTRA_PREVIOUS_QUESTION_IDS = "org.adaptlab.chpir.android.survey.previous_questions";
+    public final static String EXTRA_PARTICIPANT_METADATA = "org.adaptlab.chpir.android.survey.metadata";
+    public final static String EXTRA_QUESTIONS_TO_SKIP_IDS = "org.adaptlab.chpir.android.survey.questions_to_skip_ids";
+    public final static String EXTRA_SECTION_ID = "org.adaptlab.chpir.android.survey.section_id";
+    public final static String EXTRA_AUTHORIZE_SURVEY = "org.adaptlab.chpir.android.survey.authorize_boolean";
     private static final String TAG = "SurveyFragment";
     private static final int REVIEW_CODE = 100;
     private static final int SECTION_CODE = 200;
+    public static final int AUTHORIZE_CODE = 300;
     private static final Long REVIEW_PAGE_ID = -1L;
     private static final Map<String, Integer> mMenuItems;
+    private boolean noBackgroundTask = true;
+    private boolean mAllowFragmentCommit;
 
     static {
         Map<String, Integer> menuItems = new HashMap<String, Integer>();
@@ -211,10 +209,21 @@ public class SurveyFragment extends Fragment {
     }
 
     public void refreshView() {
-        setParticipantLabel();
-        updateQuestionCountLabel();
-        updateQuestionText();
-        createQuestionFragment();
+        if (noBackgroundTask) {
+            AuthorizedActivity authority = (AuthorizedActivity) getActivity();
+            if (authority.getAuthorize()) {
+                authority.setAuthorize(false);
+                if (AppUtil.getAdminSettingsInstance() != null && AppUtil.getAdminSettingsInstance().getRequirePassword() && !AuthUtils.isSignedIn()) {
+                    Intent i = new Intent(getContext(), LoginActivity.class);
+                    getActivity().startActivityForResult(i, AUTHORIZE_CODE);
+                }
+            } else {
+                setParticipantLabel();
+                updateQuestionCountLabel();
+                updateQuestionText();
+                createQuestionFragment();
+            }
+        }
     }
 
     @Override
@@ -255,24 +264,25 @@ public class SurveyFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mAllowFragmentCommit = true;
         setRetainInstance(true);
         getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
-        AppUtil.authorize();
         setHasOptionsMenu(true);
         if (AppUtil.getContext() == null) AppUtil.setContext(getActivity());
-
+        boolean authority = getActivity().getIntent().getBooleanExtra(EXTRA_AUTHORIZE_SURVEY, false);
+        if (authority) {
+            AuthorizedActivity authorizedActivity = (AuthorizedActivity) getActivity();
+            authorizedActivity.setAuthorize(true);
+        }
         if (savedInstanceState != null) {
-            mInstrument = Instrument.findByRemoteId(savedInstanceState.getLong
-                    (EXTRA_INSTRUMENT_ID));
+            mInstrument = Instrument.findByRemoteId(savedInstanceState.getLong(EXTRA_INSTRUMENT_ID));
             if (!checkRules()) getActivity().finish();
             launchRosterSurvey();
             if (!mInstrument.isRoster()) {
                 mSurvey = Survey.load(Survey.class, savedInstanceState.getLong(EXTRA_SURVEY_ID));
                 mQuestionNumber = savedInstanceState.getInt(EXTRA_QUESTION_NUMBER);
-                mPreviousQuestions = savedInstanceState.getIntegerArrayList
-                        (EXTRA_PREVIOUS_QUESTION_IDS);
-                mQuestionsToSkip = savedInstanceState.getIntegerArrayList(
-                        EXTRA_QUESTIONS_TO_SKIP_IDS);
+                mPreviousQuestions = savedInstanceState.getIntegerArrayList(EXTRA_PREVIOUS_QUESTION_IDS);
+                mQuestionsToSkip = savedInstanceState.getIntegerArrayList(EXTRA_QUESTIONS_TO_SKIP_IDS);
             }
         } else {
             Long instrumentId = getActivity().getIntent().getLongExtra(EXTRA_INSTRUMENT_ID, -1);
@@ -286,7 +296,6 @@ public class SurveyFragment extends Fragment {
                 loadOrCreateSurvey();
             }
         }
-
         if (AppUtil.PRODUCTION) {
             Fabric.with(getActivity(), new Crashlytics());
             Crashlytics.setString(getString(R.string.last_instrument), mInstrument.getTitle());
@@ -295,12 +304,12 @@ public class SurveyFragment extends Fragment {
         if (!mInstrument.isRoster()) {
             mQuestionCount = mInstrument.getQuestionCount();
             mQuestions = new ArrayList<>(mInstrument.getQuestionCount());
+            noBackgroundTask = false;
             new LoadQuestionsTask().execute(mInstrument);
         }
 
         if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) {
-            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission
-                    .ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 startLocationServices();
             }
         }
@@ -317,8 +326,7 @@ public class SurveyFragment extends Fragment {
         ActivityCompat.invalidateOptionsMenu(getActivity());
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (actionBar != null) actionBar.setTitle(mInstrument.getTitle());
-        LinearLayout swipeView = (LinearLayout) v.findViewById(
-                R.id.linear_layout_for_question_index);
+        LinearLayout swipeView = (LinearLayout) v.findViewById(R.id.linear_layout_for_question_index);
         mGestureDetector = new GestureDetector(getActivity(), new GestureListener());
         swipeView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -338,16 +346,14 @@ public class SurveyFragment extends Fragment {
 
     private void registerLocationReceiver() {
         if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation() &&
-                ContextCompat.checkSelfPermission(getActivity(), Manifest.permission
-                        .ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             getActivity().registerReceiver(mLocationServiceManager.mLocationReceiver,
                     new IntentFilter(LocationServiceManager.ACTION_LOCATION));
         }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
+    protected void onResumeFragments() {
+        mAllowFragmentCommit = true;
         if (mQuestion != null) {
             if (mResumeQuestion == mQuestion)
                 mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
@@ -358,6 +364,7 @@ public class SurveyFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        mAllowFragmentCommit = false;
         super.onSaveInstanceState(outState);
         outState.putLong(EXTRA_INSTRUMENT_ID, mInstrument.getRemoteId());
         if (mSurvey != null) outState.putLong(EXTRA_SURVEY_ID, mSurvey.getId());
@@ -368,15 +375,11 @@ public class SurveyFragment extends Fragment {
 
     @Override
     public void onStop() {
-        if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()
-                && ContextCompat.checkSelfPermission(getActivity(), Manifest.permission
-                .ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-                && mLocationServiceManager != null
-                && mLocationServiceManager.mLocationReceiver != null) {
+        if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation() && ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && mLocationServiceManager != null && mLocationServiceManager.mLocationReceiver != null) {
             try {
                 getActivity().unregisterReceiver(mLocationServiceManager.mLocationReceiver);
             } catch (IllegalArgumentException e) {
-                Log.e(TAG, "Illegal Argument Exception ", e);
+                if (BuildConfig.DEBUG) Log.e(TAG, "Illegal Argument Exception ", e);
             }
         }
         super.onStop();
@@ -472,8 +475,7 @@ public class SurveyFragment extends Fragment {
                     }
                 }
             }
-            menu.findItem(R.id.menu_item_finish).setVisible(isLastQuestion())
-                    .setEnabled(hasValidResponse());
+            menu.findItem(R.id.menu_item_finish).setVisible(isLastQuestion()).setEnabled(hasValidResponse());
             showSpecialResponseSelection(menu);
         }
     }
@@ -599,7 +601,7 @@ public class SurveyFragment extends Fragment {
     }
 
     private void unSkipAndMoveToNextQuestion() {
-        if (mQuestionFragment.getSpecialResponse().equals(Response.SKIP)) {
+        if (mQuestionFragment != null && mQuestionFragment.getSpecialResponse().equals(Response.SKIP)) {
             mQuestionFragment.setSpecialResponse("");
         }
         proceedToNextQuestion();
@@ -624,8 +626,7 @@ public class SurveyFragment extends Fragment {
                     createGridFragment();
                 } else {
                     FragmentManager fm = getChildFragmentManager();
-                    mQuestionFragment = (QuestionFragment) QuestionFragmentFactory
-                            .createQuestionFragment(mQuestion);
+                    mQuestionFragment = (QuestionFragment) QuestionFragmentFactory.createQuestionFragment(mQuestion);
                     switchOutFragments(fm);
                 }
             }
@@ -646,15 +647,28 @@ public class SurveyFragment extends Fragment {
         switchOutFragments(fm);
     }
 
-    private void switchOutFragments(FragmentManager fm) {
+    private void switchOutFragments(final FragmentManager fm) {
+        if (mAllowFragmentCommit) {
+            commitFragmentTransaction(fm);
+        }
+        else {
+            new Handler().post(new Runnable() {
+                public void run() {
+                    commitFragmentTransaction(fm);
+                }
+            });
+        }
+        mSurvey.setLastQuestion(mQuestion);
+        mSurvey.save();
+        removeTextFocus();
+    }
+
+    private void commitFragmentTransaction(FragmentManager fm) {
         if (fm.findFragmentById(R.id.question_container) == null) {
             fm.beginTransaction().add(R.id.question_container, mQuestionFragment).commit();
         } else {
             fm.beginTransaction().replace(R.id.question_container, mQuestionFragment).commit();
         }
-        mSurvey.setLastQuestion(mQuestion);
-        mSurvey.save();
-        removeTextFocus();
     }
 
     public Question getQuestion() {
@@ -1133,8 +1147,7 @@ public class SurveyFragment extends Fragment {
         }
     }
 
-    private class LoadOptionsTask extends AsyncTask<Instrument, Void, HashMap<Question,
-            List<Option>>> {
+    private class LoadOptionsTask extends AsyncTask<Instrument, Void, HashMap<Question, List<Option>>> {
 
         @Override
         protected HashMap<Question, List<Option>> doInBackground(Instrument... params) {
@@ -1143,14 +1156,15 @@ public class SurveyFragment extends Fragment {
 
         @Override
         protected void onPostExecute(HashMap<Question, List<Option>> options) {
+            noBackgroundTask = true;
             mOptions = options;
             loadOrCreateQuestion();
             if (isAdded()) {
                 ActivityCompat.invalidateOptionsMenu(getActivity());
-                refreshView();
                 if (mProgressDialog != null && mProgressDialog.isShowing()) {
                     mProgressDialog.dismiss();
                 }
+                refreshView();
             }
         }
     }
@@ -1188,12 +1202,11 @@ public class SurveyFragment extends Fragment {
         }
     }
 
-    public class GestureListener extends GestureDetector.SimpleOnGestureListener {
+    private class GestureListener extends GestureDetector.SimpleOnGestureListener {
         private float MINIMUM_FLING_DISTANCE = 100;
 
         @Override
-        public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float
-                velocityY) {
+        public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float velocityY) {
             float horizontalDifference = event2.getX() - event1.getX();
             float absoluteHorizontalDifference = Math.abs(horizontalDifference);
             if (absoluteHorizontalDifference > MINIMUM_FLING_DISTANCE) {

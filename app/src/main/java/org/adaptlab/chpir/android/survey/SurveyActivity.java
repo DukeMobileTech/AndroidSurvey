@@ -1,5 +1,6 @@
 package org.adaptlab.chpir.android.survey;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
@@ -18,4 +19,21 @@ public class SurveyActivity extends AuthorizedActivity {
             getSupportActionBar().setHomeButtonEnabled(true);
         }
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+            fragment.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    @Override
+    protected void onResumeFragments() {
+        super.onResumeFragments();
+        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+            ((SurveyFragment) fragment).onResumeFragments();
+        }
+    }
+
 }

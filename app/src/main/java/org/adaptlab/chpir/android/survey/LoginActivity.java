@@ -13,8 +13,10 @@ public class LoginActivity extends SingleFragmentActivity {
     @Override
     public void onBackPressed() {
         Intent i = new Intent(this, InstrumentActivity.class);
+        i.putExtra(InstrumentFragment.EXTRA_AUTHORIZE_SURVEY, true);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(i);
-        finish();   
+        finish();
     }
+
 }

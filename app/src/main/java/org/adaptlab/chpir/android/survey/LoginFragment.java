@@ -1,7 +1,5 @@
 package org.adaptlab.chpir.android.survey;
 
-import org.adaptlab.chpir.android.survey.models.DeviceUser;
-
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -11,10 +9,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.adaptlab.chpir.android.survey.models.DeviceUser;
+
 public class LoginFragment extends Fragment {
     private EditText mUsernameEditText;
     private EditText mPasswordEditText;
-    private Button mLoginButton;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -29,19 +28,18 @@ public class LoginFragment extends Fragment {
         
         mUsernameEditText = (EditText) v.findViewById(R.id.login_username_edit_text);
         mPasswordEditText = (EditText) v.findViewById(R.id.login_password_edit_text);
-        mLoginButton = (Button) v.findViewById(R.id.login_button);
+        Button mLoginButton = (Button) v.findViewById(R.id.login_button);
         mLoginButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 String userName = mUsernameEditText.getText().toString();
                 String password = mPasswordEditText.getText().toString();
                 
                 DeviceUser deviceUser = DeviceUser.findByUserName(userName);
-                
                 if (deviceUser != null && deviceUser.checkPassword(password)) {
                     AuthUtils.signIn(deviceUser);
                     getActivity().finish();
                 } else {
-                    Toast.makeText(getActivity(), getString(R.string.invalid_username_or_password), Toast.LENGTH_LONG).show();                    
+                    Toast.makeText(getActivity(), getString(R.string.invalid_username_or_password), Toast.LENGTH_LONG).show();
                 }
             }            
         });

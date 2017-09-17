@@ -32,8 +32,7 @@ public class ReviewPageFragment extends ListFragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         mSkippedQuestions = new ArrayList<>();
-        Survey mSurvey = Survey.load(Survey.class, getActivity().getIntent().getExtras().getLong
-                (EXTRA_REVIEW_SURVEY_ID));
+        Survey mSurvey = Survey.load(Survey.class, getActivity().getIntent().getExtras().getLong(EXTRA_REVIEW_SURVEY_ID));
 		List<Response> emptyResponses = mSurvey.emptyResponses();
 		for (Response response : emptyResponses) {
 			mSkippedQuestions.add(response.getQuestion());

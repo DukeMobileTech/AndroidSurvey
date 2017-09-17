@@ -3,7 +3,10 @@ package org.adaptlab.chpir.android.survey;
 import android.os.Bundle;
 
 public abstract class AuthorizedActivity extends SingleFragmentActivity implements Foreground.Listener {
+
+    private static final String TAG = "AuthorizedActivity";
     private Foreground.Binding mListenerBinder;
+    private boolean mAuthorize = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -19,15 +22,21 @@ public abstract class AuthorizedActivity extends SingleFragmentActivity implemen
 
     @Override
     public void onBecameForeground() {
-        authorize();
+        mAuthorize = true;
     }
 
     @Override
     public void onBecameBackground() {
+        mAuthorize = true;
         AuthUtils.signOut();
     }
 
-    private void authorize() {
-        AppUtil.authorize();
+    public boolean getAuthorize() {
+        return mAuthorize;
     }
+
+    public void setAuthorize(boolean status) {
+        mAuthorize = status;
+    }
+
 }
