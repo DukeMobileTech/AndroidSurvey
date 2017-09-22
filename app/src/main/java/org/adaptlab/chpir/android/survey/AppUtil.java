@@ -30,6 +30,7 @@ import org.adaptlab.chpir.android.survey.models.InstrumentTranslation;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.OptionScore;
 import org.adaptlab.chpir.android.survey.models.OptionTranslation;
+import org.adaptlab.chpir.android.survey.models.Project;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.QuestionRandomizedFactor;
 import org.adaptlab.chpir.android.survey.models.QuestionTranslation;
@@ -125,6 +126,7 @@ public class AppUtil {
         ActiveRecordCloudSync.setAccessToken(ACCESS_TOKEN);
         ActiveRecordCloudSync.setVersionCode(AppUtil.getVersionCode(context));
         ActiveRecordCloudSync.setEndPoint(adminSettingsInstance.getApiUrl());
+        ActiveRecordCloudSync.addReceiveTable("projects", Project.class);
         ActiveRecordCloudSync.addReceiveTable("instruments", Instrument.class);
         ActiveRecordCloudSync.addReceiveTable("sections", Section.class);
         ActiveRecordCloudSync.addReceiveTable("grids", Grid.class);
@@ -161,6 +163,13 @@ public class AppUtil {
                 adminSettingsInstance = AdminSettings.getInstance();
             }
         }
+    }
+
+    public static Long getProjectId() {
+        AdminSettings adminSettings = getAdminSettingsInstance();
+        if (adminSettings.getProjectId() != null)
+            return Long.parseLong(adminSettings.getProjectId());
+        return Long.MAX_VALUE;
     }
 
     /*

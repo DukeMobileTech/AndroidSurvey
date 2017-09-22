@@ -1,6 +1,7 @@
 package org.adaptlab.chpir.android.activerecordcloudsync;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 
 import org.adaptlab.chpir.android.survey.AppUtil;
@@ -32,8 +33,7 @@ public class ActiveRecordCloudSync {
      * @param tableName
      * @param receiveTable
      */
-    public static void addReceiveTable(String tableName, Class<? extends ReceiveModel>
-            receiveTable) {
+    public static void addReceiveTable(String tableName, Class<? extends ReceiveModel> receiveTable) {
         mReceiveTables.put(tableName, receiveTable);
     }
 
@@ -58,6 +58,15 @@ public class ActiveRecordCloudSync {
         return mEndPoint;
     }
 
+    static String getProjectsEndPoint() {
+        String domainName = AppUtil.getAdminSettingsInstance().getApiDomainName();
+        if (TextUtils.isEmpty(domainName)) return null;
+        char lastChar = domainName.charAt(domainName.length() - 1);
+        if (lastChar != '/') domainName = domainName + "/";
+
+        return domainName + "api/" + AppUtil.getAdminSettingsInstance().getApiVersion() + "/projects/";
+    }
+
     public static void syncReceiveTables(Context context) {
         NetworkNotificationUtils.showNotification(context, android.R.drawable.stat_sys_download,
                 R.string.sync_notification_text);
@@ -69,28 +78,24 @@ public class ActiveRecordCloudSync {
             HttpFetchr httpFetchr = new HttpFetchr(entry.getKey(), entry.getValue());
             httpFetchr.fetch();
         }
-        NetworkNotificationUtils.showNotification(context, android.R.drawable
-                .stat_sys_download_done, R.string.sync_notification_complete_text);
+        NetworkNotificationUtils.showNotification(context, android.R.drawable.stat_sys_download_done, R.string.sync_notification_complete_text);
     }
 
     public static void syncSendTables(Context context) {
-        NetworkNotificationUtils.showNotification(context, android.R.drawable.stat_sys_download,
-                R.string.sync_notification_text);
+        NetworkNotificationUtils.showNotification(context, android.R.drawable.stat_sys_download, R.string.sync_notification_text);
         for (Map.Entry<String, Class<? extends SendModel>> entry : mSendTables.entrySet()) {
             if (AppUtil.DEBUG)
                 Log.i(TAG, "Syncing " + entry.getValue() + " to remote table " + entry.getKey());
             HttpPushr httpPushr = new HttpPushr(entry.getKey(), entry.getValue(), context);
             httpPushr.push();
         }
-        NetworkNotificationUtils.showNotification(context, android.R.drawable
-                .stat_sys_download_done, R.string.sync_notification_complete_text);
+        NetworkNotificationUtils.showNotification(context, android.R.drawable.stat_sys_download_done, R.string.sync_notification_complete_text);
     }
 
     public static boolean isApiAvailable() {
-        if (getPingAddress() == null) return true;
+        if (getPingAddress() == null) return false;
         int responseCode = ping(getPingAddress(), 10000);
-        if (responseCode == 426) return true; // Api is available but an app upgrade is required
-        return (200 <= responseCode && responseCode < 300);
+        return responseCode == 426 || (200 <= responseCode && responseCode < 300);
     }
 
     /*
@@ -149,10 +154,7 @@ public class ActiveRecordCloudSync {
     }
 
     private static String getPingAddress() {
-        if (!getReceiveTables().keySet().isEmpty()) {
-            return getEndPoint() + getReceiveTables().keySet().iterator().next();
-        }
-        return getEndPoint();
+        return getProjectsEndPoint();
     }
 
     private static int ping(String url, int timeout) {

@@ -42,7 +42,6 @@ import com.activeandroid.query.Delete;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.activerecordcloudsync.NetworkNotificationUtils;
-import org.adaptlab.chpir.android.survey.models.AdminSettings;
 import org.adaptlab.chpir.android.survey.models.Image;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.Response;
@@ -67,6 +66,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+
+import static org.adaptlab.chpir.android.survey.AppUtil.getProjectId;
 
 public class InstrumentFragment extends ListFragment {
     public final static String TAG = "InstrumentFragment";
@@ -176,8 +177,9 @@ public class InstrumentFragment extends ListFragment {
 
             private void deleteHelper(List<Survey> surveys) {
                 for (Survey survey : surveys) {
-                    new Delete().from(Response.class).where("SurveyUUID = ?",
-                            survey.getUUID()).execute();
+                    if (survey.getUUID() != null) {
+                        new Delete().from(Response.class).where("SurveyUUID = ?", survey.getUUID()).execute();
+                    }
                     survey.delete();
                 }
             }
@@ -350,13 +352,6 @@ public class InstrumentFragment extends ListFragment {
                 mScoreAdapter.swapCursor(null);
             }
         };
-    }
-
-    private Long getProjectId() {
-        AdminSettings adminSettings = AppUtil.getAdminSettingsInstance();
-        if (adminSettings.getProjectId() != null)
-            return Long.parseLong(adminSettings.getProjectId());
-        return Long.MAX_VALUE;
     }
 
     @Override
@@ -788,6 +783,7 @@ public class InstrumentFragment extends ListFragment {
             if (code == -1 && mProgressDialog != null && mProgressDialog.isShowing()) {
                 mProgressDialog.dismiss();
             }
+            ((SingleFragmentActivity) getActivity()).displayProjectName();
         }
     }
 
@@ -806,8 +802,7 @@ public class InstrumentFragment extends ListFragment {
                     setInstrumentsListViewAdapter();
                 }
             }
-            AppUtil.getAdminSettingsInstance().setLastSyncTime(ActiveRecordCloudSync
-                    .getLastSyncTime());
+            AppUtil.getAdminSettingsInstance().setLastSyncTime(ActiveRecordCloudSync.getLastSyncTime());
             AppUtil.orderInstrumentsSections();
             if (mProgressDialog != null && mProgressDialog.isShowing()) {
                 mProgressDialog.dismiss();
@@ -927,8 +922,7 @@ public class InstrumentFragment extends ListFragment {
             if (progressDialog != null && progressDialog.isShowing()) progressDialog.dismiss();
             if (isAdded()) {
                 if (instrument == null) {
-                    Toast.makeText(getActivity(), R.string.instrument_not_loaded, Toast
-                            .LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), R.string.instrument_not_loaded, Toast.LENGTH_LONG).show();
                 } else {
                     new RuleBuilder(getActivity())
                             .addRule(new InstrumentLaunchRule(instrument,
@@ -942,8 +936,7 @@ public class InstrumentFragment extends ListFragment {
                                     startActivity(i);
                                 }
 
-                                public void onRulesFail() {
-                                }
+                                public void onRulesFail() {}
                             })
                             .checkRules();
                 }
