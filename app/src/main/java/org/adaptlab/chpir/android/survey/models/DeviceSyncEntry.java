@@ -39,8 +39,7 @@ public class DeviceSyncEntry extends SendModel {
             jsonObject.put("instrument_versions", instrumentVersions().toString());
             jsonObject.put("device_uuid", AdminSettings.getInstance().getDeviceIdentifier());
             jsonObject.put("api_key", AdminSettings.getInstance().getApiKey());
-            jsonObject.put("timezone", TimeZone.getDefault().getDisplayName() + " " +
-                    TimeZone.getDefault().getID());
+            jsonObject.put("timezone", TimeZone.getDefault().getDisplayName() + " " + TimeZone.getDefault().getID());
             jsonObject.put("project_id", AdminSettings.getInstance().getProjectId());
             jsonObject.put("device_label", AdminSettings.getInstance().getDeviceLabel());
             jsonObject.put("os_build_number", AppUtil.getOsBuildNumber());

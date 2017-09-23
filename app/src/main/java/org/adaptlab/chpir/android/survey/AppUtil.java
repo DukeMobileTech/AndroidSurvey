@@ -72,8 +72,7 @@ public class AppUtil {
      */
     public static int getVersionCode(Context context) {
         try {
-            PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName
-                    (), 0);
+            PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
             return pInfo.versionCode;
         } catch (NameNotFoundException nnfe) {
             Log.e(TAG, "Error finding version code: " + nnfe);
@@ -83,8 +82,7 @@ public class AppUtil {
 
     public static String getVersionName(Context context) {
         try {
-            PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName
-                    (), 0);
+            PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
             return pInfo.versionName;
         } catch (NameNotFoundException nnfe) {
             Log.e(TAG, "Error finding version code: " + nnfe);
@@ -109,8 +107,7 @@ public class AppUtil {
         if (PRODUCTION) {
             Fabric.with(context, new Crashlytics());
             Crashlytics.setUserIdentifier(adminSettingsInstance.getDeviceIdentifier());
-            Crashlytics.setString(mContext.getString(R.string.crashlytics_device_label),
-                    adminSettingsInstance.getDeviceLabel());
+            Crashlytics.setString(mContext.getString(R.string.crashlytics_device_label), adminSettingsInstance.getDeviceLabel());
         }
 
         DatabaseSeed.seed(context);
@@ -182,10 +179,8 @@ public class AppUtil {
      * Current security checks: require encryption
      */
     public static final boolean runDeviceSecurityChecks(Context context) {
-        DevicePolicyManager devicePolicyManager = (DevicePolicyManager) context
-                .getSystemService(Context.DEVICE_POLICY_SERVICE);
-        if (devicePolicyManager.getStorageEncryptionStatus() != DevicePolicyManager
-                .ENCRYPTION_STATUS_ACTIVE) {
+        DevicePolicyManager devicePolicyManager = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        if (devicePolicyManager.getStorageEncryptionStatus() != DevicePolicyManager.ENCRYPTION_STATUS_ACTIVE) {
             new AlertDialog.Builder(context)
                     .setTitle(R.string.encryption_required_title)
                     .setMessage(R.string.encryption_required_text)

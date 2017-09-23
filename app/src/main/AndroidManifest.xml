@@ -112,6 +112,10 @@
         <meta-data
             android:name="SEED_DB"
             android:value="false"/>
+
+        <meta-data
+            android:name="AA_MODELS"
+            android:value="org.adaptlab.chpir.android.survey.models.AdminSettings, org.adaptlab.chpir.android.survey.models.DeviceSyncEntry, org.adaptlab.chpir.android.survey.models.Project, org.adaptlab.chpir.android.survey.models.Instrument, org.adaptlab.chpir.android.survey.models.Section, org.adaptlab.chpir.android.survey.models.Grid, org.adaptlab.chpir.android.survey.models.Question, org.adaptlab.chpir.android.survey.models.Option, org.adaptlab.chpir.android.survey.models.RandomizedFactor, org.adaptlab.chpir.android.survey.models.RandomizedOption, org.adaptlab.chpir.android.survey.models.QuestionRandomizedFactor, org.adaptlab.chpir.android.survey.models.GridLabel, org.adaptlab.chpir.android.survey.models.Image, org.adaptlab.chpir.android.survey.models.DeviceUser, org.adaptlab.chpir.android.survey.models.Skip, org.adaptlab.chpir.android.survey.models.Rule, org.adaptlab.chpir.android.survey.models.ScoreScheme, org.adaptlab.chpir.android.survey.models.ScoreUnit, org.adaptlab.chpir.android.survey.models.OptionScore, org.adaptlab.chpir.android.survey.models.ScoreUnitQuestion, org.adaptlab.chpir.android.survey.models.Survey, org.adaptlab.chpir.android.survey.models.Response, org.adaptlab.chpir.android.survey.models.ResponsePhoto, org.adaptlab.chpir.android.survey.models.Roster, org.adaptlab.chpir.android.survey.models.Score, org.adaptlab.chpir.android.survey.models.RawScore" />
     </application>
 
 </manifest>

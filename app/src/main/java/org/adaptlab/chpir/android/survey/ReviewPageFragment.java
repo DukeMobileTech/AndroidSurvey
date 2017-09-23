@@ -64,7 +64,11 @@ public class ReviewPageFragment extends ListFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_item_back:
-            setReturnResults(mSkippedQuestions.get(0).getNumberInInstrument() - 1);
+			if (mSkippedQuestions.size() == 0) {
+				setReturnResults(0);
+			} else {
+				setReturnResults(mSkippedQuestions.get(0).getNumberInInstrument() - 1);
+			}
             return true;
 		case R.id.menu_item_complete:
 			setReturnResults(Integer.MIN_VALUE);

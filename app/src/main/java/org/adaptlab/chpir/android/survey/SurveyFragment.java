@@ -1120,9 +1120,7 @@ public class SurveyFragment extends Fragment {
 
         @Override
         protected void onPreExecute() {
-            mProgressDialog = ProgressDialog.show(getActivity(),
-                    getString(R.string.instrument_loading_progress_header),
-                    getString(R.string.background_process_progress_message)
+            mProgressDialog = ProgressDialog.show(getActivity(), getString(R.string.instrument_loading_progress_header), getString(R.string.background_process_progress_message)
             );
         }
 
