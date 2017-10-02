@@ -140,8 +140,7 @@ public class Instrument extends ReceiveModel {
 
     public InstrumentTranslation activeTranslation() {
         return new Select().from(InstrumentTranslation.class)
-                .where("InstrumentRemoteId = ? AND Language = ? AND Active = ?",
-                        mRemoteId, getDeviceLanguage(), 1).executeSingle();
+                .where("InstrumentRemoteId = ? AND Language = ? AND Active = ?", mRemoteId, getDeviceLanguage(), 1).executeSingle();
     }
 
     public void setTitle(String title) {

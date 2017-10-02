@@ -405,8 +405,7 @@ public class Question extends ReceiveModel {
             question.setIdentifiesSurvey(jsonObject.getBoolean("identifies_survey"));
             question.setInstructions(jsonObject.getString("instructions"));
             question.setQuestionVersion(jsonObject.getInt("question_version"));
-            question.setFollowingUpQuestion(Question.findByQuestionIdentifier(
-                    jsonObject.getString("following_up_question_identifier")));
+            question.setFollowingUpQuestion(Question.findByQuestionIdentifier(jsonObject.getString("following_up_question_identifier")));
             if (!jsonObject.isNull("grid_id")) {
                 question.setGrid(Grid.findByRemoteId(jsonObject.getLong("grid_id")));
             }
@@ -417,7 +416,9 @@ public class Question extends ReceiveModel {
                 question.setSection(Section.findByRemoteId(jsonObject.getLong("section_id")));
             }
             question.setRemoteId(remoteId);
-            if (!jsonObject.isNull("deleted_at")) {
+            if (jsonObject.isNull("deleted_at")) {
+                question.setDeleted(false);
+            } else {
                 question.setDeleted(true);
             }
             if (!jsonObject.isNull("critical")) {

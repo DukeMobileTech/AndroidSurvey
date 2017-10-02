@@ -582,22 +582,17 @@ public class InstrumentFragment extends ListFragment {
 
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
-            TextView titleTextView = (TextView) view.findViewById(R.id
-                    .instrument_list_item_titleTextView);
-            TextView questionCountTextView = (TextView) view.findViewById(R.id
-                    .instrument_list_item_questionCountTextView);
-            TextView instrumentVersionTextView = (TextView) view.findViewById(R.id
-                    .instrument_list_item_instrumentVersionTextView);
+            TextView titleTextView = (TextView) view.findViewById(R.id.instrument_list_item_titleTextView);
+            TextView questionCountTextView = (TextView) view.findViewById(R.id.instrument_list_item_questionCountTextView);
+            TextView instrumentVersionTextView = (TextView) view.findViewById(R.id.instrument_list_item_instrumentVersionTextView);
 
             Long remoteId = cursor.getLong(cursor.getColumnIndexOrThrow("RemoteId"));
             Instrument instrument = Instrument.findByRemoteId(remoteId);
             int numQuestions = instrument.questions().size();
 
             titleTextView.setText(instrument.getTitle());
-            titleTextView.setTypeface(instrument.getTypeFace(
-                    getActivity().getApplicationContext()));
-            questionCountTextView.setText(numQuestions + " " + FormatUtils.pluralize
-                    (numQuestions, getString(R.string.question), getString(R.string.questions)));
+            titleTextView.setTypeface(instrument.getTypeFace(getActivity().getApplicationContext()));
+            questionCountTextView.setText(numQuestions + " " + FormatUtils.pluralize(numQuestions, getString(R.string.question), getString(R.string.questions)));
             instrumentVersionTextView.setText(getString(R.string.version) + ": " + instrument.getVersionNumber());
 
             new SetInstrumentLabelTask().execute(new InstrumentListLabel(instrument, titleTextView));
@@ -639,23 +634,17 @@ public class InstrumentFragment extends ListFragment {
                 view.setBackgroundColor(ContextCompat.getColor(context, R.color.transparent));
             }
 
-            TextView titleTextView = (TextView) view.findViewById(R.id
-                    .survey_list_item_titleTextView);
-            TextView progressTextView = (TextView) view.findViewById(R.id
-                    .survey_list_item_progressTextView);
-            TextView instrumentTitleTextView = (TextView) view.findViewById(R.id
-                    .survey_list_item_instrumentTextView);
-            TextView lastUpdatedTextView = (TextView) view.findViewById(R.id
-                    .survey_list_item_lastUpdatedTextView);
+            TextView titleTextView = (TextView) view.findViewById(R.id.survey_list_item_titleTextView);
+            TextView progressTextView = (TextView) view.findViewById(R.id.survey_list_item_progressTextView);
+            TextView instrumentTitleTextView = (TextView) view.findViewById(R.id.survey_list_item_instrumentTextView);
+            TextView lastUpdatedTextView = (TextView) view.findViewById(R.id.survey_list_item_lastUpdatedTextView);
 
             String surveyUUID = cursor.getString(cursor.getColumnIndexOrThrow("UUID"));
             Survey survey = Survey.findByUUID(surveyUUID);
 
             titleTextView.setText(survey.identifier(getActivity()));
-            titleTextView.setTypeface(survey.getInstrument().getTypeFace(getActivity()
-                    .getApplicationContext()));
-            progressTextView.setText(survey.responses().size() + " " + getString(R.string.of)
-                    + "" + " " + survey.getInstrument().questions().size());
+            titleTextView.setTypeface(survey.getInstrument().getTypeFace(getActivity().getApplicationContext()));
+            progressTextView.setText(survey.responses().size() + " " + getString(R.string.of) + "" + " " + survey.getInstrument().questions().size());
             instrumentTitleTextView.setText(survey.getInstrument().getTitle());
             DateFormat df = DateFormat.getDateTimeInstance();
             lastUpdatedTextView.setText(df.format(survey.getLastUpdated()));
