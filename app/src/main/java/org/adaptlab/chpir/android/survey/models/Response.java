@@ -245,7 +245,7 @@ public class Response extends SendModel {
 
     @Override
     public boolean belongsToRoster() {
-        return getSurvey().belongsToRoster();
+        return (getSurvey() != null) && getSurvey().belongsToRoster();
     }
 
     public void setRandomizedData(String data) {

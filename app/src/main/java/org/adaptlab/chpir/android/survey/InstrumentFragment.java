@@ -1,6 +1,7 @@
 package org.adaptlab.chpir.android.survey;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -10,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
@@ -763,6 +765,7 @@ public class InstrumentFragment extends ListFragment {
             }
         }
 
+        @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
         @Override
         protected void onPostExecute(Integer code) {
             if (isAdded()) {
@@ -772,7 +775,10 @@ public class InstrumentFragment extends ListFragment {
             if (code == -1 && mProgressDialog != null && mProgressDialog.isShowing()) {
                 mProgressDialog.dismiss();
             }
-            ((SingleFragmentActivity) getActivity()).displayProjectName();
+            SingleFragmentActivity activity = (SingleFragmentActivity) getActivity();
+            if (activity != null && !activity.isDestroyed()) {
+                activity.displayProjectName();
+            }
         }
     }
 
@@ -793,7 +799,7 @@ public class InstrumentFragment extends ListFragment {
             }
             AppUtil.getAdminSettingsInstance().setLastSyncTime(ActiveRecordCloudSync.getLastSyncTime());
             AppUtil.orderInstrumentsSections();
-            if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            if (isAdded() && !getActivity().isFinishing() && mProgressDialog != null && mProgressDialog.isShowing()) {
                 mProgressDialog.dismiss();
             }
         }
