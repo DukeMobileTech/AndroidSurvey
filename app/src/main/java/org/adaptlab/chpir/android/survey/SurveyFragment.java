@@ -216,14 +216,20 @@ public class SurveyFragment extends Fragment {
                 if (AppUtil.getAdminSettingsInstance() != null && AppUtil.getAdminSettingsInstance().getRequirePassword() && !AuthUtils.isSignedIn()) {
                     Intent i = new Intent(getContext(), LoginActivity.class);
                     getActivity().startActivityForResult(i, AUTHORIZE_CODE);
+                } else {
+                    updateUI();
                 }
             } else {
-                setParticipantLabel();
-                updateQuestionCountLabel();
-                updateQuestionText();
-                createQuestionFragment();
+                updateUI();
             }
         }
+    }
+
+    private void updateUI() {
+        setParticipantLabel();
+        updateQuestionCountLabel();
+        updateQuestionText();
+        createQuestionFragment();
     }
 
     @Override

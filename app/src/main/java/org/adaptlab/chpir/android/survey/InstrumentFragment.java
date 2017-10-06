@@ -2,6 +2,7 @@ package org.adaptlab.chpir.android.survey;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -630,29 +631,33 @@ public class InstrumentFragment extends ListFragment {
 
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
-            if (mSelectionViews != null && isPositionChecked(cursor.getPosition())) {
-                view.setBackgroundColor(ContextCompat.getColor(context, R.color.item_selected));
-            } else {
-                view.setBackgroundColor(ContextCompat.getColor(context, R.color.transparent));
+            Activity activity = (Activity) view.getContext();
+            if (activity != null) {
+                if (mSelectionViews != null && isPositionChecked(cursor.getPosition())) {
+                    view.setBackgroundColor(ContextCompat.getColor(context, R.color.item_selected));
+                } else {
+                    view.setBackgroundColor(ContextCompat.getColor(context, R.color.transparent));
+                }
+
+                TextView titleTextView = (TextView) view.findViewById(R.id.survey_list_item_titleTextView);
+
+                TextView progressTextView = (TextView) view.findViewById(R.id.survey_list_item_progressTextView);
+                TextView instrumentTitleTextView = (TextView) view.findViewById(R.id.survey_list_item_instrumentTextView);
+                TextView lastUpdatedTextView = (TextView) view.findViewById(R.id.survey_list_item_lastUpdatedTextView);
+
+                String surveyUUID = cursor.getString(cursor.getColumnIndexOrThrow("UUID"));
+                Survey survey = Survey.findByUUID(surveyUUID);
+
+                titleTextView.setText(survey.identifier(activity));
+                titleTextView.setTypeface(survey.getInstrument().getTypeFace(activity.getApplicationContext()));
+                progressTextView.setText(survey.responses().size() + " " + getString(R.string.of) + "" + " " + survey.getInstrument().questions().size());
+                instrumentTitleTextView.setText(survey.getInstrument().getTitle());
+                DateFormat df = DateFormat.getDateTimeInstance();
+                lastUpdatedTextView.setText(df.format(survey.getLastUpdated()));
+
+                if (survey.readyToSend()) progressTextView.setTextColor(Color.GREEN);
+                else progressTextView.setTextColor(Color.RED);
             }
-
-            TextView titleTextView = (TextView) view.findViewById(R.id.survey_list_item_titleTextView);
-            TextView progressTextView = (TextView) view.findViewById(R.id.survey_list_item_progressTextView);
-            TextView instrumentTitleTextView = (TextView) view.findViewById(R.id.survey_list_item_instrumentTextView);
-            TextView lastUpdatedTextView = (TextView) view.findViewById(R.id.survey_list_item_lastUpdatedTextView);
-
-            String surveyUUID = cursor.getString(cursor.getColumnIndexOrThrow("UUID"));
-            Survey survey = Survey.findByUUID(surveyUUID);
-
-            titleTextView.setText(survey.identifier(getActivity()));
-            titleTextView.setTypeface(survey.getInstrument().getTypeFace(getActivity().getApplicationContext()));
-            progressTextView.setText(survey.responses().size() + " " + getString(R.string.of) + "" + " " + survey.getInstrument().questions().size());
-            instrumentTitleTextView.setText(survey.getInstrument().getTitle());
-            DateFormat df = DateFormat.getDateTimeInstance();
-            lastUpdatedTextView.setText(df.format(survey.getLastUpdated()));
-
-            if (survey.readyToSend()) progressTextView.setTextColor(Color.GREEN);
-            else progressTextView.setTextColor(Color.RED);
         }
     }
 
