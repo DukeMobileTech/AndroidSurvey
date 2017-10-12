@@ -157,7 +157,7 @@ public class AppUtil {
     }
 
     private static void setAdminSettingsInstance() {
-        if (getContext().getResources().getBoolean(R.bool.default_admin_settings)) {
+        if (getContext() != null && getContext().getResources() != null && getContext().getResources().getBoolean(R.bool.default_admin_settings)) {
             adminSettingsInstance = DefaultAdminSettings.getInstance();
         } else {
             adminSettingsInstance = AdminSettings.getInstance();
@@ -209,7 +209,9 @@ public class AppUtil {
     }
 
     public static Context getContext() {
-        if (mContext == null) mContext = new SurveyApp().getContext();
+        if (mContext == null) {
+            mContext = SurveyApp.getInstance().getApplicationContext();
+        }
         return mContext;
     }
 

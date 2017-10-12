@@ -207,7 +207,7 @@ public class Response extends SendModel {
         if (getResponsePhoto() == null) {
             this.delete();
         }
-        getSurvey().deleteIfComplete();
+        if (getSurvey() != null) getSurvey().deleteIfComplete();
     }
 
     /*

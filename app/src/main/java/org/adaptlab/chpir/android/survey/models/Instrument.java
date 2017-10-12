@@ -87,8 +87,7 @@ public class Instrument extends ReceiveModel {
                 .from(Instrument.class)
                 .where("ProjectID = ? AND Published = ? AND Deleted = ?", projectId, true, false)
                 .orderBy("Title");
-        return Cache.openDatabase().rawQuery(instrumentsQuery.toSql(), instrumentsQuery
-                .getArguments());
+        return Cache.openDatabase().rawQuery(instrumentsQuery.toSql(), instrumentsQuery.getArguments());
     }
 
     public static List<Instrument> loadedInstruments() {

@@ -1,16 +1,19 @@
 package org.adaptlab.chpir.android.survey;
 
-import android.content.Context;
-
 public class SurveyApp extends com.activeandroid.app.Application {
+    private static SurveyApp mInstance;
+
+    public static SurveyApp getInstance() {
+        if (mInstance == null) {
+            mInstance = new SurveyApp();
+        }
+        return mInstance;
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
-    }
-
-    public Context getContext() {
-        return this;
+        mInstance = this;
     }
 
 }

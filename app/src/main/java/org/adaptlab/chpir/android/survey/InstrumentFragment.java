@@ -465,32 +465,28 @@ public class InstrumentFragment extends ListFragment {
 
     private void setSurveysListViewAdapter() {
         if (getProjectId() != Long.MAX_VALUE) {
-            Cursor surveysCursor = Survey.getProjectSurveysCursor(getProjectId());
-            mSurveyAdapter = new SurveyAdapter(getActivity(), surveysCursor, 0);
+            mSurveyAdapter = new SurveyAdapter(getActivity(), null, 0);
             setListAdapter(mSurveyAdapter);
             getActivity().getSupportLoaderManager().restartLoader(0, null, mSurveyCallbacks);
         }
     }
 
     private void setRostersListViewAdapter() {
-        Cursor rostersCursor = Roster.getCursor();
-        mRosterAdapter = new RosterAdapter(getActivity(), rostersCursor, 0);
+        mRosterAdapter = new RosterAdapter(getActivity(), null, 0);
         setListAdapter(mRosterAdapter);
         getActivity().getSupportLoaderManager().restartLoader(0, null, mRosterCallbacks);
     }
 
     private void setInstrumentsListViewAdapter() {
         if (getProjectId() != Long.MAX_VALUE) {
-            Cursor instrumentsCursor = Instrument.getProjectInstrumentsCursor(getProjectId());
-            mInstrumentAdapter = new InstrumentAdapter(getActivity(), instrumentsCursor, 0);
+            mInstrumentAdapter = new InstrumentAdapter(getActivity(), null, 0);
             setListAdapter(mInstrumentAdapter);
             getActivity().getSupportLoaderManager().restartLoader(0, null, mInstrumentCallbacks);
         }
     }
 
     private void setScoresListViewAdapter() {
-        Cursor scoresCursor = Score.getCursor();
-        mScoreAdapter = new ScoreAdapter(getActivity(), scoresCursor, 0);
+        mScoreAdapter = new ScoreAdapter(getActivity(), null, 0);
         setListAdapter(mScoreAdapter);
         getActivity().getSupportLoaderManager().restartLoader(0, null, mScoreCallbacks);
     }
