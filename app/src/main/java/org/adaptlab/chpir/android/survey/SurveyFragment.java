@@ -254,14 +254,12 @@ public class SurveyFragment extends Fragment {
             int questionNum = data.getExtras().getInt(EXTRA_QUESTION_NUMBER);
             Long instrumentId = data.getExtras().getLong(EXTRA_INSTRUMENT_ID);
             Long surveyId = data.getExtras().getLong(EXTRA_SURVEY_ID);
-            ArrayList<Integer> previousQuestions = data.getExtras().getIntegerArrayList
-                    (EXTRA_PREVIOUS_QUESTION_IDS);
+            ArrayList<Integer> previousQuestions = data.getExtras().getIntegerArrayList(EXTRA_PREVIOUS_QUESTION_IDS);
             mQuestion = mQuestions.get(questionNum);
             mQuestionNumber = questionNum;
             mInstrument = Instrument.findByRemoteId(instrumentId);
             mSurvey = Model.load(Survey.class, surveyId);
-            if (mQuestion.getSection() != null && mQuestion.getSection() == mSection)
-                showSectionView = false;
+            if (mQuestion.getSection() != null && mQuestion.getSection() == mSection) showSectionView = false;
             if (previousQuestions != null) mPreviousQuestions.addAll(previousQuestions);
             if (previousQuestion == mQuestion) showSectionView = false;
         }
@@ -302,10 +300,8 @@ public class SurveyFragment extends Fragment {
                 loadOrCreateSurvey();
             }
         }
-        if (AppUtil.PRODUCTION) {
-            Fabric.with(getActivity(), new Crashlytics());
-            Crashlytics.setString(getString(R.string.last_instrument), mInstrument.getTitle());
-        }
+
+        registerCrashlytics();
 
         if (!mInstrument.isRoster()) {
             mQuestionCount = mInstrument.getQuestionCount();
@@ -318,6 +314,15 @@ public class SurveyFragment extends Fragment {
             if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 startLocationServices();
             }
+        }
+    }
+
+    private void registerCrashlytics() {
+        if (AppUtil.PRODUCTION) {
+            Fabric.with(getActivity(), new Crashlytics());
+            Crashlytics.setString(getString(R.string.last_instrument), mInstrument.getTitle());
+            Crashlytics.setString(getString(R.string.last_survey), mSurvey.getUUID());
+            Crashlytics.setString(getString(R.string.last_question), mQuestion.getNumberInInstrument() + "");
         }
     }
 

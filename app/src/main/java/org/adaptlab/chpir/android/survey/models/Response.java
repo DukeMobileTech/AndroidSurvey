@@ -96,8 +96,7 @@ public class Response extends SendModel {
 
         try {
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("survey_uuid", (getSurvey() == null) ? getSurveyUUID() : getSurvey()
-                    .getUUID());
+            jsonObject.put("survey_uuid", (getSurvey() == null) ? getSurveyUUID() : getSurvey().getUUID());
             jsonObject.put("question_id", getQuestion().getRemoteId());
             jsonObject.put("text", getText());
             jsonObject.put("other_response", getOtherResponse());
@@ -155,6 +154,7 @@ public class Response extends SendModel {
     }
 
     public Survey getSurvey() {
+        if (getSurveyUUID() == null) return null;
         return Survey.findByUUID(getSurveyUUID());
     }
 
