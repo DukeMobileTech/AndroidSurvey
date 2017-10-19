@@ -1,57 +1,66 @@
-package org.adaptlab.chpir.android.survey.questionfragments;
 
-import android.graphics.Typeface;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+        package org.adaptlab.chpir.android.survey.questionfragments;
 
-import org.adaptlab.chpir.android.survey.GridFragment;
-import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.models.GridLabel;
-import org.adaptlab.chpir.android.survey.models.Question;
-import org.adaptlab.chpir.android.survey.models.Response;
-import org.adaptlab.chpir.android.survey.models.Survey;
-import org.adaptlab.chpir.android.survey.views.OHScrollView;
+        import android.app.Activity;
+        import android.content.Context;
+        import android.graphics.Point;
+        import android.graphics.Typeface;
+        import android.os.AsyncTask;
+        import android.os.Bundle;
+        import android.util.DisplayMetrics;
+        import android.util.Log;
+        import android.view.Display;
+        import android.view.Gravity;
+        import android.view.LayoutInflater;
+        import android.view.View;
+        import android.view.ViewGroup;
+        import android.view.WindowManager;
+        import android.widget.CheckBox;
+        import android.widget.CompoundButton;
+        import android.widget.LinearLayout;
+        import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+        import org.adaptlab.chpir.android.survey.GridFragment;
+        import org.adaptlab.chpir.android.survey.R;
+        import org.adaptlab.chpir.android.survey.models.GridLabel;
+        import org.adaptlab.chpir.android.survey.models.Question;
+        import org.adaptlab.chpir.android.survey.models.Response;
+        import org.adaptlab.chpir.android.survey.models.Survey;
+        import org.adaptlab.chpir.android.survey.views.OHScrollView;
+
+        import java.util.ArrayList;
+        import java.util.Arrays;
+        import java.util.HashSet;
+        import java.util.List;
+        import java.util.Set;
 
 public class MultipleSelectGridFragment extends GridFragment {
 
     private static final String TAG = "MultipleSelectGridFragment";
     private List<List<CheckBox>> mCheckBoxes;
-	private boolean interceptScroll = true;
-	private OHScrollView headerScrollView;
-	private OHScrollView contentScrollView;
+    private boolean interceptScroll = true;
+    private LinearLayout headerScrollView;
+    private LinearLayout contentScrollView;
     private Integer[] rowHeights;
     private Integer[] rowWidths;
+    private Integer[] labelWidths;
     private int mIndex;
 
     @Override
     public void onScrollChanged(OHScrollView scrollView, int x, int y, int oldX, int oldY) {
-        if (interceptScroll) {
-            interceptScroll = false;
-            if (scrollView == headerScrollView) {
-                contentScrollView.onOverScrolled(x, y, true, true);
-            } else if (scrollView == contentScrollView) {
-                headerScrollView.onOverScrolled(x, y, true, true);
-            }
-            interceptScroll = true;
-        }
+//        if (interceptScroll) {
+//            interceptScroll = false;
+//            if (scrollView == headerScrollView) {
+//                contentScrollView.onOverScrolled(x, y, true, true);
+//            } else if (scrollView == contentScrollView) {
+//                headerScrollView.onOverScrolled(x, y, true, true);
+//            }
+//            interceptScroll = true;
+//        }
     }
-    
-	@Override
-	protected void deserialize(String responseText) {
+
+    @Override
+    protected void deserialize(String responseText) {
         List<CheckBox> checkBoxes = mCheckBoxes.get(mIndex);
         if (responseText.equals("")) {
             for (CheckBox box : checkBoxes) {
@@ -59,55 +68,58 @@ public class MultipleSelectGridFragment extends GridFragment {
                     box.setChecked(false);
                 }
             }
-		} else {
-	        String[] listOfIndices = responseText.split(LIST_DELIMITER);
-	        for (String index : listOfIndices) {
-	            if (!index.equals("")) {
-	                Integer indexInteger = Integer.parseInt(index);
-	                checkBoxes.get(indexInteger).setChecked(true);
-	            }
-	        }
-		}
-	}
+        } else {
+            String[] listOfIndices = responseText.split(LIST_DELIMITER);
+            for (String index : listOfIndices) {
+                if (!index.equals("")) {
+                    Integer indexInteger = Integer.parseInt(index);
+                    checkBoxes.get(indexInteger).setChecked(true);
+                }
+            }
+        }
+    }
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_table_question, parent, false);
 
-		headerScrollView = (OHScrollView) v.findViewById(R.id.table_options_header_view);
-		contentScrollView = (OHScrollView) v.findViewById(R.id.table_body_options_view);
-		headerScrollView.setScrollViewListener(this);
-		contentScrollView.setScrollViewListener(this);
+        headerScrollView = (LinearLayout) v.findViewById(R.id.table_options_header_view);
+        contentScrollView = (LinearLayout) v.findViewById(R.id.table_body_options_view);
+//        headerScrollView.setScrollViewListener(this);
+//        contentScrollView.setScrollViewListener(this);
 
-		setTableHeaderOptions(v);
-		setTableBodyContent(v);
-		return v;
-	}
+        setTableHeaderOptions(v);
+        setTableBodyContent(v);
+        return v;
+    }
 
-	private void setTableHeaderOptions(View v) {
-		TextView questionTextHeader = (TextView) v.findViewById(R.id.table_header_question_text);
-		questionTextHeader.setMinHeight(MIN_HEIGHT);
-		final LinearLayout headerTableLayout = (LinearLayout) v.findViewById(R.id.table_options_header);
-		final List<GridLabel> gridLabels = getGrid().labels();
+    private void setTableHeaderOptions(View v) {
+        TextView questionTextHeader = (TextView) v.findViewById(R.id.table_header_question_text);
+        questionTextHeader.setMinHeight(MIN_HEIGHT);
+        final LinearLayout headerTableLayout = (LinearLayout) v.findViewById(R.id.table_options_header);
+        final List<GridLabel> gridLabels = getGrid().labels();
         rowWidths = new Integer[gridLabels.size()];
+        labelWidths = new Integer[gridLabels.size()];
         final List<TextView> headers = new ArrayList<>();
-		for (int k = 0; k < gridLabels.size(); k++) {
+        for (int k = 0; k < gridLabels.size(); k++) {
             TextView textView = getHeaderTextView(gridLabels.get(k).getLabelText());
-			headerTableLayout.addView(textView);
-			setRowWidth(textView, k);
+            headerTableLayout.addView(textView);
+            setRowWidth(headerTableLayout,textView, k);
+            setLabelWidth(headerTableLayout,textView, k);
             headers.add(textView);
-		}
+        }
         headerTableLayout.post(new Runnable() {
             @Override
             public void run() {
                 int numOfHeaders = gridLabels.size();
                 int headerBorders = numOfHeaders * 2;
                 int paddingLeftRight = 20;
-                int width = (headerTableLayout.getWidth() - headerBorders) / numOfHeaders;
+                //int width = (headerTableLayout.getWidth() - headerBorders) / numOfHeaders;
+                int width = 0;
                 for (int k = 0; k < headers.size(); k++) {
                     TextView view = headers.get(k);
+                    view.setWidth(labelWidths[k]);
                     view.setMinimumWidth(width + paddingLeftRight);
-                    rowWidths[k] = width + paddingLeftRight;
                 }
                 for (List<CheckBox> checkBoxes : mCheckBoxes) {
                     for (int i = 0; i < checkBoxes.size(); i++) {
@@ -121,17 +133,28 @@ public class MultipleSelectGridFragment extends GridFragment {
                 }
             }
         });
-	}
+    }
 
-	private void setRowWidth(final TextView view, final int position) {
-		view.post(new Runnable() {
-			@Override
-			public void run() {
+    private void setRowWidth(final LinearLayout layout,final TextView view, final int position) {
+        view.post(new Runnable() {
+            @Override
+            public void run() {
                 LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
-                rowWidths[position] = view.getWidth() + params.leftMargin + params.rightMargin;
+                rowWidths[position] = layout.getWidth()/rowWidths.length+ params.leftMargin + params.rightMargin;
             }
-		});
-	}
+        });
+    }
+
+    private void setLabelWidth(final LinearLayout layout,final TextView view, final int position) {
+        view.post(new Runnable() {
+            @Override
+            public void run() {
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
+                labelWidths[position] = layout.getWidth()/labelWidths.length+ params.leftMargin + params.rightMargin;
+            }
+        });
+    }
+
 
     private void setTableBodyContent(View v) {
         LinearLayout questionTextLayout = (LinearLayout) v.findViewById(R.id.table_body_question_text);
@@ -218,8 +241,8 @@ public class MultipleSelectGridFragment extends GridFragment {
         });
     }
 
-	@Override
-	protected String serialize() { return null; }
+    @Override
+    protected String serialize() { return null; }
 
     protected void setResponseIndexes(Question q, int checkedId, boolean isChecked) {
         new SaveResponseTask(getSurvey(), q, checkedId, isChecked).execute();
@@ -272,5 +295,5 @@ public class MultipleSelectGridFragment extends GridFragment {
         }
 
     }
-	
+
 }
