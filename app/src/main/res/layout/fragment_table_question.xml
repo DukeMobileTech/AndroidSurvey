@@ -37,7 +37,7 @@
             <LinearLayout
                 android:id="@+id/table_options_header"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal"/>
 
         </LinearLayout>

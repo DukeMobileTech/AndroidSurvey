@@ -126,6 +126,7 @@ public class SingleSelectGridFragment extends GridFragment {
     private void setTableHeaderOptions(View v) {
         TextView questionTextHeader = (TextView) v.findViewById(R.id.table_header_question_text);
         questionTextHeader.setMinHeight(MIN_HEIGHT);
+        questionTextHeader.setPadding( 10,10,10,10);
         final LinearLayout headerTableLayout = (LinearLayout) v.findViewById(R.id.table_options_header);
         final List<GridLabel> gridLabels = getGrid().labels();
         final List<TextView> headerViews = new ArrayList<>();
@@ -147,6 +148,7 @@ public class SingleSelectGridFragment extends GridFragment {
                 for (int k = 0; k < headerViews.size(); k++) {
                     TextView view = headerViews.get(k);
                     view.setWidth(labelWidths[k]);
+                    view.setPadding( 5,0, 5,10);
                     view.setMinimumWidth(width + 20);
                 }
                 for (RadioGroup radioGroup : mRadioGroups) {
