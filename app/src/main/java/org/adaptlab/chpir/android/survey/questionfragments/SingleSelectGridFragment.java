@@ -2,6 +2,7 @@ package org.adaptlab.chpir.android.survey.questionfragments;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,10 +26,11 @@ public class SingleSelectGridFragment extends GridFragment {
     private int mIndex;
     private List<RadioGroup> mRadioGroups;
     private Integer[] rowHeights;
+    private Integer[] rowWidths;
+    private Integer[] labelWidths;
     private boolean interceptScroll = true;
-    private OHScrollView headerScrollView;
-    private OHScrollView contentScrollView;
-
+    private LinearLayout headerScrollView;
+    private LinearLayout contentScrollView;
     @Override
     protected void deserialize(String responseText) {
         if (responseText.equals("")) {
@@ -45,11 +47,8 @@ public class SingleSelectGridFragment extends GridFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_table_question, parent, false);
 
-        headerScrollView = (OHScrollView) v.findViewById(R.id.table_options_header_view);
-        contentScrollView = (OHScrollView) v.findViewById(R.id.table_body_options_view);
-        headerScrollView.setScrollViewListener(this);
-        contentScrollView.setScrollViewListener(this);
-
+        headerScrollView = (LinearLayout) v.findViewById(R.id.table_options_header_view);
+        contentScrollView = (LinearLayout) v.findViewById(R.id.table_body_options_view);
         setTableHeaderOptions(v);
         setTableBodyContent(v);
         return v;
@@ -130,21 +129,25 @@ public class SingleSelectGridFragment extends GridFragment {
         final LinearLayout headerTableLayout = (LinearLayout) v.findViewById(R.id.table_options_header);
         final List<GridLabel> gridLabels = getGrid().labels();
         final List<TextView> headerViews = new ArrayList<>();
-        final Integer[] rowWidths = new Integer[gridLabels.size()];
+        rowWidths = new Integer[gridLabels.size()];
+        labelWidths = new Integer[gridLabels.size()];
         for (int k = 0; k < gridLabels.size(); k++) {
             TextView textView = getHeaderTextView(gridLabels.get(k).getLabelText());
             headerTableLayout.addView(textView);
+            setRowWidth(headerTableLayout,textView, k);
+            setLabelWidth(headerTableLayout,textView, k);
             headerViews.add(textView);
         }
 
         headerTableLayout.post(new Runnable() {
             @Override
             public void run() {
-                int width = (headerTableLayout.getWidth()) / gridLabels.size();
+                //int width = (headerTableLayout.getWidth()) / gridLabels.size();
+                int width = 0;
                 for (int k = 0; k < headerViews.size(); k++) {
                     TextView view = headerViews.get(k);
+                    view.setWidth(labelWidths[k]);
                     view.setMinimumWidth(width + 20);
-                    rowWidths[k] = width + 20;
                 }
                 for (RadioGroup radioGroup : mRadioGroups) {
                     for (int i = 0; i < gridLabels.size(); i++) {
@@ -156,6 +159,26 @@ public class SingleSelectGridFragment extends GridFragment {
                         radioButton.setMinimumWidth(rowWidths[i]);
                     }
                 }
+            }
+        });
+    }
+
+    private void setRowWidth(final LinearLayout layout,final TextView view, final int position) {
+        view.post(new Runnable() {
+            @Override
+            public void run() {
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
+                rowWidths[position] = layout.getWidth()/rowWidths.length+ params.leftMargin + params.rightMargin;
+            }
+        });
+    }
+
+    private void setLabelWidth(final LinearLayout layout,final TextView view, final int position) {
+        view.post(new Runnable() {
+            @Override
+            public void run() {
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
+                labelWidths[position] = layout.getWidth()/labelWidths.length+ params.leftMargin + params.rightMargin;
             }
         });
     }
@@ -189,14 +212,5 @@ public class SingleSelectGridFragment extends GridFragment {
 
     @Override
     public void onScrollChanged(OHScrollView scrollView, int x, int y, int oldX, int oldY) {
-        if (interceptScroll) {
-            interceptScroll = false;
-            if (scrollView == headerScrollView) {
-                contentScrollView.onOverScrolled(x, y, true, true);
-            } else if (scrollView == contentScrollView) {
-                headerScrollView.onOverScrolled(x, y, true, true);
-            }
-            interceptScroll = true;
-        }
     }
 }

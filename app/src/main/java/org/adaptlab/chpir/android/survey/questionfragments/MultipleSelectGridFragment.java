@@ -48,15 +48,6 @@ public class MultipleSelectGridFragment extends GridFragment {
 
     @Override
     public void onScrollChanged(OHScrollView scrollView, int x, int y, int oldX, int oldY) {
-//        if (interceptScroll) {
-//            interceptScroll = false;
-//            if (scrollView == headerScrollView) {
-//                contentScrollView.onOverScrolled(x, y, true, true);
-//            } else if (scrollView == contentScrollView) {
-//                headerScrollView.onOverScrolled(x, y, true, true);
-//            }
-//            interceptScroll = true;
-//        }
     }
 
     @Override
@@ -85,9 +76,6 @@ public class MultipleSelectGridFragment extends GridFragment {
 
         headerScrollView = (LinearLayout) v.findViewById(R.id.table_options_header_view);
         contentScrollView = (LinearLayout) v.findViewById(R.id.table_body_options_view);
-//        headerScrollView.setScrollViewListener(this);
-//        contentScrollView.setScrollViewListener(this);
-
         setTableHeaderOptions(v);
         setTableBodyContent(v);
         return v;
