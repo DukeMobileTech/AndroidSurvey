@@ -219,8 +219,7 @@ public class Question extends ReceiveModel {
             Random random = new Random();
             randomizedData = new JSONObject();
             for (int k = 0; k < questionRandomizedFactors().size(); k++) {
-                List<RandomizedOption> randomizedOptions = questionRandomizedFactors().get(k)
-                        .getRandomizedFactor().randomizedOptions();
+                List<RandomizedOption> randomizedOptions = questionRandomizedFactors().get(k).getRandomizedFactor().randomizedOptions();
                 int index = random.nextInt(randomizedOptions.size());
                 String optionText = randomizedOptions.get(index).getText();
                 text = text.replaceFirst(RANDOMIZATION_TRIGGER, optionText);
@@ -561,10 +560,8 @@ public class Question extends ReceiveModel {
                 .execute();
     }
 
-    public List<QuestionRandomizedFactor> questionRandomizedFactors() {
-        return new Select().from(QuestionRandomizedFactor.class).where("Question = ?", getId())
-                .orderBy("Position ASC")
-                .execute();
+    private List<QuestionRandomizedFactor> questionRandomizedFactors() {
+        return new Select().from(QuestionRandomizedFactor.class).where("Question = ?", getId()).orderBy("Position ASC").execute();
     }
 
     public String getRegExValidation() {
