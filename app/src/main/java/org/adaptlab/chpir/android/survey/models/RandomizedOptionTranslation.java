@@ -18,7 +18,8 @@ public class RandomizedOptionTranslation extends Model {
     @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
     private Long mRemoteId;
 
-    RandomizedOptionTranslation() {
+    // publicly visible constructor required
+    public RandomizedOptionTranslation() {
         super();
     }
 

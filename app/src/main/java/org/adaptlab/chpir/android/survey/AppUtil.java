@@ -36,6 +36,7 @@ import org.adaptlab.chpir.android.survey.models.Project;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.QuestionRandomizedFactor;
 import org.adaptlab.chpir.android.survey.models.QuestionTranslation;
+import org.adaptlab.chpir.android.survey.models.RandomizedDisplayGroup;
 import org.adaptlab.chpir.android.survey.models.RandomizedFactor;
 import org.adaptlab.chpir.android.survey.models.RandomizedOption;
 import org.adaptlab.chpir.android.survey.models.RawScore;
@@ -131,6 +132,7 @@ public class AppUtil {
         ActiveRecordCloudSync.addReceiveTable("instruments", Instrument.class);
         ActiveRecordCloudSync.addReceiveTable("sections", Section.class);
         ActiveRecordCloudSync.addReceiveTable("grids", Grid.class);
+        ActiveRecordCloudSync.addReceiveTable("randomized_display_groups", RandomizedDisplayGroup.class);
         ActiveRecordCloudSync.addReceiveTable("questions", Question.class);
         ActiveRecordCloudSync.addReceiveTable("options", Option.class);
         ActiveRecordCloudSync.addReceiveTable("randomized_factors", RandomizedFactor.class);

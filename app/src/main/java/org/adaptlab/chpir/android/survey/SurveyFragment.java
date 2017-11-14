@@ -93,7 +93,6 @@ public class SurveyFragment extends Fragment {
     public static final int AUTHORIZE_CODE = 300;
     private static final Long REVIEW_PAGE_ID = -1L;
     private static final Map<String, Integer> mMenuItems;
-    private boolean noBackgroundTask = true;
     private boolean mAllowFragmentCommit;
 
     static {
@@ -130,7 +129,6 @@ public class SurveyFragment extends Fragment {
     private ProgressBar mProgressBar;
     private LocationServiceManager mLocationServiceManager;
     private GestureDetector mGestureDetector;
-    private ProgressDialog mProgressDialog;
 
     //drawer vars
     private DrawerLayout mDrawerLayout;
@@ -209,19 +207,17 @@ public class SurveyFragment extends Fragment {
     }
 
     public void refreshView() {
-        if (noBackgroundTask) {
-            AuthorizedActivity authority = (AuthorizedActivity) getActivity();
-            if (authority.getAuthorize()) {
-                authority.setAuthorize(false);
-                if (AppUtil.getAdminSettingsInstance() != null && AppUtil.getAdminSettingsInstance().getRequirePassword() && !AuthUtils.isSignedIn()) {
-                    Intent i = new Intent(getContext(), LoginActivity.class);
-                    getActivity().startActivityForResult(i, AUTHORIZE_CODE);
-                } else {
-                    updateUI();
-                }
+        AuthorizedActivity authority = (AuthorizedActivity) getActivity();
+        if (authority.getAuthorize()) {
+            authority.setAuthorize(false);
+            if (AppUtil.getAdminSettingsInstance() != null && AppUtil.getAdminSettingsInstance().getRequirePassword() && !AuthUtils.isSignedIn()) {
+                Intent i = new Intent(getContext(), LoginActivity.class);
+                getActivity().startActivityForResult(i, AUTHORIZE_CODE);
             } else {
                 updateUI();
             }
+        } else {
+            updateUI();
         }
     }
 
@@ -300,14 +296,18 @@ public class SurveyFragment extends Fragment {
                 loadOrCreateSurvey();
             }
         }
-
-        registerCrashlytics();
-
         if (!mInstrument.isRoster()) {
             mQuestionCount = mInstrument.getQuestionCount();
             mQuestions = new ArrayList<>(mInstrument.getQuestionCount());
-            noBackgroundTask = false;
-            new LoadQuestionsTask().execute(mInstrument);
+            ProgressDialog progressDialog = ProgressDialog.show(getActivity(), getString(R.string.instrument_loading_progress_header), getString(R.string.background_process_progress_message));
+            mQuestions = mInstrument.questions(mSurvey);
+            mResponses = mSurvey.responsesMap();
+            mOptions = mInstrument.optionsMap();
+            loadOrCreateQuestion();
+            ActivityCompat.invalidateOptionsMenu(getActivity());
+            if (progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+            }
         }
 
         if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) {
@@ -315,14 +315,15 @@ public class SurveyFragment extends Fragment {
                 startLocationServices();
             }
         }
+        recordSurveyCrashStage();
     }
 
-    private void registerCrashlytics() {
+    private void recordSurveyCrashStage() {
         if (AppUtil.PRODUCTION) {
             Fabric.with(getActivity(), new Crashlytics());
-            Crashlytics.setString(getString(R.string.last_instrument), mInstrument.getTitle());
-            Crashlytics.setString(getString(R.string.last_survey), mSurvey.getUUID());
-            Crashlytics.setString(getString(R.string.last_question), mQuestion.getNumberInInstrument() + "");
+            if (mInstrument != null) Crashlytics.setString(getString(R.string.last_instrument), mInstrument.getTitle());
+            if (mSurvey != null) Crashlytics.setString(getString(R.string.last_survey), mSurvey.getUUID());
+            if (mQuestion != null) Crashlytics.setString(getString(R.string.last_question), mQuestion.getNumberInInstrument() + "");
         }
     }
 
@@ -1107,73 +1108,14 @@ public class SurveyFragment extends Fragment {
             if (mQuestion.belongsToGrid()) {
                 Question first = mGrid.questions().get(0);
                 Question last = mGrid.questions().get(mGrid.questions().size() - 1);
-                mQuestionIndex.setText((first.getNumberInInstrument()) + " - " + (
-                        last.getNumberInInstrument()) + " " + getString(R.string.of) + " " +
-                        mQuestionCount);
+                mQuestionIndex.setText((first.getNumberInInstrument()) + " - " + (last.getNumberInInstrument()) + " " + getString(R.string.of) + " " + mQuestionCount);
             } else {
-                mQuestionIndex.setText((mQuestionNumber + 1) + " " + getString(R.string.of) + " " +
-                        mQuestionCount);
+                mQuestionIndex.setText((mQuestionNumber + 1) + " " + getString(R.string.of) + " " + mQuestionCount);
             }
             mProgressBar.setProgress((int) (100 * (mQuestionNumber + 1) / (float) mQuestionCount));
 
             if (isAdded()) {
                 ActivityCompat.invalidateOptionsMenu(getActivity());
-            }
-        }
-    }
-
-    private class LoadQuestionsTask extends AsyncTask<Instrument, Void, List<Question>> {
-
-        @Override
-        protected List<Question> doInBackground(Instrument... params) {
-            return params[0].questions();
-        }
-
-        @Override
-        protected void onPreExecute() {
-            mProgressDialog = ProgressDialog.show(getActivity(), getString(R.string.instrument_loading_progress_header), getString(R.string.background_process_progress_message)
-            );
-        }
-
-        @Override
-        protected void onPostExecute(List<Question> questions) {
-            mQuestions = questions;
-            new LoadResponsesTask().execute(mSurvey);
-        }
-    }
-
-    private class LoadResponsesTask extends AsyncTask<Survey, Void, HashMap<Question, Response>> {
-
-        @Override
-        protected HashMap<Question, Response> doInBackground(Survey... params) {
-            return params[0].responsesMap();
-        }
-
-        @Override
-        protected void onPostExecute(HashMap<Question, Response> responses) {
-            mResponses = responses;
-            new LoadOptionsTask().execute(mInstrument);
-        }
-    }
-
-    private class LoadOptionsTask extends AsyncTask<Instrument, Void, HashMap<Question, List<Option>>> {
-
-        @Override
-        protected HashMap<Question, List<Option>> doInBackground(Instrument... params) {
-            return params[0].optionsMap();
-        }
-
-        @Override
-        protected void onPostExecute(HashMap<Question, List<Option>> options) {
-            noBackgroundTask = true;
-            mOptions = options;
-            loadOrCreateQuestion();
-            if (isAdded()) {
-                ActivityCompat.invalidateOptionsMenu(getActivity());
-                if (mProgressDialog != null && mProgressDialog.isShowing()) {
-                    mProgressDialog.dismiss();
-                }
-                refreshView();
             }
         }
     }

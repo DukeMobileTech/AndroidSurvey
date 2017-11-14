@@ -499,7 +499,7 @@ public class InstrumentFragment extends ListFragment {
             cursor.moveToPosition(position);
             Long instrumentRemoteId = cursor.getLong(cursor.getColumnIndexOrThrow("RemoteId"));
             Instrument instrument = Instrument.findByRemoteId(instrumentRemoteId);
-            if (instrument == null) return;
+            if (instrument == null || instrument.getQuestionCount() == 0) return;
             new LoadInstrumentTask().execute(instrument);
         } else if (l.getAdapter() instanceof SurveyAdapter) {
             Survey survey = getSurveyAtPosition(l, position);

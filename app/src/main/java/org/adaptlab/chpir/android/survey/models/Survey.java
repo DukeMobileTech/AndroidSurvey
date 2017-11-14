@@ -64,6 +64,8 @@ public class Survey extends SendModel {
     private String mRosterUUID;
     @Column(name = "Language")
     private String mLanguage;
+    @Column(name = "RandomizationOrder")
+    private String mRandomizationOrder;
 
     public Survey() {
         super();
@@ -93,6 +95,7 @@ public class Survey extends SendModel {
                 jsonObject.put("roster_uuid", mRosterUUID);
             }
             jsonObject.put("language", mLanguage);
+            jsonObject.put("randomization_order", mRandomizationOrder);
             json.put("survey", jsonObject);
         } catch (JSONException je) {
             Log.e(TAG, "JSON exception", je);
@@ -376,4 +379,13 @@ public class Survey extends SendModel {
     public void setLanguage(String language) {
         mLanguage = language;
     }
+
+    public void setRandomizationOrder(String order) {
+        mRandomizationOrder = order;
+    }
+
+    public String getRandomizationOrder() {
+        return mRandomizationOrder;
+    }
+
 }

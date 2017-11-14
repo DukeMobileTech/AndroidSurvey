@@ -79,6 +79,8 @@ public class Question extends ReceiveModel {
     private boolean mCritical;
     @Column(name = "NumberInGrid")
     private int mNumberInGrid;
+    @Column (name = "DisplayGroup")
+    private DisplayGroup mDisplayGroup;
 
     public Question() {
         super();
@@ -423,6 +425,9 @@ public class Question extends ReceiveModel {
             if (!jsonObject.isNull("critical")) {
                 question.setCritical(jsonObject.getBoolean("critical"));
             }
+            if (!jsonObject.isNull("display_group_id")) {
+                question.setDisplayGroup(DisplayGroup.findByRemoteId(jsonObject.getLong("display_group_id")));
+            }
             question.save();
 
             // Generate translations
@@ -595,7 +600,7 @@ public class Question extends ReceiveModel {
         return mNumberInInstrument;
     }
 
-    private void setNumberInInstrument(int number) {
+    public void setNumberInInstrument(int number) {
         mNumberInInstrument = number;
     }
 
@@ -682,6 +687,10 @@ public class Question extends ReceiveModel {
 
     public boolean hasRandomizedFactors() {
         return questionRandomizedFactors().size() > 0;
+    }
+
+    private void setDisplayGroup(DisplayGroup displayGroup) {
+        mDisplayGroup = displayGroup;
     }
 
     public enum QuestionType {

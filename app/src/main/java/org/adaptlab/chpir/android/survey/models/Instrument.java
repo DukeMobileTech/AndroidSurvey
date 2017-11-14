@@ -22,7 +22,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -165,6 +167,10 @@ public class Instrument extends ReceiveModel {
                 .execute();
     }
 
+    private List<RandomizedDisplayGroup> randomizedDisplayGroups() {
+        return new Select().from(RandomizedDisplayGroup.class).where("InstrumentRemoteId = ?", getRemoteId()).execute();
+    }
+
     public Long getRemoteId() {
         return mRemoteId;
     }
@@ -217,6 +223,49 @@ public class Instrument extends ReceiveModel {
                 .where("InstrumentRemoteId = ? AND Deleted != ?", getRemoteId(), 1)
                 .orderBy("NumberInInstrument ASC")
                 .execute();
+    }
+
+    public List<Question> questions(Survey survey) {
+        if (randomizedDisplayGroups().size() > 0) {
+            if (survey.getRandomizationOrder() != null) {
+                try {
+                    JSONObject jsonObject = new JSONObject(survey.getRandomizationOrder());
+                    Iterator<String> iterator = jsonObject.keys();
+                    while (iterator.hasNext()) {
+                        String questionIdentifier = iterator.next();
+                        Question question = Question.findByQuestionIdentifier(questionIdentifier);
+                        question.setNumberInInstrument(jsonObject.getInt(questionIdentifier));
+                        question.save();
+                    }
+                } catch (JSONException e) {
+                    Log.e(TAG, e.getMessage());
+                }
+            } else {
+                JSONObject randomizationOrder = new JSONObject();
+                for (RandomizedDisplayGroup randomizedDisplayGroup : randomizedDisplayGroups()) {
+                    int beginQuestionNumber = randomizedDisplayGroup.firstQuestion().getNumberInInstrument();
+
+                    List<DisplayGroup> shuffledDisplayGroup = new ArrayList<>();
+                    shuffledDisplayGroup.addAll(randomizedDisplayGroup.displayGroups());
+                    Collections.shuffle(shuffledDisplayGroup);
+                    for (DisplayGroup group : shuffledDisplayGroup) {
+                        for (Question question : group.questions()) {
+                            question.setNumberInInstrument(beginQuestionNumber);
+                            question.save();
+                            try {
+                                randomizationOrder.put(question.getQuestionIdentifier(), beginQuestionNumber);
+                            } catch (JSONException e) {
+                                Log.e(TAG, e.toString());
+                            }
+                            beginQuestionNumber += 1;
+                        }
+                    }
+                }
+                survey.setRandomizationOrder(randomizationOrder.toString());
+                survey.save();
+            }
+        }
+        return questions();
     }
 
     public String getCriticalMessage() {
@@ -359,8 +408,7 @@ public class Instrument extends ReceiveModel {
 
     public List<Question> criticalQuestions() {
         return new Select().from(Question.class)
-                .where("InstrumentRemoteId = ? AND Deleted != ? AND Critical = ?", getRemoteId(),
-                        1, 1)
+                .where("InstrumentRemoteId = ? AND Deleted != ? AND Critical = ?", getRemoteId(), 1, 1)
                 .orderBy("NumberInInstrument ASC")
                 .execute();
     }
