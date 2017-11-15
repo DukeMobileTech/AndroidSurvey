@@ -9,7 +9,9 @@
         android:id="@+id/linear_layout_for_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:descendantFocusability="beforeDescendants"
+        android:focusableInTouchMode="true">
 
         <TextView
             android:id="@+id/api_endpoint_settings_label"
@@ -296,8 +298,6 @@
                 android:layout_weight="2"
                 android:ems="10"
                 android:inputType="textMultiLine">
-
-                <requestFocus/>
             </EditText>
 
         </LinearLayout>
