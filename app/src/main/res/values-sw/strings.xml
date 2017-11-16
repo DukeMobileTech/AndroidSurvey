@@ -147,4 +147,6 @@
     <string name="device_settings">Device Settings</string>
     <string name="show_scores">Show Scores</string>
     <string name="required_field">Field should not be empty!</string>
+    <string name="last_survey">last survey</string>
+    <string name="last_question">last question</string>
 </resources>

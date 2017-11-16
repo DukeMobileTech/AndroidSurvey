@@ -8,8 +8,13 @@ import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
 import org.adaptlab.chpir.android.survey.AppUtil;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.List;
+
+import static org.adaptlab.chpir.android.survey.models.Instrument.getDeviceLanguage;
 
 @Table(name = "RandomizedOptions")
 public class RandomizedOption extends ReceiveModel {
@@ -43,6 +48,25 @@ public class RandomizedOption extends ReceiveModel {
             option.setRandomizedFactor(RandomizedFactor.findByRemoteId(jsonObject.getLong("randomized_factor_id")));
             option.setRemoteId(remoteId);
             option.save();
+
+            // Generate translations
+            JSONArray translationsArray = jsonObject.optJSONArray("randomized_option_translations");
+            if (translationsArray != null) {
+                for (int i = 0; i < translationsArray.length(); i++) {
+                    JSONObject translationJSON = translationsArray.getJSONObject(i);
+                    Long translationRemoteId = translationJSON.getLong("id");
+                    RandomizedOptionTranslation translation = RandomizedOptionTranslation.findByRemoteId(translationRemoteId);
+                    if (translation == null) {
+                        translation = new RandomizedOptionTranslation();
+                    }
+                    translation.setRemoteId(translationRemoteId);
+                    translation.setLanguage(translationJSON.getString("language"));
+                    translation.setRandomizedOption(option);
+                    translation.setText(translationJSON.getString("text"));
+                    translation.setInstrumentTranslation(InstrumentTranslation.findByRemoteId(translationJSON.optLong("instrument_translation_id")));
+                    translation.save();
+                }
+            }
         } catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);
         }
@@ -73,6 +97,28 @@ public class RandomizedOption extends ReceiveModel {
     }
 
     public String getText() {
+        if (getInstrument().getLanguage().equals(getDeviceLanguage())) return mText;
+        if (activeTranslation() != null) {
+            return activeTranslation().getText();
+        }
+        for (RandomizedOptionTranslation translation : translations()) {
+            if (translation.getLanguage().equals(getDeviceLanguage())) {
+                return translation.getText();
+            }
+        }
         return mText;
+    }
+
+    private Instrument getInstrument() {
+        return getRandomizedFactor().getInstrument();
+    }
+
+    private RandomizedOptionTranslation activeTranslation() {
+        if (getInstrument().activeTranslation() == null) return null;
+        return new Select().from(RandomizedOptionTranslation.class).where("InstrumentTranslation = ? AND RandomizedOption = ?", getInstrument().activeTranslation().getId(), getId()).executeSingle();
+    }
+
+    private List<RandomizedOptionTranslation> translations() {
+        return getMany(RandomizedOptionTranslation.class, "RandomizedOption");
     }
 }

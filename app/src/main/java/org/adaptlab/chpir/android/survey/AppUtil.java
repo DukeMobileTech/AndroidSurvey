@@ -24,12 +24,15 @@ import org.adaptlab.chpir.android.survey.models.DeviceUser;
 import org.adaptlab.chpir.android.survey.models.EventLog;
 import org.adaptlab.chpir.android.survey.models.Grid;
 import org.adaptlab.chpir.android.survey.models.GridLabel;
+import org.adaptlab.chpir.android.survey.models.GridLabelTranslation;
+import org.adaptlab.chpir.android.survey.models.GridTranslation;
 import org.adaptlab.chpir.android.survey.models.Image;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.InstrumentTranslation;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.OptionScore;
 import org.adaptlab.chpir.android.survey.models.OptionTranslation;
+import org.adaptlab.chpir.android.survey.models.Project;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.QuestionRandomizedFactor;
 import org.adaptlab.chpir.android.survey.models.QuestionTranslation;
@@ -71,9 +74,10 @@ public class AppUtil {
      */
     public static int getVersionCode(Context context) {
         try {
-            PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName
-                    (), 0);
-            return pInfo.versionCode;
+            if (context != null) {
+                PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+                return pInfo.versionCode;
+            }
         } catch (NameNotFoundException nnfe) {
             Log.e(TAG, "Error finding version code: " + nnfe);
         }
@@ -82,8 +86,7 @@ public class AppUtil {
 
     public static String getVersionName(Context context) {
         try {
-            PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName
-                    (), 0);
+            PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
             return pInfo.versionName;
         } catch (NameNotFoundException nnfe) {
             Log.e(TAG, "Error finding version code: " + nnfe);
@@ -91,7 +94,7 @@ public class AppUtil {
         return "";
     }
 
-    public static final void appInit(Context context) {
+    static void appInit(Context context) {
         mContext = context;
         if (AppUtil.REQUIRE_SECURITY_CHECKS) {
             if (!AppUtil.runDeviceSecurityChecks(context)) {
@@ -108,8 +111,7 @@ public class AppUtil {
         if (PRODUCTION) {
             Fabric.with(context, new Crashlytics());
             Crashlytics.setUserIdentifier(adminSettingsInstance.getDeviceIdentifier());
-            Crashlytics.setString(mContext.getString(R.string.crashlytics_device_label),
-                    adminSettingsInstance.getDeviceLabel());
+            Crashlytics.setString(getContext().getString(R.string.crashlytics_device_label), adminSettingsInstance.getDeviceLabel());
         }
 
         DatabaseSeed.seed(context);
@@ -125,6 +127,7 @@ public class AppUtil {
         ActiveRecordCloudSync.setAccessToken(ACCESS_TOKEN);
         ActiveRecordCloudSync.setVersionCode(AppUtil.getVersionCode(context));
         ActiveRecordCloudSync.setEndPoint(adminSettingsInstance.getApiUrl());
+        ActiveRecordCloudSync.addReceiveTable("projects", Project.class);
         ActiveRecordCloudSync.addReceiveTable("instruments", Instrument.class);
         ActiveRecordCloudSync.addReceiveTable("sections", Section.class);
         ActiveRecordCloudSync.addReceiveTable("grids", Grid.class);
@@ -154,13 +157,18 @@ public class AppUtil {
     }
 
     private static void setAdminSettingsInstance() {
-        if (mContext != null) {
-            if (mContext.getResources().getBoolean(R.bool.default_admin_settings)) {
-                adminSettingsInstance = DefaultAdminSettings.getInstance();
-            } else {
-                adminSettingsInstance = AdminSettings.getInstance();
-            }
+        if (getContext() != null && getContext().getResources() != null && getContext().getResources().getBoolean(R.bool.default_admin_settings)) {
+            adminSettingsInstance = DefaultAdminSettings.getInstance();
+        } else {
+            adminSettingsInstance = AdminSettings.getInstance();
         }
+    }
+
+    public static Long getProjectId() {
+        AdminSettings adminSettings = getAdminSettingsInstance();
+        if (adminSettings.getProjectId() != null)
+            return Long.parseLong(adminSettings.getProjectId());
+        return Long.MAX_VALUE;
     }
 
     /*
@@ -173,10 +181,8 @@ public class AppUtil {
      * Current security checks: require encryption
      */
     public static final boolean runDeviceSecurityChecks(Context context) {
-        DevicePolicyManager devicePolicyManager = (DevicePolicyManager) context
-                .getSystemService(Context.DEVICE_POLICY_SERVICE);
-        if (devicePolicyManager.getStorageEncryptionStatus() != DevicePolicyManager
-                .ENCRYPTION_STATUS_ACTIVE) {
+        DevicePolicyManager devicePolicyManager = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        if (devicePolicyManager.getStorageEncryptionStatus() != DevicePolicyManager.ENCRYPTION_STATUS_ACTIVE) {
             new AlertDialog.Builder(context)
                     .setTitle(R.string.encryption_required_title)
                     .setMessage(R.string.encryption_required_text)
@@ -203,6 +209,9 @@ public class AppUtil {
     }
 
     public static Context getContext() {
+        if (mContext == null) {
+            mContext = SurveyApp.getInstance().getApplicationContext();
+        }
         return mContext;
     }
 
@@ -237,7 +246,9 @@ public class AppUtil {
             new Delete().from(Skip.class).execute();
             new Delete().from(DeviceUser.class).execute();
             new Delete().from(Image.class).execute();
+            new Delete().from(GridLabelTranslation.class).execute();
             new Delete().from(GridLabel.class).execute();
+            new Delete().from(GridTranslation.class).execute();
             new Delete().from(Grid.class).execute();
             new Delete().from(InstrumentTranslation.class).execute();
             new Delete().from(OptionTranslation.class).execute();

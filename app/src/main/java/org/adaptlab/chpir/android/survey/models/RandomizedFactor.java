@@ -72,4 +72,8 @@ public class RandomizedFactor extends ReceiveModel{
     public String getTitle() {
         return mTitle;
     }
+
+    public Instrument getInstrument() {
+        return Instrument.findByRemoteId(mInstrumentRemoteId);
+    }
 }

@@ -70,14 +70,6 @@ public class AdminFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_admin_settings, parent, false);
-        mDeviceIdentifierEditText = (EditText) v.findViewById(R.id.device_identifier_edit_text);
-        mDeviceIdentifierEditText.setText(getAdminSettingsInstanceDeviceId());
-
-        mDeviceLabelEditText = (EditText) v.findViewById(R.id.device_label_edit_text);
-        mDeviceLabelEditText.setText(AppUtil.getAdminSettingsInstance().getDeviceLabel());
-
-        mCustomLocaleEditText = (EditText) v.findViewById(R.id.custom_locale_edit_text);
-        mCustomLocaleEditText.setText(getAdminSettingsInstanceCustomLocaleCode());
 
         mApiDomainNameEditText = (EditText) v.findViewById(R.id.api_endpoint_text);
         mApiDomainNameEditText.setText(getAdminSettingsInstanceApiDomainName());
@@ -144,11 +136,18 @@ public class AdminFragment extends Fragment {
         mRequirePasswordCheckBox = (CheckBox) v.findViewById(R.id.require_password);
         mRequirePasswordCheckBox.setChecked(AppUtil.getAdminSettingsInstance().getRequirePassword());
 
-        mRecordSurveyLocationCheckBox = (CheckBox) v.findViewById(R.id
-                .record_survey_location_checkbox);
-        mRecordSurveyLocationCheckBox.setChecked(AppUtil.getAdminSettingsInstance()
-                .getRecordSurveyLocation());
+        mRecordSurveyLocationCheckBox = (CheckBox) v.findViewById(R.id.record_survey_location_checkbox);
+        mRecordSurveyLocationCheckBox.setChecked(AppUtil.getAdminSettingsInstance().getRecordSurveyLocation());
 
+        mDeviceIdentifierEditText = (EditText) v.findViewById(R.id.device_identifier_edit_text);
+        mDeviceIdentifierEditText.setText(getAdminSettingsInstanceDeviceId());
+        mDeviceIdentifierEditText.setSelection(mDeviceIdentifierEditText.getText().length());
+
+        mDeviceLabelEditText = (EditText) v.findViewById(R.id.device_label_edit_text);
+        mDeviceLabelEditText.setText(AppUtil.getAdminSettingsInstance().getDeviceLabel());
+
+        mCustomLocaleEditText = (EditText) v.findViewById(R.id.custom_locale_edit_text);
+        mCustomLocaleEditText.setText(getAdminSettingsInstanceCustomLocaleCode());
         // Disable edits if using default settings
         if (getActivity().getResources().getBoolean(R.bool.default_admin_settings)) {
             mDeviceIdentifierEditText.setEnabled(false);
@@ -236,6 +235,8 @@ public class AdminFragment extends Fragment {
             menu.findItem(R.id.save_admin_settings_button).setEnabled(false).setVisible(false);
             menu.findItem(R.id.delete_data_button).setEnabled(false).setVisible(false);
         }
+        // TODO: 10/6/17 fix
+        menu.findItem(R.id.delete_data_button).setEnabled(false).setVisible(false);
     }
 
     @Override
@@ -278,8 +279,7 @@ public class AdminFragment extends Fragment {
             AppUtil.getAdminSettingsInstance().setShowRF(mShowRFCheckBox.isChecked());
             AppUtil.getAdminSettingsInstance().setShowDK(mShowDKCheckBox.isChecked());
             AppUtil.getAdminSettingsInstance().setRequirePassword(mRequirePasswordCheckBox.isChecked());
-            AppUtil.getAdminSettingsInstance().setRecordSurveyLocation(mRecordSurveyLocationCheckBox
-                    .isChecked());
+            AppUtil.getAdminSettingsInstance().setRecordSurveyLocation(mRecordSurveyLocationCheckBox.isChecked());
 
             //Roster settings
             AppUtil.getAdminSettingsInstance().setUseEndpoint2(mRosterEndPointCheckBox.isChecked());

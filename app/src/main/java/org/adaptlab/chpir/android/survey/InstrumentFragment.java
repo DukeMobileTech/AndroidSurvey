@@ -1,6 +1,8 @@
 package org.adaptlab.chpir.android.survey;
 
 import android.Manifest;
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -10,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
@@ -42,7 +45,6 @@ import com.activeandroid.query.Delete;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.activerecordcloudsync.NetworkNotificationUtils;
-import org.adaptlab.chpir.android.survey.models.AdminSettings;
 import org.adaptlab.chpir.android.survey.models.Image;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.Response;
@@ -67,6 +69,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+
+import static org.adaptlab.chpir.android.survey.AppUtil.getProjectId;
 
 public class InstrumentFragment extends ListFragment {
     public final static String TAG = "InstrumentFragment";
@@ -176,8 +180,9 @@ public class InstrumentFragment extends ListFragment {
 
             private void deleteHelper(List<Survey> surveys) {
                 for (Survey survey : surveys) {
-                    new Delete().from(Response.class).where("SurveyUUID = ?",
-                            survey.getUUID()).execute();
+                    if (survey.getUUID() != null) {
+                        new Delete().from(Response.class).where("SurveyUUID = ?", survey.getUUID()).execute();
+                    }
                     survey.delete();
                 }
             }
@@ -352,13 +357,6 @@ public class InstrumentFragment extends ListFragment {
         };
     }
 
-    private Long getProjectId() {
-        AdminSettings adminSettings = AppUtil.getAdminSettingsInstance();
-        if (adminSettings.getProjectId() != null)
-            return Long.parseLong(adminSettings.getProjectId());
-        return Long.MAX_VALUE;
-    }
-
     @Override
     public void onResume() {
         super.onResume();
@@ -467,32 +465,28 @@ public class InstrumentFragment extends ListFragment {
 
     private void setSurveysListViewAdapter() {
         if (getProjectId() != Long.MAX_VALUE) {
-            Cursor surveysCursor = Survey.getProjectSurveysCursor(getProjectId());
-            mSurveyAdapter = new SurveyAdapter(getActivity(), surveysCursor, 0);
+            mSurveyAdapter = new SurveyAdapter(getActivity(), null, 0);
             setListAdapter(mSurveyAdapter);
             getActivity().getSupportLoaderManager().restartLoader(0, null, mSurveyCallbacks);
         }
     }
 
     private void setRostersListViewAdapter() {
-        Cursor rostersCursor = Roster.getCursor();
-        mRosterAdapter = new RosterAdapter(getActivity(), rostersCursor, 0);
+        mRosterAdapter = new RosterAdapter(getActivity(), null, 0);
         setListAdapter(mRosterAdapter);
         getActivity().getSupportLoaderManager().restartLoader(0, null, mRosterCallbacks);
     }
 
     private void setInstrumentsListViewAdapter() {
         if (getProjectId() != Long.MAX_VALUE) {
-            Cursor instrumentsCursor = Instrument.getProjectInstrumentsCursor(getProjectId());
-            mInstrumentAdapter = new InstrumentAdapter(getActivity(), instrumentsCursor, 0);
+            mInstrumentAdapter = new InstrumentAdapter(getActivity(), null, 0);
             setListAdapter(mInstrumentAdapter);
             getActivity().getSupportLoaderManager().restartLoader(0, null, mInstrumentCallbacks);
         }
     }
 
     private void setScoresListViewAdapter() {
-        Cursor scoresCursor = Score.getCursor();
-        mScoreAdapter = new ScoreAdapter(getActivity(), scoresCursor, 0);
+        mScoreAdapter = new ScoreAdapter(getActivity(), null, 0);
         setListAdapter(mScoreAdapter);
         getActivity().getSupportLoaderManager().restartLoader(0, null, mScoreCallbacks);
     }
@@ -587,22 +581,17 @@ public class InstrumentFragment extends ListFragment {
 
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
-            TextView titleTextView = (TextView) view.findViewById(R.id
-                    .instrument_list_item_titleTextView);
-            TextView questionCountTextView = (TextView) view.findViewById(R.id
-                    .instrument_list_item_questionCountTextView);
-            TextView instrumentVersionTextView = (TextView) view.findViewById(R.id
-                    .instrument_list_item_instrumentVersionTextView);
+            TextView titleTextView = (TextView) view.findViewById(R.id.instrument_list_item_titleTextView);
+            TextView questionCountTextView = (TextView) view.findViewById(R.id.instrument_list_item_questionCountTextView);
+            TextView instrumentVersionTextView = (TextView) view.findViewById(R.id.instrument_list_item_instrumentVersionTextView);
 
             Long remoteId = cursor.getLong(cursor.getColumnIndexOrThrow("RemoteId"));
             Instrument instrument = Instrument.findByRemoteId(remoteId);
             int numQuestions = instrument.questions().size();
 
             titleTextView.setText(instrument.getTitle());
-            titleTextView.setTypeface(instrument.getTypeFace(
-                    getActivity().getApplicationContext()));
-            questionCountTextView.setText(numQuestions + " " + FormatUtils.pluralize
-                    (numQuestions, getString(R.string.question), getString(R.string.questions)));
+            titleTextView.setTypeface(instrument.getTypeFace(getActivity().getApplicationContext()));
+            questionCountTextView.setText(numQuestions + " " + FormatUtils.pluralize(numQuestions, getString(R.string.question), getString(R.string.questions)));
             instrumentVersionTextView.setText(getString(R.string.version) + ": " + instrument.getVersionNumber());
 
             new SetInstrumentLabelTask().execute(new InstrumentListLabel(instrument, titleTextView));
@@ -638,35 +627,33 @@ public class InstrumentFragment extends ListFragment {
 
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
-            if (mSelectionViews != null && isPositionChecked(cursor.getPosition())) {
-                view.setBackgroundColor(ContextCompat.getColor(context, R.color.item_selected));
-            } else {
-                view.setBackgroundColor(ContextCompat.getColor(context, R.color.transparent));
+            Activity activity = (Activity) view.getContext();
+            if (activity != null) {
+                if (mSelectionViews != null && isPositionChecked(cursor.getPosition())) {
+                    view.setBackgroundColor(ContextCompat.getColor(context, R.color.item_selected));
+                } else {
+                    view.setBackgroundColor(ContextCompat.getColor(context, R.color.transparent));
+                }
+
+                TextView titleTextView = (TextView) view.findViewById(R.id.survey_list_item_titleTextView);
+
+                TextView progressTextView = (TextView) view.findViewById(R.id.survey_list_item_progressTextView);
+                TextView instrumentTitleTextView = (TextView) view.findViewById(R.id.survey_list_item_instrumentTextView);
+                TextView lastUpdatedTextView = (TextView) view.findViewById(R.id.survey_list_item_lastUpdatedTextView);
+
+                String surveyUUID = cursor.getString(cursor.getColumnIndexOrThrow("UUID"));
+                Survey survey = Survey.findByUUID(surveyUUID);
+
+                titleTextView.setText(survey.identifier(activity));
+                titleTextView.setTypeface(survey.getInstrument().getTypeFace(activity.getApplicationContext()));
+                progressTextView.setText(survey.responses().size() + " " + getString(R.string.of) + "" + " " + survey.getInstrument().questions().size());
+                instrumentTitleTextView.setText(survey.getInstrument().getTitle());
+                DateFormat df = DateFormat.getDateTimeInstance();
+                lastUpdatedTextView.setText(df.format(survey.getLastUpdated()));
+
+                if (survey.readyToSend()) progressTextView.setTextColor(Color.GREEN);
+                else progressTextView.setTextColor(Color.RED);
             }
-
-            TextView titleTextView = (TextView) view.findViewById(R.id
-                    .survey_list_item_titleTextView);
-            TextView progressTextView = (TextView) view.findViewById(R.id
-                    .survey_list_item_progressTextView);
-            TextView instrumentTitleTextView = (TextView) view.findViewById(R.id
-                    .survey_list_item_instrumentTextView);
-            TextView lastUpdatedTextView = (TextView) view.findViewById(R.id
-                    .survey_list_item_lastUpdatedTextView);
-
-            String surveyUUID = cursor.getString(cursor.getColumnIndexOrThrow("UUID"));
-            Survey survey = Survey.findByUUID(surveyUUID);
-
-            titleTextView.setText(survey.identifier(getActivity()));
-            titleTextView.setTypeface(survey.getInstrument().getTypeFace(getActivity()
-                    .getApplicationContext()));
-            progressTextView.setText(survey.responses().size() + " " + getString(R.string.of)
-                    + "" + " " + survey.getInstrument().questions().size());
-            instrumentTitleTextView.setText(survey.getInstrument().getTitle());
-            DateFormat df = DateFormat.getDateTimeInstance();
-            lastUpdatedTextView.setText(df.format(survey.getLastUpdated()));
-
-            if (survey.readyToSend()) progressTextView.setTextColor(Color.GREEN);
-            else progressTextView.setTextColor(Color.RED);
         }
     }
 
@@ -779,6 +766,7 @@ public class InstrumentFragment extends ListFragment {
             }
         }
 
+        @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
         @Override
         protected void onPostExecute(Integer code) {
             if (isAdded()) {
@@ -787,6 +775,10 @@ public class InstrumentFragment extends ListFragment {
             }
             if (code == -1 && mProgressDialog != null && mProgressDialog.isShowing()) {
                 mProgressDialog.dismiss();
+            }
+            SingleFragmentActivity activity = (SingleFragmentActivity) getActivity();
+            if (activity != null && !activity.isDestroyed()) {
+                activity.displayProjectName();
             }
         }
     }
@@ -806,10 +798,9 @@ public class InstrumentFragment extends ListFragment {
                     setInstrumentsListViewAdapter();
                 }
             }
-            AppUtil.getAdminSettingsInstance().setLastSyncTime(ActiveRecordCloudSync
-                    .getLastSyncTime());
+            AppUtil.getAdminSettingsInstance().setLastSyncTime(ActiveRecordCloudSync.getLastSyncTime());
             AppUtil.orderInstrumentsSections();
-            if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            if (isAdded() && !getActivity().isFinishing() && mProgressDialog != null && mProgressDialog.isShowing()) {
                 mProgressDialog.dismiss();
             }
         }
@@ -927,8 +918,7 @@ public class InstrumentFragment extends ListFragment {
             if (progressDialog != null && progressDialog.isShowing()) progressDialog.dismiss();
             if (isAdded()) {
                 if (instrument == null) {
-                    Toast.makeText(getActivity(), R.string.instrument_not_loaded, Toast
-                            .LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), R.string.instrument_not_loaded, Toast.LENGTH_LONG).show();
                 } else {
                     new RuleBuilder(getActivity())
                             .addRule(new InstrumentLaunchRule(instrument,
@@ -942,8 +932,7 @@ public class InstrumentFragment extends ListFragment {
                                     startActivity(i);
                                 }
 
-                                public void onRulesFail() {
-                                }
+                                public void onRulesFail() {}
                             })
                             .checkRules();
                 }
