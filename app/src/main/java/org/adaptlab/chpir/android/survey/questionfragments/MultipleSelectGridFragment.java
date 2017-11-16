@@ -1,54 +1,39 @@
 
         package org.adaptlab.chpir.android.survey.questionfragments;
 
-        import android.app.Activity;
-        import android.content.Context;
-        import android.graphics.Point;
         import android.graphics.Typeface;
-        import android.os.AsyncTask;
-        import android.os.Bundle;
-        import android.util.DisplayMetrics;
-        import android.util.Log;
-        import android.view.Display;
-        import android.view.Gravity;
-        import android.view.LayoutInflater;
-        import android.view.View;
-        import android.view.ViewGroup;
-        import android.view.WindowManager;
-        import android.widget.CheckBox;
-        import android.widget.CompoundButton;
-        import android.widget.LinearLayout;
-        import android.widget.TextView;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
-        import org.adaptlab.chpir.android.survey.GridFragment;
-        import org.adaptlab.chpir.android.survey.R;
-        import org.adaptlab.chpir.android.survey.models.GridLabel;
-        import org.adaptlab.chpir.android.survey.models.Question;
-        import org.adaptlab.chpir.android.survey.models.Response;
-        import org.adaptlab.chpir.android.survey.models.Survey;
-        import org.adaptlab.chpir.android.survey.views.OHScrollView;
+import org.adaptlab.chpir.android.survey.GridFragment;
+import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.models.GridLabel;
+import org.adaptlab.chpir.android.survey.models.Question;
+import org.adaptlab.chpir.android.survey.models.Response;
+import org.adaptlab.chpir.android.survey.models.Survey;
 
-        import java.util.ArrayList;
-        import java.util.Arrays;
-        import java.util.HashSet;
-        import java.util.List;
-        import java.util.Set;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class MultipleSelectGridFragment extends GridFragment {
 
     private static final String TAG = "MultipleSelectGridFragment";
     private List<List<CheckBox>> mCheckBoxes;
-    private boolean interceptScroll = true;
-    private LinearLayout headerScrollView;
-    private LinearLayout contentScrollView;
     private Integer[] rowHeights;
     private Integer[] rowWidths;
     private Integer[] labelWidths;
     private int mIndex;
-
-    @Override
-    public void onScrollChanged(OHScrollView scrollView, int x, int y, int oldX, int oldY) {
-    }
 
     @Override
     protected void deserialize(String responseText) {
@@ -73,9 +58,6 @@ public class MultipleSelectGridFragment extends GridFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_table_question, parent, false);
-
-        headerScrollView = (LinearLayout) v.findViewById(R.id.table_options_header_view);
-        contentScrollView = (LinearLayout) v.findViewById(R.id.table_body_options_view);
         setTableHeaderOptions(v);
         setTableBodyContent(v);
         return v;
@@ -100,10 +82,7 @@ public class MultipleSelectGridFragment extends GridFragment {
         headerTableLayout.post(new Runnable() {
             @Override
             public void run() {
-                int numOfHeaders = gridLabels.size();
-                int headerBorders = numOfHeaders * 2;
                 int paddingLeftRight = 20;
-                //int width = (headerTableLayout.getWidth() - headerBorders) / numOfHeaders;
                 int width = 0;
                 for (int k = 0; k < headers.size(); k++) {
                     TextView view = headers.get(k);
@@ -130,7 +109,7 @@ public class MultipleSelectGridFragment extends GridFragment {
             @Override
             public void run() {
                 LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
-                rowWidths[position] = layout.getWidth()/rowWidths.length+ params.leftMargin + params.rightMargin;
+                rowWidths[position] = layout.getWidth() / rowWidths.length + params.leftMargin + params.rightMargin;
             }
         });
     }
@@ -140,11 +119,10 @@ public class MultipleSelectGridFragment extends GridFragment {
             @Override
             public void run() {
                 LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
-                labelWidths[position] = layout.getWidth()/labelWidths.length+ params.leftMargin + params.rightMargin;
+                labelWidths[position] = layout.getWidth() / labelWidths.length + params.leftMargin + params.rightMargin;
             }
         });
     }
-
 
     private void setTableBodyContent(View v) {
         LinearLayout questionTextLayout = (LinearLayout) v.findViewById(R.id.table_body_question_text);
@@ -166,16 +144,14 @@ public class MultipleSelectGridFragment extends GridFragment {
 
     private void setQuestionText(LinearLayout questionTextLayout, int k, Question q) {
         LinearLayout questionRow = new LinearLayout(getActivity());
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         params.setMargins(MARGIN_0, MARGIN_0, MARGIN_10, MARGIN_10);
         questionRow.setLayoutParams(params);
         TextView questionNumber = new TextView(getActivity());
         questionNumber.setText(String.valueOf(q.getNumberInGrid() + "."));
         questionNumber.setMinHeight(MIN_HEIGHT);
         questionNumber.setTypeface(Typeface.DEFAULT_BOLD);
-        LinearLayout.LayoutParams questionNumberParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams questionNumberParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         questionNumberParams.setMargins(MARGIN_0, MARGIN_0, MARGIN_10, MARGIN_0);
         questionNumber.setLayoutParams(questionNumberParams);
         questionRow.addView(questionNumber);
@@ -283,7 +259,6 @@ public class MultipleSelectGridFragment extends GridFragment {
             survey.save();
             return null;
         }
-
     }
 
 }

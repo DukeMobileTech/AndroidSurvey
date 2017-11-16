@@ -16,7 +16,6 @@ import android.widget.TextView;
 
 import com.activeandroid.Model;
 
-import org.adaptlab.chpir.android.survey.listeners.ScrollViewListener;
 import org.adaptlab.chpir.android.survey.models.Grid;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
@@ -25,7 +24,7 @@ import org.adaptlab.chpir.android.survey.models.Survey;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class GridFragment extends QuestionFragment implements ScrollViewListener {
+public abstract class GridFragment extends QuestionFragment {
 	public final static String EXTRA_GRID_ID = 
             "org.adaptlab.chpir.android.survey.grid_id";
 	public final static String EXTRA_SURVEY_ID =

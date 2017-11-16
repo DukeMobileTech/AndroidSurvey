@@ -2,7 +2,6 @@ package org.adaptlab.chpir.android.survey.questionfragments;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +15,6 @@ import org.adaptlab.chpir.android.survey.GridFragment;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.GridLabel;
 import org.adaptlab.chpir.android.survey.models.Question;
-import org.adaptlab.chpir.android.survey.views.OHScrollView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +26,7 @@ public class SingleSelectGridFragment extends GridFragment {
     private Integer[] rowHeights;
     private Integer[] rowWidths;
     private Integer[] labelWidths;
-    private boolean interceptScroll = true;
-    private LinearLayout headerScrollView;
-    private LinearLayout contentScrollView;
+
     @Override
     protected void deserialize(String responseText) {
         if (responseText.equals("")) {
@@ -46,9 +42,6 @@ public class SingleSelectGridFragment extends GridFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_table_question, parent, false);
-
-        headerScrollView = (LinearLayout) v.findViewById(R.id.table_options_header_view);
-        contentScrollView = (LinearLayout) v.findViewById(R.id.table_body_options_view);
         setTableHeaderOptions(v);
         setTableBodyContent(v);
         return v;
@@ -75,8 +68,7 @@ public class SingleSelectGridFragment extends GridFragment {
         LinearLayout choiceRow = new LinearLayout(getActivity());
         RadioGroup radioButtons = new RadioGroup(getActivity());
         radioButtons.setOrientation(RadioGroup.HORIZONTAL);
-        RadioGroup.LayoutParams buttonParams = new RadioGroup.LayoutParams(
-                RadioGroup.LayoutParams.MATCH_PARENT, MIN_HEIGHT);
+        RadioGroup.LayoutParams buttonParams = new RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT, MIN_HEIGHT);
         radioButtons.setLayoutParams(buttonParams);
         adjustRowHeight(radioButtons, k);
         List<GridLabel> gridLabels = getGrid().labels();
@@ -84,8 +76,7 @@ public class SingleSelectGridFragment extends GridFragment {
             RadioButton button = new RadioButton(getActivity());
             button.setSaveEnabled(false);
             button.setId(i);
-            RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(
-                    RadioGroup.LayoutParams.WRAP_CONTENT, MIN_HEIGHT);
+            RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(RadioGroup.LayoutParams.WRAP_CONTENT, MIN_HEIGHT);
             button.setLayoutParams(params);
             radioButtons.addView(button, i);
         }
@@ -102,16 +93,14 @@ public class SingleSelectGridFragment extends GridFragment {
 
     private void setQuestionText(LinearLayout questionTextLayout, int k, Question q) {
         LinearLayout questionRow = new LinearLayout(getActivity());
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         params.setMargins(MARGIN_0, MARGIN_0, MARGIN_10, MARGIN_10);
         questionRow.setLayoutParams(params);
         TextView questionNumber = new TextView(getActivity());
         questionNumber.setText(String.valueOf(q.getNumberInGrid() + "."));
         questionNumber.setMinHeight(MIN_HEIGHT);
         questionNumber.setTypeface(Typeface.DEFAULT_BOLD);
-        LinearLayout.LayoutParams questionNumberParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams questionNumberParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         questionNumberParams.setMargins(MARGIN_0, MARGIN_0, MARGIN_10, MARGIN_0);
         questionNumber.setLayoutParams(questionNumberParams);
         questionRow.addView(questionNumber);
@@ -143,12 +132,11 @@ public class SingleSelectGridFragment extends GridFragment {
         headerTableLayout.post(new Runnable() {
             @Override
             public void run() {
-                //int width = (headerTableLayout.getWidth()) / gridLabels.size();
                 int width = 0;
                 for (int k = 0; k < headerViews.size(); k++) {
                     TextView view = headerViews.get(k);
                     view.setWidth(labelWidths[k]);
-                    view.setPadding( 5,0, 5,10);
+                    view.setPadding(5, 0, 5, 10);
                     view.setMinimumWidth(width + 20);
                 }
                 for (RadioGroup radioGroup : mRadioGroups) {
@@ -170,7 +158,7 @@ public class SingleSelectGridFragment extends GridFragment {
             @Override
             public void run() {
                 LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
-                rowWidths[position] = layout.getWidth()/rowWidths.length+ params.leftMargin + params.rightMargin;
+                rowWidths[position] = layout.getWidth() / rowWidths.length + params.leftMargin + params.rightMargin;
             }
         });
     }
@@ -180,7 +168,7 @@ public class SingleSelectGridFragment extends GridFragment {
             @Override
             public void run() {
                 LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
-                labelWidths[position] = layout.getWidth()/labelWidths.length+ params.leftMargin + params.rightMargin;
+                labelWidths[position] = layout.getWidth() / labelWidths.length + params.leftMargin + params.rightMargin;
             }
         });
     }
@@ -212,7 +200,4 @@ public class SingleSelectGridFragment extends GridFragment {
         return null;
     }
 
-    @Override
-    public void onScrollChanged(OHScrollView scrollView, int x, int y, int oldX, int oldY) {
-    }
 }
