@@ -47,4 +47,12 @@ public class DisplayGroup extends Model {
         return new Select().from(Question.class).where("DisplayGroup = ?", getId()).orderBy("NumberInInstrument ASC").execute();
     }
 
+    public String getTitle() {
+        return mTitle;
+    }
+
+    public Long getRemoteId() {
+        return mRemoteId;
+    }
+
 }

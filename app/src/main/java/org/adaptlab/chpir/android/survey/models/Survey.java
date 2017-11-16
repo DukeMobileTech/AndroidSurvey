@@ -19,6 +19,7 @@ import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.SendModel;
 import org.adaptlab.chpir.android.survey.AppUtil;
+import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.R;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -66,6 +67,9 @@ public class Survey extends SendModel {
     private String mLanguage;
     @Column(name = "RandomizationOrder")
     private String mRandomizationOrder;
+    @Column(name = "QuestionRandomizedFactorsOrder")
+    private String mQuestionRandomizedFactorsOrder;
+
 
     public Survey() {
         super();
@@ -386,6 +390,29 @@ public class Survey extends SendModel {
 
     public String getRandomizationOrder() {
         return mRandomizationOrder;
+    }
+
+
+    public void setQuestionRandomizedFactorsOrder(String order) {
+        mQuestionRandomizedFactorsOrder = order;
+    }
+
+    public String getQuestionRandomizedFactorsOrder() {
+        if (mQuestionRandomizedFactorsOrder == null) {
+           mQuestionRandomizedFactorsOrder = new JSONObject().toString();
+        }
+        return mQuestionRandomizedFactorsOrder;
+    }
+
+    public String getQuestionRandomizedFactorsOrderByDisplayGroup(DisplayGroup group) {
+        String groupOrder = null;
+        try {
+            JSONObject order = new JSONObject(getQuestionRandomizedFactorsOrder());
+            groupOrder = (String) order.opt(String.valueOf(group.getRemoteId()));
+        } catch (JSONException e) {
+            if (BuildConfig.DEBUG) Log.e(TAG, "JSON exception", e);
+        }
+        return groupOrder;
     }
 
 }

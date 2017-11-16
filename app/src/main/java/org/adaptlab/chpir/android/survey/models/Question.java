@@ -208,36 +208,78 @@ public class Question extends ReceiveModel {
         JSONObject randomizedData;
         String text = getText();
         if (response == null) return text;
-        if (!TextUtils.isEmpty(response.getRandomizedData())) {
-            try {
-                randomizedData = new JSONObject(response.getRandomizedData());
+        if (getDisplayGroup() != null) {
+            // Questions in the same display group use the same randomization order for their factors
+            if (TextUtils.isEmpty(response.getSurvey().getQuestionRandomizedFactorsOrderByDisplayGroup(getDisplayGroup()))) {
+                Random random = new Random();
+                randomizedData = new JSONObject();
                 for (int k = 0; k < questionRandomizedFactors().size(); k++) {
-                    text = text.replaceFirst(RANDOMIZATION_TRIGGER, randomizedData.getString(String.valueOf(k + 1)));
+                    List<RandomizedOption> randomizedOptions = questionRandomizedFactors().get(k).getRandomizedFactor().randomizedOptions();
+                    int index = random.nextInt(randomizedOptions.size());
+                    RandomizedOption randomizedOption = randomizedOptions.get(index);
+                    text = text.replaceFirst(RANDOMIZATION_TRIGGER, randomizedOption.getText());
+                    try {
+                        randomizedData.put(String.valueOf(k + 1), randomizedOption.getRemoteId());
+                    } catch (JSONException e) {
+                        if (BuildConfig.DEBUG) Log.e(TAG, "JSON exception", e);
+                    }
                 }
-            } catch (JSONException e) {
-                if (BuildConfig.DEBUG) Log.e(TAG, "JSON exception", e);
+                response.setRandomizedData(randomizedData.toString());
+                response.save();
+                JSONObject json = new JSONObject();
+                try {
+                    json = new JSONObject(response.getSurvey().getQuestionRandomizedFactorsOrder());
+                    json.put(String.valueOf(getDisplayGroup().getRemoteId()), randomizedData.toString());
+                } catch (JSONException e) {
+                    if (BuildConfig.DEBUG) Log.e(TAG, "JSONException " + e);
+                }
+                response.getSurvey().setQuestionRandomizedFactorsOrder(json.toString());
+            } else {
+                text = replaceRandomizationTriggers(text, response.getSurvey().getQuestionRandomizedFactorsOrderByDisplayGroup(getDisplayGroup()), response);
             }
         } else {
-            Random random = new Random();
-            randomizedData = new JSONObject();
-            for (int k = 0; k < questionRandomizedFactors().size(); k++) {
-                List<RandomizedOption> randomizedOptions = questionRandomizedFactors().get(k).getRandomizedFactor().randomizedOptions();
-                int index = random.nextInt(randomizedOptions.size());
-                String optionText = randomizedOptions.get(index).getText();
-                text = text.replaceFirst(RANDOMIZATION_TRIGGER, optionText);
-                try {
-                    randomizedData.put(String.valueOf(k + 1), optionText);
-                } catch (JSONException e) {
-                    if (BuildConfig.DEBUG) Log.e(TAG, "JSON exception", e);
+            // Factor randomization for non-display group questions
+            if (!TextUtils.isEmpty(response.getRandomizedData())) {
+                text = replaceRandomizationTriggers(text, response.getRandomizedData(), null);
+            } else {
+                Random random = new Random();
+                randomizedData = new JSONObject();
+                for (int k = 0; k < questionRandomizedFactors().size(); k++) {
+                    List<RandomizedOption> randomizedOptions = questionRandomizedFactors().get(k).getRandomizedFactor().randomizedOptions();
+                    int index = random.nextInt(randomizedOptions.size());
+                    RandomizedOption randomizedOption = randomizedOptions.get(index);
+                    text = text.replaceFirst(RANDOMIZATION_TRIGGER, randomizedOption.getText());
+                    try {
+                        randomizedData.put(String.valueOf(k + 1), randomizedOption.getRemoteId());
+                    } catch (JSONException e) {
+                        if (BuildConfig.DEBUG) Log.e(TAG, "JSON exception", e);
+                    }
                 }
+                response.setRandomizedData(randomizedData.toString());
+                response.save(); // fallback when INSTRUCTIONS question type
             }
-            response.setRandomizedData(randomizedData.toString());
-            response.save(); // fallback when INSTRUCTIONS question type
         }
         return text;
     }
 
-    public Question getFollowingUpQuestion() {
+    private String replaceRandomizationTriggers(String text, String jsonString, Response response) {
+        try {
+            JSONObject randomizedData = new JSONObject(jsonString);
+            for (int k = 0; k < questionRandomizedFactors().size(); k++) {
+                RandomizedOption randomizedOption = RandomizedOption.findByRemoteId(randomizedData.getLong(String.valueOf(k + 1)));
+                text = text.replaceFirst(RANDOMIZATION_TRIGGER, randomizedOption.getText());
+                if (response != null) {
+                    response.setRandomizedData(randomizedData.toString());
+                    response.save();
+                }
+            }
+        } catch (JSONException e) {
+            if (BuildConfig.DEBUG) Log.e(TAG, "JSON exception", e);
+        }
+        return text;
+    }
+
+    private Question getFollowingUpQuestion() {
         return mFollowingUpQuestion;
     }
 
@@ -245,13 +287,11 @@ public class Question extends ReceiveModel {
      * Question types which must have their responses (represented as indices)
      * mapped to the original option text.
      */
-    public boolean followUpWithOptionText() {
+    private boolean followUpWithOptionText() {
         return getFollowingUpQuestion().getQuestionType().equals(QuestionType.SELECT_MULTIPLE) ||
                 getFollowingUpQuestion().getQuestionType().equals(QuestionType.SELECT_ONE) ||
-                getFollowingUpQuestion().getQuestionType().equals(QuestionType
-                        .SELECT_ONE_WRITE_OTHER) ||
-                getFollowingUpQuestion().getQuestionType().equals(QuestionType
-                        .SELECT_MULTIPLE_WRITE_OTHER);
+                getFollowingUpQuestion().getQuestionType().equals(QuestionType.SELECT_ONE_WRITE_OTHER) ||
+                getFollowingUpQuestion().getQuestionType().equals(QuestionType.SELECT_MULTIPLE_WRITE_OTHER);
     }
 
     /*
@@ -691,6 +731,10 @@ public class Question extends ReceiveModel {
 
     private void setDisplayGroup(DisplayGroup displayGroup) {
         mDisplayGroup = displayGroup;
+    }
+
+    private DisplayGroup getDisplayGroup() {
+        return mDisplayGroup;
     }
 
     public enum QuestionType {
