@@ -7,6 +7,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -25,12 +26,11 @@ public class SingleSelectGridFragment extends GridFragment {
     private static final String TAG = "SingleSelectGridFragment";
     private int mIndex;
     private List<RadioGroup> mRadioGroups;
+    private List<TextView> mHeaders;
+    private int optionNumbers;
     private Integer[] rowHeights;
-    private Integer[] rowWidths;
-    private Integer[] labelWidths;
-    private boolean interceptScroll = true;
-    private LinearLayout headerScrollView;
-    private LinearLayout contentScrollView;
+    private int rowWidth;
+    private int labelWidth;
     @Override
     protected void deserialize(String responseText) {
         if (responseText.equals("")) {
@@ -46,9 +46,6 @@ public class SingleSelectGridFragment extends GridFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_table_question, parent, false);
-
-        headerScrollView = (LinearLayout) v.findViewById(R.id.table_options_header_view);
-        contentScrollView = (LinearLayout) v.findViewById(R.id.table_body_options_view);
         setTableHeaderOptions(v);
         setTableBodyContent(v);
         return v;
@@ -129,58 +126,46 @@ public class SingleSelectGridFragment extends GridFragment {
         questionTextHeader.setPadding( 10,10,10,10);
         final LinearLayout headerTableLayout = (LinearLayout) v.findViewById(R.id.table_options_header);
         final List<GridLabel> gridLabels = getGrid().labels();
-        final List<TextView> headerViews = new ArrayList<>();
-        rowWidths = new Integer[gridLabels.size()];
-        labelWidths = new Integer[gridLabels.size()];
+        mHeaders = new ArrayList<>();
+        optionNumbers = gridLabels.size();
         for (int k = 0; k < gridLabels.size(); k++) {
             TextView textView = getHeaderTextView(gridLabels.get(k).getLabelText());
             headerTableLayout.addView(textView);
-            setRowWidth(headerTableLayout,textView, k);
-            setLabelWidth(headerTableLayout,textView, k);
-            headerViews.add(textView);
+            mHeaders.add(textView);
         }
+        setLabelWidth(headerTableLayout);
+        setRadioGroupWidth(headerTableLayout);
+    }
 
-        headerTableLayout.post(new Runnable() {
+    private void setRadioGroupWidth(final LinearLayout layout) {
+        layout.post(new Runnable() {
             @Override
             public void run() {
-                //int width = (headerTableLayout.getWidth()) / gridLabels.size();
-                int width = 0;
-                for (int k = 0; k < headerViews.size(); k++) {
-                    TextView view = headerViews.get(k);
-                    view.setWidth(labelWidths[k]);
-                    view.setPadding( 5,0, 5,10);
-                    view.setMinimumWidth(width + 20);
-                }
+                rowWidth = layout.getWidth()/optionNumbers;
                 for (RadioGroup radioGroup : mRadioGroups) {
-                    for (int i = 0; i < gridLabels.size(); i++) {
+                    for (int i = 0; i < optionNumbers; i++) {
                         RadioButton radioButton = (RadioButton) radioGroup.getChildAt(i);
-                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(rowWidths[i], LinearLayout.LayoutParams.WRAP_CONTENT);
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(rowWidth, LinearLayout.LayoutParams.WRAP_CONTENT);
                         params.gravity = Gravity.CENTER_VERTICAL;
                         radioButton.setLayoutParams(params);
                         radioButton.setPadding(MARGIN_10, MARGIN_0, MARGIN_10, MARGIN_0);
-                        radioButton.setMinimumWidth(rowWidths[i]);
+                        radioButton.setMinimumWidth(rowWidth);
                     }
                 }
             }
         });
     }
 
-    private void setRowWidth(final LinearLayout layout,final TextView view, final int position) {
-        view.post(new Runnable() {
+    private void setLabelWidth(final LinearLayout layout) {
+        layout.post(new Runnable() {
             @Override
             public void run() {
-                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
-                rowWidths[position] = layout.getWidth()/rowWidths.length+ params.leftMargin + params.rightMargin;
-            }
-        });
-    }
-
-    private void setLabelWidth(final LinearLayout layout,final TextView view, final int position) {
-        view.post(new Runnable() {
-            @Override
-            public void run() {
-                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
-                labelWidths[position] = layout.getWidth()/labelWidths.length+ params.leftMargin + params.rightMargin;
+                labelWidth = layout.getWidth()/optionNumbers;
+                for(TextView curTextVeiw:mHeaders){
+                    curTextVeiw.setWidth(labelWidth);
+                    curTextVeiw.setPadding(5,0,5,10);
+                    curTextVeiw.setMinimumWidth(20);
+                }
             }
         });
     }
@@ -210,9 +195,5 @@ public class SingleSelectGridFragment extends GridFragment {
     @Override
     protected String serialize() {
         return null;
-    }
-
-    @Override
-    public void onScrollChanged(OHScrollView scrollView, int x, int y, int oldX, int oldY) {
     }
 }

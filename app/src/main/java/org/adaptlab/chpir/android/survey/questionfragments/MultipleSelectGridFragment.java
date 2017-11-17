@@ -38,17 +38,12 @@ public class MultipleSelectGridFragment extends GridFragment {
 
     private static final String TAG = "MultipleSelectGridFragment";
     private List<List<CheckBox>> mCheckBoxes;
-    private boolean interceptScroll = true;
-    private LinearLayout headerScrollView;
-    private LinearLayout contentScrollView;
-    private Integer[] rowHeights;
-    private Integer[] rowWidths;
-    private Integer[] labelWidths;
+    private List<TextView> mHeaders;
+    private int optionNumbers;
+    private int[] rowHeights;
+    private int rowWidth;
+    private int labelWidth;
     private int mIndex;
-
-    @Override
-    public void onScrollChanged(OHScrollView scrollView, int x, int y, int oldX, int oldY) {
-    }
 
     @Override
     protected void deserialize(String responseText) {
@@ -73,9 +68,6 @@ public class MultipleSelectGridFragment extends GridFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_table_question, parent, false);
-
-        headerScrollView = (LinearLayout) v.findViewById(R.id.table_options_header_view);
-        contentScrollView = (LinearLayout) v.findViewById(R.id.table_body_options_view);
         setTableHeaderOptions(v);
         setTableBodyContent(v);
         return v;
@@ -87,60 +79,50 @@ public class MultipleSelectGridFragment extends GridFragment {
         questionTextHeader.setPadding( 10,10,10,10);
         final LinearLayout headerTableLayout = (LinearLayout) v.findViewById(R.id.table_options_header);
         final List<GridLabel> gridLabels = getGrid().labels();
-        rowWidths = new Integer[gridLabels.size()];
-        labelWidths = new Integer[gridLabels.size()];
-        final List<TextView> headers = new ArrayList<>();
+        optionNumbers = gridLabels.size();
+        rowWidth = 0;
+        labelWidth = 0;
+        rowWidth = headerTableLayout.getWidth()/optionNumbers;
+        labelWidth = headerTableLayout.getWidth()/optionNumbers;
+        mHeaders = new ArrayList<>();
         for (int k = 0; k < gridLabels.size(); k++) {
             TextView textView = getHeaderTextView(gridLabels.get(k).getLabelText());
             headerTableLayout.addView(textView);
-            setRowWidth(headerTableLayout,textView, k);
-            setLabelWidth(headerTableLayout,textView, k);
-            headers.add(textView);
+            mHeaders.add(textView);
         }
-        headerTableLayout.post(new Runnable() {
+        setLabelWidth(headerTableLayout);
+        setCheckBoxesWidth(headerTableLayout);
+    }
+
+    private void setCheckBoxesWidth(final LinearLayout layout) {
+        layout.post(new Runnable() {
             @Override
             public void run() {
-                int numOfHeaders = gridLabels.size();
-                int headerBorders = numOfHeaders * 2;
-                int paddingLeftRight = 20;
-                //int width = (headerTableLayout.getWidth() - headerBorders) / numOfHeaders;
-                int width = 0;
-                for (int k = 0; k < headers.size(); k++) {
-                    TextView view = headers.get(k);
-                    view.setWidth(labelWidths[k]);
-                    view.setPadding( 5,0, 5,10);
-                    view.setMinimumWidth(width + paddingLeftRight);
-                }
+                rowWidth = layout.getWidth()/optionNumbers;
                 for (List<CheckBox> checkBoxes : mCheckBoxes) {
                     for (int i = 0; i < checkBoxes.size(); i++) {
                         CheckBox checkBox = checkBoxes.get(i);
-                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(rowWidths[i], LinearLayout.LayoutParams.WRAP_CONTENT);
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(rowWidth, LinearLayout.LayoutParams.WRAP_CONTENT);
                         params.gravity = Gravity.CENTER_VERTICAL;
                         checkBox.setLayoutParams(params);
                         checkBox.setPadding(MARGIN_10, MARGIN_0, MARGIN_10, MARGIN_0);
-                        checkBox.setMinimumWidth(rowWidths[i]);
+                        checkBox.setMinimumWidth(rowWidth);
                     }
                 }
             }
         });
     }
 
-    private void setRowWidth(final LinearLayout layout,final TextView view, final int position) {
-        view.post(new Runnable() {
+    private void setLabelWidth(final LinearLayout layout) {
+        layout.post(new Runnable() {
             @Override
             public void run() {
-                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
-                rowWidths[position] = layout.getWidth()/rowWidths.length+ params.leftMargin + params.rightMargin;
-            }
-        });
-    }
-
-    private void setLabelWidth(final LinearLayout layout,final TextView view, final int position) {
-        view.post(new Runnable() {
-            @Override
-            public void run() {
-                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
-                labelWidths[position] = layout.getWidth()/labelWidths.length+ params.leftMargin + params.rightMargin;
+                labelWidth = layout.getWidth()/optionNumbers;
+                for(TextView curTextVeiw:mHeaders){
+                    curTextVeiw.setWidth(labelWidth);
+                    curTextVeiw.setPadding(5,0,5,10);
+                    curTextVeiw.setMinimumWidth(20);
+                }
             }
         });
     }
@@ -151,7 +133,7 @@ public class MultipleSelectGridFragment extends GridFragment {
         LinearLayout optionsListLinearLayout = (LinearLayout) v.findViewById(R.id.table_body_options_choice);
         mCheckBoxes = new ArrayList<>();
         List<Question> questionList = getQuestions();
-        rowHeights = new Integer[questionList.size()];
+        rowHeights = new int[questionList.size()];
         for (int k = 0; k < questionList.size(); k++) {
             final Question q = questionList.get(k);
             setQuestionText(questionTextLayout, k, q);

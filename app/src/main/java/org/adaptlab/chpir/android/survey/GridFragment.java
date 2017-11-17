@@ -25,7 +25,7 @@ import org.adaptlab.chpir.android.survey.models.Survey;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class GridFragment extends QuestionFragment implements ScrollViewListener {
+public abstract class GridFragment extends QuestionFragment{
 	public final static String EXTRA_GRID_ID = 
             "org.adaptlab.chpir.android.survey.grid_id";
 	public final static String EXTRA_SURVEY_ID =
