@@ -87,8 +87,7 @@ public class Instrument extends ReceiveModel {
                 .from(Instrument.class)
                 .where("ProjectID = ? AND Published = ? AND Deleted = ?", projectId, true, false)
                 .orderBy("Title");
-        return Cache.openDatabase().rawQuery(instrumentsQuery.toSql(), instrumentsQuery
-                .getArguments());
+        return Cache.openDatabase().rawQuery(instrumentsQuery.toSql(), instrumentsQuery.getArguments());
     }
 
     public static List<Instrument> loadedInstruments() {
@@ -140,8 +139,7 @@ public class Instrument extends ReceiveModel {
 
     public InstrumentTranslation activeTranslation() {
         return new Select().from(InstrumentTranslation.class)
-                .where("InstrumentRemoteId = ? AND Language = ? AND Active = ?",
-                        mRemoteId, getDeviceLanguage(), 1).executeSingle();
+                .where("InstrumentRemoteId = ? AND Language = ? AND Active = ?", mRemoteId, getDeviceLanguage(), 1).executeSingle();
     }
 
     public void setTitle(String title) {

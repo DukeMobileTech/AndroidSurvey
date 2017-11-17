@@ -68,8 +68,7 @@ public class NetworkNotificationUtils {
      */
     @SuppressWarnings("deprecation")
     private static boolean isNetworkAvailable(Context context) {
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context
-                .CONNECTIVITY_SERVICE);
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         return cm.getBackgroundDataSetting() && cm.getActiveNetworkInfo() != null;
     }
 }

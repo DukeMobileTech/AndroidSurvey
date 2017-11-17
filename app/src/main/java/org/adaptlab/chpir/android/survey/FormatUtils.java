@@ -86,4 +86,7 @@ public class FormatUtils {
         return Html.fromHtml(text);
     }
 
+    public static String removeNonNumericCharacters(String string) {
+        return string.replaceAll("[^\\d.]", "");
+    }
 }
