@@ -219,8 +219,7 @@ public class Question extends ReceiveModel {
             Random random = new Random();
             randomizedData = new JSONObject();
             for (int k = 0; k < questionRandomizedFactors().size(); k++) {
-                List<RandomizedOption> randomizedOptions = questionRandomizedFactors().get(k)
-                        .getRandomizedFactor().randomizedOptions();
+                List<RandomizedOption> randomizedOptions = questionRandomizedFactors().get(k).getRandomizedFactor().randomizedOptions();
                 int index = random.nextInt(randomizedOptions.size());
                 String optionText = randomizedOptions.get(index).getText();
                 text = text.replaceFirst(RANDOMIZATION_TRIGGER, optionText);
@@ -405,8 +404,7 @@ public class Question extends ReceiveModel {
             question.setIdentifiesSurvey(jsonObject.getBoolean("identifies_survey"));
             question.setInstructions(jsonObject.getString("instructions"));
             question.setQuestionVersion(jsonObject.getInt("question_version"));
-            question.setFollowingUpQuestion(Question.findByQuestionIdentifier(
-                    jsonObject.getString("following_up_question_identifier")));
+            question.setFollowingUpQuestion(Question.findByQuestionIdentifier(jsonObject.getString("following_up_question_identifier")));
             if (!jsonObject.isNull("grid_id")) {
                 question.setGrid(Grid.findByRemoteId(jsonObject.getLong("grid_id")));
             }
@@ -417,7 +415,9 @@ public class Question extends ReceiveModel {
                 question.setSection(Section.findByRemoteId(jsonObject.getLong("section_id")));
             }
             question.setRemoteId(remoteId);
-            if (!jsonObject.isNull("deleted_at")) {
+            if (jsonObject.isNull("deleted_at")) {
+                question.setDeleted(false);
+            } else {
                 question.setDeleted(true);
             }
             if (!jsonObject.isNull("critical")) {
@@ -560,10 +560,8 @@ public class Question extends ReceiveModel {
                 .execute();
     }
 
-    public List<QuestionRandomizedFactor> questionRandomizedFactors() {
-        return new Select().from(QuestionRandomizedFactor.class).where("Question = ?", getId())
-                .orderBy("Position ASC")
-                .execute();
+    private List<QuestionRandomizedFactor> questionRandomizedFactors() {
+        return new Select().from(QuestionRandomizedFactor.class).where("Question = ?", getId()).orderBy("Position ASC").execute();
     }
 
     public String getRegExValidation() {

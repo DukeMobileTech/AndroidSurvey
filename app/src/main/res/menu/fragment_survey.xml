@@ -5,7 +5,7 @@
         android:id="@+id/menu_item_previous"
         android:icon="@drawable/ic_menu_item_previous_item"
         android:title="@string/previous_button"
-        app:showAsAction="ifRoom|withText"/>
+        app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/menu_item_skip"
         android:icon="@drawable/ic_menu_item_sk"
@@ -30,11 +30,11 @@
         android:id="@+id/menu_item_next"
         android:icon="@drawable/ic_menu_item_next_item"
         android:title="@string/next_button"
-        app:showAsAction="ifRoom|withText"/>
+        app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/menu_item_finish"
         android:icon="@drawable/ic_menu_item_accept"
         android:title="@string/finish_button"
         android:visibility="gone"
-        app:showAsAction="ifRoom|withText"/>
+        app:showAsAction="ifRoom"/>
 </menu>

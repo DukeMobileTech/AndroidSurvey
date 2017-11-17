@@ -105,7 +105,9 @@ public abstract class QuestionFragment extends Fragment {
 
         // Overridden by subclasses to place their graphical elements on the fragment.
         createQuestionComponent(questionComponent);
-        deserialize(mResponse.getText());
+        if (mResponse != null) {
+            deserialize(mResponse.getText());
+        }
         return v;
     }
 

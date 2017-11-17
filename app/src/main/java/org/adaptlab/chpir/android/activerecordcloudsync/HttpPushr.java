@@ -53,9 +53,7 @@ public class HttpPushr {
 
     private List<? extends SendModel> getElements() {
         try {
-            return new Select().from(mSendTableClass)
-                    .orderBy(String.format("%s", mSendTableClass.newInstance().getPrimaryKey()) +
-                            " ASC").execute();
+            return new Select().from(mSendTableClass).orderBy(String.format("%s", mSendTableClass.newInstance().getPrimaryKey()) + " ASC").execute();
         } catch (InstantiationException er) {
             if (AppUtil.DEBUG) Log.e(TAG, "InstantiationException " + er);
         } catch (IllegalAccessException er) {
@@ -69,11 +67,9 @@ public class HttpPushr {
             HttpURLConnection connection = null;
             String endPoint;
             if (element.belongsToRoster() && AppUtil.getAdminSettingsInstance().useEndpoint2()) {
-                endPoint = ActiveRecordCloudSync.getEndPoint2() + mRemoteTableName +
-                        ActiveRecordCloudSync.getParams2();
+                endPoint = ActiveRecordCloudSync.getEndPoint2() + mRemoteTableName + ActiveRecordCloudSync.getParams2();
             } else {
-                endPoint = ActiveRecordCloudSync.getEndPoint() + mRemoteTableName +
-                        ActiveRecordCloudSync.getParams();
+                endPoint = ActiveRecordCloudSync.getEndPoint() + mRemoteTableName + ActiveRecordCloudSync.getParams();
             }
             try {
                 connection = (HttpURLConnection) new URL(endPoint).openConnection();
@@ -94,8 +90,7 @@ public class HttpPushr {
                     if (AppUtil.DEBUG) Log.i(TAG, "Received OK HTTP code for " + element.toJSON());
                     element.setAsSent(mContext);
                 } else {
-                    if (AppUtil.DEBUG) Log.e(TAG, "Received BAD HTTP code " + responseCode +
-                            " for " + element.toJSON());
+                    if (AppUtil.DEBUG) Log.e(TAG, "Received BAD HTTP code " + responseCode + " for " + element.toJSON());
                 }
 
             } catch (IOException e) {

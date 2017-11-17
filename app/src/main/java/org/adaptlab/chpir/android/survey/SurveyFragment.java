@@ -219,19 +219,21 @@ public class SurveyFragment extends Fragment {
     public void refreshView() {
         if (noBackgroundTask) {
             AuthorizedActivity authority = (AuthorizedActivity) getActivity();
-            if (authority.getAuthorize()) {
+            if (authority.getAuthorize() && AppUtil.getAdminSettingsInstance() != null && AppUtil.getAdminSettingsInstance().getRequirePassword() && !AuthUtils.isSignedIn()) {
                 authority.setAuthorize(false);
-                if (AppUtil.getAdminSettingsInstance() != null && AppUtil.getAdminSettingsInstance().getRequirePassword() && !AuthUtils.isSignedIn()) {
-                    Intent i = new Intent(getContext(), LoginActivity.class);
-                    getActivity().startActivityForResult(i, AUTHORIZE_CODE);
-                }
+                Intent i = new Intent(getContext(), LoginActivity.class);
+                getActivity().startActivityForResult(i, AUTHORIZE_CODE);
             } else {
-                setParticipantLabel();
-                updateQuestionCountLabel();
-                updateQuestionText();
-                createQuestionFragment();
+                updateUI();
             }
         }
+    }
+
+    private void updateUI() {
+        setParticipantLabel();
+        updateQuestionCountLabel();
+        updateQuestionText();
+        createQuestionFragment();
     }
 
     @Override
@@ -256,14 +258,12 @@ public class SurveyFragment extends Fragment {
             int questionNum = data.getExtras().getInt(EXTRA_QUESTION_NUMBER);
             Long instrumentId = data.getExtras().getLong(EXTRA_INSTRUMENT_ID);
             Long surveyId = data.getExtras().getLong(EXTRA_SURVEY_ID);
-            ArrayList<Integer> previousQuestions = data.getExtras().getIntegerArrayList
-                    (EXTRA_PREVIOUS_QUESTION_IDS);
+            ArrayList<Integer> previousQuestions = data.getExtras().getIntegerArrayList(EXTRA_PREVIOUS_QUESTION_IDS);
             mQuestion = mQuestions.get(questionNum);
             mQuestionNumber = questionNum;
             mInstrument = Instrument.findByRemoteId(instrumentId);
             mSurvey = Model.load(Survey.class, surveyId);
-            if (mQuestion.getSection() != null && mQuestion.getSection() == mSection)
-                showSectionView = false;
+            if (mQuestion.getSection() != null && mQuestion.getSection() == mSection) showSectionView = false;
             if (previousQuestions != null) mPreviousQuestions.addAll(previousQuestions);
             if (previousQuestion == mQuestion) showSectionView = false;
         }
@@ -304,10 +304,8 @@ public class SurveyFragment extends Fragment {
                 loadOrCreateSurvey();
             }
         }
-        if (AppUtil.PRODUCTION) {
-            Fabric.with(getActivity(), new Crashlytics());
-            Crashlytics.setString(getString(R.string.last_instrument), mInstrument.getTitle());
-        }
+
+        registerCrashlytics();
 
         if (!mInstrument.isRoster()) {
             mQuestionCount = mInstrument.getQuestionCount();
@@ -320,6 +318,15 @@ public class SurveyFragment extends Fragment {
             if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 startLocationServices();
             }
+        }
+    }
+
+    private void registerCrashlytics() {
+        if (AppUtil.PRODUCTION) {
+            Fabric.with(getActivity(), new Crashlytics());
+            Crashlytics.setString(getString(R.string.last_instrument), mInstrument.getTitle());
+            Crashlytics.setString(getString(R.string.last_survey), mSurvey.getUUID());
+            Crashlytics.setString(getString(R.string.last_question), mQuestion.getNumberInInstrument() + "");
         }
     }
 
@@ -738,10 +745,8 @@ public class SurveyFragment extends Fragment {
      */
     private void removeTextFocus() {
         if (getActivity().getCurrentFocus() != null) {
-            InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService
-                    (Context.INPUT_METHOD_SERVICE);
-            inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken()
-                    , InputMethodManager.HIDE_NOT_ALWAYS);
+            InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
     }
 
@@ -804,8 +809,7 @@ public class SurveyFragment extends Fragment {
     private Question getNextQuestionWhenNumberFormatException(int questionIndex) {
         Question nextQuestion;
         nextQuestion = nextQuestionHelper(questionIndex);
-        Log.wtf(TAG, "Received a non-numeric skip response index for " +
-                mQuestion.getQuestionIdentifier());
+        Log.wtf(TAG, "Received a non-numeric skip response index for " + mQuestion.getQuestionIdentifier());
         return nextQuestion;
     }
 
@@ -820,8 +824,7 @@ public class SurveyFragment extends Fragment {
 
     private Question getNextQuestionForSkipPattern(int questionIndex, int responseIndex) {
         Question nextQuestion;
-        if (responseIndex < mQuestion.defaultOptions().size() && mQuestion.defaultOptions().get
-                (responseIndex).getNextQuestion() != null) {
+        if (responseIndex < mQuestion.defaultOptions().size() && mQuestion.defaultOptions().get(responseIndex).getNextQuestion() != null) {
             nextQuestion = mQuestion.defaultOptions().get(responseIndex).getNextQuestion();
             mQuestionNumber = nextQuestion.getNumberInInstrument() - 1;
         } else {
@@ -1155,9 +1158,7 @@ public class SurveyFragment extends Fragment {
 
         @Override
         protected void onPreExecute() {
-            mProgressDialog = ProgressDialog.show(getActivity(),
-                    getString(R.string.instrument_loading_progress_header),
-                    getString(R.string.background_process_progress_message)
+            mProgressDialog = ProgressDialog.show(getActivity(), getString(R.string.instrument_loading_progress_header), getString(R.string.background_process_progress_message)
             );
         }
 

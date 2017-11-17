@@ -9,6 +9,8 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.QuestionFragment;
 
+import static org.adaptlab.chpir.android.survey.FormatUtils.removeNonNumericCharacters;
+
 public class SelectOneQuestionFragment extends QuestionFragment {
     private RadioGroup mRadioGroup;
     private int mResponseIndex;
@@ -57,7 +59,7 @@ public class SelectOneQuestionFragment extends QuestionFragment {
         	if (checked > -1)
         		((RadioButton) getRadioGroup().getChildAt(checked)).setChecked(false);
         } else {
-            ((RadioButton) getRadioGroup().getChildAt(Integer.parseInt(responseText))).setChecked(true);
+            ((RadioButton) getRadioGroup().getChildAt(Integer.parseInt(removeNonNumericCharacters(responseText)))).setChecked(true);
         }
     }
     

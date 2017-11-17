@@ -1,5 +1,6 @@
 package org.adaptlab.chpir.android.activerecordcloudsync;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.activeandroid.ActiveAndroid;
@@ -26,14 +27,18 @@ public class HttpFetchr {
     }
 
     public void fetch() {
-        if (ActiveRecordCloudSync.getEndPoint() == null) {
+        if (TextUtils.isEmpty(ActiveRecordCloudSync.getEndPoint())) {
             if (BuildConfig.DEBUG) Log.i(TAG, "ActiveRecordCloudSync end point is not set!");
             return;
         }
 
         try {
-            String url = ActiveRecordCloudSync.getEndPoint() + mRemoteTableName +
-                    ActiveRecordCloudSync.getParams();
+            String url;
+            if (mRemoteTableName.equals("projects")) {
+                url = ActiveRecordCloudSync.getProjectsEndPoint() + ActiveRecordCloudSync.getParams();
+            } else {
+                url = ActiveRecordCloudSync.getEndPoint() + mRemoteTableName + ActiveRecordCloudSync.getParams();
+            }
             String jsonString = getUrl(url);
             JSONArray jsonArray = new JSONArray(jsonString);
 
