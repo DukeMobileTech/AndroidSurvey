@@ -1,0 +1,3 @@
+ALTER TABLE Questions ADD COLUMN RemoteOptionSetId LONG;
+ALTER TABLE Questions ADD COLUMN DisplayId LONG;
+ALTER TABLE Options ADD COLUMN RemoteOptionSetId LONG;

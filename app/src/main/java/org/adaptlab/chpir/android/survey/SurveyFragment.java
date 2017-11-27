@@ -46,6 +46,7 @@ import com.activeandroid.Model;
 import com.crashlytics.android.Crashlytics;
 
 import org.adaptlab.chpir.android.survey.location.LocationServiceManager;
+import org.adaptlab.chpir.android.survey.models.Display;
 import org.adaptlab.chpir.android.survey.models.Grid;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.Option;
@@ -122,6 +123,7 @@ public class SurveyFragment extends Fragment {
     private ArrayList<Integer> mQuestionsToSkip;
     private ArrayList<Section> mSections;
     private List<Question> mQuestions;
+    private ArrayList<Display> mDisplays;
     private HashMap<Question, Response> mResponses;
     private HashMap<Question, List<Option>> mOptions;
     private TextView mQuestionText;
@@ -296,6 +298,7 @@ public class SurveyFragment extends Fragment {
                 loadOrCreateSurvey();
             }
         }
+        mDisplays = (ArrayList<Display>) mInstrument.displays();
 
         registerCrashlytics();
 
@@ -1058,7 +1061,7 @@ public class SurveyFragment extends Fragment {
      * If this question has instructions, append and add new line
      */
     private void appendInstructions(TextView text) {
-        if (mQuestion.getInstructions() != null && !mQuestion.getInstructions().equals("")) {
+        if (!TextUtils.isEmpty(mQuestion.getInstructions()) && !mQuestion.getInstructions().equals("null")) {
             text.setText(styleTextWithHtml(mQuestion.getInstructions() + "<br />"));
         } else {
             text.setText("");

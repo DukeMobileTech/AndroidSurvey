@@ -40,6 +40,8 @@ public class Option extends ReceiveModel {
     private boolean mCritical;
     @Column(name = "CompleteSurvey")
     private boolean mCompleteSurvey;
+    @Column(name = "RemoteOptionSetId")
+    private Long mRemoteOptionSetId;
 
     public Option() {
         super();
@@ -83,8 +85,10 @@ public class Option extends ReceiveModel {
         return getQuestion().getInstrument();
     }
 
+    // TODO: 11/27/17 FIX
     public Question getQuestion() {
-        return mQuestion;
+//        return mQuestion;
+        return new Select().from(Question.class).where("RemoteOptionSetId = ?", getRemoteOptionId()).executeSingle();
     }
 
     public String getDeviceLanguage() {
@@ -116,24 +120,25 @@ public class Option extends ReceiveModel {
             if (option == null) {
                 option = this;
             }
+            option.setRemoteId(remoteId);
 
             if (AppUtil.DEBUG) Log.i(TAG, "Creating object from JSON Object: " + jsonObject);
             option.setText(jsonObject.getString("text"));
-            option.setQuestion(Question.findByRemoteId(jsonObject.getLong("question_id")));
-            option.setRemoteId(remoteId);
-            option.setNextQuestion(jsonObject.getString("next_question"));
-            if (!jsonObject.isNull("number_in_question")) {
-                option.setNumberInQuestion(jsonObject.getInt("number_in_question"));
-            }
-            option.setInstrumentVersion(jsonObject.getInt("instrument_version"));
-            option.setSpecial(jsonObject.getBoolean("special"));
-            if (!jsonObject.isNull("deleted_at")) {
-                option.setDeleted(true);
-            }
-            if (!jsonObject.isNull("critical")) {
-                option.setCritical(jsonObject.getBoolean("critical"));
-            }
-            option.setCompleteSurvey(jsonObject.optBoolean("complete_survey"));
+//            option.setQuestion(Question.findByRemoteId(jsonObject.getLong("question_id")));
+//            option.setNextQuestion(jsonObject.getString("next_question"));
+//            if (!jsonObject.isNull("number_in_question")) {
+//                option.setNumberInQuestion(jsonObject.getInt("number_in_question"));
+//            }
+//            option.setInstrumentVersion(jsonObject.getInt("instrument_version"));
+//            option.setSpecial(jsonObject.getBoolean("special"));
+//            if (!jsonObject.isNull("deleted_at")) {
+//                option.setDeleted(true);
+//            }
+//            if (!jsonObject.isNull("critical")) {
+//                option.setCritical(jsonObject.getBoolean("critical"));
+//            }
+//            option.setCompleteSurvey(jsonObject.optBoolean("complete_survey"));
+            option.setRemoteOptionSetId(jsonObject.optLong("option_set_id"));
             option.save();
 
             // Generate translations
@@ -158,6 +163,14 @@ public class Option extends ReceiveModel {
         } catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);
         }
+    }
+
+    private void setRemoteOptionSetId(Long id) {
+        mRemoteOptionSetId = id;
+    }
+
+    private Long getRemoteOptionId() {
+        return mRemoteOptionSetId;
     }
 
     public static Option findByRemoteId(Long id) {
