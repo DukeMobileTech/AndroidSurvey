@@ -11,12 +11,12 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -37,6 +37,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -51,14 +52,11 @@ import org.adaptlab.chpir.android.survey.models.Grid;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.Question;
-import org.adaptlab.chpir.android.survey.models.Question.QuestionType;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Score;
 import org.adaptlab.chpir.android.survey.models.ScoreScheme;
 import org.adaptlab.chpir.android.survey.models.Section;
 import org.adaptlab.chpir.android.survey.models.Survey;
-import org.adaptlab.chpir.android.survey.questionfragments.MultipleSelectGridFragment;
-import org.adaptlab.chpir.android.survey.questionfragments.SingleSelectGridFragment;
 import org.adaptlab.chpir.android.survey.roster.RosterActivity;
 import org.adaptlab.chpir.android.survey.rules.InstrumentSurveyLimitPerMinuteRule;
 import org.adaptlab.chpir.android.survey.rules.InstrumentSurveyLimitRule;
@@ -68,6 +66,7 @@ import org.adaptlab.chpir.android.survey.tasks.SendResponsesTask;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -108,6 +107,7 @@ public class SurveyFragment extends Fragment {
 
     QuestionFragment mQuestionFragment;
     private Question mQuestion;
+    private LinearLayout mQuestionViewLayout;
     private Instrument mInstrument;
     private Survey mSurvey;
     private int mQuestionNumber;
@@ -122,6 +122,7 @@ public class SurveyFragment extends Fragment {
     private ArrayList<Integer> mPreviousQuestions;
     private ArrayList<Integer> mQuestionsToSkip;
     private ArrayList<Section> mSections;
+    private ArrayList<QuestionFragment> mQuestionFragments;
     private List<Question> mQuestions;
     private ArrayList<Display> mDisplays;
     private HashMap<Question, Response> mResponses;
@@ -176,15 +177,15 @@ public class SurveyFragment extends Fragment {
     }
 
     private void updateQuestionText() {
-        if (mQuestion != null) {
-            if (mQuestion.belongsToGrid()) {
-                setGridLabelText(mQuestionText);
-            } else {
-                setQuestionText(mQuestionText);
-            }
-            mQuestionText.setTypeface(mInstrument.getTypeFace(getActivity().getApplicationContext()));
-
-        }
+//        if (mQuestion != null) {
+//            if (mQuestion.belongsToGrid()) {
+//                setGridLabelText(mQuestionText);
+//            } else {
+//                setQuestionText(mQuestionText);
+//            }
+//            mQuestionText.setTypeface(mInstrument.getTypeFace(getActivity().getApplicationContext()));
+//
+//        }
     }
 
     public void loadOrCreateQuestion() {
@@ -328,11 +329,12 @@ public class SurveyFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_survey, parent, false);
-        mQuestionText = (TextView) v.findViewById(R.id.question_text);
+        mQuestionViewLayout = (LinearLayout) v.findViewById(R.id.question_component_layout);
+        //mQuestionText = (TextView) v.findViewById(R.id.question_text);
         mParticipantLabel = (TextView) v.findViewById(R.id.participant_label);
         mQuestionIndex = (TextView) v.findViewById(R.id.question_index);
         mProgressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
-        mQuestionText.setTypeface(mInstrument.getTypeFace(getActivity().getApplicationContext()));
+        //mQuestionText.setTypeface(mInstrument.getTypeFace(getActivity().getApplicationContext()));
         ActivityCompat.invalidateOptionsMenu(getActivity());
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (actionBar != null) actionBar.setTitle(mInstrument.getTitle());
@@ -631,55 +633,67 @@ public class SurveyFragment extends Fragment {
                     showSectionView) {
                 moveToSection(mQuestion.getSection());
             } else {
-                if (mQuestion.belongsToGrid()) {
-                    mGrid = mQuestion.getGrid();
-                    createGridFragment();
-                } else {
-                    FragmentManager fm = getChildFragmentManager();
-                    mQuestionFragment = (QuestionFragment) QuestionFragmentFactory.createQuestionFragment(mQuestion);
-                    switchOutFragments(fm);
+//                if (mQuestion.belongsToGrid()) {
+//                    mGrid = mQuestion.getGrid();
+//                    createGridFragment();
+//                } else {
+                for (Question question: mQuestions) {
+                    FrameLayout framelayout = new FrameLayout(getContext());
+                    framelayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewPager.LayoutParams.MATCH_PARENT));
+                    framelayout.setId(new BigDecimal(question.getRemoteId()).intValueExact());
+                    mQuestionViewLayout.addView(framelayout);
+
+                    Bundle bundle = new Bundle();
+                    bundle.putString("QuestionIdentifier", question.getQuestionIdentifier());
+
+                    mQuestionFragment = (QuestionFragment) QuestionFragmentFactory.createQuestionFragment(question);
+                    mQuestionFragment.setArguments(bundle);
+
+                    final FragmentManager fm = getChildFragmentManager();
+                    fm.beginTransaction().replace(framelayout.getId(), mQuestionFragment).commit();
                 }
+//                }
             }
         }
     }
 
-    private void createGridFragment() {
-        if (mQuestion.getQuestionType() == QuestionType.SELECT_ONE) {
-            mQuestionFragment = new SingleSelectGridFragment();
-        } else {
-            mQuestionFragment = new MultipleSelectGridFragment();
-        }
-        Bundle bundle = new Bundle();
-        bundle.putLong(GridFragment.EXTRA_GRID_ID, mQuestion.getGrid().getRemoteId());
-        bundle.putLong(GridFragment.EXTRA_SURVEY_ID, mSurvey.getId());
-        mQuestionFragment.setArguments(bundle);
-        FragmentManager fm = getChildFragmentManager();
-        switchOutFragments(fm);
-    }
+//    private void createGridFragment() {
+//        if (mQuestion.getQuestionType() == QuestionType.SELECT_ONE) {
+//            mQuestionFragment = new SingleSelectGridFragment();
+//        } else {
+//            mQuestionFragment = new MultipleSelectGridFragment();
+//        }
+//        Bundle bundle = new Bundle();
+//        bundle.putLong(GridFragment.EXTRA_GRID_ID, mQuestion.getGrid().getRemoteId());
+//        bundle.putLong(GridFragment.EXTRA_SURVEY_ID, mSurvey.getId());
+//        mQuestionFragment.setArguments(bundle);
+//        FragmentManager fm = getChildFragmentManager();
+//        switchOutFragments(fm);
+//    }
 
-    private void switchOutFragments(final FragmentManager fm) {
-        if (mAllowFragmentCommit) {
-            commitFragmentTransaction(fm);
-        }
-        else {
-            new Handler().post(new Runnable() {
-                public void run() {
-                    commitFragmentTransaction(fm);
-                }
-            });
-        }
-        mSurvey.setLastQuestion(mQuestion);
-        mSurvey.save();
-        removeTextFocus();
-    }
+//    private void switchOutFragments(final FragmentManager fm) {
+//        if (mAllowFragmentCommit) {
+//            commitFragmentTransaction(fm);
+//        }
+//        else {
+//            new Handler().post(new Runnable() {
+//                public void run() {
+//                    commitFragmentTransaction(fm);
+//                }
+//            });
+//        }
+//        mSurvey.setLastQuestion(mQuestion);
+//        mSurvey.save();
+//        removeTextFocus();
+//    }
 
-    private void commitFragmentTransaction(FragmentManager fm) {
-        if (fm.findFragmentById(R.id.question_container) == null) {
-            fm.beginTransaction().add(R.id.question_container, mQuestionFragment).commit();
-        } else {
-            fm.beginTransaction().replace(R.id.question_container, mQuestionFragment).commit();
-        }
-    }
+//    private void commitFragmentTransaction(FragmentManager fm) {
+//        if (fm.findFragmentById(R.id.question_container) == null) {
+//            fm.beginTransaction().add(R.id.question_container, mQuestionFragment).commit();
+//        } else {
+//            fm.beginTransaction().replace(R.id.question_container, mQuestionFragment).commit();
+//        }
+//    }
 
     public Question getQuestion() {
         return mQuestion;
@@ -844,12 +858,12 @@ public class SurveyFragment extends Fragment {
                 mPreviousQuestions.add(mQuestionNumber);
                 mQuestion = getNextQuestion(mQuestionNumber);
                 createQuestionFragment();
-                if (mQuestion != null && !setQuestionText(mQuestionText)) {
-                    setSpecialResponse(Response.LOGICAL_SKIP);
-                    moveToNextQuestion();
-                }
-            } else if (isLastQuestion() && !setQuestionText(mQuestionText)) {
-                finishSurvey();
+//                if (mQuestion != null && !setQuestionText(mQuestionText)) {
+//                    setSpecialResponse(Response.LOGICAL_SKIP);
+//                    moveToNextQuestion();
+//                }
+//            } else if (isLastQuestion() && !setQuestionText(mQuestionText)) {
+//                finishSurvey();
             }
             if (mQuestion != null) mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
         }
@@ -873,9 +887,9 @@ public class SurveyFragment extends Fragment {
                 mGrid = mQuestion.getGrid();
                 updateQuestionText();
             } else {
-                if (!setQuestionText(mQuestionText)) {
-                    moveToPreviousQuestion();
-                }
+//                if (!setQuestionText(mQuestionText)) {
+//                    moveToPreviousQuestion();
+//                }
             }
             if (mResponses.get(mQuestion) != null &&
                     !mResponses.get(mQuestion).getText().isEmpty()) {
@@ -1014,10 +1028,10 @@ public class SurveyFragment extends Fragment {
 
     private void setSurveyLocation() {
         if (mLocationServiceManager == null) {
-            if (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission
+            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission
                     .ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED) {
                 ActivityCompat.requestPermissions(getActivity(),
-                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
             } else {
                 startLocationServices();
             }

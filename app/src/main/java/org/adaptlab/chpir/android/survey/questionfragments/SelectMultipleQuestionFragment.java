@@ -1,5 +1,6 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
+import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -19,6 +20,7 @@ public class SelectMultipleQuestionFragment extends QuestionFragment {
 
     @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
+        Log.i("testsssssssss", "multpleeeeeeeeee");
         mCheckBoxes = new ArrayList<CheckBox>();
         mResponseIndices = new ArrayList<Integer>();
         for (Option option : getOptions()) {

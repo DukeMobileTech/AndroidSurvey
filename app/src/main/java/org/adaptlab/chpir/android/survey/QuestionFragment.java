@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.text.Html;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -36,6 +37,7 @@ public abstract class QuestionFragment extends Fragment {
     public TextView mValidationTextView;
     public Response mResponse;
     private Question mQuestion;
+    private List<Question> mQuestions;
     private Survey mSurvey;
     private Instrument mInstrument;
     private SurveyFragment mSurveyFragment;
@@ -51,8 +53,19 @@ public abstract class QuestionFragment extends Fragment {
     }
 
     public void init() {
+        Bundle bundle = this.getArguments();
+        String questionIdentifier = "";
+        if (bundle != null) {
+            questionIdentifier = bundle.getString("QuestionIdentifier");
+        }
         mSurvey = mSurveyFragment.getSurvey();
-        mQuestion = mSurveyFragment.getQuestion();
+        mQuestions = mSurveyFragment.getQuestions();
+        for(Question question:mQuestions){
+            if(questionIdentifier.equals(question.getQuestionIdentifier())){
+                mQuestion = question;
+                break;
+            }
+        }
         if (mSurvey == null || mQuestion == null) return;
         mResponse = loadOrCreateResponse();
         mResponse.setQuestion(mQuestion);
@@ -82,7 +95,11 @@ public abstract class QuestionFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_question_factory, parent, false);
 
         ViewGroup questionComponent = (LinearLayout) v.findViewById(R.id.question_component);
+        TextView questionText = (TextView) v.findViewById(R.id.question_text);
         mValidationTextView = (TextView) v.findViewById(R.id.validation_text);
+
+
+        questionText.setText((Html.fromHtml(mQuestion.getNumberInInstrument() + "\n" + mQuestion.getInstructions()+ "\n" + mQuestion.getText())));
 
         // Overridden by subclasses to place their graphical elements on the fragment.
         createQuestionComponent(questionComponent);
