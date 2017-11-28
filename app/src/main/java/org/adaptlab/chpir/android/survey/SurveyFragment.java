@@ -11,8 +11,6 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.print.PrintAttributes;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -53,16 +51,11 @@ import org.adaptlab.chpir.android.survey.models.Grid;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.Question;
-import org.adaptlab.chpir.android.survey.models.Question.QuestionType;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Score;
 import org.adaptlab.chpir.android.survey.models.ScoreScheme;
 import org.adaptlab.chpir.android.survey.models.Section;
 import org.adaptlab.chpir.android.survey.models.Survey;
-import org.adaptlab.chpir.android.survey.questionfragments.MultipleSelectGridFragment;
-import org.adaptlab.chpir.android.survey.questionfragments.RatingQuestionFragment;
-import org.adaptlab.chpir.android.survey.questionfragments.SelectOneQuestionFragment;
-import org.adaptlab.chpir.android.survey.questionfragments.SingleSelectGridFragment;
 import org.adaptlab.chpir.android.survey.roster.RosterActivity;
 import org.adaptlab.chpir.android.survey.rules.InstrumentSurveyLimitPerMinuteRule;
 import org.adaptlab.chpir.android.survey.rules.InstrumentSurveyLimitRule;
@@ -72,6 +65,7 @@ import org.adaptlab.chpir.android.survey.tasks.SendResponsesTask;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -112,7 +106,7 @@ public class SurveyFragment extends Fragment {
 
     QuestionFragment mQuestionFragment;
     private Question mQuestion;
-    private LinearLayout mTestLayout;
+    private LinearLayout mQuestionViewLayout;
     private Instrument mInstrument;
     private Survey mSurvey;
     private int mQuestionNumber;
@@ -131,7 +125,6 @@ public class SurveyFragment extends Fragment {
     private List<Question> mQuestions;
     private HashMap<Question, Response> mResponses;
     private HashMap<Question, List<Option>> mOptions;
-    private FrameLayout mQuestionContainer;
     private TextView mQuestionText;
     private TextView mQuestionIndex;
     private TextView mParticipantLabel;
@@ -182,7 +175,7 @@ public class SurveyFragment extends Fragment {
     }
 
     private void updateQuestionText() {
-        if (mQuestion != null) {
+//        if (mQuestion != null) {
 //            if (mQuestion.belongsToGrid()) {
 //                setGridLabelText(mQuestionText);
 //            } else {
@@ -190,7 +183,7 @@ public class SurveyFragment extends Fragment {
 //            }
 //            mQuestionText.setTypeface(mInstrument.getTypeFace(getActivity().getApplicationContext()));
 //
-        }
+//        }
     }
 
     public void loadOrCreateQuestion() {
@@ -333,8 +326,7 @@ public class SurveyFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_survey, parent, false);
-        mQuestionContainer = (FrameLayout) v.findViewById(R.id.question_container);
-        mTestLayout = (LinearLayout) v.findViewById(R.id.testLayout);
+        mQuestionViewLayout = (LinearLayout) v.findViewById(R.id.question_component_layout);
         //mQuestionText = (TextView) v.findViewById(R.id.question_text);
         mParticipantLabel = (TextView) v.findViewById(R.id.participant_label);
         mQuestionIndex = (TextView) v.findViewById(R.id.question_index);
@@ -638,80 +630,67 @@ public class SurveyFragment extends Fragment {
                     showSectionView) {
                 moveToSection(mQuestion.getSection());
             } else {
-                if (mQuestion.belongsToGrid()) {
-                    mGrid = mQuestion.getGrid();
-                    createGridFragment();
-                } else {
-                    //FragmentManager fm = getChildFragmentManager();
-                    //mQuestionFragment = (QuestionFragment) QuestionFragmentFactory.createQuestionFragment(mQuestion);
-                    //switchOutFragments(fm);
+//                if (mQuestion.belongsToGrid()) {
+//                    mGrid = mQuestion.getGrid();
+//                    createGridFragment();
+//                } else {
+                for (Question question: mQuestions) {
+                    FrameLayout framelayout = new FrameLayout(getContext());
+                    framelayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewPager.LayoutParams.MATCH_PARENT));
+                    framelayout.setId(new BigDecimal(question.getRemoteId()).intValueExact());
+                    mQuestionViewLayout.addView(framelayout);
 
-                    int layoutId = 0;
-                    for(Question question: mQuestions){
-                        FrameLayout framelayout = new FrameLayout(getContext());
-                        framelayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                ViewPager.LayoutParams.MATCH_PARENT));
-                        framelayout.setId(layoutId);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("QuestionIdentifier", question.getQuestionIdentifier());
 
-                        mTestLayout.addView(framelayout);
+                    mQuestionFragment = (QuestionFragment) QuestionFragmentFactory.createQuestionFragment(question);
+                    mQuestionFragment.setArguments(bundle);
 
-                        Bundle bundle = new Bundle();
-                        bundle.putString("QuestionIdentifier", question.getQuestionIdentifier());
-
-                        mQuestionFragment = (QuestionFragment) QuestionFragmentFactory.createQuestionFragment(question);
-                        mQuestionFragment.setArguments(bundle);
-
-                        final FragmentManager fm = getChildFragmentManager();
-                        if(layoutId==0){
-                            fm.beginTransaction().add(R.id.question_container, mQuestionFragment).commit();
-                        }
-                        else{
-                            fm.beginTransaction().add(framelayout.getId(), mQuestionFragment).commit();
-                        }
-                        layoutId++;
-                    }
+                    final FragmentManager fm = getChildFragmentManager();
+                    fm.beginTransaction().replace(framelayout.getId(), mQuestionFragment).commit();
                 }
+//                }
             }
         }
     }
 
-    private void createGridFragment() {
-        if (mQuestion.getQuestionType() == QuestionType.SELECT_ONE) {
-            mQuestionFragment = new SingleSelectGridFragment();
-        } else {
-            mQuestionFragment = new MultipleSelectGridFragment();
-        }
-        Bundle bundle = new Bundle();
-        bundle.putLong(GridFragment.EXTRA_GRID_ID, mQuestion.getGrid().getRemoteId());
-        bundle.putLong(GridFragment.EXTRA_SURVEY_ID, mSurvey.getId());
-        mQuestionFragment.setArguments(bundle);
-        FragmentManager fm = getChildFragmentManager();
-        switchOutFragments(fm);
-    }
+//    private void createGridFragment() {
+//        if (mQuestion.getQuestionType() == QuestionType.SELECT_ONE) {
+//            mQuestionFragment = new SingleSelectGridFragment();
+//        } else {
+//            mQuestionFragment = new MultipleSelectGridFragment();
+//        }
+//        Bundle bundle = new Bundle();
+//        bundle.putLong(GridFragment.EXTRA_GRID_ID, mQuestion.getGrid().getRemoteId());
+//        bundle.putLong(GridFragment.EXTRA_SURVEY_ID, mSurvey.getId());
+//        mQuestionFragment.setArguments(bundle);
+//        FragmentManager fm = getChildFragmentManager();
+//        switchOutFragments(fm);
+//    }
 
-    private void switchOutFragments(final FragmentManager fm) {
-        if (mAllowFragmentCommit) {
-            commitFragmentTransaction(fm);
-        }
-        else {
-            new Handler().post(new Runnable() {
-                public void run() {
-                    commitFragmentTransaction(fm);
-                }
-            });
-        }
-        mSurvey.setLastQuestion(mQuestion);
-        mSurvey.save();
-        removeTextFocus();
-    }
+//    private void switchOutFragments(final FragmentManager fm) {
+//        if (mAllowFragmentCommit) {
+//            commitFragmentTransaction(fm);
+//        }
+//        else {
+//            new Handler().post(new Runnable() {
+//                public void run() {
+//                    commitFragmentTransaction(fm);
+//                }
+//            });
+//        }
+//        mSurvey.setLastQuestion(mQuestion);
+//        mSurvey.save();
+//        removeTextFocus();
+//    }
 
-    private void commitFragmentTransaction(FragmentManager fm) {
-        if (fm.findFragmentById(R.id.question_container) == null) {
-            fm.beginTransaction().add(R.id.question_container, mQuestionFragment).commit();
-        } else {
-            fm.beginTransaction().replace(R.id.question_container, mQuestionFragment).commit();
-        }
-    }
+//    private void commitFragmentTransaction(FragmentManager fm) {
+//        if (fm.findFragmentById(R.id.question_container) == null) {
+//            fm.beginTransaction().add(R.id.question_container, mQuestionFragment).commit();
+//        } else {
+//            fm.beginTransaction().replace(R.id.question_container, mQuestionFragment).commit();
+//        }
+//    }
 
     public Question getQuestion() {
         return mQuestion;

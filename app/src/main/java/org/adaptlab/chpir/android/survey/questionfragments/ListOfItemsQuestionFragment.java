@@ -50,7 +50,7 @@ public abstract class ListOfItemsQuestionFragment extends QuestionFragment {
                 public void afterTextChanged(Editable s) { }
             });
             if (index == 0) {
-                editText.requestFocus();
+//                editText.requestFocus();
                 showKeyBoard();
             }
             index++;

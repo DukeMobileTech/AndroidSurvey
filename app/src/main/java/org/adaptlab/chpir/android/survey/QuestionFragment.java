@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.Html;
 import android.text.InputType;
@@ -100,8 +99,7 @@ public abstract class QuestionFragment extends Fragment {
         mValidationTextView = (TextView) v.findViewById(R.id.validation_text);
 
 
-        questionText.setText((Html.fromHtml(mQuestion.getNumberInInstrument()+"."+mQuestion.getQuestionIdentifier()+"\n"+
-                mQuestion.getInstructions()+"\n"+mQuestion.getText())));
+        questionText.setText((Html.fromHtml(mQuestion.getNumberInInstrument() + "\n" + mQuestion.getInstructions()+ "\n" + mQuestion.getText())));
 
         // Overridden by subclasses to place their graphical elements on the fragment.
         createQuestionComponent(questionComponent);
