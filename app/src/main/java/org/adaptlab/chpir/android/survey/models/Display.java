@@ -11,6 +11,8 @@ import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
+
 @Table(name = "Displays")
 public class Display extends ReceiveModel {
     private static final String TAG = "Display";
@@ -52,6 +54,14 @@ public class Display extends ReceiveModel {
 
     public int getPosition() {
         return mPosition;
+    }
+
+    public List<Question> questions() {
+        return new Select().from(Question.class).where("DisplayId = ? AND Deleted != ?", getRemoteId(), 1).execute();
+    }
+
+    private Long getRemoteId() {
+        return mRemoteId;
     }
 
     private void setRemoteId(Long id) {

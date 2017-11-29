@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -134,6 +135,9 @@ public class SurveyFragment extends Fragment {
     private LocationServiceManager mLocationServiceManager;
     private GestureDetector mGestureDetector;
     private ProgressDialog mProgressDialog;
+    private Display mDisplay;
+    private int mDisplayNumber;
+    private ArrayList<Integer> mPreviousDisplays;
 
     //drawer vars
     private DrawerLayout mDrawerLayout;
@@ -227,8 +231,8 @@ public class SurveyFragment extends Fragment {
     private void updateUI() {
         setParticipantLabel();
         updateQuestionCountLabel();
-        updateQuestionText();
-        createQuestionFragment();
+//        updateQuestionText();
+        createQuestionFragments();
     }
 
     @Override
@@ -300,6 +304,10 @@ public class SurveyFragment extends Fragment {
             }
         }
         mDisplays = (ArrayList<Display>) mInstrument.displays();
+        mDisplayNumber = 0;
+        mDisplay = mDisplays.get(mDisplayNumber);
+        mPreviousDisplays = new ArrayList<>();
+        mQuestionFragments = new ArrayList<>();
 
         registerCrashlytics();
 
@@ -467,29 +475,41 @@ public class SurveyFragment extends Fragment {
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        if (mQuestion != null) {
-            menu.findItem(R.id.menu_item_previous).setEnabled(!isFirstQuestion());
-            menu.findItem(R.id.menu_item_next).setVisible(!isLastQuestion())
-                    .setEnabled(hasValidResponse());
-            if (mQuestion.belongsToGrid()) {
-                menu.findItem(R.id.menu_item_skip).setVisible(false);
-                menu.findItem(R.id.menu_item_rf).setVisible(false);
-                menu.findItem(R.id.menu_item_na).setVisible(false);
-                menu.findItem(R.id.menu_item_dk).setVisible(false);
+        menu.findItem(R.id.menu_item_previous).setEnabled(mDisplayNumber != 0);
+        menu.findItem(R.id.menu_item_next).setVisible(mDisplayNumber != mDisplays.size() - 1).setEnabled(hasValidResponse());
+        menu.findItem(R.id.menu_item_finish).setVisible(mDisplayNumber == mDisplays.size() - 1);
+        for (String key : mMenuItems.keySet()) {
+            if (!mInstrument.getSpecialOptionStrings().contains(key)) {
+                menu.findItem(mMenuItems.get(key)).setVisible(false).setEnabled(false);
             } else {
-                for (String key : mMenuItems.keySet()) {
-                    if (!mInstrument.getSpecialOptionStrings().contains(key)) {
-                        menu.findItem(mMenuItems.get(key)).setVisible(false).setEnabled(false);
-                    } else {
-                        if (key.equals(Response.SKIP)) {
-                            menu.findItem(mMenuItems.get(key)).setEnabled(hasValidResponse());
-                        }
-                    }
+                if (key.equals(Response.SKIP)) {
+                    menu.findItem(mMenuItems.get(key)).setEnabled(hasValidResponse());
                 }
             }
-            menu.findItem(R.id.menu_item_finish).setVisible(isLastQuestion()).setEnabled(hasValidResponse());
-            showSpecialResponseSelection(menu);
         }
+
+//        if (mQuestion != null) {
+//            menu.findItem(R.id.menu_item_previous).setEnabled(!isFirstQuestion());
+//            menu.findItem(R.id.menu_item_next).setVisible(!isLastQuestion()).setEnabled(hasValidResponse());
+//            if (mQuestion.belongsToGrid()) {
+//                menu.findItem(R.id.menu_item_skip).setVisible(false);
+//                menu.findItem(R.id.menu_item_rf).setVisible(false);
+//                menu.findItem(R.id.menu_item_na).setVisible(false);
+//                menu.findItem(R.id.menu_item_dk).setVisible(false);
+//            } else {
+//                for (String key : mMenuItems.keySet()) {
+//                    if (!mInstrument.getSpecialOptionStrings().contains(key)) {
+//                        menu.findItem(mMenuItems.get(key)).setVisible(false).setEnabled(false);
+//                    } else {
+//                        if (key.equals(Response.SKIP)) {
+//                            menu.findItem(mMenuItems.get(key)).setEnabled(hasValidResponse());
+//                        }
+//                    }
+//                }
+//            }
+//            menu.findItem(R.id.menu_item_finish).setVisible(isLastQuestion()).setEnabled(hasValidResponse());
+//            showSpecialResponseSelection(menu);
+//        }
     }
 
     @Override
@@ -499,10 +519,12 @@ public class SurveyFragment extends Fragment {
         }
         switch (item.getItemId()) {
             case R.id.menu_item_previous:
-                moveToPreviousQuestion();
+//                moveToPreviousQuestion();
+                moveToPreviousDisplay();
                 return true;
             case R.id.menu_item_next:
-                unSkipAndMoveToNextQuestion();
+//                unSkipAndMoveToNextQuestion();
+                moveToNextDisplay();
                 return true;
             case R.id.menu_item_skip:
                 setSpecialResponse(Response.SKIP);
@@ -525,6 +547,23 @@ public class SurveyFragment extends Fragment {
         }
     }
 
+    private void moveToPreviousDisplay() {
+        if (mDisplayNumber >= 0 && mDisplayNumber < mDisplays.size()) {
+            mDisplayNumber = mPreviousDisplays.remove(mPreviousDisplays.size() - 1);
+            mDisplay = mDisplays.get(mDisplayNumber);
+            createQuestionFragments();
+        }
+    }
+
+    private void moveToNextDisplay() {
+        mPreviousDisplays.add(mDisplayNumber);
+        mDisplayNumber += 1;
+        if (mDisplayNumber < mDisplays.size()) {
+            mDisplay = mDisplays.get(mDisplayNumber);
+            createQuestionFragments();
+        }
+    }
+
     public boolean isFirstQuestion() {
         return mQuestionNumber == 0;
     }
@@ -539,8 +578,12 @@ public class SurveyFragment extends Fragment {
     }
 
     public boolean hasValidResponse() {
-        return !(mQuestionFragment != null && mQuestionFragment.getResponse() != null) ||
-                mQuestionFragment.getResponse().isValid();
+        for (QuestionFragment fragment : mQuestionFragments) {
+            if (!(mQuestionFragment != null && mQuestionFragment.getResponse() != null) || !fragment.getResponse().isValid()) return false;
+        }
+        return true;
+//        return !(mQuestionFragment != null && mQuestionFragment.getResponse() != null) ||
+//                mQuestionFragment.getResponse().isValid();
     }
 
     /*
@@ -623,37 +666,48 @@ public class SurveyFragment extends Fragment {
      * Place the question fragment for the corresponding mQuestion
      * on the view in the question_container.
      */
-    protected void createQuestionFragment() {
+    protected void createQuestionFragments() {
+        Log.i(TAG, "Create Question Fragments for display: " + mDisplay.getPosition());
         if (!isActivityFinished) {
-            if (mQuestion == null || mSurvey == null) {
-                loadOrCreateQuestion();
-                loadOrCreateSurvey();
-            }
-            if (mInstrument.getShowSectionsFragment() && mQuestion.isFirstQuestionInSection() &&
-                    showSectionView) {
-                moveToSection(mQuestion.getSection());
-            } else {
+//            if (mQuestion == null || mSurvey == null) {
+//                loadOrCreateQuestion();
+//                loadOrCreateSurvey();
+//            }
+//            if (mInstrument.getShowSectionsFragment() && mQuestion.isFirstQuestionInSection() && showSectionView) {
+//                moveToSection(mQuestion.getSection());
+//            } else {
 //                if (mQuestion.belongsToGrid()) {
 //                    mGrid = mQuestion.getGrid();
 //                    createGridFragment();
 //                } else {
-                for (Question question: mQuestions) {
-                    FrameLayout framelayout = new FrameLayout(getContext());
-                    framelayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewPager.LayoutParams.MATCH_PARENT));
-                    framelayout.setId(new BigDecimal(question.getRemoteId()).intValueExact());
-                    mQuestionViewLayout.addView(framelayout);
 
-                    Bundle bundle = new Bundle();
-                    bundle.putString("QuestionIdentifier", question.getQuestionIdentifier());
-
-                    mQuestionFragment = (QuestionFragment) QuestionFragmentFactory.createQuestionFragment(question);
-                    mQuestionFragment.setArguments(bundle);
-
-                    final FragmentManager fm = getChildFragmentManager();
-                    fm.beginTransaction().replace(framelayout.getId(), mQuestionFragment).commit();
-                }
-//                }
+            // Remove previous fragments
+            FragmentManager fm = getChildFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+            for (Fragment fragment : mQuestionFragments) {
+                ft.remove(fragment);
             }
+            ft.commit();
+            mQuestionFragments.clear();
+
+            List<Question> displayQuestions = mDisplay.questions();
+            Log.i(TAG, "Questions: " + displayQuestions.size());
+            for (Question question: displayQuestions) {
+                FrameLayout framelayout = new FrameLayout(getContext());
+                framelayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewPager.LayoutParams.MATCH_PARENT));
+                framelayout.setId(new BigDecimal(question.getRemoteId()).intValueExact());
+                mQuestionViewLayout.addView(framelayout);
+
+                Bundle bundle = new Bundle();
+                bundle.putString("QuestionIdentifier", question.getQuestionIdentifier());
+                mQuestionFragment = (QuestionFragment) QuestionFragmentFactory.createQuestionFragment(question);
+                mQuestionFragment.setArguments(bundle);
+
+                fm.beginTransaction().replace(framelayout.getId(), mQuestionFragment).commit();
+                mQuestionFragments.add(mQuestionFragment);
+            }
+//                }
+//            }
         }
     }
 
@@ -852,12 +906,12 @@ public class SurveyFragment extends Fragment {
             mPreviousQuestions.add(mQuestion.getNumberInInstrument() - 1);
             Question lastQuestion = mGrid.questions().get(mGrid.questions().size() - 1);
             mQuestion = nextQuestionHelper(lastQuestion.getNumberInInstrument());
-            createQuestionFragment();
+            createQuestionFragments();
         } else {
             if (mQuestionNumber < mQuestionCount - 1) {
                 mPreviousQuestions.add(mQuestionNumber);
                 mQuestion = getNextQuestion(mQuestionNumber);
-                createQuestionFragment();
+                createQuestionFragments();
 //                if (mQuestion != null && !setQuestionText(mQuestionText)) {
 //                    setSpecialResponse(Response.LOGICAL_SKIP);
 //                    moveToNextQuestion();
@@ -882,7 +936,7 @@ public class SurveyFragment extends Fragment {
             mQuestionNumber = mPreviousQuestions.remove(mPreviousQuestions.size() - 1);
             mQuestion = mQuestions.get(mQuestionNumber);
             showSectionView = false;
-            createQuestionFragment();
+            createQuestionFragments();
             if (mQuestion.belongsToGrid()) {
                 mGrid = mQuestion.getGrid();
                 updateQuestionText();

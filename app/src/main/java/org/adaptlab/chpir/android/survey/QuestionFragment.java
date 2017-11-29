@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.Html;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -98,8 +99,12 @@ public abstract class QuestionFragment extends Fragment {
         TextView questionText = (TextView) v.findViewById(R.id.question_text);
         mValidationTextView = (TextView) v.findViewById(R.id.validation_text);
 
+        String instructions = "";
+        if (!TextUtils.isEmpty(mQuestion.getInstructions()) && !mQuestion.getInstructions().equals("null")) {
+            instructions = mQuestion.getInstructions();
+        }
 
-        questionText.setText((Html.fromHtml(mQuestion.getNumberInInstrument() + "\n" + mQuestion.getInstructions()+ "\n" + mQuestion.getText())));
+        questionText.setText(Html.fromHtml(mQuestion.getNumberInInstrument() + "<br />" + instructions + "<br />" + mQuestion.getText()));
 
         // Overridden by subclasses to place their graphical elements on the fragment.
         createQuestionComponent(questionComponent);

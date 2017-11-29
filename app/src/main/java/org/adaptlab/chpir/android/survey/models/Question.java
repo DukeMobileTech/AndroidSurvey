@@ -375,8 +375,7 @@ public class Question extends ReceiveModel {
     }
 
     public int optionCount() {
-        return new Select().from(Option.class)
-                .where("Question = ? AND Deleted != ?", getId(), 1).count();
+        return new Select().from(Option.class).where("Question = ? AND Deleted != ?", getId(), 1).count();
     }
 
     public void setOptionCount(int num) {
