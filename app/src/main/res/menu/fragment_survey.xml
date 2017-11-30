@@ -7,26 +7,6 @@
         android:title="@string/previous_button"
         app:showAsAction="ifRoom"/>
     <item
-        android:id="@+id/menu_item_skip"
-        android:icon="@drawable/ic_menu_item_sk"
-        android:title="@string/sk"
-        app:showAsAction="ifRoom"/>
-    <item
-        android:id="@+id/menu_item_rf"
-        android:icon="@drawable/ic_menu_item_rf"
-        android:title="@string/rf"
-        app:showAsAction="ifRoom"/>
-    <item
-        android:id="@+id/menu_item_na"
-        android:icon="@drawable/ic_menu_item_na"
-        android:title="@string/na"
-        app:showAsAction="ifRoom"/>
-    <item
-        android:id="@+id/menu_item_dk"
-        android:icon="@drawable/ic_menu_item_dk"
-        android:title="@string/dk"
-        app:showAsAction="ifRoom"/>
-    <item
         android:id="@+id/menu_item_next"
         android:icon="@drawable/ic_menu_item_next_item"
         android:title="@string/next_button"

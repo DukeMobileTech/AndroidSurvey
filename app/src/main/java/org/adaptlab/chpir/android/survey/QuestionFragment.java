@@ -18,8 +18,11 @@ import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import org.adaptlab.chpir.android.survey.models.Instrument;
@@ -43,6 +46,7 @@ public abstract class QuestionFragment extends Fragment {
     private Instrument mInstrument;
     private SurveyFragment mSurveyFragment;
     private List<Option> mOptions;
+    private RadioGroup mSpecialResponses;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -111,8 +115,38 @@ public abstract class QuestionFragment extends Fragment {
         if (mResponse != null) {
             deserialize(mResponse.getText());
         }
+
+        mSpecialResponses = (RadioGroup) v.findViewById(R.id.special_responses_container);
+        final List<String> responses = AppUtil.getAdminSettingsInstance().getSpecialOptions();
+
+        for (String response : responses) {
+            int responseId = responses.indexOf(response);
+            Button button = new RadioButton(getActivity());
+            button.setText(response);
+            button.setId(responseId);
+            button.setTypeface(getInstrument().getTypeFace(getActivity().getApplicationContext()));
+
+            mSpecialResponses.addView(button, responseId);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    unSetResponse();
+                    setSpecialResponse(responses.get(v.getId()));
+                    setResponseText();
+                }
+            });
+        }
+        deserializeSpecialResponse();
         return v;
     }
+
+    private void deserializeSpecialResponse() {
+        if (TextUtils.isEmpty(mResponse.getSpecialResponse())) return;
+        int id = AppUtil.getAdminSettingsInstance().getSpecialOptions().indexOf(mResponse.getSpecialResponse());
+        mSpecialResponses.check(id);
+    }
+
+    protected abstract void unSetResponse();
 
     @Override
     public void onPause() {
@@ -227,7 +261,6 @@ public abstract class QuestionFragment extends Fragment {
         validateResponse();
         if (isAdded() && !mResponse.getText().equals("")) {
             mResponse.setSpecialResponse("");
-            ActivityCompat.invalidateOptionsMenu(getActivity());
         }
         new SaveResponseTask().execute(mResponse);
     }

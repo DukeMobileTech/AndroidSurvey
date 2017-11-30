@@ -1,10 +1,10 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
-import org.adaptlab.chpir.android.survey.FormatUtils;
-import org.adaptlab.chpir.android.survey.QuestionFragment;
-
 import android.view.ViewGroup;
 import android.widget.TimePicker;
+
+import org.adaptlab.chpir.android.survey.FormatUtils;
+import org.adaptlab.chpir.android.survey.QuestionFragment;
 
 public class TimeQuestionFragment extends QuestionFragment {
     private int mHour;
@@ -41,5 +41,9 @@ public class TimeQuestionFragment extends QuestionFragment {
             mTimePicker.setCurrentMinute(timeComponents[1]);
         }
     }
-   
+
+    @Override
+    protected void unSetResponse() {
+
+    }
 }

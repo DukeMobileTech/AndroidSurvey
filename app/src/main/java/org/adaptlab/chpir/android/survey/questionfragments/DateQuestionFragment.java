@@ -18,7 +18,7 @@ public class DateQuestionFragment extends QuestionFragment {
     protected int mYear;
     
     private DatePicker mDatePicker;
-    
+
     protected DatePicker beforeAddViewHook(ViewGroup component) {
         DatePicker datePicker = new DatePicker(getActivity());
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -61,6 +61,11 @@ public class DateQuestionFragment extends QuestionFragment {
             mYear = dateComponents.get(GregorianCalendar.YEAR);
             mDatePicker.updateDate(mYear, mMonth, mDay);
         }
+    }
+
+    @Override
+    protected void unSetResponse() {
+
     }
 
 }

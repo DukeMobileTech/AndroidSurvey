@@ -52,4 +52,8 @@ public class FreeResponseQuestionFragment extends QuestionFragment {
         return mText;
     }
 
+    @Override
+    protected void unSetResponse() {
+
+    }
 }

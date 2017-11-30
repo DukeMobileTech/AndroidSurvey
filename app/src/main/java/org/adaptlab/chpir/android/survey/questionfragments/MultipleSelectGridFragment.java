@@ -261,4 +261,9 @@ public class MultipleSelectGridFragment extends GridFragment {
         }
     }
 
+    @Override
+    protected void unSetResponse() {
+
+    }
+
 }

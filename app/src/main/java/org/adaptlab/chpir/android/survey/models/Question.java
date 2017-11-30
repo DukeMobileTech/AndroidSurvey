@@ -724,4 +724,9 @@ public class Question extends ReceiveModel {
         PHONE_NUMBER, ADDRESS, SELECT_ONE_IMAGE, SELECT_MULTIPLE_IMAGE,
         LIST_OF_INTEGER_BOXES, LABELED_SLIDER
     }
+
+    public static boolean selectOneVariant(QuestionType type) {
+        return (type == QuestionType.SELECT_ONE || type == QuestionType.SELECT_ONE_WRITE_OTHER || type == QuestionType.SELECT_ONE_IMAGE);
+    }
+
 }

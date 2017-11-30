@@ -125,4 +125,9 @@ public abstract class PictureQuestionFragment extends QuestionFragment {
 		return deleteButton;
 	}
 
+	@Override
+	protected void unSetResponse() {
+
+	}
+
 }

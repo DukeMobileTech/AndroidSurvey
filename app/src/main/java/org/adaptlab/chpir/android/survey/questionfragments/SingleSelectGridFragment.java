@@ -200,4 +200,8 @@ public class SingleSelectGridFragment extends GridFragment {
         return null;
     }
 
+    @Override
+    protected void unSetResponse() {
+
+    }
 }

@@ -1,10 +1,10 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
-import org.adaptlab.chpir.android.survey.QuestionFragment;
-
 import android.view.ViewGroup;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+
+import org.adaptlab.chpir.android.survey.QuestionFragment;
 
 public class SliderQuestionFragment extends QuestionFragment {
     private int mProgress;
@@ -46,5 +46,9 @@ public class SliderQuestionFragment extends QuestionFragment {
             mSlider.setProgress(Integer.parseInt(responseText));
         }
     }
-   
+
+    @Override
+    protected void unSetResponse() {
+
+    }
 }

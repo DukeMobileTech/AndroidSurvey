@@ -24,6 +24,11 @@ public class SelectOneQuestionFragment extends QuestionFragment {
     }
 
     @Override
+    protected void unSetResponse() {
+
+    }
+
+    @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
         mRadioGroup = new RadioGroup(getActivity());
         for (Option option : getOptions()) {

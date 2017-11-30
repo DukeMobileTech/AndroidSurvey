@@ -1,9 +1,9 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
-import org.adaptlab.chpir.android.survey.QuestionFragment;
-
 import android.view.View;
 import android.view.ViewGroup;
+
+import org.adaptlab.chpir.android.survey.QuestionFragment;
 
 /*
  * This question type exist only to add text to a screen.
@@ -25,4 +25,8 @@ public class InstructionsQuestionFragment extends QuestionFragment {
 	@Override
 	protected void deserialize(String responseText) { }
 
+	@Override
+	protected void unSetResponse() {
+
+	}
 }

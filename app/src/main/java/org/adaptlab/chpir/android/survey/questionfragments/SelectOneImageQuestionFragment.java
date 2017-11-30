@@ -99,4 +99,9 @@ public class SelectOneImageQuestionFragment extends QuestionFragment {
 		}
 	}
 
+	@Override
+	protected void unSetResponse() {
+
+	}
+
 }

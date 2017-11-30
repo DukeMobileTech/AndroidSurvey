@@ -70,11 +70,9 @@ import org.json.JSONObject;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import io.fabric.sdk.android.Fabric;
@@ -93,18 +91,18 @@ public class SurveyFragment extends Fragment {
     private static final int SECTION_CODE = 200;
     public static final int AUTHORIZE_CODE = 300;
     private static final Long REVIEW_PAGE_ID = -1L;
-    private static final Map<String, Integer> mMenuItems;
+//    private static final Map<String, Integer> mMenuItems;
     private boolean noBackgroundTask = true;
     private boolean mAllowFragmentCommit;
 
-    static {
-        Map<String, Integer> menuItems = new HashMap<String, Integer>();
-        menuItems.put(Response.SKIP, R.id.menu_item_skip);
-        menuItems.put(Response.NA, R.id.menu_item_na);
-        menuItems.put(Response.RF, R.id.menu_item_rf);
-        menuItems.put(Response.DK, R.id.menu_item_dk);
-        mMenuItems = Collections.unmodifiableMap(menuItems);
-    }
+//    static {
+//        Map<String, Integer> menuItems = new HashMap<String, Integer>();
+//        menuItems.put(Response.SKIP, R.id.menu_item_skip);
+//        menuItems.put(Response.NA, R.id.menu_item_na);
+//        menuItems.put(Response.RF, R.id.menu_item_rf);
+//        menuItems.put(Response.DK, R.id.menu_item_dk);
+//        mMenuItems = Collections.unmodifiableMap(menuItems);
+//    }
 
     QuestionFragment mQuestionFragment;
     private Question mQuestion;
@@ -478,15 +476,6 @@ public class SurveyFragment extends Fragment {
         menu.findItem(R.id.menu_item_previous).setEnabled(mDisplayNumber != 0);
         menu.findItem(R.id.menu_item_next).setVisible(mDisplayNumber != mDisplays.size() - 1).setEnabled(hasValidResponse());
         menu.findItem(R.id.menu_item_finish).setVisible(mDisplayNumber == mDisplays.size() - 1);
-        for (String key : mMenuItems.keySet()) {
-            if (!mInstrument.getSpecialOptionStrings().contains(key)) {
-                menu.findItem(mMenuItems.get(key)).setVisible(false).setEnabled(false);
-            } else {
-                if (key.equals(Response.SKIP)) {
-                    menu.findItem(mMenuItems.get(key)).setEnabled(hasValidResponse());
-                }
-            }
-        }
 
 //        if (mQuestion != null) {
 //            menu.findItem(R.id.menu_item_previous).setEnabled(!isFirstQuestion());
@@ -526,19 +515,19 @@ public class SurveyFragment extends Fragment {
 //                unSkipAndMoveToNextQuestion();
                 moveToNextDisplay();
                 return true;
-            case R.id.menu_item_skip:
-                setSpecialResponse(Response.SKIP);
-                proceedToNextQuestion();
-                return true;
-            case R.id.menu_item_rf:
-                setSpecialResponse(Response.RF);
-                return true;
-            case R.id.menu_item_na:
-                setSpecialResponse(Response.NA);
-                return true;
-            case R.id.menu_item_dk:
-                setSpecialResponse(Response.DK);
-                return true;
+//            case R.id.menu_item_skip:
+//                setSpecialResponse(Response.SKIP);
+//                proceedToNextQuestion();
+//                return true;
+//            case R.id.menu_item_rf:
+//                setSpecialResponse(Response.RF);
+//                return true;
+//            case R.id.menu_item_na:
+//                setSpecialResponse(Response.NA);
+//                return true;
+//            case R.id.menu_item_dk:
+//                setSpecialResponse(Response.DK);
+//                return true;
             case R.id.menu_item_finish:
                 finishSurvey();
                 return true;
@@ -589,20 +578,20 @@ public class SurveyFragment extends Fragment {
     /*
      * Give a visual indication when a special response is selected
      */
-    public void showSpecialResponseSelection(Menu menu) {
-        if (mQuestionFragment != null && mQuestionFragment.getSpecialResponse() != null && menu
-                != null) {
-            if (mQuestionFragment.getSpecialResponse().equals(Response.SKIP)) {
-                menu.findItem(R.id.menu_item_skip).setIcon(R.drawable.ic_menu_item_sk_selected);
-            } else if (mQuestionFragment.getSpecialResponse().equals(Response.RF)) {
-                menu.findItem(R.id.menu_item_rf).setIcon(R.drawable.ic_menu_item_rf_selected);
-            } else if (mQuestionFragment.getSpecialResponse().equals(Response.NA)) {
-                menu.findItem(R.id.menu_item_na).setIcon(R.drawable.ic_menu_item_na_selected);
-            } else if (mQuestionFragment.getSpecialResponse().equals(Response.DK)) {
-                menu.findItem(R.id.menu_item_dk).setIcon(R.drawable.ic_menu_item_dk_selected);
-            }
-        }
-    }
+//    public void showSpecialResponseSelection(Menu menu) {
+//        if (mQuestionFragment != null && mQuestionFragment.getSpecialResponse() != null && menu
+//                != null) {
+//            if (mQuestionFragment.getSpecialResponse().equals(Response.SKIP)) {
+//                menu.findItem(R.id.menu_item_skip).setIcon(R.drawable.ic_menu_item_sk_selected);
+//            } else if (mQuestionFragment.getSpecialResponse().equals(Response.RF)) {
+//                menu.findItem(R.id.menu_item_rf).setIcon(R.drawable.ic_menu_item_rf_selected);
+//            } else if (mQuestionFragment.getSpecialResponse().equals(Response.NA)) {
+//                menu.findItem(R.id.menu_item_na).setIcon(R.drawable.ic_menu_item_na_selected);
+//            } else if (mQuestionFragment.getSpecialResponse().equals(Response.DK)) {
+//                menu.findItem(R.id.menu_item_dk).setIcon(R.drawable.ic_menu_item_dk_selected);
+//            }
+//        }
+//    }
 
     private boolean checkRules() {
         return new RuleBuilder(getActivity())
@@ -667,7 +656,6 @@ public class SurveyFragment extends Fragment {
      * on the view in the question_container.
      */
     protected void createQuestionFragments() {
-        Log.i(TAG, "Create Question Fragments for display: " + mDisplay.getPosition());
         if (!isActivityFinished) {
 //            if (mQuestion == null || mSurvey == null) {
 //                loadOrCreateQuestion();
@@ -691,7 +679,6 @@ public class SurveyFragment extends Fragment {
             mQuestionFragments.clear();
 
             List<Question> displayQuestions = mDisplay.questions();
-            Log.i(TAG, "Questions: " + displayQuestions.size());
             for (Question question: displayQuestions) {
                 FrameLayout framelayout = new FrameLayout(getContext());
                 framelayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewPager.LayoutParams.MATCH_PARENT));

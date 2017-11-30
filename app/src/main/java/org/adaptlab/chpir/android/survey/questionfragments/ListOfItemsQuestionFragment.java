@@ -85,4 +85,10 @@ public abstract class ListOfItemsQuestionFragment extends QuestionFragment {
             if(BuildConfig.DEBUG) Log.e(TAG, "IOException " + e.getMessage());
         }
     }
+
+    @Override
+    protected void unSetResponse() {
+
+    }
+
 }

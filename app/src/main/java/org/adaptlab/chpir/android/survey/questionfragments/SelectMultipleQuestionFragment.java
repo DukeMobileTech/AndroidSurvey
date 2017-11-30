@@ -81,5 +81,9 @@ public class SelectMultipleQuestionFragment extends QuestionFragment {
     protected void addCheckBox(CheckBox checkbox) {
         mCheckBoxes.add(checkbox);
     }
-    
+
+    @Override
+    protected void unSetResponse() {
+
+    }
 }
