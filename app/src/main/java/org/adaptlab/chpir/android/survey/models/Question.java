@@ -404,7 +404,7 @@ public class Question extends ReceiveModel {
             question.setInstrumentRemoteId(jsonObject.optLong("instrument_id"));
             question.setRegExValidation(jsonObject.optString("reg_ex_validation", null));
             question.setRegExValidationMessage(jsonObject.optString("reg_ex_validation_message", null));
-            question.setOptionCount(jsonObject.getInt("option_count"));
+            question.setOptionCount(jsonObject.optInt("option_count"));
             question.setImageCount(jsonObject.getInt("image_count"));
             question.setInstrumentVersion(jsonObject.getInt("instrument_version"));
             question.setIdentifiesSurvey(jsonObject.optBoolean("identifies_survey", false));
@@ -416,7 +416,7 @@ public class Question extends ReceiveModel {
 //            }
             question.setInstructions(jsonObject.getString("instructions"));
             question.setQuestionVersion(jsonObject.getInt("question_version"));
-            question.setDisplay(jsonObject.getLong("display_id"));
+            question.setDisplay(jsonObject.optLong("display_id"));
 //            question.setFollowingUpQuestion(Question.findByQuestionIdentifier(jsonObject.getString("following_up_question_identifier")));
 //            if (!jsonObject.isNull("grid_id")) {
 //                question.setGrid(Grid.findByRemoteId(jsonObject.getLong("grid_id")));
@@ -453,10 +453,8 @@ public class Question extends ReceiveModel {
                     translation.setLanguage(translationJSON.getString("language"));
                     translation.setQuestion(question);
                     translation.setText(translationJSON.getString("text"));
-                    translation.setRegExValidationMessage(translationJSON.getString
-                            ("reg_ex_validation_message"));
-                    translation.setInstrumentTranslation(InstrumentTranslation.findByRemoteId(
-                            translationJSON.optLong("instrument_translation_id")));
+                    translation.setRegExValidationMessage(translationJSON.optString("reg_ex_validation_message"));
+                    translation.setInstrumentTranslation(InstrumentTranslation.findByRemoteId(translationJSON.optLong("instrument_translation_id")));
                     if (!translationJSON.isNull("instructions")) {
                         translation.setInstructions(translationJSON.getString("instructions"));
                     }

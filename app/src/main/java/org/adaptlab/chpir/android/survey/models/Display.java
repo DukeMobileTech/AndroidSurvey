@@ -57,7 +57,10 @@ public class Display extends ReceiveModel {
     }
 
     public List<Question> questions() {
-        return new Select().from(Question.class).where("DisplayId = ? AND Deleted != ?", getRemoteId(), 1).execute();
+        return new Select().from(Question.class)
+                .where("DisplayId = ? AND Deleted != ?", getRemoteId(), 1)
+                .orderBy("NumberInInstrument ASC")
+                .execute();
     }
 
     private Long getRemoteId() {
