@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import com.activeandroid.Model;
 
-import org.adaptlab.chpir.android.survey.models.Grid;
+import org.adaptlab.chpir.android.survey.models.Display;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Survey;
@@ -25,8 +25,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class GridFragment extends QuestionFragment {
-	public final static String EXTRA_GRID_ID = 
-            "org.adaptlab.chpir.android.survey.grid_id";
+//	public final static String EXTRA_GRID_ID =
+//            "org.adaptlab.chpir.android.survey.grid_id";
+	public final static String EXTRA_DISPLAY_ID =
+			"org.adaptlab.chpir.android.survey.display_id";
 	public final static String EXTRA_SURVEY_ID =
 			"org.adaptlab.chpir.android.survey.survey_id";
 	public static final int MIN_HEIGHT = 80;
@@ -36,27 +38,34 @@ public abstract class GridFragment extends QuestionFragment {
 	protected void createQuestionComponent(ViewGroup questionComponent){};
 	
 	private static final String TAG = "GridFragment";
-	private Grid mGrid;
+//	private Grid mGrid;
+	private Display mDisplay;
 	private Survey mSurvey;
 	private List<Question> mQuestions;
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
+//		if (savedInstanceState != null) {
+//        	mGrid = Grid.findByRemoteId(savedInstanceState.getLong(EXTRA_GRID_ID));
+//        } else {
+//            mGrid = Grid.findByRemoteId(getArguments().getLong(EXTRA_GRID_ID));
+//        }
 		if (savedInstanceState != null) {
-        	mGrid = Grid.findByRemoteId(savedInstanceState.getLong(EXTRA_GRID_ID));
-        } else {
-            mGrid = Grid.findByRemoteId(getArguments().getLong(EXTRA_GRID_ID));
-        }
+			mDisplay = Display.findByRemoteId(savedInstanceState.getLong(EXTRA_DISPLAY_ID));
+		} else {
+			mDisplay = Display.findByRemoteId(getArguments().getLong(EXTRA_DISPLAY_ID));
+		}
 		init();
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         // Allow both portrait and landscape orientations
         getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-        for (Question question : getSurveyFragment().getQuestions()) {
-            if (question.getGrid() == mGrid) {
-                mQuestions.add(question);
-            }
-        }
+//        for (Question question : getSurveyFragment().getQuestions()) {
+//            if (question.getGrid() == mGrid) {
+//                mQuestions.add(question);
+//            }
+//        }
+		mQuestions = mDisplay.questions();
 	}
 	
 	@Override
@@ -86,7 +95,7 @@ public abstract class GridFragment extends QuestionFragment {
 	
 	@Override
 	public String getSpecialResponse() {
-		if (mGrid == null && mSurvey == null) {
+		if (mDisplay == null && mSurvey == null) {
 			return "";
 		}
 		
@@ -103,7 +112,7 @@ public abstract class GridFragment extends QuestionFragment {
 	@Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putLong(EXTRA_GRID_ID, mGrid.getRemoteId());
+        outState.putLong(EXTRA_DISPLAY_ID, mDisplay.getRemoteId());
         outState.putLong(EXTRA_SURVEY_ID, mSurvey.getId());
 	}
 
@@ -120,10 +129,11 @@ public abstract class GridFragment extends QuestionFragment {
                 NestedScrollView tableScrollView = (NestedScrollView) getActivity().findViewById(R.id.grid_scroll_view);
                 int scrollViewHeight = tableScrollView.getHeight();
                 int activityVerticalMargin = (int) getActivity().getResources().getDimension(R.dimen.activity_vertical_margin);
-                final int questionTextHeight = getActivity().findViewById(R.id.linear_layout_for_question_text_view).getHeight();
-                int questionIndexLabelHeight = getActivity().findViewById(R.id.participant_label_and_question_index).getHeight();
+//                final int questionTextHeight = getActivity().findViewById(R.id.linear_layout_for_question_text_view).getHeight();
+//                int questionIndexLabelHeight = getActivity().findViewById(R.id.participant_label_and_question_index).getHeight();
                 int progressBarHeight = getActivity().findViewById(R.id.progress_bar).getHeight();
-                int remainingScreenHeight = screenHeight - activityVerticalMargin - questionTextHeight - questionIndexLabelHeight - progressBarHeight;
+//                int remainingScreenHeight = screenHeight - activityVerticalMargin - questionTextHeight - questionIndexLabelHeight - progressBarHeight;
+				int remainingScreenHeight = screenHeight - activityVerticalMargin - progressBarHeight;
                 int viewHeight = tableScrollView.getHeight();
                 if (scrollViewHeight < tableBodyHeight && remainingScreenHeight > tableBodyHeight) {
                     viewHeight = tableBodyHeight;
@@ -132,7 +142,8 @@ public abstract class GridFragment extends QuestionFragment {
                 } else if (remainingScreenHeight < 0 && scrollViewHeight < tableBodyHeight && tableBodyHeight < screenHeight) {
                     viewHeight = tableBodyHeight;
                 } else if (remainingScreenHeight < 0 && scrollViewHeight < tableBodyHeight && tableBodyHeight > screenHeight) {
-                    viewHeight = screenHeight - activityVerticalMargin - questionIndexLabelHeight - progressBarHeight - tableHeaderHeight;
+//                    viewHeight = screenHeight - activityVerticalMargin - questionIndexLabelHeight - progressBarHeight - tableHeaderHeight;
+					viewHeight = screenHeight - activityVerticalMargin - progressBarHeight - tableHeaderHeight;
                 }
                 ViewGroup.LayoutParams params = tableScrollView.getLayoutParams();
                 params.height = viewHeight;
@@ -164,10 +175,14 @@ public abstract class GridFragment extends QuestionFragment {
 		return mQuestions;
 	}
 	
-	protected Grid getGrid() {
-		return mGrid;
-	}
-	
+//	protected Grid getGrid() {
+//		return mGrid;
+//	}
+
+    protected Display getDisplay() {
+        return mDisplay;
+    }
+
 	protected Survey getSurvey() {
 		return mSurvey;
 	}

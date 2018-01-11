@@ -29,6 +29,10 @@ public class Display extends ReceiveModel {
         super();
     }
 
+    public enum DisplayMode {
+        SINGLE, MULTIPLE, TABLE
+    }
+
     @Override
     public void createObjectFromJSON(JSONObject jsonObject) {
         if (BuildConfig.DEBUG) Log.i(TAG, "Creating Display: " + jsonObject);
@@ -63,7 +67,18 @@ public class Display extends ReceiveModel {
                 .execute();
     }
 
-    private Long getRemoteId() {
+    public String getMode() {
+        return mMode;
+    }
+
+    public List<Option> options() {
+        return new Select().from(Option.class)
+                .where("RemoteOptionSetId = ? AND Deleted != ?",
+                        questions().get(0).getRemoteOptionId(), 1)
+                .execute();
+    }
+
+    public Long getRemoteId() {
         return mRemoteId;
     }
 

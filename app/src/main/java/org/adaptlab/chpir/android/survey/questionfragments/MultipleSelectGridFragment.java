@@ -1,7 +1,7 @@
 
-        package org.adaptlab.chpir.android.survey.questionfragments;
+package org.adaptlab.chpir.android.survey.questionfragments;
 
-        import android.graphics.Typeface;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import org.adaptlab.chpir.android.survey.GridFragment;
 import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.models.GridLabel;
+import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Survey;
@@ -68,12 +68,12 @@ public class MultipleSelectGridFragment extends GridFragment {
         questionTextHeader.setMinHeight(MIN_HEIGHT);
         questionTextHeader.setPadding( 10,10,10,10);
         final LinearLayout headerTableLayout = (LinearLayout) v.findViewById(R.id.table_options_header);
-        final List<GridLabel> gridLabels = getGrid().labels();
+        final List<Option> gridLabels = getDisplay().options();
         rowWidths = new Integer[gridLabels.size()];
         labelWidths = new Integer[gridLabels.size()];
         final List<TextView> headers = new ArrayList<>();
         for (int k = 0; k < gridLabels.size(); k++) {
-            TextView textView = getHeaderTextView(gridLabels.get(k).getLabelText());
+            TextView textView = getHeaderTextView(gridLabels.get(k).getText());
             headerTableLayout.addView(textView);
             setRowWidth(headerTableLayout,textView, k);
             setLabelWidth(headerTableLayout,textView, k);
@@ -148,7 +148,8 @@ public class MultipleSelectGridFragment extends GridFragment {
         params.setMargins(MARGIN_0, MARGIN_0, MARGIN_10, MARGIN_10);
         questionRow.setLayoutParams(params);
         TextView questionNumber = new TextView(getActivity());
-        questionNumber.setText(String.valueOf(q.getNumberInGrid() + "."));
+//        questionNumber.setText(String.valueOf(q.getNumberInGrid() + "."));
+        questionNumber.setText(String.valueOf((getQuestions().indexOf(q) + 1) + "."));
         questionNumber.setMinHeight(MIN_HEIGHT);
         questionNumber.setTypeface(Typeface.DEFAULT_BOLD);
         LinearLayout.LayoutParams questionNumberParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -176,8 +177,8 @@ public class MultipleSelectGridFragment extends GridFragment {
     private void setCheckBoxes(LinearLayout optionsListLinearLayout, int k, final Question q) {
         LinearLayout choiceRow = new LinearLayout(getActivity());
         List<CheckBox> checkBoxes = new ArrayList<>();
-        List<GridLabel> gridLabels = getGrid().labels();
-        for (int i = 0; i < gridLabels.size(); i++) {
+//        List<GridLabel> gridLabels = getGrid().labels();
+        for (int i = 0; i < getDisplay().options().size(); i++) {
             CheckBox checkBox = new CheckBox(getActivity());
             checkBox.setSaveEnabled(false);
             checkBox.setId(i);

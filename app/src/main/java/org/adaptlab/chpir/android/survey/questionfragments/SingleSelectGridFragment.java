@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 import org.adaptlab.chpir.android.survey.GridFragment;
 import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.models.GridLabel;
+import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.Question;
 
 import java.util.ArrayList;
@@ -71,8 +71,9 @@ public class SingleSelectGridFragment extends GridFragment {
         RadioGroup.LayoutParams buttonParams = new RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT, MIN_HEIGHT);
         radioButtons.setLayoutParams(buttonParams);
         adjustRowHeight(radioButtons, k);
-        List<GridLabel> gridLabels = getGrid().labels();
-        for (int i = 0; i < gridLabels.size(); i++) {
+//        List<GridLabel> gridLabels = getGrid().labels();
+//        for (int i = 0; i < gridLabels.size(); i++) {
+        for (int i = 0; i < getDisplay().options().size(); i++) {
             RadioButton button = new RadioButton(getActivity());
             button.setSaveEnabled(false);
             button.setId(i);
@@ -97,7 +98,8 @@ public class SingleSelectGridFragment extends GridFragment {
         params.setMargins(MARGIN_0, MARGIN_0, MARGIN_10, MARGIN_10);
         questionRow.setLayoutParams(params);
         TextView questionNumber = new TextView(getActivity());
-        questionNumber.setText(String.valueOf(q.getNumberInGrid() + "."));
+//        questionNumber.setText(String.valueOf(q.getNumberInGrid() + "."));
+        questionNumber.setText(String.valueOf((getQuestions().indexOf(q) + 1) + "."));
         questionNumber.setMinHeight(MIN_HEIGHT);
         questionNumber.setTypeface(Typeface.DEFAULT_BOLD);
         LinearLayout.LayoutParams questionNumberParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -117,12 +119,13 @@ public class SingleSelectGridFragment extends GridFragment {
         questionTextHeader.setMinHeight(MIN_HEIGHT);
         questionTextHeader.setPadding( 10,10,10,10);
         final LinearLayout headerTableLayout = (LinearLayout) v.findViewById(R.id.table_options_header);
-        final List<GridLabel> gridLabels = getGrid().labels();
+//        final List<GridLabel> gridLabels = getGrid().labels();
+        final List<Option> gridLabels = getDisplay().options();
         final List<TextView> headerViews = new ArrayList<>();
         rowWidths = new Integer[gridLabels.size()];
         labelWidths = new Integer[gridLabels.size()];
         for (int k = 0; k < gridLabels.size(); k++) {
-            TextView textView = getHeaderTextView(gridLabels.get(k).getLabelText());
+            TextView textView = getHeaderTextView(gridLabels.get(k).getText());
             headerTableLayout.addView(textView);
             setRowWidth(headerTableLayout,textView, k);
             setLabelWidth(headerTableLayout,textView, k);

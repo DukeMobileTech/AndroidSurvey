@@ -58,6 +58,8 @@ import org.adaptlab.chpir.android.survey.models.Score;
 import org.adaptlab.chpir.android.survey.models.ScoreScheme;
 import org.adaptlab.chpir.android.survey.models.Section;
 import org.adaptlab.chpir.android.survey.models.Survey;
+import org.adaptlab.chpir.android.survey.questionfragments.MultipleSelectGridFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.SingleSelectGridFragment;
 import org.adaptlab.chpir.android.survey.roster.RosterActivity;
 import org.adaptlab.chpir.android.survey.rules.InstrumentSurveyLimitPerMinuteRule;
 import org.adaptlab.chpir.android.survey.rules.InstrumentSurveyLimitRule;
@@ -474,8 +476,8 @@ public class SurveyFragment extends Fragment {
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         menu.findItem(R.id.menu_item_previous).setEnabled(mDisplayNumber != 0);
-        menu.findItem(R.id.menu_item_next).setVisible(mDisplayNumber != mDisplays.size() - 1).setEnabled(hasValidResponse());
-        menu.findItem(R.id.menu_item_finish).setVisible(mDisplayNumber == mDisplays.size() - 1);
+        menu.findItem(R.id.menu_item_next).setVisible(mDisplayNumber != mDisplays.size() - 1).setEnabled(true);
+        menu.findItem(R.id.menu_item_finish).setVisible(mDisplayNumber == mDisplays.size() - 1).setEnabled(true);
 
 //        if (mQuestion != null) {
 //            menu.findItem(R.id.menu_item_previous).setEnabled(!isFirstQuestion());
@@ -679,19 +681,43 @@ public class SurveyFragment extends Fragment {
             mQuestionFragments.clear();
 
             List<Question> displayQuestions = mDisplay.questions();
-            for (Question question: displayQuestions) {
+            if (mDisplay.getMode().equals(Display.DisplayMode.TABLE.toString())) {
+                // Show table
+                if (displayQuestions.get(0).getQuestionType() == Question.QuestionType.SELECT_ONE) {
+                    mQuestionFragment = new SingleSelectGridFragment();
+                } else {
+                    mQuestionFragment = new MultipleSelectGridFragment();
+                }
+
                 FrameLayout framelayout = new FrameLayout(getContext());
                 framelayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewPager.LayoutParams.MATCH_PARENT));
-                framelayout.setId(new BigDecimal(question.getRemoteId()).intValueExact());
+
+                framelayout.setId(new BigDecimal(displayQuestions.get(0).getRemoteId()).intValueExact());
                 mQuestionViewLayout.addView(framelayout);
 
                 Bundle bundle = new Bundle();
-                bundle.putString("QuestionIdentifier", question.getQuestionIdentifier());
-                mQuestionFragment = (QuestionFragment) QuestionFragmentFactory.createQuestionFragment(question);
+                bundle.putLong(GridFragment.EXTRA_DISPLAY_ID, mDisplay.getRemoteId());
+                bundle.putLong(GridFragment.EXTRA_SURVEY_ID, mSurvey.getId());
                 mQuestionFragment.setArguments(bundle);
-
                 fm.beginTransaction().replace(framelayout.getId(), mQuestionFragment).commit();
                 mQuestionFragments.add(mQuestionFragment);
+
+            } else {
+                for (Question question : displayQuestions) {
+                    FrameLayout framelayout = new FrameLayout(getContext());
+                    framelayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewPager.LayoutParams.MATCH_PARENT));
+
+                    framelayout.setId(new BigDecimal(question.getRemoteId()).intValueExact());
+                    mQuestionViewLayout.addView(framelayout);
+
+                    Bundle bundle = new Bundle();
+                    bundle.putString("QuestionIdentifier", question.getQuestionIdentifier());
+                    mQuestionFragment = (QuestionFragment) QuestionFragmentFactory.createQuestionFragment(question);
+                    mQuestionFragment.setArguments(bundle);
+
+                    fm.beginTransaction().replace(framelayout.getId(), mQuestionFragment).commit();
+                    mQuestionFragments.add(mQuestionFragment);
+                }
             }
 //                }
 //            }
