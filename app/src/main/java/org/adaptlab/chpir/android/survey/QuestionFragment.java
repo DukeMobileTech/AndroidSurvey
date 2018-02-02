@@ -281,17 +281,22 @@ public abstract class QuestionFragment extends Fragment {
 
     private void setResponseSkips() {
         if (mQuestion.isSkipQuestionType() && !TextUtils.isEmpty(mResponse.getText())) {
-            Option selectedOption = mQuestion.options().get(Integer.parseInt(mResponse.getText()));
-            NextQuestion skipOption = new Select().from(NextQuestion.class)
-                    .where("OptionIdentifier = ? AND QuestionIdentifier = ? AND RemoteInstrumentId = ?",
-                            selectedOption.getIdentifier(), mQuestion.getQuestionIdentifier(), mInstrument.getRemoteId())
-                    .executeSingle();
-            if (skipOption != null) {
-                mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), skipOption.getNextQuestionIdentifier());
-            } else if (mQuestion.hasSkips(mInstrument)) {
+            int responseIndex = Integer.parseInt(mResponse.getText());
+            if (mQuestion.isOtherQuestionType() && responseIndex == mQuestion.options().size()) {
                 mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion.getQuestionIdentifier());
+            } else {
+                Option selectedOption = mQuestion.options().get(Integer.parseInt(mResponse.getText()));
+                NextQuestion skipOption = new Select().from(NextQuestion.class)
+                        .where("OptionIdentifier = ? AND QuestionIdentifier = ? AND RemoteInstrumentId = ?",
+                                selectedOption.getIdentifier(), mQuestion.getQuestionIdentifier(), mInstrument.getRemoteId())
+                        .executeSingle();
+                if (skipOption != null) {
+                    mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), skipOption.getNextQuestionIdentifier());
+                } else if (mQuestion.hasSkips(mInstrument)) {
+                    mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion.getQuestionIdentifier());
+                }
+                mSurveyFragment.setMultipleSkipQuestions(selectedOption, mQuestion);
             }
-            mSurveyFragment.setMultipleSkipQuestions(selectedOption, mQuestion);
         }
     }
 
