@@ -45,12 +45,14 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.activeandroid.Model;
+import com.activeandroid.query.Select;
 import com.crashlytics.android.Crashlytics;
 
 import org.adaptlab.chpir.android.survey.location.LocationServiceManager;
 import org.adaptlab.chpir.android.survey.models.Display;
 import org.adaptlab.chpir.android.survey.models.Grid;
 import org.adaptlab.chpir.android.survey.models.Instrument;
+import org.adaptlab.chpir.android.survey.models.MultipleSkip;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
@@ -589,6 +591,35 @@ public class SurveyFragment extends Fragment {
             } else {
                 ft.show(mQuestionFragments.get(k));
             }
+        }
+        ft.commit();
+    }
+
+    protected void setMultipleSkipQuestions(Option selectedOption, Question currentQuestion) {
+        List<MultipleSkip> multipleSkips = new Select().from(MultipleSkip.class)
+                .where("OptionIdentifier = ? AND QuestionIdentifier = ? AND RemoteInstrumentId = ?",
+                        selectedOption.getIdentifier(), currentQuestion.getQuestionIdentifier(), mInstrument.getRemoteId())
+                .execute();
+        FragmentManager fm = getChildFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        if (multipleSkips.size() > 0) {
+            // Questions to skip
+            for(MultipleSkip questionToSkip : multipleSkips) {
+                Question question = Question.findByQuestionIdentifier(questionToSkip.getSkipQuestionIdentifier());
+                if (question.getDisplay() == mDisplay) {
+                    int questionIndex = mDisplay.questions().indexOf(question);
+                    ft.hide(mQuestionFragments.get(questionIndex));
+                } else {
+                    // Another display
+                    Log.i(TAG, "Skip question in another display");
+                    // TODO: 2/1/18 Implement
+                }
+            }
+        } else {
+            // Nothing to skip
+            // Unskip previously selected for skip
+            Log.i(TAG, "Selection has no skips");
+            // TODO: 2/1/18 Implement...does regular skip patterns affect this?
         }
         ft.commit();
     }

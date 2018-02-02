@@ -277,7 +277,9 @@ public abstract class QuestionFragment extends Fragment {
             } else if (mQuestion.hasSkips(mInstrument)) {
                 mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion.getQuestionIdentifier());
             }
+            mSurveyFragment.setMultipleSkipQuestions(selectedOption, mQuestion);
         }
+
     }
 
     protected abstract String serialize();
