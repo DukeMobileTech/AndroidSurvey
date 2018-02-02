@@ -30,6 +30,7 @@ import org.adaptlab.chpir.android.survey.models.GridTranslation;
 import org.adaptlab.chpir.android.survey.models.Image;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.InstrumentTranslation;
+import org.adaptlab.chpir.android.survey.models.NextQuestion;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.OptionScore;
 import org.adaptlab.chpir.android.survey.models.OptionTranslation;
@@ -147,6 +148,7 @@ public class AppUtil {
         ActiveRecordCloudSync.addReceiveTable("option_scores", OptionScore.class);
         ActiveRecordCloudSync.addReceiveTable("score_unit_questions", ScoreUnitQuestion.class);
         ActiveRecordCloudSync.addReceiveTable("displays", Display.class);
+        ActiveRecordCloudSync.addReceiveTable("next_questions", NextQuestion.class);
         ActiveRecordCloudSync.addSendTable("surveys", Survey.class);
         ActiveRecordCloudSync.addSendTable("responses", Response.class);
         ActiveRecordCloudSync.addSendTable("response_images", ResponsePhoto.class);

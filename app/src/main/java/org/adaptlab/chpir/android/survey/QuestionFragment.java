@@ -25,7 +25,10 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.activeandroid.query.Select;
+
 import org.adaptlab.chpir.android.survey.models.Instrument;
+import org.adaptlab.chpir.android.survey.models.NextQuestion;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
@@ -263,6 +266,18 @@ public abstract class QuestionFragment extends Fragment {
             mResponse.setSpecialResponse("");
         }
         new SaveResponseTask().execute(mResponse);
+        if (mQuestion.isSkipQuestionType() && !TextUtils.isEmpty(mResponse.getText())) {
+            Option selectedOption = mQuestion.options().get(Integer.parseInt(mResponse.getText()));
+            NextQuestion skipOption = new Select().from(NextQuestion.class)
+                    .where("OptionIdentifier = ? AND QuestionIdentifier = ? AND RemoteInstrumentId = ?",
+                            selectedOption.getIdentifier(), mQuestion.getQuestionIdentifier(), mInstrument.getRemoteId())
+                    .executeSingle();
+            if (skipOption != null) {
+                mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), skipOption.getNextQuestionIdentifier());
+            } else if (mQuestion.hasSkips(mInstrument)) {
+                mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion.getQuestionIdentifier());
+            }
+        }
     }
 
     protected abstract String serialize();

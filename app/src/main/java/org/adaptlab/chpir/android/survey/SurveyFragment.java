@@ -136,6 +136,7 @@ public class SurveyFragment extends Fragment {
     private GestureDetector mGestureDetector;
     private ProgressDialog mProgressDialog;
     private Display mDisplay;
+    private Display mSkipToDisplay;
     private int mDisplayNumber;
     private ArrayList<Integer> mPreviousDisplays;
 
@@ -548,11 +549,48 @@ public class SurveyFragment extends Fragment {
 
     private void moveToNextDisplay() {
         mPreviousDisplays.add(mDisplayNumber);
-        mDisplayNumber += 1;
+        if (mSkipToDisplay == null) {
+            mDisplayNumber += 1;
+        } else {
+            mDisplayNumber = mSkipToDisplay.getPosition() - 1;
+            mSkipToDisplay = null;
+        }
         if (mDisplayNumber < mDisplays.size()) {
             mDisplay = mDisplays.get(mDisplayNumber);
             createQuestionFragments();
         }
+    }
+
+    protected void setNextQuestion(String currentQuestionIdentifier, String nextQuestionIdentifier) {
+        Question currentQuestion = Question.findByQuestionIdentifier(currentQuestionIdentifier);
+        Question nextQuestion = Question.findByQuestionIdentifier(nextQuestionIdentifier);
+        int currentIndex = mDisplay.questions().indexOf(currentQuestion);
+        if (nextQuestion.getDisplay() == mDisplay) {
+            int nextIndex = mDisplay.questions().indexOf(nextQuestion);
+            hideInBetweenQuestions(currentIndex, nextIndex);
+        } else {
+            hideInBetweenQuestions(currentIndex, -1);
+            mSkipToDisplay = nextQuestion.getDisplay();
+            // TODO: 2/1/18 Implement hiding questions in next display that appear before the
+            // question skipped to
+        }
+    }
+
+    private void hideInBetweenQuestions(int currentIndex, int nextIndex) {
+        FragmentManager fm = getChildFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        for (int k = 0; k < mQuestionFragments.size(); k++) {
+            if (k <= currentIndex) {
+                ft.show(mQuestionFragments.get(k));
+            } else if (k > currentIndex && k < nextIndex) {
+                ft.hide(mQuestionFragments.get(k));
+            } else if (k > currentIndex && nextIndex == -1) {
+                ft.hide(mQuestionFragments.get(k));
+            } else {
+                ft.show(mQuestionFragments.get(k));
+            }
+        }
+        ft.commit();
     }
 
     public boolean isFirstQuestion() {

@@ -382,7 +382,10 @@ public class Instrument extends ReceiveModel {
     }
 
     public List<Display> displays() {
-        return new Select().from(Display.class).where("InstrumentId = ?", getRemoteId()).execute();
+        return new Select().from(Display.class)
+                .where("InstrumentId = ?", getRemoteId())
+                .orderBy("Position ASC")
+                .execute();
     }
 
     @Override

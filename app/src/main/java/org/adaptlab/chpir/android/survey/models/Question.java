@@ -150,6 +150,18 @@ public class Question extends ReceiveModel {
         return false;
     }
 
+    public boolean isSkipQuestionType() {
+        return (getQuestionType() == QuestionType.SELECT_ONE || getQuestionType() == QuestionType.SELECT_ONE_WRITE_OTHER);
+    }
+
+    public boolean hasSkips(Instrument instrument) {
+        List<NextQuestion> skipOptions = new Select().from(NextQuestion.class)
+                .where("QuestionIdentifier = ? AND RemoteInstrumentId = ?",
+                        getQuestionIdentifier(), instrument.getRemoteId())
+                .execute();
+        return (skipOptions.size() > 0);
+    }
+
     public boolean hasCompleteSurveyOption() {
         Option completeSurveyOption = new Select().from(Option.class)
                 .where("Question = ? AND Deleted != ? AND Special = ? AND CompleteSurvey = ?",
@@ -405,7 +417,7 @@ public class Question extends ReceiveModel {
             question.setRegExValidation(jsonObject.optString("reg_ex_validation", null));
             question.setRegExValidationMessage(jsonObject.optString("reg_ex_validation_message", null));
             question.setOptionCount(jsonObject.optInt("option_count"));
-            question.setImageCount(jsonObject.getInt("image_count"));
+            question.setImageCount(jsonObject.optInt("image_count"));
             question.setInstrumentVersion(jsonObject.getInt("instrument_version"));
             question.setIdentifiesSurvey(jsonObject.optBoolean("identifies_survey", false));
             if (!jsonObject.isNull("number_in_instrument")) {
@@ -711,6 +723,11 @@ public class Question extends ReceiveModel {
 
     private void setDisplay(long display) {
         mDisplayId = display;
+    }
+
+    public Display getDisplay() {
+        if (mDisplayId == null) return null;
+        return Display.findByRemoteId(mDisplayId);
     }
 
     public enum QuestionType {

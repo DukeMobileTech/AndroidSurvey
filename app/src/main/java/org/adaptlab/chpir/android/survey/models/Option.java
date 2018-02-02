@@ -42,6 +42,8 @@ public class Option extends ReceiveModel {
     private boolean mCompleteSurvey;
     @Column(name = "RemoteOptionSetId")
     private Long mRemoteOptionSetId;
+    @Column(name = "Identifier")
+    private String mIdentifier;
 
     public Option() {
         super();
@@ -126,9 +128,7 @@ public class Option extends ReceiveModel {
             option.setText(jsonObject.getString("text"));
 //            option.setQuestion(Question.findByRemoteId(jsonObject.getLong("question_id")));
 //            option.setNextQuestion(jsonObject.getString("next_question"));
-//            if (!jsonObject.isNull("number_in_question")) {
-//                option.setNumberInQuestion(jsonObject.getInt("number_in_question"));
-//            }
+            option.setNumberInQuestion(jsonObject.optInt("number_in_question", -1));
 //            option.setInstrumentVersion(jsonObject.getInt("instrument_version"));
 //            option.setSpecial(jsonObject.getBoolean("special"));
 //            if (!jsonObject.isNull("deleted_at")) {
@@ -139,6 +139,7 @@ public class Option extends ReceiveModel {
 //            }
 //            option.setCompleteSurvey(jsonObject.optBoolean("complete_survey"));
             option.setRemoteOptionSetId(jsonObject.optLong("option_set_id"));
+            option.setIdentifier(jsonObject.optString("identifier"));
             option.save();
 
             // Generate translations
@@ -163,6 +164,14 @@ public class Option extends ReceiveModel {
         } catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);
         }
+    }
+
+    private void setIdentifier(String id) {
+       mIdentifier = id;
+    }
+
+    public String getIdentifier() {
+        return mIdentifier;
     }
 
     private void setRemoteOptionSetId(Long id) {
