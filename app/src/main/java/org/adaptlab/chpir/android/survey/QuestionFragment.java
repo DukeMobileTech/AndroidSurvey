@@ -35,6 +35,7 @@ import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.ResponsePhoto;
 import org.adaptlab.chpir.android.survey.models.Survey;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -120,7 +121,14 @@ public abstract class QuestionFragment extends Fragment {
         }
 
         mSpecialResponses = (RadioGroup) v.findViewById(R.id.special_responses_container);
-        final List<String> responses = AppUtil.getAdminSettingsInstance().getSpecialOptions();
+        List<String> responses = new ArrayList<>();
+        if (mQuestion.hasSpecialOptions()) {
+            for (Option option : mQuestion.specialOptions()) {
+                responses.add(option.getText());
+            }
+        } else {
+            responses = AppUtil.getAdminSettingsInstance().getSpecialOptions();
+        }
 
         for (String response : responses) {
             int responseId = responses.indexOf(response);
@@ -130,11 +138,12 @@ public abstract class QuestionFragment extends Fragment {
             button.setTypeface(getInstrument().getTypeFace(getActivity().getApplicationContext()));
 
             mSpecialResponses.addView(button, responseId);
+            final List<String> finalResponses = responses;
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     unSetResponse();
-                    setSpecialResponse(responses.get(v.getId()));
+                    setSpecialResponse(finalResponses.get(v.getId()));
                     setResponseText();
                 }
             });
@@ -214,6 +223,7 @@ public abstract class QuestionFragment extends Fragment {
             mResponse.setDeviceUser(AuthUtils.getCurrentUser());
             mResponse.setTimeEnded(new Date());
             deserialize(mResponse.getText());
+            setSpecialResponseSkips();
         }
     }
 
@@ -266,6 +276,10 @@ public abstract class QuestionFragment extends Fragment {
             mResponse.setSpecialResponse("");
         }
         new SaveResponseTask().execute(mResponse);
+        setResponseSkips();
+    }
+
+    private void setResponseSkips() {
         if (mQuestion.isSkipQuestionType() && !TextUtils.isEmpty(mResponse.getText())) {
             Option selectedOption = mQuestion.options().get(Integer.parseInt(mResponse.getText()));
             NextQuestion skipOption = new Select().from(NextQuestion.class)
@@ -279,6 +293,9 @@ public abstract class QuestionFragment extends Fragment {
             }
             mSurveyFragment.setMultipleSkipQuestions(selectedOption, mQuestion);
         }
+    }
+
+    private void setSpecialResponseSkips() {
 
     }
 

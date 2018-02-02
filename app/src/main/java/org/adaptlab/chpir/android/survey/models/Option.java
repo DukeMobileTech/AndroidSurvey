@@ -90,7 +90,12 @@ public class Option extends ReceiveModel {
     // TODO: 11/27/17 FIX
     public Question getQuestion() {
 //        return mQuestion;
-        return new Select().from(Question.class).where("RemoteOptionSetId = ?", getRemoteOptionId()).executeSingle();
+        if (getSpecial()) {
+            return new Select().from(Question.class).where("RemoteSpecialOptionSetId = ?", getRemoteOptionId()).executeSingle(); // TODO: 2/2/18 Investigate
+        } else {
+            return new Select().from(Question.class).where("RemoteOptionSetId = ?", getRemoteOptionId()).executeSingle();
+
+        }
     }
 
     public String getDeviceLanguage() {
@@ -130,7 +135,7 @@ public class Option extends ReceiveModel {
 //            option.setNextQuestion(jsonObject.getString("next_question"));
             option.setNumberInQuestion(jsonObject.optInt("number_in_question", -1));
 //            option.setInstrumentVersion(jsonObject.getInt("instrument_version"));
-//            option.setSpecial(jsonObject.getBoolean("special"));
+            option.setSpecial(jsonObject.optBoolean("special", false));
 //            if (!jsonObject.isNull("deleted_at")) {
 //                option.setDeleted(true);
 //            }

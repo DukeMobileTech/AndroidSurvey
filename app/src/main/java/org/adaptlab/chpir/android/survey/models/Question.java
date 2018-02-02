@@ -83,6 +83,8 @@ public class Question extends ReceiveModel {
     private Long mRemoteOptionSetId;
     @Column(name = "DisplayId")
     private Long mDisplayId;
+    @Column(name = "RemoteSpecialOptionSetId")
+    private Long mRemoteSpecialOptionSetId;
 
     public Question() {
         super();
@@ -449,6 +451,7 @@ public class Question extends ReceiveModel {
                 question.setCritical(jsonObject.getBoolean("critical"));
             }
             question.setRemoteOptionSetId(jsonObject.optLong("option_set_id"));
+            question.setRemoteSpecialOptionSetId(jsonObject.optLong("special_option_set_id"));
             question.save();
 
             // Generate translations
@@ -476,6 +479,10 @@ public class Question extends ReceiveModel {
         } catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);
         }
+    }
+
+    private void setRemoteSpecialOptionSetId(Long id) {
+        mRemoteSpecialOptionSetId = id;
     }
 
     private void setRemoteOptionSetId(Long id) {
@@ -578,9 +585,22 @@ public class Question extends ReceiveModel {
         return !defaultOptions().isEmpty();
     }
 
+    public boolean hasSpecialOptions() {
+        return (mRemoteSpecialOptionSetId > 0);
+    }
+
+//    public boolean hasSpecialOptionSkips() {
+//        if (!hasSpecialOptions()) return false;
+//
+//    }
+
     public List<Option> specialOptions() {
+//        return new Select().from(Option.class)
+//                .where("Question = ? AND Deleted != ? AND Special = ?", getId(), 1, 1)
+//                .orderBy("NumberInQuestion ASC")
+//                .execute();
         return new Select().from(Option.class)
-                .where("Question = ? AND Deleted != ? AND Special = ?", getId(), 1, 1)
+                .where("RemoteOptionSetId = ? AND Deleted != ?", mRemoteSpecialOptionSetId, 1)
                 .orderBy("NumberInQuestion ASC")
                 .execute();
     }
