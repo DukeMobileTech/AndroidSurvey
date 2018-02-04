@@ -65,7 +65,7 @@ public class DateQuestionFragment extends QuestionFragment {
 
     @Override
     protected void unSetResponse() {
-
+        
     }
 
 }

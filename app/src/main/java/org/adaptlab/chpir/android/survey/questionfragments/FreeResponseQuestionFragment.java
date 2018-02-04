@@ -3,6 +3,7 @@ package org.adaptlab.chpir.android.survey.questionfragments;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
@@ -31,9 +32,12 @@ public class FreeResponseQuestionFragment extends QuestionFragment {
             }
 
             public void afterTextChanged(Editable s) {
+                if(mSpecialResponses!=null&&s.length()>0){
+                    mSpecialResponses.clearCheck();
+                }
             }
         });
-//        mFreeText.requestFocus();
+
         showKeyBoard();
         questionComponent.addView(mFreeText);
     }
@@ -54,6 +58,7 @@ public class FreeResponseQuestionFragment extends QuestionFragment {
 
     @Override
     protected void unSetResponse() {
-
+        mFreeText.setText("");
+        mResponse.setResponse("");
     }
 }

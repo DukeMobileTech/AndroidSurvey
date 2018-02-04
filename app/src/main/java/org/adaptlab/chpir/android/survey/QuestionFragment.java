@@ -50,7 +50,7 @@ public abstract class QuestionFragment extends Fragment {
     private Instrument mInstrument;
     private SurveyFragment mSurveyFragment;
     private List<Option> mOptions;
-    private RadioGroup mSpecialResponses;
+    protected RadioGroup mSpecialResponses;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -132,7 +132,7 @@ public abstract class QuestionFragment extends Fragment {
 
         for (String response : responses) {
             int responseId = responses.indexOf(response);
-            Button button = new RadioButton(getActivity());
+            final Button button = new RadioButton(getActivity());
             button.setText(response);
             button.setId(responseId);
             button.setTypeface(getInstrument().getTypeFace(getActivity().getApplicationContext()));
