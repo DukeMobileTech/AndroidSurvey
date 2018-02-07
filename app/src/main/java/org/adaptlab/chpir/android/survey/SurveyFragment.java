@@ -617,7 +617,7 @@ public class SurveyFragment extends Fragment {
             }
         } else {
             // Nothing to skip
-            // Unskip previously selected for skip
+            // Un-skip previously selected for skip
             Log.i(TAG, "Selection has no skips");
             // TODO: 2/1/18 Implement...does regular skip patterns affect this?
         }

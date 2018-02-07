@@ -156,6 +156,14 @@ public class Question extends ReceiveModel {
         return (getQuestionType() == QuestionType.SELECT_ONE || getQuestionType() == QuestionType.SELECT_ONE_WRITE_OTHER);
     }
 
+    public boolean isMultipleSkipQuestion(Instrument instrument) {
+        List<MultipleSkip> multipleSkips = new Select().from(MultipleSkip.class)
+                .where("QuestionIdentifier = ? AND RemoteInstrumentId = ?",
+                        getQuestionIdentifier(), instrument.getRemoteId())
+                .execute();
+        return (multipleSkips.size() > 0);
+    }
+
     public boolean hasSkips(Instrument instrument) {
         List<NextQuestion> skipOptions = new Select().from(NextQuestion.class)
                 .where("QuestionIdentifier = ? AND RemoteInstrumentId = ?",
@@ -493,6 +501,10 @@ public class Question extends ReceiveModel {
         return mRemoteOptionSetId;
     }
 
+    public Long getRemoteSpecialOptionSetId() {
+        return mRemoteSpecialOptionSetId;
+    }
+
     public static Question findByRemoteId(Long id) {
         return new Select().from(Question.class).where("RemoteId = ?", id).executeSingle();
     }
@@ -589,10 +601,17 @@ public class Question extends ReceiveModel {
         return (mRemoteSpecialOptionSetId > 0);
     }
 
-//    public boolean hasSpecialOptionSkips() {
-//        if (!hasSpecialOptions()) return false;
-//
-//    }
+    public boolean hasSpecialSkips(Instrument instrument) {
+        if (!hasSpecialOptions()) return false;
+        List<NextQuestion> specialSkipOptions = new Select("NextQuestions.*")
+                .from(NextQuestion.class)
+                .innerJoin(Option.class)
+                .on("Options.Identifier=NextQuestions.OptionIdentifier")
+                .where("QuestionIdentifier = ? AND RemoteInstrumentId = ?",
+                        getQuestionIdentifier(), instrument.getRemoteId())
+                .execute();
+        return (specialSkipOptions.size() > 0);
+    }
 
     public List<Option> specialOptions() {
 //        return new Select().from(Option.class)

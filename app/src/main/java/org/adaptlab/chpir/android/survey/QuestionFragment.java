@@ -144,7 +144,7 @@ public abstract class QuestionFragment extends Fragment {
                 public void onClick(View v) {
                     unSetResponse();
                     setSpecialResponse(finalResponses.get(v.getId()));
-                    setResponseText();
+//                    setResponseText(); // TODO: 2/7/18 Do in unSetResponse
                 }
             });
         }
@@ -291,12 +291,29 @@ public abstract class QuestionFragment extends Fragment {
             } else if (mQuestion.hasSkips(mInstrument)) {
                 mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion.getQuestionIdentifier());
             }
+        } else if (mQuestion.isMultipleSkipQuestion(mInstrument) && !TextUtils.isEmpty(mResponse.getText())) {
+            Option selectedOption = mQuestion.options().get(Integer.parseInt(mResponse.getText()));
             mSurveyFragment.setMultipleSkipQuestions(selectedOption, mQuestion);
         }
     }
 
     private void setSpecialResponseSkips() {
-
+        if (!TextUtils.isEmpty(mResponse.getSpecialResponse()) && mQuestion.hasSpecialOptions()) {
+            Option specialOption = new Select().from(Option.class)
+                    .where("Text = ? AND RemoteOptionSetId = ?", mResponse.getSpecialResponse(), mQuestion.getRemoteSpecialOptionSetId())
+                    .executeSingle();
+            if (specialOption != null) {
+                NextQuestion specialSkipOption = new Select().from(NextQuestion.class)
+                        .where("OptionIdentifier = ? AND QuestionIdentifier = ? AND RemoteInstrumentId = ?",
+                                specialOption.getIdentifier(), mQuestion.getQuestionIdentifier(), mInstrument.getRemoteId())
+                        .executeSingle();
+                if (specialSkipOption != null) {
+                    mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), specialSkipOption.getNextQuestionIdentifier());
+                } else if (mQuestion.hasSpecialSkips(mInstrument)) {
+                    mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion.getQuestionIdentifier());
+                }
+            }
+        }
     }
 
     protected abstract String serialize();
