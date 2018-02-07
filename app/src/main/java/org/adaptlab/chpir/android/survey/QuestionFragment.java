@@ -111,8 +111,12 @@ public abstract class QuestionFragment extends Fragment {
         if (!TextUtils.isEmpty(mQuestion.getInstructions()) && !mQuestion.getInstructions().equals("null")) {
             instructions = mQuestion.getInstructions();
         }
+        if (TextUtils.isEmpty(instructions)) {
+            questionText.setText(Html.fromHtml(mQuestion.getNumberInInstrument() + "<br />" + mQuestion.getText()));
+        } else {
+            questionText.setText(Html.fromHtml(mQuestion.getNumberInInstrument() + "<br />" + instructions + "<br />" + mQuestion.getText()));
 
-        questionText.setText(Html.fromHtml(mQuestion.getNumberInInstrument() + "<br />" + instructions + "<br />" + mQuestion.getText()));
+        }
 
         // Overridden by subclasses to place their graphical elements on the fragment.
         createQuestionComponent(questionComponent);
@@ -126,8 +130,8 @@ public abstract class QuestionFragment extends Fragment {
             for (Option option : mQuestion.specialOptions()) {
                 responses.add(option.getText());
             }
-        } else {
-            responses = AppUtil.getAdminSettingsInstance().getSpecialOptions();
+//        } else {
+//            responses = AppUtil.getAdminSettingsInstance().getSpecialOptions();
         }
 
         for (String response : responses) {
@@ -148,6 +152,7 @@ public abstract class QuestionFragment extends Fragment {
                 }
             });
         }
+        if (responses.size() == 0) mSpecialResponses.setVisibility(View.GONE);
         deserializeSpecialResponse();
         return v;
     }
