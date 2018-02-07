@@ -1,6 +1,7 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.DatePicker.OnDateChangedListener;
@@ -16,7 +17,6 @@ public class DateQuestionFragment extends QuestionFragment {
     protected int mDay;
     protected int mMonth;
     protected int mYear;
-    
     private DatePicker mDatePicker;
 
     protected DatePicker beforeAddViewHook(ViewGroup component) {
@@ -36,6 +36,7 @@ public class DateQuestionFragment extends QuestionFragment {
                         mMonth = newMonth;
                         mYear = newYear;
                         setResponseText();
+                        mSpecialResponses.clearCheck();
                     }
                 });
         component.addView(datePicker);
@@ -65,7 +66,9 @@ public class DateQuestionFragment extends QuestionFragment {
 
     @Override
     protected void unSetResponse() {
-
+        if (mResponse != null) {
+            mResponse.setResponse("");
+        }
     }
 
 }

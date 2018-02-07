@@ -20,7 +20,6 @@ public class SelectMultipleQuestionFragment extends QuestionFragment {
 
     @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
-        Log.i("testsssssssss", "multpleeeeeeeeee");
         mCheckBoxes = new ArrayList<CheckBox>();
         mResponseIndices = new ArrayList<Integer>();
         for (Option option : getOptions()) {

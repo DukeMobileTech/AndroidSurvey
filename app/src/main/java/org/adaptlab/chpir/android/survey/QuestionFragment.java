@@ -50,7 +50,7 @@ public abstract class QuestionFragment extends Fragment {
     private Instrument mInstrument;
     private SurveyFragment mSurveyFragment;
     private List<Option> mOptions;
-    private RadioGroup mSpecialResponses;
+    protected RadioGroup mSpecialResponses;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -136,7 +136,7 @@ public abstract class QuestionFragment extends Fragment {
 
         for (String response : responses) {
             int responseId = responses.indexOf(response);
-            Button button = new RadioButton(getActivity());
+            final Button button = new RadioButton(getActivity());
             button.setText(response);
             button.setId(responseId);
             button.setTypeface(getInstrument().getTypeFace(getActivity().getApplicationContext()));
@@ -286,15 +286,21 @@ public abstract class QuestionFragment extends Fragment {
 
     private void setResponseSkips() {
         if (mQuestion.isSkipQuestionType() && !TextUtils.isEmpty(mResponse.getText())) {
-            Option selectedOption = mQuestion.options().get(Integer.parseInt(mResponse.getText()));
-            NextQuestion skipOption = new Select().from(NextQuestion.class)
-                    .where("OptionIdentifier = ? AND QuestionIdentifier = ? AND RemoteInstrumentId = ?",
-                            selectedOption.getIdentifier(), mQuestion.getQuestionIdentifier(), mInstrument.getRemoteId())
-                    .executeSingle();
-            if (skipOption != null) {
-                mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), skipOption.getNextQuestionIdentifier());
-            } else if (mQuestion.hasSkips(mInstrument)) {
+            int responseIndex = Integer.parseInt(mResponse.getText());
+            if (mQuestion.isOtherQuestionType() && responseIndex == mQuestion.options().size()) {
                 mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion.getQuestionIdentifier());
+            } else {
+                Option selectedOption = mQuestion.options().get(Integer.parseInt(mResponse.getText()));
+                NextQuestion skipOption = new Select().from(NextQuestion.class)
+                        .where("OptionIdentifier = ? AND QuestionIdentifier = ? AND RemoteInstrumentId = ?",
+                                selectedOption.getIdentifier(), mQuestion.getQuestionIdentifier(), mInstrument.getRemoteId())
+                        .executeSingle();
+                if (skipOption != null) {
+                    mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), skipOption.getNextQuestionIdentifier());
+                } else if (mQuestion.hasSkips(mInstrument)) {
+                    mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion.getQuestionIdentifier());
+                }
+                mSurveyFragment.setMultipleSkipQuestions(selectedOption, mQuestion);
             }
         } else if (mQuestion.isMultipleSkipQuestion(mInstrument) && !TextUtils.isEmpty(mResponse.getText())) {
             Option selectedOption = mQuestion.options().get(Integer.parseInt(mResponse.getText()));

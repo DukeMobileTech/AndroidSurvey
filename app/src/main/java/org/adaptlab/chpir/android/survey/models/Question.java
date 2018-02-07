@@ -783,4 +783,8 @@ public class Question extends ReceiveModel {
         return (type == QuestionType.SELECT_ONE || type == QuestionType.SELECT_ONE_WRITE_OTHER || type == QuestionType.SELECT_ONE_IMAGE);
     }
 
+    public boolean isOtherQuestionType() {
+        return (mQuestionType == QuestionType.SELECT_ONE_WRITE_OTHER);
+    }
+
 }

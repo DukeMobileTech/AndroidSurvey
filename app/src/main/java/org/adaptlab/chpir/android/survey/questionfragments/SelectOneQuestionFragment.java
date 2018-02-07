@@ -1,5 +1,6 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -24,11 +25,6 @@ public class SelectOneQuestionFragment extends QuestionFragment {
     }
 
     @Override
-    protected void unSetResponse() {
-
-    }
-
-    @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
         mRadioGroup = new RadioGroup(getActivity());
         for (Option option : getOptions()) {
@@ -45,9 +41,21 @@ public class SelectOneQuestionFragment extends QuestionFragment {
         
         getRadioGroup().setOnCheckedChangeListener(new OnCheckedChangeListener() {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                setResponseIndex(checkedId);
+                if(checkedId!=-1) {
+                    setResponseIndex(checkedId);
+                }
             }
         });
+        for(int i=0; i<getRadioGroup().getChildCount(); i++){
+            getRadioGroup().getChildAt(i).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(mSpecialResponses!=null){
+                        mSpecialResponses.clearCheck();
+                    }
+                }
+            });
+        }
         questionComponent.addView(mRadioGroup);
         beforeAddViewHook(questionComponent);
     }
@@ -71,6 +79,11 @@ public class SelectOneQuestionFragment extends QuestionFragment {
     protected void setResponseIndex(int index) {
         mResponseIndex = index;
         setResponseText();
+    }
+
+    @Override
+    protected void unSetResponse() {
+        getRadioGroup().clearCheck();
     }
   
 }
