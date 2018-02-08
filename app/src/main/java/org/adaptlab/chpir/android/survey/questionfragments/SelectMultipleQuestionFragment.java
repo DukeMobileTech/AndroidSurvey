@@ -1,6 +1,7 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -12,7 +13,7 @@ import java.util.ArrayList;
 
 public class SelectMultipleQuestionFragment extends QuestionFragment {
     private ArrayList<Integer> mResponseIndices;
-    private ArrayList<CheckBox> mCheckBoxes;
+    protected ArrayList<CheckBox> mCheckBoxes;
     
     // This is used to add additional UI components in subclasses.
     protected void beforeAddViewHook(ViewGroup questionComponent) {
@@ -31,6 +32,14 @@ public class SelectMultipleQuestionFragment extends QuestionFragment {
             checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     toggleResponseIndex(optionId);
+                }
+            });
+            checkbox.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v){
+                    if(mSpecialResponses!=null){
+                        mSpecialResponses.clearCheck();
+                    }
                 }
             });
             mCheckBoxes.add(checkbox);
@@ -83,6 +92,11 @@ public class SelectMultipleQuestionFragment extends QuestionFragment {
 
     @Override
     protected void unSetResponse() {
-
+        if(mResponse!=null){
+            mResponse.setResponse("");
+        }
+        for(CheckBox oneBox: mCheckBoxes){
+            oneBox.setChecked(false);
+        }
     }
 }

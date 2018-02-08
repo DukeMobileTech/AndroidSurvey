@@ -38,7 +38,7 @@ public class SelectOneQuestionFragment extends QuestionFragment {
                 LinearLayout.LayoutParams.WRAP_CONTENT));
             mRadioGroup.addView(radioButton, optionId);
         }
-        
+
         getRadioGroup().setOnCheckedChangeListener(new OnCheckedChangeListener() {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 if(checkedId!=-1) {
@@ -84,6 +84,9 @@ public class SelectOneQuestionFragment extends QuestionFragment {
     @Override
     protected void unSetResponse() {
         getRadioGroup().clearCheck();
+        if (mResponse != null) {
+            mResponse.setResponse("");
+        }
     }
   
 }

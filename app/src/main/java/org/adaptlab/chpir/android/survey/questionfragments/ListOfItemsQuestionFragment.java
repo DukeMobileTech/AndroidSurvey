@@ -47,7 +47,11 @@ public abstract class ListOfItemsQuestionFragment extends QuestionFragment {
                 
                 // Required by interface
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-                public void afterTextChanged(Editable s) { }
+                public void afterTextChanged(Editable s) {
+                    if(mSpecialResponses!=null&&s.length()>0){
+                        mSpecialResponses.clearCheck();
+                    }
+                }
             });
             if (index == 0) {
 //                editText.requestFocus();
@@ -88,7 +92,12 @@ public abstract class ListOfItemsQuestionFragment extends QuestionFragment {
 
     @Override
     protected void unSetResponse() {
-
+        for(EditText oneEditText:mResponses){
+            oneEditText.setText("");
+        }
+        if(mResponse!=null){
+            mResponse.setResponse("");
+        }
     }
 
 }
