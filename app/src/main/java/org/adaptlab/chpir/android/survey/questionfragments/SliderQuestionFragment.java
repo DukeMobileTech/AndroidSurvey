@@ -1,5 +1,7 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -29,6 +31,15 @@ public class SliderQuestionFragment extends QuestionFragment {
             public void onStartTrackingTouch(SeekBar seekBar) { }
             public void onStopTrackingTouch(SeekBar seekBar) { }     
         });
+        mSlider.setOnTouchListener(new View.OnTouchListener(){
+            @Override
+            public boolean onTouch(View v, MotionEvent event){
+                if(mSpecialResponses!=null){
+                    mSpecialResponses.clearCheck();
+                }
+                return false;
+            }
+        });
         beforeAddViewHook(questionComponent);
         questionComponent.addView(mSlider);
     }
@@ -49,6 +60,9 @@ public class SliderQuestionFragment extends QuestionFragment {
 
     @Override
     protected void unSetResponse() {
-
+        mSlider.setProgress(0);
+        if(mResponse!=null){
+            mResponse.setResponse("");
+        }
     }
 }
