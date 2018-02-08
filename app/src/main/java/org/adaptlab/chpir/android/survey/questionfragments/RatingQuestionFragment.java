@@ -1,5 +1,7 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
@@ -25,6 +27,15 @@ public class RatingQuestionFragment extends QuestionFragment  {
                 setResponseText();
             }
         });
+        mRatingBar.setOnTouchListener( new View.OnTouchListener(){
+            @Override
+            public boolean onTouch(View v, MotionEvent event){
+                if(mSpecialResponses!=null){
+                    mSpecialResponses.clearCheck();
+                }
+                return false;
+            }
+        });
         questionComponent.addView(mRatingBar);
     }
 
@@ -43,7 +54,9 @@ public class RatingQuestionFragment extends QuestionFragment  {
 
     @Override
     protected void unSetResponse() {
-
+        mRatingBar.setRating(0);
+        if (mResponse != null) {
+            mResponse.setResponse("");
+        }
     }
-  
 }
