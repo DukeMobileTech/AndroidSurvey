@@ -1,0 +1,1 @@
+ALTER TABLE Displays ADD COLUMN Title STRING;

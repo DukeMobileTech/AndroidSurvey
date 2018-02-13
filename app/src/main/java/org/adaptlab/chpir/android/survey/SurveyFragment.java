@@ -74,6 +74,8 @@ import org.json.JSONObject;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -148,39 +150,40 @@ public class SurveyFragment extends Fragment {
     private ActionBarDrawerToggle mDrawerToggle;
     private String mDrawerTitle;
     private String mTitle;
+    private String[] mDisplayTitles;
     private String[] mSectionTitles;
     private boolean mNavDrawerSet = false;
     private boolean showSectionView = true;
     private boolean isActivityFinished = false;
 
     private void selectItem(int position) {
-        if (mSections.get(position).questions().size() > 0) {
-            if (mInstrument.getShowSectionsFragment()) {
-                moveToSection(mSections.get(position));
-            } else {
-                mSection = mSections.get(position);
-                mQuestion = mSection.questions().get(0);
-                mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
-                refreshView();
-            }
-        }
-        mDrawerList.setItemChecked(position, true);
-        getActivity().setTitle(mInstrument.getTitle() + " : " + mSectionTitles[position]);
-        mDrawerLayout.closeDrawer(mDrawerList);
-        if (mSections.get(position).getRemoteId().equals(REVIEW_PAGE_ID)) {
-            goToReviewPage();
-        }
+//        if (mSections.get(position).questions().size() > 0) {
+//            if (mInstrument.getShowSectionsFragment()) {
+//                moveToSection(mSections.get(position));
+//            } else {
+//                mSection = mSections.get(position);
+//                mQuestion = mSection.questions().get(0);
+//                mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
+//                refreshView();
+//            }
+//        }
+//        mDrawerList.setItemChecked(position, true);
+//        getActivity().setTitle(mInstrument.getTitle() + " : " + mSectionTitles[position]);
+//        mDrawerLayout.closeDrawer(mDrawerList);
+//        if (mSections.get(position).getRemoteId().equals(REVIEW_PAGE_ID)) {
+//            goToReviewPage();
+//        }
     }
 
     private void moveToSection(Section section) {
-        mSection = section;
-        mPreviousQuestions.add(mQuestionNumber);
-        Intent i = new Intent(getActivity(), SectionActivity.class);
-        Bundle args = new Bundle();
-        args.putLong(EXTRA_SECTION_ID, section.getRemoteId());
-        args.putLong(EXTRA_SURVEY_ID, mSurvey.getId());
-        i.putExtras(args);
-        startActivityForResult(i, SECTION_CODE);
+//        mSection = section;
+//        mPreviousQuestions.add(mQuestionNumber);
+//        Intent i = new Intent(getActivity(), SectionActivity.class);
+//        Bundle args = new Bundle();
+//        args.putLong(EXTRA_SECTION_ID, section.getRemoteId());
+//        args.putLong(EXTRA_SURVEY_ID, mSurvey.getId());
+//        i.putExtras(args);
+//        startActivityForResult(i, SECTION_CODE);
     }
 
     private void updateQuestionText() {
@@ -424,7 +427,7 @@ public class SurveyFragment extends Fragment {
         mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer);
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         mDrawerList.setAdapter(new ArrayAdapter<>(getActivity(), R.layout.drawer_list_item,
-                mSectionTitles));
+                mDisplayTitles));
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
         mDrawerToggle = new ActionBarDrawerToggle(
                 getActivity(),
@@ -454,25 +457,39 @@ public class SurveyFragment extends Fragment {
     }
 
     private void setNavigationDrawerItems() {
-        mSections = new ArrayList<>();
-        mSections.addAll(mInstrument.sections());
-        if (mInstrument.getDirectReviewNavigation()) {
-            Section reviewSection = Section.findByRemoteId(REVIEW_PAGE_ID);
-            if (reviewSection == null) {
-                reviewSection = new Section();
-                reviewSection.setRemoteId(REVIEW_PAGE_ID);
-                reviewSection.setTitle(getActivity().getString(R.string.review_section_title));
-                reviewSection.setInstrumentRemoteId(mInstrument.getRemoteId());
-                reviewSection.save();
-            }
-            if (!mSections.contains(reviewSection)) {
-                mSections.add(reviewSection);
-            }
+//        mSections = new ArrayList<>();
+//        mSections.addAll(mInstrument.sections());
+//        if (mInstrument.getDirectReviewNavigation()) {
+//            Section reviewSection = Section.findByRemoteId(REVIEW_PAGE_ID);
+//            if (reviewSection == null) {
+//                reviewSection = new Section();
+//                reviewSection.setRemoteId(REVIEW_PAGE_ID);
+//                reviewSection.setTitle(getActivity().getString(R.string.review_section_title));
+//                reviewSection.setInstrumentRemoteId(mInstrument.getRemoteId());
+//                reviewSection.save();
+//            }
+//            if (!mSections.contains(reviewSection)) {
+//                mSections.add(reviewSection);
+//            }
+//        }
+//        mSectionTitles = new String[mSections.size()];
+//        for (int i = 0; i < mSections.size(); i++) {
+//            mSectionTitles[i] = mSections.get(i).getTitle();
+//        }
+        sortDisplayList();
+        mDisplayTitles = new String[mDisplays.size()];
+        for(int i=0; i<mDisplays.size(); i++){
+            mDisplayTitles[i]=mDisplays.get(i).getTitle();
         }
-        mSectionTitles = new String[mSections.size()];
-        for (int i = 0; i < mSections.size(); i++) {
-            mSectionTitles[i] = mSections.get(i).getTitle();
-        }
+    }
+
+    private void sortDisplayList(){
+        Collections.sort(mDisplays, new Comparator<Display>() {
+            @Override
+            public int compare(Display lhs, Display rhs) {
+                return lhs.getPosition()<rhs.getPosition() ? -1:1;
+            }
+        });
     }
 
     @Override
@@ -558,6 +575,16 @@ public class SurveyFragment extends Fragment {
             mSkipToDisplay = null;
         }
         if (mDisplayNumber < mDisplays.size()) {
+            mDisplay = mDisplays.get(mDisplayNumber);
+            createQuestionFragments();
+        }
+    }
+
+    private void moveToDisplay(int position){
+        mDrawerLayout.closeDrawer(mDrawerList);
+        if(mDisplayNumber!=position){
+            mPreviousDisplays.add(mDisplayNumber);
+            mDisplayNumber = position;
             mDisplay = mDisplays.get(mDisplayNumber);
             createQuestionFragments();
         }
@@ -1352,7 +1379,7 @@ public class SurveyFragment extends Fragment {
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            selectItem(position);
+            moveToDisplay(position);
         }
     }
 

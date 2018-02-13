@@ -12,6 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
+import java.util.StringTokenizer;
 
 @Table(name = "Displays")
 public class Display extends ReceiveModel {
@@ -24,6 +25,8 @@ public class Display extends ReceiveModel {
     private int mPosition;
     @Column(name = "InstrumentId")
     private Long mInstrumentId;
+    @Column(name = "Title")
+    private String mTitle;
 
     public Display() {
         super();
@@ -46,6 +49,7 @@ public class Display extends ReceiveModel {
             display.setMode(jsonObject.optString("mode"));
             display.setPosition(jsonObject.optInt("position"));
             display.setInstrumentId(jsonObject.optLong("instrument_id"));
+            display.setTitle(jsonObject.optString("title"));
             display.save();
         } catch (JSONException je) {
             if (BuildConfig.DEBUG) Log.e(TAG, "Error parsing object json", je);
@@ -82,6 +86,8 @@ public class Display extends ReceiveModel {
         return mRemoteId;
     }
 
+    public String getTitle(){ return mTitle; }
+
     private void setRemoteId(Long id) {
        mRemoteId = id;
     }
@@ -97,5 +103,7 @@ public class Display extends ReceiveModel {
     private void setInstrumentId(Long id) {
         mInstrumentId = id;
     }
+
+    private void setTitle(String title) { mTitle = title; }
 
 }
