@@ -11,6 +11,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -83,7 +84,7 @@ import java.util.Set;
 
 import io.fabric.sdk.android.Fabric;
 
-public class SurveyFragment extends Fragment {
+public class SurveyFragment extends Fragment implements NavigationView.OnNavigationItemSelectedListener {
     public final static String EXTRA_INSTRUMENT_ID = "org.adaptlab.chpir.android.survey.instrument_id";
     public final static String EXTRA_QUESTION_NUMBER = "org.adaptlab.chpir.android.survey.question_number";
     public final static String EXTRA_SURVEY_ID = "org.adaptlab.chpir.android.survey.survey_id";
@@ -100,6 +101,7 @@ public class SurveyFragment extends Fragment {
 //    private static final Map<String, Integer> mMenuItems;
     private boolean noBackgroundTask = true;
     private boolean mAllowFragmentCommit;
+    private NavigationView mNavigationView;
 
 //    static {
 //        Map<String, Integer> menuItems = new HashMap<String, Integer>();
@@ -424,11 +426,17 @@ public class SurveyFragment extends Fragment {
         setNavigationDrawerItems();
         mTitle = mDrawerTitle = mInstrument.getTitle();
         mDrawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer);
+//        mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer);
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-        mDrawerList.setAdapter(new ArrayAdapter<>(getActivity(), R.layout.drawer_list_item,
-                mDisplayTitles));
-        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+//        mDrawerList.setAdapter(new ArrayAdapter<>(getActivity(), R.layout.drawer_list_item,
+//                mDisplayTitles));
+//        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+        mNavigationView = (NavigationView) getActivity().findViewById(R.id.navigation);
+        final Menu menu = mNavigationView.getMenu();
+        for(String oneTitle: mDisplayTitles){
+            menu.add(oneTitle);
+        }
+        mNavigationView.setNavigationItemSelectedListener(this);
         mDrawerToggle = new ActionBarDrawerToggle(
                 getActivity(),
                 mDrawerLayout,
@@ -581,7 +589,7 @@ public class SurveyFragment extends Fragment {
     }
 
     private void moveToDisplay(int position){
-        mDrawerLayout.closeDrawer(mDrawerList);
+        mDrawerLayout.closeDrawer(mNavigationView);
         if(mDisplayNumber!=position){
             mPreviousDisplays.add(mDisplayNumber);
             mDisplayNumber = position;
@@ -600,8 +608,9 @@ public class SurveyFragment extends Fragment {
         } else {
             hideInBetweenQuestions(currentIndex, -1);
             mSkipToDisplay = nextQuestion.getDisplay();
-            // TODO: 2/1/18 Implement hiding questions in next display that appear before the
-            // question skipped to
+            // TODO: 2/1/18 Implement hiding questions in next display that appear before the question skipped to
+//            int nextIndex = mSkipToDisplay.questions().indexOf(nextQuestion);
+//            hideInBetweenQuestions(0,nextIndex);
         }
     }
 
@@ -1294,6 +1303,19 @@ public class SurveyFragment extends Fragment {
         }
     }
 
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        int id = 0;
+        for(String oneTitile: mDisplayTitles){
+            if(oneTitile.equals(item.getTitle())){
+                break;
+            }
+            id++;
+        }
+        moveToDisplay(id);
+        return true;
+    }
+
     private class LoadQuestionsTask extends AsyncTask<Instrument, Void, List<Question>> {
 
         @Override
@@ -1351,7 +1373,6 @@ public class SurveyFragment extends Fragment {
     }
 
     private class ScoreSurveyTask extends AsyncTask<Survey, Void, Survey> {
-
         @Override
         protected Survey doInBackground(Survey... params) {
             Survey survey = params[0];
@@ -1379,7 +1400,7 @@ public class SurveyFragment extends Fragment {
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            moveToDisplay(position);
+            //moveToDisplay(position);
         }
     }
 
