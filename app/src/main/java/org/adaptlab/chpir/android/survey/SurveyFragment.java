@@ -784,7 +784,10 @@ public class SurveyFragment extends Fragment implements NavigationView.OnNavigat
             }
             ft.commit();
             mQuestionFragments.clear();
-
+            for(int i=0;i<mDisplays.size();i++){
+                mNavigationView.getMenu().getItem(i).setChecked(false);
+            }
+            mNavigationView.getMenu().getItem(mDisplayNumber).setChecked(true);
             List<Question> displayQuestions = mDisplay.questions();
             if (mDisplay.getMode().equals(Display.DisplayMode.TABLE.toString())) {
                 // Show table
