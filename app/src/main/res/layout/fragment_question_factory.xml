@@ -54,12 +54,18 @@
         android:id="@+id/validation_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginTop="10dp"
         android:gravity="center_horizontal"
         android:textColor="@color/red"
         android:visibility="invisible"/>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:layout_marginBottom="10dp"
+        android:background="?android:attr/dividerHorizontal" />
+
 
 </LinearLayout>
