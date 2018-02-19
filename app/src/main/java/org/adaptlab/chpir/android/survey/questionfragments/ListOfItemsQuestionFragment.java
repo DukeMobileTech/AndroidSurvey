@@ -30,7 +30,7 @@ public abstract class ListOfItemsQuestionFragment extends QuestionFragment {
     
     protected void createQuestionComponent(ViewGroup questionComponent) {
         mResponses = new ArrayList<>();
-        int index = 0;
+//        int index = 0;
         for (Option option : getOptions()) {
             final TextView optionText = new TextView(getActivity());
             optionText.setText(option.getText());
@@ -53,11 +53,11 @@ public abstract class ListOfItemsQuestionFragment extends QuestionFragment {
                     }
                 }
             });
-            if (index == 0) {
+//            if (index == 0) {
 //                editText.requestFocus();
-                showKeyBoard();
-            }
-            index++;
+//                showKeyBoard();
+//            }
+//            index++;
         }
     }
 

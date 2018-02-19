@@ -1,6 +1,5 @@
 package org.adaptlab.chpir.android.survey;
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -10,14 +9,11 @@ import android.text.Html;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -45,7 +41,6 @@ public abstract class QuestionFragment extends Fragment {
     public TextView mValidationTextView;
     public Response mResponse;
     private Question mQuestion;
-    private List<Question> mQuestions;
     private Survey mSurvey;
     private Instrument mInstrument;
     private SurveyFragment mSurveyFragment;
@@ -68,13 +63,7 @@ public abstract class QuestionFragment extends Fragment {
             questionIdentifier = bundle.getString("QuestionIdentifier");
         }
         mSurvey = mSurveyFragment.getSurvey();
-        mQuestions = mSurveyFragment.getQuestions();
-        for(Question question:mQuestions){
-            if(questionIdentifier.equals(question.getQuestionIdentifier())){
-                mQuestion = question;
-                break;
-            }
-        }
+        mQuestion = mSurveyFragment.getQuestion(questionIdentifier);
         if (mSurvey == null || mQuestion == null) return;
         mResponse = loadOrCreateResponse();
         mResponse.setQuestion(mQuestion);
@@ -108,13 +97,16 @@ public abstract class QuestionFragment extends Fragment {
         mValidationTextView = (TextView) v.findViewById(R.id.validation_text);
 
         String instructions = "";
-        if (!TextUtils.isEmpty(mQuestion.getInstructions()) && !mQuestion.getInstructions().equals("null")) {
+        if (!TextUtils.isEmpty(mQuestion.getInstructions()) && !mQuestion.getInstructions()
+                .equals("null")) {
             instructions = mQuestion.getInstructions();
         }
         if (TextUtils.isEmpty(instructions)) {
-            questionText.setText(Html.fromHtml(mQuestion.getNumberInInstrument() + "<br />" + mQuestion.getText()));
+            questionText.setText(Html.fromHtml(mQuestion.getNumberInInstrument() + "<br />" +
+                    mQuestion.getText()));
         } else {
-            questionText.setText(Html.fromHtml(mQuestion.getNumberInInstrument() + "<br />" + instructions + "<br />" + mQuestion.getText()));
+            questionText.setText(Html.fromHtml(mQuestion.getNumberInInstrument() + "<br />" +
+                    instructions + "<br />" + mQuestion.getText()));
 
         }
 
@@ -159,7 +151,8 @@ public abstract class QuestionFragment extends Fragment {
 
     private void deserializeSpecialResponse() {
         if (TextUtils.isEmpty(mResponse.getSpecialResponse())) return;
-        int id = AppUtil.getAdminSettingsInstance().getSpecialOptions().indexOf(mResponse.getSpecialResponse());
+        int id = AppUtil.getAdminSettingsInstance().getSpecialOptions().indexOf(mResponse
+                .getSpecialResponse());
         mSpecialResponses.check(id);
     }
 
@@ -168,34 +161,34 @@ public abstract class QuestionFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        hideKeyBoard();
+//        hideKeyBoard();
     }
 
-    protected void hideKeyBoard() {
-        try {
-            getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams
-                    .SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-            if (getActivity().getCurrentFocus() != null && getActivity().getCurrentFocus()
-                    .getWindowToken() != null) {
-                ((InputMethodManager) getActivity().getSystemService(Context
-                        .INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(getActivity()
-                        .getCurrentFocus().getWindowToken(), 0);
-            }
-        } catch (Exception ex) {
-            if (BuildConfig.DEBUG) Log.e(TAG, "Input Method Exception " + ex.getMessage());
-        }
-    }
+//    protected void hideKeyBoard() {
+//        try {
+//            getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams
+//                    .SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+//            if (getActivity().getCurrentFocus() != null && getActivity().getCurrentFocus()
+//                    .getWindowToken() != null) {
+//                ((InputMethodManager) getActivity().getSystemService(Context
+//                        .INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(getActivity()
+//                        .getCurrentFocus().getWindowToken(), 0);
+//            }
+//        } catch (Exception ex) {
+//            if (BuildConfig.DEBUG) Log.e(TAG, "Input Method Exception " + ex.getMessage());
+//        }
+//    }
 
     protected abstract void createQuestionComponent(ViewGroup questionComponent);
 
     protected abstract void deserialize(String responseText);
 
-    protected void showKeyBoard() {
-        InputMethodManager manager = (InputMethodManager) getActivity().getSystemService(Context
-                .INPUT_METHOD_SERVICE);
-        manager.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager
-                .HIDE_IMPLICIT_ONLY);
-    }
+//    protected void showKeyBoard() {
+//        InputMethodManager manager = (InputMethodManager) getActivity().getSystemService(Context
+//                .INPUT_METHOD_SERVICE);
+//        manager.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager
+//                .HIDE_IMPLICIT_ONLY);
+//    }
 
     protected SurveyFragment getSurveyFragment() {
         return mSurveyFragment;
@@ -288,21 +281,28 @@ public abstract class QuestionFragment extends Fragment {
         if (mQuestion.isSkipQuestionType() && !TextUtils.isEmpty(mResponse.getText())) {
             int responseIndex = Integer.parseInt(mResponse.getText());
             if (mQuestion.isOtherQuestionType() && responseIndex == mQuestion.options().size()) {
-                mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion.getQuestionIdentifier());
+                mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion
+                        .getQuestionIdentifier());
             } else {
-                Option selectedOption = mQuestion.options().get(Integer.parseInt(mResponse.getText()));
+                Option selectedOption = mQuestion.options().get(Integer.parseInt(mResponse
+                        .getText()));
                 NextQuestion skipOption = new Select().from(NextQuestion.class)
-                        .where("OptionIdentifier = ? AND QuestionIdentifier = ? AND RemoteInstrumentId = ?",
-                                selectedOption.getIdentifier(), mQuestion.getQuestionIdentifier(), mInstrument.getRemoteId())
+                        .where("OptionIdentifier = ? AND QuestionIdentifier = ? AND " +
+                                        "RemoteInstrumentId = ?",
+                                selectedOption.getIdentifier(), mQuestion.getQuestionIdentifier()
+                                , mInstrument.getRemoteId())
                         .executeSingle();
                 if (skipOption != null) {
-                    mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), skipOption.getNextQuestionIdentifier());
+                    mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), skipOption
+                            .getNextQuestionIdentifier());
                 } else if (mQuestion.hasSkips(mInstrument)) {
-                    mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion.getQuestionIdentifier());
+                    mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion
+                            .getQuestionIdentifier());
                 }
                 mSurveyFragment.setMultipleSkipQuestions(selectedOption, mQuestion);
             }
-        } else if (mQuestion.isMultipleSkipQuestion(mInstrument) && !TextUtils.isEmpty(mResponse.getText())) {
+        } else if (mQuestion.isMultipleSkipQuestion(mInstrument) && !TextUtils.isEmpty(mResponse
+                .getText())) {
             Option selectedOption = mQuestion.options().get(Integer.parseInt(mResponse.getText()));
             mSurveyFragment.setMultipleSkipQuestions(selectedOption, mQuestion);
         }
@@ -311,17 +311,22 @@ public abstract class QuestionFragment extends Fragment {
     private void setSpecialResponseSkips() {
         if (!TextUtils.isEmpty(mResponse.getSpecialResponse()) && mQuestion.hasSpecialOptions()) {
             Option specialOption = new Select().from(Option.class)
-                    .where("Text = ? AND RemoteOptionSetId = ?", mResponse.getSpecialResponse(), mQuestion.getRemoteSpecialOptionSetId())
+                    .where("Text = ? AND RemoteOptionSetId = ?", mResponse.getSpecialResponse(),
+                            mQuestion.getRemoteSpecialOptionSetId())
                     .executeSingle();
             if (specialOption != null) {
                 NextQuestion specialSkipOption = new Select().from(NextQuestion.class)
-                        .where("OptionIdentifier = ? AND QuestionIdentifier = ? AND RemoteInstrumentId = ?",
-                                specialOption.getIdentifier(), mQuestion.getQuestionIdentifier(), mInstrument.getRemoteId())
+                        .where("OptionIdentifier = ? AND QuestionIdentifier = ? AND " +
+                                        "RemoteInstrumentId = ?",
+                                specialOption.getIdentifier(), mQuestion.getQuestionIdentifier(),
+                                mInstrument.getRemoteId())
                         .executeSingle();
                 if (specialSkipOption != null) {
-                    mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), specialSkipOption.getNextQuestionIdentifier());
+                    mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(),
+                            specialSkipOption.getNextQuestionIdentifier());
                 } else if (mQuestion.hasSpecialSkips(mInstrument)) {
-                    mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion.getQuestionIdentifier());
+                    mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion
+                            .getQuestionIdentifier());
                 }
             }
         }

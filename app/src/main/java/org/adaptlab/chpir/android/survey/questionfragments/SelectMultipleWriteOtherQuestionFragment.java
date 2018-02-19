@@ -25,10 +25,10 @@ public class SelectMultipleWriteOtherQuestionFragment extends
                 if (isChecked) {
                     otherText.setEnabled(true);
                     otherText.requestFocus();
-                    showKeyBoard();
+//                    showKeyBoard();
                 } else {
                     otherText.setEnabled(false);
-                    hideKeyBoard();
+//                    hideKeyBoard();
                     otherText.getText().clear();
                 }
                 toggleResponseIndex(otherId);

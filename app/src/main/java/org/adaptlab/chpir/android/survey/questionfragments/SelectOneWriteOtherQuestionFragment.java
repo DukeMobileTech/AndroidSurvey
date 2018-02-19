@@ -1,6 +1,5 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -9,10 +8,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 
-import org.adaptlab.chpir.android.survey.AuthUtils;
 import org.adaptlab.chpir.android.survey.R;
-
-import java.util.Date;
 
 public class SelectOneWriteOtherQuestionFragment extends
         SelectOneQuestionFragment {
@@ -44,10 +40,10 @@ public class SelectOneWriteOtherQuestionFragment extends
                     if (checkedId == otherId) {
                         otherText.setEnabled(true);
                         otherText.requestFocus();
-                        showKeyBoard();
+//                        showKeyBoard();
                     } else {
                         otherText.setEnabled(false);
-                        hideKeyBoard();
+//                        hideKeyBoard();
                         otherText.getText().clear();
                     }
                     setResponseIndex(checkedId);

@@ -142,7 +142,7 @@ public class AppUtil {
 //        ActiveRecordCloudSync.addReceiveTable("grid_labels", GridLabel.class);
         ActiveRecordCloudSync.addReceiveTable("images", Image.class);
         ActiveRecordCloudSync.addReceiveTable("device_users", DeviceUser.class);
-        ActiveRecordCloudSync.addReceiveTable("skips", Skip.class);
+//        ActiveRecordCloudSync.addReceiveTable("skips", Skip.class);
         ActiveRecordCloudSync.addReceiveTable("rules", Rule.class);
         ActiveRecordCloudSync.addReceiveTable("score_schemes", ScoreScheme.class);
         ActiveRecordCloudSync.addReceiveTable("score_units", ScoreUnit.class);
