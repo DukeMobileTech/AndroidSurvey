@@ -390,13 +390,14 @@ public class SurveyFragment extends Fragment implements NavigationView.OnNavigat
         }
     }
 
+    // TODO: 2/19/18 Fix
     @Override
     public void onSaveInstanceState(Bundle outState) {
         mAllowFragmentCommit = false;
         super.onSaveInstanceState(outState);
-        outState.putLong(EXTRA_INSTRUMENT_ID, mInstrument.getRemoteId());
-        if (mSurvey != null) outState.putLong(EXTRA_SURVEY_ID, mSurvey.getId());
         outState.putInt(EXTRA_QUESTION_NUMBER, mQuestionNumber);
+        outState.putLong(EXTRA_INSTRUMENT_ID, mInstrument.getRemoteId());
+        outState.putLong(EXTRA_SURVEY_ID, mSurvey.getId());
         outState.putIntegerArrayList(EXTRA_PREVIOUS_QUESTION_IDS, mPreviousQuestions);
         outState.putIntegerArrayList(EXTRA_QUESTIONS_TO_SKIP_IDS, mQuestionsToSkip);
     }
@@ -486,8 +487,8 @@ public class SurveyFragment extends Fragment implements NavigationView.OnNavigat
 //        }
         sortDisplayList();
         mDisplayTitles = new String[mDisplays.size()];
-        for(int i=0; i<mDisplays.size(); i++){
-            mDisplayTitles[i]=mDisplays.get(i).getTitle();
+        for(int i = 0; i < mDisplays.size(); i++){
+            mDisplayTitles[i] = mDisplays.get(i).getTitle();
         }
     }
 
@@ -495,7 +496,7 @@ public class SurveyFragment extends Fragment implements NavigationView.OnNavigat
         Collections.sort(mDisplays, new Comparator<Display>() {
             @Override
             public int compare(Display lhs, Display rhs) {
-                return lhs.getPosition()<rhs.getPosition() ? -1:1;
+                return lhs.getPosition() < rhs.getPosition() ? -1 : 1;
             }
         });
     }
@@ -590,11 +591,12 @@ public class SurveyFragment extends Fragment implements NavigationView.OnNavigat
 
     private void moveToDisplay(int position){
         mDrawerLayout.closeDrawer(mNavigationView);
-        if(mDisplayNumber!=position){
+        if (mDisplayNumber != position) {
             mPreviousDisplays.add(mDisplayNumber);
             mDisplayNumber = position;
             mDisplay = mDisplays.get(mDisplayNumber);
             createQuestionFragments();
+            updateQuestionCountLabel();
         }
     }
 
@@ -1287,30 +1289,34 @@ public class SurveyFragment extends Fragment implements NavigationView.OnNavigat
     }
 
     private void updateQuestionCountLabel() {
-        if (mQuestion != null) {
-            if (mQuestion.belongsToGrid()) {
-                Question first = mGrid.questions().get(0);
-                Question last = mGrid.questions().get(mGrid.questions().size() - 1);
-                mQuestionIndex.setText((first.getNumberInInstrument()) + " - " + (
-                        last.getNumberInInstrument()) + " " + getString(R.string.of) + " " +
-                        mQuestionCount);
-            } else {
-                mQuestionIndex.setText((mQuestionNumber + 1) + " " + getString(R.string.of) + " " +
-                        mQuestionCount);
-            }
-            mProgressBar.setProgress((int) (100 * (mQuestionNumber + 1) / (float) mQuestionCount));
-
-            if (isAdded()) {
-                ActivityCompat.invalidateOptionsMenu(getActivity());
-            }
+//        if (mQuestion != null) {
+//            if (mQuestion.belongsToGrid()) {
+//                Question first = mGrid.questions().get(0);
+//                Question last = mGrid.questions().get(mGrid.questions().size() - 1);
+//                mQuestionIndex.setText((first.getNumberInInstrument()) + " - " + (
+//                        last.getNumberInInstrument()) + " " + getString(R.string.of) + " " +
+//                        mQuestionCount);
+//            } else {
+//                mQuestionIndex.setText((mQuestionNumber + 1) + " " + getString(R.string.of) + " " +
+//                        mQuestionCount);
+//            }
+//            mProgressBar.setProgress((int) (100 * (mQuestionNumber + 1) / (float) mQuestionCount));
+//
+//            if (isAdded()) {
+//                ActivityCompat.invalidateOptionsMenu(getActivity());
+//            }
+//        }
+        if (mDisplay != null) {
+            mQuestionIndex.setText(getString(R.string.screen) + " " + (mDisplayNumber + 1) + " " + getString(R.string.of) + " " + mDisplays.size() + " (" + getString(R.string.questions) + " " + mDisplay.questions().get(0).getNumberInInstrument() + " - " + mDisplay.questions().get(mDisplay.questions().size() - 1).getNumberInInstrument() + ")");
+            mProgressBar.setProgress((int) (100 * (mDisplayNumber + 1) / (float) mDisplays.size()));
         }
     }
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = 0;
-        for(String oneTitile: mDisplayTitles){
-            if(oneTitile.equals(item.getTitle())){
+        for (String oneTitle : mDisplayTitles) {
+            if (oneTitle.equals(item.getTitle())){
                 break;
             }
             id++;
