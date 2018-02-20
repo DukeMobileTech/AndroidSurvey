@@ -442,6 +442,12 @@ public class SurveyFragment extends Fragment implements NavigationView
         if (!mNavDrawerSet) {
             setupNavigationDrawer();
         }
+        if (mNavigationView != null) {
+            for (int i = 0; i < mDisplays.size(); i++) {
+                mNavigationView.getMenu().getItem(i).setChecked(false);
+            }
+            mNavigationView.getMenu().getItem(mDisplayNumber).setChecked(true);
+        }
     }
 
     private void setupNavigationDrawer() {
@@ -525,7 +531,6 @@ public class SurveyFragment extends Fragment implements NavigationView
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        Log.i("mPreviousDisplays",mPreviousDisplays.toString());
         menu.findItem(R.id.menu_item_previous).setEnabled(mDisplayNumber!=0||!mPreviousDisplays.isEmpty());
         menu.findItem(R.id.menu_item_next).setVisible(mDisplayNumber != mDisplays.size() - 1)
                 .setEnabled(true);
