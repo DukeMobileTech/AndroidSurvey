@@ -52,7 +52,6 @@ public class SelectOneQuestionFragment extends QuestionFragment {
                 public void onClick(View v) {
                     if(mSpecialResponses!=null){
                         mSpecialResponses.clearCheck();
-                        setSpecialResponse("");
                     }
                 }
             });

@@ -50,7 +50,6 @@ public abstract class ListOfItemsQuestionFragment extends QuestionFragment {
                 public void afterTextChanged(Editable s) {
                     if(mSpecialResponses!=null&&s.length()>0){
                         mSpecialResponses.clearCheck();
-                        setSpecialResponse("");
                     }
                 }
             });

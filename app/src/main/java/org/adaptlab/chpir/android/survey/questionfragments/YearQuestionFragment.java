@@ -29,7 +29,6 @@ public class YearQuestionFragment extends DateQuestionFragment {
                     setResponseText();
                     if (mSpecialResponses != null) {
                         mSpecialResponses.clearCheck();
-                        setSpecialResponse("");
                     }
                 }
             });

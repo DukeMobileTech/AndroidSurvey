@@ -32,7 +32,6 @@ public class RatingQuestionFragment extends QuestionFragment  {
             public boolean onTouch(View v, MotionEvent event){
                 if(mSpecialResponses!=null){
                     mSpecialResponses.clearCheck();
-                    setSpecialResponse("");
                 }
                 return false;
             }

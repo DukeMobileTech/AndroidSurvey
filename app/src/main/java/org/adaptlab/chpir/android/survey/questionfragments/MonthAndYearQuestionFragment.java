@@ -28,7 +28,6 @@ public class MonthAndYearQuestionFragment extends DateQuestionFragment {
                         setResponseText();
                         if (mSpecialResponses != null) {
                             mSpecialResponses.clearCheck();
-                            setSpecialResponse("");
                         }
                     }
                 });
@@ -43,4 +42,5 @@ public class MonthAndYearQuestionFragment extends DateQuestionFragment {
     protected String serialize() {
         return FormatUtils.formatDate(mMonth, mYear);
     }
+
 }
