@@ -27,6 +27,10 @@ public class YearQuestionFragment extends DateQuestionFragment {
                     mMonth = newMonth;
                     mYear = newYear;
                     setResponseText();
+                    if (mSpecialResponses != null) {
+                        mSpecialResponses.clearCheck();
+                        setSpecialResponse("");
+                    }
                 }
             });
         mDatePicker.findViewById(Resources.getSystem().getIdentifier("day", "id", "android"))

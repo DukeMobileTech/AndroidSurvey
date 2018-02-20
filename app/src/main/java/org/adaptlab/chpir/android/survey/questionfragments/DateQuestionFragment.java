@@ -37,6 +37,7 @@ public class DateQuestionFragment extends QuestionFragment {
                         setResponseText();
                         if (mSpecialResponses != null) {
                             mSpecialResponses.clearCheck();
+                            setSpecialResponse("");
                         }
                     }
                 });

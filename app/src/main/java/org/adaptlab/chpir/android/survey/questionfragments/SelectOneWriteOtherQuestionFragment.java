@@ -31,6 +31,7 @@ public class SelectOneWriteOtherQuestionFragment extends
             public void onClick(View v) {
                 if(mSpecialResponses!=null){
                     mSpecialResponses.clearCheck();
+                    setSpecialResponse("");
                 }
             }
         });

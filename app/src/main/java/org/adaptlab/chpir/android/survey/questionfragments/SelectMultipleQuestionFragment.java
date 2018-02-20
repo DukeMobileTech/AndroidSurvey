@@ -39,6 +39,7 @@ public class SelectMultipleQuestionFragment extends QuestionFragment {
                 public void onClick(View v){
                     if(mSpecialResponses!=null){
                         mSpecialResponses.clearCheck();
+                        setSpecialResponse("");
                     }
                 }
             });

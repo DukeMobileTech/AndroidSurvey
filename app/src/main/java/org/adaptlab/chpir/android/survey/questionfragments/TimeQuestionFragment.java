@@ -33,6 +33,7 @@ public class TimeQuestionFragment extends QuestionFragment {
 
             public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
                 mSpecialResponses.clearCheck();
+                setSpecialResponse("");
             }
         });
     }
