@@ -9,6 +9,7 @@ import android.text.Html;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -122,8 +123,6 @@ public abstract class QuestionFragment extends Fragment {
             for (Option option : mQuestion.specialOptions()) {
                 responses.add(option.getText());
             }
-//        } else {
-//            responses = AppUtil.getAdminSettingsInstance().getSpecialOptions();
         }
 
         for (String response : responses) {
@@ -151,9 +150,11 @@ public abstract class QuestionFragment extends Fragment {
 
     private void deserializeSpecialResponse() {
         if (TextUtils.isEmpty(mResponse.getSpecialResponse())) return;
-        int id = AppUtil.getAdminSettingsInstance().getSpecialOptions().indexOf(mResponse
-                .getSpecialResponse());
-        mSpecialResponses.check(id);
+        for(int i=0; i<mSpecialResponses.getChildCount(); i++){
+            if(((RadioButton)mSpecialResponses.getChildAt(i)).getText().equals(mResponse.getSpecialResponse())){
+                mSpecialResponses.check(i);
+            }
+        }
     }
 
     protected abstract void unSetResponse();
@@ -221,6 +222,7 @@ public abstract class QuestionFragment extends Fragment {
             mResponse.setDeviceUser(AuthUtils.getCurrentUser());
             mResponse.setTimeEnded(new Date());
             deserialize(mResponse.getText());
+            new SaveResponseTask().execute(mResponse);
             setSpecialResponseSkips();
         }
     }
