@@ -599,6 +599,7 @@ public class SurveyFragment extends Fragment implements NavigationView
     }
 
     private void moveToPreviousDisplay() {
+        mDrawerLayout.closeDrawer(mNavigationView);
         if (mDisplayNumber >= 0 && mDisplayNumber < mDisplays.size()) {
             mDisplayNumber = mPreviousDisplays.remove(mPreviousDisplays.size() - 1);
             mDisplay = mDisplays.get(mDisplayNumber);
@@ -607,6 +608,7 @@ public class SurveyFragment extends Fragment implements NavigationView
     }
 
     private void moveToNextDisplay() {
+        mDrawerLayout.closeDrawer(mNavigationView);
         mPreviousDisplays.add(mDisplayNumber);
         if (mSkipToDisplay == null) {
             mDisplayNumber += 1;
