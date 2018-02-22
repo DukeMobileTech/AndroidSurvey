@@ -195,6 +195,9 @@ public class SurveyFragment extends Fragment implements NavigationView
 // .getApplicationContext()));
 //
 //        }
+        // TODO: 2/22/18 Fix
+//        setQuestionText(mQuestionText);
+//        mQuestionText.setTypeface(mInstrument.getTypeFace(getActivity().getApplicationContext()));
     }
 
     public void loadOrCreateQuestion() {

@@ -210,22 +210,30 @@ public class Question extends ReceiveModel {
      * then return nothing.  This question will be skipped in that case.
      */
     public String getFollowingUpText(HashMap<Question, Response> responses, Context context) {
+        String questionText = "";
+        for (FollowUpQuestion followingUpQuestion : getFollowingUpQuestions()) {
+            Response followUpResponse = responses.get(followingUpQuestion.getFollowingUpQuestion());
 
-        Response followUpResponse = responses.get(getFollowingUpQuestion());
-        if (followUpResponse == null ||
-                followUpResponse.getText().equals("") ||
-                followUpResponse.hasSpecialResponse()) {
-            return null;
-        }
+//            if (followUpResponse == null ||
+//                    followUpResponse.getText().equals("") ||
+//                    followUpResponse.hasSpecialResponse()) {
+//                return null;
+//            }
 
-        if (followUpWithOptionText()) {
-            return getText().replaceAll(
-                    FOLLOW_UP_TRIGGER_STRING,
-                    getFollowingUpQuestion().getOptionTextByResponse(followUpResponse, context)
-            );
-        } else {
-            return getText().replaceAll(FOLLOW_UP_TRIGGER_STRING, followUpResponse.getText());
+            if (followUpWithOptionText(followingUpQuestion)) {
+                questionText = getText().replaceFirst(FOLLOW_UP_TRIGGER_STRING, followingUpQuestion.getFollowingUpQuestion().getOptionTextByResponse(followUpResponse, context));
+            } else {
+                questionText = getText().replaceFirst(FOLLOW_UP_TRIGGER_STRING, followUpResponse.getText());
+            }
         }
+        return questionText;
+    }
+
+    private List<FollowUpQuestion> getFollowingUpQuestions() {
+        return new Select().from(FollowUpQuestion.class)
+                .where("QuestionIdentifier = ? AND RemoteInstrumentId = ? ", mQuestionIdentifier, mRemoteId)
+                .orderBy("Position")
+                .execute();
     }
 
     /*
@@ -265,21 +273,16 @@ public class Question extends ReceiveModel {
         return text;
     }
 
-    public Question getFollowingUpQuestion() {
-        return mFollowingUpQuestion;
-    }
+//    public Question getFollowingUpQuestion() {
+//        return mFollowingUpQuestion;
+//    }
 
     /*
      * Question types which must have their responses (represented as indices)
      * mapped to the original option text.
      */
-    public boolean followUpWithOptionText() {
-        return getFollowingUpQuestion().getQuestionType().equals(QuestionType.SELECT_MULTIPLE) ||
-                getFollowingUpQuestion().getQuestionType().equals(QuestionType.SELECT_ONE) ||
-                getFollowingUpQuestion().getQuestionType().equals(QuestionType
-                        .SELECT_ONE_WRITE_OTHER) ||
-                getFollowingUpQuestion().getQuestionType().equals(QuestionType
-                        .SELECT_MULTIPLE_WRITE_OTHER);
+    public boolean followUpWithOptionText(FollowUpQuestion followingUpQuestion) {
+        return followingUpQuestion.getFollowingUpQuestion().getQuestionType().equals(QuestionType.SELECT_MULTIPLE) || followingUpQuestion.getFollowingUpQuestion().getQuestionType().equals(QuestionType.SELECT_ONE) || followingUpQuestion.getFollowingUpQuestion().getQuestionType().equals(QuestionType.SELECT_ONE_WRITE_OTHER) || followingUpQuestion.getFollowingUpQuestion().getQuestionType().equals(QuestionType.SELECT_MULTIPLE_WRITE_OTHER);
     }
 
     /*
@@ -552,7 +555,7 @@ public class Question extends ReceiveModel {
     }
 
     public boolean isFollowUpQuestion() {
-        return (getFollowingUpQuestion() != null);
+        return (getFollowingUpQuestions().size() == 0);
     }
 
     public List<Question> questionsToSkip() {
