@@ -141,6 +141,7 @@ public class SurveyFragment extends Fragment implements NavigationView
     private Display mSkipToDisplay;
     private int mDisplayNumber;
     private ArrayList<Integer> mPreviousDisplays;
+    private String mQuestionSkipToIdentifier;
 
     //drawer vars
     private DrawerLayout mDrawerLayout;
@@ -622,6 +623,11 @@ public class SurveyFragment extends Fragment implements NavigationView
         if (mDisplayNumber < mDisplays.size()) {
             mDisplay = mDisplays.get(mDisplayNumber);
             createQuestionFragments();
+            Question nextQuestion = Question.findByQuestionIdentifier(mQuestionSkipToIdentifier);
+            if (nextQuestion.getDisplay() == mDisplay) {
+                int nextIndex = mDisplay.questions().indexOf(nextQuestion);
+                hideInBetweenQuestions(-1, nextIndex);
+            }
         }
     }
 
@@ -638,6 +644,7 @@ public class SurveyFragment extends Fragment implements NavigationView
 
     protected void setNextQuestion(String currentQuestionIdentifier, String
             nextQuestionIdentifier) {
+        mQuestionSkipToIdentifier = nextQuestionIdentifier;
         Question currentQuestion = Question.findByQuestionIdentifier(currentQuestionIdentifier);
         Question nextQuestion = Question.findByQuestionIdentifier(nextQuestionIdentifier);
         int currentIndex = mDisplay.questions().indexOf(currentQuestion);
@@ -647,10 +654,8 @@ public class SurveyFragment extends Fragment implements NavigationView
         } else {
             hideInBetweenQuestions(currentIndex, -1);
             mSkipToDisplay = nextQuestion.getDisplay();
-            // TODO: 2/1/18 Implement hiding questions in next display that appear before the
-            // question skipped to
-//            int nextIndex = mSkipToDisplay.questions().indexOf(nextQuestion);
-//            hideInBetweenQuestions(0,nextIndex);
+            // TODO: 2/1/18 Implement hiding questions in next display that appear before the next question skip to
+            // DONE
         }
     }
 
