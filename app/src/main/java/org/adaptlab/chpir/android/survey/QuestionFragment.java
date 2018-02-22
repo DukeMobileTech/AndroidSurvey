@@ -5,11 +5,9 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
-import android.text.Html;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +34,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static org.adaptlab.chpir.android.survey.FormatUtils.styleTextWithHtml;
+
 public abstract class QuestionFragment extends Fragment {
     protected final static String LIST_DELIMITER = ",";
     private final static String TAG = "QuestionFragment";
@@ -47,6 +47,7 @@ public abstract class QuestionFragment extends Fragment {
     private SurveyFragment mSurveyFragment;
     private List<Option> mOptions;
     protected RadioGroup mSpecialResponses;
+    private TextView mQuestionText;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -94,22 +95,24 @@ public abstract class QuestionFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_question_factory, parent, false);
 
         ViewGroup questionComponent = (LinearLayout) v.findViewById(R.id.question_component);
-        TextView questionText = (TextView) v.findViewById(R.id.question_text);
+        mQuestionText = (TextView) v.findViewById(R.id.question_text);
         mValidationTextView = (TextView) v.findViewById(R.id.validation_text);
+        mQuestionText.setTypeface(mInstrument.getTypeFace(getActivity().getApplicationContext()));
 
-        String instructions = "";
-        if (!TextUtils.isEmpty(mQuestion.getInstructions()) && !mQuestion.getInstructions()
-                .equals("null")) {
-            instructions = mQuestion.getInstructions();
-        }
-        if (TextUtils.isEmpty(instructions)) {
-            questionText.setText(Html.fromHtml(mQuestion.getNumberInInstrument() + "<br />" +
-                    mQuestion.getText()));
-        } else {
-            questionText.setText(Html.fromHtml(mQuestion.getNumberInInstrument() + "<br />" +
-                    instructions + "<br />" + mQuestion.getText()));
-
-        }
+//        String instructions = "";
+//        if (!TextUtils.isEmpty(mQuestion.getInstructions()) && !mQuestion.getInstructions()
+//                .equals("null")) {
+//            instructions = mQuestion.getInstructions();
+//        }
+//        if (TextUtils.isEmpty(instructions)) {
+//            mQuestionText.setText(Html.fromHtml(mQuestion.getNumberInInstrument() + "<br />" +
+//                    mQuestion.getText()));
+//        } else {
+//            mQuestionText.setText(Html.fromHtml(mQuestion.getNumberInInstrument() + "<br />" +
+//                    instructions + "<br />" + mQuestion.getText()));
+//
+//        }
+        setQuestionText();
 
         // Overridden by subclasses to place their graphical elements on the fragment.
         createQuestionComponent(questionComponent);
@@ -150,8 +153,9 @@ public abstract class QuestionFragment extends Fragment {
 
     private void deserializeSpecialResponse() {
         if (TextUtils.isEmpty(mResponse.getSpecialResponse())) return;
-        for(int i=0; i<mSpecialResponses.getChildCount(); i++){
-            if(((RadioButton)mSpecialResponses.getChildAt(i)).getText().equals(mResponse.getSpecialResponse())){
+        for (int i = 0; i < mSpecialResponses.getChildCount(); i++) {
+            if (((RadioButton) mSpecialResponses.getChildAt(i)).getText().equals(mResponse
+                    .getSpecialResponse())) {
                 mSpecialResponses.check(i);
             }
         }
@@ -222,8 +226,12 @@ public abstract class QuestionFragment extends Fragment {
             mResponse.setDeviceUser(AuthUtils.getCurrentUser());
             mResponse.setTimeEnded(new Date());
             deserialize(mResponse.getText());
-            new SaveResponseTask().execute(mResponse);
+            mSurvey.setLastQuestion(mQuestion);
+//            new SaveResponseTask().execute(mResponse);
+            mResponse.save();
+            mSurvey.save();
             setSpecialResponseSkips();
+            refreshFollowUpQuestion();
         }
     }
 
@@ -275,8 +283,18 @@ public abstract class QuestionFragment extends Fragment {
         if (isAdded() && !mResponse.getText().equals("")) {
             mResponse.setSpecialResponse("");
         }
-        new SaveResponseTask().execute(mResponse);
+        mSurvey.setLastQuestion(mQuestion);
+//        new SaveResponseTask().execute(mResponse);
+        mResponse.save();
+        mSurvey.save();
         setResponseSkips();
+        refreshFollowUpQuestion();
+    }
+
+    private void refreshFollowUpQuestion() {
+        if (mQuestion.isToFollowUpOnQuestion()) {
+            mSurveyFragment.reAnimateFollowUpFragment(mQuestion);
+        }
     }
 
     private void setResponseSkips() {
@@ -288,12 +306,7 @@ public abstract class QuestionFragment extends Fragment {
             } else {
                 Option selectedOption = mQuestion.options().get(Integer.parseInt(mResponse
                         .getText()));
-                NextQuestion skipOption = new Select().from(NextQuestion.class)
-                        .where("OptionIdentifier = ? AND QuestionIdentifier = ? AND " +
-                                        "RemoteInstrumentId = ?",
-                                selectedOption.getIdentifier(), mQuestion.getQuestionIdentifier()
-                                , mInstrument.getRemoteId())
-                        .executeSingle();
+                NextQuestion skipOption = getNextQuestion(selectedOption);
                 if (skipOption != null) {
                     mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), skipOption
                             .getNextQuestionIdentifier());
@@ -310,19 +323,20 @@ public abstract class QuestionFragment extends Fragment {
         }
     }
 
+    private NextQuestion getNextQuestion(Option selectedOption) {
+        return new Select().from(NextQuestion.class).where("OptionIdentifier = ? AND " +
+                "QuestionIdentifier = ? AND " + "RemoteInstrumentId = ?", selectedOption
+                .getIdentifier(), mQuestion.getQuestionIdentifier(), mInstrument.getRemoteId())
+                .executeSingle();
+    }
+
     private void setSpecialResponseSkips() {
         if (!TextUtils.isEmpty(mResponse.getSpecialResponse()) && mQuestion.hasSpecialOptions()) {
-            Option specialOption = new Select().from(Option.class)
-                    .where("Text = ? AND RemoteOptionSetId = ?", mResponse.getSpecialResponse(),
-                            mQuestion.getRemoteSpecialOptionSetId())
-                    .executeSingle();
+            Option specialOption = new Select().from(Option.class).where("Text = ? AND " +
+                    "RemoteOptionSetId = ?", mResponse.getSpecialResponse(), mQuestion
+                    .getRemoteSpecialOptionSetId()).executeSingle();
             if (specialOption != null) {
-                NextQuestion specialSkipOption = new Select().from(NextQuestion.class)
-                        .where("OptionIdentifier = ? AND QuestionIdentifier = ? AND " +
-                                        "RemoteInstrumentId = ?",
-                                specialOption.getIdentifier(), mQuestion.getQuestionIdentifier(),
-                                mInstrument.getRemoteId())
-                        .executeSingle();
+                NextQuestion specialSkipOption = getNextQuestion(specialOption);
                 if (specialSkipOption != null) {
                     mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(),
                             specialSkipOption.getNextQuestionIdentifier());
@@ -380,6 +394,52 @@ public abstract class QuestionFragment extends Fragment {
             mValidationTextView.setAnimation(animation);
         }
     }
+
+
+    /*
+     * If this question is a follow up question, then attempt
+     * to get the response to the question that is being followed up on.
+     *
+     * If the question being followed up on was skipped by the user,
+     * then return false. This gives the calling function an opportunity
+     * to handle this accordingly.  Likely this will involve skipping
+     * the question that is a follow up question.
+     *
+     * If this question is not a following up question, then just
+     * set the text as normal.
+     */
+    protected boolean setQuestionText() {
+        appendNumberAndInstructions(mQuestionText);
+        if (mQuestion.isFollowUpQuestion()) {
+            String followUpText = mQuestion.getFollowingUpText(mSurveyFragment.getResponses(),
+                    getActivity());
+            if (followUpText == null) {
+                return false;
+            } else {
+                mQuestionText.append(styleTextWithHtml(followUpText));
+            }
+        } else if (mQuestion.hasRandomizedFactors()) {
+            mQuestionText.append(styleTextWithHtml(mQuestion.getRandomizedText(mSurveyFragment
+                    .getResponses().get(mQuestion))));
+        } else {
+            mQuestionText.append(styleTextWithHtml(mQuestion.getText()));
+        }
+        return true;
+    }
+
+    /*
+     * If this question has instructions, append and add new line
+     */
+    private void appendNumberAndInstructions(TextView text) {
+        if (!TextUtils.isEmpty(mQuestion.getInstructions()) && !mQuestion.getInstructions()
+                .equals("null")) {
+            text.setText(styleTextWithHtml(mQuestion.getNumberInInstrument() + "<br />" +
+                    mQuestion.getInstructions() + "<br />"));
+        } else {
+            text.setText(styleTextWithHtml(mQuestion.getNumberInInstrument() + "<br />"));
+        }
+    }
+
 
     private class SaveResponseTask extends AsyncTask<Response, Void, Survey> {
 
