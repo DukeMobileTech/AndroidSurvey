@@ -54,7 +54,7 @@
                     android:textColor="@color/secondary_text"/>
 
                 <TextView
-                    android:id="@+id/question_index"
+                    android:id="@+id/display_index_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="10dp"

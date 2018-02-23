@@ -51,8 +51,16 @@ public class FollowUpQuestion extends ReceiveModel {
         return new Select().from(FollowUpQuestion.class).where("RemoteId = ?", id).executeSingle();
     }
 
-    public Question getFollowingUpQuestion() {
-        return Question.findByQuestionIdentifier(getFollowingUpQuestionIdentifier());
+    public Question getFollowingUpOnQuestion() {
+        return new Select().from(Question.class).where("QuestionIdentifier = ? AND InstrumentRemoteId = ? AND Deleted != 1", mFollowingUpQuestionIdentifier, mRemoteInstrumentId).executeSingle();
+    }
+
+    public Question getFollowUpQuestion() {
+        return new Select().from(Question.class).where("QuestionIdentifier = ? AND InstrumentRemoteId = ? AND Deleted != 1", mQuestionIdentifier, mRemoteInstrumentId).executeSingle();
+    }
+
+    private String getQuestionIdentifier() {
+        return mQuestionIdentifier;
     }
 
     private String getFollowingUpQuestionIdentifier() {

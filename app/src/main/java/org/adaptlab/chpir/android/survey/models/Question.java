@@ -17,12 +17,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 @Table(name = "Questions")
 public class Question extends ReceiveModel {
@@ -30,12 +27,7 @@ public class Question extends ReceiveModel {
     public static final String FOLLOW_UP_TRIGGER_STRING = "\\[followup\\]";
     private static final String RANDOMIZATION_TRIGGER = "\\[RANDOMIZED_FACTOR\\]";
     private static final String TAG = "QuestionModel";
-    public static Set<QuestionType> AnyResponseQuestions = new HashSet<QuestionType>(Arrays.asList(
-            QuestionType.FREE_RESPONSE, QuestionType.SLIDER, QuestionType.DATE, QuestionType.RATING,
-            QuestionType.TIME, QuestionType.INTEGER, QuestionType.EMAIL_ADDRESS,
-            QuestionType.DECIMAL_NUMBER, QuestionType.INSTRUCTIONS, QuestionType.MONTH_AND_YEAR,
-            QuestionType.YEAR, QuestionType.PHONE_NUMBER, QuestionType.ADDRESS,
-            QuestionType.REAR_PICTURE, QuestionType.FRONT_PICTURE));
+
     @Column(name = "Text")
     private String mText;
     @Column(name = "QuestionType")
@@ -210,30 +202,40 @@ public class Question extends ReceiveModel {
      * then return nothing.  This question will be skipped in that case.
      */
     public String getFollowingUpText(HashMap<Question, Response> responses, Context context) {
-        String questionText = "";
-        for (FollowUpQuestion followingUpQuestion : getFollowingUpQuestions()) {
-            Response followUpResponse = responses.get(followingUpQuestion.getFollowingUpQuestion());
+        String questionText = getText();
+        for (FollowUpQuestion followingUpQuestion : followingUpQuestions()) {
+            Response followUpResponse = responses.get(followingUpQuestion.getFollowingUpOnQuestion());
 
-//            if (followUpResponse == null ||
-//                    followUpResponse.getText().equals("") ||
-//                    followUpResponse.hasSpecialResponse()) {
-//                return null;
-//            }
+            if (followUpResponse == null || followUpResponse.getText().equals("") || followUpResponse.hasSpecialResponse()) {
+                continue;
+            }
 
             if (followUpWithOptionText(followingUpQuestion)) {
-                questionText = getText().replaceFirst(FOLLOW_UP_TRIGGER_STRING, followingUpQuestion.getFollowingUpQuestion().getOptionTextByResponse(followUpResponse, context));
+                String text = followingUpQuestion.getFollowingUpOnQuestion().getOptionTextByResponse(followUpResponse, context);
+                questionText = questionText.replaceFirst(FOLLOW_UP_TRIGGER_STRING, text);
             } else {
-                questionText = getText().replaceFirst(FOLLOW_UP_TRIGGER_STRING, followUpResponse.getText());
+                questionText = questionText.replaceFirst(FOLLOW_UP_TRIGGER_STRING, followUpResponse.getText());
             }
         }
         return questionText;
     }
 
-    private List<FollowUpQuestion> getFollowingUpQuestions() {
+    private List<FollowUpQuestion> followingUpQuestions() {
         return new Select().from(FollowUpQuestion.class)
-                .where("QuestionIdentifier = ? AND RemoteInstrumentId = ? ", mQuestionIdentifier, mRemoteId)
+                .where("QuestionIdentifier = ? AND RemoteInstrumentId = ? ", mQuestionIdentifier, mInstrumentRemoteId)
                 .orderBy("Position")
                 .execute();
+    }
+
+    public List<FollowUpQuestion> toFollowUpOnQuestions() {
+        return new Select().from(FollowUpQuestion.class)
+                .where("FollowingUpQuestionIdentifier = ? AND RemoteInstrumentId = ? ", mQuestionIdentifier, mInstrumentRemoteId)
+                .orderBy("Position")
+                .execute();
+    }
+
+    public boolean isToFollowUpOnQuestion() {
+        return (toFollowUpOnQuestions().size() > 0);
     }
 
     /*
@@ -273,7 +275,7 @@ public class Question extends ReceiveModel {
         return text;
     }
 
-//    public Question getFollowingUpQuestion() {
+//    public Question getFollowingUpOnQuestion() {
 //        return mFollowingUpQuestion;
 //    }
 
@@ -282,7 +284,7 @@ public class Question extends ReceiveModel {
      * mapped to the original option text.
      */
     public boolean followUpWithOptionText(FollowUpQuestion followingUpQuestion) {
-        return followingUpQuestion.getFollowingUpQuestion().getQuestionType().equals(QuestionType.SELECT_MULTIPLE) || followingUpQuestion.getFollowingUpQuestion().getQuestionType().equals(QuestionType.SELECT_ONE) || followingUpQuestion.getFollowingUpQuestion().getQuestionType().equals(QuestionType.SELECT_ONE_WRITE_OTHER) || followingUpQuestion.getFollowingUpQuestion().getQuestionType().equals(QuestionType.SELECT_MULTIPLE_WRITE_OTHER);
+        return followingUpQuestion.getFollowingUpOnQuestion().getQuestionType().equals(QuestionType.SELECT_MULTIPLE) || followingUpQuestion.getFollowingUpOnQuestion().getQuestionType().equals(QuestionType.SELECT_ONE) || followingUpQuestion.getFollowingUpOnQuestion().getQuestionType().equals(QuestionType.SELECT_ONE_WRITE_OTHER) || followingUpQuestion.getFollowingUpOnQuestion().getQuestionType().equals(QuestionType.SELECT_MULTIPLE_WRITE_OTHER);
     }
 
     /*
@@ -320,14 +322,13 @@ public class Question extends ReceiveModel {
      * option text.  If this is an "other" response, return the
      * text specified in the other response.
      */
-    public String getOptionTextByResponse(Response response, Context context) {
+    private String getOptionTextByResponse(Response response, Context context) {
         String text = response.getText();
-
         try {
             if (hasMultipleResponses()) {
                 return FormatUtils.unformatMultipleResponses(defaultOptions(), text, context);
             } else if (Integer.parseInt(text) == defaultOptions().size()) {
-                return response.getOtherResponse();
+                return (response.getOtherResponse() == null) ? "Other" : response.getOtherResponse();
             } else {
                 return defaultOptions().get(Integer.parseInt(text)).getText();
             }
@@ -379,10 +380,6 @@ public class Question extends ReceiveModel {
      * number.
      */
     public boolean loaded() {
-        Log.i(TAG, "getOptionCount " + getOptionCount());
-        Log.i(TAG, "optionCount " + optionCount());
-        Log.i(TAG, "getImageCount " + getImageCount());
-        Log.i(TAG, "imageCount " + imageCount());
         return true;
 //        return getOptionCount() == optionCount() && getImageCount() == imageCount();
     }
@@ -555,7 +552,7 @@ public class Question extends ReceiveModel {
     }
 
     public boolean isFollowUpQuestion() {
-        return (getFollowingUpQuestions().size() == 0);
+        return (followingUpQuestions().size() > 0);
     }
 
     public List<Question> questionsToSkip() {
@@ -779,7 +776,7 @@ public class Question extends ReceiveModel {
         LIST_OF_TEXT_BOXES, INTEGER, EMAIL_ADDRESS,
         DECIMAL_NUMBER, INSTRUCTIONS, MONTH_AND_YEAR, YEAR,
         PHONE_NUMBER, ADDRESS, SELECT_ONE_IMAGE, SELECT_MULTIPLE_IMAGE,
-        LIST_OF_INTEGER_BOXES, LABELED_SLIDER
+        LIST_OF_INTEGER_BOXES, LABELED_SLIDER, GEO_LOCATION
     }
 
     public static boolean selectOneVariant(QuestionType type) {

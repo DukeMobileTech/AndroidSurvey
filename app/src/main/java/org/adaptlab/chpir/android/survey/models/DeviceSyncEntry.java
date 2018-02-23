@@ -6,20 +6,20 @@ import android.util.Log;
 import org.adaptlab.chpir.android.activerecordcloudsync.SendModel;
 import org.adaptlab.chpir.android.survey.AppUtil;
 import org.adaptlab.chpir.android.survey.BuildConfig;
-import org.adaptlab.chpir.android.survey.location.LocationServiceManager;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.adaptlab.chpir.android.survey.location.LocationManager;
 
 import java.util.Locale;
 import java.util.TimeZone;
 
 public class DeviceSyncEntry extends SendModel {
     private static final String TAG = "DeviceSyncEntry";
-    private LocationServiceManager mLocationServiceManager;
+    private LocationManager mLocationManager;
 
     public DeviceSyncEntry() {
-        mLocationServiceManager = LocationServiceManager.get(AppUtil.getContext());
-        mLocationServiceManager.startLocationUpdates();
+        mLocationManager = new LocationManager(AppUtil.getContext());
+        mLocationManager.startLocationUpdates();
     }
 
     @Override
@@ -29,8 +29,8 @@ public class DeviceSyncEntry extends SendModel {
         try {
             JSONObject jsonObject = new JSONObject();
 
-            jsonObject.put("latitude", mLocationServiceManager.getLatitude());
-            jsonObject.put("longitude", mLocationServiceManager.getLongitude());
+            jsonObject.put("latitude", mLocationManager.getLatitude());
+            jsonObject.put("longitude", mLocationManager.getLongitude());
             jsonObject.put("current_version_code", AppUtil.getVersionCode(AppUtil.getContext()));
             jsonObject.put("current_version_name", AppUtil.getVersionName(AppUtil.getContext()));
             jsonObject.put("num_complete_surveys", Survey.getCompleted().size());
@@ -39,7 +39,8 @@ public class DeviceSyncEntry extends SendModel {
             jsonObject.put("instrument_versions", instrumentVersions().toString());
             jsonObject.put("device_uuid", AdminSettings.getInstance().getDeviceIdentifier());
             jsonObject.put("api_key", AdminSettings.getInstance().getApiKey());
-            jsonObject.put("timezone", TimeZone.getDefault().getDisplayName() + " " + TimeZone.getDefault().getID());
+            jsonObject.put("timezone", TimeZone.getDefault().getDisplayName() + " " + TimeZone
+                    .getDefault().getID());
             jsonObject.put("project_id", AdminSettings.getInstance().getProjectId());
             jsonObject.put("device_label", AdminSettings.getInstance().getDeviceLabel());
             jsonObject.put("os_build_number", AppUtil.getOsBuildNumber());
