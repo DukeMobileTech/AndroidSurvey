@@ -7,10 +7,10 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -49,7 +49,7 @@ import com.activeandroid.Model;
 import com.activeandroid.query.Select;
 import com.crashlytics.android.Crashlytics;
 
-import org.adaptlab.chpir.android.survey.location.LocationServiceManager;
+import org.adaptlab.chpir.android.survey.location.LocationManager;
 import org.adaptlab.chpir.android.survey.models.Display;
 import org.adaptlab.chpir.android.survey.models.FollowUpQuestion;
 import org.adaptlab.chpir.android.survey.models.Grid;
@@ -107,6 +107,7 @@ public class SurveyFragment extends Fragment implements NavigationView
     private static final int SECTION_CODE = 200;
     public static final int AUTHORIZE_CODE = 300;
     private static final Long REVIEW_PAGE_ID = -1L;
+    private static final int ACCESS_FINE_LOCATION_CODE = 1;
     private NavigationView mNavigationView;
 //    private boolean mAllowFragmentCommit;
     private QuestionFragment mQuestionFragment;
@@ -136,7 +137,6 @@ public class SurveyFragment extends Fragment implements NavigationView
     private TextView mDisplayIndexLabel;
     private TextView mParticipantLabel;
     private ProgressBar mProgressBar;
-    private LocationServiceManager mLocationServiceManager;
     private GestureDetector mGestureDetector;
     private ProgressDialog mProgressDialog;
     private Display mDisplay;
@@ -144,6 +144,7 @@ public class SurveyFragment extends Fragment implements NavigationView
     private int mDisplayNumber;
     private ArrayList<Integer> mPreviousDisplays;
     private String mQuestionSkipToIdentifier;
+    private LocationManager mLocationManager;
 
     //drawer vars
     private DrawerLayout mDrawerLayout;
@@ -188,14 +189,10 @@ public class SurveyFragment extends Fragment implements NavigationView
             Intent i = new Intent(getContext(), LoginActivity.class);
             getActivity().startActivityForResult(i, AUTHORIZE_CODE);
         } else {
-            updateUI();
+            setParticipantLabel();
+            updateDisplayCountLabel();
+            createQuestionFragments();
         }
-    }
-
-    private void updateUI() {
-        setParticipantLabel();
-        updateDisplayCountLabel();
-        createQuestionFragments();
     }
 
     @Override
@@ -262,7 +259,6 @@ public class SurveyFragment extends Fragment implements NavigationView
             mDisplayNumber = savedInstanceState.getInt(EXTRA_DISPLAY_NUMBER);
             mDisplays = (ArrayList<Display>) mInstrument.displays();
             mDisplay = mDisplays.get(mDisplayNumber);
-            Log.i(TAG, "savedInstanceState mDisplayNumber: " + mDisplayNumber);
         } else {
             Long instrumentId = getActivity().getIntent().getLongExtra(EXTRA_INSTRUMENT_ID, -1);
             mMetadata = getActivity().getIntent().getStringExtra(EXTRA_PARTICIPANT_METADATA);
@@ -280,10 +276,8 @@ public class SurveyFragment extends Fragment implements NavigationView
 //                mDisplayNumber = 0;
 //            } else {
             mDisplay = mSurvey.getLastQuestion().getDisplay();
-            Log.i(TAG, "Other Display Pos: " + mDisplay.getPosition());
             mDisplayNumber = mDisplay.getPosition() - 1;
 //            }
-            Log.i(TAG, "Other mDisplayNumber: " + mDisplayNumber);
         }
 //        mDisplays = (ArrayList<Display>) mInstrument.displays();
 //        mDisplay = mDisplays.get(mDisplayNumber);
@@ -313,7 +307,9 @@ public class SurveyFragment extends Fragment implements NavigationView
         if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) {
             if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission
                     .ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                startLocationServices();
+                startLocationUpdates();
+            } else {
+                ActivityCompat.requestPermissions(getActivity(), new String[]{ android.Manifest.permission.ACCESS_FINE_LOCATION }, ACCESS_FINE_LOCATION_CODE);
             }
         }
     }
@@ -329,14 +325,23 @@ public class SurveyFragment extends Fragment implements NavigationView
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case ACCESS_FINE_LOCATION_CODE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    startLocationUpdates();
+                }
+            }
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_survey, parent, false);
         mQuestionViewLayout = (LinearLayout) v.findViewById(R.id.question_component_layout);
-        //mQuestionText = (TextView) v.findViewById(R.id.question_text);
         mParticipantLabel = (TextView) v.findViewById(R.id.participant_label);
         mDisplayIndexLabel = (TextView) v.findViewById(R.id.display_index_label);
         mProgressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
-        //mQuestionText.setTypeface(mInstrument.getTypeFace(getActivity().getApplicationContext()));
         ActivityCompat.invalidateOptionsMenu(getActivity());
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (actionBar != null) actionBar.setTitle(mInstrument.getTitle());
@@ -356,19 +361,24 @@ public class SurveyFragment extends Fragment implements NavigationView
     @Override
     public void onStart() {
         super.onStart();
-        registerLocationReceiver();
+        startLocationUpdates();
     }
 
-    private void registerLocationReceiver() {
-        if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation() &&
-                ContextCompat.checkSelfPermission(getActivity(), Manifest.permission
-                        .ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            getActivity().registerReceiver(mLocationServiceManager.mLocationReceiver,
-                    new IntentFilter(LocationServiceManager.ACTION_LOCATION));
+    private void startLocationUpdates() {
+        if (mLocationManager == null){
+            mLocationManager = new LocationManager(getActivity());
+            mLocationManager.startLocationUpdates();
         }
     }
 
-    protected void onResumeFragments() {
+    public LocationManager getLocationManager() {
+        if (mLocationManager == null) startLocationUpdates();
+        return mLocationManager;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
         refreshView();
     }
 
@@ -387,15 +397,8 @@ public class SurveyFragment extends Fragment implements NavigationView
 
     @Override
     public void onStop() {
-        if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation() && ContextCompat
-                .checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED && mLocationServiceManager != null &&
-                mLocationServiceManager.mLocationReceiver != null) {
-            try {
-                getActivity().unregisterReceiver(mLocationServiceManager.mLocationReceiver);
-            } catch (IllegalArgumentException e) {
-                if (BuildConfig.DEBUG) Log.e(TAG, "Illegal Argument Exception ", e);
-            }
+        if (mLocationManager != null) {
+            mLocationManager.stopLocationUpdates();
         }
         super.onStop();
     }
@@ -765,11 +768,6 @@ public class SurveyFragment extends Fragment implements NavigationView
         } else {
             mSurvey = Model.load(Survey.class, surveyId);
         }
-    }
-
-    private void startLocationServices() {
-        mLocationServiceManager = LocationServiceManager.get(getActivity());
-        mLocationServiceManager.startLocationUpdates();
     }
 
 //    private void proceedToNextQuestion() {
@@ -1250,17 +1248,11 @@ public class SurveyFragment extends Fragment implements NavigationView
     }
 
     private void setSurveyLocation() {
-        if (mLocationServiceManager == null) {
-            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission
-                    .ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED) {
-                ActivityCompat.requestPermissions(getActivity(),
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-            } else {
-                startLocationServices();
-            }
+        if (mLocationManager == null) {
+            startLocationUpdates();
         } else {
-            mSurvey.setLatitude(mLocationServiceManager.getLatitude());
-            mSurvey.setLongitude(mLocationServiceManager.getLongitude());
+            mSurvey.setLatitude(mLocationManager.getLatitude());
+            mSurvey.setLongitude(mLocationManager.getLongitude());
         }
     }
 

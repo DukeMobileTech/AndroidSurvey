@@ -17,12 +17,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 @Table(name = "Questions")
 public class Question extends ReceiveModel {
@@ -30,12 +27,7 @@ public class Question extends ReceiveModel {
     public static final String FOLLOW_UP_TRIGGER_STRING = "\\[followup\\]";
     private static final String RANDOMIZATION_TRIGGER = "\\[RANDOMIZED_FACTOR\\]";
     private static final String TAG = "QuestionModel";
-    public static Set<QuestionType> AnyResponseQuestions = new HashSet<QuestionType>(Arrays.asList(
-            QuestionType.FREE_RESPONSE, QuestionType.SLIDER, QuestionType.DATE, QuestionType.RATING,
-            QuestionType.TIME, QuestionType.INTEGER, QuestionType.EMAIL_ADDRESS,
-            QuestionType.DECIMAL_NUMBER, QuestionType.INSTRUCTIONS, QuestionType.MONTH_AND_YEAR,
-            QuestionType.YEAR, QuestionType.PHONE_NUMBER, QuestionType.ADDRESS,
-            QuestionType.REAR_PICTURE, QuestionType.FRONT_PICTURE));
+
     @Column(name = "Text")
     private String mText;
     @Column(name = "QuestionType")
@@ -784,7 +776,7 @@ public class Question extends ReceiveModel {
         LIST_OF_TEXT_BOXES, INTEGER, EMAIL_ADDRESS,
         DECIMAL_NUMBER, INSTRUCTIONS, MONTH_AND_YEAR, YEAR,
         PHONE_NUMBER, ADDRESS, SELECT_ONE_IMAGE, SELECT_MULTIPLE_IMAGE,
-        LIST_OF_INTEGER_BOXES, LABELED_SLIDER
+        LIST_OF_INTEGER_BOXES, LABELED_SLIDER, GEO_LOCATION
     }
 
     public static boolean selectOneVariant(QuestionType type) {
