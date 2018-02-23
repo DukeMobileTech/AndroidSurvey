@@ -142,6 +142,8 @@ public class SurveyFragment extends Fragment implements NavigationView
     private int mDisplayNumber;
     private ArrayList<Integer> mPreviousDisplays;
     private String mQuestionSkipToIdentifier;
+    private String mQuestionSkipStartIdentifier;
+    private HashSet<String> mQuestionMultipleSkipIdentifierSet;
 
     //drawer vars
     private DrawerLayout mDrawerLayout;
@@ -322,6 +324,7 @@ public class SurveyFragment extends Fragment implements NavigationView
         mDisplay = mDisplays.get(mDisplayNumber);
         mPreviousDisplays = new ArrayList<>();
         mQuestionFragments = new ArrayList<>();
+        mQuestionMultipleSkipIdentifierSet = new HashSet<>();
         ProgressDialog progressDialog = ProgressDialog.show(getActivity(), getString(R.string.instrument_loading_progress_header), getString(R.string.background_process_progress_message));
         mDisplayQuestions = mInstrument.displayQuestions();
         mResponses = mSurvey.responsesMap();
@@ -608,6 +611,7 @@ public class SurveyFragment extends Fragment implements NavigationView
             mDisplayNumber = mPreviousDisplays.remove(mPreviousDisplays.size() - 1);
             mDisplay = mDisplays.get(mDisplayNumber);
             createQuestionFragments();
+            hideQuestionInDisplay();
         }
     }
 
@@ -623,11 +627,7 @@ public class SurveyFragment extends Fragment implements NavigationView
         if (mDisplayNumber < mDisplays.size()) {
             mDisplay = mDisplays.get(mDisplayNumber);
             createQuestionFragments();
-            Question nextQuestion = Question.findByQuestionIdentifier(mQuestionSkipToIdentifier);
-            if (nextQuestion.getDisplay() == mDisplay) {
-                int nextIndex = mDisplay.questions().indexOf(nextQuestion);
-                hideInBetweenQuestions(-1, nextIndex);
-            }
+            hideQuestionInDisplay();
         }
     }
 
@@ -642,9 +642,31 @@ public class SurveyFragment extends Fragment implements NavigationView
         }
     }
 
+    private void hideQuestionInDisplay(){
+        Question skipStartQuestion = Question.findByQuestionIdentifier(mQuestionSkipStartIdentifier);
+        Question skipToQuestion = Question.findByQuestionIdentifier(mQuestionSkipToIdentifier);
+        if(skipStartQuestion!=null&&skipToQuestion!=null){
+            if(skipStartQuestion.getDisplay()==mDisplay&&skipToQuestion.getDisplay()==mDisplay){
+                int curIndex = mDisplay.questions().indexOf(skipStartQuestion);
+                int nextIndex = mDisplay.questions().indexOf(skipToQuestion);
+                hideInBetweenQuestions(curIndex,nextIndex);
+            }
+            else if(skipStartQuestion.getDisplay()!=mDisplay&&skipToQuestion.getDisplay()==mDisplay){
+                int nextIndex = mDisplay.questions().indexOf(skipToQuestion);
+                hideInBetweenQuestions(-1, nextIndex);
+            }
+            else if(skipStartQuestion.getDisplay()==mDisplay&&skipToQuestion.getDisplay()!=mDisplay){
+                int curIndex = mDisplay.questions().indexOf(skipStartQuestion);
+                hideInBetweenQuestions(curIndex,-1);
+            }
+        }
+    }
+
     protected void setNextQuestion(String currentQuestionIdentifier, String
             nextQuestionIdentifier) {
+        mQuestionSkipStartIdentifier = currentQuestionIdentifier;
         mQuestionSkipToIdentifier = nextQuestionIdentifier;
+        Log.i("SkipsIdentifier",mQuestionSkipStartIdentifier+"   "+mQuestionSkipToIdentifier);
         Question currentQuestion = Question.findByQuestionIdentifier(currentQuestionIdentifier);
         Question nextQuestion = Question.findByQuestionIdentifier(nextQuestionIdentifier);
         int currentIndex = mDisplay.questions().indexOf(currentQuestion);
@@ -659,8 +681,16 @@ public class SurveyFragment extends Fragment implements NavigationView
         }
     }
 
+    protected void clearSkpis(){
+        mQuestionSkipStartIdentifier = "";
+        mQuestionSkipToIdentifier = "";
+        mQuestionMultipleSkipIdentifierSet.clear();
+    }
+
     private void hideInBetweenQuestions(int currentIndex, int nextIndex) {
         FragmentManager fm = getChildFragmentManager();
+        Log.i("fragmentManager",fm.toString());
+        Log.i("mFragmentsSize",mQuestionFragments.size()+"");
         FragmentTransaction ft = fm.beginTransaction();
         for (int k = 0; k < mQuestionFragments.size(); k++) {
             if (k <= currentIndex) {
