@@ -607,6 +607,7 @@ public class SurveyFragment extends Fragment implements NavigationView
             mDisplayNumber = position;
             mDisplay = mDisplays.get(mDisplayNumber);
             createQuestionFragments();
+            hideQuestionInDisplay();
             updateDisplayCountLabel();
         }
     }
@@ -648,12 +649,6 @@ public class SurveyFragment extends Fragment implements NavigationView
             // TODO: 2/1/18 Implement hiding questions in next display that appear before the next question skip to
             // DONE
         }
-    }
-
-    protected void clearSkpis(){
-        mQuestionSkipStartIdentifier = "";
-        mQuestionSkipToIdentifier = "";
-        mQuestionMultipleSkipIdentifierSet.clear();
     }
 
     private void hideInBetweenQuestions(int currentIndex, int nextIndex) {

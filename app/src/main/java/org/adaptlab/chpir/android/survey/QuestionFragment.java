@@ -120,6 +120,10 @@ public abstract class QuestionFragment extends Fragment {
             deserialize(mResponse.getText());
         }
 
+        setResponseSkips();
+        setSpecialResponseSkips();
+        refreshFollowUpQuestion();
+
         mSpecialResponses = (RadioGroup) v.findViewById(R.id.special_responses_container);
         List<String> responses = new ArrayList<>();
         if (mQuestion.hasSpecialOptions()) {
