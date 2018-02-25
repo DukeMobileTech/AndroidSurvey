@@ -359,7 +359,7 @@ public abstract class QuestionFragment extends Fragment {
                             .getQuestionIdentifier());
                 }
             }
-            if (mQuestion.isMultipleSkipQuestion(mInstrument) && !TextUtils.isEmpty(mResponse.getSpecialResponse().toString())){
+            if (mQuestion.isMultipleSkipQuestion(mInstrument) && !TextUtils.isEmpty(mResponse.getSpecialResponse())){
                 mSurveyFragment.setMultipleSkipQuestions(specialOption, mQuestion);
             }
         }

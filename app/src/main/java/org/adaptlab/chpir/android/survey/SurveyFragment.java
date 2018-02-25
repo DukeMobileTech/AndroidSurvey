@@ -659,6 +659,7 @@ public class SurveyFragment extends Fragment implements NavigationView
         FragmentManager fm = getChildFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
         for (int k = 0; k < mQuestionFragments.size(); k++) {
+            Log.i("Fragment",mQuestionFragments.get(k).toString()+"");
             if (k <= currentIndex) {
                 ft.show(mQuestionFragments.get(k));
             } else if (k > currentIndex && k < nextIndex) {
@@ -688,24 +689,26 @@ public class SurveyFragment extends Fragment implements NavigationView
 //    }
 
     private void hideMultipleQuestion(){
-        FragmentManager fm = getChildFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-        HashSet<Integer> showFragmentSet = new HashSet<>();
-        for (MultipleSkip questionToSkip : mMultipleSkipList) {
-            Question question = Question.findByQuestionIdentifier(questionToSkip
-                    .getSkipQuestionIdentifier());
-            int index = mDisplay.questions().indexOf(question);
-            showFragmentSet.add(index);
-            if(question.getDisplay()==mDisplay){
-                ft.hide(mQuestionFragments.get(index));
+        if(mMultipleSkipList!=null&&mMultipleSkipList.size()>0){
+            FragmentManager fm = getChildFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+            HashSet<Integer> showFragmentSet = new HashSet<>();
+            for (MultipleSkip questionToSkip : mMultipleSkipList) {
+                Question question = Question.findByQuestionIdentifier(questionToSkip
+                        .getSkipQuestionIdentifier());
+                int index = mDisplay.questions().indexOf(question);
+                showFragmentSet.add(index);
+                if(question.getDisplay()==mDisplay){
+                    ft.hide(mQuestionFragments.get(index));
+                }
             }
-        }
-        for(int k=0; k<mQuestionFragments.size();k++){
-            if(!showFragmentSet.contains(k)){
-                ft.show(mQuestionFragments.get(k));
+            for(int k=0; k<mQuestionFragments.size();k++){
+                if(!showFragmentSet.contains(k)){
+                    ft.show(mQuestionFragments.get(k));
+                }
             }
+            ft.commit();
         }
-        ft.commit();
     }
 
     protected void reAnimateFollowUpFragment(Question currentQuestion) {
