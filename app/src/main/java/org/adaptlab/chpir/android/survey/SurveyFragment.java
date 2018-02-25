@@ -730,6 +730,7 @@ public class SurveyFragment extends Fragment implements NavigationView
                 .execute();
         mQuestionMultipleSkipIdentifierSet = new HashSet<>();
         mMultipleSkipList = multipleSkips;
+        Log.i("multipleSkips",multipleSkips.toString()+"");
             // Questions to skip
             for (MultipleSkip questionToSkip : multipleSkips) {
                 Question question = Question.findByQuestionIdentifier(questionToSkip

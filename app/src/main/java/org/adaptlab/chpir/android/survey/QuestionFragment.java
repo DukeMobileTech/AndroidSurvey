@@ -8,6 +8,7 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -334,11 +335,20 @@ public abstract class QuestionFragment extends Fragment {
                 .executeSingle();
     }
 
+    // TODO: Special option multiple skips
+    // DONE
     private void setSpecialResponseSkips() {
         if (!TextUtils.isEmpty(mResponse.getSpecialResponse()) && mQuestion.hasSpecialOptions()) {
             Option specialOption = new Select().from(Option.class).where("Text = ? AND " +
                     "RemoteOptionSetId = ?", mResponse.getSpecialResponse(), mQuestion
                     .getRemoteSpecialOptionSetId()).executeSingle();
+//            Option selectedSpecialOption = new Option();
+//            for(Option curSpecialOption: mQuestion.specialOptions()){
+//                if(curSpecialOption.getText().equals(mResponse.getSpecialResponse().toString())){
+//                    selectedSpecialOption = curSpecialOption;
+//                }
+//            }
+//            Log.i("TestSelectSpecialOption",specialOption.getText()+" "+selectedSpecialOption.getText()+" ");
             if (specialOption != null) {
                 NextQuestion specialSkipOption = getNextQuestion(specialOption);
                 if (specialSkipOption != null) {
@@ -348,6 +358,9 @@ public abstract class QuestionFragment extends Fragment {
                     mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion
                             .getQuestionIdentifier());
                 }
+            }
+            if (mQuestion.isMultipleSkipQuestion(mInstrument) && !TextUtils.isEmpty(mResponse.getSpecialResponse().toString())){
+                mSurveyFragment.setMultipleSkipQuestions(specialOption, mQuestion);
             }
         }
     }
