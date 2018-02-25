@@ -146,6 +146,7 @@ public class SurveyFragment extends Fragment implements NavigationView
     private String mQuestionSkipToIdentifier;
     private String mQuestionSkipStartIdentifier;
     private HashSet<String> mQuestionMultipleSkipIdentifierSet;
+    private List<MultipleSkip> mMultipleSkipList;
     private LocationManager mLocationManager;
 
     //drawer vars
@@ -576,6 +577,7 @@ public class SurveyFragment extends Fragment implements NavigationView
             mDisplay = mDisplays.get(mDisplayNumber);
             createQuestionFragments();
             hideQuestionInDisplay();
+            hideMultipleQuestion();
             updateDisplayCountLabel();
         } else {
             mDisplayNumber -= 1;
@@ -596,6 +598,7 @@ public class SurveyFragment extends Fragment implements NavigationView
             mDisplay = mDisplays.get(mDisplayNumber);
             createQuestionFragments();
             hideQuestionInDisplay();
+            hideMultipleQuestion();
         }
         updateDisplayCountLabel();
     }
@@ -608,6 +611,7 @@ public class SurveyFragment extends Fragment implements NavigationView
             mDisplay = mDisplays.get(mDisplayNumber);
             createQuestionFragments();
             hideQuestionInDisplay();
+            hideMultipleQuestion();
             updateDisplayCountLabel();
         }
     }
@@ -653,8 +657,6 @@ public class SurveyFragment extends Fragment implements NavigationView
 
     private void hideInBetweenQuestions(int currentIndex, int nextIndex) {
         FragmentManager fm = getChildFragmentManager();
-        Log.i("fragmentManager",fm.toString());
-        Log.i("mFragmentsSize",mQuestionFragments.size()+"");
         FragmentTransaction ft = fm.beginTransaction();
         for (int k = 0; k < mQuestionFragments.size(); k++) {
             if (k <= currentIndex) {
@@ -664,6 +666,42 @@ public class SurveyFragment extends Fragment implements NavigationView
             } else if (k > currentIndex && nextIndex == -1) {
                 ft.hide(mQuestionFragments.get(k));
             } else {
+                ft.show(mQuestionFragments.get(k));
+            }
+        }
+        ft.commit();
+    }
+
+//    private void hideMultipleQuestion(){
+//        FragmentManager fm = getChildFragmentManager();
+//        FragmentTransaction ft = fm.beginTransaction();
+//        for (int k = 0; k < mQuestionFragments.size(); k++) {
+//            if (mQuestionFragments.get(k).getQuestion()!=null&&mQuestionMultipleSkipIdentifierSet.contains(mQuestionFragments.get(k).getQuestion().getQuestionIdentifier())) {
+//                ft.hide(mQuestionFragments.get(k));
+//                Log.i("HIDE",mQuestionFragments.get(k).toString()+"");
+//            }
+//            else{
+//                ft.show(mQuestionFragments.get(k));
+//            }
+//        }
+//        ft.commit();
+//    }
+
+    private void hideMultipleQuestion(){
+        FragmentManager fm = getChildFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        HashSet<Integer> showFragmentSet = new HashSet<>();
+        for (MultipleSkip questionToSkip : mMultipleSkipList) {
+            Question question = Question.findByQuestionIdentifier(questionToSkip
+                    .getSkipQuestionIdentifier());
+            int index = mDisplay.questions().indexOf(question);
+            showFragmentSet.add(index);
+            if(question.getDisplay()==mDisplay){
+                ft.hide(mQuestionFragments.get(index));
+            }
+        }
+        for(int k=0; k<mQuestionFragments.size();k++){
+            if(!showFragmentSet.contains(k)){
                 ft.show(mQuestionFragments.get(k));
             }
         }
@@ -690,29 +728,17 @@ public class SurveyFragment extends Fragment implements NavigationView
                         selectedOption.getIdentifier(), currentQuestion.getQuestionIdentifier(),
                         mInstrument.getRemoteId())
                 .execute();
-        FragmentManager fm = getChildFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-        if (multipleSkips.size() > 0) {
+        mQuestionMultipleSkipIdentifierSet = new HashSet<>();
+        mMultipleSkipList = multipleSkips;
             // Questions to skip
             for (MultipleSkip questionToSkip : multipleSkips) {
                 Question question = Question.findByQuestionIdentifier(questionToSkip
                         .getSkipQuestionIdentifier());
-                if (question.getDisplay() == mDisplay) {
-                    int questionIndex = mDisplay.questions().indexOf(question);
-                    ft.hide(mQuestionFragments.get(questionIndex));
-                } else {
-                    // Another display
-                    Log.i(TAG, "Skip question in another display");
-                    // TODO: 2/1/18 Implement
-                }
+                mQuestionMultipleSkipIdentifierSet.add(question.getQuestionIdentifier());
+                // TODO: 2/1/18 Implement
+                //DONE
             }
-        } else {
-            // Nothing to skip
-            // Un-skip previously selected for skip
-            Log.i(TAG, "Selection has no skips");
-            // TODO: 2/1/18 Implement...does regular skip patterns affect this?
-        }
-        ft.commit();
+        hideMultipleQuestion();
     }
 
     public boolean isFirstQuestion() {
