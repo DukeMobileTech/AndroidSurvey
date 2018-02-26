@@ -8,7 +8,7 @@ import android.widget.RatingBar;
 
 import org.adaptlab.chpir.android.survey.QuestionFragment;
 
-public class RatingQuestionFragment extends QuestionFragment  {
+public class RatingQuestionFragment extends QuestionFragment {
     private final static int NUM_STARS = 5;
     private float mRating;
     private RatingBar mRatingBar;
@@ -20,17 +20,17 @@ public class RatingQuestionFragment extends QuestionFragment  {
         mRatingBar.setLayoutParams(new ViewGroup.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT));
-        mRatingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {       
+        mRatingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
                 mRating = rating;
                 setResponseText();
             }
         });
-        mRatingBar.setOnTouchListener( new View.OnTouchListener(){
+        mRatingBar.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event){
-                if(mSpecialResponses!=null){
+            public boolean onTouch(View v, MotionEvent event) {
+                if (mSpecialResponses != null) {
                     mSpecialResponses.clearCheck();
                 }
                 return false;

@@ -4,7 +4,7 @@ import android.text.InputType;
 import android.widget.EditText;
 
 public class ListOfIntegerBoxesQuestionFragment extends ListOfItemsQuestionFragment {
-    
+
     @Override
     protected EditText createEditText() {
         EditText editText = new EditText(getActivity());

@@ -13,12 +13,12 @@ import org.adaptlab.chpir.android.survey.R;
 public class SelectOneWriteOtherQuestionFragment extends
         SelectOneQuestionFragment {
     protected EditText otherText = null;
-	
+
     @Override
     protected void beforeAddViewHook(ViewGroup questionComponent) {
         RadioButton radioButton = new RadioButton(getActivity());
         otherText = new EditText(getActivity());
-        
+
         radioButton.setText(R.string.other_specify);
         radioButton.setTypeface(getInstrument().getTypeFace(getActivity().getApplicationContext()));
         final int otherId = getOptions().size();
@@ -29,14 +29,14 @@ public class SelectOneWriteOtherQuestionFragment extends
         radioButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mSpecialResponses!=null){
+                if (mSpecialResponses != null) {
                     mSpecialResponses.clearCheck();
                 }
             }
         });
         getRadioGroup().setOnCheckedChangeListener(new OnCheckedChangeListener() {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if(checkedId!=-1){
+                if (checkedId != -1) {
                     if (checkedId == otherId) {
                         otherText.setEnabled(true);
                         otherText.requestFocus();
@@ -50,11 +50,11 @@ public class SelectOneWriteOtherQuestionFragment extends
                 }
             }
         });
-        for(int i=0; i<getRadioGroup().getChildCount(); i++){
+        for (int i = 0; i < getRadioGroup().getChildCount(); i++) {
             getRadioGroup().getChildAt(i).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(mSpecialResponses!=null){
+                    if (mSpecialResponses != null) {
                         mSpecialResponses.clearCheck();
                     }
                 }

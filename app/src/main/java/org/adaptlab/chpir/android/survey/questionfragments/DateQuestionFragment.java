@@ -57,7 +57,7 @@ public class DateQuestionFragment extends QuestionFragment {
     @Override
     protected void deserialize(String responseText) {
         GregorianCalendar dateComponents = FormatUtils.unformatDate(responseText);
-        if(dateComponents != null) {
+        if (dateComponents != null) {
             mDay = dateComponents.get(GregorianCalendar.DAY_OF_MONTH);
             mMonth = dateComponents.get(GregorianCalendar.MONTH);
             mYear = dateComponents.get(GregorianCalendar.YEAR);

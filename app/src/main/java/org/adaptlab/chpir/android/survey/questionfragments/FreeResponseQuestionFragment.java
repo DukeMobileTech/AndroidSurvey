@@ -17,7 +17,8 @@ public class FreeResponseQuestionFragment extends QuestionFragment {
     @Override
     public void createQuestionComponent(ViewGroup questionComponent) {
         mFreeText = new EditText(getActivity());
-        mFreeText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+        mFreeText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE |
+                InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         beforeAddViewHook(mFreeText);
         mFreeText.setHint(R.string.free_response_edittext);
         mFreeText.addTextChangedListener(new TextWatcher() {
@@ -31,7 +32,7 @@ public class FreeResponseQuestionFragment extends QuestionFragment {
             }
 
             public void afterTextChanged(Editable s) {
-                if(mSpecialResponses!=null&&s.length()>0){
+                if (mSpecialResponses != null && s.length() > 0) {
                     mSpecialResponses.clearCheck();
                 }
             }

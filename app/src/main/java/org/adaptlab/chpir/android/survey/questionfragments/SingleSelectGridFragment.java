@@ -35,7 +35,8 @@ public class SingleSelectGridFragment extends GridFragment {
                 ((RadioButton) mRadioGroups.get(mIndex).getChildAt(checked)).setChecked(false);
             }
         } else {
-            ((RadioButton) mRadioGroups.get(mIndex).getChildAt(Integer.parseInt(responseText))).setChecked(true);
+            ((RadioButton) mRadioGroups.get(mIndex).getChildAt(Integer.parseInt(responseText)))
+                    .setChecked(true);
         }
     }
 
@@ -48,8 +49,10 @@ public class SingleSelectGridFragment extends GridFragment {
     }
 
     private void setTableBodyContent(View v) {
-        LinearLayout questionTextLayout = (LinearLayout) v.findViewById(R.id.table_body_question_text);
-        LinearLayout optionsListLinearLayout = (LinearLayout) v.findViewById(R.id.table_body_options_choice);
+        LinearLayout questionTextLayout = (LinearLayout) v.findViewById(R.id
+                .table_body_question_text);
+        LinearLayout optionsListLinearLayout = (LinearLayout) v.findViewById(R.id
+                .table_body_options_choice);
         mRadioGroups = new ArrayList<>();
         List<Question> questionList = getQuestions();
         rowHeights = new Integer[questionList.size()];
@@ -68,7 +71,8 @@ public class SingleSelectGridFragment extends GridFragment {
         LinearLayout choiceRow = new LinearLayout(getActivity());
         RadioGroup radioButtons = new RadioGroup(getActivity());
         radioButtons.setOrientation(RadioGroup.HORIZONTAL);
-        RadioGroup.LayoutParams buttonParams = new RadioGroup.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT, MIN_HEIGHT);
+        RadioGroup.LayoutParams buttonParams = new RadioGroup.LayoutParams(RadioGroup
+                .LayoutParams.MATCH_PARENT, MIN_HEIGHT);
         radioButtons.setLayoutParams(buttonParams);
         adjustRowHeight(radioButtons, k);
 //        List<GridLabel> gridLabels = getGrid().labels();
@@ -77,7 +81,8 @@ public class SingleSelectGridFragment extends GridFragment {
             RadioButton button = new RadioButton(getActivity());
             button.setSaveEnabled(false);
             button.setId(i);
-            RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(RadioGroup.LayoutParams.WRAP_CONTENT, MIN_HEIGHT);
+            RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(RadioGroup.LayoutParams
+                    .WRAP_CONTENT, MIN_HEIGHT);
             button.setLayoutParams(params);
             radioButtons.addView(button, i);
         }
@@ -94,7 +99,8 @@ public class SingleSelectGridFragment extends GridFragment {
 
     private void setQuestionText(LinearLayout questionTextLayout, int k, Question q) {
         LinearLayout questionRow = new LinearLayout(getActivity());
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout
+                .LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         params.setMargins(MARGIN_0, MARGIN_0, MARGIN_10, MARGIN_10);
         questionRow.setLayoutParams(params);
         TextView questionNumber = new TextView(getActivity());
@@ -102,7 +108,8 @@ public class SingleSelectGridFragment extends GridFragment {
         questionNumber.setText(String.valueOf((getQuestions().indexOf(q) + 1) + "."));
         questionNumber.setMinHeight(MIN_HEIGHT);
         questionNumber.setTypeface(Typeface.DEFAULT_BOLD);
-        LinearLayout.LayoutParams questionNumberParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams questionNumberParams = new LinearLayout.LayoutParams
+                (LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         questionNumberParams.setMargins(MARGIN_0, MARGIN_0, MARGIN_10, MARGIN_0);
         questionNumber.setLayoutParams(questionNumberParams);
         questionRow.addView(questionNumber);
@@ -117,8 +124,9 @@ public class SingleSelectGridFragment extends GridFragment {
     private void setTableHeaderOptions(View v) {
         TextView questionTextHeader = (TextView) v.findViewById(R.id.table_header_question_text);
         questionTextHeader.setMinHeight(MIN_HEIGHT);
-        questionTextHeader.setPadding( 10,10,10,10);
-        final LinearLayout headerTableLayout = (LinearLayout) v.findViewById(R.id.table_options_header);
+        questionTextHeader.setPadding(10, 10, 10, 10);
+        final LinearLayout headerTableLayout = (LinearLayout) v.findViewById(R.id
+                .table_options_header);
 //        final List<GridLabel> gridLabels = getGrid().labels();
         final List<Option> gridLabels = getDisplay().options();
         final List<TextView> headerViews = new ArrayList<>();
@@ -127,8 +135,8 @@ public class SingleSelectGridFragment extends GridFragment {
         for (int k = 0; k < gridLabels.size(); k++) {
             TextView textView = getHeaderTextView(gridLabels.get(k).getText());
             headerTableLayout.addView(textView);
-            setRowWidth(headerTableLayout,textView, k);
-            setLabelWidth(headerTableLayout,textView, k);
+            setRowWidth(headerTableLayout, textView, k);
+            setLabelWidth(headerTableLayout, textView, k);
             headerViews.add(textView);
         }
 
@@ -145,7 +153,8 @@ public class SingleSelectGridFragment extends GridFragment {
                 for (RadioGroup radioGroup : mRadioGroups) {
                     for (int i = 0; i < gridLabels.size(); i++) {
                         RadioButton radioButton = (RadioButton) radioGroup.getChildAt(i);
-                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(rowWidths[i], LinearLayout.LayoutParams.WRAP_CONTENT);
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams
+                                (rowWidths[i], LinearLayout.LayoutParams.WRAP_CONTENT);
                         params.gravity = Gravity.CENTER_VERTICAL;
                         radioButton.setLayoutParams(params);
                         radioButton.setPadding(MARGIN_10, MARGIN_0, MARGIN_10, MARGIN_0);
@@ -156,22 +165,26 @@ public class SingleSelectGridFragment extends GridFragment {
         });
     }
 
-    private void setRowWidth(final LinearLayout layout,final TextView view, final int position) {
+    private void setRowWidth(final LinearLayout layout, final TextView view, final int position) {
         view.post(new Runnable() {
             @Override
             public void run() {
-                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
-                rowWidths[position] = layout.getWidth() / rowWidths.length + params.leftMargin + params.rightMargin;
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view
+                        .getLayoutParams();
+                rowWidths[position] = layout.getWidth() / rowWidths.length + params.leftMargin +
+                        params.rightMargin;
             }
         });
     }
 
-    private void setLabelWidth(final LinearLayout layout,final TextView view, final int position) {
+    private void setLabelWidth(final LinearLayout layout, final TextView view, final int position) {
         view.post(new Runnable() {
             @Override
             public void run() {
-                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
-                labelWidths[position] = layout.getWidth() / labelWidths.length + params.leftMargin + params.rightMargin;
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view
+                        .getLayoutParams();
+                labelWidths[position] = layout.getWidth() / labelWidths.length + params
+                        .leftMargin + params.rightMargin;
             }
         });
     }
@@ -180,7 +193,8 @@ public class SingleSelectGridFragment extends GridFragment {
         view.post(new Runnable() {
             @Override
             public void run() {
-                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view
+                        .getLayoutParams();
                 rowHeights[position] = view.getHeight() + params.topMargin + params.bottomMargin;
             }
         });
@@ -192,7 +206,7 @@ public class SingleSelectGridFragment extends GridFragment {
             public void run() {
                 int diff = rowHeights[pos] - view.getHeight();
                 RadioGroup.LayoutParams params = (RadioGroup.LayoutParams) view.getLayoutParams();
-                params.setMargins(MARGIN_0, diff/2, MARGIN_0, diff/2);
+                params.setMargins(MARGIN_0, diff / 2, MARGIN_0, diff / 2);
                 view.setLayoutParams(params);
             }
         });

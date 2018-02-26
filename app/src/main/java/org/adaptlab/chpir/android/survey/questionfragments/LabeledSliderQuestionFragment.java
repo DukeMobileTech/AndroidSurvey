@@ -12,14 +12,14 @@ import org.adaptlab.chpir.android.survey.models.Option;
 import java.util.List;
 
 public class LabeledSliderQuestionFragment extends SliderQuestionFragment {
-    
+
     @Override
     public void beforeAddViewHook(ViewGroup questionComponent) {
         if (getOptions() != null) {
             TableLayout tableLayout = new TableLayout(getActivity());
             TableRow tableRow = new TableRow(getActivity());
             tableLayout.setStretchAllColumns(true);
-            
+
             for (Option option : getOptions()) {
                 TextView optionText = new TextView(getActivity());
                 optionText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
@@ -27,16 +27,16 @@ public class LabeledSliderQuestionFragment extends SliderQuestionFragment {
                 optionText.setText(option.getText());
                 tableRow.addView(optionText);
             }
-            
+
             tableLayout.addView(tableRow);
             questionComponent.addView(tableLayout);
         }
     }
-    
+
     private int getGravityByPosition(Option option) {
         List<Option> options = getOptions();
         if (options.isEmpty()) return Gravity.START;
-        
+
         if (options.get(0).equals(option)) {
             // Left-most label
             return Gravity.START;
@@ -46,6 +46,6 @@ public class LabeledSliderQuestionFragment extends SliderQuestionFragment {
         } else {
             // All other labels
             return Gravity.CENTER_HORIZONTAL;
-        }       
+        }
     }
 }

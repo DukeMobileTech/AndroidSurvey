@@ -21,7 +21,8 @@ public class MonthAndYearQuestionFragment extends DateQuestionFragment {
         datePicker.init(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH),
                 new DatePicker.OnDateChangedListener() {
                     @Override
-                    public void onDateChanged(DatePicker view, int newYear, int newMonth, int newDay) {
+                    public void onDateChanged(DatePicker view, int newYear, int newMonth, int
+                            newDay) {
                         mDay = newDay;
                         mMonth = newMonth;
                         mYear = newYear;
@@ -37,7 +38,7 @@ public class MonthAndYearQuestionFragment extends DateQuestionFragment {
 
         return datePicker;
     }
-    
+
     @Override
     protected String serialize() {
         return FormatUtils.formatDate(mMonth, mYear);

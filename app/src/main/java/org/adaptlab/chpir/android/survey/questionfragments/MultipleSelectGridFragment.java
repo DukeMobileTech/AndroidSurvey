@@ -1,4 +1,3 @@
-
 package org.adaptlab.chpir.android.survey.questionfragments;
 
 import android.graphics.Typeface;
@@ -66,8 +65,9 @@ public class MultipleSelectGridFragment extends GridFragment {
     private void setTableHeaderOptions(View v) {
         TextView questionTextHeader = (TextView) v.findViewById(R.id.table_header_question_text);
         questionTextHeader.setMinHeight(MIN_HEIGHT);
-        questionTextHeader.setPadding( 10,10,10,10);
-        final LinearLayout headerTableLayout = (LinearLayout) v.findViewById(R.id.table_options_header);
+        questionTextHeader.setPadding(10, 10, 10, 10);
+        final LinearLayout headerTableLayout = (LinearLayout) v.findViewById(R.id
+                .table_options_header);
         final List<Option> gridLabels = getDisplay().options();
         rowWidths = new Integer[gridLabels.size()];
         labelWidths = new Integer[gridLabels.size()];
@@ -75,8 +75,8 @@ public class MultipleSelectGridFragment extends GridFragment {
         for (int k = 0; k < gridLabels.size(); k++) {
             TextView textView = getHeaderTextView(gridLabels.get(k).getText());
             headerTableLayout.addView(textView);
-            setRowWidth(headerTableLayout,textView, k);
-            setLabelWidth(headerTableLayout,textView, k);
+            setRowWidth(headerTableLayout, textView, k);
+            setLabelWidth(headerTableLayout, textView, k);
             headers.add(textView);
         }
         headerTableLayout.post(new Runnable() {
@@ -87,13 +87,14 @@ public class MultipleSelectGridFragment extends GridFragment {
                 for (int k = 0; k < headers.size(); k++) {
                     TextView view = headers.get(k);
                     view.setWidth(labelWidths[k]);
-                    view.setPadding( 5,0, 5,10);
+                    view.setPadding(5, 0, 5, 10);
                     view.setMinimumWidth(width + paddingLeftRight);
                 }
                 for (List<CheckBox> checkBoxes : mCheckBoxes) {
                     for (int i = 0; i < checkBoxes.size(); i++) {
                         CheckBox checkBox = checkBoxes.get(i);
-                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(rowWidths[i], LinearLayout.LayoutParams.WRAP_CONTENT);
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams
+                                (rowWidths[i], LinearLayout.LayoutParams.WRAP_CONTENT);
                         params.gravity = Gravity.CENTER_VERTICAL;
                         checkBox.setLayoutParams(params);
                         checkBox.setPadding(MARGIN_10, MARGIN_0, MARGIN_10, MARGIN_0);
@@ -104,29 +105,35 @@ public class MultipleSelectGridFragment extends GridFragment {
         });
     }
 
-    private void setRowWidth(final LinearLayout layout,final TextView view, final int position) {
+    private void setRowWidth(final LinearLayout layout, final TextView view, final int position) {
         view.post(new Runnable() {
             @Override
             public void run() {
-                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
-                rowWidths[position] = layout.getWidth() / rowWidths.length + params.leftMargin + params.rightMargin;
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view
+                        .getLayoutParams();
+                rowWidths[position] = layout.getWidth() / rowWidths.length + params.leftMargin +
+                        params.rightMargin;
             }
         });
     }
 
-    private void setLabelWidth(final LinearLayout layout,final TextView view, final int position) {
+    private void setLabelWidth(final LinearLayout layout, final TextView view, final int position) {
         view.post(new Runnable() {
             @Override
             public void run() {
-                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
-                labelWidths[position] = layout.getWidth() / labelWidths.length + params.leftMargin + params.rightMargin;
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view
+                        .getLayoutParams();
+                labelWidths[position] = layout.getWidth() / labelWidths.length + params
+                        .leftMargin + params.rightMargin;
             }
         });
     }
 
     private void setTableBodyContent(View v) {
-        LinearLayout questionTextLayout = (LinearLayout) v.findViewById(R.id.table_body_question_text);
-        LinearLayout optionsListLinearLayout = (LinearLayout) v.findViewById(R.id.table_body_options_choice);
+        LinearLayout questionTextLayout = (LinearLayout) v.findViewById(R.id
+                .table_body_question_text);
+        LinearLayout optionsListLinearLayout = (LinearLayout) v.findViewById(R.id
+                .table_body_options_choice);
         mCheckBoxes = new ArrayList<>();
         List<Question> questionList = getQuestions();
         rowHeights = new Integer[questionList.size()];
@@ -144,7 +151,8 @@ public class MultipleSelectGridFragment extends GridFragment {
 
     private void setQuestionText(LinearLayout questionTextLayout, int k, Question q) {
         LinearLayout questionRow = new LinearLayout(getActivity());
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout
+                .LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         params.setMargins(MARGIN_0, MARGIN_0, MARGIN_10, MARGIN_10);
         questionRow.setLayoutParams(params);
         TextView questionNumber = new TextView(getActivity());
@@ -152,7 +160,8 @@ public class MultipleSelectGridFragment extends GridFragment {
         questionNumber.setText(String.valueOf((getQuestions().indexOf(q) + 1) + "."));
         questionNumber.setMinHeight(MIN_HEIGHT);
         questionNumber.setTypeface(Typeface.DEFAULT_BOLD);
-        LinearLayout.LayoutParams questionNumberParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams questionNumberParams = new LinearLayout.LayoutParams
+                (LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         questionNumberParams.setMargins(MARGIN_0, MARGIN_0, MARGIN_10, MARGIN_0);
         questionNumber.setLayoutParams(questionNumberParams);
         questionRow.addView(questionNumber);
@@ -168,7 +177,8 @@ public class MultipleSelectGridFragment extends GridFragment {
         view.post(new Runnable() {
             @Override
             public void run() {
-                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view
+                        .getLayoutParams();
                 rowHeights[position] = view.getHeight() + params.topMargin + params.bottomMargin;
             }
         });
@@ -201,7 +211,8 @@ public class MultipleSelectGridFragment extends GridFragment {
         view.post(new Runnable() {
             @Override
             public void run() {
-                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view
+                        .getLayoutParams();
                 params.height = rowHeights[pos];
                 view.setLayoutParams(params);
             }
@@ -209,7 +220,9 @@ public class MultipleSelectGridFragment extends GridFragment {
     }
 
     @Override
-    protected String serialize() { return null; }
+    protected String serialize() {
+        return null;
+    }
 
     protected void setResponseIndexes(Question q, int checkedId, boolean isChecked) {
         new SaveResponseTask(getSurvey(), q, checkedId, isChecked).execute();
@@ -250,7 +263,7 @@ public class MultipleSelectGridFragment extends GridFragment {
                     serialized += str;
                     if (size < responses.size() - 1)
                         serialized += LIST_DELIMITER;
-                    size +=1;
+                    size += 1;
                 }
             } else {
                 serialized = id;

@@ -21,100 +21,101 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SelectMultipleImageQuestionFragment extends QuestionFragment {
-	private final int SELECTED = Color.GREEN;
-	private final int UNSELECTED = Color.TRANSPARENT;
-	private List<Integer> mSelectedViews;
-	private GridView mGridView;
-	private ArrayList<Image> mImages;
-	
-	@Override
-	protected void createQuestionComponent(ViewGroup questionComponent) {
-		LayoutInflater inflater = getActivity().getLayoutInflater();
-		View v = inflater.inflate(R.layout.fragment_image, questionComponent, false);
-		mImages = (ArrayList<Image>) getQuestion().images();
-		mSelectedViews = new ArrayList<Integer>();
-		mGridView = (GridView) v.findViewById(R.id.imageGridView);
-		setUpAdapter();
-		mGridView.setOnItemClickListener(new OnItemClickListener() {
-	        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-	        	toggleImageBackgroundColor((ImageView) v);
-	        }
-	    });
-		questionComponent.addView(mGridView);
-	}
+    private final int SELECTED = Color.GREEN;
+    private final int UNSELECTED = Color.TRANSPARENT;
+    private List<Integer> mSelectedViews;
+    private GridView mGridView;
+    private ArrayList<Image> mImages;
 
-	private void setUpAdapter() {
-		if (getActivity() == null || mGridView == null) return;
+    @Override
+    protected void createQuestionComponent(ViewGroup questionComponent) {
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View v = inflater.inflate(R.layout.fragment_image, questionComponent, false);
+        mImages = (ArrayList<Image>) getQuestion().images();
+        mSelectedViews = new ArrayList<Integer>();
+        mGridView = (GridView) v.findViewById(R.id.imageGridView);
+        setUpAdapter();
+        mGridView.setOnItemClickListener(new OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                toggleImageBackgroundColor((ImageView) v);
+            }
+        });
+        questionComponent.addView(mGridView);
+    }
+
+    private void setUpAdapter() {
+        if (getActivity() == null || mGridView == null) return;
         if (mImages != null) {
             mGridView.setAdapter(new ImageAdapter(mImages));
         } else {
             mGridView.setAdapter(null);
         }
-	}
-	
-	private void toggleImageBackgroundColor(ImageView view) {
-		ColorDrawable drawable = (ColorDrawable) view.getBackground();
-		if (drawable.getColor() == SELECTED) {
-			view.setBackgroundColor(UNSELECTED);
-		} else {
-			view.setBackgroundColor(SELECTED);
-		}
-		setResponseText();
-	}
+    }
 
-	@Override
-	protected String serialize() {
-		String serialized = "";
-		for (int i=0; i < mGridView.getChildCount(); i++) {
-			ImageView view = (ImageView) mGridView.getChildAt(i);
-			ColorDrawable drawable = (ColorDrawable) view.getBackground();
-			if (drawable.getColor() == SELECTED) {
-				serialized += i;
-				if (i <  mGridView.getChildCount() - 1) serialized += LIST_DELIMITER;
-			}
-		}
-		return serialized;
-	}
+    private void toggleImageBackgroundColor(ImageView view) {
+        ColorDrawable drawable = (ColorDrawable) view.getBackground();
+        if (drawable.getColor() == SELECTED) {
+            view.setBackgroundColor(UNSELECTED);
+        } else {
+            view.setBackgroundColor(SELECTED);
+        }
+        setResponseText();
+    }
 
-	@Override
-	protected void deserialize(String responseText) {
-		if (responseText.equals("")) return;   
+    @Override
+    protected String serialize() {
+        String serialized = "";
+        for (int i = 0; i < mGridView.getChildCount(); i++) {
+            ImageView view = (ImageView) mGridView.getChildAt(i);
+            ColorDrawable drawable = (ColorDrawable) view.getBackground();
+            if (drawable.getColor() == SELECTED) {
+                serialized += i;
+                if (i < mGridView.getChildCount() - 1) serialized += LIST_DELIMITER;
+            }
+        }
+        return serialized;
+    }
+
+    @Override
+    protected void deserialize(String responseText) {
+        if (responseText.equals("")) return;
         String[] listOfIndices = responseText.split(LIST_DELIMITER);
         for (String index : listOfIndices) {
             if (!index.equals("")) {
                 Integer indexInteger = Integer.parseInt(index);
                 mSelectedViews.add(indexInteger);
             }
-        }		
-	}
-	
-	private class ImageAdapter extends ArrayAdapter<Image> {
-		
-		public ImageAdapter(ArrayList<Image> images) {
-			super(getActivity(), 0, images);
-		}
-		
-		public View getView(int position, View view, ViewGroup parent) {
-			if (view == null) {
-                view = getActivity().getLayoutInflater().inflate(R.layout.image_item, parent, false);
+        }
+    }
+
+    private class ImageAdapter extends ArrayAdapter<Image> {
+
+        public ImageAdapter(ArrayList<Image> images) {
+            super(getActivity(), 0, images);
+        }
+
+        public View getView(int position, View view, ViewGroup parent) {
+            if (view == null) {
+                view = getActivity().getLayoutInflater().inflate(R.layout.image_item, parent,
+                        false);
             }
-			Image img = getItem(position);
-			ImageView imageView = (ImageView)view.findViewById(R.id.image_item_view);
-			String path = getActivity().getFileStreamPath(img.getBitmapPath()).getAbsolutePath();
-			BitmapDrawable bitmap = PictureUtils.getScaledDrawable(getActivity(), path);
-			imageView.setImageDrawable(bitmap);
-			if (mSelectedViews.contains(position)) {
-				imageView.setBackgroundColor(SELECTED);
-			} else {
-				imageView.setBackgroundColor(UNSELECTED);
-			}
-			return view;	
-		}
-	}
+            Image img = getItem(position);
+            ImageView imageView = (ImageView) view.findViewById(R.id.image_item_view);
+            String path = getActivity().getFileStreamPath(img.getBitmapPath()).getAbsolutePath();
+            BitmapDrawable bitmap = PictureUtils.getScaledDrawable(getActivity(), path);
+            imageView.setImageDrawable(bitmap);
+            if (mSelectedViews.contains(position)) {
+                imageView.setBackgroundColor(SELECTED);
+            } else {
+                imageView.setBackgroundColor(UNSELECTED);
+            }
+            return view;
+        }
+    }
 
-	@Override
-	protected void unSetResponse() {
+    @Override
+    protected void unSetResponse() {
 
-	}
+    }
 
 }

@@ -11,9 +11,9 @@ import org.adaptlab.chpir.android.survey.QuestionFragment;
 public class SliderQuestionFragment extends QuestionFragment {
     private int mProgress;
     private SeekBar mSlider;
-    
+
     protected void beforeAddViewHook(ViewGroup questionComponent) {
-        
+
     }
 
     @Override
@@ -23,18 +23,21 @@ public class SliderQuestionFragment extends QuestionFragment {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 mProgress = progress;
                 if (mProgress > -1) {
-                	setResponseText();
+                    setResponseText();
                 }
             }
 
             // Required by interface
-            public void onStartTrackingTouch(SeekBar seekBar) { }
-            public void onStopTrackingTouch(SeekBar seekBar) { }     
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
         });
-        mSlider.setOnTouchListener(new View.OnTouchListener(){
+        mSlider.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public boolean onTouch(View v, MotionEvent event){
-                if(mSpecialResponses!=null){
+            public boolean onTouch(View v, MotionEvent event) {
+                if (mSpecialResponses != null) {
                     mSpecialResponses.clearCheck();
                 }
                 return false;
@@ -52,7 +55,7 @@ public class SliderQuestionFragment extends QuestionFragment {
     @Override
     protected void deserialize(String responseText) {
         if (responseText.equals("")) {
-        	mSlider.setProgress(-1);
+            mSlider.setProgress(-1);
         } else {
             mSlider.setProgress(Integer.parseInt(responseText));
         }
@@ -61,7 +64,7 @@ public class SliderQuestionFragment extends QuestionFragment {
     @Override
     protected void unSetResponse() {
         mSlider.setProgress(0);
-        if(mResponse!=null){
+        if (mResponse != null) {
             mResponse.setResponse("");
         }
     }

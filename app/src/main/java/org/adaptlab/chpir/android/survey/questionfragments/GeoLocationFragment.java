@@ -32,7 +32,8 @@ public class GeoLocationFragment extends QuestionFragment {
     protected void createQuestionComponent(ViewGroup questionComponent) {
         final LocationManager locationManager = getSurveyFragment().getLocationManager();
         locationManager.startLocationUpdates();
-        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context
+                .LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.fragment_location, null);
         mLatitude = view.findViewById(R.id.latitude);
         mLongitude = view.findViewById(R.id.longitude);

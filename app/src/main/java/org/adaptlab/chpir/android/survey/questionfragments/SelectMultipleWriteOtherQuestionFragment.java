@@ -34,10 +34,10 @@ public class SelectMultipleWriteOtherQuestionFragment extends
                 toggleResponseIndex(otherId);
             }
         });
-        checkbox.setOnClickListener(new View.OnClickListener(){
+        checkbox.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v){
-                if(mSpecialResponses!=null){
+            public void onClick(View v) {
+                if (mSpecialResponses != null) {
                     mSpecialResponses.clearCheck();
                 }
             }
@@ -51,10 +51,10 @@ public class SelectMultipleWriteOtherQuestionFragment extends
     @Override
     protected void unSetResponse() {
         otherText.setText("");
-        for(CheckBox oneBox: mCheckBoxes){
+        for (CheckBox oneBox : mCheckBoxes) {
             oneBox.setChecked(false);
         }
-        if(mResponse!=null){
+        if (mResponse != null) {
             mResponse.setResponse("");
         }
     }
