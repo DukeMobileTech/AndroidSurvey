@@ -781,4 +781,9 @@ public class Question extends ReceiveModel {
         return (mQuestionType == QuestionType.SELECT_ONE_WRITE_OTHER);
     }
 
+    public boolean isTextEntryQuestionType() {
+        QuestionType type = getQuestionType();
+        return (type == QuestionType.FREE_RESPONSE || type == QuestionType.LIST_OF_INTEGER_BOXES || type == QuestionType.LIST_OF_TEXT_BOXES || type == QuestionType.INTEGER || type == QuestionType.EMAIL_ADDRESS || type == QuestionType.DECIMAL_NUMBER || type == QuestionType.INSTRUCTIONS || type == QuestionType.PHONE_NUMBER || type == QuestionType.ADDRESS);
+    }
+
 }

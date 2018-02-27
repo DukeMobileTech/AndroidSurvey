@@ -37,8 +37,6 @@ public class FreeResponseQuestionFragment extends QuestionFragment {
                 }
             }
         });
-
-//        showKeyBoard();
         questionComponent.addView(mFreeText);
     }
 

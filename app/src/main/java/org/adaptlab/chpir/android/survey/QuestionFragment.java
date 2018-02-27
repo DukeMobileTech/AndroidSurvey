@@ -1,5 +1,6 @@
 package org.adaptlab.chpir.android.survey;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -8,12 +9,12 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -96,23 +97,9 @@ public abstract class QuestionFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_question_factory, parent, false);
 
         ViewGroup questionComponent = (LinearLayout) v.findViewById(R.id.question_component);
-        mQuestionText = (TextView) v.findViewById(R.id.question_text);
-        mValidationTextView = (TextView) v.findViewById(R.id.validation_text);
+        mQuestionText = v.findViewById(R.id.question_text);
+        mValidationTextView = v.findViewById(R.id.validation_text);
         mQuestionText.setTypeface(mInstrument.getTypeFace(getActivity().getApplicationContext()));
-
-//        String instructions = "";
-//        if (!TextUtils.isEmpty(mQuestion.getInstructions()) && !mQuestion.getInstructions()
-//                .equals("null")) {
-//            instructions = mQuestion.getInstructions();
-//        }
-//        if (TextUtils.isEmpty(instructions)) {
-//            mQuestionText.setText(Html.fromHtml(mQuestion.getNumberInInstrument() + "<br />" +
-//                    mQuestion.getText()));
-//        } else {
-//            mQuestionText.setText(Html.fromHtml(mQuestion.getNumberInInstrument() + "<br />" +
-//                    instructions + "<br />" + mQuestion.getText()));
-//
-//        }
         setQuestionText();
 
         // Overridden by subclasses to place their graphical elements on the fragment.
@@ -125,7 +112,7 @@ public abstract class QuestionFragment extends Fragment {
         setSpecialResponseSkips();
         refreshFollowUpQuestion();
 
-        mSpecialResponses = (RadioGroup) v.findViewById(R.id.special_responses_container);
+        mSpecialResponses = v.findViewById(R.id.special_responses_container);
         List<String> responses = new ArrayList<>();
         if (mQuestion.hasSpecialOptions()) {
             for (Option option : mQuestion.specialOptions()) {
@@ -147,7 +134,6 @@ public abstract class QuestionFragment extends Fragment {
                 public void onClick(View v) {
                     unSetResponse();
                     setSpecialResponse(finalResponses.get(v.getId()));
-//                    setResponseText(); // TODO: 2/7/18 Do in unSetResponse
                 }
             });
         }
@@ -167,6 +153,21 @@ public abstract class QuestionFragment extends Fragment {
     }
 
     protected abstract void unSetResponse();
+
+    /*
+     * This will remove the focus of the input as the survey is
+     * traversed.  If this is not called, then it will be possible
+     * for someone to change the answer to a question that they are
+     * not currently viewing.
+     */
+    private void removeTextFocus() {
+        if (getActivity().getCurrentFocus() != null) {
+            InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService
+                    (Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken()
+                    , InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+    }
 
     @Override
     public void onPause() {
@@ -235,6 +236,7 @@ public abstract class QuestionFragment extends Fragment {
 //            new SaveResponseTask().execute(mResponse);
             mResponse.save();
             mSurvey.save();
+            removeTextFocus();
             setSpecialResponseSkips();
             refreshFollowUpQuestion();
         }
@@ -292,6 +294,9 @@ public abstract class QuestionFragment extends Fragment {
 //        new SaveResponseTask().execute(mResponse);
         mResponse.save();
         mSurvey.save();
+        if (!mQuestion.isTextEntryQuestionType()) {
+            removeTextFocus();
+        }
         setResponseSkips();
         refreshFollowUpQuestion();
     }
