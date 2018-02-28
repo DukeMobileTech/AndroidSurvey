@@ -227,22 +227,27 @@ public class InstrumentFragment extends ListFragment {
         mProgressDialog = new ProgressDialog(getActivity());
     }
 
+    // TODO: 2/28/18 Empty message shows up briefly...
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_instrument, container, false);
+    }
+
     private void requestNeededPermissions() {
-        if (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission
-                .ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED) {
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        String[] permissions = { Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE
+        };
+        if (!hasPermission(permissions)) {
+            ActivityCompat.requestPermissions(getActivity(), permissions, 1);
         }
-        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission
-                .CAMERA) == PackageManager.PERMISSION_DENIED) {
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{Manifest.permission.CAMERA}, 2);
+    }
+
+    private boolean hasPermission(String[] permissions) {
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(getActivity(), permission) == PackageManager.PERMISSION_DENIED) {
+                return false;
+            }
         }
-        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission
-                .WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 3);
-        }
+        return true;
     }
 
     /*
