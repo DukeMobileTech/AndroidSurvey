@@ -111,7 +111,6 @@ public abstract class QuestionFragment extends Fragment {
             response.setSurvey(mSurvey);
             response.save();
             mSurveyFragment.getResponses().put(mQuestion, response);
-            mSurveyFragment.refreshView();
         }
         return response;
     }

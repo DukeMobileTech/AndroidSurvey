@@ -548,26 +548,11 @@ public class SurveyFragment extends Fragment implements NavigationView
         }
         switch (item.getItemId()) {
             case R.id.menu_item_previous:
-//                moveToPreviousQuestion();
                 moveToPreviousDisplay();
                 return true;
             case R.id.menu_item_next:
-//                unSkipAndMoveToNextQuestion();
                 moveToNextDisplay();
                 return true;
-//            case R.id.menu_item_skip:
-//                setSpecialResponse(Response.SKIP);
-//                proceedToNextQuestion();
-//                return true;
-//            case R.id.menu_item_rf:
-//                setSpecialResponse(Response.RF);
-//                return true;
-//            case R.id.menu_item_na:
-//                setSpecialResponse(Response.NA);
-//                return true;
-//            case R.id.menu_item_dk:
-//                setSpecialResponse(Response.DK);
-//                return true;
             case R.id.menu_item_finish:
                 finishSurvey();
                 return true;
@@ -603,10 +588,10 @@ public class SurveyFragment extends Fragment implements NavigationView
         }
         if (mDisplayNumber < mDisplays.size()) {
             mDisplay = mDisplays.get(mDisplayNumber);
-            createQuestionFragments();
-            hideQuestionInDisplay();
-            hideMultipleQuestion();
         }
+        createQuestionFragments();
+        hideQuestionInDisplay();
+        hideMultipleQuestion();
         updateDisplayCountLabel();
     }
 
@@ -855,13 +840,12 @@ public class SurveyFragment extends Fragment implements NavigationView
 
     protected void createQuestionFragments() {
         if (!isActivityFinished) {
-            // Remove previous fragments
+            // Hide previous fragments
             FragmentManager fm = getChildFragmentManager();
-            FragmentTransaction ft = fm.beginTransaction();
+            FragmentTransaction fragmentTransaction = fm.beginTransaction();
             for (Fragment fragment : mQuestionFragments) {
-                ft.remove(fragment);
+                fragmentTransaction.hide(fragment);
             }
-            ft.commit();
             mQuestionFragments.clear();
 
             if (mNavigationView != null) {
@@ -893,12 +877,12 @@ public class SurveyFragment extends Fragment implements NavigationView
                 bundle.putLong(GridFragment.EXTRA_DISPLAY_ID, mDisplay.getRemoteId());
                 bundle.putLong(GridFragment.EXTRA_SURVEY_ID, mSurvey.getId());
                 questionFragment.setArguments(bundle);
-                fm.beginTransaction().replace(framelayout.getId(), questionFragment).commit();
+                fragmentTransaction.add(framelayout.getId(), questionFragment);
                 mQuestionFragments.add(questionFragment);
             } else {
-                FragmentTransaction fragmentTransaction = fm.beginTransaction();
                 for (Question question : displayQuestions) {
-                    int frameLayoutId = new BigDecimal(question.getRemoteId()).intValueExact() + 1000000; // Add large offset to avoid id conflicts
+                    // Add large offset to avoid id conflicts
+                    int frameLayoutId = new BigDecimal(question.getRemoteId()).intValueExact() + 1000000;
                     FrameLayout frameLayout = getActivity().findViewById(frameLayoutId);
                     if (frameLayout == null) {
                         frameLayout = new FrameLayout(getContext());
@@ -908,18 +892,22 @@ public class SurveyFragment extends Fragment implements NavigationView
                         mQuestionViewLayout.addView(frameLayout);
                     }
 
-                    Bundle bundle = new Bundle();
-                    bundle.putString("QuestionIdentifier", question.getQuestionIdentifier());
-                    QuestionFragment questionFragment = (QuestionFragment) QuestionFragmentFactory
-                            .createQuestionFragment(question);
-                    questionFragment.setArguments(bundle);
-
-                    fragmentTransaction.replace(frameLayout.getId(), questionFragment);
-                    fragmentTransaction.addToBackStack(null);
+                    String qfTag = mSurvey.getId().toString() + "-" + question.getId().toString();
+                    QuestionFragment questionFragment = (QuestionFragment) fm.findFragmentByTag(qfTag);
+                    if (questionFragment == null) {
+                        Bundle bundle = new Bundle();
+                        bundle.putString("QuestionIdentifier", question.getQuestionIdentifier());
+                        questionFragment = (QuestionFragment) QuestionFragmentFactory
+                                .createQuestionFragment(question);
+                        questionFragment.setArguments(bundle);
+                        fragmentTransaction.add(frameLayout.getId(), questionFragment, qfTag);
+                    } else {
+                        fragmentTransaction.show(questionFragment);
+                    }
                     mQuestionFragments.add(questionFragment);
                 }
-                fragmentTransaction.commit();
             }
+            fragmentTransaction.commit();
         }
     }
 
