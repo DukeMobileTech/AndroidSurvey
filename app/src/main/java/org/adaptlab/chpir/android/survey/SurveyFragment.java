@@ -582,14 +582,14 @@ public class SurveyFragment extends Fragment implements NavigationView
                 > 0) {
             mDisplayNumber = mPreviousDisplays.remove(mPreviousDisplays.size() - 1);
             mDisplay = mDisplays.get(mDisplayNumber);
-            createQuestionFragments();
-            hideQuestionInDisplay();
-            hideMultipleQuestion();
-            updateDisplayCountLabel();
         } else {
             mDisplayNumber -= 1;
             mDisplay = mDisplays.get(mDisplayNumber);
         }
+        createQuestionFragments();
+        hideQuestionInDisplay();
+        hideMultipleQuestion();
+        updateDisplayCountLabel();
     }
 
     private void moveToNextDisplay() {
@@ -757,18 +757,18 @@ public class SurveyFragment extends Fragment implements NavigationView
         hideMultipleQuestion();
     }
 
-    public boolean isFirstQuestion() {
-        return mQuestionNumber == 0;
-    }
+//    public boolean isFirstQuestion() {
+//        return mQuestionNumber == 0;
+//    }
 
-    public boolean isLastQuestion() {
-        if (mQuestion.belongsToGrid()) {
-            Question lastGridQuestion = mGrid.questions().get(mGrid.questions().size() - 1);
-            return mQuestionCount == lastGridQuestion.getNumberInInstrument();
-        } else {
-            return mQuestionCount == mQuestionNumber + 1;
-        }
-    }
+//    public boolean isLastQuestion() {
+//        if (mQuestion.belongsToGrid()) {
+//            Question lastGridQuestion = mGrid.questions().get(mGrid.questions().size() - 1);
+//            return mQuestionCount == lastGridQuestion.getNumberInInstrument();
+//        } else {
+//            return mQuestionCount == mQuestionNumber + 1;
+//        }
+//    }
 
 //    public boolean hasValidResponse() {
 //        for (QuestionFragment fragment : mQuestionFragments) {
@@ -883,7 +883,7 @@ public class SurveyFragment extends Fragment implements NavigationView
 
                 FrameLayout framelayout = new FrameLayout(getContext());
                 framelayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams
-                        .MATCH_PARENT, ViewPager.LayoutParams.MATCH_PARENT));
+                        .MATCH_PARENT, ViewPager.LayoutParams.WRAP_CONTENT));
 
                 framelayout.setId(new BigDecimal(displayQuestions.get(0).getRemoteId())
                         .intValueExact());
@@ -898,12 +898,15 @@ public class SurveyFragment extends Fragment implements NavigationView
             } else {
                 FragmentTransaction fragmentTransaction = fm.beginTransaction();
                 for (Question question : displayQuestions) {
-                    FrameLayout framelayout = new FrameLayout(getContext());
-                    framelayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams
-                            .MATCH_PARENT, ViewPager.LayoutParams.MATCH_PARENT));
-
-                    framelayout.setId(new BigDecimal(question.getRemoteId()).intValueExact());
-                    mQuestionViewLayout.addView(framelayout);
+                    int frameLayoutId = new BigDecimal(question.getRemoteId()).intValueExact() + 1000000; // Add large offset to avoid id conflicts
+                    FrameLayout frameLayout = getActivity().findViewById(frameLayoutId);
+                    if (frameLayout == null) {
+                        frameLayout = new FrameLayout(getContext());
+                        frameLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams
+                                .MATCH_PARENT, ViewPager.LayoutParams.WRAP_CONTENT));
+                        frameLayout.setId(frameLayoutId);
+                        mQuestionViewLayout.addView(frameLayout);
+                    }
 
                     Bundle bundle = new Bundle();
                     bundle.putString("QuestionIdentifier", question.getQuestionIdentifier());
@@ -911,7 +914,8 @@ public class SurveyFragment extends Fragment implements NavigationView
                             .createQuestionFragment(question);
                     questionFragment.setArguments(bundle);
 
-                    fragmentTransaction.replace(framelayout.getId(), questionFragment);
+                    fragmentTransaction.replace(frameLayout.getId(), questionFragment);
+                    fragmentTransaction.addToBackStack(null);
                     mQuestionFragments.add(questionFragment);
                 }
                 fragmentTransaction.commit();

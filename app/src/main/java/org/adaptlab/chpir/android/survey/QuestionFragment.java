@@ -39,6 +39,13 @@ import java.util.List;
 import static org.adaptlab.chpir.android.survey.FormatUtils.styleTextWithHtml;
 
 public abstract class QuestionFragment extends Fragment {
+    public final static String EXTRA_INSTRUMENT_ID = "org.adaptlab.chpir.android.survey" +
+            ".instrument_id";
+    public final static String EXTRA_RESPONSE_ID = "org.adaptlab.chpir.android.survey" +
+            ".response_id";
+    public final static String EXTRA_SURVEY_ID = "org.adaptlab.chpir.android.survey.survey_id";
+    public final static String EXTRA_QUESTION_ID = "org.adaptlab.chpir.android.survey" +
+            ".question_id";
     protected final static String LIST_DELIMITER = ",";
     private final static String TAG = "QuestionFragment";
     public TextView mValidationTextView;
@@ -57,7 +64,24 @@ public abstract class QuestionFragment extends Fragment {
         setHasOptionsMenu(true);
         mSurveyFragment = (SurveyFragment) getParentFragment();
         if (mSurveyFragment == null) return;
-        init();
+        if (savedInstanceState == null) {
+            init();
+        } else {
+            mInstrument = Instrument.load(Instrument.class, savedInstanceState.getLong(EXTRA_INSTRUMENT_ID));
+            mSurvey = Survey.load(Survey.class, savedInstanceState.getLong(EXTRA_SURVEY_ID));
+            mQuestion = Question.load(Question.class, savedInstanceState.getLong(EXTRA_QUESTION_ID));
+            mResponse = Response.load(Response.class, savedInstanceState.getLong(EXTRA_RESPONSE_ID));
+            mOptions = mSurveyFragment.getOptions().get(mQuestion);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong(EXTRA_INSTRUMENT_ID, mInstrument.getId());
+        outState.putLong(EXTRA_SURVEY_ID, mSurvey.getId());
+        outState.putLong(EXTRA_QUESTION_ID, mQuestion.getId());
+        outState.putLong(EXTRA_RESPONSE_ID, mResponse.getId());
     }
 
     public void init() {
@@ -430,14 +454,12 @@ public abstract class QuestionFragment extends Fragment {
      * If this question is not a following up question, then just
      * set the text as normal.
      */
-    protected boolean setQuestionText() {
+    protected void setQuestionText() {
         appendNumberAndInstructions(mQuestionText);
         if (mQuestion.isFollowUpQuestion()) {
             String followUpText = mQuestion.getFollowingUpText(mSurveyFragment.getResponses(),
                     getActivity());
-            if (followUpText == null) {
-                return false;
-            } else {
+            if (followUpText != null) {
                 mQuestionText.append(styleTextWithHtml(followUpText));
             }
         } else if (mQuestion.hasRandomizedFactors()) {
@@ -446,7 +468,6 @@ public abstract class QuestionFragment extends Fragment {
         } else {
             mQuestionText.append(styleTextWithHtml(mQuestion.getText()));
         }
-        return true;
     }
 
     /*

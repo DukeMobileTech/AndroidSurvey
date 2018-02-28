@@ -6,6 +6,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.widget.NestedScrollView;
 import android.util.Log;
 import android.view.Gravity;
@@ -110,7 +111,7 @@ public abstract class GridFragment extends QuestionFragment {
     }
 
 	@Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putLong(EXTRA_DISPLAY_ID, mDisplay.getRemoteId());
         outState.putLong(EXTRA_SURVEY_ID, mSurvey.getId());
