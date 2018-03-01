@@ -20,10 +20,12 @@ import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Survey;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class ReviewPageFragment extends ListFragment {
 	public final static String EXTRA_REVIEW_SURVEY_ID = "org.adaptlab.chpir.android.survey.review_survey_id";
+	public final static String EXTRA_SKIPPED_QUESTION_ID_LIST = "org.adaptlab.chpir.android.survey.skipped_question_id_list";
     private static final String TAG = "ReviewPageFragment";
     private ArrayList<Question> mSkippedQuestions;
 
@@ -31,11 +33,16 @@ public class ReviewPageFragment extends ListFragment {
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        Intent intent = getActivity().getIntent();
         mSkippedQuestions = new ArrayList<>();
-        Survey mSurvey = Survey.load(Survey.class, getActivity().getIntent().getExtras().getLong(EXTRA_REVIEW_SURVEY_ID));
+        Survey mSurvey = Survey.load(Survey.class, intent.getExtras().getLong(EXTRA_REVIEW_SURVEY_ID));
+		HashSet<String> questionSkipSet = new HashSet<>((intent.getExtras().getStringArrayList(EXTRA_SKIPPED_QUESTION_ID_LIST)));
 		List<Response> emptyResponses = mSurvey.emptyResponses();
 		for (Response response : emptyResponses) {
-			mSkippedQuestions.add(response.getQuestion());
+			Question curQuestion = response.getQuestion();
+			if(!questionSkipSet.contains(curQuestion.getQuestionIdentifier())){
+				mSkippedQuestions.add(curQuestion);
+			}
 		}
         setListAdapter(new QuestionAdapter(mSkippedQuestions));
         getActivity().setTitle(getActivity().getResources().getString(R.string.skipped_questions));

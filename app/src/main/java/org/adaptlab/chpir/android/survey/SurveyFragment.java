@@ -1326,9 +1326,14 @@ public class SurveyFragment extends Fragment implements NavigationView
     }
 
     private void goToReviewPage() {
+        ArrayList<String> questionsToSkip = new ArrayList<>();
+        for(Question curSkip: mQuestionsToSkipSet){
+            if(curSkip!=null) questionsToSkip.add(curSkip.getQuestionIdentifier());
+        }
         Intent i = new Intent(getActivity(), ReviewPageActivity.class);
         Bundle b = new Bundle();
         b.putLong(ReviewPageFragment.EXTRA_REVIEW_SURVEY_ID, mSurvey.getId());
+        b.putStringArrayList(ReviewPageFragment.EXTRA_SKIPPED_QUESTION_ID_LIST, questionsToSkip);
         i.putExtras(b);
         startActivityForResult(i, REVIEW_CODE);
     }
