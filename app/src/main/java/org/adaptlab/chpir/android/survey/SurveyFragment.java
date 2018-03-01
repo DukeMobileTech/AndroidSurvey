@@ -81,6 +81,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import io.fabric.sdk.android.Fabric;
@@ -128,11 +129,12 @@ public class SurveyFragment extends Fragment implements NavigationView
     private ArrayList<Integer> mQuestionsToSkip;
     private ArrayList<Section> mSections;
     private ArrayList<QuestionFragment> mQuestionFragments;
-    private List<Question> mQuestions;
     private ArrayList<Display> mDisplays;
     private HashMap<Question, Response> mResponses;
     private HashMap<Question, List<Option>> mOptions;
     private HashMap<Display, List<Question>> mDisplayQuestions;
+    private HashMap<String,List<Question>> mQuestionsToSkipMap;
+    private HashSet<Question> mQuestionsToSkipSet;
 //    private TextView mQuestionText;
     private TextView mDisplayIndexLabel;
     private TextView mParticipantLabel;
@@ -147,6 +149,7 @@ public class SurveyFragment extends Fragment implements NavigationView
     private String mQuestionSkipStartIdentifier;
     private HashSet<String> mQuestionMultipleSkipIdentifierSet;
     private List<MultipleSkip> mMultipleSkipList;
+    private List<Question> mQuestions;
     private LocationManager mLocationManager;
 
     //drawer vars
@@ -284,13 +287,17 @@ public class SurveyFragment extends Fragment implements NavigationView
         }
 //        mDisplays = (ArrayList<Display>) mInstrument.displays();
 //        mDisplay = mDisplays.get(mDisplayNumber);
+        mQuestions = new ArrayList<>();
         mPreviousDisplays = new ArrayList<>();
         mQuestionFragments = new ArrayList<>();
         mQuestionMultipleSkipIdentifierSet = new HashSet<>();
+        mQuestionsToSkipMap = new HashMap<>();
+        mQuestionsToSkipSet = new HashSet<>();
         ProgressDialog progressDialog = ProgressDialog.show(getActivity(), getString(R.string.instrument_loading_progress_header), getString(R.string.background_process_progress_message));
         mDisplayQuestions = mInstrument.displayQuestions();
         mResponses = mSurvey.responsesMap();
         mOptions = mInstrument.optionsMap();
+        mQuestions = mInstrument.questions();
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
@@ -576,8 +583,9 @@ public class SurveyFragment extends Fragment implements NavigationView
             mDisplayNumber = mPreviousDisplays.remove(mPreviousDisplays.size() - 1);
             mDisplay = mDisplays.get(mDisplayNumber);
             createQuestionFragments();
-            hideQuestionInDisplay();
-            hideMultipleQuestion();
+//            hideQuestionInDisplay();
+//            hideMultipleQuestion();
+            hdieQuestionsInDisplayGeneral();
             updateDisplayCountLabel();
         } else {
             mDisplayNumber -= 1;
@@ -597,8 +605,9 @@ public class SurveyFragment extends Fragment implements NavigationView
         if (mDisplayNumber < mDisplays.size()) {
             mDisplay = mDisplays.get(mDisplayNumber);
             createQuestionFragments();
-            hideQuestionInDisplay();
-            hideMultipleQuestion();
+//            hideQuestionInDisplay();
+//            hideMultipleQuestion();
+            hdieQuestionsInDisplayGeneral();
         }
         updateDisplayCountLabel();
     }
@@ -610,68 +619,131 @@ public class SurveyFragment extends Fragment implements NavigationView
             mDisplayNumber = position;
             mDisplay = mDisplays.get(mDisplayNumber);
             createQuestionFragments();
-            hideQuestionInDisplay();
-            hideMultipleQuestion();
+//            hideQuestionInDisplay();
+//            hideMultipleQuestion();
+            hdieQuestionsInDisplayGeneral();
             updateDisplayCountLabel();
         }
     }
+//
+//    private void hideQuestionInDisplay(){
+//        Question skipStartQuestion = Question.findByQuestionIdentifier(mQuestionSkipStartIdentifier);
+//        Question skipToQuestion = Question.findByQuestionIdentifier(mQuestionSkipToIdentifier);
+//        if(skipStartQuestion!=null&&skipToQuestion!=null){
+//            if(skipStartQuestion.getDisplay()==mDisplay&&skipToQuestion.getDisplay()==mDisplay){
+//                int curIndex = mDisplay.questions().indexOf(skipStartQuestion);
+//                int nextIndex = mDisplay.questions().indexOf(skipToQuestion);
+//                hideInBetweenQuestions(curIndex,nextIndex);
+//            }
+//            else if(skipStartQuestion.getDisplay()!=mDisplay&&skipToQuestion.getDisplay()==mDisplay){
+//                int nextIndex = mDisplay.questions().indexOf(skipToQuestion);
+//                hideInBetweenQuestions(-1, nextIndex);
+//            }
+//            else if(skipStartQuestion.getDisplay()==mDisplay&&skipToQuestion.getDisplay()!=mDisplay){
+//                int curIndex = mDisplay.questions().indexOf(skipStartQuestion);
+//                hideInBetweenQuestions(curIndex,-1);
+//            }
+//        }
+//    }
 
-    private void hideQuestionInDisplay(){
-        Question skipStartQuestion = Question.findByQuestionIdentifier(mQuestionSkipStartIdentifier);
-        Question skipToQuestion = Question.findByQuestionIdentifier(mQuestionSkipToIdentifier);
-        if(skipStartQuestion!=null&&skipToQuestion!=null){
-            if(skipStartQuestion.getDisplay()==mDisplay&&skipToQuestion.getDisplay()==mDisplay){
-                int curIndex = mDisplay.questions().indexOf(skipStartQuestion);
-                int nextIndex = mDisplay.questions().indexOf(skipToQuestion);
-                hideInBetweenQuestions(curIndex,nextIndex);
-            }
-            else if(skipStartQuestion.getDisplay()!=mDisplay&&skipToQuestion.getDisplay()==mDisplay){
-                int nextIndex = mDisplay.questions().indexOf(skipToQuestion);
-                hideInBetweenQuestions(-1, nextIndex);
-            }
-            else if(skipStartQuestion.getDisplay()==mDisplay&&skipToQuestion.getDisplay()!=mDisplay){
-                int curIndex = mDisplay.questions().indexOf(skipStartQuestion);
-                hideInBetweenQuestions(curIndex,-1);
+    private void updateQuestionsToSkipMap(String questionIdentifier,List<Question> questionsToSkip){
+        if(questionsToSkip==null||questionsToSkip.size()==0){
+            if(mQuestionsToSkipMap.containsKey(questionIdentifier)) {
+                mQuestionsToSkipMap.remove(questionIdentifier);
             }
         }
-    }
-
-    protected void setNextQuestion(String currentQuestionIdentifier, String
-            nextQuestionIdentifier) {
-        mQuestionSkipStartIdentifier = currentQuestionIdentifier;
-        mQuestionSkipToIdentifier = nextQuestionIdentifier;
-        Log.i("SkipsIdentifier",mQuestionSkipStartIdentifier+"   "+mQuestionSkipToIdentifier);
-        Question currentQuestion = Question.findByQuestionIdentifier(currentQuestionIdentifier);
-        Question nextQuestion = Question.findByQuestionIdentifier(nextQuestionIdentifier);
-        int currentIndex = mDisplay.questions().indexOf(currentQuestion);
-        if (nextQuestion.getDisplay() == mDisplay) {
-            int nextIndex = mDisplay.questions().indexOf(nextQuestion);
-            hideInBetweenQuestions(currentIndex, nextIndex);
-        } else {
-            hideInBetweenQuestions(currentIndex, -1);
-            mSkipToDisplay = nextQuestion.getDisplay();
-            // TODO: 2/1/18 Implement hiding questions in next display that appear before the next question skip to
-            // DONE
+        else{
+            mQuestionsToSkipMap.put(questionIdentifier, questionsToSkip);
         }
+        Log.i("Map",mQuestionsToSkipMap.toString()+" ");
     }
 
-    private void hideInBetweenQuestions(int currentIndex, int nextIndex) {
+    private void updateQuestionsToSkipSet(){
+        mQuestionsToSkipSet = new HashSet<>();
+        for(HashMap.Entry<String,List<Question>> curPair: mQuestionsToSkipMap.entrySet()){
+            for(Question curQuestion: curPair.getValue()){
+                mQuestionsToSkipSet.add(curQuestion);
+            }
+        }
+        Log.i("Set",mQuestionsToSkipSet.toString()+" ");
+    }
+
+    private void hdieQuestionsInDisplayGeneral(){
+        updateQuestionsToSkipSet();
         FragmentManager fm = getChildFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
-        for (int k = 0; k < mQuestionFragments.size(); k++) {
-            Log.i("Fragment",mQuestionFragments.get(k).toString()+"");
-            if (k <= currentIndex) {
-                ft.show(mQuestionFragments.get(k));
-            } else if (k > currentIndex && k < nextIndex) {
-                ft.hide(mQuestionFragments.get(k));
-            } else if (k > currentIndex && nextIndex == -1) {
-                ft.hide(mQuestionFragments.get(k));
-            } else {
-                ft.show(mQuestionFragments.get(k));
+        HashSet<Integer> hideSet = new HashSet<>();
+        for(Question curSkip: mQuestionsToSkipSet){
+            int index = mDisplay.questions().indexOf(curSkip);
+            if(index!=-1){
+                hideSet.add(index);
+                ft.hide(mQuestionFragments.get(index));
+            }
+        }
+        for(int i=0; i<mQuestionFragments.size(); i++){
+            if(!hideSet.contains(i)){
+                ft.show(mQuestionFragments.get(i));
             }
         }
         ft.commit();
     }
+
+//    protected void setNextQuestion(String currentQuestionIdentifier, String
+//            nextQuestionIdentifier) {
+//        mQuestionSkipStartIdentifier = currentQuestionIdentifier;
+//        mQuestionSkipToIdentifier = nextQuestionIdentifier;
+//        Log.i("SkipsIdentifier",mQuestionSkipStartIdentifier+"   "+mQuestionSkipToIdentifier);
+//        Question currentQuestion = Question.findByQuestionIdentifier(currentQuestionIdentifier);
+//        Question nextQuestion = Question.findByQuestionIdentifier(nextQuestionIdentifier);
+//        int currentIndex = mDisplay.questions().indexOf(currentQuestion);
+//        if (nextQuestion.getDisplay() == mDisplay) {
+//            int nextIndex = mDisplay.questions().indexOf(nextQuestion);
+//            hideInBetweenQuestions(currentIndex, nextIndex);
+//        } else {
+//            hideInBetweenQuestions(currentIndex, -1);
+//            mSkipToDisplay = nextQuestion.getDisplay();
+//            // TODO: 2/1/18 Implement hiding questions in next display that appear before the next question skip to
+//            // DONE
+//        }
+//    }
+
+    protected void setNextQuestion(String currentQuestionIdentifier, String
+            nextQuestionIdentifier, String questionIdentifier){
+        List<Question> skipList = new ArrayList<>();
+        boolean skipStart = false;
+        boolean skipEnd = false;
+        for(Question curQuestion: mQuestions){
+            if(curQuestion.getQuestionIdentifier().equals(nextQuestionIdentifier)){
+                skipEnd = true;
+            }
+            if(skipStart&&!skipEnd){
+                skipList.add(curQuestion);
+            }
+            if(curQuestion.getQuestionIdentifier().equals(currentQuestionIdentifier)){
+                skipStart = true;
+            }
+        }
+        updateQuestionsToSkipMap(questionIdentifier+"/skipTo", skipList);
+        hdieQuestionsInDisplayGeneral();
+    }
+
+//    private void hideInBetweenQuestions(int currentIndex, int nextIndex) {
+//        FragmentManager fm = getChildFragmentManager();
+//        FragmentTransaction ft = fm.beginTransaction();
+//        for (int k = 0; k < mQuestionFragments.size(); k++) {
+//            Log.i("Fragment",mQuestionFragments.get(k).toString()+"");
+//            if (k <= currentIndex) {
+//                ft.show(mQuestionFragments.get(k));
+//            } else if (k > currentIndex && k < nextIndex) {
+//                ft.hide(mQuestionFragments.get(k));
+//            } else if (k > currentIndex && nextIndex == -1) {
+//                ft.hide(mQuestionFragments.get(k));
+//            } else {
+//                ft.show(mQuestionFragments.get(k));
+//            }
+//        }
+//        ft.commit();
+//    }
 
 //    private void hideMultipleQuestion(){
 //        FragmentManager fm = getChildFragmentManager();
@@ -726,6 +798,31 @@ public class SurveyFragment extends Fragment implements NavigationView
     }
 
     protected void setMultipleSkipQuestions(Option selectedOption, Question currentQuestion) {
+        List<Question> skipList = new ArrayList<>();
+        List<MultipleSkip> multipleSkips = new Select().from(MultipleSkip.class)
+                .where("OptionIdentifier = ? AND QuestionIdentifier = ? AND RemoteInstrumentId = ?",
+                        selectedOption.getIdentifier(), currentQuestion.getQuestionIdentifier(),
+                        mInstrument.getRemoteId())
+                .execute();
+//        mQuestionMultipleSkipIdentifierSet = new HashSet<>();
+//        mMultipleSkipList = multipleSkips;
+//        Log.i("multipleSkips",multipleSkips.toString()+"");
+            // Questions to skip
+            for (MultipleSkip questionToSkip : multipleSkips) {
+                Question question = Question.findByQuestionIdentifier(questionToSkip
+                        .getSkipQuestionIdentifier());
+                skipList.add(question);
+
+                //mQuestionMultipleSkipIdentifierSet.add(question.getQuestionIdentifier());
+                // TODO: 2/1/18 Implement
+                //DONE
+            }
+        updateQuestionsToSkipMap(currentQuestion.getQuestionIdentifier()+"/multi",skipList);
+        hdieQuestionsInDisplayGeneral();
+//        hideMultipleQuestion();
+    }
+
+    protected void setMultipleSkipQuestions2(Option selectedOption, Question currentQuestion) {
         List<MultipleSkip> multipleSkips = new Select().from(MultipleSkip.class)
                 .where("OptionIdentifier = ? AND QuestionIdentifier = ? AND RemoteInstrumentId = ?",
                         selectedOption.getIdentifier(), currentQuestion.getQuestionIdentifier(),
@@ -734,14 +831,14 @@ public class SurveyFragment extends Fragment implements NavigationView
         mQuestionMultipleSkipIdentifierSet = new HashSet<>();
         mMultipleSkipList = multipleSkips;
         Log.i("multipleSkips",multipleSkips.toString()+"");
-            // Questions to skip
-            for (MultipleSkip questionToSkip : multipleSkips) {
-                Question question = Question.findByQuestionIdentifier(questionToSkip
-                        .getSkipQuestionIdentifier());
-                mQuestionMultipleSkipIdentifierSet.add(question.getQuestionIdentifier());
-                // TODO: 2/1/18 Implement
-                //DONE
-            }
+        // Questions to skip
+        for (MultipleSkip questionToSkip : multipleSkips) {
+            Question question = Question.findByQuestionIdentifier(questionToSkip
+                    .getSkipQuestionIdentifier());
+            mQuestionMultipleSkipIdentifierSet.add(question.getQuestionIdentifier());
+            // TODO: 2/1/18 Implement
+            //DONE
+        }
         hideMultipleQuestion();
     }
 
