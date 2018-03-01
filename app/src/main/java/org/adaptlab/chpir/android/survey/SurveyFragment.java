@@ -624,6 +624,7 @@ public class SurveyFragment extends Fragment implements NavigationView
     private void updateQuestionsToSkipMap(String questionIdentifier, List<Question> questionsToSkip) {
         if (questionsToSkip == null || questionsToSkip.size() == 0) {
             if (mQuestionsToSkipMap.containsKey(questionIdentifier)) {
+                Log.i("Remove",questionIdentifier+"Removed");
                 mQuestionsToSkipMap.remove(questionIdentifier);
             }
         } else {
@@ -683,18 +684,16 @@ public class SurveyFragment extends Fragment implements NavigationView
             nextQuestionIdentifier, String questionIdentifier) {
         List<Question> skipList = new ArrayList<>();
         boolean skipStart = false;
-        boolean skipEnd = false;
         for (Question curQuestion : mQuestions) {
-            if (curQuestion.getQuestionIdentifier().equals(nextQuestionIdentifier)) {
-                skipEnd = true;
-            }
-            if (skipStart && !skipEnd) {
-                skipList.add(curQuestion);
-            }
+            if(skipStart) skipList.add(curQuestion);
             if (curQuestion.getQuestionIdentifier().equals(currentQuestionIdentifier)) {
                 skipStart = true;
             }
+            if(curQuestion.getQuestionIdentifier().equals(nextQuestionIdentifier)){
+                break;
+            }
         }
+        Log.i("SkipList",skipList.toString()+"");
         updateQuestionsToSkipMap(questionIdentifier + "/skipTo", skipList);
         hideQuestionsInDisplayGeneral();
     }
