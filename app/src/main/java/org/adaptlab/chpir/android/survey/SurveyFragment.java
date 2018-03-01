@@ -19,6 +19,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -147,6 +148,7 @@ public class SurveyFragment extends Fragment implements NavigationView
     private HashSet<String> mQuestionMultipleSkipIdentifierSet;
     private List<MultipleSkip> mMultipleSkipList;
     private LocationManager mLocationManager;
+    private NestedScrollView mScrollView;
 
     //drawer vars
     private DrawerLayout mDrawerLayout;
@@ -159,6 +161,7 @@ public class SurveyFragment extends Fragment implements NavigationView
     private boolean mNavDrawerSet = false;
     private boolean showSectionView = true;
     private boolean isActivityFinished = false;
+    private boolean isScreenRotated = false;
 
 //    public void loadOrCreateQuestion() {
 //        mPreviousQuestions = new ArrayList<>();
@@ -251,15 +254,8 @@ public class SurveyFragment extends Fragment implements NavigationView
             launchRosterSurvey();
             if (!mInstrument.isRoster()) {
                 mSurvey = Survey.load(Survey.class, savedInstanceState.getLong(EXTRA_SURVEY_ID));
-                mQuestionNumber = savedInstanceState.getInt(EXTRA_QUESTION_NUMBER);
-                mPreviousQuestions = savedInstanceState.getIntegerArrayList
-                        (EXTRA_PREVIOUS_QUESTION_IDS);
-                mQuestionsToSkip = savedInstanceState.getIntegerArrayList
-                        (EXTRA_QUESTIONS_TO_SKIP_IDS);
             }
             mDisplayNumber = savedInstanceState.getInt(EXTRA_DISPLAY_NUMBER);
-            mDisplays = (ArrayList<Display>) mInstrument.displays();
-            mDisplay = mDisplays.get(mDisplayNumber);
         } else {
             Long instrumentId = getActivity().getIntent().getLongExtra(EXTRA_INSTRUMENT_ID, -1);
             mMetadata = getActivity().getIntent().getStringExtra(EXTRA_PARTICIPANT_METADATA);
@@ -271,17 +267,8 @@ public class SurveyFragment extends Fragment implements NavigationView
             if (!mInstrument.isRoster()) {
                 loadOrCreateSurvey();
             }
-            mDisplays = (ArrayList<Display>) mInstrument.displays();
-//            mQuestionNumber = getActivity().getIntent().getIntExtra(EXTRA_QUESTION_NUMBER, -1);
-//            if (mQuestionNumber == -1) {
-//                mDisplayNumber = 0;
-//            } else {
-            mDisplay = mSurvey.getLastQuestion().getDisplay();
-            mDisplayNumber = mDisplay.getPosition() - 1;
-//            }
+            mDisplayNumber = mSurvey.getLastQuestion().getDisplay().getPosition() - 1;
         }
-//        mDisplays = (ArrayList<Display>) mInstrument.displays();
-//        mDisplay = mDisplays.get(mDisplayNumber);
         mPreviousDisplays = new ArrayList<>();
         mQuestionFragments = new ArrayList<>();
         mQuestionMultipleSkipIdentifierSet = new HashSet<>();
@@ -291,6 +278,8 @@ public class SurveyFragment extends Fragment implements NavigationView
         mDisplayQuestions = mInstrument.displayQuestions();
         mResponses = mSurvey.responsesMap();
         mOptions = mInstrument.optionsMap();
+        mDisplays = (ArrayList<Display>) mInstrument.displays();
+        mDisplay = mDisplays.get(mDisplayNumber);
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
@@ -363,6 +352,7 @@ public class SurveyFragment extends Fragment implements NavigationView
                 return mGestureDetector.onTouchEvent(event);
             }
         });
+        mScrollView = v.findViewById(R.id.survey_fragment_scroll_view);
 
         return v;
     }
@@ -391,17 +381,13 @@ public class SurveyFragment extends Fragment implements NavigationView
         refreshView();
     }
 
-    // TODO: 2/19/18 Fix
     @Override
     public void onSaveInstanceState(Bundle outState) {
-//        mAllowFragmentCommit = false;
         super.onSaveInstanceState(outState);
-        outState.putInt(EXTRA_QUESTION_NUMBER, mQuestionNumber);
         outState.putInt(EXTRA_DISPLAY_NUMBER, mDisplayNumber);
         outState.putLong(EXTRA_INSTRUMENT_ID, mInstrument.getRemoteId());
         outState.putLong(EXTRA_SURVEY_ID, mSurvey.getId());
-        outState.putIntegerArrayList(EXTRA_PREVIOUS_QUESTION_IDS, mPreviousQuestions);
-        outState.putIntegerArrayList(EXTRA_QUESTIONS_TO_SKIP_IDS, mQuestionsToSkip);
+        isScreenRotated = true;
     }
 
     @Override
@@ -634,7 +620,6 @@ public class SurveyFragment extends Fragment implements NavigationView
             nextQuestionIdentifier) {
         mQuestionSkipStartIdentifier = currentQuestionIdentifier;
         mQuestionSkipToIdentifier = nextQuestionIdentifier;
-        Log.i("SkipsIdentifier", mQuestionSkipStartIdentifier + "   " + mQuestionSkipToIdentifier);
         Question currentQuestion = Question.findByQuestionIdentifier(currentQuestionIdentifier);
         Question nextQuestion = Question.findByQuestionIdentifier(nextQuestionIdentifier);
         int currentIndex = mDisplay.questions().indexOf(currentQuestion);
@@ -654,7 +639,6 @@ public class SurveyFragment extends Fragment implements NavigationView
         FragmentManager fm = getChildFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
         for (int k = 0; k < mQuestionFragments.size(); k++) {
-            Log.i("Fragment", mQuestionFragments.get(k).toString() + "");
             if (k <= currentIndex) {
                 ft.show(mQuestionFragments.get(k));
             } else if (k > currentIndex && k < nextIndex) {
@@ -894,7 +878,7 @@ public class SurveyFragment extends Fragment implements NavigationView
 
                     String qfTag = mSurvey.getId().toString() + "-" + question.getId().toString();
                     QuestionFragment questionFragment = (QuestionFragment) fm.findFragmentByTag(qfTag);
-                    if (questionFragment == null) {
+                    if (questionFragment == null || isScreenRotated) {
                         Bundle bundle = new Bundle();
                         bundle.putString("QuestionIdentifier", question.getQuestionIdentifier());
                         questionFragment = (QuestionFragment) QuestionFragmentFactory
@@ -962,7 +946,11 @@ public class SurveyFragment extends Fragment implements NavigationView
         return null;
     }
 
-    public List<Question> getQuestions(Display display) {
+    protected NestedScrollView getScrollView() {
+        return mScrollView;
+    }
+
+    protected List<Question> getQuestions(Display display) {
         return mDisplayQuestions.get(display);
     }
 
@@ -978,9 +966,9 @@ public class SurveyFragment extends Fragment implements NavigationView
         return mOptions;
     }
 
-    private void setGridLabelText(TextView view) {
-        view.setText(styleTextWithHtml(mGrid.getText()));
-    }
+//    private void setGridLabelText(TextView view) {
+//        view.setText(styleTextWithHtml(mGrid.getText()));
+//    }
 
     /*
      * If a question has a skip pattern, then read the response

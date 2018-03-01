@@ -50,12 +50,12 @@ public class SelectMultipleQuestionFragment extends QuestionFragment {
 
     @Override
     protected String serialize() {
-        String serialized = "";
+        StringBuilder serialized = new StringBuilder();
         for (int i = 0; i < mResponseIndices.size(); i++) {
-            serialized += mResponseIndices.get(i);
-            if (i < mResponseIndices.size() - 1) serialized += LIST_DELIMITER;
+            serialized.append(mResponseIndices.get(i));
+            if (i < mResponseIndices.size() - 1) serialized.append(LIST_DELIMITER);
         }
-        return serialized;
+        return serialized.toString();
     }
 
     @Override

@@ -193,6 +193,12 @@ public abstract class QuestionFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        mSurveyFragment.getScrollView().fullScroll(View.FOCUS_UP);
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
 //        hideKeyBoard();
