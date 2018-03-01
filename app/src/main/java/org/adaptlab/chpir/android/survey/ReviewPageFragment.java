@@ -44,7 +44,7 @@ public class ReviewPageFragment extends ListFragment {
 	@Override
     public void onListItemClick(ListView l, View v, int position, long id) {
 		Question question = ((QuestionAdapter) getListAdapter()).getItem(position);
-		if (question != null) setReturnResults(question.getNumberInInstrument() - 1);
+		if (question != null) setReturnResults(question.getDisplay().getPosition() - 1);
 	}
 	
 	@Override
@@ -67,7 +67,7 @@ public class ReviewPageFragment extends ListFragment {
 			if (mSkippedQuestions.size() == 0) {
 				setReturnResults(0);
 			} else {
-				setReturnResults(mSkippedQuestions.get(0).getNumberInInstrument() - 1);
+				setReturnResults(mSkippedQuestions.get(0).getDisplay().getPosition() - 1);
 			}
             return true;
 		case R.id.menu_item_complete:
@@ -80,7 +80,7 @@ public class ReviewPageFragment extends ListFragment {
 	
 	private void setReturnResults(int num) {
 		Intent i = new Intent();
-		i.putExtra(SurveyFragment.EXTRA_QUESTION_NUMBER, num);
+		i.putExtra(SurveyFragment.EXTRA_DISPLAY_NUMBER, num);
 		getActivity().setResult(Activity.RESULT_OK, i);
 		getActivity().finish();
 	}

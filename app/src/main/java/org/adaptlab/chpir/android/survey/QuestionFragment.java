@@ -1,5 +1,6 @@
 package org.adaptlab.chpir.android.survey;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -8,12 +9,12 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -38,6 +39,13 @@ import java.util.List;
 import static org.adaptlab.chpir.android.survey.FormatUtils.styleTextWithHtml;
 
 public abstract class QuestionFragment extends Fragment {
+    public final static String EXTRA_INSTRUMENT_ID = "org.adaptlab.chpir.android.survey" +
+            ".instrument_id";
+    public final static String EXTRA_RESPONSE_ID = "org.adaptlab.chpir.android.survey" +
+            ".response_id";
+    public final static String EXTRA_SURVEY_ID = "org.adaptlab.chpir.android.survey.survey_id";
+    public final static String EXTRA_QUESTION_ID = "org.adaptlab.chpir.android.survey" +
+            ".question_id";
     protected final static String LIST_DELIMITER = ",";
     private final static String TAG = "QuestionFragment";
     public TextView mValidationTextView;
@@ -56,7 +64,24 @@ public abstract class QuestionFragment extends Fragment {
         setHasOptionsMenu(true);
         mSurveyFragment = (SurveyFragment) getParentFragment();
         if (mSurveyFragment == null) return;
-        init();
+        if (savedInstanceState == null) {
+            init();
+        } else {
+            mInstrument = Instrument.load(Instrument.class, savedInstanceState.getLong(EXTRA_INSTRUMENT_ID));
+            mSurvey = Survey.load(Survey.class, savedInstanceState.getLong(EXTRA_SURVEY_ID));
+            mQuestion = Question.load(Question.class, savedInstanceState.getLong(EXTRA_QUESTION_ID));
+            mResponse = Response.load(Response.class, savedInstanceState.getLong(EXTRA_RESPONSE_ID));
+            mOptions = mSurveyFragment.getOptions().get(mQuestion);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong(EXTRA_INSTRUMENT_ID, mInstrument.getId());
+        outState.putLong(EXTRA_SURVEY_ID, mSurvey.getId());
+        outState.putLong(EXTRA_QUESTION_ID, mQuestion.getId());
+        outState.putLong(EXTRA_RESPONSE_ID, mResponse.getId());
     }
 
     public void init() {
@@ -89,7 +114,6 @@ public abstract class QuestionFragment extends Fragment {
             response.setSurvey(mSurvey);
             response.save();
             mSurveyFragment.getResponses().put(mQuestion, response);
-            mSurveyFragment.refreshView();
         }
         return response;
     }
@@ -99,24 +123,9 @@ public abstract class QuestionFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_question_factory, parent, false);
 
         ViewGroup questionComponent = (LinearLayout) v.findViewById(R.id.question_component);
-        mQuestionText = (TextView) v.findViewById(R.id.question_text);
-        mValidationTextView = (TextView) v.findViewById(R.id.validation_text);
+        mQuestionText = v.findViewById(R.id.question_text);
+        mValidationTextView = v.findViewById(R.id.validation_text);
         mQuestionText.setTypeface(mInstrument.getTypeFace(getActivity().getApplicationContext()));
-
-//        String instructions = "";
-//        if (!TextUtils.isEmpty(mQuestion.getInstructions()) && !mQuestion.getInstructions()
-//                .equals("null")) {
-//            instructions = mQuestion.getInstructions();
-//        }
-//        if (TextUtils.isEmpty(instructions)) {
-//            mQuestionText.setText(Html.fromHtml(mQuestion.getNumberInInstrument() + "<br />" +
-//                    mQuestion.getText()));
-//        } else {
-//            mQuestionText.setText(Html.fromHtml(mQuestion.getNumberInInstrument() + "<br />" +
-//                    instructions + "<br />" + mQuestion.getText()));
-//
-//        }
-
         setQuestionText();
 
         // Overridden by subclasses to place their graphical elements on the fragment.
@@ -125,7 +134,11 @@ public abstract class QuestionFragment extends Fragment {
             deserialize(mResponse.getText());
         }
 
-        mSpecialResponses = (RadioGroup) v.findViewById(R.id.special_responses_container);
+        setResponseSkips();
+        setSpecialResponseSkips();
+        refreshFollowUpQuestion();
+
+        mSpecialResponses = v.findViewById(R.id.special_responses_container);
         List<String> responses = new ArrayList<>();
         if (mQuestion.hasSpecialOptions()) {
             for (Option option : mQuestion.specialOptions()) {
@@ -147,7 +160,6 @@ public abstract class QuestionFragment extends Fragment {
                 public void onClick(View v) {
                     unSetResponse();
                     setSpecialResponse(finalResponses.get(v.getId()));
-//                    setResponseText(); // TODO: 2/7/18 Do in unSetResponse
                 }
             });
         }
@@ -167,6 +179,27 @@ public abstract class QuestionFragment extends Fragment {
     }
 
     protected abstract void unSetResponse();
+
+    /*
+     * This will remove the focus of the input as the survey is
+     * traversed.  If this is not called, then it will be possible
+     * for someone to change the answer to a question that they are
+     * not currently viewing.
+     */
+    private void removeTextFocus() {
+        if (getActivity().getCurrentFocus() != null) {
+            InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService
+                    (Context.INPUT_METHOD_SERVICE);
+            inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken()
+                    , InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mSurveyFragment.getScrollView().fullScroll(View.FOCUS_UP);
+    }
 
     @Override
     public void onPause() {
@@ -235,6 +268,7 @@ public abstract class QuestionFragment extends Fragment {
 //            new SaveResponseTask().execute(mResponse);
             mResponse.save();
             mSurvey.save();
+            removeTextFocus();
             setSpecialResponseSkips();
             refreshFollowUpQuestion();
         }
@@ -292,6 +326,9 @@ public abstract class QuestionFragment extends Fragment {
 //        new SaveResponseTask().execute(mResponse);
         mResponse.save();
         mSurvey.save();
+        if (!mQuestion.isTextEntryQuestionType()) {
+            removeTextFocus();
+        }
         setResponseSkips();
         refreshFollowUpQuestion();
     }
@@ -307,7 +344,7 @@ public abstract class QuestionFragment extends Fragment {
             int responseIndex = Integer.parseInt(mResponse.getText());
             if (mQuestion.isOtherQuestionType() && responseIndex == mQuestion.options().size()) {
                 mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion
-                        .getQuestionIdentifier(),mQuestion.getQuestionIdentifier());
+                        .getQuestionIdentifier(), mQuestion.getQuestionIdentifier());
 
             } else {
                 Option selectedOption = mQuestion.options().get(Integer.parseInt(mResponse
@@ -317,19 +354,19 @@ public abstract class QuestionFragment extends Fragment {
 //                    mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), skipOption
 //                            .getNextQuestionIdentifier());
                     mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), skipOption
-                            .getNextQuestionIdentifier(),mQuestion.getQuestionIdentifier());
+                            .getNextQuestionIdentifier(), mQuestion.getQuestionIdentifier());
                 } else if (mQuestion.hasSkips(mInstrument)) {
 //                    mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion
 //                            .getQuestionIdentifier());
                     mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion
-                            .getQuestionIdentifier(),mQuestion.getQuestionIdentifier());
+                            .getQuestionIdentifier(), mQuestion.getQuestionIdentifier());
                 }
                 mSurveyFragment.setMultipleSkipQuestions(selectedOption, mQuestion);
             }
         } else if (mQuestion.isMultipleSkipQuestion(mInstrument) && !TextUtils.isEmpty(mResponse
                 .getText())) {
             Option selectedOption = mQuestion.options().get(Integer.parseInt(mResponse.getText()));
-             mSurveyFragment.setMultipleSkipQuestions(selectedOption, mQuestion);
+            mSurveyFragment.setMultipleSkipQuestions(selectedOption, mQuestion);
         }
     }
 
@@ -360,13 +397,13 @@ public abstract class QuestionFragment extends Fragment {
 //                    mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(),
 //                            specialSkipOption.getNextQuestionIdentifier());
                     mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(),
-                            specialSkipOption.getNextQuestionIdentifier(),mQuestion.getQuestionIdentifier());
+                            specialSkipOption.getNextQuestionIdentifier(), mQuestion.getQuestionIdentifier());
                 } else if (mQuestion.hasSpecialSkips(mInstrument)) {
                     mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion
-                            .getQuestionIdentifier(),mQuestion.getQuestionIdentifier());
+                            .getQuestionIdentifier(), mQuestion.getQuestionIdentifier());
                 }
             }
-            if (mQuestion.isMultipleSkipQuestion(mInstrument) && !TextUtils.isEmpty(mResponse.getSpecialResponse())){
+            if (mQuestion.isMultipleSkipQuestion(mInstrument) && !TextUtils.isEmpty(mResponse.getSpecialResponse())) {
                 mSurveyFragment.setMultipleSkipQuestions(specialOption, mQuestion);
             }
         }
@@ -432,14 +469,12 @@ public abstract class QuestionFragment extends Fragment {
      * If this question is not a following up question, then just
      * set the text as normal.
      */
-    protected boolean setQuestionText() {
+    protected void setQuestionText() {
         appendNumberAndInstructions(mQuestionText);
         if (mQuestion.isFollowUpQuestion()) {
             String followUpText = mQuestion.getFollowingUpText(mSurveyFragment.getResponses(),
                     getActivity());
-            if (followUpText == null) {
-                return false;
-            } else {
+            if (followUpText != null) {
                 mQuestionText.append(styleTextWithHtml(followUpText));
             }
         } else if (mQuestion.hasRandomizedFactors()) {
@@ -448,7 +483,6 @@ public abstract class QuestionFragment extends Fragment {
         } else {
             mQuestionText.append(styleTextWithHtml(mQuestion.getText()));
         }
-        return true;
     }
 
     /*
