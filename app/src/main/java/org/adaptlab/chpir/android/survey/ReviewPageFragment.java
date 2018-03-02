@@ -15,11 +15,14 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.adaptlab.chpir.android.survey.models.Display;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Survey;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 
@@ -44,6 +47,7 @@ public class ReviewPageFragment extends ListFragment {
 				mSkippedQuestions.add(curQuestion);
 			}
 		}
+		sortReviewQuestions();
         setListAdapter(new QuestionAdapter(mSkippedQuestions));
         getActivity().setTitle(getActivity().getResources().getString(R.string.skipped_questions));
 	}
@@ -83,6 +87,15 @@ public class ReviewPageFragment extends ListFragment {
 		default:
 			return super.onOptionsItemSelected(item);		
 		}
+	}
+
+	private void sortReviewQuestions(){
+		Collections.sort(mSkippedQuestions, new Comparator<Question>() {
+			@Override
+			public int compare(Question lhs, Question rhs) {
+				return lhs.getNumberInInstrument() < rhs.getNumberInInstrument() ? -1 : 1;
+			}
+		});
 	}
 	
 	private void setReturnResults(int num) {
