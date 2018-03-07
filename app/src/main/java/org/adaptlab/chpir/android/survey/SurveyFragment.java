@@ -586,8 +586,10 @@ public class SurveyFragment extends Fragment implements NavigationView
         for (Question curSkip : mQuestionsToSkipSet) {
             int index = mDisplay.questions().indexOf(curSkip);
             if (index != -1) {
+                QuestionFragment curQuestionFragment = mQuestionFragments.get(index);
+                curQuestionFragment.unSetAllResponses();
                 hideSet.add(index);
-                ft.hide(mQuestionFragments.get(index));
+                ft.hide(curQuestionFragment);
             }
         }
         for (int i = 0; i < mQuestionFragments.size(); i++) {
