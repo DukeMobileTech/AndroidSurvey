@@ -4,6 +4,7 @@ import android.content.Context;
 import android.text.Html;
 import android.text.Spanned;
 
+import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.Option;
 
 import java.util.GregorianCalendar;
@@ -66,11 +67,11 @@ public class FormatUtils {
         }
     }
     
-    public static String unformatMultipleResponses(List<Option> options, String responseText, Context context) {
+    public static String unformatMultipleResponses(List<Option> options, String responseText, Context context, Instrument instrument) {
         String[] responses = responseText.split(",");
         String multipleText = "";
         for (int i = 0; i < responses.length; i++) {
-            multipleText += options.get(Integer.parseInt(responses[i])).getText();
+            multipleText += options.get(Integer.parseInt(responses[i])).getText(instrument);
             if (i < responses.length - 2) multipleText += context.getString(R.string.comma) + context.getString(R.string.space);
             else if (i == responses.length - 2) multipleText += context.getString(R.string.space)
                     + context.getString(R.string.and) + context.getString(R.string.space);

@@ -71,7 +71,7 @@ public class DatabaseSeed {
     private static void setOptions(Question q, int num) {
         for (int i = 0; i < num; i++) {
             Option option = new Option();
-            option.setQuestion(q);
+//            option.setQuestion(q);
             option.setText("This is option " + i);
             option.setRemoteId(new Long(i));
             option.save();

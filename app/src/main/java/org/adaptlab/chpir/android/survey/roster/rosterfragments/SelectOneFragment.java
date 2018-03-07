@@ -12,7 +12,7 @@ public class SelectOneFragment extends RosterFragment {
         RadioGroup mRadioGroup = new RadioGroup(getActivity());
 
         for (int i = 0; i < getQuestion().defaultOptions().size(); i++) {
-            String option = getQuestion().defaultOptions().get(i).getText();
+            String option = getQuestion().defaultOptions().get(i).getText(getQuestion().getInstrument());
             RadioButton radioButton = new RadioButton(getActivity());
             radioButton.setText(option);
             radioButton.setId(i);

@@ -12,7 +12,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
-import java.util.StringTokenizer;
 
 @Table(name = "Displays")
 public class Display extends ReceiveModel {
@@ -76,9 +75,11 @@ public class Display extends ReceiveModel {
     }
 
     public List<Option> options() {
-        return new Select().from(Option.class)
-                .where("RemoteOptionSetId = ? AND Deleted != ?",
-                        questions().get(0).getRemoteOptionId(), 1)
+        return new Select("Options.*").distinct().from(Option.class)
+                .innerJoin(OptionInOptionSet.class)
+                .on("OptionInOptionSets.RemoteOptionSetId = ?", questions().get(0).getRemoteOptionSetId())
+                .where("Options.Deleted != 1 AND OptionInOptionSets.Special = 0 AND OptionInOptionSets.RemoteOptionId = Options.RemoteId")
+                .orderBy("OptionInOptionSets.NumberInQuestion ASC")
                 .execute();
     }
 

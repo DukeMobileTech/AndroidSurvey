@@ -30,7 +30,7 @@ public class SelectOneQuestionFragment extends QuestionFragment {
         for (Option option : getOptions()) {
             int optionId = getOptions().indexOf(option);
             RadioButton radioButton = new RadioButton(getActivity());
-            radioButton.setText(option.getText());
+            radioButton.setText(option.getText(getInstrument()));
             radioButton.setId(optionId);
             radioButton.setTypeface(getInstrument().getTypeFace(getActivity()
                     .getApplicationContext()));

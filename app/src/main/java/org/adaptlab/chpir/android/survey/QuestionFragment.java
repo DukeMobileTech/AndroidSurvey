@@ -28,6 +28,7 @@ import com.activeandroid.query.Select;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.NextQuestion;
 import org.adaptlab.chpir.android.survey.models.Option;
+import org.adaptlab.chpir.android.survey.models.OptionInOptionSet;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.ResponsePhoto;
@@ -101,6 +102,7 @@ public abstract class QuestionFragment extends Fragment {
         mInstrument = mSurvey.getInstrument();
         if (mSurveyFragment.getOptions() != null) {
             mOptions = mSurveyFragment.getOptions().get(mQuestion);
+            if (mOptions == null) mOptions = new ArrayList<>();
         }
         setResponseSkips();
         setSpecialResponseSkips();
@@ -142,9 +144,12 @@ public abstract class QuestionFragment extends Fragment {
         mSpecialResponses = v.findViewById(R.id.special_responses_container);
         List<String> responses = new ArrayList<>();
         if (mQuestion.hasSpecialOptions()) {
+            Log.i(TAG, "has special options " + mQuestion.specialOptions().size());
             for (Option option : mQuestion.specialOptions()) {
-                responses.add(option.getText());
+                responses.add(option.getText(mQuestion.getInstrument()));
             }
+        } else {
+            Log.i(TAG, "No special options");
         }
 
         for (String response : responses) {
@@ -250,7 +255,7 @@ public abstract class QuestionFragment extends Fragment {
         return mSurvey;
     }
 
-    public Instrument getInstrument() {
+    protected Instrument getInstrument() {
         return mInstrument;
     }
 
@@ -385,27 +390,17 @@ public abstract class QuestionFragment extends Fragment {
                 .executeSingle();
     }
 
-    // TODO: Special option multiple skips
-    // DONE
     private void setSpecialResponseSkips() {
         if (!TextUtils.isEmpty(mResponse.getSpecialResponse()) && mQuestion.hasSpecialOptions()) {
-            Option specialOption = new Select().from(Option.class).where("Text = ? AND " +
-                    "RemoteOptionSetId = ?", mResponse.getSpecialResponse(), mQuestion
-                    .getRemoteSpecialOptionSetId()).executeSingle();
-//            Option selectedSpecialOption = new Option();
-//            for(Option curSpecialOption: mQuestion.specialOptions()){
-//                if(curSpecialOption.getText().equals(mResponse.getSpecialResponse().toString())){
-//                    selectedSpecialOption = curSpecialOption;
-//                }
-//            }
-//            Log.i("TestSelectSpecialOption",specialOption.getText()+" "+selectedSpecialOption.getText()+" ");
+            Option specialOption = new Select("Options.*").distinct().from(Option.class)
+                    .innerJoin(OptionInOptionSet.class)
+                    .on("OptionInOptionSets.RemoteOptionSetId = ?", mQuestion.getRemoteSpecialOptionSetId())
+                    .where("Options.Text = ? AND OptionInOptionSets.RemoteOptionId = Options.RemoteId",
+                            mResponse.getSpecialResponse())
+                    .executeSingle();
             if (specialOption != null) {
-                Log.i("specialOption",specialOption.toString()+" ");
                 NextQuestion specialSkipOption = getNextQuestion(specialOption);
                 if (specialSkipOption != null) {
-                    Log.i("specialSkipOption",specialSkipOption.toString()+" ");
-//                    mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(),
-//                            specialSkipOption.getNextQuestionIdentifier());
                     mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(),
                             specialSkipOption.getNextQuestionIdentifier(), mQuestion.getQuestionIdentifier());
                 } else if (mQuestion.hasSpecialSkips(mInstrument)) {

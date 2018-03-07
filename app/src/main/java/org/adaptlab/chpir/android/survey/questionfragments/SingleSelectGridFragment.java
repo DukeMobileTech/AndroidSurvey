@@ -19,6 +19,8 @@ import org.adaptlab.chpir.android.survey.models.Question;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.adaptlab.chpir.android.survey.FormatUtils.styleTextWithHtml;
+
 public class SingleSelectGridFragment extends GridFragment {
     private static final String TAG = "SingleSelectGridFragment";
     private int mIndex;
@@ -114,7 +116,7 @@ public class SingleSelectGridFragment extends GridFragment {
         questionNumber.setLayoutParams(questionNumberParams);
         questionRow.addView(questionNumber);
         TextView questionText = new TextView(getActivity());
-        questionText.setText(q.getText());
+        questionText.setText(styleTextWithHtml(q.getText()));
         questionText.setMinHeight(MIN_HEIGHT);
         questionRow.addView(questionText);
         questionTextLayout.addView(questionRow, k);
@@ -133,7 +135,7 @@ public class SingleSelectGridFragment extends GridFragment {
         rowWidths = new Integer[gridLabels.size()];
         labelWidths = new Integer[gridLabels.size()];
         for (int k = 0; k < gridLabels.size(); k++) {
-            TextView textView = getHeaderTextView(gridLabels.get(k).getText());
+            TextView textView = getHeaderTextView(gridLabels.get(k).getText(getInstrument()));
             headerTableLayout.addView(textView);
             setRowWidth(headerTableLayout, textView, k);
             setLabelWidth(headerTableLayout, textView, k);

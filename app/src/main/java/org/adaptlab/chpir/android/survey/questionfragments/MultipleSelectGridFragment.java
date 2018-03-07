@@ -25,6 +25,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.adaptlab.chpir.android.survey.FormatUtils.styleTextWithHtml;
+
 public class MultipleSelectGridFragment extends GridFragment {
 
     private static final String TAG = "MultipleSelectGridFragment";
@@ -73,7 +75,7 @@ public class MultipleSelectGridFragment extends GridFragment {
         labelWidths = new Integer[gridLabels.size()];
         final List<TextView> headers = new ArrayList<>();
         for (int k = 0; k < gridLabels.size(); k++) {
-            TextView textView = getHeaderTextView(gridLabels.get(k).getText());
+            TextView textView = getHeaderTextView(gridLabels.get(k).getText(getInstrument()));
             headerTableLayout.addView(textView);
             setRowWidth(headerTableLayout, textView, k);
             setLabelWidth(headerTableLayout, textView, k);
@@ -166,7 +168,7 @@ public class MultipleSelectGridFragment extends GridFragment {
         questionNumber.setLayoutParams(questionNumberParams);
         questionRow.addView(questionNumber);
         TextView questionText = new TextView(getActivity());
-        questionText.setText(q.getText());
+        questionText.setText(styleTextWithHtml(q.getText()));
         questionText.setMinHeight(MIN_HEIGHT);
         questionRow.addView(questionText);
         questionTextLayout.addView(questionRow, k);

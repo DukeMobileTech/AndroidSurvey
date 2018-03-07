@@ -134,15 +134,15 @@ public class Question extends ReceiveModel {
             mRegExValidationMessage = message;
     }
 
-    public boolean hasSkipPattern() {
-        for (Option option : defaultOptions()) {
-            if (option.getNextQuestion() != null &&
-                    !option.getNextQuestion().getQuestionIdentifier().equals("")) {
-                return true;
-            }
-        }
-        return false;
-    }
+//    public boolean hasSkipPattern() {
+//        for (Option option : defaultOptions()) {
+//            if (option.getNextQuestion() != null &&
+//                    !option.getNextQuestion().getQuestionIdentifier().equals("")) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
     public boolean isSkipQuestionType() {
         return (getQuestionType() == QuestionType.SELECT_ONE || getQuestionType() == QuestionType.SELECT_ONE_WRITE_OTHER);
@@ -164,24 +164,13 @@ public class Question extends ReceiveModel {
         return (skipOptions.size() > 0);
     }
 
-    public boolean hasCompleteSurveyOption() {
-        Option completeSurveyOption = new Select().from(Option.class)
-                .where("Question = ? AND Deleted != ? AND Special = ? AND CompleteSurvey = ?",
-                        getId(), 1, 0, 1)
-                .executeSingle();
-        return completeSurveyOption != null;
-    }
-
-    public List<Option> defaultOptions() {
-//        return new Select().from(Option.class)
-//                .where("Question = ? AND Deleted != ? AND Special = ?", getId(), 1, 0)
-//                .orderBy("NumberInQuestion ASC")
-//                .execute();
-        return new Select().from(Option.class)
-                .where("RemoteOptionSetId = ? AND Deleted != ? AND Special = ?", getRemoteOptionId(), 1, 0)
-                .orderBy("NumberInQuestion ASC")
-                .execute();
-    }
+//    public boolean hasCompleteSurveyOption() {
+//        Option completeSurveyOption = new Select().from(Option.class)
+//                .where("Question = ? AND Deleted != ? AND Special = ? AND CompleteSurvey = ?",
+//                        getId(), 1, 0, 1)
+//                .executeSingle();
+//        return completeSurveyOption != null;
+//    }
 
     public String getQuestionIdentifier() {
         return mQuestionIdentifier;
@@ -326,11 +315,11 @@ public class Question extends ReceiveModel {
         String text = response.getText();
         try {
             if (hasMultipleResponses()) {
-                return FormatUtils.unformatMultipleResponses(defaultOptions(), text, context);
+                return FormatUtils.unformatMultipleResponses(defaultOptions(), text, context, getInstrument());
             } else if (Integer.parseInt(text) == defaultOptions().size()) {
                 return (response.getOtherResponse() == null) ? "Other" : response.getOtherResponse();
             } else {
-                return defaultOptions().get(Integer.parseInt(text)).getText();
+                return defaultOptions().get(Integer.parseInt(text)).getText(getInstrument());
             }
         } catch (NumberFormatException nfe) {
             Log.e(TAG, text + " is not an option number");
@@ -449,15 +438,10 @@ public class Question extends ReceiveModel {
 //            if (!jsonObject.isNull("section_id")) {
 //                question.setSection(Section.findByRemoteId(jsonObject.getLong("section_id")));
 //            }
+
             question.setRemoteId(remoteId);
-            if (jsonObject.isNull("deleted_at")) {
-                question.setDeleted(false);
-            } else {
-                question.setDeleted(true);
-            }
-            if (!jsonObject.isNull("critical")) {
-                question.setCritical(jsonObject.getBoolean("critical"));
-            }
+            question.setDeleted(jsonObject.optBoolean("deleted_at", false));
+            question.setCritical(jsonObject.optBoolean("critical", false));
             question.setRemoteOptionSetId(jsonObject.optLong("option_set_id"));
             question.setRemoteSpecialOptionSetId(jsonObject.optLong("special_option_set_id"));
             question.save();
@@ -497,7 +481,7 @@ public class Question extends ReceiveModel {
         mRemoteOptionSetId = id;
     }
 
-    public Long getRemoteOptionId() {
+    protected Long getRemoteOptionSetId() {
         return mRemoteOptionSetId;
     }
 
@@ -565,34 +549,20 @@ public class Question extends ReceiveModel {
         return toBeSkipped;
     }
 
-    public List<Option> options() {
+//    public Option specialOptionByText(String optionText) {
 //        return new Select().from(Option.class)
-//                .where("Question = ? AND Deleted != ?", getId(), 1)
-//                .orderBy("NumberInQuestion ASC")
-//                .execute();
-        return new Select().from(Option.class)
-                .where("RemoteOptionSetId = ? AND Deleted != ?", getRemoteOptionId(), 1)
-                .orderBy("NumberInQuestion ASC")
-                .execute();
-    }
+//                .where("Question = ? AND Deleted != ? AND Special = ? AND Text = ?", getId(), 1,
+//                        1, optionText)
+//                .executeSingle();
+//    }
 
-    public Option specialOptionByText(String optionText) {
-        return new Select().from(Option.class)
-                .where("Question = ? AND Deleted != ? AND Special = ? AND Text = ?", getId(), 1,
-                        1, optionText)
-                .executeSingle();
-    }
+//    public Option anyResponseOption() {
+//        return new Select().from(Option.class)
+//                .where("Question = ? AND Deleted != ? AND Special = ? AND Text = ?",
+//                        getId(), 1, 1, Option.ANY_RESPONSE)
+//                .executeSingle();
+//    }
 
-    public Option anyResponseOption() {
-        return new Select().from(Option.class)
-                .where("Question = ? AND Deleted != ? AND Special = ? AND Text = ?",
-                        getId(), 1, 1, Option.ANY_RESPONSE)
-                .executeSingle();
-    }
-
-    /*
-     * Relationships
-     */
     public boolean hasOptions() {
         return !defaultOptions().isEmpty();
     }
@@ -613,14 +583,30 @@ public class Question extends ReceiveModel {
         return (specialSkipOptions.size() > 0);
     }
 
+    public List<Option> options() {
+        return new Select("Options.*").distinct().from(Option.class)
+                .innerJoin(OptionInOptionSet.class)
+                .on("OptionInOptionSets.RemoteOptionSetId = ?", getRemoteOptionSetId())
+                .where("Options.Deleted != 1 AND OptionInOptionSets.RemoteOptionId = Options.RemoteId")
+                .orderBy("OptionInOptionSets.NumberInQuestion ASC")
+                .execute();
+    }
+
+    public List<Option> defaultOptions() {
+        return new Select("Options.*").distinct().from(Option.class)
+                .innerJoin(OptionInOptionSet.class)
+                .on("OptionInOptionSets.RemoteOptionSetId = ?", getRemoteOptionSetId())
+                .where("Options.Deleted != 1 AND OptionInOptionSets.Special = 0 AND OptionInOptionSets.RemoteOptionId = Options.RemoteId")
+                .orderBy("OptionInOptionSets.NumberInQuestion ASC")
+                .execute();
+    }
+
     public List<Option> specialOptions() {
-//        return new Select().from(Option.class)
-//                .where("Question = ? AND Deleted != ? AND Special = ?", getId(), 1, 1)
-//                .orderBy("NumberInQuestion ASC")
-//                .execute();
-        return new Select().from(Option.class)
-                .where("RemoteOptionSetId = ? AND Deleted != ?", mRemoteSpecialOptionSetId, 1)
-                .orderBy("NumberInQuestion ASC")
+        return new Select("Options.*").distinct().from(Option.class)
+                .innerJoin(OptionInOptionSet.class)
+                .on("OptionInOptionSets.RemoteOptionSetId = ?", getRemoteSpecialOptionSetId())
+                .where("Options.Deleted != 1 AND OptionInOptionSets.Special = 1 AND OptionInOptionSets.RemoteOptionId = Options.RemoteId")
+                .orderBy("OptionInOptionSets.NumberInQuestion ASC")
                 .execute();
     }
 
@@ -629,9 +615,11 @@ public class Question extends ReceiveModel {
     }
 
     public List<Option> criticalOptions() {
-        return new Select().from(Option.class)
-                .where("Question = ? AND Deleted != ? AND Critical = ?", getId(), 1, 1)
-                .orderBy("NumberInQuestion ASC")
+        return new Select("Options.*").distinct().from(Option.class)
+                .innerJoin(OptionInOptionSet.class)
+                .on("OptionInOptionSets.RemoteOptionSetId = ?", getRemoteOptionSetId())
+                .where("Options.Deleted != 1 AND Options.Critical = 1 AND OptionInOptionSets.RemoteOptionId = Options.RemoteId")
+                .orderBy("OptionInOptionSets.NumberInQuestion ASC")
                 .execute();
     }
 

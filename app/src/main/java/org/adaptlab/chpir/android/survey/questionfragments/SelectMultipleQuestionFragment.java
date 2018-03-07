@@ -25,7 +25,7 @@ public class SelectMultipleQuestionFragment extends QuestionFragment {
         for (Option option : getOptions()) {
             final int optionId = getOptions().indexOf(option);
             CheckBox checkbox = new CheckBox(getActivity());
-            checkbox.setText(option.getText());
+            checkbox.setText(option.getText(getInstrument()));
             checkbox.setTypeface(getInstrument().getTypeFace(getActivity().getApplicationContext
                     ()));
             checkbox.setId(optionId);

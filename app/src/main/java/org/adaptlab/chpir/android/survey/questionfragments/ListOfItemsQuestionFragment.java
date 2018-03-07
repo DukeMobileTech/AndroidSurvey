@@ -34,7 +34,7 @@ public abstract class ListOfItemsQuestionFragment extends QuestionFragment {
 //        int index = 0;
         for (Option option : getOptions()) {
             final TextView optionText = new TextView(getActivity());
-            optionText.setText(option.getText());
+            optionText.setText(option.getText(getInstrument()));
             questionComponent.addView(optionText);
             EditText editText = createEditText();
             editText.setHint(R.string.free_response_edittext);

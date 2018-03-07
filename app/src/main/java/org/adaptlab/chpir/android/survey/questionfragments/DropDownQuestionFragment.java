@@ -68,7 +68,7 @@ public class DropDownQuestionFragment extends QuestionFragment {
     private void setSpinnerAdapter() {
         ArrayList<String> optionsArray = new ArrayList<>();
         for (Option option : getOptions()) {
-            optionsArray.add(option.getText());
+            optionsArray.add(option.getText(getInstrument()));
         }
         optionsArray.add(""); // Adds empty selection
         mAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item,
