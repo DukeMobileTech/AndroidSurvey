@@ -17,6 +17,8 @@ import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.Question;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 import static org.adaptlab.chpir.android.survey.FormatUtils.styleTextWithHtml;
@@ -56,7 +58,7 @@ public class SingleSelectGridFragment extends GridFragment {
         LinearLayout optionsListLinearLayout = (LinearLayout) v.findViewById(R.id
                 .table_body_options_choice);
         mRadioGroups = new ArrayList<>();
-        List<Question> questionList = getQuestions();
+        List<Question> questionList = getQuestionExcludingSkip();
         rowHeights = new Integer[questionList.size()];
         for (int k = 0; k < questionList.size(); k++) {
             final Question q = questionList.get(k);
@@ -107,7 +109,8 @@ public class SingleSelectGridFragment extends GridFragment {
         questionRow.setLayoutParams(params);
         TextView questionNumber = new TextView(getActivity());
 //        questionNumber.setText(String.valueOf(q.getNumberInGrid() + "."));
-        questionNumber.setText(String.valueOf((getQuestions().indexOf(q) + 1) + "."));
+//        questionNumber.setText(String.valueOf((getQuestions().indexOf(q) + 1) + "."));
+        questionNumber.setText(String.valueOf(q.getNumberInInstrument()+"."));
         questionNumber.setMinHeight(MIN_HEIGHT);
         questionNumber.setTypeface(Typeface.DEFAULT_BOLD);
         LinearLayout.LayoutParams questionNumberParams = new LinearLayout.LayoutParams

@@ -67,7 +67,9 @@ public class SelectOneWriteOtherQuestionFragment extends
 
     @Override
     protected void unSetResponse() {
-        getRadioGroup().clearCheck();
+        if(getRadioGroup()!=null){
+            getRadioGroup().clearCheck();
+        }
         otherText.setText("");
         if (mResponse != null) {
             mResponse.setResponse("");

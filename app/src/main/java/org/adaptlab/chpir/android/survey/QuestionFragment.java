@@ -80,10 +80,18 @@ public abstract class QuestionFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putLong(EXTRA_INSTRUMENT_ID, mInstrument.getId());
-        outState.putLong(EXTRA_SURVEY_ID, mSurvey.getId());
-        outState.putLong(EXTRA_QUESTION_ID, mQuestion.getId());
-        outState.putLong(EXTRA_RESPONSE_ID, mResponse.getId());
+        if(mInstrument!=null){
+            outState.putLong(EXTRA_INSTRUMENT_ID, mInstrument.getId());
+        }
+        if(mSurvey!=null){
+            outState.putLong(EXTRA_SURVEY_ID, mSurvey.getId());
+        }
+        if(mQuestion!=null){
+            outState.putLong(EXTRA_QUESTION_ID, mQuestion.getId());
+        }
+        if(mResponse!=null){
+            outState.putLong(EXTRA_RESPONSE_ID, mResponse.getId());
+        }
     }
 
     public void init() {

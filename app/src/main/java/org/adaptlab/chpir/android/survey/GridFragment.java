@@ -24,6 +24,7 @@ import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Survey;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public abstract class GridFragment extends QuestionFragment {
@@ -31,6 +32,8 @@ public abstract class GridFragment extends QuestionFragment {
             "org.adaptlab.chpir.android.survey.display_id";
     public final static String EXTRA_SURVEY_ID =
             "org.adaptlab.chpir.android.survey.survey_id";
+    public final static String EXTRA_SKIPPED_QUESTION_ID_LIST =
+            "org.adaptlab.chpir.android.survey.extra_skipped_id_list";
     public static final int MIN_HEIGHT = 80;
     public static final int MARGIN_10 = 10;
     public static final int MARGIN_0 = 0;
@@ -43,6 +46,7 @@ public abstract class GridFragment extends QuestionFragment {
     private Display mDisplay;
     private Survey mSurvey;
     private List<Question> mQuestions;
+    private HashSet<String> mQuestionsSkipSet;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -76,6 +80,7 @@ public abstract class GridFragment extends QuestionFragment {
             mSurvey = Model.load(Survey.class, surveyId);
             mQuestions = new ArrayList<>();
         }
+        mQuestionsSkipSet = new HashSet<>((getArguments().getStringArrayList(EXTRA_SKIPPED_QUESTION_ID_LIST)));
     }
 
     @Override
@@ -193,6 +198,16 @@ public abstract class GridFragment extends QuestionFragment {
 //	protected Grid getGrid() {
 //		return mGrid;
 //	}
+
+    protected List<Question> getQuestionExcludingSkip(){
+        List<Question> questionLst = new ArrayList<>();
+        for(Question curQuestion: mQuestions){
+            if(!mQuestionsSkipSet.contains(curQuestion.getQuestionIdentifier())){
+                questionLst.add(curQuestion);
+            }
+        }
+        return questionLst;
+    }
 
     protected Display getDisplay() {
         return mDisplay;

@@ -580,24 +580,26 @@ public class SurveyFragment extends Fragment implements NavigationView
 
     private void hideQuestionsInDisplay() {
         updateQuestionsToSkipSet();
-        FragmentManager fm = getChildFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-        HashSet<Integer> hideSet = new HashSet<>();
-        for (Question curSkip : mQuestionsToSkipSet) {
-            int index = mDisplay.questions().indexOf(curSkip);
-            if (index != -1) {
-                QuestionFragment curQuestionFragment = mQuestionFragments.get(index);
-                curQuestionFragment.unSetAllResponses();
-                hideSet.add(index);
-                ft.hide(curQuestionFragment);
+        if (!mDisplay.getMode().equals(Display.DisplayMode.TABLE.toString())) {
+            FragmentManager fm = getChildFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+            HashSet<Integer> hideSet = new HashSet<>();
+            for (Question curSkip : mQuestionsToSkipSet) {
+                int index = mDisplay.questions().indexOf(curSkip);
+                if (index != -1) {
+                    QuestionFragment curQuestionFragment = mQuestionFragments.get(index);
+                    curQuestionFragment.unSetAllResponses();
+                    hideSet.add(index);
+                    ft.hide(curQuestionFragment);
+                }
             }
-        }
-        for (int i = 0; i < mQuestionFragments.size(); i++) {
-            if (!hideSet.contains(i)) {
-                ft.show(mQuestionFragments.get(i));
+            for (int i = 0; i < mQuestionFragments.size(); i++) {
+                if (!hideSet.contains(i)) {
+                    ft.show(mQuestionFragments.get(i));
+                }
             }
+            ft.commit();
         }
-        ft.commit();
     }
 
     protected void setNextQuestion(String currentQuestionIdentifier, String
@@ -837,7 +839,13 @@ public class SurveyFragment extends Fragment implements NavigationView
                         .intValueExact());
                 mQuestionViewLayout.addView(framelayout);
 
+                ArrayList<String> questionsToSkip = new ArrayList<>();
+                for(Question curSkip: mQuestionsToSkipSet){
+                    if(curSkip!=null) questionsToSkip.add(curSkip.getQuestionIdentifier());
+                }
+
                 Bundle bundle = new Bundle();
+                bundle.putStringArrayList(GridFragment.EXTRA_SKIPPED_QUESTION_ID_LIST, questionsToSkip);
                 bundle.putLong(GridFragment.EXTRA_DISPLAY_ID, mDisplay.getRemoteId());
                 bundle.putLong(GridFragment.EXTRA_SURVEY_ID, mSurvey.getId());
                 questionFragment.setArguments(bundle);
