@@ -55,7 +55,7 @@ public abstract class QuestionFragment extends Fragment {
     private Question mQuestion;
     private Survey mSurvey;
     private Instrument mInstrument;
-    private SurveyFragment mSurveyFragment;
+    protected SurveyFragment mSurveyFragment;
     private List<Option> mOptions;
     protected RadioGroup mSpecialResponses;
     private TextView mQuestionText;
@@ -112,8 +112,6 @@ public abstract class QuestionFragment extends Fragment {
             mOptions = mSurveyFragment.getOptions().get(mQuestion);
             if (mOptions == null) mOptions = new ArrayList<>();
         }
-//        setResponseSkips();
-//        setSpecialResponseSkips();
         refreshFollowUpQuestion();
     }
 

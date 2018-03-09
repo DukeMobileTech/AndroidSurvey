@@ -952,6 +952,10 @@ public class SurveyFragment extends Fragment implements NavigationView
         return null;
     }
 
+    public HashSet<Question> getQuestionsToSkipSet(){
+        return mQuestionsToSkipSet;
+    }
+
     protected NestedScrollView getScrollView() {
         return mScrollView;
     }

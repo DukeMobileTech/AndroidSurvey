@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.NestedScrollView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -16,9 +17,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.activeandroid.Model;
+import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.survey.models.Display;
 import org.adaptlab.chpir.android.survey.models.Instrument;
+import org.adaptlab.chpir.android.survey.models.NextQuestion;
+import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Survey;
@@ -219,17 +223,42 @@ public abstract class GridFragment extends QuestionFragment {
         return questionLst;
     }
 
-//    protected void unSetSkipResponses(){
-//        List<Question> questionSkipList = getSkipQuestions();
-//        for (Question question : questionSkipList) {
-//            Response response = mSurvey.getResponseByQuestion(question);
-//            if (response != null) {
-//                response.setDeviceUser(AuthUtils.getCurrentUser());
-//                response.setResponse("");
-//                response.save();
-//            }
-//        }
-//    }
+    private NextQuestion getNextQuestion(Question question, Option selectedOption) {
+        return new Select().from(NextQuestion.class).where("OptionIdentifier = ? AND " +
+                "QuestionIdentifier = ? AND " + "RemoteInstrumentId = ?", selectedOption
+                .getIdentifier(), question.getQuestionIdentifier(), question.getInstrument().getRemoteId())
+                .executeSingle();
+    }
+
+    private void setResponseSkips(Question question, int responseIndex) {
+        if (question.isSkipQuestionType() && responseIndex!=-1) {
+            if ((question.isOtherQuestionType()||question.isDropDownQuestionType()) && responseIndex == question.options().size()) {
+                Log.i("isOtherOrDropDown","isOtherOrDropDownQuestionType");
+                mSurveyFragment.setNextQuestion(question.getQuestionIdentifier(), question
+                        .getQuestionIdentifier(), question.getQuestionIdentifier());
+                mSurveyFragment.setMultipleSkipQuestions(null, question);
+
+            } else if (responseIndex < question.options().size()){
+                Option selectedOption = question.options().get(responseIndex);
+                NextQuestion skipOption = getNextQuestion(question,selectedOption);
+                Log.i("selectedOption",selectedOption.toString()+" ");
+                if (skipOption != null) {
+                    Log.i("skipOption",skipOption.toString()+" ");
+                    mSurveyFragment.setNextQuestion(question.getQuestionIdentifier(), skipOption
+                            .getNextQuestionIdentifier(), question.getQuestionIdentifier());
+                } else if (question.hasSkips(question.getInstrument())) {
+                    mSurveyFragment.setNextQuestion(question.getQuestionIdentifier(), question
+                            .getQuestionIdentifier(), question.getQuestionIdentifier());
+                }
+                if (question.isMultipleSkipQuestion(question.getInstrument())){
+                    mSurveyFragment.setMultipleSkipQuestions(selectedOption, question);
+                }
+            }
+        } else if(!TextUtils.isEmpty(mResponse.getText())){
+            mSurveyFragment.setNextQuestion(question.getQuestionIdentifier(), question
+                    .getQuestionIdentifier(), question.getQuestionIdentifier());
+        }
+    }
 
     protected Display getDisplay() {
         return mDisplay;
@@ -240,6 +269,7 @@ public abstract class GridFragment extends QuestionFragment {
     }
 
     protected void setResponseIndex(Question q, int checkedId) {
+        setResponseSkips(q,checkedId);
         new SaveResponseTask(mSurvey, q, checkedId).execute();
     }
 
