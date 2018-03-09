@@ -112,8 +112,8 @@ public abstract class QuestionFragment extends Fragment {
             mOptions = mSurveyFragment.getOptions().get(mQuestion);
             if (mOptions == null) mOptions = new ArrayList<>();
         }
-        setResponseSkips();
-        setSpecialResponseSkips();
+//        setResponseSkips();
+//        setSpecialResponseSkips();
         refreshFollowUpQuestion();
     }
 
@@ -368,9 +368,10 @@ public abstract class QuestionFragment extends Fragment {
         if (mQuestion.isSkipQuestionType() && !TextUtils.isEmpty(mResponse.getText())) {
             int responseIndex = Integer.parseInt(mResponse.getText());
             if ((mQuestion.isOtherQuestionType()||mQuestion.isDropDownQuestionType()) && responseIndex == mQuestion.options().size()) {
-                Log.i("OtherQuestionType","isOtherQuestionType ");
+                Log.i("isOtherOrDropDown","isOtherOrDropDownQuestionType");
                 mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion
                         .getQuestionIdentifier(), mQuestion.getQuestionIdentifier());
+                mSurveyFragment.setMultipleSkipQuestions(null, mQuestion);
 
             } else if (responseIndex < mQuestion.options().size()){
                 Option selectedOption = mQuestion.options().get(responseIndex);
@@ -378,21 +379,15 @@ public abstract class QuestionFragment extends Fragment {
                 Log.i("selectedOption",selectedOption.toString()+" ");
                 if (skipOption != null) {
                     Log.i("skipOption",skipOption.toString()+" ");
-//                    mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), skipOption
-//                            .getNextQuestionIdentifier());
                     mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), skipOption
                             .getNextQuestionIdentifier(), mQuestion.getQuestionIdentifier());
                 } else if (mQuestion.hasSkips(mInstrument)) {
-//                    mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion
-//                            .getQuestionIdentifier());
                     mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion
                             .getQuestionIdentifier(), mQuestion.getQuestionIdentifier());
                 }
-                mSurveyFragment.setMultipleSkipQuestions(selectedOption, mQuestion);
-            }
-            if (mQuestion.isMultipleSkipQuestion(mInstrument) && responseIndex < mQuestion.options().size()) {
-                Option selectedOption = mQuestion.options().get(responseIndex);
-                mSurveyFragment.setMultipleSkipQuestions(selectedOption, mQuestion);
+                if (mQuestion.isMultipleSkipQuestion(mInstrument)){
+                    mSurveyFragment.setMultipleSkipQuestions(selectedOption, mQuestion);
+                }
             }
         } else if(!TextUtils.isEmpty(mResponse.getText())){
             mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion

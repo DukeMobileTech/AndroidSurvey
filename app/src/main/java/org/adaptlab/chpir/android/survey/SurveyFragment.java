@@ -710,15 +710,17 @@ public class SurveyFragment extends Fragment implements NavigationView
 
     protected void setMultipleSkipQuestions(Option selectedOption, Question currentQuestion) {
         List<Question> skipList = new ArrayList<>();
-        List<MultipleSkip> multipleSkips = new Select().from(MultipleSkip.class)
-                .where("OptionIdentifier = ? AND QuestionIdentifier = ? AND RemoteInstrumentId = ?",
-                        selectedOption.getIdentifier(), currentQuestion.getQuestionIdentifier(),
-                        mInstrument.getRemoteId())
-                .execute();
-        for (MultipleSkip questionToSkip : multipleSkips) {
-            Question question = Question.findByQuestionIdentifier(questionToSkip
-                    .getSkipQuestionIdentifier());
-            skipList.add(question);
+        if(selectedOption!=null){
+            List<MultipleSkip> multipleSkips = new Select().from(MultipleSkip.class)
+                    .where("OptionIdentifier = ? AND QuestionIdentifier = ? AND RemoteInstrumentId = ?",
+                            selectedOption.getIdentifier(), currentQuestion.getQuestionIdentifier(),
+                            mInstrument.getRemoteId())
+                    .execute();
+            for (MultipleSkip questionToSkip : multipleSkips) {
+                Question question = Question.findByQuestionIdentifier(questionToSkip
+                        .getSkipQuestionIdentifier());
+                skipList.add(question);
+            }
         }
         updateQuestionsToSkipMap(currentQuestion.getQuestionIdentifier() + "/multi", skipList);
         hideQuestionsInDisplay();
