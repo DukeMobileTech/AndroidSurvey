@@ -576,8 +576,24 @@ public class SurveyFragment extends Fragment implements NavigationView
         for (HashMap.Entry<String, List<Question>> curPair : mQuestionsToSkipMap.entrySet()) {
             mQuestionsToSkipSet.addAll(curPair.getValue());
         }
-        unSetSkipQuestionResponse();
         Log.i("Set", mQuestionsToSkipSet.toString() + " ");
+    }
+
+    private void unSetSkipQuestionResponse(){
+        Log.i("myResponses",mResponses.toString()+"");
+        for(Question curSkip: mQuestionsToSkipSet){
+            if(curSkip!=null){
+                Response curResponse = mResponses.get(curSkip);
+                if(curResponse!=null){
+                    curResponse.setResponse("");
+                    curResponse.setSpecialResponse("");
+                    curResponse.setOtherResponse("");
+                    curResponse.setDeviceUser(AuthUtils.getCurrentUser());
+                    curResponse.save();
+                    Log.i("UnsetResponse",curResponse.toString()+"");
+                }
+            }
+        }
     }
 
     private void hideQuestionsInDisplay() {
@@ -599,23 +615,6 @@ public class SurveyFragment extends Fragment implements NavigationView
                 }
             }
             ft.commit();
-        }
-    }
-
-    private void unSetSkipQuestionResponse(){
-        Log.i("myResponses",mResponses.toString()+"");
-        for(Question curSkip: mQuestionsToSkipSet){
-            if(curSkip!=null){
-                Response curResponse = mResponses.get(curSkip);
-                if(curResponse!=null){
-                    curResponse.setResponse("");
-                    curResponse.setSpecialResponse("");
-                    curResponse.setOtherResponse("");
-                    curResponse.setDeviceUser(AuthUtils.getCurrentUser());
-                    curResponse.save();
-                    Log.i("UnsetResponse",curResponse.toString()+"");
-                }
-            }
         }
     }
 
@@ -1148,6 +1147,7 @@ public class SurveyFragment extends Fragment implements NavigationView
     * complete.  Send to server if network is available.
     */
     public void finishSurvey() {
+        unSetSkipQuestionResponse();
         if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) {
             setSurveyLocation();
         }
