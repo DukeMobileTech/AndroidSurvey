@@ -288,15 +288,15 @@ public abstract class QuestionFragment extends Fragment {
         }
     }
 
-    public void unSetAllResponses(){
-        unSetResponse();
-        if(mResponse!=null){
-            mResponse.setSpecialResponse("");
-        }
-        if(mSpecialResponses!=null){
-            mSpecialResponses.clearCheck();
-        }
-    }
+//    public void unSetAllResponses(){
+//        unSetResponse();
+//        if(mResponse!=null){
+//            mResponse.setSpecialResponse("");
+//        }
+//        if(mSpecialResponses!=null){
+//            mSpecialResponses.clearCheck();
+//        }
+//    }
 
     public Response getResponse() {
         return mResponse;

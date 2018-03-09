@@ -209,6 +209,28 @@ public abstract class GridFragment extends QuestionFragment {
         return questionLst;
     }
 
+    protected List<Question> getSkipQuestions(){
+        List<Question> questionLst = new ArrayList<>();
+        for(Question curQuestion: mQuestions){
+            if(mQuestionsSkipSet.contains(curQuestion.getQuestionIdentifier())){
+                questionLst.add(curQuestion);
+            }
+        }
+        return questionLst;
+    }
+
+//    protected void unSetSkipResponses(){
+//        List<Question> questionSkipList = getSkipQuestions();
+//        for (Question question : questionSkipList) {
+//            Response response = mSurvey.getResponseByQuestion(question);
+//            if (response != null) {
+//                response.setDeviceUser(AuthUtils.getCurrentUser());
+//                response.setResponse("");
+//                response.save();
+//            }
+//        }
+//    }
+
     protected Display getDisplay() {
         return mDisplay;
     }
