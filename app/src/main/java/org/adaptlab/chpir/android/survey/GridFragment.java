@@ -50,7 +50,6 @@ public abstract class GridFragment extends QuestionFragment {
     private Display mDisplay;
     private Survey mSurvey;
     private List<Question> mQuestions;
-    private HashSet<String> mQuestionsSkipSet;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -84,7 +83,6 @@ public abstract class GridFragment extends QuestionFragment {
             mSurvey = Model.load(Survey.class, surveyId);
             mQuestions = new ArrayList<>();
         }
-        mQuestionsSkipSet = new HashSet<>((getArguments().getStringArrayList(EXTRA_SKIPPED_QUESTION_ID_LIST)));
     }
 
     @Override
@@ -206,17 +204,7 @@ public abstract class GridFragment extends QuestionFragment {
     protected List<Question> getQuestionExcludingSkip(){
         List<Question> questionLst = new ArrayList<>();
         for(Question curQuestion: mQuestions){
-            if(!mQuestionsSkipSet.contains(curQuestion.getQuestionIdentifier())){
-                questionLst.add(curQuestion);
-            }
-        }
-        return questionLst;
-    }
-
-    protected List<Question> getSkipQuestions(){
-        List<Question> questionLst = new ArrayList<>();
-        for(Question curQuestion: mQuestions){
-            if(mQuestionsSkipSet.contains(curQuestion.getQuestionIdentifier())){
+            if(!mSurveyFragment.getQuestionsToSkipSet().contains(curQuestion)){
                 questionLst.add(curQuestion);
             }
         }

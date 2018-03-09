@@ -2,6 +2,7 @@ package org.adaptlab.chpir.android.survey.questionfragments;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +28,12 @@ public class SingleSelectGridFragment extends GridFragment {
     private static final String TAG = "SingleSelectGridFragment";
     private int mIndex;
     private List<RadioGroup> mRadioGroups;
+    private List<Question> mQuestionList;
+    private LinearLayout headerTableLayout;
+    private LinearLayout questionTextLayout;
+    private LinearLayout optionsListLinearLayout;
+    private View mView;
+    private HashSet<Integer> mViewToHideSet;
     private Integer[] rowHeights;
     private Integer[] rowWidths;
     private Integer[] labelWidths;
@@ -46,27 +53,55 @@ public class SingleSelectGridFragment extends GridFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_table_question, parent, false);
-        setTableHeaderOptions(v);
-        setTableBodyContent(v);
-        return v;
+        mView = inflater.inflate(R.layout.fragment_table_question, parent, false);
+        setTableHeaderOptions(mView);
+        setTableBodyContent(mView);
+        updateLayout();
+        return mView;
     }
 
     private void setTableBodyContent(View v) {
-        LinearLayout questionTextLayout = (LinearLayout) v.findViewById(R.id
+        questionTextLayout = (LinearLayout) v.findViewById(R.id
                 .table_body_question_text);
-        LinearLayout optionsListLinearLayout = (LinearLayout) v.findViewById(R.id
+        optionsListLinearLayout = (LinearLayout) v.findViewById(R.id
                 .table_body_options_choice);
         mRadioGroups = new ArrayList<>();
-        List<Question> questionList = getQuestionExcludingSkip();
-        rowHeights = new Integer[questionList.size()];
-        for (int k = 0; k < questionList.size(); k++) {
-            final Question q = questionList.get(k);
+        mQuestionList = getQuestions();
+        rowHeights = new Integer[mQuestionList.size()];
+        for (int k = 0; k < mQuestionList.size(); k++) {
+            final Question q = mQuestionList.get(k);
             setQuestionText(questionTextLayout, k, q);
             setRadioButtons(optionsListLinearLayout, k, q);
             mIndex = k;
             if (getSurvey().getResponseByQuestion(q) != null) {
                 deserialize(getSurvey().getResponseByQuestion(q).getText());
+            }
+        }
+    }
+
+    private void updateViewToHideSet(){
+        mViewToHideSet = new HashSet<>();
+        for(int i=0; i<mQuestionList.size(); i++){
+            if(mSurveyFragment.getQuestionsToSkipSet().contains(mQuestionList.get(i))){
+                mViewToHideSet.add(i);
+            }
+        }
+    }
+
+    private void updateLayout(){
+        updateViewToHideSet();
+        for(int index: mViewToHideSet){
+            questionTextLayout.getChildAt(index).setVisibility(View.INVISIBLE);
+            optionsListLinearLayout.getChildAt(index).setVisibility(View.INVISIBLE);
+        }
+        for(int i=0; i<questionTextLayout.getChildCount(); i++){
+            if(mViewToHideSet.contains(i)){
+                questionTextLayout.getChildAt(i).setVisibility(View.INVISIBLE);
+                optionsListLinearLayout.getChildAt(i).setVisibility(View.INVISIBLE);
+            }
+            else{
+                questionTextLayout.getChildAt(i).setVisibility(View.VISIBLE);
+                optionsListLinearLayout.getChildAt(i).setVisibility(View.VISIBLE);
             }
         }
     }
@@ -88,6 +123,12 @@ public class SingleSelectGridFragment extends GridFragment {
             RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(RadioGroup.LayoutParams
                     .WRAP_CONTENT, MIN_HEIGHT);
             button.setLayoutParams(params);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    updateLayout();
+                }
+            });
             radioButtons.addView(button, i);
         }
         choiceRow.addView(radioButtons);
@@ -130,7 +171,7 @@ public class SingleSelectGridFragment extends GridFragment {
         TextView questionTextHeader = (TextView) v.findViewById(R.id.table_header_question_text);
         questionTextHeader.setMinHeight(MIN_HEIGHT);
         questionTextHeader.setPadding(10, 10, 10, 10);
-        final LinearLayout headerTableLayout = (LinearLayout) v.findViewById(R.id
+        headerTableLayout = (LinearLayout) v.findViewById(R.id
                 .table_options_header);
 //        final List<GridLabel> gridLabels = getGrid().labels();
         final List<Option> gridLabels = getDisplay().options();

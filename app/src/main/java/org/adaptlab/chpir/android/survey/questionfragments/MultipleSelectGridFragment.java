@@ -31,6 +31,7 @@ public class MultipleSelectGridFragment extends GridFragment {
 
     private static final String TAG = "MultipleSelectGridFragment";
     private List<List<CheckBox>> mCheckBoxes;
+    private List<Question> mQuestionList;
     private Integer[] rowHeights;
     private Integer[] rowWidths;
     private Integer[] labelWidths;
@@ -137,10 +138,10 @@ public class MultipleSelectGridFragment extends GridFragment {
         LinearLayout optionsListLinearLayout = (LinearLayout) v.findViewById(R.id
                 .table_body_options_choice);
         mCheckBoxes = new ArrayList<>();
-        List<Question> questionList = getQuestionExcludingSkip();
-        rowHeights = new Integer[questionList.size()];
-        for (int k = 0; k < questionList.size(); k++) {
-            final Question q = questionList.get(k);
+        mQuestionList = getQuestionExcludingSkip();
+        rowHeights = new Integer[mQuestionList.size()];
+        for (int k = 0; k < mQuestionList.size(); k++) {
+            final Question q = mQuestionList.get(k);
             setQuestionText(questionTextLayout, k, q);
             setCheckBoxes(optionsListLinearLayout, k, q);
             mIndex = k;
@@ -150,6 +151,7 @@ public class MultipleSelectGridFragment extends GridFragment {
             }
         }
     }
+
 
     private void setQuestionText(LinearLayout questionTextLayout, int k, Question q) {
         LinearLayout questionRow = new LinearLayout(getActivity());
