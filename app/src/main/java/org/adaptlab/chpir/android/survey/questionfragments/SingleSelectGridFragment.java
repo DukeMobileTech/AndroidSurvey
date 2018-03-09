@@ -16,6 +16,7 @@ import org.adaptlab.chpir.android.survey.GridFragment;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.Question;
+import org.adaptlab.chpir.android.survey.models.Response;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -90,20 +91,23 @@ public class SingleSelectGridFragment extends GridFragment {
 
     private void updateLayout(){
         updateViewToHideSet();
-        for(int index: mViewToHideSet){
-            questionTextLayout.getChildAt(index).setVisibility(View.INVISIBLE);
-            optionsListLinearLayout.getChildAt(index).setVisibility(View.INVISIBLE);
-        }
-        for(int i=0; i<questionTextLayout.getChildCount(); i++){
-            if(mViewToHideSet.contains(i)){
-                questionTextLayout.getChildAt(i).setVisibility(View.INVISIBLE);
-                optionsListLinearLayout.getChildAt(i).setVisibility(View.INVISIBLE);
+        mView.post(new Runnable() {
+            @Override
+            public void run() {
+                for(int i=0; i<questionTextLayout.getChildCount(); i++){
+                    View curQuestionTextView = questionTextLayout.getChildAt(i);
+                    View curOptionListView = optionsListLinearLayout.getChildAt(i);
+                    if(mViewToHideSet.contains(i)){
+                        setCurrentRowHeight(curQuestionTextView, 0);
+                        setCurrentRowHeight(curOptionListView,0);
+                    }
+                    else{
+                        setCurrentRowHeight(curQuestionTextView, rowHeights[i]);
+                        setCurrentRowHeight(curOptionListView,rowHeights[i]);
+                    }
+                }
             }
-            else{
-                questionTextLayout.getChildAt(i).setVisibility(View.VISIBLE);
-                optionsListLinearLayout.getChildAt(i).setVisibility(View.VISIBLE);
-            }
-        }
+        });
     }
 
     private void setRadioButtons(LinearLayout optionsListLinearLayout, int k, final Question q) {
@@ -209,6 +213,12 @@ public class SingleSelectGridFragment extends GridFragment {
                 }
             }
         });
+    }
+
+    private void setCurrentRowHeight(View view, int height){
+        ViewGroup.LayoutParams params = view.getLayoutParams();
+        params.height = height;
+        view.setLayoutParams(params);
     }
 
     private void setRowWidth(final LinearLayout layout, final TextView view, final int position) {

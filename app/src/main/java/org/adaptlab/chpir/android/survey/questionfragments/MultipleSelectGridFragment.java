@@ -152,7 +152,6 @@ public class MultipleSelectGridFragment extends GridFragment {
         }
     }
 
-
     private void setQuestionText(LinearLayout questionTextLayout, int k, Question q) {
         LinearLayout questionRow = new LinearLayout(getActivity());
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout
