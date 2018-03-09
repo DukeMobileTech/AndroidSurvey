@@ -145,7 +145,7 @@ public class Question extends ReceiveModel {
 //    }
 
     public boolean isSkipQuestionType() {
-        return (getQuestionType() == QuestionType.SELECT_ONE || getQuestionType() == QuestionType.SELECT_ONE_WRITE_OTHER);
+        return (getQuestionType() == QuestionType.SELECT_ONE || getQuestionType() == QuestionType.SELECT_ONE_WRITE_OTHER ||getQuestionType() == QuestionType.DROP_DOWN);
     }
 
     public boolean isMultipleSkipQuestion(Instrument instrument) {
@@ -767,6 +767,10 @@ public class Question extends ReceiveModel {
 
     public boolean isOtherQuestionType() {
         return (mQuestionType == QuestionType.SELECT_ONE_WRITE_OTHER);
+    }
+
+    public boolean isDropDownQuestionType() {
+        return (mQuestionType == QuestionType.DROP_DOWN);
     }
 
     public boolean isTextEntryQuestionType() {

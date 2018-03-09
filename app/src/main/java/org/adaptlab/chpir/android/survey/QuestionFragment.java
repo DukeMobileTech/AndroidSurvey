@@ -367,14 +367,13 @@ public abstract class QuestionFragment extends Fragment {
     private void setResponseSkips() {
         if (mQuestion.isSkipQuestionType() && !TextUtils.isEmpty(mResponse.getText())) {
             int responseIndex = Integer.parseInt(mResponse.getText());
-            if (mQuestion.isOtherQuestionType() && responseIndex == mQuestion.options().size()) {
+            if ((mQuestion.isOtherQuestionType()||mQuestion.isDropDownQuestionType()) && responseIndex == mQuestion.options().size()) {
                 Log.i("OtherQuestionType","isOtherQuestionType ");
                 mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion
                         .getQuestionIdentifier(), mQuestion.getQuestionIdentifier());
 
-            } else {
-                Option selectedOption = mQuestion.options().get(Integer.parseInt(mResponse
-                        .getText()));
+            } else if (responseIndex < mQuestion.options().size()){
+                Option selectedOption = mQuestion.options().get(responseIndex);
                 NextQuestion skipOption = getNextQuestion(selectedOption);
                 Log.i("selectedOption",selectedOption.toString()+" ");
                 if (skipOption != null) {
@@ -391,9 +390,8 @@ public abstract class QuestionFragment extends Fragment {
                 }
                 mSurveyFragment.setMultipleSkipQuestions(selectedOption, mQuestion);
             }
-            if (mQuestion.isMultipleSkipQuestion(mInstrument) && !TextUtils.isEmpty(mResponse
-                    .getText())) {
-                Option selectedOption = mQuestion.options().get(Integer.parseInt(mResponse.getText()));
+            if (mQuestion.isMultipleSkipQuestion(mInstrument) && responseIndex < mQuestion.options().size()) {
+                Option selectedOption = mQuestion.options().get(responseIndex);
                 mSurveyFragment.setMultipleSkipQuestions(selectedOption, mQuestion);
             }
         } else if(!TextUtils.isEmpty(mResponse.getText())){
