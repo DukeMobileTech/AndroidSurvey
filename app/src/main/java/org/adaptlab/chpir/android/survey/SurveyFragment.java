@@ -80,6 +80,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import io.fabric.sdk.android.Fabric;
@@ -115,6 +116,7 @@ public class SurveyFragment extends Fragment implements NavigationView
     private LinearLayout mQuestionViewLayout;
     private Instrument mInstrument;
     private Survey mSurvey;
+    private HashSet<Integer> mHiddenDisplayNumberSet;
     private int mQuestionNumber;
     private int mQuestionCount;
     private String mMetadata;
@@ -412,23 +414,21 @@ public class SurveyFragment extends Fragment implements NavigationView
         if (!mNavDrawerSet) {
             setupNavigationDrawer();
         }
-        if (mNavigationView != null) {
-            for (int i = 0; i < mDisplays.size(); i++) {
-                mNavigationView.getMenu().getItem(i).setChecked(false);
-            }
-            mNavigationView.getMenu().getItem(mDisplayNumber).setChecked(true);
-        }
+        setSelectedDrawerItemChecked();
     }
 
     private void setupNavigationDrawer() {
+        updateHiddenDisplayNumberSet();
         setNavigationDrawerItems();
         mTitle = mDrawerTitle = mInstrument.getTitle();
         mDrawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         mNavigationView = (NavigationView) getActivity().findViewById(R.id.navigation);
-        final Menu menu = mNavigationView.getMenu();
-        for (String oneTitle : mDisplayTitles) {
-            menu.add(oneTitle);
+        Menu menu = mNavigationView.getMenu();
+        for(int i=0; i<mDisplayTitles.length; i++){
+            if(!mHiddenDisplayNumberSet.contains(i)){
+                menu.add(mDisplayTitles[i]);
+            }
         }
         mNavigationView.setNavigationItemSelectedListener(this);
         mDrawerToggle = new ActionBarDrawerToggle(
@@ -442,6 +442,14 @@ public class SurveyFragment extends Fragment implements NavigationView
                 ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
                 if (actionBar != null) {
                     actionBar.setTitle(mDrawerTitle);
+                }
+                updateHiddenDisplayNumberSet();
+                Menu menu = mNavigationView.getMenu();
+                menu.clear();
+                for(int i=0; i<mDisplayTitles.length; i++){
+                    if(!mHiddenDisplayNumberSet.contains(i)){
+                        menu.add(mDisplayTitles[i]);
+                    }
                 }
                 getActivity().invalidateOptionsMenu();
             }
@@ -473,6 +481,22 @@ public class SurveyFragment extends Fragment implements NavigationView
                 return lhs.getPosition() < rhs.getPosition() ? -1 : 1;
             }
         });
+    }
+
+    private void updateHiddenDisplayNumberSet(){
+        mHiddenDisplayNumberSet = new HashSet<>();
+        for(Map.Entry<Display, List<Question>> curEntry: mDisplayQuestions.entrySet()){
+            boolean isSkip = true;
+            for(Question curQuestion: curEntry.getValue()){
+                if(!mQuestionsToSkipSet.contains(curQuestion)){
+                    isSkip = false;
+                    break;
+                }
+            }
+            if(isSkip){
+                mHiddenDisplayNumberSet.add(mDisplays.indexOf(curEntry.getKey()));
+            }
+        }
     }
 
     @Override
@@ -522,7 +546,6 @@ public class SurveyFragment extends Fragment implements NavigationView
     }
 
     private void moveToNextDisplay() {
-        Log.i("mDisplayQuestions",mDisplayQuestions.toString()+"");
         mDrawerLayout.closeDrawer(mNavigationView);
         mPreviousDisplays.add(mDisplayNumber);
         for(int i = mDisplayNumber+1; i<mDisplays.size(); i++){
@@ -822,6 +845,23 @@ public class SurveyFragment extends Fragment implements NavigationView
 //        proceedToNextQuestion();
 //    }
 
+    private void setSelectedDrawerItemChecked(){
+        if(mNavigationView!=null){
+            int index = mDisplayNumber;
+            for(int num: mHiddenDisplayNumberSet){
+                if(num<mDisplayNumber){
+                    index--;
+                }
+            }
+            for (int i = 0; i < mDisplays.size()-mHiddenDisplayNumberSet.size(); i++) {
+                mNavigationView.getMenu().getItem(i).setChecked(false);
+            }
+            if(index>-1&&index<mNavigationView.getMenu().size()){
+                mNavigationView.getMenu().getItem(index).setChecked(true);
+            }
+        }
+    }
+
     protected void createQuestionFragments() {
         if (!isActivityFinished) {
             // Hide previous fragments
@@ -831,14 +871,7 @@ public class SurveyFragment extends Fragment implements NavigationView
                 fragmentTransaction.hide(fragment);
             }
             mQuestionFragments.clear();
-
-            if (mNavigationView != null) {
-                for (int i = 0; i < mDisplays.size(); i++) {
-                    mNavigationView.getMenu().getItem(i).setChecked(false);
-                }
-                mNavigationView.getMenu().getItem(mDisplayNumber).setChecked(true);
-            }
-
+            setSelectedDrawerItemChecked();
             List<Question> displayQuestions = mDisplayQuestions.get(mDisplay);
             if (mDisplay.getMode().equals(Display.DisplayMode.TABLE.toString())) {
                 // Show table
