@@ -28,7 +28,6 @@ import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Survey;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 public abstract class GridFragment extends QuestionFragment {
@@ -46,44 +45,37 @@ public abstract class GridFragment extends QuestionFragment {
     }
 
     private static final String TAG = "GridFragment";
-    //	private Grid mGrid;
     private Display mDisplay;
     private Survey mSurvey;
     private List<Question> mQuestions;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-//		if (savedInstanceState != null) {
-//        	mGrid = Grid.findByRemoteId(savedInstanceState.getLong(EXTRA_GRID_ID));
-//        } else {
-//            mGrid = Grid.findByRemoteId(getArguments().getLong(EXTRA_GRID_ID));
-//        }
-        if (savedInstanceState != null) {
-            mDisplay = Display.findByRemoteId(savedInstanceState.getLong(EXTRA_DISPLAY_ID));
-        } else {
-            mDisplay = Display.findByRemoteId(getArguments().getLong(EXTRA_DISPLAY_ID));
-        }
-        init();
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        if (savedInstanceState != null) {
+            mDisplay = Display.findByRemoteId(savedInstanceState.getLong(EXTRA_DISPLAY_ID));
+            mSurvey = Model.load(Survey.class, savedInstanceState.getLong(EXTRA_SURVEY_ID));
+        } else {
+            if (getArguments() != null) {
+                mDisplay = Display.findByRemoteId(getArguments().getLong(EXTRA_DISPLAY_ID));
+                mSurvey = Model.load(Survey.class, getArguments().getLong(EXTRA_SURVEY_ID));
+            }
+        }
+
         // Allow both portrait and landscape orientations
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-//        for (Question question : getSurveyFragment().getQuestions()) {
-//            if (question.getGrid() == mGrid) {
-//                mQuestions.add(question);
-//            }
-//        }
+        if (getActivity() != null) {
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+        }
         mQuestions = mDisplay.questions();
     }
 
-    @Override
-    public void init() {
-        long surveyId = getArguments().getLong(EXTRA_SURVEY_ID);
-        if (surveyId != -1) {
-            mSurvey = Model.load(Survey.class, surveyId);
-            mQuestions = new ArrayList<>();
-        }
-    }
+//    @Override
+//    public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
+//        super.onCreateView(inflater, parent, savedInstanceState);
+//        return inflater.inflate(R.layout.fragment_table_question, parent, false);
+//    }
 
     @Override
     public void setSpecialResponse(String specialResponse) {
@@ -128,50 +120,42 @@ public abstract class GridFragment extends QuestionFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        final NestedScrollView nestedScrollView = (NestedScrollView) getActivity().findViewById(R
-                .id.grid_scroll_view);
-        nestedScrollView.post(new Runnable() {
-            @Override
-            public void run() {
-                final int screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
-                int tableHeaderHeight = getActivity().findViewById(R.id.table_header).getHeight();
-                int tableBodyHeight = getActivity().findViewById(R.id.table_body_question_text)
-                        .getHeight();
-                NestedScrollView tableScrollView = (NestedScrollView) getActivity().findViewById
-                        (R.id.grid_scroll_view);
-                int scrollViewHeight = tableScrollView.getHeight();
-                int activityVerticalMargin = (int) getActivity().getResources().getDimension(R
-                        .dimen.activity_vertical_margin);
-//                final int questionTextHeight = getActivity().findViewById(R.id
-// .linear_layout_for_question_text_view).getHeight();
-//                int questionIndexLabelHeight = getActivity().findViewById(R.id
-// .participant_label_and_question_index).getHeight();
-                int progressBarHeight = getActivity().findViewById(R.id.progress_bar).getHeight();
-//                int remainingScreenHeight = screenHeight - activityVerticalMargin -
-// questionTextHeight - questionIndexLabelHeight - progressBarHeight;
-                int remainingScreenHeight = screenHeight - activityVerticalMargin -
-                        progressBarHeight;
-                int viewHeight = tableScrollView.getHeight();
-                if (scrollViewHeight < tableBodyHeight && remainingScreenHeight > tableBodyHeight) {
-                    viewHeight = tableBodyHeight;
-                } else if (scrollViewHeight < tableBodyHeight && remainingScreenHeight >
-                        scrollViewHeight) {
-                    viewHeight = remainingScreenHeight;
-                } else if (remainingScreenHeight < 0 && scrollViewHeight < tableBodyHeight &&
-                        tableBodyHeight < screenHeight) {
-                    viewHeight = tableBodyHeight;
-                } else if (remainingScreenHeight < 0 && scrollViewHeight < tableBodyHeight &&
-                        tableBodyHeight > screenHeight) {
-//                    viewHeight = screenHeight - activityVerticalMargin -
-// questionIndexLabelHeight - progressBarHeight - tableHeaderHeight;
-                    viewHeight = screenHeight - activityVerticalMargin - progressBarHeight -
-                            tableHeaderHeight;
+        final NestedScrollView nestedScrollView = getActivity().findViewById(R.id.grid_scroll_view);
+        if (nestedScrollView != null) {
+            nestedScrollView.post(new Runnable() {
+                @Override
+                public void run() {
+                    final int screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
+                    int tableHeaderHeight = getActivity().findViewById(R.id.table_header).getHeight();
+
+                    int tableBodyHeight = getActivity().findViewById(R.id.table_body_question_text).getHeight();
+                    NestedScrollView tableScrollView = getActivity().findViewById(R.id
+                            .grid_scroll_view);
+                    int scrollViewHeight = tableScrollView.getHeight();
+                    int activityVerticalMargin = (int) getActivity().getResources().getDimension(R
+                            .dimen.activity_vertical_margin);
+                    int progressBarHeight = getActivity().findViewById(R.id.progress_bar).getHeight();
+                    int remainingScreenHeight = screenHeight - activityVerticalMargin - progressBarHeight;
+                    int viewHeight = tableScrollView.getHeight();
+                    if (scrollViewHeight < tableBodyHeight && remainingScreenHeight > tableBodyHeight) {
+                        viewHeight = tableBodyHeight;
+                    } else if (scrollViewHeight < tableBodyHeight && remainingScreenHeight >
+                            scrollViewHeight) {
+                        viewHeight = remainingScreenHeight;
+                    } else if (remainingScreenHeight < 0 && scrollViewHeight < tableBodyHeight &&
+                            tableBodyHeight < screenHeight) {
+                        viewHeight = tableBodyHeight;
+                    } else if (remainingScreenHeight < 0 && scrollViewHeight < tableBodyHeight &&
+                            tableBodyHeight > screenHeight) {
+                        viewHeight = screenHeight - activityVerticalMargin - progressBarHeight -
+                                tableHeaderHeight;
+                    }
+                    ViewGroup.LayoutParams params = tableScrollView.getLayoutParams();
+                    params.height = viewHeight;
+                    tableScrollView.setLayoutParams(params);
                 }
-                ViewGroup.LayoutParams params = tableScrollView.getLayoutParams();
-                params.height = viewHeight;
-                tableScrollView.setLayoutParams(params);
-            }
-        });
+            });
+        }
     }
 
     protected GradientDrawable getBorder() {
@@ -196,10 +180,6 @@ public abstract class GridFragment extends QuestionFragment {
     protected List<Question> getQuestions() {
         return mQuestions;
     }
-
-//	protected Grid getGrid() {
-//		return mGrid;
-//	}
 
     protected List<Question> getQuestionExcludingSkip(){
         List<Question> questionLst = new ArrayList<>();

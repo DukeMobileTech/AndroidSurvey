@@ -2,8 +2,7 @@ package org.adaptlab.chpir.android.survey.questionfragments;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Gravity;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,11 +15,9 @@ import org.adaptlab.chpir.android.survey.GridFragment;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.Question;
-import org.adaptlab.chpir.android.survey.models.Response;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
 import static org.adaptlab.chpir.android.survey.FormatUtils.styleTextWithHtml;
@@ -30,14 +27,12 @@ public class SingleSelectGridFragment extends GridFragment {
     private int mIndex;
     private List<RadioGroup> mRadioGroups;
     private List<Question> mQuestionList;
-    private LinearLayout headerTableLayout;
     private LinearLayout questionTextLayout;
     private LinearLayout optionsListLinearLayout;
     private View mView;
     private HashSet<Integer> mViewToHideSet;
     private Integer[] rowHeights;
-    private Integer[] rowWidths;
-    private Integer[] labelWidths;
+    private int mOptionWidth;
 
     @Override
     protected void deserialize(String responseText) {
@@ -62,10 +57,8 @@ public class SingleSelectGridFragment extends GridFragment {
     }
 
     private void setTableBodyContent(View v) {
-        questionTextLayout = (LinearLayout) v.findViewById(R.id
-                .table_body_question_text);
-        optionsListLinearLayout = (LinearLayout) v.findViewById(R.id
-                .table_body_options_choice);
+        questionTextLayout = v.findViewById(R.id.table_body_question_text);
+        optionsListLinearLayout = v.findViewById(R.id.table_body_options_choice);
         mRadioGroups = new ArrayList<>();
         mQuestionList = getQuestions();
         rowHeights = new Integer[mQuestionList.size()];
@@ -80,30 +73,31 @@ public class SingleSelectGridFragment extends GridFragment {
         }
     }
 
-    private void updateViewToHideSet(){
+    private void updateViewToHideSet() {
         mViewToHideSet = new HashSet<>();
-        for(int i=0; i<mQuestionList.size(); i++){
-            if(mSurveyFragment.getQuestionsToSkipSet().contains(mQuestionList.get(i))){
+        for (int i = 0; i < mQuestionList.size(); i++) {
+            if (mSurveyFragment.getQuestionsToSkipSet().contains(mQuestionList.get(i))) {
                 mViewToHideSet.add(i);
             }
         }
     }
 
-    private void updateLayout(){
+    private void updateLayout() {
         updateViewToHideSet();
         mView.post(new Runnable() {
             @Override
             public void run() {
-                for(int i=0; i<questionTextLayout.getChildCount(); i++){
+                for (int i = 0; i < questionTextLayout.getChildCount(); i++) {
                     View curQuestionTextView = questionTextLayout.getChildAt(i);
                     View curOptionListView = optionsListLinearLayout.getChildAt(i);
-                    if(mViewToHideSet.contains(i)){
+                    if (mViewToHideSet.contains(i)) {
                         setCurrentRowHeight(curQuestionTextView, 0);
-                        setCurrentRowHeight(curOptionListView,0);
-                    }
-                    else{
-                        setCurrentRowHeight(curQuestionTextView, rowHeights[i]);
-                        setCurrentRowHeight(curOptionListView,rowHeights[i]);
+                        setCurrentRowHeight(curOptionListView, 0);
+                    } else {
+                        if (rowHeights[i] != null) {
+                            setCurrentRowHeight(curQuestionTextView, rowHeights[i]);
+                            setCurrentRowHeight(curOptionListView, rowHeights[i]);
+                        }
                     }
                 }
             }
@@ -118,14 +112,11 @@ public class SingleSelectGridFragment extends GridFragment {
                 .LayoutParams.MATCH_PARENT, MIN_HEIGHT);
         radioButtons.setLayoutParams(buttonParams);
         adjustRowHeight(radioButtons, k);
-//        List<GridLabel> gridLabels = getGrid().labels();
-//        for (int i = 0; i < gridLabels.size(); i++) {
         for (int i = 0; i < getDisplay().options().size(); i++) {
             RadioButton button = new RadioButton(getActivity());
             button.setSaveEnabled(false);
             button.setId(i);
-            RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(RadioGroup.LayoutParams
-                    .WRAP_CONTENT, MIN_HEIGHT);
+            RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(mOptionWidth, MIN_HEIGHT);
             button.setLayoutParams(params);
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -153,9 +144,7 @@ public class SingleSelectGridFragment extends GridFragment {
         params.setMargins(MARGIN_0, MARGIN_0, MARGIN_10, MARGIN_10);
         questionRow.setLayoutParams(params);
         TextView questionNumber = new TextView(getActivity());
-//        questionNumber.setText(String.valueOf(q.getNumberInGrid() + "."));
-//        questionNumber.setText(String.valueOf((getQuestions().indexOf(q) + 1) + "."));
-        questionNumber.setText(String.valueOf(q.getNumberInInstrument()+"."));
+        questionNumber.setText(String.valueOf(q.getNumberInInstrument() + "."));
         questionNumber.setMinHeight(MIN_HEIGHT);
         questionNumber.setTypeface(Typeface.DEFAULT_BOLD);
         LinearLayout.LayoutParams questionNumberParams = new LinearLayout.LayoutParams
@@ -172,77 +161,29 @@ public class SingleSelectGridFragment extends GridFragment {
     }
 
     private void setTableHeaderOptions(View v) {
-        TextView questionTextHeader = (TextView) v.findViewById(R.id.table_header_question_text);
+        TextView questionTextHeader = v.findViewById(R.id.table_header_question_text);
         questionTextHeader.setMinHeight(MIN_HEIGHT);
         questionTextHeader.setPadding(10, 10, 10, 10);
-        headerTableLayout = (LinearLayout) v.findViewById(R.id
-                .table_options_header);
-//        final List<GridLabel> gridLabels = getGrid().labels();
-        final List<Option> gridLabels = getDisplay().options();
-        final List<TextView> headerViews = new ArrayList<>();
-        rowWidths = new Integer[gridLabels.size()];
-        labelWidths = new Integer[gridLabels.size()];
-        for (int k = 0; k < gridLabels.size(); k++) {
-            TextView textView = getHeaderTextView(gridLabels.get(k).getText(getInstrument()));
-            headerTableLayout.addView(textView);
-            setRowWidth(headerTableLayout, textView, k);
-            setLabelWidth(headerTableLayout, textView, k);
-            headerViews.add(textView);
-        }
 
-        headerTableLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                int width = 0;
-                for (int k = 0; k < headerViews.size(); k++) {
-                    TextView view = headerViews.get(k);
-                    view.setWidth(labelWidths[k]);
-                    view.setPadding(5, 0, 5, 10);
-                    view.setMinimumWidth(width + 20);
-                }
-                for (RadioGroup radioGroup : mRadioGroups) {
-                    for (int i = 0; i < gridLabels.size(); i++) {
-                        RadioButton radioButton = (RadioButton) radioGroup.getChildAt(i);
-                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams
-                                (rowWidths[i], LinearLayout.LayoutParams.WRAP_CONTENT);
-                        params.gravity = Gravity.CENTER_VERTICAL;
-                        radioButton.setLayoutParams(params);
-                        radioButton.setPadding(MARGIN_10, MARGIN_0, MARGIN_10, MARGIN_0);
-                        radioButton.setMinimumWidth(rowWidths[i]);
-                    }
-                }
-            }
-        });
+        LinearLayout headerTableLayout = v.findViewById(R.id.table_options_header);
+        final List<Option> headerLabels = getDisplay().options();
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        float margin = getActivity().getResources().getDimension(R.dimen.activity_horizontal_margin);
+        float totalWidth = (displayMetrics.widthPixels - margin * 2) / 2;
+        mOptionWidth = (int) totalWidth / headerLabels.size();
+
+        for (int k = 0; k < headerLabels.size(); k++) {
+            TextView textView = getHeaderTextView(headerLabels.get(k).getText(getInstrument()));
+            textView.setWidth(mOptionWidth);
+            headerTableLayout.addView(textView);
+        }
     }
 
-    private void setCurrentRowHeight(View view, int height){
+    private void setCurrentRowHeight(View view, int height) {
         ViewGroup.LayoutParams params = view.getLayoutParams();
         params.height = height;
         view.setLayoutParams(params);
-    }
-
-    private void setRowWidth(final LinearLayout layout, final TextView view, final int position) {
-        view.post(new Runnable() {
-            @Override
-            public void run() {
-                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view
-                        .getLayoutParams();
-                rowWidths[position] = layout.getWidth() / rowWidths.length + params.leftMargin +
-                        params.rightMargin;
-            }
-        });
-    }
-
-    private void setLabelWidth(final LinearLayout layout, final TextView view, final int position) {
-        view.post(new Runnable() {
-            @Override
-            public void run() {
-                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view
-                        .getLayoutParams();
-                labelWidths[position] = layout.getWidth() / labelWidths.length + params
-                        .leftMargin + params.rightMargin;
-            }
-        });
     }
 
     private void setRowHeight(final LinearLayout view, final int position) {
