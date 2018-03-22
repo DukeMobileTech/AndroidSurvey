@@ -80,6 +80,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -154,6 +155,7 @@ public class SurveyFragment extends Fragment implements NavigationView
     private List<Question> mQuestions;
     private LocationManager mLocationManager;
     private NestedScrollView mScrollView;
+    private TextView mDisplayTitle;
 
     //drawer vars
     private DrawerLayout mDrawerLayout;
@@ -200,7 +202,7 @@ public class SurveyFragment extends Fragment implements NavigationView
             getActivity().startActivityForResult(i, AUTHORIZE_CODE);
         } else {
             setParticipantLabel();
-            updateDisplayCountLabel();
+            updateDisplayLabels();
             createQuestionFragments();
         }
     }
@@ -345,6 +347,7 @@ public class SurveyFragment extends Fragment implements NavigationView
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_survey, parent, false);
+        mDisplayTitle = v.findViewById(R.id.display_title);
         mQuestionViewLayout = (LinearLayout) v.findViewById(R.id.question_component_layout);
         mParticipantLabel = (TextView) v.findViewById(R.id.participant_label);
         mDisplayIndexLabel = (TextView) v.findViewById(R.id.display_index_label);
@@ -425,8 +428,8 @@ public class SurveyFragment extends Fragment implements NavigationView
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         mNavigationView = (NavigationView) getActivity().findViewById(R.id.navigation);
         Menu menu = mNavigationView.getMenu();
-        for(int i=0; i<mDisplayTitles.length; i++){
-            if(!mHiddenDisplayNumberSet.contains(i)){
+        for (int i = 0; i < mDisplayTitles.length; i++) {
+            if (!mHiddenDisplayNumberSet.contains(i)) {
                 menu.add(mDisplayTitles[i]);
             }
         }
@@ -446,8 +449,8 @@ public class SurveyFragment extends Fragment implements NavigationView
                 updateHiddenDisplayNumberSet();
                 Menu menu = mNavigationView.getMenu();
                 menu.clear();
-                for(int i=0; i<mDisplayTitles.length; i++){
-                    if(!mHiddenDisplayNumberSet.contains(i)){
+                for (int i = 0; i < mDisplayTitles.length; i++) {
+                    if (!mHiddenDisplayNumberSet.contains(i)) {
                         menu.add(mDisplayTitles[i]);
                     }
                 }
@@ -483,17 +486,17 @@ public class SurveyFragment extends Fragment implements NavigationView
         });
     }
 
-    private void updateHiddenDisplayNumberSet(){
+    private void updateHiddenDisplayNumberSet() {
         mHiddenDisplayNumberSet = new HashSet<>();
-        for(Map.Entry<Display, List<Question>> curEntry: mDisplayQuestions.entrySet()){
+        for (Map.Entry<Display, List<Question>> curEntry : mDisplayQuestions.entrySet()) {
             boolean isSkip = true;
-            for(Question curQuestion: curEntry.getValue()){
-                if(!mQuestionsToSkipSet.contains(curQuestion)){
+            for (Question curQuestion : curEntry.getValue()) {
+                if (!mQuestionsToSkipSet.contains(curQuestion)) {
                     isSkip = false;
                     break;
                 }
             }
-            if(isSkip){
+            if (isSkip) {
                 mHiddenDisplayNumberSet.add(mDisplays.indexOf(curEntry.getKey()));
             }
         }
@@ -542,32 +545,31 @@ public class SurveyFragment extends Fragment implements NavigationView
         }
         createQuestionFragments();
         hideQuestionsInDisplay();
-        updateDisplayCountLabel();
+        updateDisplayLabels();
     }
 
     private void moveToNextDisplay() {
         mDrawerLayout.closeDrawer(mNavigationView);
         mPreviousDisplays.add(mDisplayNumber);
-        for(int i = mDisplayNumber+1; i<mDisplays.size(); i++){
+        for (int i = mDisplayNumber + 1; i < mDisplays.size(); i++) {
             boolean skipDisplay = true;
-            for(Question curQuestion: mDisplayQuestions.get(mDisplays.get(i))){
-                if(!mQuestionsToSkipSet.contains(curQuestion)){
-                    skipDisplay=false;
+            for (Question curQuestion : mDisplayQuestions.get(mDisplays.get(i))) {
+                if (!mQuestionsToSkipSet.contains(curQuestion)) {
+                    skipDisplay = false;
                     break;
                 }
             }
-            if(!skipDisplay){
+            if (!skipDisplay) {
                 mDisplayNumber = i;
                 mDisplay = mDisplays.get(mDisplayNumber);
                 break;
-            }
-            else if(i==mDisplays.size()-1){
+            } else if (i == mDisplays.size() - 1) {
                 goToReviewPage();
             }
         }
         createQuestionFragments();
         hideQuestionsInDisplay();
-        updateDisplayCountLabel();
+        updateDisplayLabels();
     }
 
     private void moveToDisplay(int position) {
@@ -578,14 +580,15 @@ public class SurveyFragment extends Fragment implements NavigationView
             mDisplay = mDisplays.get(mDisplayNumber);
             createQuestionFragments();
             hideQuestionsInDisplay();
-            updateDisplayCountLabel();
+            updateDisplayLabels();
         }
     }
 
-    private void updateQuestionsToSkipMap(String questionIdentifier, List<Question> questionsToSkip) {
+    private void updateQuestionsToSkipMap(String questionIdentifier, List<Question>
+            questionsToSkip) {
         if (questionsToSkip == null || questionsToSkip.size() == 0) {
             if (mQuestionsToSkipMap.containsKey(questionIdentifier)) {
-                Log.i("Remove",questionIdentifier+"Removed");
+                Log.i("Remove", questionIdentifier + "Removed");
                 mQuestionsToSkipMap.remove(questionIdentifier);
             }
         } else {
@@ -602,18 +605,18 @@ public class SurveyFragment extends Fragment implements NavigationView
         Log.i("Set", mQuestionsToSkipSet.toString() + " ");
     }
 
-    private void unSetSkipQuestionResponse(){
-        Log.i("myResponses",mResponses.toString()+"");
-        for(Question curSkip: mQuestionsToSkipSet){
-            if(curSkip!=null){
+    private void unSetSkipQuestionResponse() {
+        Log.i("myResponses", mResponses.toString() + "");
+        for (Question curSkip : mQuestionsToSkipSet) {
+            if (curSkip != null) {
                 Response curResponse = mResponses.get(curSkip);
-                if(curResponse!=null){
+                if (curResponse != null) {
                     curResponse.setResponse("");
                     curResponse.setSpecialResponse("");
                     curResponse.setOtherResponse("");
                     curResponse.setDeviceUser(AuthUtils.getCurrentUser());
                     curResponse.save();
-                    Log.i("UnsetResponse",curResponse.toString()+"");
+                    Log.i("UnsetResponse", curResponse.toString() + "");
                 }
             }
         }
@@ -646,15 +649,15 @@ public class SurveyFragment extends Fragment implements NavigationView
         List<Question> skipList = new ArrayList<>();
         boolean skipStart = false;
         for (Question curQuestion : mQuestions) {
-            if(skipStart) skipList.add(curQuestion);
+            if (skipStart) skipList.add(curQuestion);
             if (curQuestion.getQuestionIdentifier().equals(currentQuestionIdentifier)) {
                 skipStart = true;
             }
-            if(curQuestion.getQuestionIdentifier().equals(nextQuestionIdentifier)){
+            if (curQuestion.getQuestionIdentifier().equals(nextQuestionIdentifier)) {
                 break;
             }
         }
-        Log.i("SkipList",skipList.toString()+"");
+        Log.i("SkipList", skipList.toString() + "");
         updateQuestionsToSkipMap(questionIdentifier + "/skipTo", skipList);
         hideQuestionsInDisplay();
     }
@@ -733,9 +736,10 @@ public class SurveyFragment extends Fragment implements NavigationView
 
     protected void setMultipleSkipQuestions(Option selectedOption, Question currentQuestion) {
         List<Question> skipList = new ArrayList<>();
-        if(selectedOption!=null){
+        if (selectedOption != null) {
             List<MultipleSkip> multipleSkips = new Select().from(MultipleSkip.class)
-                    .where("OptionIdentifier = ? AND QuestionIdentifier = ? AND RemoteInstrumentId = ?",
+                    .where("OptionIdentifier = ? AND QuestionIdentifier = ? AND " +
+                                    "RemoteInstrumentId = ?",
                             selectedOption.getIdentifier(), currentQuestion.getQuestionIdentifier(),
                             mInstrument.getRemoteId())
                     .execute();
@@ -845,18 +849,18 @@ public class SurveyFragment extends Fragment implements NavigationView
 //        proceedToNextQuestion();
 //    }
 
-    private void setSelectedDrawerItemChecked(){
-        if(mNavigationView!=null){
+    private void setSelectedDrawerItemChecked() {
+        if (mNavigationView != null) {
             int index = mDisplayNumber;
-            for(int num: mHiddenDisplayNumberSet){
-                if(num<mDisplayNumber){
+            for (int num : mHiddenDisplayNumberSet) {
+                if (num < mDisplayNumber) {
                     index--;
                 }
             }
-            for (int i = 0; i < mDisplays.size()-mHiddenDisplayNumberSet.size(); i++) {
+            for (int i = 0; i < mDisplays.size() - mHiddenDisplayNumberSet.size(); i++) {
                 mNavigationView.getMenu().getItem(i).setChecked(false);
             }
-            if(index>-1&&index<mNavigationView.getMenu().size()){
+            if (index > -1 && index < mNavigationView.getMenu().size()) {
                 mNavigationView.getMenu().getItem(index).setChecked(true);
             }
         }
@@ -891,12 +895,13 @@ public class SurveyFragment extends Fragment implements NavigationView
                 mQuestionViewLayout.addView(framelayout);
 
                 ArrayList<String> questionsToSkip = new ArrayList<>();
-                for(Question curSkip: mQuestionsToSkipSet){
-                    if(curSkip!=null) questionsToSkip.add(curSkip.getQuestionIdentifier());
+                for (Question curSkip : mQuestionsToSkipSet) {
+                    if (curSkip != null) questionsToSkip.add(curSkip.getQuestionIdentifier());
                 }
 
                 Bundle bundle = new Bundle();
-                bundle.putStringArrayList(GridFragment.EXTRA_SKIPPED_QUESTION_ID_LIST, questionsToSkip);
+                bundle.putStringArrayList(GridFragment.EXTRA_SKIPPED_QUESTION_ID_LIST,
+                        questionsToSkip);
                 bundle.putLong(GridFragment.EXTRA_DISPLAY_ID, mDisplay.getRemoteId());
                 bundle.putLong(GridFragment.EXTRA_SURVEY_ID, mSurvey.getId());
                 questionFragment.setArguments(bundle);
@@ -905,18 +910,21 @@ public class SurveyFragment extends Fragment implements NavigationView
             } else {
                 for (Question question : displayQuestions) {
                     // Add large offset to avoid id conflicts
-                    int frameLayoutId = new BigDecimal(question.getRemoteId()).intValueExact() + 1000000;
+                    int frameLayoutId = new BigDecimal(question.getRemoteId()).intValueExact() +
+                            1000000;
                     FrameLayout frameLayout = getActivity().findViewById(frameLayoutId);
                     if (frameLayout == null) {
                         frameLayout = new FrameLayout(getContext());
-                        frameLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams
+                        frameLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup
+                                .LayoutParams
                                 .MATCH_PARENT, ViewPager.LayoutParams.WRAP_CONTENT));
                         frameLayout.setId(frameLayoutId);
                         mQuestionViewLayout.addView(frameLayout);
                     }
 
                     String qfTag = mSurvey.getId().toString() + "-" + question.getId().toString();
-                    QuestionFragment questionFragment = (QuestionFragment) fm.findFragmentByTag(qfTag);
+                    QuestionFragment questionFragment = (QuestionFragment) fm.findFragmentByTag
+                            (qfTag);
                     if (questionFragment == null || isScreenRotated) {
                         Bundle bundle = new Bundle();
                         bundle.putString("QuestionIdentifier", question.getQuestionIdentifier());
@@ -985,7 +993,7 @@ public class SurveyFragment extends Fragment implements NavigationView
         return null;
     }
 
-    public HashSet<Question> getQuestionsToSkipSet(){
+    public HashSet<Question> getQuestionsToSkipSet() {
         return mQuestionsToSkipSet;
     }
 
@@ -1150,7 +1158,7 @@ public class SurveyFragment extends Fragment implements NavigationView
 //            }
 //            if (mQuestion != null) mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
 //        }
-//        updateDisplayCountLabel();
+//        updateDisplayLabels();
 //    }
 
     /*
@@ -1178,7 +1186,7 @@ public class SurveyFragment extends Fragment implements NavigationView
 //            }
 //        }
 //
-//        updateDisplayCountLabel();
+//        updateDisplayLabels();
 //    }
 
     /*
@@ -1302,8 +1310,8 @@ public class SurveyFragment extends Fragment implements NavigationView
 
     private void goToReviewPage() {
         ArrayList<String> questionsToSkip = new ArrayList<>();
-        for(Question curSkip: mQuestionsToSkipSet){
-            if(curSkip!=null) questionsToSkip.add(curSkip.getQuestionIdentifier());
+        for (Question curSkip : mQuestionsToSkipSet) {
+            if (curSkip != null) questionsToSkip.add(curSkip.getQuestionIdentifier());
         }
         Intent i = new Intent(getActivity(), ReviewPageActivity.class);
         Bundle b = new Bundle();
@@ -1351,33 +1359,17 @@ public class SurveyFragment extends Fragment implements NavigationView
         }
     }
 
-    private void updateDisplayCountLabel() {
-//        if (mQuestion != null) {
-//            if (mQuestion.belongsToGrid()) {
-//                Question first = mGrid.questions().get(0);
-//                Question last = mGrid.questions().get(mGrid.questions().size() - 1);
-//                mDisplayIndexLabel.setText((first.getNumberInInstrument()) + " - " + (
-//                        last.getNumberInInstrument()) + " " + getString(R.string.of) + " " +
-//                        mQuestionCount);
-//            } else {
-//                mDisplayIndexLabel.setText((mQuestionNumber + 1) + " " + getString(R.string.of)
-// + "
-// " +
-//                        mQuestionCount);
-//            }
-//            mProgressBar.setProgress((int) (100 * (mQuestionNumber + 1) / (float)
-// mQuestionCount));
-//
-//            if (isAdded()) {
-//                ActivityCompat.invalidateOptionsMenu(getActivity());
-//            }
-//        }
+    private void updateDisplayLabels() {
         if (mDisplay != null) {
-            mDisplayIndexLabel.setText(getString(R.string.screen) + " " + (mDisplayNumber + 1) + " "
-                    + getString(R.string.of) + " " + mDisplays.size() + " (" + getString(R.string
-                    .questions) + " " + mDisplay.questions().get(0).getNumberInInstrument() + " -" +
-                    " " + mDisplay.questions().get(mDisplay.questions().size() - 1)
-                    .getNumberInInstrument() + ")");
+            // Screen title
+            mDisplayTitle.setText(mDisplay.getTitle());
+            // Progress text
+            mDisplayIndexLabel.setText(String.format(Locale.getDefault(), "%s %d %s %d %s%s %d %s" +
+                    " %d%s", getString(R.string.screen), mDisplayNumber + 1, getString(R.string
+                    .of), mDisplays.size(), "(", getString(R.string.questions), mDisplay
+                    .questions().get(0).getNumberInInstrument(), "-", mDisplay.questions().get
+                    (mDisplay.questions().size() - 1).getNumberInInstrument(), ")"));
+            // Progress bar
             mProgressBar.setProgress((int) (100 * (mDisplayNumber + 1) / (float) mDisplays.size()));
         }
     }
