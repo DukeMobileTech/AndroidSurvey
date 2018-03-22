@@ -1,10 +1,7 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
 import android.graphics.Typeface;
-import android.os.AsyncTask;
-import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -17,10 +14,10 @@ import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
-import org.adaptlab.chpir.android.survey.models.Survey;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -53,14 +50,6 @@ public class MultipleSelectGridFragment extends GridFragment {
                 }
             }
         }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_table_question, parent, false);
-        setTableHeaderOptions(v);
-        setTableBodyContent(v);
-        return v;
     }
 
     private void setTableHeaderOptions(View v) {
@@ -175,59 +164,52 @@ public class MultipleSelectGridFragment extends GridFragment {
     }
 
     protected void setResponseIndexes(Question q, int checkedId, boolean isChecked) {
-        new SaveResponseTask(getSurvey(), q, checkedId, isChecked).execute();
-    }
-
-    private class SaveResponseTask extends AsyncTask<Void, Void, Void> {
-        private String id;
-        private Question question;
-        private Survey survey;
-        private boolean isChecked;
-
-        private SaveResponseTask(Survey s, Question q, int checkedId, boolean status) {
-            question = q;
-            id = String.valueOf(checkedId);
-            survey = s;
-            isChecked = status;
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            Response response = survey.getResponseByQuestion(question);
-            if (response == null) {
-                response = new Response();
-                response.setQuestion(question);
-                response.setSurvey(survey);
-            }
-            String serialized = "";
-            if (!response.getText().equals("")) {
-                String[] listOfIndices = response.getText().split(LIST_DELIMITER);
-                Set<String> responses = new HashSet<>(Arrays.asList(listOfIndices));
-                if (responses.contains(id) && !isChecked) {
-                    responses.remove(id);
-                } else {
-                    responses.add(id);
-                }
-                int size = 0;
-                for (String str : responses) {
-                    serialized += str;
-                    if (size < responses.size() - 1)
-                        serialized += LIST_DELIMITER;
-                    size += 1;
-                }
-            } else {
-                serialized = id;
-            }
-            response.setResponse(serialized);
-            response.save();
-            survey.save();
-            return null;
-        }
+        saveResponse(q, checkedId, isChecked);
     }
 
     @Override
-    protected void unSetResponse() {
-
+    protected void saveResponse(Question question, int checkedId, boolean isChecked) {
+        Response response = getSurvey().getResponseByQuestion(question);
+        if (response == null) {
+            response = new Response();
+            response.setQuestion(question);
+            response.setSurvey(getSurvey());
+        }
+        StringBuilder serialized = new StringBuilder();
+        if (!response.getText().equals("")) {
+            String[] listOfIndices = response.getText().split(LIST_DELIMITER);
+            Set<String> responses = new HashSet<>(Arrays.asList(listOfIndices));
+            if (responses.contains(String.valueOf(checkedId)) && !isChecked) {
+                responses.remove(String.valueOf(checkedId));
+            } else {
+                responses.add(String.valueOf(checkedId));
+            }
+            int size = 0;
+            for (String str : responses) {
+                serialized.append(str);
+                if (size < responses.size() - 1)
+                    serialized.append(LIST_DELIMITER);
+                size += 1;
+            }
+        } else {
+            serialized = new StringBuilder(String.valueOf(checkedId));
+        }
+        response.setResponse(serialized.toString());
+        response.setTimeEnded(new Date());
+        response.save();
+        getSurvey().setLastQuestion(question);
+        getSurvey().save();
     }
+
+    @Override
+    protected void createQuestionComponent(ViewGroup questionComponent) {
+        View v = getLayoutInflater().inflate(R.layout.fragment_table_question, null);
+        setTableHeaderOptions(v);
+        setTableBodyContent(v);
+        questionComponent.addView(v);
+    }
+
+    @Override
+    protected void unSetResponse() {}
 
 }

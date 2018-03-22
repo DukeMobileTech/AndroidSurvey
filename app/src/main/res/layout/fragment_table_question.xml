@@ -43,11 +43,11 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!--The layout_height has to be specified in order for the NestedScrollView to scroll-->
+    <!-- The layout_height has to be specified in order for the NestedScrollView to scroll - Done programmatically -->
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/grid_scroll_view"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="400dp"
         android:layout_below="@+id/table_header">
 
         <LinearLayout

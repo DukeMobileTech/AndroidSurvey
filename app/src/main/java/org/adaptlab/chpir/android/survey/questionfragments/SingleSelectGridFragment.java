@@ -1,9 +1,7 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
 import android.graphics.Typeface;
-import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -45,15 +43,6 @@ public class SingleSelectGridFragment extends GridFragment {
             ((RadioButton) mRadioGroups.get(mIndex).getChildAt(Integer.parseInt(responseText)))
                     .setChecked(true);
         }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.fragment_table_question, parent, false);
-        setTableHeaderOptions(mView);
-        setTableBodyContent(mView);
-        updateLayout();
-        return mView;
     }
 
     private void setTableBodyContent(View v) {
@@ -215,7 +204,14 @@ public class SingleSelectGridFragment extends GridFragment {
     }
 
     @Override
-    protected void unSetResponse() {
+    protected void unSetResponse() {}
 
+    @Override
+    protected void createQuestionComponent(ViewGroup questionComponent) {
+        mView = getLayoutInflater().inflate(R.layout.fragment_table_question, null);
+        setTableHeaderOptions(mView);
+        setTableBodyContent(mView);
+        updateLayout();
+        questionComponent.addView(mView);
     }
 }
