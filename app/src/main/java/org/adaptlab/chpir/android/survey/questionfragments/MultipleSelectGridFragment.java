@@ -86,6 +86,7 @@ public class MultipleSelectGridFragment extends GridFragment {
             if (response != null) {
                 deserialize(response.getText());
             }
+            createResponse(q);
         }
     }
 

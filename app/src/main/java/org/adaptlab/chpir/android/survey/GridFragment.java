@@ -79,8 +79,10 @@ public abstract class GridFragment extends QuestionFragment {
         ViewGroup questionComponent = (LinearLayout) v.findViewById(R.id.question_component);
         TextView questionText = v.findViewById(R.id.question_text);
         questionText.setTypeface(getInstrument().getTypeFace(getActivity()));
-        questionText.setText(styleTextWithHtml(getQuestionRange() + "<br />" + getInstructions()
-                + "<br />"));
+        questionText.setText(styleTextWithHtml(getQuestionRange() + "<br />"));
+        if (getInstructions() != null) {
+            questionText.append(styleTextWithHtml(getInstructions() + "<br />"));
+        }
         createQuestionComponent(questionComponent);
 
         // Hide special responses UI
@@ -263,6 +265,18 @@ public abstract class GridFragment extends QuestionFragment {
     protected Instrument getInstrument() {
         return mSurvey.getInstrument();
     }
+
+    protected void createResponse(Question question) {
+        Response response = getSurvey().getResponseByQuestion(question);
+        if (response == null) {
+            response = new Response();
+            response.setQuestion(question);
+            response.setSurvey(getSurvey());
+            response.setTimeStarted(new Date());
+            response.save();
+        }
+    }
+
 
     protected void saveResponse(Question question, int checkedId, boolean isChecked) {
         Response response = mSurvey.getResponseByQuestion(question);

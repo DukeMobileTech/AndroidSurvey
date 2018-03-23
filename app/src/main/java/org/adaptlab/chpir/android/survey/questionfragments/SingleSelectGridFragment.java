@@ -13,8 +13,10 @@ import org.adaptlab.chpir.android.survey.GridFragment;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.Question;
+import org.adaptlab.chpir.android.survey.models.Response;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -55,6 +57,7 @@ public class SingleSelectGridFragment extends GridFragment {
             final Question q = mQuestionList.get(k);
             setQuestionText(questionTextLayout, k, q);
             setRadioButtons(optionsListLinearLayout, k, q);
+            createResponse(q);
             mIndex = k;
             if (getSurvey().getResponseByQuestion(q) != null) {
                 deserialize(getSurvey().getResponseByQuestion(q).getText());
