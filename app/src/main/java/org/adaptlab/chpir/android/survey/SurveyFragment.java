@@ -326,8 +326,7 @@ public class SurveyFragment extends Fragment implements NavigationView
             Fabric.with(getActivity(), new Crashlytics());
             Crashlytics.setString(getString(R.string.last_instrument), mInstrument.getTitle());
             Crashlytics.setString(getString(R.string.last_survey), mSurvey.getUUID());
-            Crashlytics.setString(getString(R.string.last_question), mQuestion
-                    .getNumberInInstrument() + "");
+            Crashlytics.setString(getString(R.string.last_display), mDisplay.getTitle());
         }
     }
 
@@ -891,7 +890,7 @@ public class SurveyFragment extends Fragment implements NavigationView
                         .MATCH_PARENT, ViewPager.LayoutParams.WRAP_CONTENT));
 
                 framelayout.setId(new BigDecimal(displayQuestions.get(0).getRemoteId())
-                        .intValueExact());
+                        .intValueExact() + 1000000);
                 mQuestionViewLayout.addView(framelayout);
 
                 ArrayList<String> questionsToSkip = new ArrayList<>();

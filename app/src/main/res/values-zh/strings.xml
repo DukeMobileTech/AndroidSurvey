@@ -148,6 +148,11 @@
     <string name="show_scores">Show Scores</string>
     <string name="required_field">Field should not be empty!</string>
     <string name="last_survey">last survey</string>
-    <string name="last_question">last question</string>
+    <string name="last_display">last question</string>
     <string name="api_configuration">Please enter the API end point values in the Settings panel and then refresh</string>
+    <string name="screen">screen</string>
+    <string name="latitude">Latitude</string>
+    <string name="longitude">Longitude</string>
+    <string name="altitude">Altitude</string>
+    <string name="update_location">Update Location</string>
 </resources>
