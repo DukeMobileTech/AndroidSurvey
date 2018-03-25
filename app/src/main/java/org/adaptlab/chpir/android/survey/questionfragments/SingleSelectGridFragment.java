@@ -106,7 +106,8 @@ public class SingleSelectGridFragment extends GridFragment {
                 .LayoutParams.MATCH_PARENT, MIN_HEIGHT);
         radioButtons.setLayoutParams(buttonParams);
         adjustRowHeight(radioButtons, k);
-        for (int i = 0; i < getDisplay().options().size(); i++) {
+        int normalOptionsSize = getDisplay().options().size();
+        for (int i = 0; i < normalOptionsSize; i++) {
             RadioButton button = new RadioButton(getActivity());
             button.setSaveEnabled(false);
             button.setId(i);
@@ -119,6 +120,22 @@ public class SingleSelectGridFragment extends GridFragment {
                 }
             });
             radioButtons.addView(button, i);
+        }
+        if(q.hasSpecialOptions()){
+            for(int j=0; j<q.specialOptions().size(); j++){
+                RadioButton button = new RadioButton(getActivity());
+                button.setSaveEnabled(false);
+                button.setId(j+normalOptionsSize);
+                RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(mOptionWidth, MIN_HEIGHT);
+                button.setLayoutParams(params);
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        updateLayout();
+                    }
+                });
+                radioButtons.addView(button, j+getDisplay().options().size());
+            }
         }
         choiceRow.addView(radioButtons);
         optionsListLinearLayout.addView(choiceRow, k);
@@ -213,11 +230,19 @@ public class SingleSelectGridFragment extends GridFragment {
         questionTextHeader.setPadding(10, 10, 10, 10);
 
         LinearLayout headerTableLayout = v.findViewById(R.id.table_options_header);
-        final List<Option> headerLabels = getDisplay().options();
+        List<Option> headerLabels = getDisplay().options();
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         float margin = getActivity().getResources().getDimension(R.dimen.activity_horizontal_margin);
         float totalWidth = (displayMetrics.widthPixels - margin * 2) / 2;
+        for(Question curQuestion: getQuestions()){
+            if(curQuestion.hasSpecialOptions()){
+                for(Option curSpecialOption: curQuestion.specialOptions()){
+                    headerLabels.add(curSpecialOption);
+                }
+                break;
+            }
+        }
         mOptionWidth = (int) totalWidth / headerLabels.size();
 
         for (int k = 0; k < headerLabels.size(); k++) {
