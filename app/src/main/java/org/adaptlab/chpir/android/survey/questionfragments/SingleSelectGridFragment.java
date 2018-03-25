@@ -2,8 +2,10 @@ package org.adaptlab.chpir.android.survey.questionfragments;
 
 import android.graphics.Typeface;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -86,10 +88,10 @@ public class SingleSelectGridFragment extends GridFragment {
                         setCurrentRowHeight(curQuestionTextView, 0);
                         setCurrentRowHeight(curOptionListView, 0);
                     } else {
-                        if (rowHeights[i] != null) {
-                            setCurrentRowHeight(curQuestionTextView, rowHeights[i]);
-                            setCurrentRowHeight(curOptionListView, rowHeights[i]);
-                        }
+//                        if (rowHeights[i] != null) {
+//                            setCurrentRowHeight(curQuestionTextView, rowHeights[i]);
+//                            setCurrentRowHeight(curOptionListView, rowHeights[i]);
+//                        }
                     }
                 }
             }
@@ -127,6 +129,29 @@ public class SingleSelectGridFragment extends GridFragment {
             }
         });
         mRadioGroups.add(radioButtons);
+//        if(q.hasSpecialOptions()){
+//            LinearLayout specialOptionView = new LinearLayout(getActivity());
+//            LinearLayout.LayoutParams specialOptionsParams = new LinearLayout.LayoutParams(LinearLayout
+//                    .LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+//            specialOptionsParams.setMargins(MARGIN_0, MARGIN_0, MARGIN_10, MARGIN_10);
+//            choiceRow.setLayoutParams(specialOptionsParams);
+//            List<String> responses = new ArrayList<>();
+//            Log.i("GridSpecialOptions", "has special options " + q.specialOptions().size());
+//            for (Option option : q.specialOptions()) {
+//                responses.add(option.getText(q.getInstrument()));
+//            }
+//            for (String response : responses) {
+//                int responseId = responses.indexOf(response);
+//                final Button button = new RadioButton(getActivity());
+//                button.setText(response);
+//                button.setId(responseId);
+//                button.setTypeface(getInstrument().getTypeFace(getActivity().getApplicationContext()));
+//                specialOptionView.addView(button, responseId);
+//                button.setVisibility(View.INVISIBLE);
+//                break;
+//            }
+//            questionTextLayout.addView(specialOptionView);
+//        }
     }
 
     private void setQuestionText(LinearLayout questionTextLayout, int k, Question q) {
@@ -150,6 +175,36 @@ public class SingleSelectGridFragment extends GridFragment {
         questionRow.addView(questionText);
         questionTextLayout.addView(questionRow, k);
         setRowHeight(questionRow, k);
+//        if(q.hasSpecialOptions()){
+//            LinearLayout specialOptionView = new LinearLayout(getActivity());
+//            LinearLayout.LayoutParams specialOptionsParams = new LinearLayout.LayoutParams(LinearLayout
+//                    .LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+//            specialOptionsParams.setMargins(MARGIN_0, MARGIN_0, MARGIN_10, MARGIN_10);
+//            questionRow.setLayoutParams(specialOptionsParams);
+//            List<String> responses = new ArrayList<>();
+//            Log.i("GridSpecialOptions", "has special options " + q.specialOptions().size());
+//            for (Option option : q.specialOptions()) {
+//                responses.add(option.getText(q.getInstrument()));
+//            }
+//            for (String response : responses) {
+//                int responseId = responses.indexOf(response);
+//                final Button button = new RadioButton(getActivity());
+//                button.setText(response);
+//                button.setId(responseId);
+//                button.setTypeface(getInstrument().getTypeFace(getActivity().getApplicationContext()));
+//
+//                specialOptionView.addView(button, responseId);
+//                final List<String> finalResponses = responses;
+//                button.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        unSetResponse();
+//                        setSpecialResponse(finalResponses.get(v.getId()));
+//                    }
+//                });
+//            }
+//            questionTextLayout.addView(specialOptionView);
+//        }
     }
 
     private void setTableHeaderOptions(View v) {

@@ -25,6 +25,7 @@ import android.widget.TextView;
 
 import com.activeandroid.query.Select;
 
+import org.adaptlab.chpir.android.survey.models.Display;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.NextQuestion;
 import org.adaptlab.chpir.android.survey.models.Option;
@@ -146,36 +147,37 @@ public abstract class QuestionFragment extends Fragment {
         setResponseSkips();
         setSpecialResponseSkips();
         refreshFollowUpQuestion();
-
-        mSpecialResponses = v.findViewById(R.id.special_responses_container);
-        List<String> responses = new ArrayList<>();
-        if (mQuestion.hasSpecialOptions()) {
-            Log.i(TAG, "has special options " + mQuestion.specialOptions().size());
-            for (Option option : mQuestion.specialOptions()) {
-                responses.add(option.getText(mQuestion.getInstrument()));
-            }
-        } else {
-            Log.i(TAG, "No special options");
-        }
-
-        for (String response : responses) {
-            int responseId = responses.indexOf(response);
-            final Button button = new RadioButton(getActivity());
-            button.setText(response);
-            button.setId(responseId);
-            button.setTypeface(getInstrument().getTypeFace(getActivity().getApplicationContext()));
-
-            mSpecialResponses.addView(button, responseId);
-            final List<String> finalResponses = responses;
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    unSetResponse();
-                    setSpecialResponse(finalResponses.get(v.getId()));
+        if (!mQuestion.getDisplay().getMode().equals(Display.DisplayMode.TABLE.toString())){
+            mSpecialResponses = v.findViewById(R.id.special_responses_container);
+            List<String> responses = new ArrayList<>();
+            if (mQuestion.hasSpecialOptions()) {
+                Log.i(TAG, "has special options " + mQuestion.specialOptions().size());
+                for (Option option : mQuestion.specialOptions()) {
+                    responses.add(option.getText(mQuestion.getInstrument()));
                 }
-            });
+            } else {
+                Log.i(TAG, "No special options");
+            }
+
+            for (String response : responses) {
+                int responseId = responses.indexOf(response);
+                final Button button = new RadioButton(getActivity());
+                button.setText(response);
+                button.setId(responseId);
+                button.setTypeface(getInstrument().getTypeFace(getActivity().getApplicationContext()));
+
+                mSpecialResponses.addView(button, responseId);
+                final List<String> finalResponses = responses;
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        unSetResponse();
+                        setSpecialResponse(finalResponses.get(v.getId()));
+                    }
+                });
+            }
+            if (responses.size() == 0) mSpecialResponses.setVisibility(View.GONE);
         }
-        if (responses.size() == 0) mSpecialResponses.setVisibility(View.GONE);
         deserializeSpecialResponse();
         return v;
     }
