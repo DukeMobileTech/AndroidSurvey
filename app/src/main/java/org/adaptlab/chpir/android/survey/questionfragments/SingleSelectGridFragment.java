@@ -88,10 +88,10 @@ public class SingleSelectGridFragment extends GridFragment {
                         setCurrentRowHeight(curQuestionTextView, 0);
                         setCurrentRowHeight(curOptionListView, 0);
                     } else {
-//                        if (rowHeights[i] != null) {
-//                            setCurrentRowHeight(curQuestionTextView, rowHeights[i]);
-//                            setCurrentRowHeight(curOptionListView, rowHeights[i]);
-//                        }
+                        if (rowHeights[i] != null) {
+                            setCurrentRowHeight(curQuestionTextView, rowHeights[i]);
+                            setCurrentRowHeight(curOptionListView, rowHeights[i]);
+                        }
                     }
                 }
             }
