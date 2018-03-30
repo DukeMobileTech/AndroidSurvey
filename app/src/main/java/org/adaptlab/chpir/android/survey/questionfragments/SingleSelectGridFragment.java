@@ -106,7 +106,7 @@ public class SingleSelectGridFragment extends GridFragment {
                 .LayoutParams.MATCH_PARENT, MIN_HEIGHT);
         radioButtons.setLayoutParams(buttonParams);
         adjustRowHeight(radioButtons, k);
-        int normalOptionsSize = getDisplay().options().size();
+        final int normalOptionsSize = getDisplay().options().size();
         for (int i = 0; i < normalOptionsSize; i++) {
             RadioButton button = new RadioButton(getActivity());
             button.setSaveEnabled(false);
@@ -122,6 +122,11 @@ public class SingleSelectGridFragment extends GridFragment {
             radioButtons.addView(button, i);
         }
         if(q.hasSpecialOptions()){
+            List<String> responses = new ArrayList<>();
+            for (Option option : q.specialOptions()) {
+                responses.add(option.getText(q.getInstrument()));
+            }
+            final List<String> finalResponses = responses;
             for(int j=0; j<q.specialOptions().size(); j++){
                 RadioButton button = new RadioButton(getActivity());
                 button.setSaveEnabled(false);
@@ -131,6 +136,7 @@ public class SingleSelectGridFragment extends GridFragment {
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        setSpecialResponse(q, finalResponses.get(view.getId()-normalOptionsSize));
                         updateLayout();
                     }
                 });

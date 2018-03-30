@@ -22,6 +22,7 @@ import org.adaptlab.chpir.android.survey.models.Display;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.NextQuestion;
 import org.adaptlab.chpir.android.survey.models.Option;
+import org.adaptlab.chpir.android.survey.models.OptionInOptionSet;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Survey;
@@ -116,6 +117,22 @@ public abstract class GridFragment extends QuestionFragment {
                 response.save();
                 deserialize(response.getText());
             }
+        }
+    }
+
+    public void setSpecialResponse(Question question, String specialResponse) {
+        Response response = mSurvey.getResponseByQuestion(question);
+        if (response != null) {
+            response.setSpecialResponse(specialResponse);
+            response.setResponse("");
+            response.setDeviceUser(AuthUtils.getCurrentUser());
+            response.setTimeEnded(new Date());
+            deserialize(response.getText());
+            mSurvey.setLastQuestion(question);
+//            new SaveResponseTask().execute(mResponse);
+            response.save();
+            mSurvey.save();
+            setSpecialResponseSkips(question);
         }
     }
 
@@ -242,9 +259,43 @@ public abstract class GridFragment extends QuestionFragment {
                     mSurveyFragment.setMultipleSkipQuestions(selectedOption, question);
                 }
             }
-        } else if (!TextUtils.isEmpty(mResponse.getText())) {
+        } else if (!TextUtils.isEmpty(getSurvey().getResponseByQuestion(question).getText())) {
             mSurveyFragment.setNextQuestion(question.getQuestionIdentifier(), question
                     .getQuestionIdentifier(), question.getQuestionIdentifier());
+        }
+    }
+
+    private void setSpecialResponseSkips(Question question) {
+        Log.i(TAG,"00000000000000");
+        Response curResponse = mSurvey.getResponseByQuestion(question);
+        Log.i("SPECIALRESPONSE", curResponse.getSpecialResponse());
+        Log.i("HASSPECIALRESPONSE",question.hasSpecialOptions()+"");
+        if (!TextUtils.isEmpty(curResponse.getSpecialResponse()) && question.hasSpecialOptions()) {
+            Log.i(TAG,"1111111111111111");
+            Option specialOption = new Select("Options.*").distinct().from(Option.class)
+                    .innerJoin(OptionInOptionSet.class)
+                    .on("OptionInOptionSets.RemoteOptionSetId = ?", question.getRemoteSpecialOptionSetId())
+                    .where("Options.Text = ? AND OptionInOptionSets.RemoteOptionId = Options.RemoteId",
+                            curResponse.getSpecialResponse())
+                    .executeSingle();
+            Log.i("SPECIALOPTION",specialOption.getText(getInstrument()));
+            if (specialOption != null) {
+                Log.i(TAG,"222222222222222");
+                NextQuestion specialSkipOption = getNextQuestion(question, specialOption);
+                if (specialSkipOption != null) {
+                    Log.i(TAG,"3333333333333");
+                    mSurveyFragment.setNextQuestion(question.getQuestionIdentifier(),
+                            specialSkipOption.getNextQuestionIdentifier(), question.getQuestionIdentifier());
+                } else if (question.hasSpecialSkips(question.getInstrument())) {
+                    Log.i(TAG,"44444444444444");
+                    mSurveyFragment.setNextQuestion(question.getQuestionIdentifier(), question
+                            .getQuestionIdentifier(), question.getQuestionIdentifier());
+                }
+            }
+            if (question.isMultipleSkipQuestion(question.getInstrument()) && !TextUtils.isEmpty(curResponse.getSpecialResponse())) {
+                Log.i(TAG,"55555555555555");
+                mSurveyFragment.setMultipleSkipQuestions(specialOption, question);
+            }
         }
     }
 
