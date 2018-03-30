@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.activeandroid.Model;
@@ -124,12 +125,9 @@ public abstract class GridFragment extends QuestionFragment {
         Response response = mSurvey.getResponseByQuestion(question);
         if (response != null) {
             response.setSpecialResponse(specialResponse);
-            response.setResponse("");
             response.setDeviceUser(AuthUtils.getCurrentUser());
             response.setTimeEnded(new Date());
-            deserialize(response.getText());
             mSurvey.setLastQuestion(question);
-//            new SaveResponseTask().execute(mResponse);
             response.save();
             mSurvey.save();
             setSpecialResponseSkips(question);

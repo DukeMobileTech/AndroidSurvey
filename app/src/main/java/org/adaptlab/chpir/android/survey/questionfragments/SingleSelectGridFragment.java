@@ -1,6 +1,7 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
 import android.graphics.Typeface;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -43,7 +44,7 @@ public class SingleSelectGridFragment extends GridFragment {
             if (checked > -1) {
                 ((RadioButton) mRadioGroups.get(mIndex).getChildAt(checked)).setChecked(false);
             }
-        } else {
+        } else{
             ((RadioButton) mRadioGroups.get(mIndex).getChildAt(Integer.parseInt(responseText)))
                     .setChecked(true);
         }
