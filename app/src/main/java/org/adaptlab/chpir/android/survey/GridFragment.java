@@ -72,6 +72,9 @@ public abstract class GridFragment extends QuestionFragment {
             getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         }
         mQuestions = mDisplay.questions();
+        for(Question curQuestion: mQuestions){
+            setSpecialResponseSkips(curQuestion);
+        }
     }
 
     @Override
