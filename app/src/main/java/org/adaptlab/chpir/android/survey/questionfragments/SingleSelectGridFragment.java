@@ -1,12 +1,10 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
 import android.graphics.Typeface;
-import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -16,10 +14,8 @@ import org.adaptlab.chpir.android.survey.GridFragment;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.Question;
-import org.adaptlab.chpir.android.survey.models.Response;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -44,7 +40,7 @@ public class SingleSelectGridFragment extends GridFragment {
             if (checked > -1) {
                 ((RadioButton) mRadioGroups.get(mIndex).getChildAt(checked)).setChecked(false);
             }
-        } else{
+        } else {
             ((RadioButton) mRadioGroups.get(mIndex).getChildAt(Integer.parseInt(responseText)))
                     .setChecked(true);
         }
@@ -122,26 +118,27 @@ public class SingleSelectGridFragment extends GridFragment {
             });
             radioButtons.addView(button, i);
         }
-        if(q.hasSpecialOptions()){
+        if (q.hasSpecialOptions()) {
             List<String> responses = new ArrayList<>();
             for (Option option : q.specialOptions()) {
                 responses.add(option.getText(q.getInstrument()));
             }
             final List<String> finalResponses = responses;
-            for(int j=0; j<q.specialOptions().size(); j++){
+            for (int j = 0; j < q.specialOptions().size(); j++) {
                 RadioButton button = new RadioButton(getActivity());
                 button.setSaveEnabled(false);
-                button.setId(j+normalOptionsSize);
-                RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(mOptionWidth, MIN_HEIGHT);
+                button.setId(j + normalOptionsSize);
+                RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(mOptionWidth,
+                        MIN_HEIGHT);
                 button.setLayoutParams(params);
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        setSpecialResponse(q, finalResponses.get(view.getId()-normalOptionsSize));
+                        setSpecialResponse(q, finalResponses.get(view.getId() - normalOptionsSize));
                         updateLayout();
                     }
                 });
-                radioButtons.addView(button, j+getDisplay().options().size());
+                radioButtons.addView(button, j + getDisplay().options().size());
             }
         }
         choiceRow.addView(radioButtons);
@@ -155,7 +152,8 @@ public class SingleSelectGridFragment extends GridFragment {
         mRadioGroups.add(radioButtons);
 //        if(q.hasSpecialOptions()){
 //            LinearLayout specialOptionView = new LinearLayout(getActivity());
-//            LinearLayout.LayoutParams specialOptionsParams = new LinearLayout.LayoutParams(LinearLayout
+//            LinearLayout.LayoutParams specialOptionsParams = new LinearLayout.LayoutParams
+// (LinearLayout
 //                    .LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 //            specialOptionsParams.setMargins(MARGIN_0, MARGIN_0, MARGIN_10, MARGIN_10);
 //            choiceRow.setLayoutParams(specialOptionsParams);
@@ -169,7 +167,8 @@ public class SingleSelectGridFragment extends GridFragment {
 //                final Button button = new RadioButton(getActivity());
 //                button.setText(response);
 //                button.setId(responseId);
-//                button.setTypeface(getInstrument().getTypeFace(getActivity().getApplicationContext()));
+//                button.setTypeface(getInstrument().getTypeFace(getActivity()
+// .getApplicationContext()));
 //                specialOptionView.addView(button, responseId);
 //                button.setVisibility(View.INVISIBLE);
 //                break;
@@ -201,7 +200,8 @@ public class SingleSelectGridFragment extends GridFragment {
         setRowHeight(questionRow, k);
 //        if(q.hasSpecialOptions()){
 //            LinearLayout specialOptionView = new LinearLayout(getActivity());
-//            LinearLayout.LayoutParams specialOptionsParams = new LinearLayout.LayoutParams(LinearLayout
+//            LinearLayout.LayoutParams specialOptionsParams = new LinearLayout.LayoutParams
+// (LinearLayout
 //                    .LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 //            specialOptionsParams.setMargins(MARGIN_0, MARGIN_0, MARGIN_10, MARGIN_10);
 //            questionRow.setLayoutParams(specialOptionsParams);
@@ -215,7 +215,8 @@ public class SingleSelectGridFragment extends GridFragment {
 //                final Button button = new RadioButton(getActivity());
 //                button.setText(response);
 //                button.setId(responseId);
-//                button.setTypeface(getInstrument().getTypeFace(getActivity().getApplicationContext()));
+//                button.setTypeface(getInstrument().getTypeFace(getActivity()
+// .getApplicationContext()));
 //
 //                specialOptionView.addView(button, responseId);
 //                final List<String> finalResponses = responses;
@@ -240,13 +241,12 @@ public class SingleSelectGridFragment extends GridFragment {
         List<Option> headerLabels = getDisplay().options();
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        float margin = getActivity().getResources().getDimension(R.dimen.activity_horizontal_margin);
+        float margin = getActivity().getResources().getDimension(R.dimen
+                .activity_horizontal_margin);
         float totalWidth = (displayMetrics.widthPixels - margin * 2) / 2;
-        for(Question curQuestion: getQuestions()){
-            if(curQuestion.hasSpecialOptions()){
-                for(Option curSpecialOption: curQuestion.specialOptions()){
-                    headerLabels.add(curSpecialOption);
-                }
+        for (Question curQuestion : getQuestions()) {
+            if (curQuestion.hasSpecialOptions()) {
+                headerLabels.addAll(curQuestion.specialOptions());
                 break;
             }
         }
@@ -294,7 +294,8 @@ public class SingleSelectGridFragment extends GridFragment {
     }
 
     @Override
-    protected void unSetResponse() {}
+    protected void unSetResponse() {
+    }
 
     @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {

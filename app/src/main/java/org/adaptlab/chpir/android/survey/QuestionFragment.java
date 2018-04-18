@@ -70,10 +70,13 @@ public abstract class QuestionFragment extends Fragment {
         if (savedInstanceState == null) {
             init();
         } else {
-            mInstrument = Instrument.load(Instrument.class, savedInstanceState.getLong(EXTRA_INSTRUMENT_ID));
+            mInstrument = Instrument.load(Instrument.class, savedInstanceState.getLong
+                    (EXTRA_INSTRUMENT_ID));
             mSurvey = Survey.load(Survey.class, savedInstanceState.getLong(EXTRA_SURVEY_ID));
-            mQuestion = Question.load(Question.class, savedInstanceState.getLong(EXTRA_QUESTION_ID));
-            mResponse = Response.load(Response.class, savedInstanceState.getLong(EXTRA_RESPONSE_ID));
+            mQuestion = Question.load(Question.class, savedInstanceState.getLong
+                    (EXTRA_QUESTION_ID));
+            mResponse = Response.load(Response.class, savedInstanceState.getLong
+                    (EXTRA_RESPONSE_ID));
             mOptions = mSurveyFragment.getOptions().get(mQuestion);
         }
     }
@@ -81,16 +84,16 @@ public abstract class QuestionFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if(mInstrument!=null){
+        if (mInstrument != null) {
             outState.putLong(EXTRA_INSTRUMENT_ID, mInstrument.getId());
         }
-        if(mSurvey!=null){
+        if (mSurvey != null) {
             outState.putLong(EXTRA_SURVEY_ID, mSurvey.getId());
         }
-        if(mQuestion!=null){
+        if (mQuestion != null) {
             outState.putLong(EXTRA_QUESTION_ID, mQuestion.getId());
         }
-        if(mResponse!=null){
+        if (mResponse != null) {
             outState.putLong(EXTRA_RESPONSE_ID, mResponse.getId());
         }
     }
@@ -147,7 +150,7 @@ public abstract class QuestionFragment extends Fragment {
         setResponseSkips();
         setSpecialResponseSkips();
         refreshFollowUpQuestion();
-        if (!mQuestion.getDisplay().getMode().equals(Display.DisplayMode.TABLE.toString())){
+        if (!mQuestion.getDisplay().getMode().equals(Display.DisplayMode.TABLE.toString())) {
             mSpecialResponses = v.findViewById(R.id.special_responses_container);
             List<String> responses = new ArrayList<>();
             if (mQuestion.hasSpecialOptions()) {
@@ -164,7 +167,8 @@ public abstract class QuestionFragment extends Fragment {
                 final Button button = new RadioButton(getActivity());
                 button.setText(response);
                 button.setId(responseId);
-                button.setTypeface(getInstrument().getTypeFace(getActivity().getApplicationContext()));
+                button.setTypeface(getInstrument().getTypeFace(getActivity()
+                        .getApplicationContext()));
 
                 mSpecialResponses.addView(button, responseId);
                 final List<String> finalResponses = responses;
@@ -288,13 +292,13 @@ public abstract class QuestionFragment extends Fragment {
         }
     }
 
-    public void unSetAllResponses(){
+    public void unSetAllResponses() {
         unSetResponse();
-        if(mResponse!=null){
+        if (mResponse != null) {
             mResponse.setSpecialResponse("");
             mResponse.setOtherResponse("");
         }
-        if(mSpecialResponses!=null){
+        if (mSpecialResponses != null) {
             mSpecialResponses.clearCheck();
         }
     }
@@ -367,29 +371,30 @@ public abstract class QuestionFragment extends Fragment {
     private void setResponseSkips() {
         if (mQuestion.isSkipQuestionType() && !TextUtils.isEmpty(mResponse.getText())) {
             int responseIndex = Integer.parseInt(mResponse.getText());
-            if ((mQuestion.isOtherQuestionType()||mQuestion.isDropDownQuestionType()) && responseIndex == mQuestion.options().size()) {
-                Log.i("isOtherOrDropDown","isOtherOrDropDownQuestionType");
+            if ((mQuestion.isOtherQuestionType() || mQuestion.isDropDownQuestionType()) &&
+                    responseIndex == mQuestion.options().size()) {
+                Log.i("isOtherOrDropDown", "isOtherOrDropDownQuestionType");
                 mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion
                         .getQuestionIdentifier(), mQuestion.getQuestionIdentifier());
                 mSurveyFragment.setMultipleSkipQuestions(null, mQuestion);
 
-            } else if (responseIndex < mQuestion.options().size()){
+            } else if (responseIndex < mQuestion.options().size()) {
                 Option selectedOption = mQuestion.options().get(responseIndex);
                 NextQuestion skipOption = getNextQuestion(selectedOption);
-                Log.i("selectedOption",selectedOption.toString()+" ");
+                Log.i("selectedOption", selectedOption.toString() + " ");
                 if (skipOption != null) {
-                    Log.i("skipOption",skipOption.toString()+" ");
+                    Log.i("skipOption", skipOption.toString() + " ");
                     mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), skipOption
                             .getNextQuestionIdentifier(), mQuestion.getQuestionIdentifier());
                 } else if (mQuestion.hasSkips(mInstrument)) {
                     mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion
                             .getQuestionIdentifier(), mQuestion.getQuestionIdentifier());
                 }
-                if (mQuestion.isMultipleSkipQuestion(mInstrument)){
+                if (mQuestion.isMultipleSkipQuestion(mInstrument)) {
                     mSurveyFragment.setMultipleSkipQuestions(selectedOption, mQuestion);
                 }
             }
-        } else if(!TextUtils.isEmpty(mResponse.getText())){
+        } else if (!TextUtils.isEmpty(mResponse.getText())) {
             mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion
                     .getQuestionIdentifier(), mQuestion.getQuestionIdentifier());
         }
@@ -406,21 +411,25 @@ public abstract class QuestionFragment extends Fragment {
         if (!TextUtils.isEmpty(mResponse.getSpecialResponse()) && mQuestion.hasSpecialOptions()) {
             Option specialOption = new Select("Options.*").distinct().from(Option.class)
                     .innerJoin(OptionInOptionSet.class)
-                    .on("OptionInOptionSets.RemoteOptionSetId = ?", mQuestion.getRemoteSpecialOptionSetId())
-                    .where("Options.Text = ? AND OptionInOptionSets.RemoteOptionId = Options.RemoteId",
+                    .on("OptionInOptionSets.RemoteOptionSetId = ?", mQuestion
+                            .getRemoteSpecialOptionSetId())
+                    .where("Options.Text = ? AND OptionInOptionSets.RemoteOptionId = Options" +
+                                    ".RemoteId",
                             mResponse.getSpecialResponse())
                     .executeSingle();
             if (specialOption != null) {
                 NextQuestion specialSkipOption = getNextQuestion(specialOption);
                 if (specialSkipOption != null) {
                     mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(),
-                            specialSkipOption.getNextQuestionIdentifier(), mQuestion.getQuestionIdentifier());
+                            specialSkipOption.getNextQuestionIdentifier(), mQuestion
+                                    .getQuestionIdentifier());
                 } else if (mQuestion.hasSpecialSkips(mInstrument)) {
                     mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion
                             .getQuestionIdentifier(), mQuestion.getQuestionIdentifier());
                 }
             }
-            if (mQuestion.isMultipleSkipQuestion(mInstrument) && !TextUtils.isEmpty(mResponse.getSpecialResponse())) {
+            if (mQuestion.isMultipleSkipQuestion(mInstrument) && !TextUtils.isEmpty(mResponse
+                    .getSpecialResponse())) {
                 mSurveyFragment.setMultipleSkipQuestions(specialOption, mQuestion);
             }
         }

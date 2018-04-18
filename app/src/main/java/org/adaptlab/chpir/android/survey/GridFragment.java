@@ -13,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.activeandroid.Model;
@@ -267,35 +266,28 @@ public abstract class GridFragment extends QuestionFragment {
     }
 
     private void setSpecialResponseSkips(Question question) {
-        Log.i(TAG,"00000000000000");
         Response curResponse = mSurvey.getResponseByQuestion(question);
-        Log.i("SPECIALRESPONSE", curResponse.getSpecialResponse());
-        Log.i("HASSPECIALRESPONSE",question.hasSpecialOptions()+"");
-        if (!TextUtils.isEmpty(curResponse.getSpecialResponse()) && question.hasSpecialOptions()) {
-            Log.i(TAG,"1111111111111111");
-            Option specialOption = new Select("Options.*").distinct().from(Option.class)
-                    .innerJoin(OptionInOptionSet.class)
-                    .on("OptionInOptionSets.RemoteOptionSetId = ?", question.getRemoteSpecialOptionSetId())
-                    .where("Options.Text = ? AND OptionInOptionSets.RemoteOptionId = Options.RemoteId",
-                            curResponse.getSpecialResponse())
-                    .executeSingle();
-            Log.i("SPECIALOPTION",specialOption.getText(getInstrument()));
-            if (specialOption != null) {
-                Log.i(TAG,"222222222222222");
-                NextQuestion specialSkipOption = getNextQuestion(question, specialOption);
-                if (specialSkipOption != null) {
-                    Log.i(TAG,"3333333333333");
-                    mSurveyFragment.setNextQuestion(question.getQuestionIdentifier(),
-                            specialSkipOption.getNextQuestionIdentifier(), question.getQuestionIdentifier());
-                } else if (question.hasSpecialSkips(question.getInstrument())) {
-                    Log.i(TAG,"44444444444444");
-                    mSurveyFragment.setNextQuestion(question.getQuestionIdentifier(), question
-                            .getQuestionIdentifier(), question.getQuestionIdentifier());
+        if (curResponse != null) {
+            if (!TextUtils.isEmpty(curResponse.getSpecialResponse()) && question.hasSpecialOptions()) {
+                Option specialOption = new Select("Options.*").distinct().from(Option.class)
+                        .innerJoin(OptionInOptionSet.class)
+                        .on("OptionInOptionSets.RemoteOptionSetId = ?", question.getRemoteSpecialOptionSetId())
+                        .where("Options.Text = ? AND OptionInOptionSets.RemoteOptionId = Options" +
+                                        ".RemoteId", curResponse.getSpecialResponse())
+                        .executeSingle();
+                if (specialOption != null) {
+                    NextQuestion specialSkipOption = getNextQuestion(question, specialOption);
+                    if (specialSkipOption != null) {
+                        mSurveyFragment.setNextQuestion(question.getQuestionIdentifier(),
+                                specialSkipOption.getNextQuestionIdentifier(), question.getQuestionIdentifier());
+                    } else if (question.hasSpecialSkips(question.getInstrument())) {
+                        mSurveyFragment.setNextQuestion(question.getQuestionIdentifier(), question
+                                .getQuestionIdentifier(), question.getQuestionIdentifier());
+                    }
                 }
-            }
-            if (question.isMultipleSkipQuestion(question.getInstrument()) && !TextUtils.isEmpty(curResponse.getSpecialResponse())) {
-                Log.i(TAG,"55555555555555");
-                mSurveyFragment.setMultipleSkipQuestions(specialOption, question);
+                if (question.isMultipleSkipQuestion(question.getInstrument()) && !TextUtils.isEmpty(curResponse.getSpecialResponse())) {
+                    mSurveyFragment.setMultipleSkipQuestions(specialOption, question);
+                }
             }
         }
     }
