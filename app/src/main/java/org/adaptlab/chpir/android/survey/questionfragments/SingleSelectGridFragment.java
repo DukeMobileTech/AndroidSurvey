@@ -3,17 +3,22 @@ package org.adaptlab.chpir.android.survey.questionfragments;
 import android.graphics.Typeface;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import org.adaptlab.chpir.android.survey.GridFragment;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.Question;
+import org.adaptlab.chpir.android.survey.models.Response;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -97,7 +102,8 @@ public class SingleSelectGridFragment extends GridFragment {
 
     private void setRadioButtons(LinearLayout optionsListLinearLayout, int k, final Question q) {
         LinearLayout choiceRow = new LinearLayout(getActivity());
-        RadioGroup radioButtons = new RadioGroup(getActivity());
+        choiceRow.setOrientation(LinearLayout.HORIZONTAL);
+        final RadioGroup radioButtons = new RadioGroup(getActivity());
         radioButtons.setOrientation(RadioGroup.HORIZONTAL);
         RadioGroup.LayoutParams buttonParams = new RadioGroup.LayoutParams(RadioGroup
                 .LayoutParams.MATCH_PARENT, MIN_HEIGHT);
@@ -118,30 +124,78 @@ public class SingleSelectGridFragment extends GridFragment {
             });
             radioButtons.addView(button, i);
         }
+//        if (q.hasSpecialOptions()) {
+//            List<String> responses = new ArrayList<>();
+//            for (Option option : q.specialOptions()) {
+//                responses.add(option.getText(q.getInstrument()));
+//            }
+//            final List<String> finalResponses = responses;
+//            for (int j = 0; j < q.specialOptions().size(); j++) {
+//                RadioButton button = new RadioButton(getActivity());
+//                button.setSaveEnabled(false);
+//                button.setId(j + normalOptionsSize);
+//                RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(mOptionWidth,
+//                        MIN_HEIGHT);
+//                button.setLayoutParams(params);
+//                button.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//                        setSpecialResponse(q, finalResponses.get(view.getId() - normalOptionsSize));
+//                        updateLayout();
+//                    }
+//                });
+//                radioButtons.addView(button, j + getDisplay().options().size());
+//            }
+//        }
+
+        LinearLayout radioGroupLayout = new LinearLayout(getActivity());
+        radioGroupLayout.setLayoutParams(new LinearLayout.LayoutParams(normalOptionsSize * mOptionWidth,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
+        radioGroupLayout.addView(radioButtons);
+        choiceRow.addView(radioGroupLayout);
+
         if (q.hasSpecialOptions()) {
-            List<String> responses = new ArrayList<>();
+            final Spinner spinner = new Spinner(getActivity());
+            spinner.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT));
+            ArrayList<String> optionsArray = new ArrayList<>();
             for (Option option : q.specialOptions()) {
-                responses.add(option.getText(q.getInstrument()));
+                optionsArray.add(option.getText(getInstrument()));
             }
-            final List<String> finalResponses = responses;
-            for (int j = 0; j < q.specialOptions().size(); j++) {
-                RadioButton button = new RadioButton(getActivity());
-                button.setSaveEnabled(false);
-                button.setId(j + normalOptionsSize);
-                RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(mOptionWidth,
-                        MIN_HEIGHT);
-                button.setLayoutParams(params);
-                button.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        setSpecialResponse(q, finalResponses.get(view.getId() - normalOptionsSize));
-                        updateLayout();
+            optionsArray.add("");
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
+                    android.R.layout.simple_spinner_item, optionsArray);
+            spinner.setAdapter(adapter);
+            spinner.setSelection(q.specialOptions().size());
+            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    Log.i(TAG, "Position: " + position);
+                    if (position < q.specialOptions().size()) {
+                        // TODO: 4/18/18 fix
+                        radioButtons.clearCheck();
+                        Response response = getSurvey().getResponseByQuestion(q);
+                        if (response != null) {
+                            response.setResponse("");
+                        }
+                        setSpecialResponse(q, q.specialOptions().get(position).getText(getInstrument()));
                     }
-                });
-                radioButtons.addView(button, j + getDisplay().options().size());
-            }
+                }
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+
+            LinearLayout spinnerLayout = new LinearLayout(getActivity());
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(mOptionWidth,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.gravity = Gravity.CENTER;
+            spinnerLayout.setLayoutParams(params);
+            spinnerLayout.addView(spinner);
+            choiceRow.addView(spinnerLayout);
         }
-        choiceRow.addView(radioButtons);
+
         optionsListLinearLayout.addView(choiceRow, k);
         radioButtons.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -150,6 +204,7 @@ public class SingleSelectGridFragment extends GridFragment {
             }
         });
         mRadioGroups.add(radioButtons);
+
 //        if(q.hasSpecialOptions()){
 //            LinearLayout specialOptionView = new LinearLayout(getActivity());
 //            LinearLayout.LayoutParams specialOptionsParams = new LinearLayout.LayoutParams
@@ -244,19 +299,28 @@ public class SingleSelectGridFragment extends GridFragment {
         float margin = getActivity().getResources().getDimension(R.dimen
                 .activity_horizontal_margin);
         float totalWidth = (displayMetrics.widthPixels - margin * 2) / 2;
-        for (Question curQuestion : getQuestions()) {
-            if (curQuestion.hasSpecialOptions()) {
-                headerLabels.addAll(curQuestion.specialOptions());
+
+        int headerCount = headerLabels.size();
+        for (Question question : getQuestions()) {
+            if (question.hasSpecialOptions()) {
+                headerCount += 1;
                 break;
             }
         }
-        mOptionWidth = (int) totalWidth / headerLabels.size();
+        mOptionWidth = (int) totalWidth / headerCount;
 
         for (int k = 0; k < headerLabels.size(); k++) {
             TextView textView = getHeaderTextView(headerLabels.get(k).getText(getInstrument()));
             textView.setWidth(mOptionWidth);
             headerTableLayout.addView(textView);
         }
+
+        if (headerCount != headerLabels.size()) {
+            TextView textView = getHeaderTextView(getString(R.string.special_response_abbrv));
+            textView.setWidth(mOptionWidth);
+            headerTableLayout.addView(textView);
+        }
+
     }
 
     private void setCurrentRowHeight(View view, int height) {

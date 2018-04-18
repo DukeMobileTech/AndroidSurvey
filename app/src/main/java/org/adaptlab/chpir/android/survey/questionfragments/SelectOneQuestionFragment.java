@@ -85,7 +85,7 @@ public class SelectOneQuestionFragment extends QuestionFragment {
 
     @Override
     protected void unSetResponse() {
-        if(getRadioGroup()!=null){
+        if (getRadioGroup() != null) {
             getRadioGroup().clearCheck();
         }
         if (mResponse != null) {

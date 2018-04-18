@@ -155,4 +155,5 @@
     <string name="altitude">Altitude</string>
     <string name="update_location">Update Location</string>
     <string name="api_configuration">Please enter the API end point values in the Settings panel and then refresh</string>
+    <string name="special_response_abbrv">SR</string>
 </resources>
