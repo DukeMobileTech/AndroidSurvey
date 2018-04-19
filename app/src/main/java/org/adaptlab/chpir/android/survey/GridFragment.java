@@ -321,7 +321,6 @@ public abstract class GridFragment extends QuestionFragment {
         }
     }
 
-
     protected void saveResponse(Question question, int checkedId, boolean isChecked) {
         Response response = mSurvey.getResponseByQuestion(question);
         if (response == null) {
