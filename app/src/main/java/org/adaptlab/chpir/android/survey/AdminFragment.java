@@ -4,24 +4,37 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.URLUtil;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
+import org.adaptlab.chpir.android.survey.models.AdminSettings;
 import org.adaptlab.chpir.android.survey.tasks.ApkUpdateTask;
+import org.apache.commons.codec.CharEncoding;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,6 +68,7 @@ public class AdminFragment extends Fragment {
     private CheckBox mRequirePasswordCheckBox;
     private CheckBox mRecordSurveyLocationCheckBox;
     private ArrayList<EditText> mRequiredFields;
+    private AlertDialog mDialog;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -77,49 +91,49 @@ public class AdminFragment extends Fragment {
         mApiKeyEditText.setText(getAdminSettingsInstanceApiKey());
         mRequiredFields = new ArrayList<>(Arrays.asList(mApiDomainNameEditText, mApiVersionEditText, mProjectIdEditText, mApiKeyEditText));
 
-        mRosterEndPointCheckBox = (CheckBox) v.findViewById(R.id.api2_endpoint);
-        mRosterEndPointCheckBox.setChecked(AppUtil.getAdminSettingsInstance().useEndpoint2());
-        mRosterEndPointCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                buttonView.setChecked(isChecked);
-                toggleRosterSettingsVisibility(isChecked);
-            }
-        });
+//        mRosterEndPointCheckBox = (CheckBox) v.findViewById(R.id.api2_endpoint);
+//        mRosterEndPointCheckBox.setChecked(AppUtil.getAdminSettingsInstance().useEndpoint2());
+//        mRosterEndPointCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                buttonView.setChecked(isChecked);
+//                toggleRosterSettingsVisibility(isChecked);
+//            }
+//        });
 
         // TODO: 6/29/17 Add project id to end point
-        mRosterSyncSettingsLabel = (TextView) v.findViewById(R.id.roster_sync_settings_label);
-        mApi2DomainNameLabel = (TextView) v.findViewById(R.id.api2_endpoint_label);
-        mApi2VersionLabel = (TextView) v.findViewById(R.id.api2_version_label);
-        mApi2KeyLabel = (TextView) v.findViewById(R.id.api2_key_label);
-        mApi2DomainNameEditText = (EditText) v.findViewById(R.id.api2_endpoint_text);
-        mApi2DomainNameEditText.setText(getAdminSettingsInstanceApi2DomainName());
-        mApi2VersionEditText = (EditText) v.findViewById(R.id.api2_version_text);
-        mApi2VersionEditText.setText(getAdminSettingsInstanceApi2Version());
-        mApi2KeyEditText = (EditText) v.findViewById(R.id.api2_key_text);
-        mApi2KeyEditText.setText(getAdminSettingsInstanceApi2Key());
-        toggleRosterSettingsVisibility(AppUtil.getAdminSettingsInstance().useEndpoint2());
+//        mRosterSyncSettingsLabel = (TextView) v.findViewById(R.id.roster_sync_settings_label);
+//        mApi2DomainNameLabel = (TextView) v.findViewById(R.id.api2_endpoint_label);
+//        mApi2VersionLabel = (TextView) v.findViewById(R.id.api2_version_label);
+//        mApi2KeyLabel = (TextView) v.findViewById(R.id.api2_key_label);
+//        mApi2DomainNameEditText = (EditText) v.findViewById(R.id.api2_endpoint_text);
+//        mApi2DomainNameEditText.setText(getAdminSettingsInstanceApi2DomainName());
+//        mApi2VersionEditText = (EditText) v.findViewById(R.id.api2_version_text);
+//        mApi2VersionEditText.setText(getAdminSettingsInstanceApi2Version());
+//        mApi2KeyEditText = (EditText) v.findViewById(R.id.api2_key_text);
+//        mApi2KeyEditText.setText(getAdminSettingsInstanceApi2Key());
+//        toggleRosterSettingsVisibility(AppUtil.getAdminSettingsInstance().useEndpoint2());
 
         mShowSurveysCheckBox = (CheckBox) v.findViewById(R.id.show_surveys_checkbox);
         mShowSurveysCheckBox.setChecked(AppUtil.getAdminSettingsInstance().getShowSurveys());
 
-        mShowRostersCheckBox = (CheckBox) v.findViewById(R.id.show_rosters_checkbox);
-        mShowRostersCheckBox.setChecked(AppUtil.getAdminSettingsInstance().getShowRosters());
+//        mShowRostersCheckBox = (CheckBox) v.findViewById(R.id.show_rosters_checkbox);
+//        mShowRostersCheckBox.setChecked(AppUtil.getAdminSettingsInstance().getShowRosters());
 
         mShowScoresCheckBox = (CheckBox) v.findViewById(R.id.show_scores_checkbox);
         mShowScoresCheckBox.setChecked(AppUtil.getAdminSettingsInstance().getShowScores());
 
-        mShowSkipCheckBox = (CheckBox) v.findViewById(R.id.show_skip_checkbox);
-        mShowSkipCheckBox.setChecked(AppUtil.getAdminSettingsInstance().getShowSkip());
-
-        mShowNACheckBox = (CheckBox) v.findViewById(R.id.show_na_checkbox);
-        mShowNACheckBox.setChecked(AppUtil.getAdminSettingsInstance().getShowNA());
-
-        mShowRFCheckBox = (CheckBox) v.findViewById(R.id.show_rf_checkbox);
-        mShowRFCheckBox.setChecked(AppUtil.getAdminSettingsInstance().getShowRF());
-
-        mShowDKCheckBox = (CheckBox) v.findViewById(R.id.show_dk_checkbox);
-        mShowDKCheckBox.setChecked(AppUtil.getAdminSettingsInstance().getShowDK());
+//        mShowSkipCheckBox = (CheckBox) v.findViewById(R.id.show_skip_checkbox);
+//        mShowSkipCheckBox.setChecked(AppUtil.getAdminSettingsInstance().getShowSkip());
+//
+//        mShowNACheckBox = (CheckBox) v.findViewById(R.id.show_na_checkbox);
+//        mShowNACheckBox.setChecked(AppUtil.getAdminSettingsInstance().getShowNA());
+//
+//        mShowRFCheckBox = (CheckBox) v.findViewById(R.id.show_rf_checkbox);
+//        mShowRFCheckBox.setChecked(AppUtil.getAdminSettingsInstance().getShowRF());
+//
+//        mShowDKCheckBox = (CheckBox) v.findViewById(R.id.show_dk_checkbox);
+//        mShowDKCheckBox.setChecked(AppUtil.getAdminSettingsInstance().getShowDK());
 
         mRequirePasswordCheckBox = (CheckBox) v.findViewById(R.id.require_password);
         mRequirePasswordCheckBox.setChecked(AppUtil.getAdminSettingsInstance().getRequirePassword());
@@ -143,14 +157,14 @@ public class AdminFragment extends Fragment {
             mCustomLocaleEditText.setEnabled(false);
             mRecordSurveyLocationCheckBox.setEnabled(false);
             mRequirePasswordCheckBox.setEnabled(false);
-            mShowDKCheckBox.setEnabled(false);
-            mShowRFCheckBox.setEnabled(false);
-            mShowNACheckBox.setEnabled(false);
-            mShowSkipCheckBox.setEnabled(false);
+//            mShowDKCheckBox.setEnabled(false);
+//            mShowRFCheckBox.setEnabled(false);
+//            mShowNACheckBox.setEnabled(false);
+//            mShowSkipCheckBox.setEnabled(false);
             mShowScoresCheckBox.setEnabled(false);
-            mShowRostersCheckBox.setEnabled(false);
+//            mShowRostersCheckBox.setEnabled(false);
             mShowSurveysCheckBox.setEnabled(false);
-            mRosterEndPointCheckBox.setEnabled(false);
+//            mRosterEndPointCheckBox.setEnabled(false);
         }
 
         final TextView lastUpdateTextView = (TextView) v.findViewById(R.id.last_update_label);
@@ -184,28 +198,182 @@ public class AdminFragment extends Fragment {
             }
         });
 
+        Button settingsDownload = v.findViewById(R.id.fetch_endpoint_settings);
+        settingsDownload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showConfigurationsDialog();
+            }
+        });
+
         return v;
     }
 
-    private void toggleRosterSettingsVisibility(boolean isChecked) {
-        if (isChecked) {
-            mRosterSyncSettingsLabel.setVisibility(View.VISIBLE);
-            mApi2DomainNameLabel.setVisibility(View.VISIBLE);
-            mApi2VersionLabel.setVisibility(View.VISIBLE);
-            mApi2KeyLabel.setVisibility(View.VISIBLE);
-            mApi2DomainNameEditText.setVisibility(View.VISIBLE);
-            mApi2VersionEditText.setVisibility(View.VISIBLE);
-            mApi2KeyEditText.setVisibility(View.VISIBLE);
-        } else {
-            mRosterSyncSettingsLabel.setVisibility(View.GONE);
-            mApi2DomainNameEditText.setVisibility(View.GONE);
-            mApi2VersionEditText.setVisibility(View.GONE);
-            mApi2KeyEditText.setVisibility(View.GONE);
-            mApi2DomainNameLabel.setVisibility(View.GONE);
-            mApi2VersionLabel.setVisibility(View.GONE);
-            mApi2KeyLabel.setVisibility(View.GONE);
+    private void showConfigurationsDialog() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder.setTitle(R.string.api_endpoint_settings)
+                    .setView(R.layout.fragment_api_settings)
+                    .setPositiveButton(R.string.upper_case_OK, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {}
+                    });
+            final AlertDialog dialog = builder.create();
+            dialog.show();
+
+            final EditText endpointEditText = dialog.findViewById(R.id.apiEndpointEditText);
+            final EditText versionEditText = dialog.findViewById(R.id.apiVersionEditText);
+            final EditText projectEditText = dialog.findViewById(R.id.projectIdEditText);
+            final AdminSettings adminSettings = AdminSettings.getInstance();
+            endpointEditText.setText(adminSettings.getApiDomainName());
+            versionEditText.setText(adminSettings.getApiVersion());
+            projectEditText.setText(adminSettings.getProjectId());
+
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String endpoint = endpointEditText.getText().toString();
+                    String version = versionEditText.getText().toString();
+                    String project = projectEditText.getText().toString();
+                    if (URLUtil.isValidUrl(endpoint)) {
+                        adminSettings.setApiDomainName(endpoint);
+                        adminSettings.setApiVersion(version);
+                        adminSettings.setProjectId(project);
+                        mApiDomainNameEditText.setText(endpoint);
+                        mApiVersionEditText.setText(version);
+                        mProjectIdEditText.setText(project);
+                        dialog.dismiss();
+                        deviceUserLogin(adminSettings.getApiUrl());
+                    } else {
+                        endpointEditText.setError(getString(R.string.invalid_url));
+                    }
+                }
+            });
         }
     }
+
+    private void deviceUserLogin(final String endpoint) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder.setTitle(R.string.device_user_login)
+                    .setView(R.layout.fragment_login);
+            mDialog = builder.create();
+            mDialog.show();
+
+            final EditText username = mDialog.findViewById(R.id.login_username_edit_text);
+            final EditText password = mDialog.findViewById(R.id.login_password_edit_text);
+            final Button login = mDialog.findViewById(R.id.login_button);
+            login.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    new RemoteAuthenticationTask().execute(endpoint, username.getText().toString(), password.getText().toString());
+                }
+            });
+        }
+    }
+
+    private class RemoteAuthenticationTask extends AsyncTask<String, Void, String> {
+        private final String TAG = "AdminFragment.RemoteAuthenticationTask";
+        private String uri;
+        private String userName;
+        private String password;
+
+        @Override
+        protected String doInBackground(String... params) {
+            uri = params[0];
+            userName = params[1];
+            password = params[2];
+
+            final String urlString;
+            if (uri.contains("device_users/")) {
+                urlString = uri;
+            } else {
+                urlString = uri + "device_users/";
+            }
+            JSONObject json = new JSONObject();
+            try {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("username", userName);
+                jsonObject.put("password", password);
+                json.put("device_user", jsonObject);
+            } catch (JSONException je) {
+                if (BuildConfig.DEBUG) Log.e(TAG, "JSON exception", je);
+            }
+
+            HttpURLConnection urlConnection = null;
+            String apiKey = null;
+
+            try {
+                URL url = new URL(urlString);
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("POST");
+                urlConnection.setRequestProperty("Content-Type", "application/json");
+                urlConnection.setRequestProperty("Accept", "application/json");
+                urlConnection.setConnectTimeout(10000);
+                urlConnection.setReadTimeout(10000);
+                urlConnection.setDoOutput(true);
+
+                byte[] outputInBytes = json.toString().getBytes(CharEncoding.UTF_8);
+                OutputStream outputStream = urlConnection.getOutputStream();
+                outputStream.write(outputInBytes);
+                outputStream.close();
+
+                if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    ByteArrayOutputStream output = new ByteArrayOutputStream();
+                    InputStream in = urlConnection.getInputStream();
+
+                    int bytesRead = 0;
+                    byte[] buffer = new byte[1024];
+                    while ((bytesRead = in.read(buffer)) > 0) {
+                        output.write(buffer, 0, bytesRead);
+                    }
+                    output.close();
+                    String jsonString = new String(output.toByteArray());
+                    JSONObject jsonObject = new JSONObject(jsonString);
+                    apiKey = jsonObject.optString("access_token", null);
+                } else if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                    apiKey = HttpURLConnection.HTTP_UNAUTHORIZED + "";
+                }
+
+            } catch (IOException | JSONException e) {
+                Log.e(TAG, "Exception: " + e);
+            } finally {
+                if (urlConnection != null) urlConnection.disconnect();
+            }
+            return apiKey;
+        }
+
+        @Override
+        protected void onPostExecute(String param) {
+            if (param.equals(HttpURLConnection.HTTP_UNAUTHORIZED + "")) {
+                Toast.makeText(getActivity(), R.string.invalid_user_credentials, Toast.LENGTH_LONG).show();
+            } else {
+                AdminSettings.getInstance().setApiKey(param);
+                mApiKeyEditText.setText(param);
+                if (mDialog != null) mDialog.dismiss();
+            }
+        }
+
+    }
+
+//    private void toggleRosterSettingsVisibility(boolean isChecked) {
+//        if (isChecked) {
+//            mRosterSyncSettingsLabel.setVisibility(View.VISIBLE);
+//            mApi2DomainNameLabel.setVisibility(View.VISIBLE);
+//            mApi2VersionLabel.setVisibility(View.VISIBLE);
+//            mApi2KeyLabel.setVisibility(View.VISIBLE);
+//            mApi2DomainNameEditText.setVisibility(View.VISIBLE);
+//            mApi2VersionEditText.setVisibility(View.VISIBLE);
+//            mApi2KeyEditText.setVisibility(View.VISIBLE);
+//        } else {
+//            mRosterSyncSettingsLabel.setVisibility(View.GONE);
+//            mApi2DomainNameEditText.setVisibility(View.GONE);
+//            mApi2VersionEditText.setVisibility(View.GONE);
+//            mApi2KeyEditText.setVisibility(View.GONE);
+//            mApi2DomainNameLabel.setVisibility(View.GONE);
+//            mApi2VersionLabel.setVisibility(View.GONE);
+//            mApi2KeyLabel.setVisibility(View.GONE);
+//        }
+//    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -257,20 +425,20 @@ public class AdminFragment extends Fragment {
             AppUtil.appInit(getActivity());
 
             AppUtil.getAdminSettingsInstance().setShowSurveys(mShowSurveysCheckBox.isChecked());
-            AppUtil.getAdminSettingsInstance().setShowRosters(mShowRostersCheckBox.isChecked());
+//            AppUtil.getAdminSettingsInstance().setShowRosters(mShowRostersCheckBox.isChecked());
             AppUtil.getAdminSettingsInstance().setShowScores(mShowScoresCheckBox.isChecked());
-            AppUtil.getAdminSettingsInstance().setShowSkip(mShowSkipCheckBox.isChecked());
-            AppUtil.getAdminSettingsInstance().setShowNA(mShowNACheckBox.isChecked());
-            AppUtil.getAdminSettingsInstance().setShowRF(mShowRFCheckBox.isChecked());
-            AppUtil.getAdminSettingsInstance().setShowDK(mShowDKCheckBox.isChecked());
+//            AppUtil.getAdminSettingsInstance().setShowSkip(mShowSkipCheckBox.isChecked());
+//            AppUtil.getAdminSettingsInstance().setShowNA(mShowNACheckBox.isChecked());
+//            AppUtil.getAdminSettingsInstance().setShowRF(mShowRFCheckBox.isChecked());
+//            AppUtil.getAdminSettingsInstance().setShowDK(mShowDKCheckBox.isChecked());
             AppUtil.getAdminSettingsInstance().setRequirePassword(mRequirePasswordCheckBox.isChecked());
             AppUtil.getAdminSettingsInstance().setRecordSurveyLocation(mRecordSurveyLocationCheckBox.isChecked());
 
             //Roster settings
-            AppUtil.getAdminSettingsInstance().setUseEndpoint2(mRosterEndPointCheckBox.isChecked());
-            AppUtil.getAdminSettingsInstance().setApi2DomainName(mApi2DomainNameEditText.getText().toString());
-            AppUtil.getAdminSettingsInstance().setApi2Version(mApi2VersionEditText.getText().toString());
-            AppUtil.getAdminSettingsInstance().setApi2Key(mApi2KeyEditText.getText().toString());
+//            AppUtil.getAdminSettingsInstance().setUseEndpoint2(mRosterEndPointCheckBox.isChecked());
+//            AppUtil.getAdminSettingsInstance().setApi2DomainName(mApi2DomainNameEditText.getText().toString());
+//            AppUtil.getAdminSettingsInstance().setApi2Version(mApi2VersionEditText.getText().toString());
+//            AppUtil.getAdminSettingsInstance().setApi2Key(mApi2KeyEditText.getText().toString());
 
             getActivity().finish();
         }

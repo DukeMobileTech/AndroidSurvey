@@ -149,7 +149,6 @@
     <string name="required_field">Field should not be empty!</string>
     <string name="last_survey">last survey</string>
     <string name="last_display">last question</string>
-    <string name="api_configuration">Please enter the API end point values in the Settings panel and then refresh</string>
     <string name="screen">screen</string>
     <string name="latitude">Latitude</string>
     <string name="longitude">Longitude</string>
@@ -157,4 +156,13 @@
     <string name="update_location">Update Location</string>
     <string name="special_response_abbrv">SR</string>
     <string name="select_special_response">Select Special Response</string>
+    <string name="invalid_url">Invalid URL</string>
+    <string name="device_user_login">Login Using Device User Credentials</string>
+    <string name="capitalized_version">Version</string>
+    <string name="url">URL</string>
+    <string name="upper_case_OK">OK</string>
+    <string name="invalid_user_credentials">Invalid user credentials</string>
+    <string name="configure_api_endpoint">Configure API Endpoint</string>
+    <string name="api_endpoint_instructions">Manually fill in the details in the API Endpoint Settings section or use the button below to fetch them.</string>
+    <string name="download_api_endpoint_settings">Download API Endpoint Settings</string>
 </resources>

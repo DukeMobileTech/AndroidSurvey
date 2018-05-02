@@ -25,6 +25,7 @@ import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBar.Tab;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
@@ -45,6 +46,7 @@ import com.activeandroid.query.Delete;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.activerecordcloudsync.NetworkNotificationUtils;
+import org.adaptlab.chpir.android.survey.models.AdminSettings;
 import org.adaptlab.chpir.android.survey.models.Image;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.Response;
@@ -225,6 +227,15 @@ public class InstrumentFragment extends ListFragment {
         setMultiChoiceModeListener();
         requestNeededPermissions();
         mProgressDialog = new ProgressDialog(getActivity());
+        checkApiEndpointSettings();
+    }
+
+    private void checkApiEndpointSettings() {
+        AdminSettings adminSettings = AdminSettings.getInstance();
+        if (TextUtils.isEmpty(adminSettings.getApiDomainName()) || TextUtils.isEmpty(adminSettings.getApiVersion()) || TextUtils.isEmpty(adminSettings.getProjectId()) || TextUtils.isEmpty(adminSettings.getApiKey())) {
+            Intent i = new Intent(getActivity(), AdminActivity.class);
+            startActivity(i);
+        }
     }
 
     // TODO: 2/28/18 Empty message shows up briefly...
@@ -827,6 +838,11 @@ public class InstrumentFragment extends ListFragment {
             List<Instrument> instruments = Instrument.getAllProjectInstruments(getProjectId());
             for (int k = 0; k < instruments.size(); k++) {
                 new InstrumentSanitizerTask().execute(instruments.get(k), (k == instruments.size() - 1));
+            }
+            if (instruments.size() == 0) {
+                if (isAdded() && !getActivity().isFinishing() && mProgressDialog != null && mProgressDialog.isShowing()) {
+                    mProgressDialog.dismiss();
+                }
             }
         }
 

@@ -7,7 +7,7 @@ import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
-import org.adaptlab.chpir.android.survey.AppUtil;
+import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -31,7 +31,7 @@ public class OptionInOptionSet extends ReceiveModel {
     @Override
     public void createObjectFromJSON(JSONObject jsonObject) {
         try {
-            if (AppUtil.DEBUG) Log.i(TAG, "Creating object from JSON Object: " + jsonObject);
+            if (BuildConfig.DEBUG) Log.i(TAG, "Creating object from JSON Object: " + jsonObject);
             Long remoteId = jsonObject.getLong("id");
             OptionInOptionSet option = OptionInOptionSet.findByRemoteId(remoteId);
             if (option == null) {

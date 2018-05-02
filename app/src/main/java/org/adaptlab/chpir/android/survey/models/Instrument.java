@@ -177,17 +177,18 @@ public class Instrument extends ReceiveModel {
         mLanguage = language;
     }
 
+    // TODO: 5/1/18 Fix
     public void sanitize() {
-        Log.i(TAG, "sanitize");
-        Log.i(TAG, "questionCount: " + questionCount());
-        Log.i(TAG, "getQuestionCount: " + getQuestionCount());
-        if (questionCount() != getQuestionCount()) {
-            Log.i(TAG, "question count not equal");
-            setLoaded(false);
-        } else {
-            Log.i(TAG, "setting loaded to true");
-            setLoaded(true);
-        }
+//        Log.i(TAG, "sanitize");
+//        Log.i(TAG, "questionCount: " + questionCount());
+//        Log.i(TAG, "getQuestionCount: " + getQuestionCount());
+//        if (questionCount() != getQuestionCount()) {
+//            Log.i(TAG, "question count not equal");
+//            setLoaded(false);
+//        } else {
+//            Log.i(TAG, "setting loaded to true");
+        setLoaded(true);
+//        }
         for (Question question : questions()) {
             if (!question.loaded()) {
                 setLoaded(false);

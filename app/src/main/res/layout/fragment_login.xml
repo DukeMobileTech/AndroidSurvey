@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:padding="@dimen/activity_horizontal_margin">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,21 +14,21 @@
             android:id="@+id/login_username_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/username"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
-            android:layout_marginTop="40dp" />
+            android:layout_marginTop="40dp"
+            android:text="@string/username"/>
 
 
         <EditText
             android:id="@+id/login_username_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textNoSuggestions"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             android:layout_marginTop="40dp"
-            android:ems="10" />
+            android:ems="10"
+            android:inputType="textNoSuggestions"/>
 
     </LinearLayout>
 
@@ -40,38 +41,39 @@
             android:id="@+id/login_password_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/password"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
-            android:layout_marginTop="40dp"/>
+            android:layout_marginTop="40dp"
+            android:text="@string/password"/>
 
         <EditText
             android:id="@+id/login_password_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPassword"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             android:layout_marginTop="40dp"
-            android:ems="10" />
+            android:ems="10"
+            android:inputType="textPassword"/>
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
         android:gravity="center_horizontal"
-        android:orientation="horizontal"
-        android:layout_marginTop="40dp">
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/login_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:width="200dp"
+            android:layout_margin="10dp"
+            android:padding="10dp"
+            android:background="@color/primary"
             android:text="@string/login"
-            android:background="@color/green"
             android:textColor="@color/white"/>
 
     </LinearLayout>
