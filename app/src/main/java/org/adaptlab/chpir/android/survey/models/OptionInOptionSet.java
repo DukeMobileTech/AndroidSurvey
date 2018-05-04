@@ -53,6 +53,14 @@ public class OptionInOptionSet extends ReceiveModel {
         return new Select().from(OptionInOptionSet.class).where("RemoteId = ?", id).executeSingle();
     }
 
+    public Long getRemoteOptionSetId() {
+        return mRemoteOptionSetId;
+    }
+
+    public Long getRemoteOptionId() {
+        return mRemoteOptionId;
+    }
+
     private void setRemoteOptionSetId(Long id) {
         mRemoteOptionSetId = id;
     }

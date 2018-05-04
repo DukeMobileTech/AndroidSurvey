@@ -137,6 +137,7 @@ public class SurveyFragment extends Fragment implements NavigationView
     private HashMap<Question, List<Option>> mOptions;
     private HashMap<Display, List<Question>> mDisplayQuestions;
     private HashMap<String, List<Question>> mQuestionsToSkipMap;
+    private HashMap<Long, List<Option>> mSpecialOptions;
     private HashSet<Question> mQuestionsToSkipSet;
     //    private TextView mQuestionText;
     private TextView mDisplayIndexLabel;
@@ -145,13 +146,13 @@ public class SurveyFragment extends Fragment implements NavigationView
     private GestureDetector mGestureDetector;
     //    private ProgressDialog mProgressDialog;
     private Display mDisplay;
-    private Display mSkipToDisplay;
+//    private Display mSkipToDisplay;
     private int mDisplayNumber;
     private ArrayList<Integer> mPreviousDisplays;
-    private String mQuestionSkipToIdentifier;
-    private String mQuestionSkipStartIdentifier;
+//    private String mQuestionSkipToIdentifier;
+//    private String mQuestionSkipStartIdentifier;
     private HashSet<String> mQuestionMultipleSkipIdentifierSet;
-    private List<MultipleSkip> mMultipleSkipList;
+//    private List<MultipleSkip> mMultipleSkipList;
     private List<Question> mQuestions;
     private LocationManager mLocationManager;
     private NestedScrollView mScrollView;
@@ -159,14 +160,14 @@ public class SurveyFragment extends Fragment implements NavigationView
 
     //drawer vars
     private DrawerLayout mDrawerLayout;
-    private ListView mDrawerList;
+//    private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
     private String mDrawerTitle;
     private String mTitle;
     private String[] mDisplayTitles;
-    private String[] mSectionTitles;
+//    private String[] mSectionTitles;
     private boolean mNavDrawerSet = false;
-    private boolean showSectionView = true;
+//    private boolean showSectionView = true;
     private boolean isActivityFinished = false;
     private boolean isScreenRotated = false;
 
@@ -282,6 +283,7 @@ public class SurveyFragment extends Fragment implements NavigationView
         mQuestionMultipleSkipIdentifierSet = new HashSet<>();
         mQuestionsToSkipMap = new HashMap<>();
         mQuestionsToSkipSet = new HashSet<>();
+        mSpecialOptions = new HashMap<>();
         ProgressDialog progressDialog = ProgressDialog.show(getActivity(), getString(R.string
                 .instrument_loading_progress_header), getString(R.string
                 .background_process_progress_message));
@@ -291,6 +293,7 @@ public class SurveyFragment extends Fragment implements NavigationView
         mOptions = mInstrument.optionsMap();
         mDisplays = (ArrayList<Display>) mInstrument.displays();
         mDisplay = mDisplays.get(mDisplayNumber);
+        mSpecialOptions = mInstrument.specialOptionsMap();
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
@@ -1014,6 +1017,10 @@ public class SurveyFragment extends Fragment implements NavigationView
 
     public HashMap<Question, List<Option>> getOptions() {
         return mOptions;
+    }
+
+    public HashMap<Long, List<Option>> getSpecialOptions() {
+        return mSpecialOptions;
     }
 
 //    private void setGridLabelText(TextView view) {

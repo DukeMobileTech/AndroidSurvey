@@ -58,6 +58,7 @@ public abstract class QuestionFragment extends Fragment {
     private Instrument mInstrument;
     protected SurveyFragment mSurveyFragment;
     private List<Option> mOptions;
+    private List<Option> mSpecialOptions;
     protected RadioGroup mSpecialResponses;
     private TextView mQuestionText;
 
@@ -79,6 +80,7 @@ public abstract class QuestionFragment extends Fragment {
                     (EXTRA_RESPONSE_ID));
             mOptions = mSurveyFragment.getOptions().get(mQuestion);
         }
+        mSpecialOptions = mSurveyFragment.getSpecialOptions().get(mQuestion.getRemoteSpecialOptionSetId());
     }
 
     @Override
@@ -154,12 +156,9 @@ public abstract class QuestionFragment extends Fragment {
             mSpecialResponses = v.findViewById(R.id.special_responses_container);
             List<String> responses = new ArrayList<>();
             if (mQuestion.hasSpecialOptions()) {
-                Log.i(TAG, "has special options " + mQuestion.specialOptions().size());
-                for (Option option : mQuestion.specialOptions()) {
+                for (Option option : mSpecialOptions) {
                     responses.add(option.getText(mQuestion.getInstrument()));
                 }
-            } else {
-                Log.i(TAG, "No special options");
             }
 
             for (String response : responses) {

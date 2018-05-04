@@ -397,6 +397,23 @@ public class Instrument extends ReceiveModel {
                 .execute();
     }
 
+    public HashMap<Long, List<Option>> specialOptionsMap() {
+        HashMap<Long, List<Option>> map = new HashMap<>();
+        List<OptionInOptionSet> specialOptionInOptionSet = new Select().from(OptionInOptionSet.class).where("Special = 1").execute();
+        for (OptionInOptionSet optionInOptionSet : specialOptionInOptionSet) {
+            List<Option> options = map.get(optionInOptionSet.getRemoteOptionSetId());
+            if (options == null) {
+                List<Option> list = new ArrayList<>();
+                list.add(Option.findByRemoteId(optionInOptionSet.getRemoteOptionId()));
+                map.put(optionInOptionSet.getRemoteOptionSetId(), list);
+            } else {
+                options.add(Option.findByRemoteId(optionInOptionSet.getRemoteOptionId()));
+                map.put(optionInOptionSet.getRemoteOptionSetId(), options);
+            }
+        }
+        return map;
+    }
+
     @Override
     public String toString() {
         return mTitle;
