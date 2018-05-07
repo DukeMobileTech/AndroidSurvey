@@ -101,12 +101,13 @@ public class AppUtil {
 
     static void appInit(Context context) {
         mContext = context;
-        if (AppUtil.REQUIRE_SECURITY_CHECKS) {
-            if (!AppUtil.runDeviceSecurityChecks(context)) {
-                // Device has failed security checks
-                return;
-            }
-        }
+        // TODO: 5/4/18 RE-ENABLE
+//        if (AppUtil.REQUIRE_SECURITY_CHECKS) {
+//            if (!AppUtil.runDeviceSecurityChecks(context)) {
+//                // Device has failed security checks
+//                return;
+//            }
+//        }
 
         setAdminSettingsInstance();
 

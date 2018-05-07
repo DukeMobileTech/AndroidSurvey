@@ -1,8 +1,10 @@
 package org.adaptlab.chpir.android.survey;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -224,10 +226,24 @@ public class AdminFragment extends Fragment {
             final EditText endpointEditText = dialog.findViewById(R.id.apiEndpointEditText);
             final EditText versionEditText = dialog.findViewById(R.id.apiVersionEditText);
             final EditText projectEditText = dialog.findViewById(R.id.projectIdEditText);
+            final CheckBox surveysCheckBox = dialog.findViewById(R.id.showSurveys);
             final AdminSettings adminSettings = AdminSettings.getInstance();
-            endpointEditText.setText(adminSettings.getApiDomainName());
-            versionEditText.setText(adminSettings.getApiVersion());
-            projectEditText.setText(adminSettings.getProjectId());
+            if (TextUtils.isEmpty(adminSettings.getApiDomainName())) {
+                endpointEditText.setText(getString(R.string.default_api_domain_name));
+            } else {
+                endpointEditText.setText(adminSettings.getApiDomainName());
+            }
+            if (TextUtils.isEmpty(adminSettings.getApiVersion())) {
+                versionEditText.setText(getString(R.string.default_api_version));
+            } else {
+                versionEditText.setText(adminSettings.getApiVersion());
+            }
+            if (TextUtils.isEmpty(adminSettings.getProjectId())) {
+                projectEditText.setText(getString(R.string.default_project_id));
+            } else {
+                projectEditText.setText(adminSettings.getProjectId());
+            }
+            surveysCheckBox.setChecked(true);
 
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -239,9 +255,11 @@ public class AdminFragment extends Fragment {
                         adminSettings.setApiDomainName(endpoint);
                         adminSettings.setApiVersion(version);
                         adminSettings.setProjectId(project);
+                        adminSettings.setShowSurveys(surveysCheckBox.isChecked());
                         mApiDomainNameEditText.setText(endpoint);
                         mApiVersionEditText.setText(version);
                         mProjectIdEditText.setText(project);
+                        mShowSurveysCheckBox.setChecked(surveysCheckBox.isChecked());
                         dialog.dismiss();
                         deviceUserLogin(adminSettings.getApiUrl());
                     } else {
@@ -350,6 +368,10 @@ public class AdminFragment extends Fragment {
                 AdminSettings.getInstance().setApiKey(param);
                 mApiKeyEditText.setText(param);
                 if (mDialog != null) mDialog.dismiss();
+                saveAdminSettings();
+                Intent i = new Intent();
+                getActivity().setResult(Activity.RESULT_OK, i);
+                getActivity().finish();
             }
         }
 
@@ -397,6 +419,7 @@ public class AdminFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.save_admin_settings_button:
                 saveAdminSettings();
+                getActivity().finish();
                 return true;
             case R.id.delete_data_button:
                 deleteData();
@@ -440,7 +463,6 @@ public class AdminFragment extends Fragment {
 //            AppUtil.getAdminSettingsInstance().setApi2Version(mApi2VersionEditText.getText().toString());
 //            AppUtil.getAdminSettingsInstance().setApi2Key(mApi2KeyEditText.getText().toString());
 
-            getActivity().finish();
         }
     }
 

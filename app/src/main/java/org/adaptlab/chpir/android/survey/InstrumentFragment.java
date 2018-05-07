@@ -78,6 +78,7 @@ public class InstrumentFragment extends ListFragment {
     public final static String TAG = "InstrumentFragment";
     public final static String EXTRA_AUTHORIZE_SURVEY =
             "org.adaptlab.chpir.android.survey.authorize_survey_bool";
+    private final static int DEFAULT_SETTINGS_CODE = 101;
     private SurveyAdapter mSurveyAdapter;
     private InstrumentAdapter mInstrumentAdapter;
     private RosterAdapter mRosterAdapter;
@@ -234,11 +235,17 @@ public class InstrumentFragment extends ListFragment {
         AdminSettings adminSettings = AdminSettings.getInstance();
         if (TextUtils.isEmpty(adminSettings.getApiDomainName()) || TextUtils.isEmpty(adminSettings.getApiVersion()) || TextUtils.isEmpty(adminSettings.getProjectId()) || TextUtils.isEmpty(adminSettings.getApiKey())) {
             Intent i = new Intent(getActivity(), AdminActivity.class);
-            startActivity(i);
+            startActivityForResult(i, DEFAULT_SETTINGS_CODE);
         }
     }
 
-    // TODO: 2/28/18 Empty message shows up briefly...
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK && requestCode == DEFAULT_SETTINGS_CODE) {
+            new RefreshInstrumentsTask().execute();
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_instrument, container, false);

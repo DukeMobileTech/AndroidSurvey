@@ -590,13 +590,11 @@ public class SurveyFragment extends Fragment implements NavigationView
             questionsToSkip) {
         if (questionsToSkip == null || questionsToSkip.size() == 0) {
             if (mQuestionsToSkipMap.containsKey(questionIdentifier)) {
-                Log.i("Remove", questionIdentifier + "Removed");
                 mQuestionsToSkipMap.remove(questionIdentifier);
             }
         } else {
             mQuestionsToSkipMap.put(questionIdentifier, questionsToSkip);
         }
-        Log.i("Map", mQuestionsToSkipMap.toString() + " ");
     }
 
     private void updateQuestionsToSkipSet() {
@@ -604,11 +602,9 @@ public class SurveyFragment extends Fragment implements NavigationView
         for (HashMap.Entry<String, List<Question>> curPair : mQuestionsToSkipMap.entrySet()) {
             mQuestionsToSkipSet.addAll(curPair.getValue());
         }
-        Log.i("Set", mQuestionsToSkipSet.toString() + " ");
     }
 
     private void unSetSkipQuestionResponse() {
-        Log.i("myResponses", mResponses.toString() + "");
         for (Question curSkip : mQuestionsToSkipSet) {
             if (curSkip != null) {
                 Response curResponse = mResponses.get(curSkip);
@@ -618,7 +614,6 @@ public class SurveyFragment extends Fragment implements NavigationView
                     curResponse.setOtherResponse("");
                     curResponse.setDeviceUser(AuthUtils.getCurrentUser());
                     curResponse.save();
-                    Log.i("UnsetResponse", curResponse.toString() + "");
                 }
             }
         }
@@ -659,7 +654,6 @@ public class SurveyFragment extends Fragment implements NavigationView
                 break;
             }
         }
-        Log.i("SkipList", skipList.toString() + "");
         updateQuestionsToSkipMap(questionIdentifier + "/skipTo", skipList);
         hideQuestionsInDisplay();
     }
@@ -1368,7 +1362,11 @@ public class SurveyFragment extends Fragment implements NavigationView
     private void updateDisplayLabels() {
         if (mDisplay != null) {
             // Screen title
-            mDisplayTitle.setText(mDisplay.getTitle());
+            if (!mDisplay.getMode().equals(Display.DisplayMode.SINGLE.toString())) {
+                mDisplayTitle.setText(String.format(Locale.getDefault(), "%s %s%d %s %d%s", mDisplay.getTitle(), "(", mDisplay.questions().get(0).getNumberInInstrument(), "-", mDisplay.questions().get(mDisplay.questions().size() - 1).getNumberInInstrument(), ")"));
+            } else {
+                mDisplayTitle.setText(mDisplay.getTitle());
+            }
             // Progress text
             mDisplayIndexLabel.setText(String.format(Locale.getDefault(), "%s %d %s %d %s%s %d %s" +
                     " %d%s", getString(R.string.screen), mDisplayNumber + 1, getString(R.string
