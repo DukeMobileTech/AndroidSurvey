@@ -25,16 +25,12 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Html;
-import android.text.Spanned;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -53,7 +49,6 @@ import com.crashlytics.android.Crashlytics;
 import org.adaptlab.chpir.android.survey.location.LocationManager;
 import org.adaptlab.chpir.android.survey.models.Display;
 import org.adaptlab.chpir.android.survey.models.FollowUpQuestion;
-import org.adaptlab.chpir.android.survey.models.Grid;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.MultipleSkip;
 import org.adaptlab.chpir.android.survey.models.Option;
@@ -61,7 +56,6 @@ import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Score;
 import org.adaptlab.chpir.android.survey.models.ScoreScheme;
-import org.adaptlab.chpir.android.survey.models.Section;
 import org.adaptlab.chpir.android.survey.models.Survey;
 import org.adaptlab.chpir.android.survey.questionfragments.MultipleSelectGridFragment;
 import org.adaptlab.chpir.android.survey.questionfragments.SingleSelectGridFragment;
@@ -108,32 +102,15 @@ public class SurveyFragment extends Fragment implements NavigationView
             ".display_number";
     private static final String TAG = "SurveyFragment";
     private static final int REVIEW_CODE = 100;
-    //    private static final int SECTION_CODE = 200;
     public static final int AUTHORIZE_CODE = 300;
-    private static final Long REVIEW_PAGE_ID = -1L;
     private static final int ACCESS_FINE_LOCATION_CODE = 1;
     private NavigationView mNavigationView;
-    //    private boolean mAllowFragmentCommit;
-//    private QuestionFragment mQuestionFragment;
-    private Question mQuestion;
     private LinearLayout mQuestionViewLayout;
     private Instrument mInstrument;
     private Survey mSurvey;
     private HashSet<Integer> mHiddenDisplayNumberSet;
-    private int mQuestionNumber;
-    private int mQuestionCount;
     private String mMetadata;
-    private Question mResumeQuestion = null;
-    private Grid mGrid;
-    private Section mSection;
-    // mPreviousQuestions is a Stack, however Android does not allow you
-    // to save a Stack to the savedInstanceState, so it is represented as
-    // an Integer array.
-    private ArrayList<Integer> mPreviousQuestions;
-    private ArrayList<Integer> mQuestionsToSkip;
-    private ArrayList<Section> mSections;
     private ArrayList<QuestionFragment> mQuestionFragments;
-    //    private List<Question> mQuestions;
     private ArrayList<Display> mDisplays;
     private HashMap<Question, Response> mResponses;
     private HashMap<Question, List<Option>> mOptions;
@@ -141,20 +118,12 @@ public class SurveyFragment extends Fragment implements NavigationView
     private HashMap<String, List<Question>> mQuestionsToSkipMap;
     private HashMap<Long, List<Option>> mSpecialOptions;
     private HashSet<Question> mQuestionsToSkipSet;
-    //    private TextView mQuestionText;
     private TextView mDisplayIndexLabel;
     private TextView mParticipantLabel;
     private ProgressBar mProgressBar;
-    private GestureDetector mGestureDetector;
-    //    private ProgressDialog mProgressDialog;
     private Display mDisplay;
-//    private Display mSkipToDisplay;
     private int mDisplayNumber;
     private ArrayList<Integer> mPreviousDisplays;
-//    private String mQuestionSkipToIdentifier;
-//    private String mQuestionSkipStartIdentifier;
-    private HashSet<String> mQuestionMultipleSkipIdentifierSet;
-//    private List<MultipleSkip> mMultipleSkipList;
     private List<Question> mQuestions;
     private LocationManager mLocationManager;
     private NestedScrollView mScrollView;
@@ -162,39 +131,13 @@ public class SurveyFragment extends Fragment implements NavigationView
 
     //drawer vars
     private DrawerLayout mDrawerLayout;
-//    private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
     private String mDrawerTitle;
     private String mTitle;
     private String[] mDisplayTitles;
-//    private String[] mSectionTitles;
     private boolean mNavDrawerSet = false;
-//    private boolean showSectionView = true;
     private boolean isActivityFinished = false;
     private boolean isScreenRotated = false;
-
-//    public void loadOrCreateQuestion() {
-//        mPreviousQuestions = new ArrayList<>();
-//        mQuestionsToSkip = new ArrayList<>();
-//        int questionNum = getActivity().getIntent().getIntExtra(EXTRA_QUESTION_NUMBER, -1);
-//        if (questionNum == -1) {
-//            mQuestion = mQuestions.get(0);
-//            mQuestionNumber = 0;
-//        } else if (questionNum >= mQuestions.size()) {
-//            mQuestion = mQuestions.get(mQuestions.size() - 1);
-//            mQuestionNumber = mQuestions.size() - 1;
-//            for (int i = 0; i < mQuestionNumber; i++)
-//                mPreviousQuestions.add(i);
-//        } else {
-//            mQuestion = mQuestions.get(questionNum);
-//            mQuestionNumber = questionNum;
-//            for (int i = 0; i < mQuestionNumber; i++)
-//                mPreviousQuestions.add(i);
-//        }
-//        if (mQuestion.belongsToGrid()) {
-//            mGrid = mQuestion.getGrid();
-//        }
-//    }
 
     public void refreshView() {
         AuthorizedActivity authority = (AuthorizedActivity) getActivity();
@@ -226,22 +169,6 @@ public class SurveyFragment extends Fragment implements NavigationView
                 }
             }
         }
-//        if (resultCode == Activity.RESULT_OK && requestCode == SECTION_CODE) {
-//            Question previousQuestion = mQuestion;
-//            int questionNum = data.getExtras().getInt(EXTRA_QUESTION_NUMBER);
-//            Long instrumentId = data.getExtras().getLong(EXTRA_INSTRUMENT_ID);
-//            Long surveyId = data.getExtras().getLong(EXTRA_SURVEY_ID);
-//            ArrayList<Integer> previousQuestions = data.getExtras().getIntegerArrayList
-//                    (EXTRA_PREVIOUS_QUESTION_IDS);
-//            mQuestion = mQuestions.get(questionNum);
-//            mQuestionNumber = questionNum;
-//            mInstrument = Instrument.findByRemoteId(instrumentId);
-//            mSurvey = Model.load(Survey.class, surveyId);
-//            if (mQuestion.getSection() != null && mQuestion.getSection() == mSection)
-//                showSectionView = false;
-//            if (previousQuestions != null) mPreviousQuestions.addAll(previousQuestions);
-//            if (previousQuestion == mQuestion) showSectionView = false;
-//        }
     }
 
     @Override
@@ -286,7 +213,6 @@ public class SurveyFragment extends Fragment implements NavigationView
 
         mPreviousDisplays = new ArrayList<>();
         mQuestionFragments = new ArrayList<>();
-        mQuestionMultipleSkipIdentifierSet = new HashSet<>();
         mQuestionsToSkipMap = new HashMap<>();
         mQuestionsToSkipSet = new HashSet<>();
         mSpecialOptions = new HashMap<>();
@@ -371,15 +297,6 @@ public class SurveyFragment extends Fragment implements NavigationView
         ActivityCompat.invalidateOptionsMenu(getActivity());
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (actionBar != null) actionBar.setTitle(mInstrument.getTitle());
-        LinearLayout swipeView = (LinearLayout) v.findViewById(R.id
-                .linear_layout_for_question_index);
-        mGestureDetector = new GestureDetector(getActivity(), new GestureListener());
-        swipeView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return mGestureDetector.onTouchEvent(event);
-            }
-        });
         mScrollView = v.findViewById(R.id.survey_fragment_scroll_view);
 
         return v;
@@ -672,64 +589,6 @@ public class SurveyFragment extends Fragment implements NavigationView
         hideQuestionsInDisplay();
     }
 
-//    private void hideInBetweenQuestions(int currentIndex, int nextIndex) {
-//        FragmentManager fm = getChildFragmentManager();
-//        FragmentTransaction ft = fm.beginTransaction();
-//        for (int k = 0; k < mQuestionFragments.size(); k++) {
-//            Log.i("Fragment",mQuestionFragments.get(k).toString()+"");
-//            if (k <= currentIndex) {
-//                ft.show(mQuestionFragments.get(k));
-//            } else if (k > currentIndex && k < nextIndex) {
-//                ft.hide(mQuestionFragments.get(k));
-//            } else if (k > currentIndex && nextIndex == -1) {
-//                ft.hide(mQuestionFragments.get(k));
-//            } else {
-//                ft.show(mQuestionFragments.get(k));
-//            }
-//        }
-//        ft.commit();
-//    }
-
-//    private void hideMultipleQuestion(){
-//        FragmentManager fm = getChildFragmentManager();
-//        FragmentTransaction ft = fm.beginTransaction();
-//        for (int k = 0; k < mQuestionFragments.size(); k++) {
-//            if (mQuestionFragments.get(k).getQuestion()
-// !=null&&mQuestionMultipleSkipIdentifierSet.contains(mQuestionFragments.get(k).getQuestion()
-// .getQuestionIdentifier())) {
-//                ft.hide(mQuestionFragments.get(k));
-//                Log.i("HIDE",mQuestionFragments.get(k).toString()+"");
-//            }
-//            else{
-//                ft.show(mQuestionFragments.get(k));
-//            }
-//        }
-//        ft.commit();
-//    }
-
-//    private void hideMultipleQuestion() {
-//        if (mMultipleSkipList != null && mMultipleSkipList.size() > 0) {
-//            FragmentManager fm = getChildFragmentManager();
-//            FragmentTransaction ft = fm.beginTransaction();
-//            HashSet<Integer> showFragmentSet = new HashSet<>();
-//            for (MultipleSkip questionToSkip : mMultipleSkipList) {
-//                Question question = Question.findByQuestionIdentifier(questionToSkip
-//                        .getSkipQuestionIdentifier());
-//                int index = mDisplay.questions().indexOf(question);
-//                showFragmentSet.add(index);
-//                if (question.getDisplay() == mDisplay) {
-//                    ft.hide(mQuestionFragments.get(index));
-//                }
-//            }
-//            for (int k = 0; k < mQuestionFragments.size(); k++) {
-//                if (!showFragmentSet.contains(k)) {
-//                    ft.show(mQuestionFragments.get(k));
-//                }
-//            }
-//            ft.commit();
-//        }
-//    }
-
     protected void reAnimateFollowUpFragment(Question currentQuestion) {
         FragmentManager fm = getChildFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
@@ -762,48 +621,6 @@ public class SurveyFragment extends Fragment implements NavigationView
         updateQuestionsToSkipMap(currentQuestion.getQuestionIdentifier() + "/multi", skipList);
         hideQuestionsInDisplay();
     }
-
-//    public boolean isFirstQuestion() {
-//        return mQuestionNumber == 0;
-//    }
-
-//    public boolean isLastQuestion() {
-//        if (mQuestion.belongsToGrid()) {
-//            Question lastGridQuestion = mGrid.questions().get(mGrid.questions().size() - 1);
-//            return mQuestionCount == lastGridQuestion.getNumberInInstrument();
-//        } else {
-//            return mQuestionCount == mQuestionNumber + 1;
-//        }
-//    }
-
-//    public boolean hasValidResponse() {
-//        for (QuestionFragment fragment : mQuestionFragments) {
-//            if (!(mQuestionFragment != null && mQuestionFragment.getResponse() != null) ||
-//                    !fragment.getResponse().isValid())
-//                return false;
-//        }
-//        return true;
-////        return !(mQuestionFragment != null && mQuestionFragment.getResponse() != null) ||
-////                mQuestionFragment.getResponse().isValid();
-//    }
-
-    /*
-     * Give a visual indication when a special response is selected
-     */
-//    public void showSpecialResponseSelection(Menu menu) {
-//        if (mQuestionFragment != null && mQuestionFragment.getSpecialResponse() != null && menu
-//                != null) {
-//            if (mQuestionFragment.getSpecialResponse().equals(Response.SKIP)) {
-//                menu.findItem(R.id.menu_item_skip).setIcon(R.drawable.ic_menu_item_sk_selected);
-//            } else if (mQuestionFragment.getSpecialResponse().equals(Response.RF)) {
-//                menu.findItem(R.id.menu_item_rf).setIcon(R.drawable.ic_menu_item_rf_selected);
-//            } else if (mQuestionFragment.getSpecialResponse().equals(Response.NA)) {
-//                menu.findItem(R.id.menu_item_na).setIcon(R.drawable.ic_menu_item_na_selected);
-//            } else if (mQuestionFragment.getSpecialResponse().equals(Response.DK)) {
-//                menu.findItem(R.id.menu_item_dk).setIcon(R.drawable.ic_menu_item_dk_selected);
-//            }
-//        }
-//    }
 
     private boolean checkRules() {
         return new RuleBuilder(getActivity())
@@ -848,22 +665,6 @@ public class SurveyFragment extends Fragment implements NavigationView
             mSurvey = Model.load(Survey.class, surveyId);
         }
     }
-
-//    private void proceedToNextQuestion() {
-//        if (isLastQuestion()) {
-//            finishSurvey();
-//        } else {
-//            moveToNextQuestion();
-//        }
-//    }
-
-//    private void unSkipAndMoveToNextQuestion() {
-//        if (mQuestionFragment != null && mQuestionFragment.getSpecialResponse().equals(Response
-//                .SKIP)) {
-//            mQuestionFragment.setSpecialResponse("");
-//        }
-//        proceedToNextQuestion();
-//    }
 
     private void setSelectedDrawerItemChecked() {
         if (mNavigationView != null) {
@@ -963,44 +764,6 @@ public class SurveyFragment extends Fragment implements NavigationView
         }
     }
 
-//    private void createGridFragment() {
-//        if (mQuestion.getQuestionType() == QuestionType.SELECT_ONE) {
-//            mQuestionFragment = new SingleSelectGridFragment();
-//        } else {
-//            mQuestionFragment = new MultipleSelectGridFragment();
-//        }
-//        Bundle bundle = new Bundle();
-//        bundle.putLong(GridFragment.EXTRA_GRID_ID, mQuestion.getGrid().getRemoteId());
-//        bundle.putLong(GridFragment.EXTRA_SURVEY_ID, mSurvey.getId());
-//        mQuestionFragment.setArguments(bundle);
-//        FragmentManager fm = getChildFragmentManager();
-//        switchOutFragments(fm);
-//    }
-
-//    private void switchOutFragments(final FragmentManager fm) {
-//        if (mAllowFragmentCommit) {
-//            commitFragmentTransaction(fm);
-//        }
-//        else {
-//            new Handler().post(new Runnable() {
-//                public void run() {
-//                    commitFragmentTransaction(fm);
-//                }
-//            });
-//        }
-//        mSurvey.setLastQuestion(mQuestion);
-//        mSurvey.save();
-//        removeTextFocus();
-//    }
-
-//    private void commitFragmentTransaction(FragmentManager fm) {
-//        if (fm.findFragmentById(R.id.question_container) == null) {
-//            fm.beginTransaction().add(R.id.question_container, mQuestionFragment).commit();
-//        } else {
-//            fm.beginTransaction().replace(R.id.question_container, mQuestionFragment).commit();
-//        }
-//    }
-
     public Display getDisplay() {
         return mDisplay;
     }
@@ -1041,178 +804,6 @@ public class SurveyFragment extends Fragment implements NavigationView
     public HashMap<Long, List<Option>> getSpecialOptions() {
         return mSpecialOptions;
     }
-
-//    private void setGridLabelText(TextView view) {
-//        view.setText(styleTextWithHtml(mGrid.getText()));
-//    }
-
-    /*
-     * If a question has a skip pattern, then read the response
-     * when pressing the "next" button.  If the index of the response
-     * is able to have a skip pattern, then set the next question to
-     * the question indicated by the skip pattern.  "Other" responses
-     * cannot have skip patterns, and the question is just set to the
-     * next question in the sequence.
-     */
-//    private Question getNextQuestion(int questionIndex) {
-//        Question nextQuestion = null;
-//        Option responseOption = null;
-//        Response response = mResponses.get(mQuestion);
-//        if (response == null) {
-//            nextQuestion = nextQuestionHelper(questionIndex);
-//        } else {
-//            if (mQuestion.hasCompleteSurveyOption()) {
-//                if (mQuestion.hasOptions() && !TextUtils.isEmpty(response.getText())) {
-//                    int index = Integer.parseInt(response.getText());
-//                    if (index < mQuestion.defaultOptions().size())
-//                        responseOption = mQuestion.defaultOptions().get(index);
-//                }
-//                if (responseOption != null && responseOption.getCompleteSurvey()) {
-//                    scoreAndCompleteSurvey();
-//                    return null;
-//                }
-//            } else if (!TextUtils.isEmpty(response.getSpecialResponse())) {
-//                Option specialOption = mQuestion.specialOptionByText(response.getSpecialResponse
-//                        ().trim());
-//                if (specialOption != null && specialOption.getNextQuestion() != null) {
-//                    nextQuestion = specialOption.getNextQuestion();
-//                } else {
-//                    nextQuestion = nextQuestionHelper(questionIndex);
-//                }
-//            } else if (Question.AnyResponseQuestions.contains(mQuestion.getQuestionType())) {
-//                Option anyResponseOption = mQuestion.anyResponseOption();
-//                if (!TextUtils.isEmpty(response.getText()) && anyResponseOption != null &&
-//                        anyResponseOption.getNextQuestion() != null) {
-//                    nextQuestion = anyResponseOption.getNextQuestion();
-//                } else {
-//                    nextQuestion = nextQuestionHelper(questionIndex);
-//                }
-//            } else if (mQuestion.hasSkipPattern()) {
-//                try {
-//                    int responseIndex = Integer.parseInt(response.getText());
-//                    addQuestionsToSkip(responseIndex);
-//                    nextQuestion = getNextQuestionForSkipPattern(questionIndex, responseIndex);
-//                } catch (NumberFormatException nfe) {
-//                    nextQuestion = getNextQuestionWhenNumberFormatException(questionIndex);
-//                }
-//            } else {
-//                nextQuestion = nextQuestionHelper(questionIndex);
-//            }
-//        }
-//        return getNextUnSkippedQuestion(nextQuestion);
-//    }
-
-//    private Question getNextQuestionWhenNumberFormatException(int questionIndex) {
-//        Question nextQuestion;
-//        nextQuestion = nextQuestionHelper(questionIndex);
-//        Log.wtf(TAG, "Received a non-numeric skip response index for " + mQuestion
-//                .getQuestionIdentifier());
-//        return nextQuestion;
-//    }
-
-//    private void addQuestionsToSkip(int responseIndex) {
-//        if (responseIndex < mQuestion.defaultOptions().size()) {
-//            Option selectedOption = mQuestion.defaultOptions().get(responseIndex);
-//            for (Question skipQuestion : selectedOption.questionsToSkip()) {
-//                mQuestionsToSkip.add(skipQuestion.getNumberInInstrument());
-//            }
-//        }
-//    }
-
-//    private Question getNextQuestionForSkipPattern(int questionIndex, int responseIndex) {
-//        Question nextQuestion;
-//        if (responseIndex < mQuestion.defaultOptions().size() && mQuestion.defaultOptions().get
-//                (responseIndex).getNextQuestion() != null) {
-//            nextQuestion = mQuestion.defaultOptions().get(responseIndex).getNextQuestion();
-//            mQuestionNumber = nextQuestion.getNumberInInstrument() - 1;
-//        } else {
-//            nextQuestion = nextQuestionHelper(questionIndex);
-//        }
-//        return nextQuestion;
-//    }
-
-//    private Question getNextUnSkippedQuestion(Question nextQuestion) {
-//        if (mQuestionsToSkip.contains(nextQuestion.getNumberInInstrument())) {
-//            if (isLastQuestion()) {
-//                finishSurvey();
-//            } else {
-//                nextQuestion = nextQuestionHelper(nextQuestion.getNumberInInstrument() - 1);
-//                nextQuestion = getNextUnSkippedQuestion(nextQuestion);
-//            }
-//        }
-//        return nextQuestion;
-//    }
-
-//    private Question nextQuestionHelper(int index) {
-//        mQuestionNumber = index + 1;
-//        if (mQuestionNumber >= mQuestions.size())
-//            mQuestionNumber = mQuestions.size() - 1;
-//        return mQuestions.get(mQuestionNumber);
-//    }
-
-//    private void clearSkipsForCurrentQuestion() {
-//        if (!mQuestionsToSkip.isEmpty()) {
-//            for (Question question : mQuestion.questionsToSkip()) {
-//                mQuestionsToSkip.remove(Integer.valueOf(question.getNumberInInstrument()));
-//            }
-//        }
-//    }
-
-    /*
-     * Switch out the next question with a fragment from the
-     * QuestionFragmentFactory.  Increment the question to
-     * the next question.
-     */
-//    public void moveToNextQuestion() {
-//        if (mQuestion.belongsToGrid()) {
-//            mPreviousQuestions.add(mQuestion.getNumberInInstrument() - 1);
-//            Question lastQuestion = mGrid.questions().get(mGrid.questions().size() - 1);
-//            mQuestion = nextQuestionHelper(lastQuestion.getNumberInInstrument());
-//            createQuestionFragments();
-//        } else {
-//            if (mQuestionNumber < mQuestionCount - 1) {
-//                mPreviousQuestions.add(mQuestionNumber);
-//                mQuestion = getNextQuestion(mQuestionNumber);
-//                createQuestionFragments();
-////                if (mQuestion != null && !setQuestionText(mQuestionText)) {
-////                    setSpecialResponse(Response.LOGICAL_SKIP);
-////                    moveToNextQuestion();
-////                }
-////            } else if (isLastQuestion() && !setQuestionText(mQuestionText)) {
-////                finishSurvey();
-//            }
-//            if (mQuestion != null) mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
-//        }
-//        updateDisplayLabels();
-//    }
-
-    /*
-     * Move to previous question.  Takes into account if
-     * this question is following up another question.  If
-     * this question is not a follow up question, just move
-     * to the previous question in the sequence.
-     */
-//    public void moveToPreviousQuestion() {
-//        if (mQuestionNumber > 0 && mQuestionNumber < mQuestionCount) {
-//            mQuestionNumber = mPreviousQuestions.remove(mPreviousQuestions.size() - 1);
-//            mQuestion = mQuestions.get(mQuestionNumber);
-//            showSectionView = false;
-//            createQuestionFragments();
-//            if (mQuestion.belongsToGrid()) {
-//                mGrid = mQuestion.getGrid();
-//            } else {
-////                if (!setQuestionText(mQuestionText)) {
-////                    moveToPreviousQuestion();
-////                }
-//            }
-//            if (mResponses.get(mQuestion) != null &&
-//                    !mResponses.get(mQuestion).getText().isEmpty()) {
-//                clearSkipsForCurrentQuestion();
-//            }
-//        }
-//
-//        updateDisplayLabels();
-//    }
 
     /*
     * Destroy this activity, and save the survey and mark it as
@@ -1260,8 +851,6 @@ public class SurveyFragment extends Fragment implements NavigationView
                     .setNegativeButton(R.string.review, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            mQuestion = Question.findByQuestionIdentifier(criticalResponses.get(0));
-                            mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
                             refreshView();
                         }
                     });
@@ -1269,8 +858,6 @@ public class SurveyFragment extends Fragment implements NavigationView
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    mQuestion = Question.findByQuestionIdentifier(criticalResponses.get(position));
-                    mQuestionNumber = mQuestion.getNumberInInstrument() - 1;
                     refreshView();
                     criticalDialog.dismiss();
                 }
@@ -1360,21 +947,6 @@ public class SurveyFragment extends Fragment implements NavigationView
         }
     }
 
-    private Spanned styleTextWithHtml(String text) {
-        return Html.fromHtml(text);
-    }
-
-    /*
-     * Save the special response field and clear the current
-     * response if there is one.
-     */
-//    private void setSpecialResponse(String response) {
-//        mQuestionFragment.setSpecialResponse(response);
-//        if (isAdded()) {
-//            ActivityCompat.invalidateOptionsMenu(getActivity());
-//        }
-//    }
-
     private void setParticipantLabel() {
         String surveyMetaData = mSurvey.getMetadata();
         if (!TextUtils.isEmpty(surveyMetaData)) {
@@ -1412,7 +984,7 @@ public class SurveyFragment extends Fragment implements NavigationView
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = 0;
         for (String oneTitle : mDisplayTitles) {
-            if (oneTitle.equals(item.getTitle())) {
+            if (oneTitle.equals(item.getTitle().toString())) {
                 break;
             }
             id++;
@@ -1443,30 +1015,6 @@ public class SurveyFragment extends Fragment implements NavigationView
         protected void onPostExecute(Survey survey) {
             completeAndSendSurvey(survey);
             finishActivity();
-        }
-    }
-
-    private class GestureListener extends GestureDetector.SimpleOnGestureListener {
-        private float MINIMUM_FLING_DISTANCE = 100;
-
-        @Override
-        public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float
-                velocityY) {
-            float horizontalDifference = event2.getX() - event1.getX();
-            float absoluteHorizontalDifference = Math.abs(horizontalDifference);
-            if (absoluteHorizontalDifference > MINIMUM_FLING_DISTANCE) {
-                if (horizontalDifference > 0) {
-//                    moveToPreviousQuestion();
-                } else {
-//                    unSkipAndMoveToNextQuestion();
-                }
-            }
-            return true;
-        }
-
-        @Override
-        public boolean onDown(MotionEvent event) {
-            return true;
         }
     }
 
