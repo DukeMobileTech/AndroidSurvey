@@ -2,12 +2,14 @@ package org.adaptlab.chpir.android.survey;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -258,7 +260,9 @@ public class SurveyFragment extends Fragment implements NavigationView
         if (savedInstanceState != null) {
             mInstrument = Instrument.findByRemoteId(savedInstanceState.getLong
                     (EXTRA_INSTRUMENT_ID));
-            if (!checkRules()) getActivity().finish();
+            if (!checkRules()) {
+                finishActivity();
+            }
             launchRosterSurvey();
             if (!mInstrument.isRoster()) {
                 mSurvey = Survey.load(Survey.class, savedInstanceState.getLong(EXTRA_SURVEY_ID));
@@ -270,7 +274,9 @@ public class SurveyFragment extends Fragment implements NavigationView
             if (instrumentId == -1) return;
             mInstrument = Instrument.findByRemoteId(instrumentId);
             if (mInstrument == null) return;
-            if (!checkRules()) getActivity().finish();
+            if (!checkRules()) {
+                finishActivity();
+            }
             launchRosterSurvey();
             if (!mInstrument.isRoster()) {
                 loadOrCreateSurvey();
@@ -318,9 +324,17 @@ public class SurveyFragment extends Fragment implements NavigationView
                     .ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 startLocationUpdates();
             } else {
-                ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest
+                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest
                         .permission.ACCESS_FINE_LOCATION}, ACCESS_FINE_LOCATION_CODE);
             }
+        }
+    }
+
+    private void finishActivity() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getActivity().finishAfterTransition();
+        } else {
+            getActivity().finish();
         }
     }
 
@@ -810,8 +824,14 @@ public class SurveyFragment extends Fragment implements NavigationView
             Intent i = new Intent(getActivity(), RosterActivity.class);
             i.putExtra(RosterActivity.EXTRA_INSTRUMENT_ID, mInstrument.getRemoteId());
             i.putExtra(RosterActivity.EXTRA_PARTICIPANT_METADATA, mMetadata);
-            getActivity().startActivity(i);
-            getActivity().finish();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                getActivity().startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity
+                        ()).toBundle());
+                getActivity().finishAfterTransition();
+            } else {
+                getActivity().startActivity(i);
+                getActivity().finish();
+            }
         }
     }
 
@@ -865,11 +885,16 @@ public class SurveyFragment extends Fragment implements NavigationView
     protected void createQuestionFragments() {
         if (!isActivityFinished) {
             // Hide previous fragments
-            FragmentManager fm = getChildFragmentManager();
-            FragmentTransaction fragmentTransaction = fm.beginTransaction();
+            FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
+            fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
             for (Fragment fragment : mQuestionFragments) {
                 fragmentTransaction.hide(fragment);
             }
+            fragmentTransaction.commitNow();
+
+            // Add/show new fragments
+            fragmentTransaction = getChildFragmentManager().beginTransaction();
+            fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             mQuestionFragments.clear();
             setSelectedDrawerItemChecked();
             List<Question> displayQuestions = mDisplayQuestions.get(mDisplay);
@@ -919,7 +944,7 @@ public class SurveyFragment extends Fragment implements NavigationView
                     }
 
                     String qfTag = mSurvey.getId().toString() + "-" + question.getId().toString();
-                    QuestionFragment questionFragment = (QuestionFragment) fm.findFragmentByTag
+                    QuestionFragment questionFragment = (QuestionFragment) getChildFragmentManager().findFragmentByTag
                             (qfTag);
                     if (questionFragment == null || isScreenRotated) {
                         Bundle bundle = new Bundle();
@@ -1272,7 +1297,7 @@ public class SurveyFragment extends Fragment implements NavigationView
             new ScoreSurveyTask().execute(mSurvey);
         } else {
             completeAndSendSurvey(mSurvey);
-            getActivity().finish();
+            finishActivity();
         }
     }
 
@@ -1318,7 +1343,12 @@ public class SurveyFragment extends Fragment implements NavigationView
         b.putLong(ReviewPageFragment.EXTRA_REVIEW_SURVEY_ID, mSurvey.getId());
         b.putStringArrayList(ReviewPageFragment.EXTRA_SKIPPED_QUESTION_ID_LIST, questionsToSkip);
         i.putExtras(b);
-        startActivityForResult(i, REVIEW_CODE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            startActivityForResult(i, REVIEW_CODE, ActivityOptions.makeSceneTransitionAnimation(getActivity
+                    ()).toBundle());
+        } else {
+            startActivityForResult(i, REVIEW_CODE);
+        }
     }
 
     private void setSurveyLocation() {
@@ -1412,7 +1442,7 @@ public class SurveyFragment extends Fragment implements NavigationView
         @Override
         protected void onPostExecute(Survey survey) {
             completeAndSendSurvey(survey);
-            getActivity().finish();
+            finishActivity();
         }
     }
 

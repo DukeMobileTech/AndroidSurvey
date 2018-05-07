@@ -1,6 +1,8 @@
 package org.adaptlab.chpir.android.survey;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
+import android.os.Build;
 import android.support.v4.app.Fragment;
 
 public class LoginActivity extends SingleFragmentActivity {
@@ -15,8 +17,13 @@ public class LoginActivity extends SingleFragmentActivity {
         Intent i = new Intent(this, InstrumentActivity.class);
         i.putExtra(InstrumentFragment.EXTRA_AUTHORIZE_SURVEY, true);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(i);
-        finish();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            startActivity(i, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+            finishAfterTransition();
+        } else {
+            startActivity(i);
+            finish();
+        }
     }
 
 }

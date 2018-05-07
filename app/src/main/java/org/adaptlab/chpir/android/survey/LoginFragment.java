@@ -1,5 +1,6 @@
 package org.adaptlab.chpir.android.survey;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -37,7 +38,11 @@ public class LoginFragment extends Fragment {
                 DeviceUser deviceUser = DeviceUser.findByUserName(userName);
                 if (deviceUser != null && deviceUser.checkPassword(password)) {
                     AuthUtils.signIn(deviceUser);
-                    getActivity().finish();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        getActivity().finishAfterTransition();
+                    } else {
+                        getActivity().finish();
+                    }
                 } else {
                     Toast.makeText(getActivity(), getString(R.string.invalid_username_or_password), Toast.LENGTH_LONG).show();
                 }

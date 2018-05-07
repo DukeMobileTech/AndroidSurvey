@@ -3,10 +3,10 @@ package org.adaptlab.chpir.android.survey;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.text.Html;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -16,7 +16,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.adaptlab.chpir.android.survey.models.Display;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Survey;
@@ -103,7 +102,11 @@ public class ReviewPageFragment extends ListFragment {
 		Intent i = new Intent();
 		i.putExtra(SurveyFragment.EXTRA_DISPLAY_NUMBER, num);
 		getActivity().setResult(Activity.RESULT_OK, i);
-		getActivity().finish();
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			getActivity().finishAfterTransition();
+		} else {
+			getActivity().finish();
+		}
 	}
 	
 	private class QuestionAdapter extends ArrayAdapter<Question> {

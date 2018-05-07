@@ -371,7 +371,7 @@ public class AdminFragment extends Fragment {
                 saveAdminSettings();
                 Intent i = new Intent();
                 getActivity().setResult(Activity.RESULT_OK, i);
-                getActivity().finish();
+                finishActivity();
             }
         }
 
@@ -419,13 +419,21 @@ public class AdminFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.save_admin_settings_button:
                 saveAdminSettings();
-                getActivity().finish();
+                finishActivity();
                 return true;
             case R.id.delete_data_button:
                 deleteData();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void finishActivity() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getActivity().finishAfterTransition();
+        } else {
+            getActivity().finish();
         }
     }
 
@@ -570,7 +578,7 @@ public class AdminFragment extends Fragment {
         @Override
         protected void onPostExecute(Void params) {
             progressDialog.dismiss();
-            getActivity().finish();
+            finishActivity();
         }
     }
 }

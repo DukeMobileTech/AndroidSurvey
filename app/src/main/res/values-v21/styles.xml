@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.Survey" parent="Theme.AppCompat.Light">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="homeAsUpIndicator">@drawable/ic_menu</item>
+        <item name="android:homeAsUpIndicator">@drawable/ic_menu</item>
+        <item name="actionModeStyle">@style/ActionBar.ActionMode</item>
+        <item name="android:textViewStyle">@style/TextView.Survey</item>
+        <item name="android:checkboxStyle">@style/CheckBox.Survey</item>
+        <item name="android:radioButtonStyle">@style/RadioButton.Survey</item>
+        <item name="android:editTextStyle">@style/EditText.Survey</item>
+
+        <!--Transitions-->
+        <item name="android:windowActivityTransitions">true</item>
+        <item name="android:windowEnterTransition">@android:transition/slide_left</item>
+        <item name="android:windowExitTransition">@android:transition/slide_right</item>
+    </style>
+</resources>

@@ -3,6 +3,7 @@ package org.adaptlab.chpir.android.survey;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -402,7 +403,7 @@ public class InstrumentFragment extends ListFragment {
         switch (item.getItemId()) {
             case R.id.menu_item_settings:
                 Intent i = new Intent(getActivity(), AdminActivity.class);
-                startActivity(i);
+                startAnimatedActivity(i);
                 return true;
             case R.id.menu_item_refresh:
                 new RefreshInstrumentsTask().execute();
@@ -531,13 +532,22 @@ public class InstrumentFragment extends ListFragment {
             Intent i = new Intent(getActivity(), RosterActivity.class);
             i.putExtra(RosterActivity.EXTRA_ROSTER_UUID, roster.getUUID());
             i.putExtra(RosterActivity.EXTRA_INSTRUMENT_ID, roster.getInstrument().getRemoteId());
-            startActivity(i);
+            startAnimatedActivity(i);
         } else if (l.getAdapter() instanceof ScoreAdapter) {
             Score score = getScoreAtPosition(l, position);
             if (score == null) return;
             Intent intent = new Intent(getActivity(), ScoreUnitActivity.class);
             intent.putExtra(ScoreUnitFragment.EXTRA_SCORE_ID, score.getId());
-            startActivity(intent);
+            startAnimatedActivity(intent);
+        }
+    }
+
+    private void startAnimatedActivity(Intent i) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity
+                    ()).toBundle());
+        } else {
+            startActivity(i);
         }
     }
 
@@ -954,7 +964,7 @@ public class InstrumentFragment extends ListFragment {
                                 public void onRulesPass() {
                                     Intent i = new Intent(getActivity(), SurveyActivity.class);
                                     i.putExtra(SurveyFragment.EXTRA_INSTRUMENT_ID, instrument.getRemoteId());
-                                    startActivity(i);
+                                    startAnimatedActivity(i);
                                 }
 
                                 public void onRulesFail() {}
@@ -1002,7 +1012,7 @@ public class InstrumentFragment extends ListFragment {
                     i.putExtra(SurveyFragment.EXTRA_SURVEY_ID, survey.getId());
                     i.putExtra(SurveyFragment.EXTRA_QUESTION_NUMBER, survey.getLastQuestion().getNumberInInstrument() - 1);
                     i.putExtra(SurveyFragment.EXTRA_AUTHORIZE_SURVEY, mAuthorizeSurvey);
-                    startActivity(i);
+                    startAnimatedActivity(i);
                 }
             }
         }
