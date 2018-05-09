@@ -38,8 +38,7 @@ public abstract class ListOfItemsQuestionFragment extends QuestionFragment {
             questionComponent.addView(optionText);
             EditText editText = createEditText();
             editText.setHint(R.string.free_response_edittext);
-            editText.setTypeface(getInstrument().getTypeFace(getActivity().getApplicationContext
-                    ()));
+            editText.setTypeface(getInstrument().getTypeFace(getActivity().getApplicationContext()));
             questionComponent.addView(editText);
             mResponses.add(editText);
             editText.addTextChangedListener(new TextWatcher() {

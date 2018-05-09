@@ -24,7 +24,7 @@ public class SelectMultipleWriteOtherQuestionFragment extends
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     otherText.setEnabled(true);
-                    otherText.requestFocus();
+//                    otherText.requestFocus();
 //                    showKeyBoard();
                 } else {
                     otherText.setEnabled(false);

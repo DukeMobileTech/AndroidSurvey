@@ -39,7 +39,7 @@ public class SelectOneWriteOtherQuestionFragment extends
                 if (checkedId != -1) {
                     if (checkedId == otherId) {
                         otherText.setEnabled(true);
-                        otherText.requestFocus();
+//                        otherText.requestFocus();
 //                        showKeyBoard();
                     } else {
                         otherText.setEnabled(false);

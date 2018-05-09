@@ -25,8 +25,8 @@ public class FreeResponseFragment extends RosterFragment {
             public void afterTextChanged(Editable s) {
             }
         });
-        editText.requestFocus();
-        showKeyBoard();
+//        editText.requestFocus();
+//        showKeyBoard();
         responseComponent.addView(editText);
     }
 }

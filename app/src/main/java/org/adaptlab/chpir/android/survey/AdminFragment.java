@@ -326,8 +326,8 @@ public class AdminFragment extends Fragment {
                 urlConnection.setRequestMethod("POST");
                 urlConnection.setRequestProperty("Content-Type", "application/json");
                 urlConnection.setRequestProperty("Accept", "application/json");
-                urlConnection.setConnectTimeout(10000);
-                urlConnection.setReadTimeout(10000);
+                urlConnection.setConnectTimeout(30000);
+                urlConnection.setReadTimeout(30000);
                 urlConnection.setDoOutput(true);
 
                 byte[] outputInBytes = json.toString().getBytes(CharEncoding.UTF_8);
@@ -362,7 +362,7 @@ public class AdminFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String param) {
-            if (param.equals(HttpURLConnection.HTTP_UNAUTHORIZED + "")) {
+            if (param == null || param.equals(HttpURLConnection.HTTP_UNAUTHORIZED + "")) {
                 Toast.makeText(getActivity(), R.string.invalid_user_credentials, Toast.LENGTH_LONG).show();
             } else {
                 AdminSettings.getInstance().setApiKey(param);

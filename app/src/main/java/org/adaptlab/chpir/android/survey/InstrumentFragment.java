@@ -777,6 +777,13 @@ public class InstrumentFragment extends ListFragment {
         @Override
         protected Integer doInBackground(Void... params) {
             if (isAdded() && NetworkNotificationUtils.checkForNetworkErrors(getActivity())) {
+                List<Instrument> instruments = Instrument.getAllProjectInstruments(getProjectId());
+                for (int k = 0; k < instruments.size(); k++) {
+                    if (!instruments.get(k).loaded()) {
+                        AdminSettings.getInstance().resetLastSyncTime();
+                        break;
+                    }
+                }
                 ActiveRecordCloudSync.syncReceiveTables(getActivity());
                 return 0;
             } else {

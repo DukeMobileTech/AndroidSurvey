@@ -124,7 +124,6 @@ public class SurveyFragment extends Fragment implements NavigationView
     private Display mDisplay;
     private int mDisplayNumber;
     private ArrayList<Integer> mPreviousDisplays;
-    private List<Question> mQuestions;
     private LocationManager mLocationManager;
     private NestedScrollView mScrollView;
     private TextView mDisplayTitle;
@@ -210,41 +209,21 @@ public class SurveyFragment extends Fragment implements NavigationView
             }
             mDisplayNumber = mSurvey.getLastQuestion().getDisplay().getPosition() - 1;
         }
-
+        mDisplays = (ArrayList<Display>) mInstrument.displays();
+        mDisplay = mDisplays.get(mDisplayNumber);
         mPreviousDisplays = new ArrayList<>();
         mQuestionFragments = new ArrayList<>();
         mQuestionsToSkipMap = new HashMap<>();
         mQuestionsToSkipSet = new HashSet<>();
         mSpecialOptions = new HashMap<>();
-        ProgressDialog progressDialog = ProgressDialog.show(getActivity(), getString(R.string
-                .instrument_loading_progress_header), getString(R.string
-                .background_process_progress_message));
-        mDisplayQuestions = mInstrument.displayQuestions();
-        mQuestions = mInstrument.questions(); // TODO: 3/1/18 Fix
-        mResponses = mSurvey.responsesMap();
-        mOptions = mInstrument.optionsMap();
-        mDisplays = (ArrayList<Display>) mInstrument.displays();
-        mDisplay = mDisplays.get(mDisplayNumber);
-        mSpecialOptions = mInstrument.specialOptionsMap();
-        if (progressDialog != null && progressDialog.isShowing()) {
-            progressDialog.dismiss();
-        }
+        mDisplayQuestions = new HashMap<>();
+        mResponses = new HashMap<>();
+        mOptions = new HashMap<>();
+        new InstrumentDataTask().execute(mInstrument, mSurvey);
         registerCrashlytics();
+    }
 
-//        if (!mInstrument.isRoster()) {
-//            mQuestionCount = mInstrument.getQuestionCount();
-//            mQuestions = new ArrayList<>(mInstrument.getQuestionCount());
-//            ProgressDialog progressDialog = ProgressDialog.show(getActivity(), getString(R
-// .string.instrument_loading_progress_header), getString(R.string
-// .background_process_progress_message));
-//            mDisplayQuestions = mInstrument.displayQuestions();
-//            mResponses = mSurvey.responsesMap();
-//            mOptions = mInstrument.optionsMap();
-//            if (progressDialog != null && progressDialog.isShowing()) {
-//                progressDialog.dismiss();
-//            }
-//        }
-
+    private void requestLocationUpdates() {
         if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) {
             if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission
                     .ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -305,7 +284,7 @@ public class SurveyFragment extends Fragment implements NavigationView
     @Override
     public void onStart() {
         super.onStart();
-        startLocationUpdates();
+        requestLocationUpdates();
     }
 
     private void startLocationUpdates() {
@@ -323,7 +302,9 @@ public class SurveyFragment extends Fragment implements NavigationView
     @Override
     public void onResume() {
         super.onResume();
-        refreshView();
+        if (mDisplayQuestions.size() > 0) {
+            refreshView();
+        }
     }
 
     @Override
@@ -576,7 +557,7 @@ public class SurveyFragment extends Fragment implements NavigationView
             nextQuestionIdentifier, String questionIdentifier) {
         List<Question> skipList = new ArrayList<>();
         boolean skipStart = false;
-        for (Question curQuestion : mQuestions) {
+        for (Question curQuestion : getQuestions()) {
             if (skipStart) skipList.add(curQuestion);
             if (curQuestion.getQuestionIdentifier().equals(currentQuestionIdentifier)) {
                 skipStart = true;
@@ -730,7 +711,7 @@ public class SurveyFragment extends Fragment implements NavigationView
                 fragmentTransaction.add(framelayout.getId(), questionFragment);
                 mQuestionFragments.add(questionFragment);
             } else {
-                for (Question question : displayQuestions) {
+                for (Question question : getQuestions(mDisplay)) {
                     // Add large offset to avoid id conflicts
                     int frameLayoutId = new BigDecimal(question.getRemoteId()).intValueExact() +
                             1000000;
@@ -787,6 +768,14 @@ public class SurveyFragment extends Fragment implements NavigationView
 
     protected List<Question> getQuestions(Display display) {
         return mDisplayQuestions.get(display);
+    }
+
+    protected List<Question> getQuestions() {
+        List<Question> questions = new ArrayList<>();
+        for(Map.Entry<Display, List<Question>> entry : mDisplayQuestions.entrySet()) {
+            questions.addAll(entry.getValue());
+        }
+        return questions;
     }
 
     public Survey getSurvey() {
@@ -1018,4 +1007,43 @@ public class SurveyFragment extends Fragment implements NavigationView
         }
     }
 
+    private class InstrumentDataTask extends AsyncTask<Object, Void, InstrumentDataWrapper> {
+        private ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog = ProgressDialog.show(getActivity(), getString(R.string
+                    .instrument_loading_progress_header), getString(R.string
+                    .background_process_progress_message));
+        }
+
+        @Override
+        protected InstrumentDataWrapper doInBackground(Object... params) {
+            InstrumentDataWrapper instrumentData = new InstrumentDataWrapper();
+            instrumentData.displayQuestions = ((Instrument) params[0]).displayQuestions();
+            instrumentData.responses = ((Survey) params[1]).responsesMap();
+            instrumentData.options = ((Instrument) params[0]).optionsMap();
+            instrumentData.specialOptions = ((Instrument) params[0]).specialOptionsMap();
+            return instrumentData;
+        }
+
+        @Override
+        protected void onPostExecute(InstrumentDataWrapper instrumentData) {
+            mDisplayQuestions = instrumentData.displayQuestions;
+            mResponses = instrumentData.responses;
+            mOptions = instrumentData.options;
+            mSpecialOptions = instrumentData.specialOptions;
+            refreshView();
+            if (progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+            }
+        }
+    }
+
+    private class InstrumentDataWrapper {
+        public HashMap<Question, Response> responses;
+        public HashMap<Question, List<Option>> options;
+        public HashMap<Display, List<Question>> displayQuestions;
+        public HashMap<Long, List<Option>> specialOptions;
+    }
 }

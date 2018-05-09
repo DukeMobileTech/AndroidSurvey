@@ -10,8 +10,7 @@ public class IntegerFragment extends RosterFragment {
     @Override
     protected void createResponseComponent(ViewGroup responseComponent) {
         EditText editText = new EditText(getActivity());
-        editText.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS | InputType
-                .TYPE_CLASS_NUMBER);
+        editText.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS | InputType.TYPE_CLASS_NUMBER);
         editText.setMinimumWidth(MINIMUM_WIDTH);
         editText.setText(getResponse().getText());
         editText.addTextChangedListener(new TextWatcher() {
@@ -25,8 +24,8 @@ public class IntegerFragment extends RosterFragment {
             public void afterTextChanged(Editable s) {
             }
         });
-        editText.requestFocus();
-        showKeyBoard();
+//        editText.requestFocus();
+//        showKeyBoard();
         responseComponent.addView(editText);
     }
 }
