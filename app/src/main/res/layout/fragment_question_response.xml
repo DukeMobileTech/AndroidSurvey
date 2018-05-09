@@ -4,14 +4,51 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/questionNumber"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="fill"
+            android:layout_weight="3"
+            android:gravity="start"
+            android:maxLines="1"
+            android:textColor="@color/secondary_text"/>
+
+        <TextView
+            android:id="@+id/questionIdentifier"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="fill"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:maxLines="1"
+            android:textColor="@color/secondary_text"/>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/linear_layout_for_question_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@drawable/question_text_layout">
+        android:background="@drawable/question_text_layout"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/question_instructions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:scrollbars="vertical"
+            android:textColor="@color/secondary_text"
+            android:textStyle="italic"/>
 
         <TextView
             android:id="@+id/question_text"
@@ -28,16 +65,18 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
         android:background="@drawable/response_component_layout"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:orientation="vertical">
 
         <DatePicker
             android:id="@+id/date_picker"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:calendarViewShown="false"
             android:datePickerMode="spinner"
             android:visibility="gone"
-            android:layout_gravity="center"
             tools:targetApi="lollipop"/>
 
     </LinearLayout>
@@ -46,9 +85,9 @@
         android:id="@+id/special_responses_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:background="@drawable/response_component_layout"
         android:gravity="center"
-        android:background="@drawable/response_component_layout"/>
+        android:orientation="horizontal"/>
 
     <TextView
         android:id="@+id/validation_text"
@@ -65,6 +104,6 @@
         android:layout_width="fill_parent"
         android:layout_height="2dp"
         android:layout_marginBottom="10dp"
-        android:background="?android:attr/dividerHorizontal" />
+        android:background="?android:attr/dividerHorizontal"/>
 
 </LinearLayout>

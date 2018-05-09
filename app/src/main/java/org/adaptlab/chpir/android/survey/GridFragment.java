@@ -78,7 +78,7 @@ public abstract class GridFragment extends QuestionFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_question_factory, parent, false);
+        View v = inflater.inflate(R.layout.fragment_question_response, parent, false);
 
         ViewGroup questionComponent = (LinearLayout) v.findViewById(R.id.question_component);
         TextView questionText = v.findViewById(R.id.question_text);

@@ -1,7 +1,6 @@
 package org.adaptlab.chpir.android.survey;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -61,6 +60,7 @@ public abstract class QuestionFragment extends Fragment {
     private List<Option> mSpecialOptions;
     protected RadioGroup mSpecialResponses;
     private TextView mQuestionText;
+    private TextView mQuestionInstructions;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -135,15 +135,20 @@ public abstract class QuestionFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_question_factory, parent, false);
-
-        ViewGroup questionComponent = (LinearLayout) v.findViewById(R.id.question_component);
+        View v = inflater.inflate(R.layout.fragment_question_response, parent, false);
+        TextView questionNumber = v.findViewById(R.id.questionNumber);
+        questionNumber.setText(String.valueOf(mQuestion.getNumberInInstrument()));
+        TextView questionIdentifier = v.findViewById(R.id.questionIdentifier);
+        questionIdentifier.setText(mQuestion.getQuestionIdentifier());
+        mQuestionInstructions = v.findViewById(R.id.question_instructions);
         mQuestionText = v.findViewById(R.id.question_text);
         mValidationTextView = v.findViewById(R.id.validation_text);
         mQuestionText.setTypeface(mInstrument.getTypeFace(getActivity().getApplicationContext()));
+        setQuestionInstructions();
         setQuestionText();
 
         // Overridden by subclasses to place their graphical elements on the fragment.
+        ViewGroup questionComponent = (LinearLayout) v.findViewById(R.id.question_component);
         createQuestionComponent(questionComponent);
         if (mResponse != null) {
             deserialize(mResponse.getText());
@@ -495,7 +500,6 @@ public abstract class QuestionFragment extends Fragment {
      * set the text as normal.
      */
     protected void setQuestionText() {
-        appendNumberAndInstructions(mQuestionText);
         if (mQuestion.isFollowUpQuestion()) {
             String followUpText = mQuestion.getFollowingUpText(mSurveyFragment.getResponses(),
                     getActivity());
@@ -510,28 +514,12 @@ public abstract class QuestionFragment extends Fragment {
         }
     }
 
-    /*
-     * If this question has instructions, append and add new line
-     */
-    private void appendNumberAndInstructions(TextView text) {
-        if (!TextUtils.isEmpty(mQuestion.getInstructions()) && !mQuestion.getInstructions()
-                .equals("null")) {
-            text.setText(styleTextWithHtml(mQuestion.getNumberInInstrument() + "<br />" +
-                    mQuestion.getInstructions() + "<br />"));
+    private void setQuestionInstructions() {
+        if (!TextUtils.isEmpty(mQuestion.getInstructions()) && !mQuestion.getInstructions().equals("null")) {
+            mQuestionInstructions.setText(styleTextWithHtml(mQuestion.getInstructions()));
         } else {
-            text.setText(styleTextWithHtml(mQuestion.getNumberInInstrument() + "<br />"));
+            mQuestionInstructions.setVisibility(View.GONE);
         }
     }
 
-
-    private class SaveResponseTask extends AsyncTask<Response, Void, Survey> {
-
-        @Override
-        protected Survey doInBackground(Response... params) {
-            params[0].save();
-            params[0].getSurvey().save();
-            return params[0].getSurvey();
-        }
-
-    }
 }

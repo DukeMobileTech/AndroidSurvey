@@ -395,7 +395,11 @@ public class SurveyFragment extends Fragment implements NavigationView
         Collections.sort(mDisplays, new Comparator<Display>() {
             @Override
             public int compare(Display lhs, Display rhs) {
-                return lhs.getPosition() < rhs.getPosition() ? -1 : 1;
+                if (lhs.getPosition() == rhs.getPosition()) {
+                    return 0;
+                } else {
+                    return lhs.getPosition() < rhs.getPosition() ? -1 : 1;
+                }
             }
         });
     }
@@ -457,6 +461,10 @@ public class SurveyFragment extends Fragment implements NavigationView
             mDisplayNumber -= 1;
             mDisplay = mDisplays.get(mDisplayNumber);
         }
+        showDisplayQuestions();
+    }
+
+    private void showDisplayQuestions() {
         createQuestionFragments();
         hideQuestionsInDisplay();
         updateDisplayLabels();
@@ -481,9 +489,7 @@ public class SurveyFragment extends Fragment implements NavigationView
                 goToReviewPage();
             }
         }
-        createQuestionFragments();
-        hideQuestionsInDisplay();
-        updateDisplayLabels();
+        showDisplayQuestions();
     }
 
     private void moveToDisplay(int position) {
@@ -492,9 +498,7 @@ public class SurveyFragment extends Fragment implements NavigationView
             mPreviousDisplays.add(mDisplayNumber);
             mDisplayNumber = position;
             mDisplay = mDisplays.get(mDisplayNumber);
-            createQuestionFragments();
-            hideQuestionsInDisplay();
-            updateDisplayLabels();
+            showDisplayQuestions();
         }
     }
 
@@ -959,9 +963,9 @@ public class SurveyFragment extends Fragment implements NavigationView
                 mDisplayTitle.setText(mDisplay.getTitle());
             }
             // Progress text
-            mDisplayIndexLabel.setText(String.format(Locale.getDefault(), "%s %d %s %d %s%s %d %s" +
+            mDisplayIndexLabel.setText(String.format(Locale.getDefault(), "%s %d %s %d %s%d %s" +
                     " %d%s", getString(R.string.screen), mDisplayNumber + 1, getString(R.string
-                    .of), mDisplays.size(), "(", getString(R.string.questions), mDisplay
+                    .of), mDisplays.size(), "(", mDisplay
                     .questions().get(0).getNumberInInstrument(), "-", mDisplay.questions().get
                     (mDisplay.questions().size() - 1).getNumberInInstrument(), ")"));
             // Progress bar
