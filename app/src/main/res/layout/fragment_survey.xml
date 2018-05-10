@@ -15,8 +15,17 @@
             android:id="@+id/display_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:gravity="center_horizontal"/>
+            android:gravity="center_horizontal"
+            android:textStyle="bold"/>
+
+        <ProgressBar
+            android:id="@+id/indeterminateProgressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:indeterminate="true"
+            android:visibility="visible"
+            />
 
         <android.support.v4.widget.NestedScrollView
             android:id="@+id/survey_fragment_scroll_view"

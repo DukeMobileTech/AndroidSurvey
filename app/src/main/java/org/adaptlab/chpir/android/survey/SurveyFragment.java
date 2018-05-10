@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -121,6 +120,7 @@ public class SurveyFragment extends Fragment implements NavigationView
     private TextView mDisplayIndexLabel;
     private TextView mParticipantLabel;
     private ProgressBar mProgressBar;
+    private ProgressBar mIndeterminateProgressBar;
     private Display mDisplay;
     private int mDisplayNumber;
     private ArrayList<Integer> mPreviousDisplays;
@@ -146,9 +146,7 @@ public class SurveyFragment extends Fragment implements NavigationView
             Intent i = new Intent(getContext(), LoginActivity.class);
             getActivity().startActivityForResult(i, AUTHORIZE_CODE);
         } else {
-            setParticipantLabel();
-            updateDisplayLabels();
-            createQuestionFragments();
+            refreshUIComponents();
         }
     }
 
@@ -273,11 +271,11 @@ public class SurveyFragment extends Fragment implements NavigationView
         mParticipantLabel = (TextView) v.findViewById(R.id.participant_label);
         mDisplayIndexLabel = (TextView) v.findViewById(R.id.display_index_label);
         mProgressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
+        mIndeterminateProgressBar = v.findViewById(R.id.indeterminateProgressBar);
         ActivityCompat.invalidateOptionsMenu(getActivity());
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (actionBar != null) actionBar.setTitle(mInstrument.getTitle());
         mScrollView = v.findViewById(R.id.survey_fragment_scroll_view);
-
         return v;
     }
 
@@ -452,7 +450,7 @@ public class SurveyFragment extends Fragment implements NavigationView
     }
 
     private void moveToPreviousDisplay() {
-        mDrawerLayout.closeDrawer(mNavigationView);
+        showIndeterminateProgressBar();
         if (mDisplayNumber >= 0 && mDisplayNumber < mDisplays.size() && mPreviousDisplays.size()
                 > 0) {
             mDisplayNumber = mPreviousDisplays.remove(mPreviousDisplays.size() - 1);
@@ -461,17 +459,27 @@ public class SurveyFragment extends Fragment implements NavigationView
             mDisplayNumber -= 1;
             mDisplay = mDisplays.get(mDisplayNumber);
         }
-        showDisplayQuestions();
+        refreshUIComponents();
     }
 
-    private void showDisplayQuestions() {
+    private void showIndeterminateProgressBar() {
+        mDrawerLayout.closeDrawer(mNavigationView);
+        mIndeterminateProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    protected void hideIndeterminateProgressBar() {
+        mIndeterminateProgressBar.setVisibility(View.GONE);
+    }
+
+    private void refreshUIComponents() {
         createQuestionFragments();
         hideQuestionsInDisplay();
         updateDisplayLabels();
+        setParticipantLabel();
     }
 
     private void moveToNextDisplay() {
-        mDrawerLayout.closeDrawer(mNavigationView);
+        showIndeterminateProgressBar();
         mPreviousDisplays.add(mDisplayNumber);
         for (int i = mDisplayNumber + 1; i < mDisplays.size(); i++) {
             boolean skipDisplay = true;
@@ -489,16 +497,16 @@ public class SurveyFragment extends Fragment implements NavigationView
                 goToReviewPage();
             }
         }
-        showDisplayQuestions();
+        refreshUIComponents();
     }
 
     private void moveToDisplay(int position) {
-        mDrawerLayout.closeDrawer(mNavigationView);
+        showIndeterminateProgressBar();
         if (mDisplayNumber != position) {
             mPreviousDisplays.add(mDisplayNumber);
             mDisplayNumber = position;
             mDisplay = mDisplays.get(mDisplayNumber);
-            showDisplayQuestions();
+            refreshUIComponents();
         }
     }
 
@@ -1012,15 +1020,6 @@ public class SurveyFragment extends Fragment implements NavigationView
     }
 
     private class InstrumentDataTask extends AsyncTask<Object, Void, InstrumentDataWrapper> {
-        private ProgressDialog progressDialog;
-
-        @Override
-        protected void onPreExecute() {
-            progressDialog = ProgressDialog.show(getActivity(), getString(R.string
-                    .instrument_loading_progress_header), getString(R.string
-                    .background_process_progress_message));
-        }
-
         @Override
         protected InstrumentDataWrapper doInBackground(Object... params) {
             InstrumentDataWrapper instrumentData = new InstrumentDataWrapper();
@@ -1038,9 +1037,6 @@ public class SurveyFragment extends Fragment implements NavigationView
             mOptions = instrumentData.options;
             mSpecialOptions = instrumentData.specialOptions;
             refreshView();
-            if (progressDialog != null && progressDialog.isShowing()) {
-                progressDialog.dismiss();
-            }
         }
     }
 

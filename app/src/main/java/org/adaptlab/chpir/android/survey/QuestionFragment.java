@@ -218,42 +218,33 @@ public abstract class QuestionFragment extends Fragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        mSurveyFragment.getScrollView().fullScroll(View.FOCUS_UP);
+    public void onStart() {
+        super.onStart();
+        hideIndeterminateProgressBar();
     }
 
+    /*
+    This is needed to hide the indeterminate progress bar when showing fragments that have previously been
+    added and hidden. The onStart lifecycle event is not called when using the method FragmentTransaction.show(fragment)
+     */
     @Override
-    public void onPause() {
-        super.onPause();
-//        hideKeyBoard();
+    public void onHiddenChanged (boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden) {
+            hideIndeterminateProgressBar();
+        }
     }
 
-//    protected void hideKeyBoard() {
-//        try {
-//            getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams
-//                    .SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-//            if (getActivity().getCurrentFocus() != null && getActivity().getCurrentFocus()
-//                    .getWindowToken() != null) {
-//                ((InputMethodManager) getActivity().getSystemService(Context
-//                        .INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(getActivity()
-//                        .getCurrentFocus().getWindowToken(), 0);
-//            }
-//        } catch (Exception ex) {
-//            if (BuildConfig.DEBUG) Log.e(TAG, "Input Method Exception " + ex.getMessage());
-//        }
-//    }
+    private void hideIndeterminateProgressBar() {
+        List<Question> displayQuestions = mSurveyFragment.getQuestions(mQuestion.getDisplay());
+        if (displayQuestions.get(displayQuestions.size() - 1).equals(mQuestion)) {
+            mSurveyFragment.hideIndeterminateProgressBar();
+        }
+    }
 
     protected abstract void createQuestionComponent(ViewGroup questionComponent);
 
     protected abstract void deserialize(String responseText);
-
-//    protected void showKeyBoard() {
-//        InputMethodManager manager = (InputMethodManager) getActivity().getSystemService(Context
-//                .INPUT_METHOD_SERVICE);
-//        manager.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager
-//                .HIDE_IMPLICIT_ONLY);
-//    }
 
     protected SurveyFragment getSurveyFragment() {
         return mSurveyFragment;
