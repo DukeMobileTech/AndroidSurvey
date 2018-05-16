@@ -45,7 +45,7 @@ public class OptionInOptionSet extends ReceiveModel {
             option.setSpecial(jsonObject.optBoolean("special", false));
             option.save();
         } catch (JSONException je) {
-            Log.e(TAG, "Error parsing object json", je);
+            if (BuildConfig.DEBUG) Log.e(TAG, "Error parsing object json", je);
         }
     }
 

@@ -481,7 +481,7 @@ public class Question extends ReceiveModel {
         mRemoteOptionSetId = id;
     }
 
-    protected Long getRemoteOptionSetId() {
+    public Long getRemoteOptionSetId() {
         return mRemoteOptionSetId;
     }
 

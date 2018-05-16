@@ -60,7 +60,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/question_component"
+        android:id="@+id/responseLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
@@ -69,16 +69,33 @@
         android:focusableInTouchMode="true"
         android:orientation="vertical">
 
-        <DatePicker
-            android:id="@+id/date_picker"
-            android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/optionSetInstructions"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:calendarViewShown="false"
-            android:datePickerMode="spinner"
-            android:visibility="gone"
-            tools:targetApi="lollipop"/>
+            android:layout_margin="5dp"
+            android:scrollbars="vertical"
+            android:textColor="@color/secondary_text"
+            android:textStyle="italic"
+            android:visibility="gone"/>
 
+        <LinearLayout
+            android:id="@+id/question_component"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <DatePicker
+                android:id="@+id/date_picker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:calendarViewShown="false"
+                android:datePickerMode="spinner"
+                android:visibility="gone"
+                tools:targetApi="lollipop"/>
+
+        </LinearLayout>
     </LinearLayout>
 
     <RadioGroup

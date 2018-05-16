@@ -8,7 +8,6 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +28,7 @@ import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.NextQuestion;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.OptionInOptionSet;
+import org.adaptlab.chpir.android.survey.models.OptionSet;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.ResponsePhoto;
@@ -149,7 +149,9 @@ public abstract class QuestionFragment extends Fragment {
 
         // Overridden by subclasses to place their graphical elements on the fragment.
         ViewGroup questionComponent = (LinearLayout) v.findViewById(R.id.question_component);
+        setChoiceSelectionInstructions(v);
         createQuestionComponent(questionComponent);
+
         if (mResponse != null) {
             deserialize(mResponse.getText());
         }
@@ -188,6 +190,17 @@ public abstract class QuestionFragment extends Fragment {
         }
         deserializeSpecialResponse();
         return v;
+    }
+
+    private void setChoiceSelectionInstructions(View view) {
+        OptionSet optionSet = OptionSet.findByRemoteId(getQuestion().getRemoteOptionSetId());
+        if (optionSet != null && !TextUtils.isEmpty(optionSet.getInstructions())) {
+            TextView instructionsView = view.findViewById(R.id.optionSetInstructions);
+            if (instructionsView != null) {
+                instructionsView.setText(styleTextWithHtml(optionSet.getInstructions()));
+                instructionsView.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
     private void deserializeSpecialResponse() {
@@ -368,7 +381,6 @@ public abstract class QuestionFragment extends Fragment {
             int responseIndex = Integer.parseInt(mResponse.getText());
             if ((mQuestion.isOtherQuestionType() || mQuestion.isDropDownQuestionType()) &&
                     responseIndex == mQuestion.options().size()) {
-                Log.i("isOtherOrDropDown", "isOtherOrDropDownQuestionType");
                 mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion
                         .getQuestionIdentifier(), mQuestion.getQuestionIdentifier());
                 mSurveyFragment.setMultipleSkipQuestions(null, mQuestion);
@@ -376,9 +388,7 @@ public abstract class QuestionFragment extends Fragment {
             } else if (responseIndex < mQuestion.options().size()) {
                 Option selectedOption = mQuestion.options().get(responseIndex);
                 NextQuestion skipOption = getNextQuestion(selectedOption);
-                Log.i("selectedOption", selectedOption.toString() + " ");
                 if (skipOption != null) {
-                    Log.i("skipOption", skipOption.toString() + " ");
                     mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), skipOption
                             .getNextQuestionIdentifier(), mQuestion.getQuestionIdentifier());
                 } else if (mQuestion.hasSkips(mInstrument)) {

@@ -14,7 +14,7 @@ public class InstructionsQuestionFragment extends QuestionFragment {
 
     @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
-        questionComponent.setVisibility(View.GONE);
+        ((ViewGroup) questionComponent.getParent()).setVisibility(View.GONE);
     }
 
     @Override

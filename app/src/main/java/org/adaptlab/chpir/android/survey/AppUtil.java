@@ -36,6 +36,7 @@ import org.adaptlab.chpir.android.survey.models.NextQuestion;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.OptionInOptionSet;
 import org.adaptlab.chpir.android.survey.models.OptionScore;
+import org.adaptlab.chpir.android.survey.models.OptionSet;
 import org.adaptlab.chpir.android.survey.models.OptionTranslation;
 import org.adaptlab.chpir.android.survey.models.Project;
 import org.adaptlab.chpir.android.survey.models.Question;
@@ -156,6 +157,7 @@ public class AppUtil {
         ActiveRecordCloudSync.addReceiveTable("multiple_skips", MultipleSkip.class);
         ActiveRecordCloudSync.addReceiveTable("follow_up_questions", FollowUpQuestion.class);
         ActiveRecordCloudSync.addReceiveTable("option_in_option_sets", OptionInOptionSet.class);
+        ActiveRecordCloudSync.addReceiveTable("option_sets", OptionSet.class);
         ActiveRecordCloudSync.addSendTable("surveys", Survey.class);
         ActiveRecordCloudSync.addSendTable("responses", Response.class);
         ActiveRecordCloudSync.addSendTable("response_images", ResponsePhoto.class);
