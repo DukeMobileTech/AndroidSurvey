@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -33,6 +34,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
@@ -47,6 +49,7 @@ import com.crashlytics.android.Crashlytics;
 
 import org.adaptlab.chpir.android.survey.location.LocationManager;
 import org.adaptlab.chpir.android.survey.models.Display;
+import org.adaptlab.chpir.android.survey.models.DisplayInstruction;
 import org.adaptlab.chpir.android.survey.models.FollowUpQuestion;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.MultipleSkip;
@@ -116,6 +119,7 @@ public class SurveyFragment extends Fragment implements NavigationView
     private HashMap<Display, List<Question>> mDisplayQuestions;
     private HashMap<String, List<Question>> mQuestionsToSkipMap;
     private HashMap<Long, List<Option>> mSpecialOptions;
+    private HashMap<Display, List<DisplayInstruction>> mDisplayInstructions;
     private HashSet<Question> mQuestionsToSkipSet;
     private TextView mDisplayIndexLabel;
     private TextView mParticipantLabel;
@@ -472,10 +476,16 @@ public class SurveyFragment extends Fragment implements NavigationView
     }
 
     private void refreshUIComponents() {
+        hideSoftInputWindow();
         createQuestionFragments();
         hideQuestionsInDisplay();
         updateDisplayLabels();
         setParticipantLabel();
+    }
+
+    private void hideSoftInputWindow() {
+        InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
     }
 
     private void moveToNextDisplay() {
@@ -806,6 +816,10 @@ public class SurveyFragment extends Fragment implements NavigationView
         return mSpecialOptions;
     }
 
+    public List<DisplayInstruction> getDisplayInstructions(Display display) {
+        return mDisplayInstructions.get(display);
+    }
+
     /*
     * Destroy this activity, and save the survey and mark it as
     * complete.  Send to server if network is available.
@@ -1027,6 +1041,7 @@ public class SurveyFragment extends Fragment implements NavigationView
             instrumentData.responses = ((Survey) params[1]).responsesMap();
             instrumentData.options = ((Instrument) params[0]).optionsMap();
             instrumentData.specialOptions = ((Instrument) params[0]).specialOptionsMap();
+            instrumentData.displayInstructions = ((Instrument) params[0]).displayInstructions();
             return instrumentData;
         }
 
@@ -1036,6 +1051,7 @@ public class SurveyFragment extends Fragment implements NavigationView
             mResponses = instrumentData.responses;
             mOptions = instrumentData.options;
             mSpecialOptions = instrumentData.specialOptions;
+            mDisplayInstructions = instrumentData.displayInstructions;
             refreshView();
         }
     }
@@ -1045,5 +1061,6 @@ public class SurveyFragment extends Fragment implements NavigationView
         public HashMap<Question, List<Option>> options;
         public HashMap<Display, List<Question>> displayQuestions;
         public HashMap<Long, List<Option>> specialOptions;
+        public HashMap<Display, List<DisplayInstruction>> displayInstructions;
     }
 }

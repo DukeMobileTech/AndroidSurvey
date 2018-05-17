@@ -83,6 +83,10 @@ public class Display extends ReceiveModel {
                 .execute();
     }
 
+    public List<DisplayInstruction> displayInstructions() {
+        return new Select().from(DisplayInstruction.class).where("RemoteDisplayId = ? AND Deleted != 1", getRemoteId()).execute();
+    }
+
     public Long getRemoteId() {
         return mRemoteId;
     }

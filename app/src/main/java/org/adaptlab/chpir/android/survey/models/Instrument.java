@@ -228,6 +228,14 @@ public class Instrument extends ReceiveModel {
         return map;
     }
 
+    public HashMap<Display, List<DisplayInstruction>> displayInstructions() {
+        HashMap<Display, List<DisplayInstruction>> map = new HashMap<>();
+        for (Display display : displays()) {
+            map.put(display, display.displayInstructions());
+        }
+        return map;
+    }
+
     public String getCriticalMessage() {
         if (getLanguage().equals(getDeviceLanguage())) return mCriticalMessage;
         if (activeTranslation() != null && !activeTranslation().getCriticalMessage().trim().equals("")) {

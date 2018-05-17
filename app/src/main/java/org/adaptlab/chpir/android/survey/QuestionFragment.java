@@ -24,6 +24,7 @@ import android.widget.TextView;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.survey.models.Display;
+import org.adaptlab.chpir.android.survey.models.DisplayInstruction;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.NextQuestion;
 import org.adaptlab.chpir.android.survey.models.Option;
@@ -61,6 +62,7 @@ public abstract class QuestionFragment extends Fragment {
     protected RadioGroup mSpecialResponses;
     private TextView mQuestionText;
     private TextView mQuestionInstructions;
+    private TextView mDisplayInstructionsText;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -135,7 +137,7 @@ public abstract class QuestionFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_question_response, parent, false);
+        View v = inflater.inflate(R.layout.fragment_question, parent, false);
         TextView questionNumber = v.findViewById(R.id.questionNumber);
         questionNumber.setText(String.valueOf(mQuestion.getNumberInInstrument()));
         TextView questionIdentifier = v.findViewById(R.id.questionIdentifier);
@@ -143,7 +145,9 @@ public abstract class QuestionFragment extends Fragment {
         mQuestionInstructions = v.findViewById(R.id.question_instructions);
         mQuestionText = v.findViewById(R.id.question_text);
         mValidationTextView = v.findViewById(R.id.validation_text);
+        mDisplayInstructionsText = v.findViewById(R.id.displayInstructions);
         mQuestionText.setTypeface(mInstrument.getTypeFace(getActivity().getApplicationContext()));
+        setDisplayInstructions();
         setQuestionInstructions();
         setQuestionText();
 
@@ -520,6 +524,22 @@ public abstract class QuestionFragment extends Fragment {
             mQuestionInstructions.setText(styleTextWithHtml(mQuestion.getInstructions()));
         } else {
             mQuestionInstructions.setVisibility(View.GONE);
+        }
+    }
+
+    private void setDisplayInstructions() {
+        List<DisplayInstruction> displayInstructions = mSurveyFragment.getDisplayInstructions(mQuestion.getDisplay());
+        if (displayInstructions != null && displayInstructions.size() > 0) {
+            StringBuilder instructions = new StringBuilder();
+            for (DisplayInstruction instruction : displayInstructions) {
+                if (instruction.getPosition() == mQuestion.getNumberInInstrument()) {
+                    instructions.append(instruction.getInstructions()).append("<br>");
+                }
+            }
+            if (instructions.length() > 0) {
+                ((LinearLayout) mDisplayInstructionsText.getParent()).setVisibility(View.VISIBLE);
+                mDisplayInstructionsText.setText(styleTextWithHtml(instructions.toString()));
+            }
         }
     }
 

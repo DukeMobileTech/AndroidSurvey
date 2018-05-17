@@ -22,6 +22,7 @@ import org.adaptlab.chpir.android.survey.models.DefaultAdminSettings;
 import org.adaptlab.chpir.android.survey.models.DeviceSyncEntry;
 import org.adaptlab.chpir.android.survey.models.DeviceUser;
 import org.adaptlab.chpir.android.survey.models.Display;
+import org.adaptlab.chpir.android.survey.models.DisplayInstruction;
 import org.adaptlab.chpir.android.survey.models.EventLog;
 import org.adaptlab.chpir.android.survey.models.FollowUpQuestion;
 import org.adaptlab.chpir.android.survey.models.Grid;
@@ -153,6 +154,7 @@ public class AppUtil {
         ActiveRecordCloudSync.addReceiveTable("option_scores", OptionScore.class);
         ActiveRecordCloudSync.addReceiveTable("score_unit_questions", ScoreUnitQuestion.class);
         ActiveRecordCloudSync.addReceiveTable("displays", Display.class);
+        ActiveRecordCloudSync.addReceiveTable("display_instructions", DisplayInstruction.class);
         ActiveRecordCloudSync.addReceiveTable("next_questions", NextQuestion.class);
         ActiveRecordCloudSync.addReceiveTable("multiple_skips", MultipleSkip.class);
         ActiveRecordCloudSync.addReceiveTable("follow_up_questions", FollowUpQuestion.class);
