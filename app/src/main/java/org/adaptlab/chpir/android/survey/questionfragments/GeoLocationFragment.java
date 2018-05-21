@@ -9,13 +9,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import org.adaptlab.chpir.android.survey.QuestionFragment;
+import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.location.LocationManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class GeoLocationFragment extends QuestionFragment {
+public class GeoLocationFragment extends SingleQuestionFragment {
     private static final String TAG = "GeoLocationFragment";
     private TextView mLatitude;
     private TextView mLongitude;

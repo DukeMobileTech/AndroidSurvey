@@ -7,12 +7,12 @@ import android.widget.DatePicker.OnDateChangedListener;
 import android.widget.LinearLayout;
 
 import org.adaptlab.chpir.android.survey.FormatUtils;
-import org.adaptlab.chpir.android.survey.QuestionFragment;
+import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-public class DateQuestionFragment extends QuestionFragment {
+public class DateQuestionFragment extends SingleQuestionFragment {
     protected int mDay;
     protected int mMonth;
     protected int mYear;

@@ -6,9 +6,9 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
 
-import org.adaptlab.chpir.android.survey.QuestionFragment;
+import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
 
-public class RatingQuestionFragment extends QuestionFragment {
+public class RatingQuestionFragment extends SingleQuestionFragment {
     private final static int NUM_STARS = 5;
     private float mRating;
     private RatingBar mRatingBar;

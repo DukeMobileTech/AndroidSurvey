@@ -4,27 +4,25 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/response_component_layout"
+    android:background="@drawable/question_text_layout"
     android:orientation="horizontal">
 
     <LinearLayout
         android:id="@+id/table_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:weightSum="2.0"
-        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:orientation="horizontal"
+        android:weightSum="2.0">
 
         <TextView
             android:id="@+id/table_header_question_text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1.0"
-            android:gravity="start"
-            android:text="@string/question_text_header"
-            android:textStyle="bold"/>
+            android:gravity="start"/>
 
         <!-- Important!!! fillViewPort allows child views to stretch and fill the view -->
         <LinearLayout
@@ -32,7 +30,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1.0"
-            android:fillViewport="true">
+            android:background="@drawable/response_component_layout"
+            android:fillViewport="true"
+            >
 
             <LinearLayout
                 android:id="@+id/table_options_header"
@@ -47,7 +47,7 @@
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/grid_scroll_view"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/table_header">
 
         <LinearLayout
@@ -61,7 +61,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.0"
-                android:orientation="vertical" />
+                android:orientation="vertical"/>
 
             <LinearLayout
                 android:id="@+id/table_body_options_view"
@@ -74,7 +74,8 @@
                     android:id="@+id/table_body_options_choice"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical" />
+                    android:background="@drawable/response_component_layout"
+                    android:orientation="vertical"/>
 
             </LinearLayout>
         </LinearLayout>

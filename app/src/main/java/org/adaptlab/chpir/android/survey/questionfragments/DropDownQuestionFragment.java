@@ -1,7 +1,6 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,13 +8,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import org.adaptlab.chpir.android.survey.QuestionFragment;
+import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.Option;
 
 import java.util.ArrayList;
 
-public class DropDownQuestionFragment extends QuestionFragment {
+public class DropDownQuestionFragment extends SingleQuestionFragment {
     private static final String TAG = "DropDownQuestionFragment";
     private int mResponseIndex;
     private Spinner mSpinner;

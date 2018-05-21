@@ -17,7 +17,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import org.adaptlab.chpir.android.survey.GridFragment;
+import org.adaptlab.chpir.android.survey.MultipleQuestionsFragment;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.Question;
@@ -29,8 +29,8 @@ import java.util.List;
 
 import static org.adaptlab.chpir.android.survey.FormatUtils.styleTextWithHtml;
 
-public class SingleSelectGridFragment extends GridFragment {
-    private static final String TAG = "SingleSelectGridFragment";
+public class SingleSelectMultipleQuestionsFragment extends MultipleQuestionsFragment {
+    private static final String TAG = "SingleSelectMultipleQuestionsFragment";
     private int mIndex;
     private List<RadioGroup> mRadioGroups;
     private List<Question> mQuestionList;
@@ -117,7 +117,7 @@ public class SingleSelectGridFragment extends GridFragment {
         buttonParams.gravity = Gravity.CENTER;
         radioButtons.setLayoutParams(buttonParams);
         adjustRowHeight(radioButtons, k);
-        final int normalOptionsSize = getDisplay().options().size();
+        final int normalOptionsSize = getDisplay().tableOptions(getTableIdentifier()).size();
         final Button specialResponseButton = new Button(getActivity());
         for (int i = 0; i < normalOptionsSize; i++) {
             RadioButton button = new RadioButton(getActivity());
@@ -238,7 +238,7 @@ public class SingleSelectGridFragment extends GridFragment {
         questionTextHeader.setPadding(10, 10, 10, 10);
 
         LinearLayout headerTableLayout = v.findViewById(R.id.table_options_header);
-        List<Option> headerLabels = getDisplay().options();
+        List<Option> headerLabels = getDisplay().tableOptions(getTableIdentifier());
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         float margin = getActivity().getResources().getDimension(R.dimen

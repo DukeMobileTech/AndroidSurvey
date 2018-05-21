@@ -14,12 +14,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import org.adaptlab.chpir.android.survey.CameraFragment;
-import org.adaptlab.chpir.android.survey.QuestionFragment;
+import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
 import org.adaptlab.chpir.android.survey.models.ResponsePhoto;
 
 import java.io.File;
 
-public abstract class PictureQuestionFragment extends QuestionFragment {
+public abstract class PictureQuestionFragment extends SingleQuestionFragment {
     public static final int REAR_CAMERA = 0;
     public static final int FRONT_CAMERA = 1;
     public static final int REQUEST_PHOTO = 0;

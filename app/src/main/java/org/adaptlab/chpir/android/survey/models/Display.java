@@ -70,6 +70,13 @@ public class Display extends ReceiveModel {
                 .execute();
     }
 
+    public List<Question> tableQuestions(String tableIdentifier) {
+        return new Select().from(Question.class)
+                .where("DisplayId = ? AND Deleted != ? AND TableIdentifier = ?", getRemoteId(), 1, tableIdentifier)
+                .orderBy("NumberInInstrument ASC")
+                .execute();
+    }
+
     public String getMode() {
         return mMode;
     }
@@ -78,6 +85,15 @@ public class Display extends ReceiveModel {
         return new Select("Options.*").distinct().from(Option.class)
                 .innerJoin(OptionInOptionSet.class)
                 .on("OptionInOptionSets.RemoteOptionSetId = ?", questions().get(0).getRemoteOptionSetId())
+                .where("Options.Deleted != 1 AND OptionInOptionSets.Special = 0 AND OptionInOptionSets.RemoteOptionId = Options.RemoteId")
+                .orderBy("OptionInOptionSets.NumberInQuestion ASC")
+                .execute();
+    }
+
+    public List<Option> tableOptions(String tableIdentifier) {
+        return new Select("Options.*").distinct().from(Option.class)
+                .innerJoin(OptionInOptionSet.class)
+                .on("OptionInOptionSets.RemoteOptionSetId = ?", tableQuestions(tableIdentifier).get(0).getRemoteOptionSetId())
                 .where("Options.Deleted != 1 AND OptionInOptionSets.Special = 0 AND OptionInOptionSets.RemoteOptionId = Options.RemoteId")
                 .orderBy("OptionInOptionSets.NumberInQuestion ASC")
                 .execute();

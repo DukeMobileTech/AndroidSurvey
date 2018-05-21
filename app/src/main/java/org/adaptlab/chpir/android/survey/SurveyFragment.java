@@ -25,7 +25,6 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -59,8 +58,8 @@ import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Score;
 import org.adaptlab.chpir.android.survey.models.ScoreScheme;
 import org.adaptlab.chpir.android.survey.models.Survey;
-import org.adaptlab.chpir.android.survey.questionfragments.MultipleSelectGridFragment;
-import org.adaptlab.chpir.android.survey.questionfragments.SingleSelectGridFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.MultipleSelectMultipleQuestionsFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.SingleSelectMultipleQuestionsFragment;
 import org.adaptlab.chpir.android.survey.roster.RosterActivity;
 import org.adaptlab.chpir.android.survey.rules.InstrumentSurveyLimitPerMinuteRule;
 import org.adaptlab.chpir.android.survey.rules.InstrumentSurveyLimitRule;
@@ -84,6 +83,8 @@ import java.util.Set;
 
 import io.fabric.sdk.android.Fabric;
 
+import static org.adaptlab.chpir.android.survey.FormatUtils.isEmpty;
+
 public class SurveyFragment extends Fragment implements NavigationView
         .OnNavigationItemSelectedListener {
     public final static String EXTRA_INSTRUMENT_ID = "org.adaptlab.chpir.android.survey" +
@@ -106,6 +107,7 @@ public class SurveyFragment extends Fragment implements NavigationView
     private static final int REVIEW_CODE = 100;
     public static final int AUTHORIZE_CODE = 300;
     private static final int ACCESS_FINE_LOCATION_CODE = 1;
+    public static final int OFFSET = 1000000;
     private NavigationView mNavigationView;
     private LinearLayout mQuestionViewLayout;
     private Instrument mInstrument;
@@ -484,8 +486,10 @@ public class SurveyFragment extends Fragment implements NavigationView
     }
 
     private void hideSoftInputWindow() {
-        InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+        InputMethodManager inputMethodManager = (InputMethodManager) getActivity()
+                .getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken
+                (), 0);
     }
 
     private void moveToNextDisplay() {
@@ -645,8 +649,9 @@ public class SurveyFragment extends Fragment implements NavigationView
             i.putExtra(RosterActivity.EXTRA_INSTRUMENT_ID, mInstrument.getRemoteId());
             i.putExtra(RosterActivity.EXTRA_PARTICIPANT_METADATA, mMetadata);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                getActivity().startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity
-                        ()).toBundle());
+                getActivity().startActivity(i, ActivityOptions.makeSceneTransitionAnimation
+                        (getActivity
+                                ()).toBundle());
                 getActivity().finishAfterTransition();
             } else {
                 getActivity().startActivity(i);
@@ -701,67 +706,70 @@ public class SurveyFragment extends Fragment implements NavigationView
             fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
             mQuestionFragments.clear();
             setSelectedDrawerItemChecked();
-            List<Question> displayQuestions = mDisplayQuestions.get(mDisplay);
-            if (mDisplay.getMode().equals(Display.DisplayMode.TABLE.toString())) {
-                // Show table
-                QuestionFragment questionFragment;
-                if (displayQuestions.get(0).getQuestionType() == Question.QuestionType.SELECT_ONE) {
-                    questionFragment = new SingleSelectGridFragment();
-                } else {
-                    questionFragment = new MultipleSelectGridFragment();
-                }
-
-                FrameLayout framelayout = new FrameLayout(getContext());
-                framelayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams
-                        .MATCH_PARENT, ViewPager.LayoutParams.WRAP_CONTENT));
-
-                framelayout.setId(new BigDecimal(displayQuestions.get(0).getRemoteId())
-                        .intValueExact() + 1000000);
-                mQuestionViewLayout.addView(framelayout);
-
-                ArrayList<String> questionsToSkip = new ArrayList<>();
-                for (Question curSkip : mQuestionsToSkipSet) {
-                    if (curSkip != null) questionsToSkip.add(curSkip.getQuestionIdentifier());
-                }
-
-                Bundle bundle = new Bundle();
-                bundle.putStringArrayList(GridFragment.EXTRA_SKIPPED_QUESTION_ID_LIST,
-                        questionsToSkip);
-                bundle.putLong(GridFragment.EXTRA_DISPLAY_ID, mDisplay.getRemoteId());
-                bundle.putLong(GridFragment.EXTRA_SURVEY_ID, mSurvey.getId());
-                questionFragment.setArguments(bundle);
-                fragmentTransaction.add(framelayout.getId(), questionFragment);
-                mQuestionFragments.add(questionFragment);
-            } else {
-                for (Question question : getQuestions(mDisplay)) {
+            for (Question question : getQuestions(mDisplay)) {
+                int frameLayoutId;
+                String qfTag;
+                if (isEmpty(question.getTableIdentifier())) {
                     // Add large offset to avoid id conflicts
-                    int frameLayoutId = new BigDecimal(question.getRemoteId()).intValueExact() +
-                            1000000;
-                    FrameLayout frameLayout = getActivity().findViewById(frameLayoutId);
-                    if (frameLayout == null) {
-                        frameLayout = new FrameLayout(getContext());
-                        frameLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup
-                                .LayoutParams
-                                .MATCH_PARENT, ViewPager.LayoutParams.WRAP_CONTENT));
-                        frameLayout.setId(frameLayoutId);
-                        mQuestionViewLayout.addView(frameLayout);
+                    frameLayoutId = new BigDecimal(question.getRemoteId()).intValueExact() +
+                            OFFSET;
+                    qfTag = mSurvey.getId().toString() + "-" + question.getId().toString();
+                } else {
+                    long sumId = 0;
+                    for (Question q: mDisplay.tableQuestions(question.getTableIdentifier())) {
+                        sumId += q.getRemoteId();
                     }
+                    frameLayoutId = new BigDecimal(sumId).intValueExact() + OFFSET;
+                    qfTag = mSurvey.getId().toString() + "-" + question.getTableIdentifier();
+                }
 
-                    String qfTag = mSurvey.getId().toString() + "-" + question.getId().toString();
-                    QuestionFragment questionFragment = (QuestionFragment) getChildFragmentManager().findFragmentByTag
-                            (qfTag);
-                    if (questionFragment == null || isScreenRotated) {
+                FrameLayout frameLayout = getActivity().findViewById(frameLayoutId);
+                if (frameLayout == null) {
+                    frameLayout = new FrameLayout(getContext());
+                    frameLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup
+                            .LayoutParams.MATCH_PARENT, ViewPager.LayoutParams.WRAP_CONTENT));
+                    frameLayout.setId(frameLayoutId);
+                    mQuestionViewLayout.addView(frameLayout);
+                }
+
+                QuestionFragment questionFragment = (QuestionFragment) getChildFragmentManager()
+                        .findFragmentByTag(qfTag);
+                if (questionFragment == null || isScreenRotated) {
+                    if (isEmpty(question.getTableIdentifier())) {
                         Bundle bundle = new Bundle();
                         bundle.putString("QuestionIdentifier", question.getQuestionIdentifier());
+
                         questionFragment = (QuestionFragment) QuestionFragmentFactory
                                 .createQuestionFragment(question);
                         questionFragment.setArguments(bundle);
                         fragmentTransaction.add(frameLayout.getId(), questionFragment, qfTag);
                     } else {
-                        fragmentTransaction.show(questionFragment);
+                        if (question.getQuestionType() == Question.QuestionType.SELECT_ONE) {
+                            questionFragment = new SingleSelectMultipleQuestionsFragment();
+                        } else if (question.getQuestionType() == Question.QuestionType
+                                .SELECT_MULTIPLE) {
+                            questionFragment = new MultipleSelectMultipleQuestionsFragment();
+                        }
+                        Bundle bundle = new Bundle();
+                        ArrayList<String> questionsToSkip = new ArrayList<>();
+                        for (Question curSkip : mQuestionsToSkipSet) {
+                            if (curSkip != null)
+                                questionsToSkip.add(curSkip.getQuestionIdentifier());
+                        }
+                        bundle.putStringArrayList(MultipleQuestionsFragment
+                                .EXTRA_SKIPPED_QUESTION_ID_LIST, questionsToSkip);
+                        bundle.putLong(MultipleQuestionsFragment.EXTRA_DISPLAY_ID, mDisplay
+                                .getRemoteId());
+                        bundle.putLong(MultipleQuestionsFragment.EXTRA_SURVEY_ID, mSurvey.getId());
+                        bundle.putString(MultipleQuestionsFragment.EXTRA_TABLE_ID, question
+                                .getTableIdentifier());
+                        questionFragment.setArguments(bundle);
+                        fragmentTransaction.add(frameLayout.getId(), questionFragment, qfTag);
                     }
-                    mQuestionFragments.add(questionFragment);
+                } else {
+                    fragmentTransaction.show(questionFragment);
                 }
+                mQuestionFragments.add(questionFragment);
             }
             fragmentTransaction.commit();
         }
@@ -794,7 +802,7 @@ public class SurveyFragment extends Fragment implements NavigationView
 
     protected List<Question> getQuestions() {
         List<Question> questions = new ArrayList<>();
-        for(Map.Entry<Display, List<Question>> entry : mDisplayQuestions.entrySet()) {
+        for (Map.Entry<Display, List<Question>> entry : mDisplayQuestions.entrySet()) {
             questions.addAll(entry.getValue());
         }
         return questions;
@@ -821,9 +829,9 @@ public class SurveyFragment extends Fragment implements NavigationView
     }
 
     /*
-    * Destroy this activity, and save the survey and mark it as
-    * complete.  Send to server if network is available.
-    */
+     * Destroy this activity, and save the survey and mark it as
+     * complete.  Send to server if network is available.
+     */
     public void finishSurvey() {
         unSetSkipQuestionResponse();
         if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) {
@@ -922,7 +930,7 @@ public class SurveyFragment extends Fragment implements NavigationView
                     for (Option option : question.criticalOptions()) {
                         optionSet.add(Integer.toString(question.defaultOptions().indexOf(option)));
                     }
-                    if (!TextUtils.isEmpty(response.getText())) {
+                    if (!isEmpty(response.getText())) {
                         responseSet.addAll(Arrays.asList(response.getText().split(",")));
                     }
                     optionSet.retainAll(responseSet);
@@ -946,8 +954,9 @@ public class SurveyFragment extends Fragment implements NavigationView
         b.putStringArrayList(ReviewPageFragment.EXTRA_SKIPPED_QUESTION_ID_LIST, questionsToSkip);
         i.putExtras(b);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            startActivityForResult(i, REVIEW_CODE, ActivityOptions.makeSceneTransitionAnimation(getActivity
-                    ()).toBundle());
+            startActivityForResult(i, REVIEW_CODE, ActivityOptions.makeSceneTransitionAnimation
+                    (getActivity
+                            ()).toBundle());
         } else {
             startActivityForResult(i, REVIEW_CODE);
         }
@@ -964,7 +973,7 @@ public class SurveyFragment extends Fragment implements NavigationView
 
     private void setParticipantLabel() {
         String surveyMetaData = mSurvey.getMetadata();
-        if (!TextUtils.isEmpty(surveyMetaData)) {
+        if (!isEmpty(surveyMetaData)) {
             try {
                 JSONObject metadata = new JSONObject(surveyMetaData);
                 if (metadata.has("survey_label")) {
@@ -980,7 +989,10 @@ public class SurveyFragment extends Fragment implements NavigationView
         if (mDisplay != null) {
             // Screen title
             if (!mDisplay.getMode().equals(Display.DisplayMode.SINGLE.toString())) {
-                mDisplayTitle.setText(String.format(Locale.getDefault(), "%s %s%d %s %d%s", mDisplay.getTitle(), "(", mDisplay.questions().get(0).getNumberInInstrument(), "-", mDisplay.questions().get(mDisplay.questions().size() - 1).getNumberInInstrument(), ")"));
+                mDisplayTitle.setText(String.format(Locale.getDefault(), "%s %s%d %s %d%s",
+                        mDisplay.getTitle(), "(", mDisplay.questions().get(0)
+                                .getNumberInInstrument(), "-", mDisplay.questions().get(mDisplay
+                                .questions().size() - 1).getNumberInInstrument(), ")"));
             } else {
                 mDisplayTitle.setText(mDisplay.getTitle());
             }

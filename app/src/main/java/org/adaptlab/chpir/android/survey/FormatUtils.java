@@ -3,6 +3,7 @@ package org.adaptlab.chpir.android.survey;
 import android.content.Context;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.TextUtils;
 
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.Option;
@@ -89,5 +90,9 @@ public class FormatUtils {
 
     public static String removeNonNumericCharacters(String string) {
         return string.replaceAll("[^\\d.]", "");
+    }
+
+    public static boolean isEmpty(String string) {
+        return (TextUtils.isEmpty(string) || string.toLowerCase().equals("null"));
     }
 }

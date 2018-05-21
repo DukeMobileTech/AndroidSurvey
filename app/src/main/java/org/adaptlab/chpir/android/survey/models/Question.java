@@ -77,6 +77,8 @@ public class Question extends ReceiveModel {
     private Long mDisplayId;
     @Column(name = "RemoteSpecialOptionSetId")
     private Long mRemoteSpecialOptionSetId;
+    @Column(name = "TableIdentifier")
+    private String mTableIdentifier;
 
     public Question() {
         super();
@@ -444,6 +446,7 @@ public class Question extends ReceiveModel {
             question.setCritical(jsonObject.optBoolean("critical", false));
             question.setRemoteOptionSetId(jsonObject.optLong("option_set_id"));
             question.setRemoteSpecialOptionSetId(jsonObject.optLong("special_option_set_id"));
+            question.setTableIdentifier(jsonObject.getString("table_identifier"));
             question.save();
 
             // Generate translations
@@ -755,6 +758,14 @@ public class Question extends ReceiveModel {
     public Display getDisplay() {
         if (mDisplayId == null) return null;
         return Display.findByRemoteId(mDisplayId);
+    }
+
+    public String getTableIdentifier() {
+        return mTableIdentifier;
+    }
+
+    public void setTableIdentifier(String mTableIdentifier) {
+        this.mTableIdentifier = mTableIdentifier;
     }
 
     public enum QuestionType {

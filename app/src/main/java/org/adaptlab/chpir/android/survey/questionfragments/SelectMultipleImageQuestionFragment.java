@@ -13,14 +13,14 @@ import android.widget.GridView;
 import android.widget.ImageView;
 
 import org.adaptlab.chpir.android.survey.PictureUtils;
-import org.adaptlab.chpir.android.survey.QuestionFragment;
+import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.Image;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SelectMultipleImageQuestionFragment extends QuestionFragment {
+public class SelectMultipleImageQuestionFragment extends SingleQuestionFragment {
     private final int SELECTED = Color.GREEN;
     private final int UNSELECTED = Color.TRANSPARENT;
     private List<Integer> mSelectedViews;

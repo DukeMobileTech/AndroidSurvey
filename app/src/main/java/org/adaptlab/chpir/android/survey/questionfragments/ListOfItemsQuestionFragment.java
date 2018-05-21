@@ -11,7 +11,7 @@ import android.widget.TextView;
 import com.opencsv.CSVReader;
 
 import org.adaptlab.chpir.android.survey.BuildConfig;
-import org.adaptlab.chpir.android.survey.QuestionFragment;
+import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.apache.commons.codec.Charsets;
@@ -23,7 +23,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
-public abstract class ListOfItemsQuestionFragment extends QuestionFragment {
+public abstract class ListOfItemsQuestionFragment extends SingleQuestionFragment {
     private static final String TAG = "ListOfItemsQuestionFragment";
     private ArrayList<EditText> mResponses;
 

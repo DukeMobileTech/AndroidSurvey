@@ -5,12 +5,12 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
-import org.adaptlab.chpir.android.survey.QuestionFragment;
+import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
 import org.adaptlab.chpir.android.survey.models.Option;
 
 import java.util.ArrayList;
 
-public class SelectMultipleQuestionFragment extends QuestionFragment {
+public class SelectMultipleQuestionFragment extends SingleQuestionFragment {
     private ArrayList<Integer> mResponseIndices;
     protected ArrayList<CheckBox> mCheckBoxes;
 

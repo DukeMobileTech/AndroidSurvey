@@ -6,10 +6,10 @@ import android.text.TextWatcher;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
-import org.adaptlab.chpir.android.survey.QuestionFragment;
+import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
 import org.adaptlab.chpir.android.survey.R;
 
-public class FreeResponseQuestionFragment extends QuestionFragment {
+public class FreeResponseQuestionFragment extends SingleQuestionFragment {
     private static final String TAG = "FreeResponseQuestionFragment";
     private String mText = "";
     private EditText mFreeText;

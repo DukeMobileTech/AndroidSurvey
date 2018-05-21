@@ -1,11 +1,10 @@
 package org.adaptlab.chpir.android.survey;
 
 import android.content.pm.ActivityInfo;
-import android.content.res.Resources;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.widget.NestedScrollView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -19,10 +18,12 @@ import com.activeandroid.Model;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.survey.models.Display;
+import org.adaptlab.chpir.android.survey.models.DisplayInstruction;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.NextQuestion;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.OptionInOptionSet;
+import org.adaptlab.chpir.android.survey.models.OptionSet;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Survey;
@@ -31,38 +32,44 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static org.adaptlab.chpir.android.survey.FormatUtils.isEmpty;
 import static org.adaptlab.chpir.android.survey.FormatUtils.styleTextWithHtml;
 
-public abstract class GridFragment extends QuestionFragment {
+public abstract class MultipleQuestionsFragment extends QuestionFragment {
     public final static String EXTRA_DISPLAY_ID =
             "org.adaptlab.chpir.android.survey.display_id";
     public final static String EXTRA_SURVEY_ID =
             "org.adaptlab.chpir.android.survey.survey_id";
     public final static String EXTRA_SKIPPED_QUESTION_ID_LIST =
             "org.adaptlab.chpir.android.survey.extra_skipped_id_list";
+    public final static String EXTRA_TABLE_ID =
+            "org.adaptlab.chpir.android.survey.table_id";
     public static final int MIN_HEIGHT = 80;
     public static final int MARGIN_10 = 10;
     public static final int MARGIN_0 = 0;
 
     protected abstract void createQuestionComponent(ViewGroup questionComponent);
 
-    private static final String TAG = "GridFragment";
+    private static final String TAG = "MultipleQuestionsFragment";
     private Display mDisplay;
     private Survey mSurvey;
     private List<Question> mQuestions;
+    private String mTableIdentifier;
+    private TextView mDisplayInstructionsText;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-
+//        setHasOptionsMenu(true);
         if (savedInstanceState != null) {
             mDisplay = Display.findByRemoteId(savedInstanceState.getLong(EXTRA_DISPLAY_ID));
             mSurvey = Model.load(Survey.class, savedInstanceState.getLong(EXTRA_SURVEY_ID));
+            mTableIdentifier = savedInstanceState.getString(EXTRA_TABLE_ID);
         } else {
             if (getArguments() != null) {
                 mDisplay = Display.findByRemoteId(getArguments().getLong(EXTRA_DISPLAY_ID));
                 mSurvey = Model.load(Survey.class, getArguments().getLong(EXTRA_SURVEY_ID));
+                mTableIdentifier = getArguments().getString(EXTRA_TABLE_ID);
             }
         }
 
@@ -70,7 +77,7 @@ public abstract class GridFragment extends QuestionFragment {
         if (getActivity() != null) {
             getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         }
-        mQuestions = mDisplay.questions();
+        mQuestions = mDisplay.tableQuestions(mTableIdentifier);
         for(Question curQuestion: mQuestions){
             setSpecialResponseSkips(curQuestion);
         }
@@ -79,19 +86,49 @@ public abstract class GridFragment extends QuestionFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_question, parent, false);
-
-        ViewGroup questionComponent = (LinearLayout) v.findViewById(R.id.question_component);
-        TextView questionText = v.findViewById(R.id.question_text);
-        questionText.setTypeface(getInstrument().getTypeFace(getActivity()));
-        questionText.setText(styleTextWithHtml(getQuestionRange() + "<br />"));
-        if (getInstructions() != null) {
-            questionText.append(styleTextWithHtml(getInstructions() + "<br />"));
+        mDisplayInstructionsText = v.findViewById(R.id.displayInstructions);
+        setDisplayInstructions();
+        TextView questionNumber = v.findViewById(R.id.questionNumber);
+        questionNumber.setText(getQuestionRange());
+        TextView questionInstructions = v.findViewById(R.id.question_instructions);
+        questionInstructions.setTypeface(getInstrument().getTypeFace(getActivity()));
+        if (isEmpty(getInstructions())) {
+            ((LinearLayout) questionInstructions.getParent()).setVisibility(View.GONE);
+        } else {
+            questionInstructions.append(styleTextWithHtml(getInstructions()));
+            questionInstructions.setGravity(Gravity.END);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                ViewGroup viewGroup = (ViewGroup) questionInstructions.getParent();
+                viewGroup.setBackground(getResources().getDrawable(R.drawable.response_component_layout));
+            }
         }
-        createQuestionComponent(questionComponent);
+        TextView questionText = v.findViewById(R.id.question_text);
+        if (questionText != null) questionText.setVisibility(View.GONE);
+        ViewGroup questionComponent1 = (LinearLayout) v.findViewById(R.id.responseLayout1);
+        questionComponent1.setVisibility(View.GONE);
+        ViewGroup questionComponent2 = (LinearLayout) v.findViewById(R.id.responseLayout2);
+        questionComponent2.setVisibility(View.VISIBLE);
+        createQuestionComponent(questionComponent2);
 
         // Hide special responses UI
         v.findViewById(R.id.special_responses_container).setVisibility(View.GONE);
         return v;
+    }
+
+    protected void setDisplayInstructions() {
+        List<DisplayInstruction> displayInstructions = mSurveyFragment.getDisplayInstructions(mDisplay);
+        if (displayInstructions != null && displayInstructions.size() > 0) {
+            StringBuilder instructions = new StringBuilder();
+            for (DisplayInstruction instruction : displayInstructions) {
+                if (instruction.getPosition() == mQuestions.get(0).getNumberInInstrument()) {
+                    instructions.append(instruction.getInstructions()).append("<br>");
+                }
+            }
+            if (instructions.length() > 0) {
+                ((LinearLayout) mDisplayInstructionsText.getParent()).setVisibility(View.VISIBLE);
+                mDisplayInstructionsText.setText(styleTextWithHtml(instructions.toString()));
+            }
+        }
     }
 
     private String getQuestionRange() {
@@ -100,13 +137,17 @@ public abstract class GridFragment extends QuestionFragment {
     }
 
     private String getInstructions() {
+        StringBuilder instructions = new StringBuilder();
         for (Question question : mQuestions) {
-            if (!TextUtils.isEmpty(question.getInstructions()) && !question.getInstructions()
-                    .equals("null")) {
-                return question.getInstructions();
+            if (!isEmpty(question.getInstructions())) {
+                instructions.append(question.getNumberInInstrument()).append(": ").append(question.getInstructions()).append("<br>");
             }
         }
-        return null;
+        OptionSet optionSet = OptionSet.findByRemoteId(mQuestions.get(0).getRemoteOptionSetId());
+        if (optionSet != null && !isEmpty(optionSet.getInstructions())) {
+            instructions.append(optionSet.getInstructions());
+        }
+        return instructions.toString();
     }
 
     @Override
@@ -157,47 +198,55 @@ public abstract class GridFragment extends QuestionFragment {
         super.onSaveInstanceState(outState);
         outState.putLong(EXTRA_DISPLAY_ID, mDisplay.getRemoteId());
         outState.putLong(EXTRA_SURVEY_ID, mSurvey.getId());
+        outState.putString(EXTRA_TABLE_ID, mTableIdentifier);
     }
 
-    @Override
-    public void onViewCreated(@NonNull final View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        final NestedScrollView nestedScrollView = view.findViewById(R.id.grid_scroll_view);
-        nestedScrollView.post(new Runnable() {
-            @Override
-            public void run() {
-                final int screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
-                int tableHeaderHeight = view.findViewById(R.id.table_header).getHeight();
-
-                int tableBodyHeight = view.findViewById(R.id.table_body_question_text).getHeight();
-                NestedScrollView tableScrollView = view.findViewById(R.id.grid_scroll_view);
-                int scrollViewHeight = tableScrollView.getHeight();
-                int activityVerticalMargin = (int) getActivity().getResources().getDimension(R
-                        .dimen.activity_vertical_margin);
-                int progressBarHeight = getActivity().findViewById(R.id.progress_bar).getHeight();
-                int remainingScreenHeight = screenHeight - activityVerticalMargin -
-                        progressBarHeight;
-                int viewHeight = tableScrollView.getHeight();
-                if (scrollViewHeight < tableBodyHeight && remainingScreenHeight >
-                        tableBodyHeight) {
-                    viewHeight = tableBodyHeight;
-                } else if (scrollViewHeight < tableBodyHeight && remainingScreenHeight >
-                        scrollViewHeight) {
-                    viewHeight = remainingScreenHeight;
-                } else if (remainingScreenHeight < 0 && scrollViewHeight < tableBodyHeight &&
-                        tableBodyHeight < screenHeight) {
-                    viewHeight = tableBodyHeight;
-                } else if (remainingScreenHeight < 0 && scrollViewHeight < tableBodyHeight &&
-                        tableBodyHeight > screenHeight) {
-                    viewHeight = screenHeight - activityVerticalMargin - progressBarHeight -
-                            tableHeaderHeight;
-                }
-                ViewGroup.LayoutParams params = tableScrollView.getLayoutParams();
-                params.height = viewHeight;
-                tableScrollView.setLayoutParams(params);
-            }
-        });
+    protected void hideIndeterminateProgressBar() {
+        List<Question> displayQuestions = mSurveyFragment.getQuestions(mDisplay);
+        if (displayQuestions.get(displayQuestions.size() - 1).equals(mQuestions.get(mQuestions.size() - 1))) {
+            mSurveyFragment.hideIndeterminateProgressBar();
+        }
     }
+
+//    @Override
+//    public void onViewCreated(@NonNull final View view, Bundle savedInstanceState) {
+//        super.onViewCreated(view, savedInstanceState);
+//        final NestedScrollView nestedScrollView = view.findViewById(R.id.grid_scroll_view);
+//        nestedScrollView.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                final int screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
+//                int tableHeaderHeight = view.findViewById(R.id.table_header).getHeight();
+//
+//                int tableBodyHeight = view.findViewById(R.id.table_body_question_text).getHeight();
+//                NestedScrollView tableScrollView = view.findViewById(R.id.grid_scroll_view);
+//                int scrollViewHeight = tableScrollView.getHeight();
+//                int activityVerticalMargin = (int) getActivity().getResources().getDimension(R
+//                        .dimen.activity_vertical_margin);
+//                int progressBarHeight = getActivity().findViewById(R.id.progress_bar).getHeight();
+//                int remainingScreenHeight = screenHeight - activityVerticalMargin -
+//                        progressBarHeight;
+//                int viewHeight = tableScrollView.getHeight();
+//                if (scrollViewHeight < tableBodyHeight && remainingScreenHeight >
+//                        tableBodyHeight) {
+//                    viewHeight = tableBodyHeight;
+//                } else if (scrollViewHeight < tableBodyHeight && remainingScreenHeight >
+//                        scrollViewHeight) {
+//                    viewHeight = remainingScreenHeight;
+//                } else if (remainingScreenHeight < 0 && scrollViewHeight < tableBodyHeight &&
+//                        tableBodyHeight < screenHeight) {
+//                    viewHeight = tableBodyHeight;
+//                } else if (remainingScreenHeight < 0 && scrollViewHeight < tableBodyHeight &&
+//                        tableBodyHeight > screenHeight) {
+//                    viewHeight = screenHeight - activityVerticalMargin - progressBarHeight -
+//                            tableHeaderHeight;
+//                }
+//                ViewGroup.LayoutParams params = tableScrollView.getLayoutParams();
+//                params.height = viewHeight;
+//                tableScrollView.setLayoutParams(params);
+//            }
+//        });
+//    }
 
     protected TextView getHeaderTextView(String text) {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
@@ -300,12 +349,16 @@ public abstract class GridFragment extends QuestionFragment {
         return mSurvey;
     }
 
+    protected String getTableIdentifier() {
+        return mTableIdentifier;
+    }
+
     protected void setResponseIndex(Question q, int checkedId) {
         setResponseSkips(q, checkedId);
         saveResponse(q, checkedId, false);
     }
 
-    @Override
+//    @Override
     protected Instrument getInstrument() {
         return mSurvey.getInstrument();
     }

@@ -9,7 +9,7 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.adaptlab.chpir.android.survey.GridFragment;
+import org.adaptlab.chpir.android.survey.MultipleQuestionsFragment;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.Question;
@@ -24,9 +24,9 @@ import java.util.Set;
 
 import static org.adaptlab.chpir.android.survey.FormatUtils.styleTextWithHtml;
 
-public class MultipleSelectGridFragment extends GridFragment {
+public class MultipleSelectMultipleQuestionsFragment extends MultipleQuestionsFragment {
 
-    private static final String TAG = "MultipleSelectGridFragment";
+    private static final String TAG = "MultipleSelectMultipleQuestionsFragment";
     private List<List<CheckBox>> mCheckBoxes;
     private Integer[] rowHeights;
     private int mIndex;

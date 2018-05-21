@@ -6,9 +6,9 @@ import android.view.ViewGroup;
 import android.widget.TimePicker;
 
 import org.adaptlab.chpir.android.survey.FormatUtils;
-import org.adaptlab.chpir.android.survey.QuestionFragment;
+import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
 
-public class TimeQuestionFragment extends QuestionFragment {
+public class TimeQuestionFragment extends SingleQuestionFragment {
     private int mHour;
     private int mMinute;
     private TimePicker mTimePicker;
