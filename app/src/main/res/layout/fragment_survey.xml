@@ -22,7 +22,7 @@
             android:id="@+id/indeterminateProgressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
+            android:layout_gravity="end"
             android:indeterminate="true"
             android:visibility="visible"
             />
@@ -97,14 +97,14 @@
 
     </LinearLayout>
 
-    <android.support.design.widget.NavigationView
+    <ExpandableListView
         android:id="@+id/navigation"
-        android:layout_width="200dp"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:background="@drawable/fragments_background"
-        android:choiceMode="singleChoice"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="0dp"/>
+        android:divider="@color/divider"
+        android:dividerHeight="0.5dp"
+        android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft"/>
 
 </android.support.v4.widget.DrawerLayout>

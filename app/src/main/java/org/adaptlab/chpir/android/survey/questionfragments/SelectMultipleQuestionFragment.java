@@ -3,7 +3,6 @@ package org.adaptlab.chpir.android.survey.questionfragments;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 
 import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
 import org.adaptlab.chpir.android.survey.models.Option;
@@ -11,6 +10,7 @@ import org.adaptlab.chpir.android.survey.models.Option;
 import java.util.ArrayList;
 
 public class SelectMultipleQuestionFragment extends SingleQuestionFragment {
+    private final static String TAG = "SelectMultipleQuestionFragment";
     private ArrayList<Integer> mResponseIndices;
     protected ArrayList<CheckBox> mCheckBoxes;
 
@@ -20,26 +20,22 @@ public class SelectMultipleQuestionFragment extends SingleQuestionFragment {
 
     @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
-        mCheckBoxes = new ArrayList<CheckBox>();
-        mResponseIndices = new ArrayList<Integer>();
+        mCheckBoxes = new ArrayList<>();
+        mResponseIndices = new ArrayList<>();
         for (Option option : getOptions()) {
             final int optionId = getOptions().indexOf(option);
-            CheckBox checkbox = new CheckBox(getActivity());
+            final CheckBox checkbox = new CheckBox(getActivity());
             checkbox.setText(option.getText(getInstrument()));
             checkbox.setTypeface(getInstrument().getTypeFace(getActivity().getApplicationContext
                     ()));
             checkbox.setId(optionId);
-            checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    toggleResponseIndex(optionId);
-                }
-            });
             checkbox.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (mSpecialResponses != null) {
                         mSpecialResponses.clearCheck();
                     }
+                    toggleResponseIndex(v.getId());
                 }
             });
             mCheckBoxes.add(checkbox);

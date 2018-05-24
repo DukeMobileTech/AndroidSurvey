@@ -1,17 +1,15 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
 import android.graphics.Typeface;
-import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.adaptlab.chpir.android.survey.MultipleQuestionsFragment;
 import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 
@@ -30,7 +28,6 @@ public class MultipleSelectMultipleQuestionsFragment extends MultipleQuestionsFr
     private List<List<CheckBox>> mCheckBoxes;
     private Integer[] rowHeights;
     private int mIndex;
-    private int mOptionWidth;
 
     @Override
     protected void deserialize(String responseText) {
@@ -49,25 +46,6 @@ public class MultipleSelectMultipleQuestionsFragment extends MultipleQuestionsFr
                     checkBoxes.get(indexInteger).setChecked(true);
                 }
             }
-        }
-    }
-
-    private void setTableHeaderOptions(View v) {
-        TextView questionTextHeader = v.findViewById(R.id.table_header_question_text);
-        questionTextHeader.setMinHeight(MIN_HEIGHT);
-        questionTextHeader.setPadding(10, 10, 10, 10);
-
-        final LinearLayout headerTableLayout = v.findViewById(R.id.table_options_header);
-        final List<Option> optionLabels = getDisplay().options();
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        float margin = getActivity().getResources().getDimension(R.dimen.activity_horizontal_margin);
-        float totalWidth = (displayMetrics.widthPixels - margin * 2) / 2;
-        mOptionWidth = (int) totalWidth / optionLabels.size();
-        for (int k = 0; k < optionLabels.size(); k++) {
-            TextView textView = getHeaderTextView(optionLabels.get(k).getText(getInstrument()));
-            textView.setWidth(mOptionWidth);
-            headerTableLayout.addView(textView);
         }
     }
 
@@ -126,23 +104,27 @@ public class MultipleSelectMultipleQuestionsFragment extends MultipleQuestionsFr
     private void setCheckBoxes(LinearLayout optionsListLinearLayout, int k, final Question q) {
         LinearLayout choiceRow = new LinearLayout(getActivity());
         List<CheckBox> checkBoxes = new ArrayList<>();
+        final Button specialResponseButton = new Button(getActivity());
         for (int i = 0; i < getDisplay().options().size(); i++) {
             CheckBox checkBox = new CheckBox(getActivity());
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(mOptionWidth, MIN_HEIGHT);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(getOptionWidth(), MIN_HEIGHT);
             checkBox.setLayoutParams(params);
             checkBox.setSaveEnabled(false);
             checkBox.setId(i);
             adjustRowHeight(checkBox, k);
             checkBoxes.add(checkBox);
             final int id = i;
-            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            checkBox.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                public void onClick(View v) {
+                    boolean isChecked = ((CheckBox) v).isChecked();
                     setResponseIndexes(q, id, isChecked);
+                    specialResponseButton.setText("");
                 }
             });
             choiceRow.addView(checkBox);
         }
+        addSpecialResponseUI(k, q, choiceRow, specialResponseButton);
         optionsListLinearLayout.addView(choiceRow, k);
         mCheckBoxes.add(checkBoxes);
     }
@@ -196,6 +178,7 @@ public class MultipleSelectMultipleQuestionsFragment extends MultipleQuestionsFr
             serialized = new StringBuilder(String.valueOf(checkedId));
         }
         response.setResponse(serialized.toString());
+        response.setSpecialResponse("");
         response.setTimeEnded(new Date());
         response.save();
         getSurvey().setLastQuestion(question);
@@ -212,5 +195,12 @@ public class MultipleSelectMultipleQuestionsFragment extends MultipleQuestionsFr
 
     @Override
     protected void unSetResponse() {}
+
+    @Override
+    protected void clearRegularResponseUI(int pos) {
+        for (CheckBox checkBox : mCheckBoxes.get(pos)) {
+            checkBox.setChecked(false);
+        }
+    }
 
 }

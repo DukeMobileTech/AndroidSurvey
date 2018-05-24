@@ -55,7 +55,6 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
     private Question mQuestion;
     private Survey mSurvey;
     private Instrument mInstrument;
-//    protected SurveyFragment mSurveyFragment;
     private List<Option> mOptions;
     private List<Option> mSpecialOptions;
     protected RadioGroup mSpecialResponses;
@@ -66,9 +65,6 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setHasOptionsMenu(true);
-//        mSurveyFragment = (SurveyFragment) getParentFragment();
-//        if (mSurveyFragment == null) return;
         if (savedInstanceState == null) {
             init();
         } else {
@@ -276,7 +272,6 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
             mResponse.setTimeEnded(new Date());
             deserialize(mResponse.getText());
             mSurvey.setLastQuestion(mQuestion);
-//            new SaveResponseTask().execute(mResponse);
             mResponse.save();
             mSurvey.save();
             removeTextFocus();
@@ -339,13 +334,10 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
 
     protected void setResponseText() {
         mResponse.setResponse(serialize());
+        mResponse.setSpecialResponse("");
         mResponse.setTimeEnded(new Date());
         validateResponse();
-        if (isAdded() && !mResponse.getText().equals("")) {
-            mResponse.setSpecialResponse("");
-        }
         mSurvey.setLastQuestion(mQuestion);
-//        new SaveResponseTask().execute(mResponse);
         mResponse.save();
         mSurvey.save();
         if (!mQuestion.isTextEntryQuestionType()) {

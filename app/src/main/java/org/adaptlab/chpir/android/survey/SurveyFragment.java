@@ -8,11 +8,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -36,6 +36,9 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListAdapter;
+import android.widget.ExpandableListView;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -72,10 +75,9 @@ import org.json.JSONObject;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -85,8 +87,7 @@ import io.fabric.sdk.android.Fabric;
 
 import static org.adaptlab.chpir.android.survey.FormatUtils.isEmpty;
 
-public class SurveyFragment extends Fragment implements NavigationView
-        .OnNavigationItemSelectedListener {
+public class SurveyFragment extends Fragment {
     public final static String EXTRA_INSTRUMENT_ID = "org.adaptlab.chpir.android.survey" +
             ".instrument_id";
     public final static String EXTRA_QUESTION_NUMBER = "org.adaptlab.chpir.android.survey" +
@@ -108,11 +109,10 @@ public class SurveyFragment extends Fragment implements NavigationView
     public static final int AUTHORIZE_CODE = 300;
     private static final int ACCESS_FINE_LOCATION_CODE = 1;
     public static final int OFFSET = 1000000;
-    private NavigationView mNavigationView;
+
     private LinearLayout mQuestionViewLayout;
     private Instrument mInstrument;
     private Survey mSurvey;
-    private HashSet<Integer> mHiddenDisplayNumberSet;
     private String mMetadata;
     private ArrayList<QuestionFragment> mQuestionFragments;
     private ArrayList<Display> mDisplays;
@@ -133,16 +133,14 @@ public class SurveyFragment extends Fragment implements NavigationView
     private LocationManager mLocationManager;
     private NestedScrollView mScrollView;
     private TextView mDisplayTitle;
-
-    //drawer vars
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
-    private String mDrawerTitle;
-    private String mTitle;
-    private String[] mDisplayTitles;
     private boolean mNavDrawerSet = false;
     private boolean isActivityFinished = false;
     private boolean isScreenRotated = false;
+    private ExpandableListView mExpandableListView;
+    private List<String> mExpandableListTitle;
+    private LinkedHashMap<String, List<String>> mExpandableListData;
 
     public void refreshView() {
         AuthorizedActivity authority = (AuthorizedActivity) getActivity();
@@ -338,78 +336,100 @@ public class SurveyFragment extends Fragment implements NavigationView
         setSelectedDrawerItemChecked();
     }
 
-    private void setupNavigationDrawer() {
-        updateHiddenDisplayNumberSet();
-        setNavigationDrawerItems();
-        mTitle = mDrawerTitle = mInstrument.getTitle();
-        mDrawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
-        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-        mNavigationView = (NavigationView) getActivity().findViewById(R.id.navigation);
-        Menu menu = mNavigationView.getMenu();
-        for (int i = 0; i < mDisplayTitles.length; i++) {
-            if (!mHiddenDisplayNumberSet.contains(i)) {
-                menu.add(mDisplayTitles[i]);
-            }
-        }
-        mNavigationView.setNavigationItemSelectedListener(this);
-        mDrawerToggle = new ActionBarDrawerToggle(
-                getActivity(),
-                mDrawerLayout,
-                R.string.drawer_open,
-                R.string.drawer_close
-        ) {
-
-            public void onDrawerOpened(View drawerView) {
-                ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-                if (actionBar != null) {
-                    actionBar.setTitle(mDrawerTitle);
-                }
-                updateHiddenDisplayNumberSet();
-                Menu menu = mNavigationView.getMenu();
-                menu.clear();
-                for (int i = 0; i < mDisplayTitles.length; i++) {
-                    if (!mHiddenDisplayNumberSet.contains(i)) {
-                        menu.add(mDisplayTitles[i]);
-                    }
-                }
-                getActivity().invalidateOptionsMenu();
-            }
-
-            public void onDrawerClosed(View view) {
-                ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-                if (actionBar != null) {
-                    actionBar.setTitle(mTitle);
-                }
-                getActivity().invalidateOptionsMenu();
-            }
-        };
-        mDrawerLayout.addDrawerListener(mDrawerToggle);
-        mNavDrawerSet = true;
-    }
-
-    private void setNavigationDrawerItems() {
-        sortDisplayList();
-        mDisplayTitles = new String[mDisplays.size()];
+    private LinkedHashMap<String, List<String>> getListData() {
+        LinkedHashMap<String, List<String>> map = new LinkedHashMap<>();
         for (int i = 0; i < mDisplays.size(); i++) {
-            mDisplayTitles[i] = mDisplays.get(i).getTitle();
+            List<String> displayTitles = map.get(mDisplays.get(i).getSectionTitle());
+            if (displayTitles == null) displayTitles = new ArrayList<>();
+            displayTitles.add(mDisplays.get(i).getTitle());
+            map.put(mDisplays.get(i).getSectionTitle(), displayTitles);
         }
+        return map;
     }
 
-    private void sortDisplayList() {
-        Collections.sort(mDisplays, new Comparator<Display>() {
+    private void setDrawerItems() {
+        final ActionBar mActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        ExpandableListAdapter mExpandableListAdapter = new DisplayTitlesListAdapter(getContext(),
+                mExpandableListTitle, mExpandableListData);
+        mExpandableListView.setAdapter(mExpandableListAdapter);
+        mExpandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
             @Override
-            public int compare(Display lhs, Display rhs) {
-                if (lhs.getPosition() == rhs.getPosition()) {
-                    return 0;
-                } else {
-                    return lhs.getPosition() < rhs.getPosition() ? -1 : 1;
+            public void onGroupExpand(int groupPosition) {
+                mActionBar.setTitle(mExpandableListTitle.get(groupPosition));
+            }
+        });
+
+        mExpandableListView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
+            @Override
+            public void onGroupCollapse(int groupPosition) {
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(mExpandableListTitle.get(groupPosition));
+            }
+        });
+
+        mExpandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+                String selectedItem = ((List) (mExpandableListData.get(mExpandableListTitle.get(groupPosition)))).get(childPosition).toString();
+                mActionBar.setTitle(selectedItem);
+                int index = 0;
+                for (Display display : mDisplays) {
+                    if (display.getTitle().equals(selectedItem)) {
+                        moveToDisplay(index);
+                        break;
+                    }
+                    index ++;
                 }
+
+                mDrawerLayout.closeDrawer(GravityCompat.START);
+                mExpandableListView.collapseGroup(groupPosition);
+                return false;
             }
         });
     }
 
+    private void setDrawerListViewWidth() {
+        int width = getResources().getDisplayMetrics().widthPixels/2;
+        DrawerLayout.LayoutParams params = (android.support.v4.widget.DrawerLayout.LayoutParams) mExpandableListView.getLayoutParams();
+        params.width = width;
+        mExpandableListView.setLayoutParams(params);
+    }
+
+    private void setupNavigationDrawer() {
+        updateHiddenDisplayNumberSet();
+        mDrawerLayout = getActivity().findViewById(R.id.drawer_layout);
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+        mExpandableListView = getActivity().findViewById(R.id.navigation);
+        setDrawerListViewWidth();
+        mExpandableListData = getListData();
+        mExpandableListTitle = new ArrayList(mExpandableListData.keySet());
+
+        setDrawerItems();
+        mDrawerToggle = new ActionBarDrawerToggle(getActivity(), mDrawerLayout, R.string.drawer_open, R.string.drawer_close) {
+
+            /** Called when a drawer has settled in a completely open state. */
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                updateHiddenDisplayNumberSet();
+                getActivity().invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+
+            /** Called when a drawer has settled in a completely closed state. */
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                getActivity().invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+        };
+
+        mDrawerToggle.setDrawerIndicatorEnabled(true);
+        mDrawerLayout.addDrawerListener(mDrawerToggle);
+        mNavDrawerSet = true;
+        ActionBar supportActionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        supportActionBar.setDisplayHomeAsUpEnabled(true);
+        supportActionBar.setHomeButtonEnabled(true);
+    }
+
     private void updateHiddenDisplayNumberSet() {
-        mHiddenDisplayNumberSet = new HashSet<>();
+        HashSet<Integer> mHiddenDisplayNumberSet = new HashSet<>();
         for (Map.Entry<Display, List<Question>> curEntry : mDisplayQuestions.entrySet()) {
             boolean isSkip = true;
             for (Question curQuestion : curEntry.getValue()) {
@@ -469,7 +489,7 @@ public class SurveyFragment extends Fragment implements NavigationView
     }
 
     private void showIndeterminateProgressBar() {
-        mDrawerLayout.closeDrawer(mNavigationView);
+        mDrawerLayout.closeDrawer(mExpandableListView);
         mIndeterminateProgressBar.setVisibility(View.VISIBLE);
     }
 
@@ -521,6 +541,8 @@ public class SurveyFragment extends Fragment implements NavigationView
             mDisplayNumber = position;
             mDisplay = mDisplays.get(mDisplayNumber);
             refreshUIComponents();
+        } else {
+            hideIndeterminateProgressBar();
         }
     }
 
@@ -675,20 +697,23 @@ public class SurveyFragment extends Fragment implements NavigationView
     }
 
     private void setSelectedDrawerItemChecked() {
-        if (mNavigationView != null) {
-            int index = mDisplayNumber;
-            for (int num : mHiddenDisplayNumberSet) {
-                if (num < mDisplayNumber) {
-                    index--;
-                }
-            }
-            for (int i = 0; i < mDisplays.size() - mHiddenDisplayNumberSet.size(); i++) {
-                mNavigationView.getMenu().getItem(i).setChecked(false);
-            }
-            if (index > -1 && index < mNavigationView.getMenu().size()) {
-                mNavigationView.getMenu().getItem(index).setChecked(true);
-            }
-        }
+//        if (mNavigationView != null) {
+//            int index = mDisplayNumber;
+//            for (int num : mHiddenDisplayNumberSet) {
+//                if (num < mDisplayNumber) {
+//                    index--;
+//                }
+//            }
+////            for (int i = 0; i < mDisplays.size() - mHiddenDisplayNumberSet.size(); i++) {
+////                mNavigationView.getMenu().getItem(i).setChecked(false);
+////            }
+//            for (int i = 0; i < mDisplayTitles.size() - mHiddenDisplayNumberSet.size(); i++) {
+//                mNavigationView.getMenu().getItem(i).setChecked(false);
+//            }
+//            if (index > -1 && index < mNavigationView.getMenu().size()) {
+//                mNavigationView.getMenu().getItem(index).setChecked(true);
+//            }
+//        }
     }
 
     protected void createQuestionFragments() {
@@ -1007,19 +1032,6 @@ public class SurveyFragment extends Fragment implements NavigationView
         }
     }
 
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        int id = 0;
-        for (String oneTitle : mDisplayTitles) {
-            if (oneTitle.equals(item.getTitle().toString())) {
-                break;
-            }
-            id++;
-        }
-        moveToDisplay(id);
-        return true;
-    }
-
     private class ScoreSurveyTask extends AsyncTask<Survey, Void, Survey> {
         @Override
         protected Survey doInBackground(Survey... params) {
@@ -1074,5 +1086,85 @@ public class SurveyFragment extends Fragment implements NavigationView
         public HashMap<Display, List<Question>> displayQuestions;
         public HashMap<Long, List<Option>> specialOptions;
         public HashMap<Display, List<DisplayInstruction>> displayInstructions;
+    }
+
+    private class DisplayTitlesListAdapter extends BaseExpandableListAdapter {
+
+        private Context mContext;
+        private List<String> mExpandableListTitle;
+        private Map<String, List<String>> mExpandableListDetail;
+        private LayoutInflater mLayoutInflater;
+
+        DisplayTitlesListAdapter(Context context, List<String> expandableListTitle,
+                                 Map<String, List<String>> expandableListDetail) {
+            mContext = context;
+            mExpandableListTitle = expandableListTitle;
+            mExpandableListDetail = expandableListDetail;
+            mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        }
+
+        @Override
+        public Object getChild(int listPosition, int expandedListPosition) {
+            return mExpandableListDetail.get(mExpandableListTitle.get(listPosition)).get(expandedListPosition);
+        }
+
+        @Override
+        public long getChildId(int listPosition, int expandedListPosition) {
+            return expandedListPosition;
+        }
+
+        @Override
+        public View getChildView(int listPosition, final int expandedListPosition,
+                                 boolean isLastChild, View convertView, ViewGroup parent) {
+            final String expandedListText = (String) getChild(listPosition, expandedListPosition);
+            if (convertView == null) {
+                convertView = mLayoutInflater.inflate(R.layout.list_item, null);
+            }
+            TextView expandedListTextView = convertView.findViewById(R.id.expandedListItem);
+            expandedListTextView.setText(expandedListText);
+            return convertView;
+        }
+
+        @Override
+        public int getChildrenCount(int listPosition) {
+            return mExpandableListDetail.get(mExpandableListTitle.get(listPosition)).size();
+        }
+
+        @Override
+        public Object getGroup(int listPosition) {
+            return mExpandableListTitle.get(listPosition);
+        }
+
+        @Override
+        public int getGroupCount() {
+            return mExpandableListTitle.size();
+        }
+
+        @Override
+        public long getGroupId(int listPosition) {
+            return listPosition;
+        }
+
+        @Override
+        public View getGroupView(int listPosition, boolean isExpanded, View convertView, ViewGroup parent) {
+            String listTitle = (String) getGroup(listPosition);
+            if (convertView == null) {
+                convertView = mLayoutInflater.inflate(R.layout.list_group, null);
+            }
+            TextView listTitleTextView = convertView.findViewById(R.id.listTitle);
+            listTitleTextView.setTypeface(mInstrument.getTypeFace(mContext), Typeface.BOLD);
+            listTitleTextView.setText(listTitle);
+            return convertView;
+        }
+
+        @Override
+        public boolean hasStableIds() {
+            return false;
+        }
+
+        @Override
+        public boolean isChildSelectable(int listPosition, int expandedListPosition) {
+            return true;
+        }
     }
 }

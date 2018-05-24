@@ -11,8 +11,8 @@ public abstract class QuestionFragment extends Fragment {
     protected abstract void createQuestionComponent(ViewGroup questionComponent);
     protected abstract void deserialize(String responseText);
     protected abstract String serialize();
-    protected abstract void setSpecialResponse(String specialResponse);
-    protected abstract String getSpecialResponse();
+//    protected abstract void setSpecialResponse(String specialResponse);
+//    protected abstract String getSpecialResponse();
     protected abstract void setDisplayInstructions();
     protected abstract void hideIndeterminateProgressBar();
 

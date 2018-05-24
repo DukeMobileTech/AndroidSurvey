@@ -26,9 +26,19 @@ public class Display extends ReceiveModel {
     private Long mInstrumentId;
     @Column(name = "Title")
     private String mTitle;
+    @Column(name = "SectionTitle")
+    private String mSectionTitle;
 
     public Display() {
         super();
+    }
+
+    public String getSectionTitle() {
+        return mSectionTitle;
+    }
+
+    private void setSectionTitle(String mSectionTitle) {
+        this.mSectionTitle = mSectionTitle;
     }
 
     public enum DisplayMode {
@@ -49,6 +59,7 @@ public class Display extends ReceiveModel {
             display.setPosition(jsonObject.optInt("position"));
             display.setInstrumentId(jsonObject.optLong("instrument_id"));
             display.setTitle(jsonObject.optString("title"));
+            display.setSectionTitle(jsonObject.optString("section_title"));
             display.save();
         } catch (JSONException je) {
             if (BuildConfig.DEBUG) Log.e(TAG, "Error parsing object json", je);
