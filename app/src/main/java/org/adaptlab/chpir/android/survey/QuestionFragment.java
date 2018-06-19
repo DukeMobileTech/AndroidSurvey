@@ -1,8 +1,11 @@
 package org.adaptlab.chpir.android.survey;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.ViewGroup;
+
+import org.adaptlab.chpir.android.survey.models.Response;
 
 public abstract class QuestionFragment extends Fragment {
     protected final static String LIST_DELIMITER = ",";
@@ -11,8 +14,6 @@ public abstract class QuestionFragment extends Fragment {
     protected abstract void createQuestionComponent(ViewGroup questionComponent);
     protected abstract void deserialize(String responseText);
     protected abstract String serialize();
-//    protected abstract void setSpecialResponse(String specialResponse);
-//    protected abstract String getSpecialResponse();
     protected abstract void setDisplayInstructions();
     protected abstract void hideIndeterminateProgressBar();
 
@@ -39,6 +40,15 @@ public abstract class QuestionFragment extends Fragment {
         if (!hidden) {
             hideIndeterminateProgressBar();
         }
+    }
+
+    protected void saveResponseInBackground(final Response response) {
+        new Handler().post(new Runnable() {
+            public void run() {
+                response.save();
+                response.getSurvey().save();
+            }
+        });
     }
 
 }

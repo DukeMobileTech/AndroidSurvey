@@ -125,7 +125,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
             response = new Response();
             response.setQuestion(mQuestion);
             response.setSurvey(mSurvey);
-            response.save();
+            saveResponseInBackground(response);
             mSurveyFragment.getResponses().put(mQuestion, response);
         }
         return response;
@@ -273,8 +273,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
             mResponse.setTimeEnded(new Date());
             deserialize(mResponse.getText());
             mSurvey.setLastQuestion(mQuestion);
-            mResponse.save();
-            mSurvey.save();
+            saveResponseInBackground(mResponse);
             removeTextFocus();
             setSpecialResponseSkips();
             refreshFollowUpQuestion();
@@ -339,8 +338,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         mResponse.setTimeEnded(new Date());
         validateResponse();
         mSurvey.setLastQuestion(mQuestion);
-        mResponse.save();
-        mSurvey.save();
+        saveResponseInBackground(mResponse);
         if (!mQuestion.isTextEntryQuestionType()) {
             removeTextFocus();
         }
