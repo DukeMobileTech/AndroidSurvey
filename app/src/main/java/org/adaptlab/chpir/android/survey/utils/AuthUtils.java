@@ -1,4 +1,4 @@
-package org.adaptlab.chpir.android.survey;
+package org.adaptlab.chpir.android.survey.utils;
 
 import org.adaptlab.chpir.android.survey.models.DeviceUser;
 

@@ -9,9 +9,9 @@ import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
-import org.adaptlab.chpir.android.survey.AppUtil;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.BuildConfig;
-import org.adaptlab.chpir.android.survey.FormatUtils;
+import org.adaptlab.chpir.android.survey.utils.FormatUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -100,11 +100,11 @@ public class Question extends ReceiveModel {
     }
 
     public String getRegExValidationMessage() {
-        if (getInstrument().getLanguage().equals(Instrument.getDeviceLanguage()))
+        if (getInstrument().getLanguage().equals(AppUtil.getDeviceLanguage()))
             return mRegExValidationMessage;
         if (activeTranslation() != null) return activeTranslation().getRegExValidationMessage();
         for (QuestionTranslation translation : translations()) {
-            if (translation.getLanguage().equals(Instrument.getDeviceLanguage())) {
+            if (translation.getLanguage().equals(AppUtil.getDeviceLanguage())) {
                 return translation.getRegExValidationMessage();
             }
         }
@@ -289,10 +289,10 @@ public class Question extends ReceiveModel {
      * text for the question.
      */
     public String getText() {
-        if (getInstrument().getLanguage().equals(Instrument.getDeviceLanguage())) return mText;
+        if (getInstrument().getLanguage().equals(AppUtil.getDeviceLanguage())) return mText;
         if (activeTranslation() != null) return activeTranslation().getText();
         for (QuestionTranslation translation : translations()) {
-            if (translation.getLanguage().equals(Instrument.getDeviceLanguage())) {
+            if (translation.getLanguage().equals(AppUtil.getDeviceLanguage())) {
                 return translation.getText();
             }
         }
@@ -679,10 +679,10 @@ public class Question extends ReceiveModel {
     }
 
     public String getInstructions() {
-        if (getInstrument().getLanguage().equals(Instrument.getDeviceLanguage())) return mInstructions;
+        if (getInstrument().getLanguage().equals(AppUtil.getDeviceLanguage())) return mInstructions;
         if (activeTranslation() != null) return activeTranslation().getInstructions();
         for (QuestionTranslation translation : translations()) {
-            if (translation.getLanguage().equals(Instrument.getDeviceLanguage())) {
+            if (translation.getLanguage().equals(AppUtil.getDeviceLanguage())) {
                 return translation.getInstructions();
             }
         }

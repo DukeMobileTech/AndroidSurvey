@@ -43,6 +43,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.activeandroid.Model;
@@ -69,6 +70,9 @@ import org.adaptlab.chpir.android.survey.rules.InstrumentSurveyLimitRule;
 import org.adaptlab.chpir.android.survey.rules.InstrumentTimingRule;
 import org.adaptlab.chpir.android.survey.rules.RuleBuilder;
 import org.adaptlab.chpir.android.survey.tasks.SendResponsesTask;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
+import org.adaptlab.chpir.android.survey.utils.AuthUtils;
+import org.adaptlab.chpir.android.survey.utils.LocaleManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -85,7 +89,7 @@ import java.util.Set;
 
 import io.fabric.sdk.android.Fabric;
 
-import static org.adaptlab.chpir.android.survey.FormatUtils.isEmpty;
+import static org.adaptlab.chpir.android.survey.utils.FormatUtils.isEmpty;
 
 public class SurveyFragment extends Fragment {
     public final static String EXTRA_INSTRUMENT_ID = "org.adaptlab.chpir.android.survey" +
@@ -144,7 +148,7 @@ public class SurveyFragment extends Fragment {
 
     public void refreshView() {
         AuthorizedActivity authority = (AuthorizedActivity) getActivity();
-        if (authority.getAuthorize() && AppUtil.getAdminSettingsInstance() != null && AppUtil
+        if (authority != null && authority.getAuthorize() && AppUtil.getAdminSettingsInstance() != null && AppUtil
                 .getAdminSettingsInstance().getRequirePassword() && !AuthUtils.isSignedIn()) {
             authority.setAuthorize(false);
             Intent i = new Intent(getContext(), LoginActivity.class);
@@ -326,16 +330,6 @@ public class SurveyFragment extends Fragment {
         super.onStop();
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.fragment_survey, menu);
-        if (!mNavDrawerSet) {
-            setupNavigationDrawer();
-        }
-        setSelectedDrawerItemChecked();
-    }
-
     private LinkedHashMap<String, List<String>> getListData() {
         LinkedHashMap<String, List<String>> map = new LinkedHashMap<>();
         for (int i = 0; i < mDisplays.size(); i++) {
@@ -445,6 +439,17 @@ public class SurveyFragment extends Fragment {
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.fragment_survey, menu);
+        if (!mNavDrawerSet) {
+            setupNavigationDrawer();
+        }
+        setSelectedDrawerItemChecked();
+        setLanguageSelection(menu);
+    }
+
+    @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         menu.findItem(R.id.menu_item_previous).setEnabled(mDisplayNumber != 0 ||
@@ -472,6 +477,47 @@ public class SurveyFragment extends Fragment {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void setLanguageSelection(Menu menu) {
+        MenuItem item = menu.findItem(R.id.language_spinner);
+        Spinner spinner = (Spinner) item.getActionView();
+        final List<String> languageCodes = Instrument.getLanguages();
+        ArrayList<String> displayLanguages = new ArrayList<>();
+        for (String languageCode: languageCodes) {
+            displayLanguages.add(new Locale(languageCode).getDisplayLanguage());
+        }
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, displayLanguages);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position != languageCodes.indexOf(AppUtil.getAdminSettingsInstance().getLanguage())) {
+                    AppUtil.getAdminSettingsInstance().setLanguage(languageCodes.get(position));
+                    LocaleManager.setNewLocale(getActivity(), languageCodes.get(position));
+                    recreateActivity();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) { }
+        });
+        spinner.setSelection(languageCodes.indexOf(AppUtil.getAdminSettingsInstance().getLanguage()));
+    }
+
+    private void recreateActivity() {
+        Intent i = new Intent(getActivity(), SurveyActivity.class);
+        i.putExtra(SurveyFragment.EXTRA_INSTRUMENT_ID, mSurvey.getInstrument().getRemoteId());
+        i.putExtra(SurveyFragment.EXTRA_SURVEY_ID, mSurvey.getId());
+        i.putExtra(SurveyFragment.EXTRA_QUESTION_NUMBER, mSurvey.getLastQuestion().getNumberInInstrument() - 1);
+        i.putExtra(SurveyFragment.EXTRA_AUTHORIZE_SURVEY, false);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+        } else {
+            startActivity(i);
         }
     }
 
@@ -689,7 +735,7 @@ public class SurveyFragment extends Fragment {
             mSurvey.setInstrumentRemoteId(mInstrument.getRemoteId());
             mSurvey.setMetadata(mMetadata);
             mSurvey.setProjectId(mInstrument.getProjectId());
-            mSurvey.setLanguage(Instrument.getDeviceLanguage());
+            mSurvey.setLanguage(AppUtil.getDeviceLanguage());
             mSurvey.save();
         } else {
             mSurvey = Model.load(Survey.class, surveyId);

@@ -7,14 +7,12 @@ import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
-import org.adaptlab.chpir.android.survey.AppUtil;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
-
-import static org.adaptlab.chpir.android.survey.models.Instrument.getDeviceLanguage;
 
 @Table(name = "RandomizedOptions")
 public class RandomizedOption extends ReceiveModel {
@@ -97,12 +95,12 @@ public class RandomizedOption extends ReceiveModel {
     }
 
     public String getText() {
-        if (getInstrument().getLanguage().equals(getDeviceLanguage())) return mText;
+        if (getInstrument().getLanguage().equals(AppUtil.getDeviceLanguage())) return mText;
         if (activeTranslation() != null) {
             return activeTranslation().getText();
         }
         for (RandomizedOptionTranslation translation : translations()) {
-            if (translation.getLanguage().equals(getDeviceLanguage())) {
+            if (translation.getLanguage().equals(AppUtil.getDeviceLanguage())) {
                 return translation.getText();
             }
         }

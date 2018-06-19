@@ -4,7 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.SendModel;
-import org.adaptlab.chpir.android.survey.AppUtil;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,7 +35,7 @@ public class DeviceSyncEntry extends SendModel {
             jsonObject.put("current_version_name", AppUtil.getVersionName(AppUtil.getContext()));
             jsonObject.put("num_complete_surveys", Survey.getCompleted().size());
             jsonObject.put("num_incomplete_surveys", Survey.getIncomplete().size());
-            jsonObject.put("current_language", Locale.getDefault().getDisplayLanguage());
+            jsonObject.put("current_language", new Locale(AppUtil.getDeviceLanguage()).getDisplayLanguage());
             jsonObject.put("instrument_versions", instrumentVersions().toString());
             jsonObject.put("device_uuid", AdminSettings.getInstance().getDeviceIdentifier());
             jsonObject.put("api_key", AdminSettings.getInstance().getApiKey());

@@ -6,7 +6,7 @@ import android.widget.DatePicker;
 import android.widget.DatePicker.OnDateChangedListener;
 import android.widget.LinearLayout;
 
-import org.adaptlab.chpir.android.survey.FormatUtils;
+import org.adaptlab.chpir.android.survey.utils.FormatUtils;
 import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
 
 import java.util.Calendar;

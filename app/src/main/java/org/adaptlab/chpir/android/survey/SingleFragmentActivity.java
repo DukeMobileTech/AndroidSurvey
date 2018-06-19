@@ -1,5 +1,6 @@
 package org.adaptlab.chpir.android.survey;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -8,8 +9,9 @@ import android.view.Window;
 import android.widget.TextView;
 
 import org.adaptlab.chpir.android.survey.models.Project;
+import org.adaptlab.chpir.android.survey.utils.LocaleManager;
 
-import static org.adaptlab.chpir.android.survey.AppUtil.getProjectId;
+import static org.adaptlab.chpir.android.survey.utils.AppUtil.getProjectId;
 
 public abstract class SingleFragmentActivity extends AppCompatActivity {
 
@@ -43,6 +45,11 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         displayProjectName();
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(LocaleManager.setLocale(base));
     }
 
     public void displayProjectName() {

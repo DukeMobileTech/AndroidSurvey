@@ -3,7 +3,7 @@ package org.adaptlab.chpir.android.survey.models;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
-import org.adaptlab.chpir.android.survey.AppUtil;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.R;
 
 @Table(name = "DefaultAdminSettings")

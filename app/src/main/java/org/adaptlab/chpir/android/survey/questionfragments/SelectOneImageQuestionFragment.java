@@ -11,7 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
-import org.adaptlab.chpir.android.survey.PictureUtils;
+import org.adaptlab.chpir.android.survey.utils.PictureUtils;
 import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.Image;

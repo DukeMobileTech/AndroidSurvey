@@ -22,7 +22,7 @@ import org.adaptlab.chpir.android.survey.models.Survey;
 
 import java.util.List;
 
-import static org.adaptlab.chpir.android.survey.FormatUtils.stripHtml;
+import static org.adaptlab.chpir.android.survey.utils.FormatUtils.stripHtml;
 
 public class ParticipantViewerActivity extends AppCompatActivity {
     public final static String EXTRA_SURVEY_ID =

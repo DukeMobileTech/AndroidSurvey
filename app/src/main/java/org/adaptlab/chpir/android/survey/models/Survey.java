@@ -18,7 +18,7 @@ import com.activeandroid.query.From;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.SendModel;
-import org.adaptlab.chpir.android.survey.AppUtil;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.R;
 import org.json.JSONException;
 import org.json.JSONObject;

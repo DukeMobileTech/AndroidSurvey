@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import static org.adaptlab.chpir.android.survey.FormatUtils.styleTextWithHtml;
+import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtml;
 
 public class SingleSelectMultipleQuestionsFragment extends MultipleQuestionsFragment {
     private static final String TAG = "SingleSelectMultipleQuestionsFragment";

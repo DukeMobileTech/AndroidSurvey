@@ -7,6 +7,7 @@ import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -107,12 +108,12 @@ public class GridLabel extends ReceiveModel {
     }
 
     public String getLabelText() {
-        if (getInstrument().getLanguage().equals(Instrument.getDeviceLanguage())) return mLabel;
+        if (getInstrument().getLanguage().equals(AppUtil.getDeviceLanguage())) return mLabel;
         if (activeTranslation() != null) {
             return activeTranslation().getLabel();
         }
         for (GridLabelTranslation translation : translations()) {
-            if (translation.getLanguage().equals(Instrument.getDeviceLanguage())) {
+            if (translation.getLanguage().equals(AppUtil.getDeviceLanguage())) {
                 return translation.getLabel();
             }
         }

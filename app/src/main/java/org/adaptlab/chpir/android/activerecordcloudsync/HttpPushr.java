@@ -5,7 +5,7 @@ import android.util.Log;
 
 import com.activeandroid.query.Select;
 
-import org.adaptlab.chpir.android.survey.AppUtil;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.apache.commons.codec.CharEncoding;
 
 import java.io.IOException;

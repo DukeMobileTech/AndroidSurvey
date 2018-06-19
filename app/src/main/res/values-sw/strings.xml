@@ -48,7 +48,7 @@
     <string name="space">" "</string>
     <string name="gps_enabled">GPS Enabled</string>
     <string name="gps_disabled">GPS Disabled</string>
-    <string name="instruments">Instruments</string>
+    <string name="instruments">Vyombo</string>
     <string name="show_surveys">Show Surveys</string>
     <string name="version_code">Version Code: </string>
     <string name="unidentified_survey">Unidentified Survey </string>
@@ -164,4 +164,6 @@
     <string name="configure_api_endpoint">Configure API Endpoint</string>
     <string name="api_endpoint_instructions">Manually fill in the details in the API Endpoint Settings section or use the button below to fetch them.</string>
     <string name="download_api_endpoint_settings">Download API Endpoint Settings</string>
+    <string name="device_language">Device Language</string>
+    <string name="language">Language</string>
 </resources>

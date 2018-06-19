@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.adaptlab.chpir.android.survey;
+package org.adaptlab.chpir.android.survey.utils;
 
 import android.app.Activity;
 import android.app.Application;

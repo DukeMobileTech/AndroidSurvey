@@ -1,4 +1,4 @@
-package org.adaptlab.chpir.android.survey;
+package org.adaptlab.chpir.android.survey.utils;
 
 import android.app.AlertDialog;
 import android.app.admin.DevicePolicyManager;
@@ -17,6 +17,9 @@ import com.crashlytics.android.Crashlytics;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.activerecordcloudsync.PollService;
+import org.adaptlab.chpir.android.survey.BuildConfig;
+import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.SurveyApp;
 import org.adaptlab.chpir.android.survey.models.AdminSettings;
 import org.adaptlab.chpir.android.survey.models.DefaultAdminSettings;
 import org.adaptlab.chpir.android.survey.models.DeviceSyncEntry;
@@ -61,6 +64,7 @@ import org.adaptlab.chpir.android.survey.models.Survey;
 import org.adaptlab.chpir.android.survey.vendor.BCrypt;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import io.fabric.sdk.android.Fabric;
@@ -101,7 +105,18 @@ public class AppUtil {
         return "";
     }
 
-    static void appInit(Context context) {
+    public static String getDeviceLanguage() {
+        String language = Locale.getDefault().getLanguage();
+        if (AppUtil.getAdminSettingsInstance() == null) return language;
+        if (!TextUtils.isEmpty(AppUtil.getAdminSettingsInstance().getCustomLocaleCode())) {
+            language = AppUtil.getAdminSettingsInstance().getCustomLocaleCode();
+        } else if (!TextUtils.isEmpty(AppUtil.getAdminSettingsInstance().getLanguage())) {
+            language = AppUtil.getAdminSettingsInstance().getLanguage();
+        }
+        return language;
+    }
+
+    public static void appInit(Context context) {
         mContext = context;
         if (AppUtil.REQUIRE_SECURITY_CHECKS) {
             if (!AppUtil.runDeviceSecurityChecks(context)) {

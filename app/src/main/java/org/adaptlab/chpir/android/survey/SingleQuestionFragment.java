@@ -33,13 +33,14 @@ import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.ResponsePhoto;
 import org.adaptlab.chpir.android.survey.models.Survey;
+import org.adaptlab.chpir.android.survey.utils.AuthUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static org.adaptlab.chpir.android.survey.FormatUtils.isEmpty;
-import static org.adaptlab.chpir.android.survey.FormatUtils.styleTextWithHtml;
+import static org.adaptlab.chpir.android.survey.utils.FormatUtils.isEmpty;
+import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtml;
 
 public abstract class SingleQuestionFragment extends QuestionFragment {
     public final static String EXTRA_INSTRUMENT_ID = "org.adaptlab.chpir.android.survey" +

@@ -2,6 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/language_spinner"
+        android:title="@string/language"
+        app:actionViewClass="android.widget.Spinner"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/menu_item_previous"
         android:icon="@drawable/ic_menu_item_previous_item"
         android:title="@string/previous_button"

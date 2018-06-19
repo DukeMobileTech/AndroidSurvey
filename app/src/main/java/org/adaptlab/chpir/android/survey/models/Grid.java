@@ -8,6 +8,7 @@ import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -123,7 +124,7 @@ public class Grid extends ReceiveModel {
     }
 
     public String getText() {
-        if (getInstrument().getLanguage().equals(Instrument.getDeviceLanguage())) {
+        if (getInstrument().getLanguage().equals(AppUtil.getDeviceLanguage())) {
             if (TextUtils.isEmpty(mInstructions) || mInstructions.equals("null")) {
                 return mName;
             } else {
@@ -139,7 +140,7 @@ public class Grid extends ReceiveModel {
                         .getInstructions();
             } else {
                 for (GridTranslation translation : translations()) {
-                    if (translation.getLanguage().equals(Instrument.getDeviceLanguage())) {
+                    if (translation.getLanguage().equals(AppUtil.getDeviceLanguage())) {
                         return translation.getName() + "<p> </p>" + translation.getInstructions();
                     }
                 }

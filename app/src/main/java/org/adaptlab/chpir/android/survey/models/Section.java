@@ -7,6 +7,7 @@ import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -144,10 +145,10 @@ public class Section extends ReceiveModel {
      * text for the section.
      */
 	public String getTitle() {
-		if (getInstrument().getLanguage().equals(Instrument.getDeviceLanguage())) return mTitle;
+		if (getInstrument().getLanguage().equals(AppUtil.getDeviceLanguage())) return mTitle;
         if (activeTranslation() != null) return activeTranslation().getText();
         for (SectionTranslation translation : translations()) {
-            if (translation.getLanguage().equals(Instrument.getDeviceLanguage())) {
+            if (translation.getLanguage().equals(AppUtil.getDeviceLanguage())) {
                 return translation.getText();
             }
         }

@@ -15,7 +15,7 @@ import com.activeandroid.query.From;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
-import org.adaptlab.chpir.android.survey.AppUtil;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 /*
 * Content Providers require column _id i.e. BaseColumns._ID which is different from the primary key
@@ -122,12 +121,12 @@ public class Instrument extends ReceiveModel {
      * text for the title.
      */
     public String getTitle() {
-        if (getLanguage().equals(getDeviceLanguage())) return mTitle;
+        if (getLanguage().equals(AppUtil.getDeviceLanguage())) return mTitle;
         if (activeTranslation() != null && !activeTranslation().getTitle().trim().equals("")) {
             return activeTranslation().getTitle();
         }
         for (InstrumentTranslation translation : translations()) {
-            if (translation.getLanguage().equals(getDeviceLanguage())
+            if (translation.getLanguage().equals(AppUtil.getDeviceLanguage())
                     && !translation.getTitle().trim().equals("")) {
                 return translation.getTitle();
             }
@@ -137,9 +136,21 @@ public class Instrument extends ReceiveModel {
         return mTitle;
     }
 
+    public static List<String> getLanguages() {
+        List<String> languages = new ArrayList<>();
+        languages.add("en");
+        List<InstrumentTranslation> translations = new Select().from(InstrumentTranslation.class).groupBy("Language").execute();
+        for (InstrumentTranslation instrumentTranslation : translations) {
+            if (!TextUtils.isEmpty(instrumentTranslation.getLanguage()) && !languages.contains(instrumentTranslation.getLanguage().trim())) {
+                languages.add(instrumentTranslation.getLanguage().trim());
+            }
+        }
+        return languages;
+    }
+
     public InstrumentTranslation activeTranslation() {
         return new Select().from(InstrumentTranslation.class)
-                .where("InstrumentRemoteId = ? AND Language = ? AND Active = ?", mRemoteId, getDeviceLanguage(), 1).executeSingle();
+                .where("InstrumentRemoteId = ? AND Language = ? AND Active = ?", mRemoteId, AppUtil.getDeviceLanguage(), 1).executeSingle();
     }
 
     public void setTitle(String title) {
@@ -148,15 +159,6 @@ public class Instrument extends ReceiveModel {
 
     public String getLanguage() {
         return mLanguage;
-    }
-
-    public static String getDeviceLanguage() {
-        if (AppUtil.getAdminSettingsInstance() != null && AppUtil.getAdminSettingsInstance()
-                .getCustomLocaleCode() != null && !AppUtil.getAdminSettingsInstance()
-                .getCustomLocaleCode().equals("")) {
-            return AppUtil.getAdminSettingsInstance().getCustomLocaleCode();
-        }
-        return Locale.getDefault().getLanguage();
     }
 
     public List<InstrumentTranslation> translations() {
@@ -237,12 +239,12 @@ public class Instrument extends ReceiveModel {
     }
 
     public String getCriticalMessage() {
-        if (getLanguage().equals(getDeviceLanguage())) return mCriticalMessage;
+        if (getLanguage().equals(AppUtil.getDeviceLanguage())) return mCriticalMessage;
         if (activeTranslation() != null && !activeTranslation().getCriticalMessage().trim().equals("")) {
             return activeTranslation().getCriticalMessage();
         }
         for (InstrumentTranslation translation : translations()) {
-            if (translation.getLanguage().equals(getDeviceLanguage())
+            if (translation.getLanguage().equals(AppUtil.getDeviceLanguage())
                     && !translation.getCriticalMessage().trim().equals("")) {
                 return translation.getCriticalMessage();
             }
@@ -255,7 +257,7 @@ public class Instrument extends ReceiveModel {
     }
 
     public Typeface getTypeFace(Context context) {
-        if (getDeviceLanguage().equals(KHMER_LANGUAGE_CODE)) {
+        if (AppUtil.getDeviceLanguage().equals(KHMER_LANGUAGE_CODE)) {
             return Typeface.createFromAsset(context.getAssets(), KHMER_FONT_LOCATION);
         } else {
             return Typeface.DEFAULT;
@@ -275,10 +277,10 @@ public class Instrument extends ReceiveModel {
      */
 
     public String getAlignment() {
-        if (getLanguage().equals(getDeviceLanguage())) return mAlignment;
+        if (getLanguage().equals(AppUtil.getDeviceLanguage())) return mAlignment;
         if (activeTranslation() != null) return activeTranslation().getAlignment();
         for (InstrumentTranslation translation : translations()) {
-            if (translation.getLanguage().equals(getDeviceLanguage())) {
+            if (translation.getLanguage().equals(AppUtil.getDeviceLanguage())) {
                 return translation.getAlignment();
             }
         }

@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.SendModel;
-import org.adaptlab.chpir.android.survey.AppUtil;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 

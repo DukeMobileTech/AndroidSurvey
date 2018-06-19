@@ -1,10 +1,11 @@
-package org.adaptlab.chpir.android.survey;
+package org.adaptlab.chpir.android.survey.utils;
 
 import android.content.Context;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
 
+import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.Option;
 

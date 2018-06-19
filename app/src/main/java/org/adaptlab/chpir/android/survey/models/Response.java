@@ -8,7 +8,7 @@ import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.SendModel;
-import org.adaptlab.chpir.android.survey.AuthUtils;
+import org.adaptlab.chpir.android.survey.utils.AuthUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 

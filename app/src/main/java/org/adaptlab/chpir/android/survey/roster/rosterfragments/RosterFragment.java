@@ -23,7 +23,7 @@ import org.adaptlab.chpir.android.survey.roster.ResponseEditorActivity;
 
 import java.util.Date;
 
-import static org.adaptlab.chpir.android.survey.FormatUtils.styleTextWithHtml;
+import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtml;
 
 public abstract class RosterFragment extends Fragment {
     public final int MINIMUM_WIDTH = 250;

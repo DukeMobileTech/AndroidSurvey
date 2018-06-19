@@ -60,6 +60,8 @@ import org.adaptlab.chpir.android.survey.rules.RuleBuilder;
 import org.adaptlab.chpir.android.survey.rules.RuleCallback;
 import org.adaptlab.chpir.android.survey.tasks.SendResponsesTask;
 import org.adaptlab.chpir.android.survey.tasks.SetScoreUnitOrderingQuestionTask;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
+import org.adaptlab.chpir.android.survey.utils.FormatUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
@@ -73,7 +75,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-import static org.adaptlab.chpir.android.survey.AppUtil.getProjectId;
+import static org.adaptlab.chpir.android.survey.utils.AppUtil.getProjectId;
 
 public class InstrumentFragment extends ListFragment {
     public final static String TAG = "InstrumentFragment";

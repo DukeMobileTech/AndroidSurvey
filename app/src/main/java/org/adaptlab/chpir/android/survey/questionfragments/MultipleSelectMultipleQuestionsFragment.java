@@ -20,7 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.adaptlab.chpir.android.survey.FormatUtils.styleTextWithHtml;
+import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtml;
 
 public class MultipleSelectMultipleQuestionsFragment extends MultipleQuestionsFragment {
 

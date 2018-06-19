@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import static org.adaptlab.chpir.android.survey.FormatUtils.stripHtml;
+import static org.adaptlab.chpir.android.survey.utils.FormatUtils.stripHtml;
 import static org.adaptlab.chpir.android.survey.roster.RosterActivity.EXTRA_QUESTION_ID;
 import static org.adaptlab.chpir.android.survey.roster.RosterActivity.EXTRA_SURVEY_IDENTIFIER;
 

@@ -60,6 +60,8 @@ public class AdminSettings extends Model {
     private boolean mShowRosters;
     @Column(name = "ShowScores")
     private boolean mShowScores;
+    @Column(name = "Language")
+    private String mLanguage;
 
     /**
      * Typically a Singleton constructor is private, but in this case the constructor
@@ -338,6 +340,15 @@ public class AdminSettings extends Model {
 
     public void setShowScores(boolean showScores) {
         mShowScores = showScores;
+        save();
+    }
+
+    public String getLanguage() {
+        return mLanguage;
+    }
+
+    public void setLanguage(String language) {
+        mLanguage = language;
         save();
     }
 

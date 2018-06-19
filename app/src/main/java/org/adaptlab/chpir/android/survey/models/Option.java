@@ -7,7 +7,7 @@ import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
-import org.adaptlab.chpir.android.survey.AppUtil;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -98,7 +98,7 @@ public class Option extends ReceiveModel {
 //    }
 
     public String getDeviceLanguage() {
-        return Instrument.getDeviceLanguage();
+        return AppUtil.getDeviceLanguage();
     }
 
     /*

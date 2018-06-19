@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import org.adaptlab.chpir.android.survey.models.DeviceUser;
+import org.adaptlab.chpir.android.survey.utils.AuthUtils;
 
 public class LoginFragment extends Fragment {
     private EditText mUsernameEditText;

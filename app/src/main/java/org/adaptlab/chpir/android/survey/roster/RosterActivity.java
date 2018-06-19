@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import static org.adaptlab.chpir.android.survey.FormatUtils.stripHtml;
+import static org.adaptlab.chpir.android.survey.utils.FormatUtils.stripHtml;
 
 public class RosterActivity extends AppCompatActivity implements ScrollViewListener {
     public final static String EXTRA_ROSTER_ID =

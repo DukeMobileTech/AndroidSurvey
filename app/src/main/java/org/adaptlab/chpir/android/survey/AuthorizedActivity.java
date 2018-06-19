@@ -2,6 +2,9 @@ package org.adaptlab.chpir.android.survey;
 
 import android.os.Bundle;
 
+import org.adaptlab.chpir.android.survey.utils.AuthUtils;
+import org.adaptlab.chpir.android.survey.utils.Foreground;
+
 public abstract class AuthorizedActivity extends SingleFragmentActivity implements Foreground.Listener {
 
     private static final String TAG = "AuthorizedActivity";

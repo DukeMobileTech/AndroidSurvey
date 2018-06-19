@@ -1,6 +1,7 @@
 package org.adaptlab.chpir.android.survey;
 
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -18,15 +19,21 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.URLUtil;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.survey.models.AdminSettings;
+import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.tasks.ApkUpdateTask;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
+import org.adaptlab.chpir.android.survey.utils.LocaleManager;
 import org.apache.commons.codec.CharEncoding;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,6 +48,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 public class AdminFragment extends Fragment {
@@ -71,6 +79,7 @@ public class AdminFragment extends Fragment {
     private CheckBox mRecordSurveyLocationCheckBox;
     private ArrayList<EditText> mRequiredFields;
     private AlertDialog mDialog;
+    private Spinner mSpinner;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -152,6 +161,10 @@ public class AdminFragment extends Fragment {
 
         mCustomLocaleEditText = (EditText) v.findViewById(R.id.custom_locale_edit_text);
         mCustomLocaleEditText.setText(getAdminSettingsInstanceCustomLocaleCode());
+
+        mSpinner = v.findViewById(R.id.device_language_spinner);
+        setSpinnerAdapter();
+
         // Disable edits if using default settings
         if (getActivity().getResources().getBoolean(R.bool.default_admin_settings)) {
             mDeviceIdentifierEditText.setEnabled(false);
@@ -209,6 +222,42 @@ public class AdminFragment extends Fragment {
         });
 
         return v;
+    }
+
+    private void setSpinnerAdapter() {
+        final List<String> languageCodes = Instrument.getLanguages();
+        ArrayList<String> displayLanguages = new ArrayList<>();
+        for (String languageCode: languageCodes) {
+            displayLanguages.add(new Locale(languageCode).getDisplayLanguage());
+        }
+        final ArrayAdapter<String> mAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, displayLanguages);
+        mAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSpinner.setAdapter(mAdapter);
+        mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position != languageCodes.indexOf(AppUtil.getAdminSettingsInstance().getLanguage())) {
+                    updateLocale(languageCodes.get(position));
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+        mSpinner.setSelection(languageCodes.indexOf(AppUtil.getAdminSettingsInstance().getLanguage()));
+    }
+
+    private void updateLocale(String languageCode) {
+        AppUtil.getAdminSettingsInstance().setLanguage(languageCode);
+        LocaleManager.setNewLocale(getActivity(), languageCode);
+        Intent i = new Intent(getActivity(), AdminActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+        } else {
+            startActivity(i);
+        }
     }
 
     private void showConfigurationsDialog() {

@@ -11,7 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import org.adaptlab.chpir.android.survey.AppUtil;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import static org.adaptlab.chpir.android.survey.FormatUtils.stripHtml;
+import static org.adaptlab.chpir.android.survey.utils.FormatUtils.stripHtml;
 
 public class ParticipantEditorActivity extends AppCompatActivity {
     public final static String EXTRA_QUESTION_NUMBER =
