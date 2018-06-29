@@ -1,10 +1,12 @@
 package org.adaptlab.chpir.android.survey.location;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Build;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -75,43 +77,45 @@ public class LocationManager {
     }
 
     public void startLocationUpdates() {
-        if (!((Activity) mContext).isDestroyed()) {
-            mSettingsClient.checkLocationSettings(mLocationSettingsRequest)
-                    .addOnSuccessListener((Activity) mContext, new OnSuccessListener<LocationSettingsResponse>() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            if (!((Activity) mContext).isDestroyed()) {
+                mSettingsClient.checkLocationSettings(mLocationSettingsRequest)
+                        .addOnSuccessListener((Activity) mContext, new OnSuccessListener<LocationSettingsResponse>() {
 
-                        @Override
-                        public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-                            if (ContextCompat.checkSelfPermission(mContext, android.Manifest
-                                    .permission
-                                    .ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                                ActivityCompat.requestPermissions((Activity) mContext,
-                                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-                            } else {
-                                mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
+                            @Override
+                            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
+                                if (ContextCompat.checkSelfPermission(mContext, Manifest
+                                        .permission
+                                        .ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                    ActivityCompat.requestPermissions((Activity) mContext,
+                                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+                                } else {
+                                    mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, Looper.myLooper());
+                                }
                             }
-                        }
-                    })
-                    .addOnFailureListener((Activity) mContext, new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            int statusCode = ((ApiException) e).getStatusCode();
-                            switch (statusCode) {
-                                case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                                    try {
-                                        ResolvableApiException rae = (ResolvableApiException) e;
-                                        rae.startResolutionForResult((Activity) mContext,
-                                                REQUEST_CHECK_SETTINGS);
-                                    } catch (IntentSender.SendIntentException sie) {
-                                        Log.e(TAG, "PendingIntent unable to execute request.");
-                                    }
-                                    break;
-                                case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                                    String errorMessage = "Location settings are inadequate, and cannot be fixed here. Fix in Settings.";
-                                    Log.e(TAG, errorMessage);
-                                    Toast.makeText(mContext, errorMessage, Toast.LENGTH_LONG).show();
+                        })
+                        .addOnFailureListener((Activity) mContext, new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                int statusCode = ((ApiException) e).getStatusCode();
+                                switch (statusCode) {
+                                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                                        try {
+                                            ResolvableApiException rae = (ResolvableApiException) e;
+                                            rae.startResolutionForResult((Activity) mContext,
+                                                    REQUEST_CHECK_SETTINGS);
+                                        } catch (IntentSender.SendIntentException sie) {
+                                            Log.e(TAG, "PendingIntent unable to execute request.");
+                                        }
+                                        break;
+                                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                                        String errorMessage = "Location settings are inadequate, and cannot be fixed here. Fix in Settings.";
+                                        Log.e(TAG, errorMessage);
+                                        Toast.makeText(mContext, errorMessage, Toast.LENGTH_LONG).show();
+                                }
                             }
-                        }
-                    });
+                        });
+            }
         }
     }
 

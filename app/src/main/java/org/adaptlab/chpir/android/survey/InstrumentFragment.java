@@ -26,7 +26,13 @@ import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBar.Tab;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Layout;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.TextUtils;
+import android.text.style.AlignmentSpan;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
@@ -187,7 +193,8 @@ public class InstrumentFragment extends ListFragment {
             private void deleteHelper(List<Survey> surveys) {
                 for (Survey survey : surveys) {
                     if (survey.getUUID() != null) {
-                        new Delete().from(Response.class).where("SurveyUUID = ?", survey.getUUID()).execute();
+                        new Delete().from(Response.class).where("SurveyUUID = ?", survey.getUUID
+                                ()).execute();
                     }
                     survey.delete();
                 }
@@ -211,7 +218,7 @@ public class InstrumentFragment extends ListFragment {
                 if (getListView().getAdapter() == mSurveyAdapter) {
                     mSurveyAdapter.clearSelection();
                     mSurveyAdapter.notifyDataSetChanged();
-                } else if(getListView().getAdapter() == mRosterAdapter) {
+                } else if (getListView().getAdapter() == mRosterAdapter) {
                     mRosterAdapter.clearSelection();
                     mRosterAdapter.notifyDataSetChanged();
                 }
@@ -225,7 +232,8 @@ public class InstrumentFragment extends ListFragment {
         AppUtil.appInit(getActivity());
         setHasOptionsMenu(true);
         if (getActivity().getIntent() != null) {
-            mAuthorizeSurvey = getActivity().getIntent().getBooleanExtra(EXTRA_AUTHORIZE_SURVEY, false);
+            mAuthorizeSurvey = getActivity().getIntent().getBooleanExtra(EXTRA_AUTHORIZE_SURVEY,
+                    false);
         }
         createLoaderCallbacks();
         setMultiChoiceModeListener();
@@ -236,7 +244,9 @@ public class InstrumentFragment extends ListFragment {
 
     private void checkApiEndpointSettings() {
         AdminSettings adminSettings = AdminSettings.getInstance();
-        if (TextUtils.isEmpty(adminSettings.getApiDomainName()) || TextUtils.isEmpty(adminSettings.getApiVersion()) || TextUtils.isEmpty(adminSettings.getProjectId()) || TextUtils.isEmpty(adminSettings.getApiKey())) {
+        if (TextUtils.isEmpty(adminSettings.getApiDomainName()) || TextUtils.isEmpty
+                (adminSettings.getApiVersion()) || TextUtils.isEmpty(adminSettings.getProjectId()
+        ) || TextUtils.isEmpty(adminSettings.getApiKey())) {
             Intent i = new Intent(getActivity(), AdminActivity.class);
             startActivityForResult(i, DEFAULT_SETTINGS_CODE);
         }
@@ -250,12 +260,14 @@ public class InstrumentFragment extends ListFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle
+            savedInstanceState) {
         return inflater.inflate(R.layout.fragment_instrument, container, false);
     }
 
     private void requestNeededPermissions() {
-        String[] permissions = { Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE
+        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission
+                .CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE
         };
         if (!hasPermission(permissions)) {
             ActivityCompat.requestPermissions(getActivity(), permissions, 1);
@@ -264,7 +276,8 @@ public class InstrumentFragment extends ListFragment {
 
     private boolean hasPermission(String[] permissions) {
         for (String permission : permissions) {
-            if (ContextCompat.checkSelfPermission(getActivity(), permission) == PackageManager.PERMISSION_DENIED) {
+            if (ContextCompat.checkSelfPermission(getActivity(), permission) == PackageManager
+                    .PERMISSION_DENIED) {
                 return false;
             }
         }
@@ -272,7 +285,7 @@ public class InstrumentFragment extends ListFragment {
     }
 
     /*
-    * Used to manage cursor loaders across activity life-cycles
+     * Used to manage cursor loaders across activity life-cycles
      */
     private void createLoaderCallbacks() {
         mInstrumentCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
@@ -608,25 +621,50 @@ public class InstrumentFragment extends ListFragment {
 
         @Override
         public View newView(Context context, Cursor cursor, ViewGroup parent) {
-            return LayoutInflater.from(context).inflate(R.layout.list_item_instrument, parent, false);
+            return LayoutInflater.from(context).inflate(R.layout.list_item_instrument, parent,
+                    false);
         }
 
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
-            TextView titleTextView = (TextView) view.findViewById(R.id.instrument_list_item_titleTextView);
-            TextView questionCountTextView = (TextView) view.findViewById(R.id.instrument_list_item_questionCountTextView);
-            TextView instrumentVersionTextView = (TextView) view.findViewById(R.id.instrument_list_item_instrumentVersionTextView);
-
             Long remoteId = cursor.getLong(cursor.getColumnIndexOrThrow("RemoteId"));
             Instrument instrument = Instrument.findByRemoteId(remoteId);
             int numQuestions = instrument.questions().size();
 
-            titleTextView.setText(instrument.getTitle());
-            titleTextView.setTypeface(instrument.getTypeFace(getActivity().getApplicationContext()));
-            questionCountTextView.setText(numQuestions + " " + FormatUtils.pluralize(numQuestions, getString(R.string.question), getString(R.string.questions)));
-            instrumentVersionTextView.setText(getString(R.string.version) + ": " + instrument.getVersionNumber());
+            TextView instrumentProperties = view.findViewById(R.id.instrumentProperties);
+            String title = instrument.getTitle() + "\n";
+            String questionCount = numQuestions + " " + FormatUtils.pluralize(numQuestions,
+                    getString(R.string.question), getString(R.string.questions)) + "  ";
+            String version = getString(R.string.version) + ": " + instrument.getVersionNumber();
+            SpannableString spannableText = new SpannableString(title + questionCount + version);
+            // Title styling
+            spannableText.setSpan(new RelativeSizeSpan(1.2f), 0, title.length(), Spannable
+                    .SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableText.setSpan(new ForegroundColorSpan(getResources().getColor(R.color
+                    .primary_text)), 0, title.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            // Question count styling
+            spannableText.setSpan(new RelativeSizeSpan(0.8f), title.length(), title.length() +
+                    questionCount.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableText.setSpan(new ForegroundColorSpan(getResources().getColor(R.color
+                    .secondary_text)), title.length(), title.length() + questionCount.length(),
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableText.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_NORMAL),
+                    title.length(), title.length() + questionCount.length(), Spannable
+                            .SPAN_EXCLUSIVE_EXCLUSIVE);
+            // Version styling
+            spannableText.setSpan(new RelativeSizeSpan(0.8f), title.length() + questionCount
+                    .length(), title.length() + questionCount.length() + version.length(),
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableText.setSpan(new ForegroundColorSpan(getResources().getColor(R.color
+                    .secondary_text)), title.length() + questionCount.length(), title.length() +
+                    questionCount.length() + version.length(), 0);
+            spannableText.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_OPPOSITE),
+                    title.length() + questionCount.length(), title.length() + questionCount
+                            .length() + version.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-            new SetInstrumentLabelTask().execute(new InstrumentListLabel(instrument, titleTextView));
+            instrumentProperties.setText(spannableText);
+            new SetInstrumentLabelTask().execute(new InstrumentListLabel(instrument,
+                    instrumentProperties));
         }
     }
 
@@ -659,33 +697,102 @@ public class InstrumentFragment extends ListFragment {
 
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
-            Activity activity = (Activity) view.getContext();
-            if (activity != null) {
-                if (mSelectionViews != null && isPositionChecked(cursor.getPosition())) {
-                    view.setBackgroundColor(ContextCompat.getColor(context, R.color.item_selected));
-                } else {
-                    view.setBackgroundColor(ContextCompat.getColor(context, R.color.transparent));
-                }
-
-                TextView titleTextView = (TextView) view.findViewById(R.id.survey_list_item_titleTextView);
-
-                TextView progressTextView = (TextView) view.findViewById(R.id.survey_list_item_progressTextView);
-                TextView instrumentTitleTextView = (TextView) view.findViewById(R.id.survey_list_item_instrumentTextView);
-                TextView lastUpdatedTextView = (TextView) view.findViewById(R.id.survey_list_item_lastUpdatedTextView);
-
-                String surveyUUID = cursor.getString(cursor.getColumnIndexOrThrow("UUID"));
-                Survey survey = Survey.findByUUID(surveyUUID);
-
-                titleTextView.setText(survey.identifier(activity));
-                titleTextView.setTypeface(survey.getInstrument().getTypeFace(activity.getApplicationContext()));
-                progressTextView.setText(survey.responses().size() + " " + getString(R.string.of) + "" + " " + survey.getInstrument().questions().size());
-                instrumentTitleTextView.setText(survey.getInstrument().getTitle());
-                DateFormat df = DateFormat.getDateTimeInstance();
-                lastUpdatedTextView.setText(df.format(survey.getLastUpdated()));
-
-                if (survey.readyToSend()) progressTextView.setTextColor(Color.GREEN);
-                else progressTextView.setTextColor(Color.RED);
+            if (mSelectionViews != null && isPositionChecked(cursor.getPosition())) {
+                view.setBackgroundColor(ContextCompat.getColor(context, R.color.item_selected));
+            } else {
+                view.setBackgroundColor(ContextCompat.getColor(context, R.color.transparent));
             }
+
+            String surveyUUID = cursor.getString(cursor.getColumnIndexOrThrow("UUID"));
+            Survey survey = Survey.findByUUID(surveyUUID);
+
+            TextView surveyTextView = view.findViewById(R.id.surveyProperties);
+            String surveyTitle = survey.identifier(AppUtil.getContext()) + "\n";
+            String instrumentTitle = survey.getInstrument().getTitle() + "\n";
+            String lastUpdated = DateFormat.getDateTimeInstance().format(survey.getLastUpdated())
+                    + "  ";
+            String progress = survey.responses().size() + " " + getString(R.string.of) + " " +
+                    survey.getInstrument().questions().size();
+
+            SpannableString spannableString = new SpannableString(surveyTitle + instrumentTitle +
+                    lastUpdated + progress);
+            // survey title
+            spannableString.setSpan(new RelativeSizeSpan(1.2f), 0, surveyTitle.length(),
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color
+                    .primary_text)), 0, surveyTitle.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            // instrument title
+            spannableString.setSpan(new RelativeSizeSpan(0.8f), surveyTitle.length(), surveyTitle
+                    .length() + instrumentTitle.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color
+                    .secondary_text)), surveyTitle.length(), surveyTitle.length() +
+                    instrumentTitle.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            // last updated at
+            spannableString.setSpan(new RelativeSizeSpan(0.8f), surveyTitle.length() +
+                    instrumentTitle.length(), surveyTitle.length() + instrumentTitle.length() +
+                    lastUpdated.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color
+                    .secondary_text)), surveyTitle.length() + instrumentTitle.length(),
+                    surveyTitle.length() + instrumentTitle.length() + lastUpdated.length(),
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            // progress
+            spannableString.setSpan(new RelativeSizeSpan(0.8f), surveyTitle.length() +
+                    instrumentTitle.length() + lastUpdated.length(), surveyTitle.length() +
+                    instrumentTitle.length() + lastUpdated.length() + progress.length(),
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color
+                    .secondary_text)), surveyTitle.length() + instrumentTitle.length() +
+                    lastUpdated.length(), surveyTitle.length() + instrumentTitle.length() +
+                    lastUpdated.length() + progress.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+            if (survey.readyToSend()) {
+                spannableString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color
+                        .green)), surveyTitle.length() + instrumentTitle.length() + lastUpdated
+                        .length(), surveyTitle.length() + instrumentTitle.length() + lastUpdated
+                        .length() + progress.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            } else {
+                spannableString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color
+                        .red)), surveyTitle.length() + instrumentTitle.length() + lastUpdated
+                        .length(), surveyTitle.length() + instrumentTitle.length() + lastUpdated
+                        .length() + progress.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+
+            surveyTextView.setText(spannableString);
+
+//            Activity activity = (Activity) view.getContext();
+//            if (activity != null) {
+//                if (mSelectionViews != null && isPositionChecked(cursor.getPosition())) {
+//                    view.setBackgroundColor(ContextCompat.getColor(context, R.color
+// .item_selected));
+//                } else {
+//                    view.setBackgroundColor(ContextCompat.getColor(context, R.color.transparent));
+//                }
+//
+//                TextView titleTextView = (TextView) view.findViewById(R.id
+// .survey_list_item_titleTextView);
+//
+//                TextView progressTextView = (TextView) view.findViewById(R.id
+// .survey_list_item_progressTextView);
+//                TextView instrumentTitleTextView = (TextView) view.findViewById(R.id
+// .survey_list_item_instrumentTextView);
+//                TextView lastUpdatedTextView = (TextView) view.findViewById(R.id
+// .survey_list_item_lastUpdatedTextView);
+//
+////                String surveyUUID = cursor.getString(cursor.getColumnIndexOrThrow("UUID"));
+////                Survey survey = Survey.findByUUID(surveyUUID);
+//
+//                titleTextView.setText(survey.identifier(activity));
+//                titleTextView.setTypeface(survey.getInstrument().getTypeFace(activity
+// .getApplicationContext()));
+//                progressTextView.setText(survey.responses().size() + " " + getString(R.string
+// .of) + "" + " " + survey.getInstrument().questions().size());
+//                instrumentTitleTextView.setText(survey.getInstrument().getTitle());
+//                DateFormat df = DateFormat.getDateTimeInstance();
+//                lastUpdatedTextView.setText(df.format(survey.getLastUpdated()));
+//
+//                if (survey.readyToSend()) progressTextView.setTextColor(Color.GREEN);
+//                else progressTextView.setTextColor(Color.RED);
+//            }
         }
     }
 
@@ -757,7 +864,9 @@ public class InstrumentFragment extends ListFragment {
             Score score = Score.findByUUID(uuid);
             if (score != null) {
                 TextView surveyIdentifier = (TextView) view.findViewById(R.id.survey_identifier);
-                surveyIdentifier.setText(String.format(Locale.getDefault(), "%s%s%s", score.getSurveyIdentifier(), " - ", score.getScoreScheme().getInstrument().getTitle()));
+                surveyIdentifier.setText(String.format(Locale.getDefault(), "%s%s%s", score
+                        .getSurveyIdentifier(), " - ", score.getScoreScheme().getInstrument()
+                        .getTitle()));
 
                 TextView schemeTitle = (TextView) view.findViewById(R.id.scheme_name_text);
                 schemeTitle.setText(String.valueOf(score.getScoreScheme().getTitle()));
@@ -765,7 +874,8 @@ public class InstrumentFragment extends ListFragment {
                 TextView totalRawScore = (TextView) view.findViewById(R.id.total_raw_score_value);
                 totalRawScore.setText(String.valueOf(score.getRawScoreSum()));
 
-                TextView totalWeightedScore = (TextView) view.findViewById(R.id.total_weighted_score_value);
+                TextView totalWeightedScore = (TextView) view.findViewById(R.id
+                        .total_weighted_score_value);
                 totalWeightedScore.setText(String.valueOf(score.getWeightedScoreSum()));
             }
         }
@@ -837,16 +947,18 @@ public class InstrumentFragment extends ListFragment {
                     setInstrumentsListViewAdapter();
                 }
             }
-            AppUtil.getAdminSettingsInstance().setLastSyncTime(ActiveRecordCloudSync.getLastSyncTime());
+            AppUtil.getAdminSettingsInstance().setLastSyncTime(ActiveRecordCloudSync
+                    .getLastSyncTime());
             AppUtil.orderInstrumentsSections();
-            if (isAdded() && !getActivity().isFinishing() && mProgressDialog != null && mProgressDialog.isShowing()) {
+            if (isAdded() && !getActivity().isFinishing() && mProgressDialog != null &&
+                    mProgressDialog.isShowing()) {
                 mProgressDialog.dismiss();
             }
         }
     }
 
     /*
-    * Refresh the images table from the server
+     * Refresh the images table from the server
      */
     private class RefreshImagesTask extends AsyncTask<Void, Void, Void> {
         private final static String TAG = "ImageDownloader";
@@ -863,10 +975,12 @@ public class InstrumentFragment extends ListFragment {
         protected void onPostExecute(Void param) {
             List<Instrument> instruments = Instrument.getAllProjectInstruments(getProjectId());
             for (int k = 0; k < instruments.size(); k++) {
-                new InstrumentSanitizerTask().execute(instruments.get(k), (k == instruments.size() - 1));
+                new InstrumentSanitizerTask().execute(instruments.get(k), (k == instruments.size
+                        () - 1));
             }
             if (instruments.size() == 0) {
-                if (isAdded() && !getActivity().isFinishing() && mProgressDialog != null && mProgressDialog.isShowing()) {
+                if (isAdded() && !getActivity().isFinishing() && mProgressDialog != null &&
+                        mProgressDialog.isShowing()) {
                     mProgressDialog.dismiss();
                 }
             }
@@ -962,7 +1076,8 @@ public class InstrumentFragment extends ListFragment {
             if (progressDialog != null && progressDialog.isShowing()) progressDialog.dismiss();
             if (isAdded()) {
                 if (instrument == null) {
-                    Toast.makeText(getActivity(), R.string.instrument_not_loaded, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), R.string.instrument_not_loaded, Toast
+                            .LENGTH_LONG).show();
                 } else {
                     new RuleBuilder(getActivity())
                             .addRule(new InstrumentLaunchRule(instrument,
@@ -972,11 +1087,13 @@ public class InstrumentFragment extends ListFragment {
                             .setCallbacks(new RuleCallback() {
                                 public void onRulesPass() {
                                     Intent i = new Intent(getActivity(), SurveyActivity.class);
-                                    i.putExtra(SurveyFragment.EXTRA_INSTRUMENT_ID, instrument.getRemoteId());
+                                    i.putExtra(SurveyFragment.EXTRA_INSTRUMENT_ID, instrument
+                                            .getRemoteId());
                                     startAnimatedActivity(i);
                                 }
 
-                                public void onRulesFail() {}
+                                public void onRulesFail() {
+                                }
                             })
                             .checkRules();
                 }
@@ -1014,12 +1131,15 @@ public class InstrumentFragment extends ListFragment {
             if (progressDialog != null && progressDialog.isShowing()) progressDialog.dismiss();
             if (isAdded()) {
                 if (survey == null) {
-                    Toast.makeText(getActivity(), R.string.instrument_not_loaded, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), R.string.instrument_not_loaded, Toast
+                            .LENGTH_LONG).show();
                 } else {
                     Intent i = new Intent(getActivity(), SurveyActivity.class);
-                    i.putExtra(SurveyFragment.EXTRA_INSTRUMENT_ID, survey.getInstrument().getRemoteId());
+                    i.putExtra(SurveyFragment.EXTRA_INSTRUMENT_ID, survey.getInstrument()
+                            .getRemoteId());
                     i.putExtra(SurveyFragment.EXTRA_SURVEY_ID, survey.getId());
-                    i.putExtra(SurveyFragment.EXTRA_QUESTION_NUMBER, survey.getLastQuestion().getNumberInInstrument() - 1);
+                    i.putExtra(SurveyFragment.EXTRA_QUESTION_NUMBER, survey.getLastQuestion()
+                            .getNumberInInstrument() - 1);
                     i.putExtra(SurveyFragment.EXTRA_AUTHORIZE_SURVEY, mAuthorizeSurvey);
                     startAnimatedActivity(i);
                 }

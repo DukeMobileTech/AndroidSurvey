@@ -4,41 +4,50 @@
                 android:layout_height="wrap_content">
 
     <TextView
-        android:id="@+id/instrument_list_item_titleTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="4dp"
-        android:paddingRight="4dp"
-        android:paddingTop="10dp"
-        android:text="@string/instrument_title"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:textColor="@color/primary_text"/>
-
-    <TextView
-        android:id="@+id/instrument_list_item_questionCountTextView"
+        android:id="@+id/instrumentProperties"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/instrument_list_item_titleTextView"
-        android:paddingBottom="10dp"
+        android:layout_height="match_parent"
         android:paddingLeft="4dp"
         android:paddingRight="4dp"
-        android:paddingTop="6dp"
-        android:textColor="#545454"
-        android:textSize="14sp"/>
-
-    <TextView
-        android:id="@+id/instrument_list_item_instrumentVersionTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@id/instrument_list_item_titleTextView"
         android:paddingBottom="10dp"
-        android:paddingLeft="4dp"
-        android:paddingRight="4dp"
-        android:paddingTop="6dp"
-        android:textColor="#545454"
-        android:textSize="14sp"/>
+        android:paddingTop="10dp"/>
 
+
+    <!--<TextView-->
+        <!--android:id="@+id/instrument_list_item_titleTextView"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:paddingLeft="4dp"-->
+        <!--android:paddingRight="4dp"-->
+        <!--android:paddingTop="10dp"-->
+        <!--android:text="@string/instrument_title"-->
+        <!--android:textColor="@color/primary_text"-->
+        <!--android:textSize="22sp"-->
+        <!--android:textStyle="bold"/>-->
+
+    <!--<TextView-->
+        <!--android:id="@+id/instrument_list_item_questionCountTextView"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_below="@id/instrument_list_item_titleTextView"-->
+        <!--android:paddingBottom="10dp"-->
+        <!--android:paddingLeft="4dp"-->
+        <!--android:paddingRight="4dp"-->
+        <!--android:paddingTop="6dp"-->
+        <!--android:textColor="#545454"-->
+        <!--android:textSize="14sp"/>-->
+
+    <!--<TextView-->
+        <!--android:id="@+id/instrument_list_item_instrumentVersionTextView"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentEnd="true"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:layout_below="@id/instrument_list_item_titleTextView"-->
+        <!--android:paddingBottom="10dp"-->
+        <!--android:paddingLeft="4dp"-->
+        <!--android:paddingRight="4dp"-->
+        <!--android:paddingTop="6dp"-->
+        <!--android:textColor="#545454"-->
+        <!--android:textSize="14sp"/>-->
 </RelativeLayout>

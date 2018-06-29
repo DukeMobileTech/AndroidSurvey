@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.preference.PreferenceManager;
 
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
+
 public class PollService extends IntentService {
     private static final String TAG = "PollService";
     public static final String PREF_IS_ALARM_ON = "isAlarmOn";
@@ -17,8 +19,8 @@ public class PollService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        if (NetworkNotificationUtils.checkForNetworkErrors(getApplicationContext())) {
-            ActiveRecordCloudSync.syncSendTables(getApplicationContext());
+        if (NetworkNotificationUtils.checkForNetworkErrors(AppUtil.getContext())) {
+            ActiveRecordCloudSync.syncSendTables(AppUtil.getContext());
         }
     }
 

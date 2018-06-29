@@ -164,7 +164,7 @@ public class Survey extends SendModel {
                 .from(Survey.class)
                 .innerJoin(Instrument.class)
                 .on("Surveys.InstrumentRemoteId=Instruments.RemoteId AND Instruments.Published=" + 1)
-                .where("Surveys.ProjectId = ?", projectId)
+                .where("Surveys.ProjectId = ? AND RosterUUID IS null", projectId)
                 .orderBy("Surveys.LastUpdated DESC")
                 .execute();
     }
@@ -301,6 +301,7 @@ public class Survey extends SendModel {
     }
 
     public Question getLastQuestion() {
+        if (getInstrument().questions().size() == 0) return null;
         if (mLastQuestionRemoteId == null) {
             return getInstrument().questions().get(0);
         } else {
