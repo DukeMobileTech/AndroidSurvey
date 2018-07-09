@@ -252,7 +252,8 @@ public class AdminFragment extends Fragment {
         AppUtil.getAdminSettingsInstance().setLanguage(languageCode);
         LocaleManager.setNewLocale(getActivity(), languageCode);
         Intent i = new Intent(getActivity(), AdminActivity.class);
-        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
+//        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
+        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
         } else {

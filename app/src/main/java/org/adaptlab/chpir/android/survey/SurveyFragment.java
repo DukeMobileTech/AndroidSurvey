@@ -513,7 +513,8 @@ public class SurveyFragment extends Fragment {
         i.putExtra(SurveyFragment.EXTRA_SURVEY_ID, mSurvey.getId());
         i.putExtra(SurveyFragment.EXTRA_QUESTION_NUMBER, mSurvey.getLastQuestion().getNumberInInstrument() - 1);
         i.putExtra(SurveyFragment.EXTRA_AUTHORIZE_SURVEY, false);
-        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
+//        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
+        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
         } else {

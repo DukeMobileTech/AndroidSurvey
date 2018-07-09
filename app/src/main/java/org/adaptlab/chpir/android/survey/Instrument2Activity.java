@@ -1,7 +1,6 @@
 package org.adaptlab.chpir.android.survey;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.ProgressDialog;
@@ -106,13 +105,14 @@ public class Instrument2Activity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK && requestCode == DEFAULT_SETTINGS_CODE) {
-            new RefreshInstrumentsTask().execute();
+            downloadInstruments();
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        setupViewPager();
         displayProjectName();
     }
 
@@ -157,7 +157,7 @@ public class Instrument2Activity extends AppCompatActivity {
                 }
                 return true;
             case R.id.menu_item_refresh:
-                new RefreshInstrumentsTask().execute();
+                downloadInstruments();
                 new SendResponsesTask(this).execute();
                 return true;
             default:
@@ -169,11 +169,76 @@ public class Instrument2Activity extends AppCompatActivity {
         return mAuthorizeSurvey;
     }
 
-    private class RefreshInstrumentsTask extends AsyncTask<Void, Void, Integer> {
+    private void downloadInstruments() {
+        showProgressDialog();
+        RefreshInstrumentsTask asyncTask = new RefreshInstrumentsTask();
+        asyncTask.setListener(new RefreshInstrumentsTask.AsyncTaskListener() {
+            @Override
+            public void onAsyncTaskFinished() {
+                displayProjectName();
+                new SetScoreUnitOrderingQuestionTask().execute();
+                RefreshImagesTask refreshImagesTask = new RefreshImagesTask();
+                refreshImagesTask.setListener(new RefreshImagesTask.AsyncTaskListener() {
+                    @Override
+                    public void onAsyncTaskFinished() {
+                        List<Instrument> instruments = Instrument.getAllProjectInstruments(
+                                getProjectId());
+                        for (int k = 0; k < instruments.size(); k++) {
+                            InstrumentSanitizerTask sanitizerTask = new InstrumentSanitizerTask();
+                            sanitizerTask.setListener(new InstrumentSanitizerTask.AsyncTaskListener() {
+                                @Override
+                                public void onAsyncTaskFinished(Boolean last) {
+                                    if (last) {
+                                        AppUtil.getAdminSettingsInstance().setLastSyncTime(
+                                                ActiveRecordCloudSync.getLastSyncTime());
+                                        AppUtil.orderInstrumentsSections();
+                                        mFragmentPagerAdapter.getInstrumentViewPagerFragment()
+                                                .refreshRecyclerView();
+                                        dismissProgressDialog();
+                                    }
+                                }
+                            });
+                            sanitizerTask.execute(instruments.get(k), (k == instruments.size() - 1));
+                        }
+                        if (instruments.size() == 0) {
+                            dismissProgressDialog();
+                        }
+                    }
+                });
+                refreshImagesTask.execute();
+            }
+        });
+        asyncTask.execute();
+    }
+
+    private void showProgressDialog() {
+        mProgressDialog = new ProgressDialog(this);
+        mProgressDialog.setTitle(getResources().getString(
+                R.string.instrument_loading_progress_header));
+        mProgressDialog.setMessage(getResources().getString(
+                R.string.background_process_progress_message));
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.show();
+    }
+
+    private void dismissProgressDialog() {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) mProgressDialog.dismiss();
+    }
+
+    private static class RefreshInstrumentsTask extends AsyncTask<Void, Void, Integer> {
+        private AsyncTaskListener mListener;
+
+        public interface AsyncTaskListener {
+            void onAsyncTaskFinished();
+        }
+
+        void setListener(AsyncTaskListener listener) {
+            this.mListener = listener;
+        }
 
         @Override
         protected Integer doInBackground(Void... params) {
-            if (NetworkNotificationUtils.checkForNetworkErrors(Instrument2Activity.this)) {
+            if (NetworkNotificationUtils.checkForNetworkErrors(AppUtil.getContext())) {
                 List<Instrument> instruments = Instrument.getAllProjectInstruments(getProjectId());
                 for (int k = 0; k < instruments.size(); k++) {
                     if (!instruments.get(k).loaded()) {
@@ -181,7 +246,7 @@ public class Instrument2Activity extends AppCompatActivity {
                         break;
                     }
                 }
-                ActiveRecordCloudSync.syncReceiveTables(Instrument2Activity.this);
+                ActiveRecordCloudSync.syncReceiveTables(AppUtil.getContext());
                 return 0;
             } else {
                 return -1;
@@ -189,37 +254,28 @@ public class Instrument2Activity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPreExecute() {
-            mProgressDialog = new ProgressDialog(Instrument2Activity.this);
-            mProgressDialog.setTitle(getResources().getString(
-                    R.string.instrument_loading_progress_header));
-            mProgressDialog.setMessage(getResources().getString(
-                    R.string.background_process_progress_message));
-            mProgressDialog.setCancelable(false);
-            mProgressDialog.show();
-        }
-
-        @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-        @Override
         protected void onPostExecute(Integer code) {
-            new RefreshImagesTask().execute();
-            new SetScoreUnitOrderingQuestionTask().execute();
-            if (code == -1 && mProgressDialog != null && mProgressDialog.isShowing()) {
-                mProgressDialog.dismiss();
-            }
-            Instrument2Activity activity = Instrument2Activity.this;
-            if (!activity.isDestroyed()) {
-                activity.displayProjectName();
-            }
+            super.onPostExecute(code);
+            mListener.onAsyncTaskFinished();
         }
     }
 
-    private class RefreshImagesTask extends AsyncTask<Void, Void, Void> {
+    private static class RefreshImagesTask extends AsyncTask<Void, Void, Void> {
         private final static String TAG = "ImageDownloader";
+
+        private AsyncTaskListener mListener;
+
+        public interface AsyncTaskListener {
+            void onAsyncTaskFinished();
+        }
+
+        void setListener(AsyncTaskListener listener) {
+            this.mListener = listener;
+        }
 
         @Override
         protected Void doInBackground(Void... arg0) {
-            if (NetworkNotificationUtils.checkForNetworkErrors(Instrument2Activity.this)) {
+            if (NetworkNotificationUtils.checkForNetworkErrors(AppUtil.getContext())) {
                 downloadImages();
             }
             return null;
@@ -227,22 +283,13 @@ public class Instrument2Activity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Void param) {
-            List<Instrument> instruments = Instrument.getAllProjectInstruments(getProjectId());
-            for (int k = 0; k < instruments.size(); k++) {
-                new InstrumentSanitizerTask().execute(instruments.get(k),
-                        (k == instruments.size() - 1));
-            }
-            if (instruments.size() == 0) {
-                if (!Instrument2Activity.this.isFinishing() && mProgressDialog != null &&
-                        mProgressDialog.isShowing()) {
-                    mProgressDialog.dismiss();
-                }
-            }
+            super.onPostExecute(param);
+            mListener.onAsyncTaskFinished();
         }
 
         private void downloadImages() {
             ActiveRecordCloudSync.setAccessToken(AppUtil.getAdminSettingsInstance().getApiKey());
-            ActiveRecordCloudSync.setVersionCode(AppUtil.getVersionCode(Instrument2Activity.this));
+            ActiveRecordCloudSync.setVersionCode(AppUtil.getVersionCode(AppUtil.getContext()));
 
             for (Image img : Image.getAll()) {
                 String[] imageUrl = img.getPhotoUrl().split("/");
@@ -254,13 +301,13 @@ public class Instrument2Activity extends AppCompatActivity {
                 try {
                     byte[] imageBytes = getUrlBytes(url);
                     if (imageBytes != null) {
-                        fileWriter = Instrument2Activity.this.openFileOutput(filename, Context
-                                .MODE_PRIVATE);
+                        fileWriter = AppUtil.getContext().openFileOutput(filename,
+                                Context.MODE_PRIVATE);
                         fileWriter.write(imageBytes);
                         img.setBitmapPath(filename);
                         img.save();
                     }
-                    if (BuildConfig.DEBUG) Log.i(TAG, "image saved in " + filename);
+                    if (BuildConfig.DEBUG) Log.i(TAG, "Image saved in " + filename);
                 } catch (IOException e) {
                     if (BuildConfig.DEBUG) Log.e(TAG, "IOException ", e);
                 } finally {
@@ -294,10 +341,18 @@ public class Instrument2Activity extends AppCompatActivity {
                 connection.disconnect();
             }
         }
-
     }
 
-    private class InstrumentSanitizerTask extends AsyncTask<Object, Void, Boolean> {
+    private static class InstrumentSanitizerTask extends AsyncTask<Object, Void, Boolean> {
+        private AsyncTaskListener mListener;
+
+        public interface AsyncTaskListener {
+            void onAsyncTaskFinished(Boolean last);
+        }
+
+        void setListener(AsyncTaskListener listener) {
+            this.mListener = listener;
+        }
 
         @Override
         protected Boolean doInBackground(Object... params) {
@@ -307,14 +362,8 @@ public class Instrument2Activity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Boolean last) {
-            AppUtil.getAdminSettingsInstance().setLastSyncTime(ActiveRecordCloudSync
-                    .getLastSyncTime());
-            AppUtil.orderInstrumentsSections();
-            mFragmentPagerAdapter.getInstrumentViewPagerFragment().refreshRecyclerView();
-            if (!Instrument2Activity.this.isFinishing() && mProgressDialog != null &&
-                    mProgressDialog.isShowing()) {
-                mProgressDialog.dismiss();
-            }
+            super.onPostExecute(last);
+            mListener.onAsyncTaskFinished(last);
         }
     }
 
