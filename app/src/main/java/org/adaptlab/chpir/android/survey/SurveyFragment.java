@@ -545,6 +545,7 @@ public class SurveyFragment extends Fragment {
     }
 
     private void refreshUIComponents() {
+        if (!isAdded()) return;
         hideSoftInputWindow();
         createQuestionFragments();
         hideQuestionsInDisplay();
@@ -553,10 +554,15 @@ public class SurveyFragment extends Fragment {
     }
 
     private void hideSoftInputWindow() {
-        InputMethodManager inputMethodManager = (InputMethodManager) getActivity()
-                .getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken
-                (), 0);
+        SurveyActivity activity = (SurveyActivity) getActivity();
+        if (activity != null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) activity
+                    .getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (inputMethodManager != null && activity.getCurrentFocus() != null) {
+                inputMethodManager.hideSoftInputFromWindow(
+                        activity.getCurrentFocus().getWindowToken(), 0);
+            }
+        }
     }
 
     private void moveToNextDisplay() {

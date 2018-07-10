@@ -1,8 +1,10 @@
 package org.adaptlab.chpir.android.survey.viewpagerfragments;
 
 import android.app.ActivityOptions;
-import android.content.Context;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -27,6 +29,7 @@ import org.adaptlab.chpir.android.survey.SurveyActivity;
 import org.adaptlab.chpir.android.survey.SurveyFragment;
 import org.adaptlab.chpir.android.survey.models.Survey;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
+import org.adaptlab.chpir.android.survey.utils.looper.ItemTouchHelperExtension;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -59,24 +62,40 @@ public class SurveyViewPagerFragment extends Fragment {
     }
 
     private void setSurveyLeftSwipe() {
-        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper
-                .SimpleCallback(0, ItemTouchHelper.LEFT) {
-            // No support for drag & drop
-            @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
-                                  RecyclerView.ViewHolder target) {
-                return false;
-            }
+        ItemTouchHelperExtension.Callback mCallback = new ItemTouchHelperCallback();
+        ItemTouchHelperExtension mItemTouchHelper = new ItemTouchHelperExtension(mCallback);
+        mItemTouchHelper.attachToRecyclerView(mRecyclerView);
+    }
 
-            @Override
-            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                SurveyAdapter surveyAdapter = (SurveyAdapter) mRecyclerView.getAdapter();
-                surveyAdapter.remove(viewHolder.getAdapterPosition());
-            }
+    private class ItemTouchHelperCallback extends ItemTouchHelperExtension.Callback {
 
-        };
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
-        itemTouchHelper.attachToRecyclerView(mRecyclerView);
+        @Override
+        public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+            return makeMovementFlags(ItemTouchHelper.UP|ItemTouchHelper.DOWN, ItemTouchHelper.START);
+        }
+
+        @Override
+        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+            return false;
+        }
+
+        @Override
+        public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {}
+
+        @Override
+        public boolean isLongPressDragEnabled() {
+            return true;
+        }
+
+        @Override
+        public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+            if (dY != 0 && dX == 0) super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            SurveyViewHolder holder = (SurveyViewHolder) viewHolder;
+            if (dX < -holder.mActionContainer.getWidth()) {
+                dX = -holder.mActionContainer.getWidth();
+            }
+            holder.mViewContent.setTranslationX(dX);
+        }
     }
 
     private class SurveyAdapter extends RecyclerView.Adapter<SurveyViewHolder> {
@@ -138,15 +157,62 @@ public class SurveyViewPagerFragment extends Fragment {
         @NonNull
         @Override
         public SurveyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            Context context = parent.getContext();
-            LayoutInflater inflater = LayoutInflater.from(context);
-            View surveyView = inflater.inflate(R.layout.list_item_survey, parent, false);
+            View surveyView = getLayoutInflater().inflate(R.layout.list_item_survey_background, parent, false);
             return new SurveyViewHolder(surveyView);
         }
 
         @Override
-        public void onBindViewHolder(@NonNull SurveyViewHolder viewHolder, int position) {
+        public void onBindViewHolder(@NonNull final SurveyViewHolder viewHolder, int position) {
             viewHolder.setSurvey(mSurveys.get(position));
+            setSurveyDeleteAction(viewHolder);
+            setSurveyLaunchAction(viewHolder);
+        }
+
+        private void setSurveyLaunchAction(@NonNull final SurveyViewHolder viewHolder) {
+            viewHolder.mViewContent.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Survey survey = mSurveys.get(viewHolder.getAdapterPosition());
+                    if (survey != null && survey.getInstrument().loaded()) {
+                        Intent i = new Intent(getActivity(), SurveyActivity.class);
+                        i.putExtra(SurveyFragment.EXTRA_INSTRUMENT_ID,
+                                survey.getInstrument().getRemoteId());
+                        i.putExtra(SurveyFragment.EXTRA_SURVEY_ID, survey.getId());
+                        i.putExtra(SurveyFragment.EXTRA_QUESTION_NUMBER,
+                                survey.getLastQuestion().getNumberInInstrument() - 1);
+                        i.putExtra(SurveyFragment.EXTRA_AUTHORIZE_SURVEY,
+                                ((Instrument2Activity) getActivity()).isAuthorizeSurvey());
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            startActivity(i, ActivityOptions.makeSceneTransitionAnimation
+                                    (getActivity()).toBundle());
+                        } else {
+                            startActivity(i);
+                        }
+                    }
+                }
+            });
+        }
+
+        private void setSurveyDeleteAction(@NonNull final SurveyViewHolder viewHolder) {
+            viewHolder.mActionContainer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    new AlertDialog.Builder(getActivity())
+                            .setTitle(R.string.delete_survey_title)
+                            .setMessage(R.string.delete_survey_message)
+                            .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    remove(viewHolder.getAdapterPosition());
+                                }
+                            })
+                            .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    notifyItemChanged(viewHolder.getAdapterPosition());
+                                }
+                            })
+                            .show();
+                }
+            });
         }
 
         @Override
@@ -159,35 +225,14 @@ public class SurveyViewPagerFragment extends Fragment {
     private class SurveyViewHolder extends RecyclerView.ViewHolder {
         TextView surveyTextView;
         Survey mSurvey;
+        public View mViewContent;
+        public View mActionContainer;
 
         SurveyViewHolder(final View itemView) {
             super(itemView);
             surveyTextView = itemView.findViewById(R.id.surveyProperties);
-            setOnClickListener(itemView);
-        }
-
-        private void setOnClickListener(View itemView) {
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mSurvey != null && mSurvey.getInstrument().loaded()) {
-                        Intent i = new Intent(getActivity(), SurveyActivity.class);
-                        i.putExtra(SurveyFragment.EXTRA_INSTRUMENT_ID,
-                                mSurvey.getInstrument().getRemoteId());
-                        i.putExtra(SurveyFragment.EXTRA_SURVEY_ID, mSurvey.getId());
-                        i.putExtra(SurveyFragment.EXTRA_QUESTION_NUMBER,
-                                mSurvey.getLastQuestion().getNumberInInstrument() - 1);
-                        i.putExtra(SurveyFragment.EXTRA_AUTHORIZE_SURVEY,
-                                ((Instrument2Activity) getActivity()).isAuthorizeSurvey());
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            startActivity(i, ActivityOptions.makeSceneTransitionAnimation
-                                    (getActivity()).toBundle());
-                        } else {
-                            startActivity(i);
-                        }
-                    }
-                }
-            });
+            mViewContent = itemView.findViewById(R.id.list_item_survey_main_content);
+            mActionContainer = itemView.findViewById(R.id.list_item_survey_action_container);
         }
 
         public void setSurvey(Survey survey) {

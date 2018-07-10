@@ -160,8 +160,8 @@ public class InstrumentFragment extends ListFragment {
 
             private void showDeleteWarning(final CursorAdapter adapter) {
                 new AlertDialog.Builder(getActivity())
-                        .setTitle(R.string.delete_title)
-                        .setMessage(R.string.delete_message)
+                        .setTitle(R.string.delete_survey_title)
+                        .setMessage(R.string.delete_survey_message)
                         .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 if (adapter == mSurveyAdapter) {
@@ -687,7 +687,7 @@ public class InstrumentFragment extends ListFragment {
 
         @Override
         public View newView(Context context, Cursor cursor, ViewGroup parent) {
-            return LayoutInflater.from(context).inflate(R.layout.list_item_survey, parent, false);
+            return LayoutInflater.from(context).inflate(R.layout.list_item_survey_foreground, parent, false);
         }
 
 

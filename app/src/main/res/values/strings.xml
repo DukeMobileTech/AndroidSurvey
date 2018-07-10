@@ -87,8 +87,8 @@
     <string name="record_survey_location">Record Survey Location</string>
     <string name="event_log_sent_survey">Sent %1$s for %2$s.</string>
     <string name="delete">Delete</string>
-    <string name="delete_title">Delete Selected Items?</string>
-    <string name="delete_message">You will not be able to recover them once deleted!</string>
+    <string name="delete_survey_title">Delete Selected Survey</string>
+    <string name="delete_survey_message">You will not be able to recover the survey once deleted!</string>
     <string name="skipped_questions">Unanswered Questions</string>
     <string name="proceed">Continue</string>
     <string name="section_number_of_questions">Number of questions in this section</string>

@@ -85,8 +85,8 @@
     <string name="record_survey_location">Record Survey Location</string>
     <string name="event_log_sent_survey">Sent %1$s for %2$s.</string>
     <string name="delete">Futa</string>
-    <string name="delete_title">Futa vitu vilivyochaguliwa?</string>
-    <string name="delete_message">Hauwezi kuvirejesha vikishafutwa!</string>
+    <string name="delete_survey_title">Futa vitu vilivyochaguliwa?</string>
+    <string name="delete_survey_message">Hauwezi kuvirejesha vikishafutwa!</string>
     <string name="skipped_questions">Maswali ambayo haijajibiwa</string>
     <string name="proceed">Endelea</string>
     <string name="section_number_of_questions">Number of questions in this section</string>
@@ -165,5 +165,5 @@
     <string name="api_endpoint_instructions">Manually fill in the details in the API Endpoint Settings section or use the button below to fetch them.</string>
     <string name="download_api_endpoint_settings">Download API Endpoint Settings</string>
     <string name="device_language">Device Language</string>
-    <string name="language">Language</string>
+    <string name="language">Lugha</string>
 </resources>

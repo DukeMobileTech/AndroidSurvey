@@ -85,8 +85,8 @@
     <string name="record_survey_location">记录调查地点</string>
     <string name="event_log_sent_survey">已为%2$s发送%1$s.</string>
     <string name="delete">删除</string>
-    <string name="delete_title">是否删除所选选项?</string>
-    <string name="delete_message">删除后数据不可恢复！</string>
+    <string name="delete_survey_title">是否删除所选选项?</string>
+    <string name="delete_survey_message">删除后数据不可恢复！</string>
     <string name="skipped_questions">待回答问题</string>
     <string name="proceed">继续</string>
     <string name="section_number_of_questions">本部分问题数量</string>
