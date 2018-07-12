@@ -192,8 +192,7 @@ public class Instrument2Activity extends AppCompatActivity {
                                         AppUtil.getAdminSettingsInstance().setLastSyncTime(
                                                 ActiveRecordCloudSync.getLastSyncTime());
                                         AppUtil.orderInstrumentsSections();
-                                        mFragmentPagerAdapter.getInstrumentViewPagerFragment()
-                                                .refreshRecyclerView();
+                                        refreshInstrumentsView();
                                         dismissProgressDialog();
                                     }
                                 }
@@ -209,6 +208,13 @@ public class Instrument2Activity extends AppCompatActivity {
             }
         });
         asyncTask.execute();
+    }
+
+    private void refreshInstrumentsView() {
+        if (mFragmentPagerAdapter != null &&
+                mFragmentPagerAdapter.getInstrumentViewPagerFragment() != null) {
+            mFragmentPagerAdapter.getInstrumentViewPagerFragment().refreshRecyclerView();
+        }
     }
 
     private void showProgressDialog() {
