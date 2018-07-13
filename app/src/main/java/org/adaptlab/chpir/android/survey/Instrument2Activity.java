@@ -16,31 +16,23 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
+import org.adaptlab.chpir.android.activerecordcloudsync.HttpUtil;
 import org.adaptlab.chpir.android.activerecordcloudsync.NetworkNotificationUtils;
 import org.adaptlab.chpir.android.survey.models.AdminSettings;
 import org.adaptlab.chpir.android.survey.models.Image;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.Project;
-import org.adaptlab.chpir.android.survey.tasks.SendResponsesTask;
 import org.adaptlab.chpir.android.survey.tasks.SetScoreUnitOrderingQuestionTask;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.utils.LocaleManager;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.List;
-import java.util.UUID;
 
 import static org.adaptlab.chpir.android.survey.utils.AppUtil.getProjectId;
 
@@ -158,7 +150,7 @@ public class Instrument2Activity extends AppCompatActivity {
                 return true;
             case R.id.menu_item_refresh:
                 downloadInstruments();
-                new SendResponsesTask(this).execute();
+//                new SendResponsesTask(this).execute();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -282,7 +274,17 @@ public class Instrument2Activity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... arg0) {
             if (NetworkNotificationUtils.checkForNetworkErrors(AppUtil.getContext())) {
-                downloadImages();
+                ActiveRecordCloudSync.setAccessToken(AppUtil.getAdminSettingsInstance().getApiKey());
+                ActiveRecordCloudSync.setVersionCode(AppUtil.getVersionCode(AppUtil.getContext()));
+                NetworkNotificationUtils.showNotification(AppUtil.getContext(),
+                        android.R.drawable.stat_sys_download,
+                        R.string.sync_notification_text);
+                for (Image image : Image.getAll()) {
+                    HttpUtil.getFile(image);
+                }
+                NetworkNotificationUtils.showNotification(AppUtil.getContext(),
+                        android.R.drawable.stat_sys_download_done,
+                        R.string.sync_notification_complete_text);
             }
             return null;
         }
@@ -291,61 +293,6 @@ public class Instrument2Activity extends AppCompatActivity {
         protected void onPostExecute(Void param) {
             super.onPostExecute(param);
             mListener.onAsyncTaskFinished();
-        }
-
-        private void downloadImages() {
-            ActiveRecordCloudSync.setAccessToken(AppUtil.getAdminSettingsInstance().getApiKey());
-            ActiveRecordCloudSync.setVersionCode(AppUtil.getVersionCode(AppUtil.getContext()));
-
-            for (Image img : Image.getAll()) {
-                String[] imageUrl = img.getPhotoUrl().split("/");
-                String url = ActiveRecordCloudSync.getEndPoint() + "images/" + imageUrl[2] + "/"
-                        + ActiveRecordCloudSync.getParams();
-                if (BuildConfig.DEBUG) Log.i(TAG, "Image url: " + url);
-                String filename = UUID.randomUUID().toString() + ".jpg";
-                FileOutputStream fileWriter = null;
-                try {
-                    byte[] imageBytes = getUrlBytes(url);
-                    if (imageBytes != null) {
-                        fileWriter = AppUtil.getContext().openFileOutput(filename,
-                                Context.MODE_PRIVATE);
-                        fileWriter.write(imageBytes);
-                        img.setBitmapPath(filename);
-                        img.save();
-                    }
-                    if (BuildConfig.DEBUG) Log.i(TAG, "Image saved in " + filename);
-                } catch (IOException e) {
-                    if (BuildConfig.DEBUG) Log.e(TAG, "IOException ", e);
-                } finally {
-                    try {
-                        if (fileWriter != null) {
-                            fileWriter.close();
-                        }
-                    } catch (Exception e) {
-                        if (BuildConfig.DEBUG) Log.e(TAG, "Exception ", e);
-                    }
-                }
-            }
-        }
-
-        private byte[] getUrlBytes(String urlSpec) throws IOException {
-            URL url = new URL(urlSpec);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-            try {
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) return null;
-                InputStream in = connection.getInputStream();
-                int bytesRead = 0;
-                byte[] buffer = new byte[1024];
-                while ((bytesRead = in.read(buffer)) > 0) {
-                    out.write(buffer, 0, bytesRead);
-                }
-                out.close();
-                return out.toByteArray();
-            } finally {
-                connection.disconnect();
-            }
         }
     }
 

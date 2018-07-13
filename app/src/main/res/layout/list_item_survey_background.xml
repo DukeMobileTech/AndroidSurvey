@@ -21,6 +21,17 @@
             android:text="@string/delete"
             android:textColor="@android:color/white"/>
 
+        <TextView
+            android:id="@+id/list_item_survey_action_submit"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:background="@color/green"
+            android:gravity="center"
+            android:padding="12dp"
+            android:text="@string/submit"
+            android:textColor="@android:color/white"
+            android:visibility="gone"/>
+
     </LinearLayout>
 
     <include layout="@layout/list_item_survey_foreground"/>

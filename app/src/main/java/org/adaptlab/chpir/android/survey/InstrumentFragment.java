@@ -64,7 +64,6 @@ import org.adaptlab.chpir.android.survey.roster.RosterActivity;
 import org.adaptlab.chpir.android.survey.rules.InstrumentLaunchRule;
 import org.adaptlab.chpir.android.survey.rules.RuleBuilder;
 import org.adaptlab.chpir.android.survey.rules.RuleCallback;
-import org.adaptlab.chpir.android.survey.tasks.SendResponsesTask;
 import org.adaptlab.chpir.android.survey.tasks.SetScoreUnitOrderingQuestionTask;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.utils.FormatUtils;
@@ -422,7 +421,7 @@ public class InstrumentFragment extends ListFragment {
                 return true;
             case R.id.menu_item_refresh:
                 new RefreshInstrumentsTask().execute();
-                new SendResponsesTask(getActivity()).execute();
+//                new SendResponsesTask(getActivity()).execute();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

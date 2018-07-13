@@ -167,4 +167,6 @@
     <string name="download_api_endpoint_settings">Download API Endpoint Settings</string>
     <string name="device_language">Device Language</string>
     <string name="language">Language</string>
+    <string name="submit_survey">Submit Survey</string>
+    <string name="submit_survey_message">Once a survey has been submitted successfully, it will be deleted from the device.</string>
 </resources>

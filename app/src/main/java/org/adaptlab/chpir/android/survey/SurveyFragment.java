@@ -69,7 +69,6 @@ import org.adaptlab.chpir.android.survey.rules.InstrumentSurveyLimitPerMinuteRul
 import org.adaptlab.chpir.android.survey.rules.InstrumentSurveyLimitRule;
 import org.adaptlab.chpir.android.survey.rules.InstrumentTimingRule;
 import org.adaptlab.chpir.android.survey.rules.RuleBuilder;
-import org.adaptlab.chpir.android.survey.tasks.SendResponsesTask;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.utils.AuthUtils;
 import org.adaptlab.chpir.android.survey.utils.LocaleManager;
@@ -984,16 +983,9 @@ public class SurveyFragment extends Fragment {
         if (mInstrument.isScorable()) {
             new ScoreSurveyTask().execute(mSurvey);
         } else {
-            completeAndSendSurvey(mSurvey);
+            mSurvey.setAsComplete(true);
+            mSurvey.save();
             finishActivity();
-        }
-    }
-
-    private void completeAndSendSurvey(Survey survey) {
-        survey.setAsComplete(true);
-        survey.save();
-        if (survey.readyToSend()) {
-            new SendResponsesTask(getActivity()).execute();
         }
     }
 
@@ -1105,7 +1097,8 @@ public class SurveyFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Survey survey) {
-            completeAndSendSurvey(survey);
+            survey.setAsComplete(true);
+            survey.save();
             finishActivity();
         }
     }
