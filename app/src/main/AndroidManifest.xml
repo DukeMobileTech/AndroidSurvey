@@ -70,14 +70,8 @@
             android:authorities="org.adaptlab.chpir.android.survey"
             android:exported="false"/>
 
-        <service android:name="org.adaptlab.chpir.android.activerecordcloudsync.PollService"/>
         <service android:name="org.adaptlab.chpir.android.activerecordcloudsync.NotificationService"/>
 
-        <receiver android:name=".receivers.StartupReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-            </intent-filter>
-        </receiver>
         <receiver
             android:name=".receivers.SurveyLaunchReceiver"
             android:permission="org.adaptlab.chpir.android.survey.LAUNCH_SURVEY">

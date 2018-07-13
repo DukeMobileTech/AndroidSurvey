@@ -81,16 +81,16 @@ public class ActiveRecordCloudSync {
         NetworkNotificationUtils.showNotification(context, android.R.drawable.stat_sys_download_done, R.string.sync_notification_complete_text);
     }
 
-    public static void syncSendTables(Context context) {
-        NetworkNotificationUtils.showNotification(context, android.R.drawable.stat_sys_download, R.string.sync_notification_text);
-        for (Map.Entry<String, Class<? extends SendModel>> entry : mSendTables.entrySet()) {
-            if (AppUtil.DEBUG)
-                Log.i(TAG, "Syncing " + entry.getValue() + " to remote table " + entry.getKey());
-            HttpPushr httpPushr = new HttpPushr(entry.getKey(), entry.getValue(), context);
-            httpPushr.push();
-        }
-        NetworkNotificationUtils.showNotification(context, android.R.drawable.stat_sys_download_done, R.string.sync_notification_complete_text);
-    }
+//    public static void syncSendTables(Context context) {
+//        NetworkNotificationUtils.showNotification(context, android.R.drawable.stat_sys_download, R.string.sync_notification_text);
+//        for (Map.Entry<String, Class<? extends SendModel>> entry : mSendTables.entrySet()) {
+//            if (AppUtil.DEBUG)
+//                Log.i(TAG, "Syncing " + entry.getValue() + " to remote table " + entry.getKey());
+//            HttpPushr httpPushr = new HttpPushr(entry.getKey(), entry.getValue(), context);
+//            httpPushr.push();
+//        }
+//        NetworkNotificationUtils.showNotification(context, android.R.drawable.stat_sys_download_done, R.string.sync_notification_complete_text);
+//    }
 
     public static boolean isApiAvailable() {
         if (getPingAddress() == null) return false;

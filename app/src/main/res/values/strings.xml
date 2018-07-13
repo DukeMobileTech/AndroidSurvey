@@ -169,4 +169,6 @@
     <string name="language">Language</string>
     <string name="submit_survey">Submit Survey</string>
     <string name="submit_survey_message">Once a survey has been submitted successfully, it will be deleted from the device.</string>
+    <string name="start">Start</string>
+    <string name="end">End</string>
 </resources>

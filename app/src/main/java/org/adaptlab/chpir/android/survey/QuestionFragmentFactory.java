@@ -19,6 +19,7 @@ import org.adaptlab.chpir.android.survey.questionfragments.ListOfIntegerBoxesQue
 import org.adaptlab.chpir.android.survey.questionfragments.ListOfTextBoxesQuestionFragment;
 import org.adaptlab.chpir.android.survey.questionfragments.MonthAndYearQuestionFragment;
 import org.adaptlab.chpir.android.survey.questionfragments.PhoneNumberQuestionFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.RangeQuestionFragment;
 import org.adaptlab.chpir.android.survey.questionfragments.RatingQuestionFragment;
 import org.adaptlab.chpir.android.survey.questionfragments.RearPictureQuestionFragment;
 import org.adaptlab.chpir.android.survey.questionfragments.SelectMultipleImageQuestionFragment;
@@ -90,6 +91,8 @@ public class QuestionFragmentFactory {
             fragment = new GeoLocationFragment();
         } else if (Question.QuestionType.DROP_DOWN.toString().equals(type)) {
             fragment = new DropDownQuestionFragment();
+        } else if (Question.QuestionType.RANGE.toString().equals(type)) {
+            fragment = new RangeQuestionFragment();
         } else {
             // Return free response fragment if unknown question type
             // This should never happen
