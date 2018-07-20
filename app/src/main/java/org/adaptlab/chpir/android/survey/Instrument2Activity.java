@@ -1,7 +1,6 @@
 package org.adaptlab.chpir.android.survey;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -39,7 +38,7 @@ import static org.adaptlab.chpir.android.survey.utils.AppUtil.getProjectId;
 public class Instrument2Activity extends AppCompatActivity {
     public final static String EXTRA_AUTHORIZE_SURVEY =
             "org.adaptlab.chpir.android.survey.authorize_survey_bool";
-    private final static int DEFAULT_SETTINGS_CODE = 101;
+    private final static String TAG = "Instrument2Activity";
     private ProgressDialog mProgressDialog;
     private FragmentPagerAdapter mFragmentPagerAdapter;
     private boolean mAuthorizeSurvey;
@@ -71,8 +70,7 @@ public class Instrument2Activity extends AppCompatActivity {
         if (TextUtils.isEmpty(adminSettings.getApiDomainName()) || TextUtils.isEmpty
                 (adminSettings.getApiVersion()) || TextUtils.isEmpty(adminSettings.getProjectId()
         ) || TextUtils.isEmpty(adminSettings.getApiKey())) {
-            Intent i = new Intent(this, AdminActivity.class);
-            startActivityForResult(i, DEFAULT_SETTINGS_CODE);
+            startActivity(new Intent(this, AdminActivity.class));
         }
     }
 
@@ -92,13 +90,6 @@ public class Instrument2Activity extends AppCompatActivity {
             }
         }
         return true;
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == Activity.RESULT_OK && requestCode == DEFAULT_SETTINGS_CODE) {
-            downloadInstruments();
-        }
     }
 
     @Override
@@ -150,7 +141,6 @@ public class Instrument2Activity extends AppCompatActivity {
                 return true;
             case R.id.menu_item_refresh:
                 downloadInstruments();
-//                new SendResponsesTask(this).execute();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -184,7 +174,6 @@ public class Instrument2Activity extends AppCompatActivity {
                                         AppUtil.getAdminSettingsInstance().setLastSyncTime(
                                                 ActiveRecordCloudSync.getLastSyncTime());
                                         AppUtil.orderInstrumentsSections();
-                                        refreshInstrumentsView();
                                         dismissProgressDialog();
                                     }
                                 }
@@ -206,6 +195,9 @@ public class Instrument2Activity extends AppCompatActivity {
         if (mFragmentPagerAdapter != null &&
                 mFragmentPagerAdapter.getInstrumentViewPagerFragment() != null) {
             mFragmentPagerAdapter.getInstrumentViewPagerFragment().refreshRecyclerView();
+        } else {
+            startActivity(new Intent(this, Instrument2Activity.class));
+            finish();
         }
     }
 
@@ -221,6 +213,7 @@ public class Instrument2Activity extends AppCompatActivity {
 
     private void dismissProgressDialog() {
         if (mProgressDialog != null && mProgressDialog.isShowing()) mProgressDialog.dismiss();
+        refreshInstrumentsView();
     }
 
     private static class RefreshInstrumentsTask extends AsyncTask<Void, Void, Integer> {

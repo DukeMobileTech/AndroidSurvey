@@ -1,6 +1,5 @@
 package org.adaptlab.chpir.android.survey;
 
-import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -333,17 +332,45 @@ public class AdminFragment extends Fragment {
             final Button login = mDialog.findViewById(R.id.login_button);
             login.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    new RemoteAuthenticationTask().execute(endpoint, username.getText().toString(), password.getText().toString());
+                    RemoteAuthenticationTask task = new RemoteAuthenticationTask();
+                    task.setListener(new RemoteAuthenticationTask.AsyncTaskListener() {
+                        @Override
+                        public void onAsyncTaskFinished(String param) {
+                            if (param == null || param.equals(HttpURLConnection.HTTP_UNAUTHORIZED
+                                    + "")) {
+                                Toast.makeText(getActivity(), R.string.invalid_user_credentials,
+                                        Toast.LENGTH_LONG).show();
+                            } else {
+                                AdminSettings.getInstance().setApiKey(param);
+                                mApiKeyEditText.setText(param);
+                                if (mDialog != null) mDialog.dismiss();
+                                saveAdminSettings();
+                                finishActivity();
+                            }
+                        }
+                    });
+                    task.execute(endpoint, username.getText().toString(),
+                            password.getText().toString());
                 }
             });
         }
     }
 
-    private class RemoteAuthenticationTask extends AsyncTask<String, Void, String> {
+    private static class RemoteAuthenticationTask extends AsyncTask<String, Void, String> {
         private final String TAG = "AdminFragment.RemoteAuthenticationTask";
         private String uri;
         private String userName;
         private String password;
+
+        private AsyncTaskListener mListener;
+
+        public interface AsyncTaskListener {
+            void onAsyncTaskFinished(String param);
+        }
+
+        void setListener(AsyncTaskListener listener) {
+            this.mListener = listener;
+        }
 
         @Override
         protected String doInBackground(String... params) {
@@ -412,17 +439,8 @@ public class AdminFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String param) {
-            if (param == null || param.equals(HttpURLConnection.HTTP_UNAUTHORIZED + "")) {
-                Toast.makeText(getActivity(), R.string.invalid_user_credentials, Toast.LENGTH_LONG).show();
-            } else {
-                AdminSettings.getInstance().setApiKey(param);
-                mApiKeyEditText.setText(param);
-                if (mDialog != null) mDialog.dismiss();
-                saveAdminSettings();
-                Intent i = new Intent();
-                getActivity().setResult(Activity.RESULT_OK, i);
-                finishActivity();
-            }
+            super.onPostExecute(param);
+            mListener.onAsyncTaskFinished(param);
         }
 
     }

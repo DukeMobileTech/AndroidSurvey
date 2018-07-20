@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">iSEE CHPIR</string>
+    <string name="app_name">iSEE</string>
     <string name="start_survey">Start Survey</string>
     <string name="survey_title_label">Choose instrument</string>
     <string name="next_button">Next</string>
