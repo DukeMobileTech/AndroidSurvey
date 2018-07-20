@@ -144,12 +144,11 @@
         android:layout_marginTop="10dp"
         android:gravity="center_horizontal"
         android:textColor="@color/red"
-        android:visibility="invisible"/>
+        android:visibility="gone"/>
 
     <View
         android:layout_width="fill_parent"
         android:layout_height="2dp"
-        android:layout_marginBottom="10dp"
         android:background="?android:attr/dividerHorizontal"/>
 
 </LinearLayout>

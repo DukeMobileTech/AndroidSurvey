@@ -36,7 +36,12 @@ public class QuestionFragmentFactory {
     private static final String TAG = "QuestionFragmentFactory";
 
     public static Fragment createQuestionFragment(Question question) {
-        String type = question.getQuestionType().toString();
+        String type;
+        if (question.getQuestionType() == null) {
+            type = Question.QuestionType.FREE_RESPONSE.toString();
+        } else {
+            type = question.getQuestionType().toString();
+        }
         Fragment fragment;
 
         if (Question.QuestionType.SELECT_ONE.toString().equals(type)) {

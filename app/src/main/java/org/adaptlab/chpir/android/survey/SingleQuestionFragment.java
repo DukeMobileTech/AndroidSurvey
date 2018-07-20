@@ -2,7 +2,6 @@ package org.adaptlab.chpir.android.survey;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -213,8 +212,6 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         }
     }
 
-//    protected abstract void unSetResponse();
-
     /*
      * This will remove the focus of the input as the survey is
      * traversed.  If this is not called, then it will be possible
@@ -237,10 +234,6 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         }
     }
 
-//    protected abstract void createQuestionComponent(ViewGroup questionComponent);
-//
-//    protected abstract void deserialize(String responseText);
-
     protected SurveyFragment getSurveyFragment() {
         return mSurveyFragment;
     }
@@ -261,10 +254,6 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         return mInstrument;
     }
 
-    public String getSpecialResponse() {
-        return (mResponse == null) ? "" : mResponse.getSpecialResponse();
-    }
-
     public void setSpecialResponse(String specialResponse) {
         if (mResponse != null) {
             mResponse.setSpecialResponse(specialResponse);
@@ -277,17 +266,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
             removeTextFocus();
             setSpecialResponseSkips();
             refreshFollowUpQuestion();
-        }
-    }
-
-    public void unSetAllResponses() {
-        unSetResponse();
-        if (mResponse != null) {
-            mResponse.setSpecialResponse("");
-            mResponse.setOtherResponse("");
-        }
-        if (mSpecialResponses != null) {
-            mSpecialResponses.clearCheck();
+            animateValidationTextView(true);
         }
     }
 
@@ -416,8 +395,6 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         }
     }
 
-//    protected abstract String serialize();
-
     /*
      * Display warning to user if response does not match regular
      * expression in question.  Disable next button if not valid.
@@ -431,11 +408,6 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         } else {
             animateValidationTextView(false);
         }
-
-        // Refresh options menu to reflect response validation status.
-        if (isAdded()) {
-            ActivityCompat.invalidateOptionsMenu(getActivity());
-        }
     }
 
     private void animateValidationTextView(boolean valid) {
@@ -444,14 +416,14 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         if (valid) {
             if (mValidationTextView.getVisibility() == TextView.VISIBLE)
                 animation = new AlphaAnimation(1, 0);
-            mValidationTextView.setVisibility(TextView.INVISIBLE);
+            mValidationTextView.setVisibility(TextView.GONE);
         } else {
             animation = new AlphaAnimation(0, 1);
             mValidationTextView.setVisibility(TextView.VISIBLE);
             if (mQuestion.getRegExValidationMessage() != null)
-                mValidationTextView.setText(mQuestion.getRegExValidationMessage());
+                mValidationTextView.setText(styleTextWithHtml(mQuestion.getRegExValidationMessage()));
             else
-                mValidationTextView.setText(R.string.not_valid_response);
+                mValidationTextView.setText(styleTextWithHtml(getString(R.string.not_valid_response)));
         }
 
         animation.setDuration(1000);
