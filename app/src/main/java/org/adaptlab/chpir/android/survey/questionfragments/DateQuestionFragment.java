@@ -8,6 +8,7 @@ import android.widget.LinearLayout;
 
 import org.adaptlab.chpir.android.survey.utils.FormatUtils;
 import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
+import org.adaptlab.chpir.android.survey.views.ScrollableDatePicker;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -19,7 +20,7 @@ public class DateQuestionFragment extends SingleQuestionFragment {
     private DatePicker mDatePicker;
 
     protected DatePicker beforeAddViewHook(ViewGroup component) {
-        DatePicker datePicker = new DatePicker(getActivity());
+        DatePicker datePicker = new ScrollableDatePicker(getActivity());
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT);
         params.gravity = Gravity.CENTER;
@@ -29,8 +30,8 @@ public class DateQuestionFragment extends SingleQuestionFragment {
         datePicker.init(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH),
                 new OnDateChangedListener() {
                     @Override
-                    public void onDateChanged(DatePicker view, int newYear,
-                                              int newMonth, int newDay) {
+                    public void onDateChanged(DatePicker view, int newYear, int newMonth,
+                                              int newDay) {
                         mDay = newDay;
                         mMonth = newMonth;
                         mYear = newYear;
