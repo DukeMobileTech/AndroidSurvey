@@ -29,6 +29,7 @@ import org.adaptlab.chpir.android.survey.questionfragments.SelectOneImageQuestio
 import org.adaptlab.chpir.android.survey.questionfragments.SelectOneQuestionFragment;
 import org.adaptlab.chpir.android.survey.questionfragments.SelectOneWriteOtherQuestionFragment;
 import org.adaptlab.chpir.android.survey.questionfragments.SliderQuestionFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.SumOfPartsQuestionFragment;
 import org.adaptlab.chpir.android.survey.questionfragments.TimeQuestionFragment;
 import org.adaptlab.chpir.android.survey.questionfragments.YearQuestionFragment;
 
@@ -98,6 +99,8 @@ public class QuestionFragmentFactory {
             fragment = new DropDownQuestionFragment();
         } else if (Question.QuestionType.RANGE.toString().equals(type)) {
             fragment = new RangeQuestionFragment();
+        } else if (Question.QuestionType.SUM_OF_PARTS.toString().equals(type)) {
+            fragment = new SumOfPartsQuestionFragment();
         } else {
             // Return free response fragment if unknown question type
             // This should never happen

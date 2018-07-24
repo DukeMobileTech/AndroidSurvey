@@ -171,4 +171,5 @@
     <string name="submit_survey_message">Once a survey has been submitted successfully, it will be deleted from the device.</string>
     <string name="start">Start</string>
     <string name="end">End</string>
+    <string name="sum_of_parts">Total Sum of Parts</string>
 </resources>

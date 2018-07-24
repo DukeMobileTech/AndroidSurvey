@@ -25,7 +25,7 @@ import java.util.ArrayList;
 
 public abstract class ListOfItemsQuestionFragment extends SingleQuestionFragment {
     private static final String TAG = "ListOfItemsQuestionFragment";
-    private ArrayList<EditText> mResponses;
+    public ArrayList<EditText> mResponses;
 
     protected abstract EditText createEditText();
 

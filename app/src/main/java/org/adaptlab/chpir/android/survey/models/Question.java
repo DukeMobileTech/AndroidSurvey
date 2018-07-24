@@ -79,6 +79,8 @@ public class Question extends ReceiveModel {
     private Long mRemoteSpecialOptionSetId;
     @Column(name = "TableIdentifier")
     private String mTableIdentifier;
+    @Column(name = "SumOfParts")
+    private Double mSumOfParts;
 
     public Question() {
         super();
@@ -447,6 +449,7 @@ public class Question extends ReceiveModel {
             question.setRemoteOptionSetId(jsonObject.optLong("option_set_id"));
             question.setRemoteSpecialOptionSetId(jsonObject.optLong("special_option_set_id"));
             question.setTableIdentifier(jsonObject.getString("table_identifier"));
+            question.setSumOfParts(jsonObject.optDouble("sum_of_parts"));
             question.save();
 
             // Generate translations
@@ -764,12 +767,20 @@ public class Question extends ReceiveModel {
         return mTableIdentifier;
     }
 
-    public void setTableIdentifier(String mTableIdentifier) {
-        this.mTableIdentifier = mTableIdentifier;
+    private void setTableIdentifier(String mTableIdentifier) {
+        mTableIdentifier = mTableIdentifier;
+    }
+
+    public Double getSumOfParts() {
+        return mSumOfParts;
+    }
+
+    private void setSumOfParts(Double sumOfParts) {
+        mSumOfParts = sumOfParts;
     }
 
     public enum QuestionType {
-        SELECT_ONE, SELECT_MULTIPLE, SELECT_ONE_WRITE_OTHER, SELECT_MULTIPLE_WRITE_OTHER, FREE_RESPONSE, SLIDER, FRONT_PICTURE, REAR_PICTURE, DATE, RATING, TIME, LIST_OF_TEXT_BOXES, INTEGER, EMAIL_ADDRESS, DECIMAL_NUMBER, INSTRUCTIONS, MONTH_AND_YEAR, YEAR, PHONE_NUMBER, ADDRESS, SELECT_ONE_IMAGE, SELECT_MULTIPLE_IMAGE, LIST_OF_INTEGER_BOXES, LABELED_SLIDER, GEO_LOCATION, DROP_DOWN, RANGE
+        SELECT_ONE, SELECT_MULTIPLE, SELECT_ONE_WRITE_OTHER, SELECT_MULTIPLE_WRITE_OTHER, FREE_RESPONSE, SLIDER, FRONT_PICTURE, REAR_PICTURE, DATE, RATING, TIME, LIST_OF_TEXT_BOXES, INTEGER, EMAIL_ADDRESS, DECIMAL_NUMBER, INSTRUCTIONS, MONTH_AND_YEAR, YEAR, PHONE_NUMBER, ADDRESS, SELECT_ONE_IMAGE, SELECT_MULTIPLE_IMAGE, LIST_OF_INTEGER_BOXES, LABELED_SLIDER, GEO_LOCATION, DROP_DOWN, RANGE, SUM_OF_PARTS
     }
 
     public static boolean selectOneVariant(QuestionType type) {
@@ -786,7 +797,12 @@ public class Question extends ReceiveModel {
 
     public boolean isTextEntryQuestionType() {
         QuestionType type = getQuestionType();
-        return (type == QuestionType.FREE_RESPONSE || type == QuestionType.LIST_OF_INTEGER_BOXES || type == QuestionType.LIST_OF_TEXT_BOXES || type == QuestionType.INTEGER || type == QuestionType.EMAIL_ADDRESS || type == QuestionType.DECIMAL_NUMBER || type == QuestionType.INSTRUCTIONS || type == QuestionType.PHONE_NUMBER || type == QuestionType.ADDRESS);
+        return (type == QuestionType.FREE_RESPONSE || type == QuestionType.LIST_OF_INTEGER_BOXES
+                || type == QuestionType.LIST_OF_TEXT_BOXES || type == QuestionType.INTEGER
+                || type == QuestionType.EMAIL_ADDRESS || type == QuestionType.DECIMAL_NUMBER
+                || type == QuestionType.INSTRUCTIONS || type == QuestionType.PHONE_NUMBER
+                || type == QuestionType.ADDRESS || type == QuestionType.RANGE
+                || type == QuestionType.SUM_OF_PARTS);
     }
 
 }
