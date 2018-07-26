@@ -23,7 +23,6 @@ public class Response extends SendModel {
     public static final String RF = "RF";
     public static final String NA = "NA";
     public static final String DK = "DK";
-    public static final String LOGICAL_SKIP = "LOGICAL_SKIP";
     public static final String BLANK = "";
 
     @Column(name = "Question")
@@ -70,8 +69,12 @@ public class Response extends SendModel {
      * declare it a match and return true.
      */
     public boolean isValid() {
-        return mQuestion.getRegExValidation() == null || getText().matches(mQuestion
-                .getRegExValidation());
+        if (mQuestion.getValidation() == null) return true;
+        if (mQuestion.getValidation().getValidationType().equals(Validation.Type.REGEX.toString())) {
+            return getText().matches(mQuestion.getValidation().getValidationText());
+        }
+        // TODO: 7/25/18 validate other types
+        return false;
     }
 
     /*

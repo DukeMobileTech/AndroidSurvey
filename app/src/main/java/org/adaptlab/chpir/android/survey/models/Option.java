@@ -75,7 +75,7 @@ public class Option extends ReceiveModel {
         return mText;
     }
 
-    public OptionTranslation activeTranslation(Instrument instrument) {
+    private OptionTranslation activeTranslation(Instrument instrument) {
         if (instrument.activeTranslation() == null) return null;
         return new Select().from(OptionTranslation.class)
                 .where("InstrumentTranslation = ? AND Option = ?",
@@ -101,10 +101,7 @@ public class Option extends ReceiveModel {
         return AppUtil.getDeviceLanguage();
     }
 
-    /*
-     * Relationships
-     */
-    public List<OptionTranslation> translations() {
+    private List<OptionTranslation> translations() {
         return getMany(OptionTranslation.class, "Option");
     }
 
@@ -167,7 +164,7 @@ public class Option extends ReceiveModel {
                 }
             }
         } catch (JSONException je) {
-            Log.e(TAG, "Error parsing object json", je);
+            if (AppUtil.DEBUG) Log.e(TAG, "Error parsing object json", je);
         }
     }
 

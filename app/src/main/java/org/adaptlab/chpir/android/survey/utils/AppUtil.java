@@ -60,6 +60,7 @@ import org.adaptlab.chpir.android.survey.models.Section;
 import org.adaptlab.chpir.android.survey.models.SectionTranslation;
 import org.adaptlab.chpir.android.survey.models.Skip;
 import org.adaptlab.chpir.android.survey.models.Survey;
+import org.adaptlab.chpir.android.survey.models.Validation;
 import org.adaptlab.chpir.android.survey.vendor.BCrypt;
 
 import java.util.List;
@@ -151,6 +152,7 @@ public class AppUtil {
         ActiveRecordCloudSync.addReceiveTable("projects", Project.class);
         ActiveRecordCloudSync.addReceiveTable("instruments", Instrument.class);
         ActiveRecordCloudSync.addReceiveTable("sections", Section.class);
+        ActiveRecordCloudSync.addReceiveTable("validations", Validation.class);
 //        ActiveRecordCloudSync.addReceiveTable("grids", Grid.class);
         ActiveRecordCloudSync.addReceiveTable("questions", Question.class);
         ActiveRecordCloudSync.addReceiveTable("options", Option.class);

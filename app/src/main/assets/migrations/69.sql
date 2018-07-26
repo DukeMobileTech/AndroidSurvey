@@ -1,1 +1,1 @@
-ALTER TABLE Questions ADD COLUMN SumOfParts DOUBLE;
+ALTER TABLE Questions ADD COLUMN ValidationId LONG;
