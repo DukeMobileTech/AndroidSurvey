@@ -39,7 +39,7 @@ public class MultipleSelectMultipleQuestionsFragment extends MultipleQuestionsFr
                 }
             }
         } else {
-            String[] listOfIndices = responseText.split(LIST_DELIMITER);
+            String[] listOfIndices = responseText.split(Response.LIST_DELIMITER);
             for (String index : listOfIndices) {
                 if (!index.equals("")) {
                     Integer indexInteger = Integer.parseInt(index);
@@ -160,7 +160,7 @@ public class MultipleSelectMultipleQuestionsFragment extends MultipleQuestionsFr
         }
         StringBuilder serialized = new StringBuilder();
         if (!response.getText().equals("")) {
-            String[] listOfIndices = response.getText().split(LIST_DELIMITER);
+            String[] listOfIndices = response.getText().split(Response.LIST_DELIMITER);
             Set<String> responses = new HashSet<>(Arrays.asList(listOfIndices));
             if (responses.contains(String.valueOf(checkedId)) && !isChecked) {
                 responses.remove(String.valueOf(checkedId));
@@ -171,7 +171,7 @@ public class MultipleSelectMultipleQuestionsFragment extends MultipleQuestionsFr
             for (String str : responses) {
                 serialized.append(str);
                 if (size < responses.size() - 1)
-                    serialized.append(LIST_DELIMITER);
+                    serialized.append(Response.LIST_DELIMITER);
                 size += 1;
             }
         } else {

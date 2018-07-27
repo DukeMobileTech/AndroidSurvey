@@ -6,6 +6,7 @@ import android.widget.CheckBox;
 
 import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
 import org.adaptlab.chpir.android.survey.models.Option;
+import org.adaptlab.chpir.android.survey.models.Response;
 
 import java.util.ArrayList;
 
@@ -49,7 +50,7 @@ public class SelectMultipleQuestionFragment extends SingleQuestionFragment {
         StringBuilder serialized = new StringBuilder();
         for (int i = 0; i < mResponseIndices.size(); i++) {
             serialized.append(mResponseIndices.get(i));
-            if (i < mResponseIndices.size() - 1) serialized.append(LIST_DELIMITER);
+            if (i < mResponseIndices.size() - 1) serialized.append(Response.LIST_DELIMITER);
         }
         return serialized.toString();
     }
@@ -63,7 +64,7 @@ public class SelectMultipleQuestionFragment extends SingleQuestionFragment {
                 }
             }
         } else {
-            String[] listOfIndices = responseText.split(LIST_DELIMITER);
+            String[] listOfIndices = responseText.split(Response.LIST_DELIMITER);
             for (String index : listOfIndices) {
                 if (!index.equals("")) {
                     Integer indexInteger = Integer.parseInt(index);

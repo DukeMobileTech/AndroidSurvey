@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import org.adaptlab.chpir.android.survey.models.Response;
 
 public abstract class QuestionFragment extends Fragment {
-    protected final static String LIST_DELIMITER = ",";
     protected SurveyFragment mSurveyFragment;
     protected abstract void unSetResponse();
     protected abstract void createQuestionComponent(ViewGroup questionComponent);

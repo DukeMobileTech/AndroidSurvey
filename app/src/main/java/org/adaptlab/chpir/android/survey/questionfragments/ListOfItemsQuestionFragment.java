@@ -14,6 +14,7 @@ import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.Option;
+import org.adaptlab.chpir.android.survey.models.Response;
 import org.apache.commons.codec.Charsets;
 import org.apache.commons.lang3.StringEscapeUtils;
 
@@ -31,7 +32,6 @@ public abstract class ListOfItemsQuestionFragment extends SingleQuestionFragment
 
     protected void createQuestionComponent(ViewGroup questionComponent) {
         mResponses = new ArrayList<>();
-//        int index = 0;
         for (Option option : getOptions()) {
             final TextView optionText = new TextView(getActivity());
             optionText.setText(option.getText(getInstrument()));
@@ -56,11 +56,6 @@ public abstract class ListOfItemsQuestionFragment extends SingleQuestionFragment
                     }
                 }
             });
-//            if (index == 0) {
-//                editText.requestFocus();
-//                showKeyBoard();
-//            }
-//            index++;
         }
     }
 
@@ -69,7 +64,7 @@ public abstract class ListOfItemsQuestionFragment extends SingleQuestionFragment
         String serialized = "";
         for (int i = 0; i < mResponses.size(); i++) {
             serialized += StringEscapeUtils.escapeCsv(mResponses.get(i).getText().toString());
-            if (i < mResponses.size() - 1) serialized += LIST_DELIMITER;
+            if (i < mResponses.size() - 1) serialized += Response.LIST_DELIMITER;
         }
         return serialized;
     }

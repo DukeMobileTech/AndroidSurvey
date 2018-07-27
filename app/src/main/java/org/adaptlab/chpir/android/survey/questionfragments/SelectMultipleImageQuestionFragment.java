@@ -12,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.utils.PictureUtils;
 import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
 import org.adaptlab.chpir.android.survey.R;
@@ -70,7 +71,7 @@ public class SelectMultipleImageQuestionFragment extends SingleQuestionFragment 
             ColorDrawable drawable = (ColorDrawable) view.getBackground();
             if (drawable.getColor() == SELECTED) {
                 serialized += i;
-                if (i < mGridView.getChildCount() - 1) serialized += LIST_DELIMITER;
+                if (i < mGridView.getChildCount() - 1) serialized += Response.LIST_DELIMITER;
             }
         }
         return serialized;
@@ -79,7 +80,7 @@ public class SelectMultipleImageQuestionFragment extends SingleQuestionFragment 
     @Override
     protected void deserialize(String responseText) {
         if (responseText.equals("")) return;
-        String[] listOfIndices = responseText.split(LIST_DELIMITER);
+        String[] listOfIndices = responseText.split(Response.LIST_DELIMITER);
         for (String index : listOfIndices) {
             if (!index.equals("")) {
                 Integer indexInteger = Integer.parseInt(index);

@@ -9,6 +9,7 @@ import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.SendModel;
 import org.adaptlab.chpir.android.survey.utils.AuthUtils;
+import org.adaptlab.chpir.android.survey.verhoeff.ParticipantIdValidator;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -16,15 +17,17 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import static org.adaptlab.chpir.android.survey.utils.FormatUtils.isEmpty;
+
 @Table(name = "Responses")
 public class Response extends SendModel {
-    private static final String TAG = "Response";
+    public final static String LIST_DELIMITER = ",";
     public static final String SKIP = "SKIP";
     public static final String RF = "RF";
     public static final String NA = "NA";
     public static final String DK = "DK";
     public static final String BLANK = "";
-
+    private static final String TAG = "Response";
     @Column(name = "Question")
     private Question mQuestion;
     @Column(name = "Text")
@@ -59,28 +62,10 @@ public class Response extends SendModel {
         setDeviceUser(AuthUtils.getCurrentUser());
     }
 
-    public String getUUID() {
-        return mUUID;
+    public static List<Response> getAll() {
+        return new Select().from(Response.class).orderBy("Id ASC").execute();
     }
 
-    /*
-     * Return true if this response matches the regular expression
-     * in its question.  If the regular expression is the empty string,
-     * declare it a match and return true.
-     */
-    public boolean isValid() {
-        if (mQuestion.getValidation() == null) return true;
-        if (mQuestion.getValidation().getValidationType().equals(Validation.Type.REGEX.toString())) {
-            return getText().matches(mQuestion.getValidation().getValidationText());
-        }
-        // TODO: 7/25/18 validate other types
-        return false;
-    }
-
-    /*
-     * Only save if this response is valid.  If valid, return
-     * true.  If not, return false.
-     */
     public boolean saveWithValidation() {
         if (isValid()) {
             setQuestionVersion(getQuestion().getQuestionVersion());
@@ -93,13 +78,92 @@ public class Response extends SendModel {
         }
     }
 
+    public boolean isValid() {
+        if (mQuestion.getValidation() == null) return true;
+        if (mQuestion.getValidation().getValidationType().equals(
+                Validation.Type.REGEX.toString())) {
+            return getText().matches(mQuestion.getValidation().getValidationText());
+        } else if (mQuestion.getValidation().getValidationType().equals(
+                Validation.Type.SUM_OF_PARTS.toString())) {
+            double sum = 0.0;
+            for (String text : getText().split(Response.LIST_DELIMITER)) {
+                if (!isEmpty(text)) {
+                    sum += Double.parseDouble(text);
+                }
+            }
+            return sum == Double.parseDouble(mQuestion.getValidation().getValidationText());
+        } else if (mQuestion.getValidation().getValidationType().equals(
+                Validation.Type.RESPONSE.toString())) {
+            return validateResponseType();
+        } else {
+            return mQuestion.getValidation().getValidationType().equals(Validation.Type.VERHOEFF
+                    .toString()) && ParticipantIdValidator.validate(getText());
+        }
+    }
+
+    private boolean validateResponseType() {
+        Question validationQuestion = Question.findByQuestionIdentifier(
+                mQuestion.getValidation().getValidationText());
+        Response response = getSurvey().getResponseByQuestion(validationQuestion);
+        double validationResponse = 0.0, givenResponse = 0.0;
+        if (response != null && !isEmpty(response.getText())) {
+            validationResponse = Double.parseDouble(response.getText());
+        }
+        if (!isEmpty(getText())) {
+            givenResponse = Double.parseDouble(getText());
+        }
+        String operator = mQuestion.getValidation().getRelationalOperator();
+        switch (operator) {
+            case "==":
+                return givenResponse == validationResponse;
+            case "!=":
+                return givenResponse != validationResponse;
+            case ">":
+                return givenResponse > validationResponse;
+            case "<":
+                return givenResponse < validationResponse;
+            case ">=":
+                return givenResponse >= validationResponse;
+            case "<=":
+                return givenResponse <= validationResponse;
+            default:
+                return true;
+        }
+    }
+
+    public Question getQuestion() {
+        return mQuestion;
+    }
+
+    public void setQuestion(Question question) {
+        mQuestion = question;
+    }
+
+    public Survey getSurvey() {
+        if (getSurveyUUID() == null) return null;
+        return Survey.findByUUID(getSurveyUUID());
+    }
+
+    public String getText() {
+        return mText;
+    }
+
+    private String getSurveyUUID() {
+        return mSurveyUUID;
+    }
+
+    public void setSurvey(Survey survey) {
+        mSurveyUUID = survey.getUUID();
+    }
+
     @Override
     public JSONObject toJSON() {
         JSONObject json = new JSONObject();
 
         try {
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("survey_uuid", (getSurvey() == null) ? getSurveyUUID() : getSurvey().getUUID());
+            jsonObject.put("survey_uuid", (getSurvey() == null) ? getSurveyUUID() : getSurvey()
+                    .getUUID());
             jsonObject.put("question_id", getQuestion().getRemoteId());
             jsonObject.put("text", getText());
             jsonObject.put("other_response", getOtherResponse());
@@ -121,86 +185,77 @@ public class Response extends SendModel {
         return json;
     }
 
-    @Override
-    public boolean isPersistent() {
-        return true;
-    }
-
-    /*
-     * Finders
-     */
-    public static List<Response> getAll() {
-        return new Select().from(Response.class).orderBy("Id ASC").execute();
-    }
-
-    /*
-     * Getters/Setters
-     */
-    public Question getQuestion() {
-        return mQuestion;
-    }
-
-    public void setQuestion(Question question) {
-        mQuestion = question;
-    }
-
-    public String getText() {
-        return mText;
-    }
-
-    public void setResponse(String text) {
-        mText = text;
-    }
-
-    public void setSurvey(Survey survey) {
-        mSurveyUUID = survey.getUUID();
-    }
-
-    public Survey getSurvey() {
-        if (getSurveyUUID() == null) return null;
-        return Survey.findByUUID(getSurveyUUID());
+    public String getOtherResponse() {
+        return mOtherResponse;
     }
 
     public void setOtherResponse(String otherResponse) {
         mOtherResponse = otherResponse;
     }
 
-    public String getOtherResponse() {
-        return mOtherResponse;
+    public String getSpecialResponse() {
+        return mSpecialResponse;
     }
 
     public void setSpecialResponse(String specialResponse) {
         mSpecialResponse = specialResponse;
     }
 
-    public String getSpecialResponse() {
-        return mSpecialResponse;
+    public Date getTimeStarted() {
+        return mTimeStarted;
     }
 
     public void setTimeStarted(Date time) {
         mTimeStarted = time;
     }
 
-    public Date getTimeStarted() {
-        return mTimeStarted;
+    public Date getTimeEnded() {
+        return mTimeEnded;
+    }
+
+    public String getUUID() {
+        return mUUID;
+    }
+
+    private int getQuestionVersion() {
+        return mQuestionVersion;
+    }
+
+    public void setQuestionVersion(int version) {
+        mQuestionVersion = version;
+    }
+
+    public String getRandomizedData() {
+        return mRandomizedData;
+    }
+
+    public DeviceUser getDeviceUser() {
+        return mDeviceUser;
+    }
+
+    public void setDeviceUser(DeviceUser deviceUser) {
+        mDeviceUser = deviceUser;
+    }
+
+    public void setRandomizedData(String data) {
+        mRandomizedData = data;
     }
 
     public void setTimeEnded(Date time) {
         mTimeEnded = time;
     }
 
-    public Date getTimeEnded() {
-        return mTimeEnded;
-    }
-
-    public ResponsePhoto getResponsePhoto() {
-        return new Select().from(ResponsePhoto.class).where("Response = ?", getId())
-                .executeSingle();
-    }
-
     @Override
     public boolean isSent() {
         return mSent;
+    }
+
+    /*
+     * Only send if survey is ready to send.
+     */
+    @Override
+    public boolean readyToSend() {
+        return (getSurvey() == null) || getSurvey().readyToSend();
     }
 
     @Override
@@ -213,37 +268,9 @@ public class Response extends SendModel {
         if (getSurvey() != null) getSurvey().deleteIfComplete();
     }
 
-    /*
-     * Only send if survey is ready to send.
-     */
     @Override
-    public boolean readyToSend() {
-        return (getSurvey() == null) || getSurvey().readyToSend();
-    }
-
-    public boolean hasSpecialResponse() {
-        return mSpecialResponse.equals(SKIP) || mSpecialResponse.equals(RF) ||
-                mSpecialResponse.equals(NA) || mSpecialResponse.equals(DK);
-    }
-
-    public DeviceUser getDeviceUser() {
-        return mDeviceUser;
-    }
-
-    public void setDeviceUser(DeviceUser deviceUser) {
-        mDeviceUser = deviceUser;
-    }
-
-    public void setQuestionVersion(int version) {
-        mQuestionVersion = version;
-    }
-
-    private int getQuestionVersion() {
-        return mQuestionVersion;
-    }
-
-    private String getSurveyUUID() {
-        return mSurveyUUID;
+    public boolean isPersistent() {
+        return true;
     }
 
     @Override
@@ -251,12 +278,18 @@ public class Response extends SendModel {
         return (getSurvey() != null) && getSurvey().belongsToRoster();
     }
 
-    public void setRandomizedData(String data) {
-        mRandomizedData = data;
+    public ResponsePhoto getResponsePhoto() {
+        return new Select().from(ResponsePhoto.class).where("Response = ?", getId())
+                .executeSingle();
     }
 
-    public String getRandomizedData() {
-        return mRandomizedData;
+    public void setResponse(String text) {
+        mText = text;
+    }
+
+    public boolean hasSpecialResponse() {
+        return mSpecialResponse.equals(SKIP) || mSpecialResponse.equals(RF) ||
+                mSpecialResponse.equals(NA) || mSpecialResponse.equals(DK);
     }
 
 }

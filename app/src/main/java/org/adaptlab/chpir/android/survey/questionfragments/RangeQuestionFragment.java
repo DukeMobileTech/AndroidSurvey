@@ -83,7 +83,7 @@ public class RangeQuestionFragment extends SingleQuestionFragment {
         if (!FormatUtils.isEmpty(responseText) && responseText.contains("-")) {
             String[] ranges = responseText.split("-");
             mStart.setText(ranges[0]);
-            mEnd.setText(ranges[1]);
+            if (ranges.length == 2) mEnd.setText(ranges[1]);
         }
     }
 
