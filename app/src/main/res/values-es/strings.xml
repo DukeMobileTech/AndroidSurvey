@@ -172,4 +172,7 @@
     <string name="start">Start</string>
     <string name="end">End</string>
     <string name="sum_of_parts">Total Sum of Parts</string>
+    <string name="clear">Clear</string>
+    <string name="signature_saved">Signature saved</string>
+    <string name="signature_not_saved">Signature NOT saved</string>
 </resources>

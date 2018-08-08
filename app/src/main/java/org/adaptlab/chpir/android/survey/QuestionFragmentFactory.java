@@ -28,6 +28,7 @@ import org.adaptlab.chpir.android.survey.questionfragments.SelectMultipleWriteOt
 import org.adaptlab.chpir.android.survey.questionfragments.SelectOneImageQuestionFragment;
 import org.adaptlab.chpir.android.survey.questionfragments.SelectOneQuestionFragment;
 import org.adaptlab.chpir.android.survey.questionfragments.SelectOneWriteOtherQuestionFragment;
+import org.adaptlab.chpir.android.survey.questionfragments.SignatureQuestionFragment;
 import org.adaptlab.chpir.android.survey.questionfragments.SliderQuestionFragment;
 import org.adaptlab.chpir.android.survey.questionfragments.SumOfPartsQuestionFragment;
 import org.adaptlab.chpir.android.survey.questionfragments.TimeQuestionFragment;
@@ -101,6 +102,8 @@ public class QuestionFragmentFactory {
             fragment = new RangeQuestionFragment();
         } else if (Question.QuestionType.SUM_OF_PARTS.toString().equals(type)) {
             fragment = new SumOfPartsQuestionFragment();
+        } else if (Question.QuestionType.SIGNATURE.toString().equals(type)) {
+            fragment = new SignatureQuestionFragment();
         } else {
             // Return free response fragment if unknown question type
             // This should never happen
