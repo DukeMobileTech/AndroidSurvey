@@ -1056,7 +1056,7 @@ public class SurveyFragment extends Fragment {
     }
 
     private void updateDisplayLabels() {
-        if (mDisplay != null) {
+        if (mDisplay != null && mDisplay.questions().size() > 0) {
             // Screen title
             if (!mDisplay.getMode().equals(Display.DisplayMode.SINGLE.toString())) {
                 mDisplayTitle.setText(String.format(Locale.getDefault(), "%s %s%d %s %d%s",
