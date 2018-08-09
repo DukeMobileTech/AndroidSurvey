@@ -262,9 +262,7 @@ public class Response extends SendModel {
     public void setAsSent(Context context) {
         mSent = true;
         this.save();
-        if (getResponsePhoto() == null) {
-            this.delete();
-        }
+        if (getResponsePhoto() == null) this.delete();
         if (getSurvey() != null) getSurvey().deleteIfComplete();
     }
 

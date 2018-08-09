@@ -208,7 +208,8 @@ public class Survey extends SendModel {
         Iterator<Response> responseIterator = responses.iterator();
         while (responseIterator.hasNext()) {
             Response response = responseIterator.next();
-            if (response.getQuestion().getQuestionType() == Question.QuestionType.INSTRUCTIONS) {
+            if (response.getQuestion().getQuestionType() == Question.QuestionType.INSTRUCTIONS ||
+                    response.getResponsePhoto() != null) {
                 responseIterator.remove();
             }
         }
