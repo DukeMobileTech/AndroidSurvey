@@ -2,6 +2,7 @@ package org.adaptlab.chpir.android.survey.questionfragments;
 
 import android.annotation.TargetApi;
 import android.os.Build;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.TimePicker;
 
@@ -19,21 +20,15 @@ public class TimeQuestionFragment extends SingleQuestionFragment {
         mHour = mTimePicker.getCurrentHour();
         mMinute = mTimePicker.getCurrentMinute();
         mTimePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
-
             @Override
             public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
                 mHour = hourOfDay;
                 mMinute = minute;
                 setResponseText();
-            }
-        });
-        questionComponent.addView(mTimePicker);
-        mTimePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
-
-            public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
                 mSpecialResponses.clearCheck();
             }
         });
+        questionComponent.addView(mTimePicker);
     }
 
     @Override
