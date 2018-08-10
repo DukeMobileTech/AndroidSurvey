@@ -653,18 +653,14 @@ public class SurveyFragment extends Fragment {
         }
     }
 
-    protected void setNextQuestion(String currentQuestionIdentifier, String
-            nextQuestionIdentifier, String questionIdentifier) {
+    protected void setNextQuestion(String currentQuestionIdentifier, String nextQuestionIdentifier,
+                                   String questionIdentifier) {
         List<Question> skipList = new ArrayList<>();
-        boolean skipStart = false;
+        boolean toBeSkipped = false;
         for (Question curQuestion : getQuestions()) {
-            if (skipStart) skipList.add(curQuestion);
-            if (curQuestion.getQuestionIdentifier().equals(currentQuestionIdentifier)) {
-                skipStart = true;
-            }
-            if (curQuestion.getQuestionIdentifier().equals(nextQuestionIdentifier)) {
-                break;
-            }
+            if (curQuestion.getQuestionIdentifier().equals(nextQuestionIdentifier)) break;
+            if (toBeSkipped) skipList.add(curQuestion);
+            if (curQuestion.getQuestionIdentifier().equals(currentQuestionIdentifier)) toBeSkipped = true;
         }
         updateQuestionsToSkipMap(questionIdentifier + "/skipTo", skipList);
         hideQuestionsInDisplay();
