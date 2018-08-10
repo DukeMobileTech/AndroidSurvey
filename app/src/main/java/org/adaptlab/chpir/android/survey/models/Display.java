@@ -28,9 +28,15 @@ public class Display extends ReceiveModel {
     private String mTitle;
     @Column(name = "SectionTitle")
     private String mSectionTitle;
+    @Column(name = "Deleted")
+    private boolean mDeleted;
 
     public Display() {
         super();
+    }
+
+    public static Display findByRemoteId(Long id) {
+        return new Select().from(Display.class).where("RemoteId = ?", id).executeSingle();
     }
 
     public String getSectionTitle() {
@@ -39,10 +45,6 @@ public class Display extends ReceiveModel {
 
     private void setSectionTitle(String mSectionTitle) {
         this.mSectionTitle = mSectionTitle;
-    }
-
-    public enum DisplayMode {
-        SINGLE, MULTIPLE, TABLE
     }
 
     @Override
@@ -60,18 +62,26 @@ public class Display extends ReceiveModel {
             display.setInstrumentId(jsonObject.optLong("instrument_id"));
             display.setTitle(jsonObject.optString("title"));
             display.setSectionTitle(jsonObject.optString("section_title"));
+            if (jsonObject.isNull("deleted_at"))
+                display.setDeleted(false);
+            else
+                display.setDeleted(true);
             display.save();
         } catch (JSONException je) {
             if (BuildConfig.DEBUG) Log.e(TAG, "Error parsing object json", je);
         }
     }
 
-    public static Display findByRemoteId(Long id) {
-        return new Select().from(Display.class).where("RemoteId = ?", id).executeSingle();
+    private void setDeleted(boolean deleted) {
+        mDeleted = deleted;
     }
 
     public int getPosition() {
         return mPosition;
+    }
+
+    private void setPosition(int position) {
+        mPosition = position;
     }
 
     public List<Question> questions() {
@@ -90,6 +100,10 @@ public class Display extends ReceiveModel {
 
     public String getMode() {
         return mMode;
+    }
+
+    private void setMode(String mode) {
+        mMode = mode;
     }
 
     public List<Option> options() {
@@ -118,24 +132,24 @@ public class Display extends ReceiveModel {
         return mRemoteId;
     }
 
-    public String getTitle(){ return mTitle; }
-
     private void setRemoteId(Long id) {
-       mRemoteId = id;
+        mRemoteId = id;
     }
 
-    private void setMode(String mode) {
-        mMode = mode;
+    public String getTitle() {
+        return mTitle;
     }
 
-    private void setPosition(int position) {
-        mPosition = position;
+    private void setTitle(String title) {
+        mTitle = title;
     }
 
     private void setInstrumentId(Long id) {
         mInstrumentId = id;
     }
 
-    private void setTitle(String title) { mTitle = title; }
+    public enum DisplayMode {
+        SINGLE, MULTIPLE, TABLE
+    }
 
 }

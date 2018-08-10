@@ -397,7 +397,7 @@ public class Instrument extends ReceiveModel {
 
     public List<Display> displays() {
         return new Select().from(Display.class)
-                .where("InstrumentId = ?", getRemoteId())
+                .where("InstrumentId = ? AND Deleted != ?", getRemoteId(), 1)
                 .orderBy("Position ASC")
                 .execute();
     }
