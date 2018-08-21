@@ -45,7 +45,7 @@ public class GeoLocationFragment extends SingleQuestionFragment {
                 mLatitude.setText(locationManager.getLatitude());
                 mLongitude.setText(locationManager.getLongitude());
                 mAltitude.setText(locationManager.getAltitude());
-                setResponseText();
+                setResponse(null);
             }
         });
         questionComponent.addView(view);

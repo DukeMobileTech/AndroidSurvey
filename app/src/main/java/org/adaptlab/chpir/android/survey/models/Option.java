@@ -188,6 +188,23 @@ public class Option extends ReceiveModel {
         return new Select().from(Option.class).where("RemoteId = ?", id).executeSingle();
     }
 
+    public static Option findByIdentifier(String identifier) {
+        if (identifier == null) return null;
+        return new Select().from(Option.class)
+                .where("Identifier = ?", identifier)
+                .executeSingle();
+    }
+
+    public static Option findByQuestionAndSpecialResponse(Question question, String specialResponse) {
+        return new Select("Options.*").distinct().from(Option.class)
+                .innerJoin(OptionInOptionSet.class)
+                .on("OptionInOptionSets.RemoteOptionSetId = ?",
+                        question.getRemoteSpecialOptionSetId())
+                .where("Options.Text = ? AND OptionInOptionSets.RemoteOptionId = Options" +
+                                ".RemoteId", specialResponse)
+                .executeSingle();
+    }
+
     /*
      * Find an existing translation, or return a new OptionTranslation
      * if a translation does not yet exist.

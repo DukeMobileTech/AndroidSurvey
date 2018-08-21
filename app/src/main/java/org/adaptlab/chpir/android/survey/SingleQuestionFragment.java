@@ -6,6 +6,7 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,14 +20,12 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.activeandroid.query.Select;
-
+import org.adaptlab.chpir.android.survey.models.ConditionSkip;
 import org.adaptlab.chpir.android.survey.models.Display;
 import org.adaptlab.chpir.android.survey.models.DisplayInstruction;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.NextQuestion;
 import org.adaptlab.chpir.android.survey.models.Option;
-import org.adaptlab.chpir.android.survey.models.OptionInOptionSet;
 import org.adaptlab.chpir.android.survey.models.OptionSet;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
@@ -87,8 +86,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
             deserialize(mResponse.getText());
         }
 
-        setResponseSkips();
-        setSpecialResponseSkips();
+        setSkipPatterns();
         refreshFollowUpQuestion();
         if (!mQuestion.getDisplay().getMode().equals(Display.DisplayMode.TABLE.toString())) {
             mSpecialResponses = v.findViewById(R.id.special_responses_container);
@@ -113,7 +111,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
                     @Override
                     public void onClick(View v) {
                         unSetResponse();
-                        setSpecialResponse(finalResponses.get(v.getId()));
+                        setResponse(finalResponses.get(v.getId()));
                     }
                 });
             }
@@ -269,81 +267,49 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         }
     }
 
-    private void setResponseSkips() {
-        if (mQuestion.isSkipQuestionType() && !TextUtils.isEmpty(mResponse.getText())) {
-            int responseIndex = Integer.parseInt(mResponse.getText());
-            if ((mQuestion.isOtherQuestionType() || mQuestion.isDropDownQuestionType()) &&
-                    responseIndex == mQuestion.options().size()) {
-                mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion
-                        .getQuestionIdentifier(), mQuestion.getQuestionIdentifier());
-                mSurveyFragment.setMultipleSkipQuestions(null, mQuestion);
-
-            } else if (responseIndex < mQuestion.options().size()) {
-                Option selectedOption = mQuestion.options().get(responseIndex);
-                NextQuestion skipOption = getNextQuestion(selectedOption);
-                if (skipOption != null) {
-                    mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), skipOption
-                            .getNextQuestionIdentifier(), mQuestion.getQuestionIdentifier());
-                } else if (mQuestion.hasSkips(mInstrument)) {
-                    mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion
-                            .getQuestionIdentifier(), mQuestion.getQuestionIdentifier());
+    private void setSkipPatterns() {
+        Option selectedOption = null;
+        String nextQuestion = null;
+        String enteredValue = null;
+        if (!TextUtils.isEmpty(mResponse.getText())) {
+            if (mQuestion.isSelectOneQuestionType()) {
+                int responseIndex = Integer.parseInt(mResponse.getText());
+                if (responseIndex < mQuestion.defaultOptions().size()) {
+                    selectedOption = mQuestion.defaultOptions().get(responseIndex);
                 }
-                if (mQuestion.isMultipleSkipQuestion(mInstrument)) {
-                    mSurveyFragment.setMultipleSkipQuestions(selectedOption, mQuestion);
-                }
+            } else if (mQuestion.getQuestionType().equals(Question.QuestionType.INTEGER)) {
+                enteredValue = mResponse.getText();
             }
-        } else if (!TextUtils.isEmpty(mResponse.getText())) {
-            mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion
-                    .getQuestionIdentifier(), mQuestion.getQuestionIdentifier());
+        }
+        if (!TextUtils.isEmpty(mResponse.getSpecialResponse())) {
+            selectedOption = Option.findByQuestionAndSpecialResponse(mQuestion,
+                    mResponse.getSpecialResponse());
+        }
+        if (selectedOption == null && enteredValue == null) {
+            showAllSubsequentQuestions();
+        } else if (selectedOption != null && enteredValue == null) {
+            nextQuestion = mQuestion.getNextQuestionIdentifier(selectedOption, mResponse);
+        } else if (selectedOption == null) {
+            nextQuestion = mQuestion.getNextQuestionIdentifier(enteredValue);
+        }
+        if (nextQuestion == null) {
+            showAllSubsequentQuestions();
+        } else {
+            mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(),
+                    nextQuestion, mQuestion.getQuestionIdentifier());
+        }
+        if (selectedOption != null && mQuestion.isMultipleSkipQuestion(mInstrument)) {
+            mSurveyFragment.setMultipleSkipQuestions(selectedOption, mQuestion);
         }
     }
 
-    private void setSpecialResponseSkips() {
-        if (!TextUtils.isEmpty(mResponse.getSpecialResponse()) && mQuestion.hasSpecialOptions()) {
-            Option specialOption = new Select("Options.*").distinct().from(Option.class)
-                    .innerJoin(OptionInOptionSet.class)
-                    .on("OptionInOptionSets.RemoteOptionSetId = ?", mQuestion
-                            .getRemoteSpecialOptionSetId())
-                    .where("Options.Text = ? AND OptionInOptionSets.RemoteOptionId = Options" +
-                                    ".RemoteId",
-                            mResponse.getSpecialResponse())
-                    .executeSingle();
-            if (specialOption != null) {
-                NextQuestion specialSkipOption = getNextQuestion(specialOption);
-                if (specialSkipOption != null) {
-                    mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(),
-                            specialSkipOption.getNextQuestionIdentifier(), mQuestion
-                                    .getQuestionIdentifier());
-                } else if (mQuestion.hasSpecialSkips(mInstrument)) {
-                    mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(), mQuestion
-                            .getQuestionIdentifier(), mQuestion.getQuestionIdentifier());
-                }
-            }
-            if (mQuestion.isMultipleSkipQuestion(mInstrument) && !TextUtils.isEmpty(mResponse
-                    .getSpecialResponse())) {
-                mSurveyFragment.setMultipleSkipQuestions(specialOption, mQuestion);
-            }
-        }
+    private void showAllSubsequentQuestions() {
+        mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(),
+                mQuestion.getQuestionIdentifier(), mQuestion.getQuestionIdentifier());
     }
 
     protected Instrument getInstrument() {
         return mInstrument;
-    }
-
-    public void setSpecialResponse(String specialResponse) {
-        if (mResponse != null) {
-            mResponse.setSpecialResponse(specialResponse);
-            mResponse.setResponse("");
-            mResponse.setDeviceUser(AuthUtils.getCurrentUser());
-            mResponse.setTimeEnded(new Date());
-            deserialize(mResponse.getText());
-            mSurvey.setLastQuestion(mQuestion);
-            saveResponseInBackground(mResponse);
-            removeTextFocus();
-            setSpecialResponseSkips();
-            refreshFollowUpQuestion();
-            animateValidationTextView(true);
-        }
     }
 
     private void deserializeSpecialResponse() {
@@ -358,13 +324,6 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
 
     public Question getQuestion() {
         return mQuestion;
-    }
-
-    private NextQuestion getNextQuestion(Option selectedOption) {
-        return new Select().from(NextQuestion.class).where("OptionIdentifier = ? AND " +
-                "QuestionIdentifier = ? AND " + "RemoteInstrumentId = ?", selectedOption
-                .getIdentifier(), mQuestion.getQuestionIdentifier(), mInstrument.getRemoteId())
-                .executeSingle();
     }
 
     /*
@@ -425,6 +384,32 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         return mResponse;
     }
 
+    protected void setResponse(String specialResponse) {
+        if (mResponse == null) return;
+        if (specialResponse == null) {
+            // Set responseText
+            mResponse.setResponse(serialize());
+            mResponse.setSpecialResponse("");
+            validateResponse();
+            if (!mQuestion.isTextEntryQuestionType()) {
+                removeTextFocus();
+            }
+        } else {
+            // Set specialResponse
+            mResponse.setSpecialResponse(specialResponse);
+            mResponse.setResponse("");
+            deserialize(mResponse.getText());
+            removeTextFocus();
+            animateValidationTextView(true);
+        }
+        mResponse.setTimeEnded(new Date());
+        mSurvey.setLastQuestion(mQuestion);
+        mResponse.setDeviceUser(AuthUtils.getCurrentUser());
+        saveResponseInBackground(mResponse);
+        setSkipPatterns();
+        refreshFollowUpQuestion();
+    }
+
     protected ResponsePhoto getResponsePhoto() {
         return mResponse.getResponsePhoto();
     }
@@ -460,20 +445,6 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
     public void setOtherResponse(String response) {
         mResponse.setOtherResponse(response);
         mResponse.setDeviceUser(AuthUtils.getCurrentUser());
-    }
-
-    protected void setResponseText() {
-        mResponse.setResponse(serialize());
-        mResponse.setSpecialResponse("");
-        mResponse.setTimeEnded(new Date());
-        validateResponse();
-        mSurvey.setLastQuestion(mQuestion);
-        saveResponseInBackground(mResponse);
-        if (!mQuestion.isTextEntryQuestionType()) {
-            removeTextFocus();
-        }
-        setResponseSkips();
-        refreshFollowUpQuestion();
     }
 
     /*

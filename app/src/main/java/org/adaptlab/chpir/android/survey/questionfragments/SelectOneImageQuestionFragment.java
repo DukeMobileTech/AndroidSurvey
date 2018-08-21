@@ -85,7 +85,7 @@ public class SelectOneImageQuestionFragment extends SingleQuestionFragment {
 
     private void setResponseIndex(int index) {
         mResponseIndex = index;
-        setResponseText();
+        setResponse(null);
     }
 
     @Override

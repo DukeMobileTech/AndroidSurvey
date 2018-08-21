@@ -26,6 +26,8 @@ public class MultipleSkip extends ReceiveModel {
     private Long mRemoteQuestionId;
     @Column(name = "RemoteInstrumentId")
     private Long mRemoteInstrumentId;
+    @Column(name = "Deleted")
+    private boolean mDeleted;
 
     @Override
     public void createObjectFromJSON(JSONObject jsonObject) {
@@ -41,6 +43,11 @@ public class MultipleSkip extends ReceiveModel {
             skipQuestion.setSkipQuestionIdentifier(jsonObject.getString("skip_question_identifier"));
             skipQuestion.setRemoteQuestionId(jsonObject.getLong("question_id"));
             skipQuestion.setRemoteInstrumentId(jsonObject.getLong("instrument_id"));
+            if (jsonObject.isNull("deleted_at")) {
+                skipQuestion.setDeleted(false);
+            } else {
+                skipQuestion.setDeleted(true);
+            }
             skipQuestion.save();
         } catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);
@@ -77,6 +84,10 @@ public class MultipleSkip extends ReceiveModel {
 
     private void setRemoteInstrumentId(Long id) {
         mRemoteInstrumentId = id;
+    }
+
+    private void setDeleted(boolean deleted) {
+        mDeleted = deleted;
     }
 
 }

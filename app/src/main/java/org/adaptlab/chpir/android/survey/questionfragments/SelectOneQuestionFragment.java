@@ -80,7 +80,7 @@ public class SelectOneQuestionFragment extends SingleQuestionFragment {
 
     protected void setResponseIndex(int index) {
         mResponseIndex = index;
-        setResponseText();
+        setResponse(null);
     }
 
     @Override

@@ -60,7 +60,7 @@ public class SelectMultipleImageQuestionFragment extends SingleQuestionFragment 
         } else {
             view.setBackgroundColor(SELECTED);
         }
-        setResponseText();
+        setResponse(null);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -11,7 +12,7 @@ import org.adaptlab.chpir.android.survey.models.Response;
 import java.util.ArrayList;
 
 public class SelectMultipleQuestionFragment extends SingleQuestionFragment {
-    private final static String TAG = "SelectMultipleQuestionFragment";
+    private final static String TAG = "SelectMultipleFragment";
     private ArrayList<Integer> mResponseIndices;
     protected ArrayList<CheckBox> mCheckBoxes;
 
@@ -69,6 +70,7 @@ public class SelectMultipleQuestionFragment extends SingleQuestionFragment {
                 if (!index.equals("")) {
                     Integer indexInteger = Integer.parseInt(index);
                     mCheckBoxes.get(indexInteger).setChecked(true);
+                    mResponseIndices.add(indexInteger);
                 }
             }
         }
@@ -80,7 +82,7 @@ public class SelectMultipleQuestionFragment extends SingleQuestionFragment {
         } else {
             mResponseIndices.add(index);
         }
-        setResponseText();
+        setResponse(null);
     }
 
     protected void addCheckBox(CheckBox checkbox) {

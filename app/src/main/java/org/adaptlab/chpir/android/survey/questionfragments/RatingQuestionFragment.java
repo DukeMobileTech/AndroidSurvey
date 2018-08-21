@@ -24,7 +24,7 @@ public class RatingQuestionFragment extends SingleQuestionFragment {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
                 mRating = rating;
-                setResponseText();
+                setResponse(null);
             }
         });
         mRatingBar.setOnTouchListener(new View.OnTouchListener() {

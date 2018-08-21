@@ -27,7 +27,7 @@ public class FreeResponseQuestionFragment extends SingleQuestionFragment {
             if (!FormatUtils.isEmpty(s.toString())) {
                 backspacing = before > count;
                 mText = s.toString();
-                setResponseText();
+                setResponse(null);
             }
         }
 

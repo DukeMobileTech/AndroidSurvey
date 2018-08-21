@@ -57,7 +57,7 @@ public class DropDownQuestionFragment extends SingleQuestionFragment {
 
     protected void setResponseIndex(int index) {
         mResponseIndex = index;
-        setResponseText();
+        setResponse(null);
     }
 
     private void clearAdapter() {

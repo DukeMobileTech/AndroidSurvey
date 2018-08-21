@@ -43,7 +43,7 @@ public abstract class ListOfItemsQuestionFragment extends SingleQuestionFragment
             mResponses.add(editText);
             editText.addTextChangedListener(new TextWatcher() {
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    setResponseText();
+                    setResponse(null);
                 }
 
                 // Required by interface

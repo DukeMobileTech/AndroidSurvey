@@ -657,7 +657,7 @@ public class SurveyFragment extends Fragment {
                                    String questionIdentifier) {
         List<Question> skipList = new ArrayList<>();
         boolean toBeSkipped = false;
-        for (Question curQuestion : getQuestions()) {
+        for (Question curQuestion : getQuestions(mDisplay)) {
             if (curQuestion.getQuestionIdentifier().equals(nextQuestionIdentifier)) break;
             if (toBeSkipped) skipList.add(curQuestion);
             if (curQuestion.getQuestionIdentifier().equals(currentQuestionIdentifier)) toBeSkipped = true;
@@ -871,14 +871,6 @@ public class SurveyFragment extends Fragment {
 
     protected List<Question> getQuestions(Display display) {
         return mDisplayQuestions.get(display);
-    }
-
-    protected List<Question> getQuestions() {
-        List<Question> questions = new ArrayList<>();
-        for (Map.Entry<Display, List<Question>> entry : mDisplayQuestions.entrySet()) {
-            questions.addAll(entry.getValue());
-        }
-        return questions;
     }
 
     public Survey getSurvey() {

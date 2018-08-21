@@ -27,7 +27,7 @@ public class YearQuestionFragment extends DateQuestionFragment {
                         mDay = newDay;
                         mMonth = newMonth;
                         mYear = newYear;
-                        setResponseText();
+                        setResponse(null);
                         if (mSpecialResponses != null) {
                             mSpecialResponses.clearCheck();
                         }

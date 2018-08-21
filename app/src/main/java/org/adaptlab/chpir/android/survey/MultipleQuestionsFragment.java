@@ -345,7 +345,8 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
     }
 
     private void setResponseSkips(Question question, int responseIndex) {
-        if (question.isSkipQuestionType() && responseIndex != -1) {
+        if (question.isSelectOneQuestionType() && question.hasRegularOptionSkips(
+                question.getInstrument()) && responseIndex != -1) {
             if ((question.isOtherQuestionType() || question.isDropDownQuestionType()) &&
                     responseIndex == question.options().size()) {
                 mSurveyFragment.setNextQuestion(question.getQuestionIdentifier(), question
@@ -358,7 +359,7 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
                 if (skipOption != null) {
                     mSurveyFragment.setNextQuestion(question.getQuestionIdentifier(), skipOption
                             .getNextQuestionIdentifier(), question.getQuestionIdentifier());
-                } else if (question.hasSkips(question.getInstrument())) {
+                } else if (question.hasRegularOptionSkips(question.getInstrument())) {
                     mSurveyFragment.setNextQuestion(question.getQuestionIdentifier(), question
                             .getQuestionIdentifier(), question.getQuestionIdentifier());
                 }
@@ -387,7 +388,7 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
                     if (specialSkipOption != null) {
                         mSurveyFragment.setNextQuestion(question.getQuestionIdentifier(),
                                 specialSkipOption.getNextQuestionIdentifier(), question.getQuestionIdentifier());
-                    } else if (question.hasSpecialSkips(question.getInstrument())) {
+                    } else if (question.hasSpecialOptionSkips(question.getInstrument())) {
                         mSurveyFragment.setNextQuestion(question.getQuestionIdentifier(), question
                                 .getQuestionIdentifier(), question.getQuestionIdentifier());
                     }

@@ -67,7 +67,7 @@ public class RangeQuestionFragment extends SingleQuestionFragment {
                 } else {
                     mTextEnd = s.toString();
                 }
-                setResponseText();
+                setResponse(null);
             }
 
             public void afterTextChanged(Editable s) {

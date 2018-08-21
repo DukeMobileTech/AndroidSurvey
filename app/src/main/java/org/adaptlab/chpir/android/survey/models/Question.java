@@ -99,30 +99,69 @@ public class Question extends ReceiveModel {
                 .executeSingle();
     }
 
-    public static boolean selectOneVariant(QuestionType type) {
-        return (type == QuestionType.SELECT_ONE || type == QuestionType.SELECT_ONE_WRITE_OTHER
-                || type == QuestionType.SELECT_ONE_IMAGE);
-    }
-
-    public boolean isSkipQuestionType() {
+    public boolean isSelectOneQuestionType() {
         return (getQuestionType() == QuestionType.SELECT_ONE ||
                 getQuestionType() == QuestionType.SELECT_ONE_WRITE_OTHER ||
                 getQuestionType() == QuestionType.DROP_DOWN);
     }
 
+    public static Question findByRemoteId(Long id) {
+        return new Select().from(Question.class).where("RemoteId = ?", id).executeSingle();
+    }
+
+    public String getNextQuestionIdentifier(Option option, Response response) {
+        if (!TextUtils.isEmpty(response.getText())) {
+            NextQuestion nextQuestion = NextQuestion.findByOptionAndQuestion(option, this);
+            if (nextQuestion != null) return nextQuestion.getNextQuestionIdentifier();
+            if (hasOptionConditionSkips(option)) {
+                String skipTo = null;
+                for (ConditionSkip conditionSkip : optionConditionSkips(option)) {
+                    String conditionSkipNextQuestion = conditionSkip.regularSkipTo(response);
+                    if (conditionSkipNextQuestion != null) {
+                        skipTo = conditionSkipNextQuestion;
+                        break;
+                    }
+                }
+                if (skipTo != null) return skipTo;
+            }
+        }
+        if (!TextUtils.isEmpty(response.getSpecialResponse())) {
+            NextQuestion nextQuestion = NextQuestion.findByOptionAndQuestion(option, this);
+            if (nextQuestion != null) return nextQuestion.getNextQuestionIdentifier();
+            if (hasOptionConditionSkips(option)) {
+                String skipTo = null;
+                for (ConditionSkip conditionSkip : optionConditionSkips(option)) {
+                    String conditionSkipNextQuestion = conditionSkip.specialSkipTo(response);
+                    if (conditionSkipNextQuestion != null) {
+                        skipTo = conditionSkipNextQuestion;
+                        break;
+                    }
+                }
+                if (skipTo != null) return skipTo;
+            }
+        }
+        return null;
+    }
+
+    public String getNextQuestionIdentifier(String value) {
+        if (TextUtils.isEmpty(value)) return null;
+        NextQuestion nextQuestion = NextQuestion.findByValueAndQuestion(value, this);
+        if (nextQuestion != null) return nextQuestion.getNextQuestionIdentifier();
+        return null;
+    }
+
+    static boolean validQuestionType(String questionType) {
+        for (QuestionType type : QuestionType.values()) {
+            if (type.name().equals(questionType)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public QuestionType getQuestionType() {
         return mQuestionType;
     }
-
-//    public boolean hasSkipPattern() {
-//        for (Option option : defaultOptions()) {
-//            if (option.getNextQuestion() != null &&
-//                    !option.getNextQuestion().getQuestionIdentifier().equals("")) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
 
     public void setQuestionType(String questionType) {
         if (validQuestionType(questionType)) {
@@ -139,11 +178,7 @@ public class Question extends ReceiveModel {
                 .where("QuestionIdentifier = ? AND RemoteInstrumentId = ?",
                         getQuestionIdentifier(), instrument.getRemoteId())
                 .execute();
-        return (multipleSkips.size() > 0);
-    }
-
-    public String getQuestionIdentifier() {
-        return mQuestionIdentifier;
+        return multipleSkips.size() > 0;
     }
 
 //    public boolean hasCompleteSurveyOption() {
@@ -154,16 +189,16 @@ public class Question extends ReceiveModel {
 //        return completeSurveyOption != null;
 //    }
 
+    public String getQuestionIdentifier() {
+        return mQuestionIdentifier;
+    }
+
     public void setQuestionIdentifier(String questionIdentifier) {
         mQuestionIdentifier = questionIdentifier;
     }
 
-    public boolean hasSkips(Instrument instrument) {
-        List<NextQuestion> skipOptions = new Select().from(NextQuestion.class)
-                .where("QuestionIdentifier = ? AND RemoteInstrumentId = ?",
-                        getQuestionIdentifier(), instrument.getRemoteId())
-                .execute();
-        return (skipOptions.size() > 0);
+    public boolean hasRegularOptionSkips(Instrument instrument) {
+        return (nextQuestions(instrument).size() > 0);
     }
 
     /*
@@ -348,7 +383,7 @@ public class Question extends ReceiveModel {
     /*
      * Return true if this response can be an array of multiple options.
      */
-    private boolean hasMultipleResponses() {
+    public boolean hasMultipleResponses() {
         return getQuestionType().equals(QuestionType.SELECT_MULTIPLE) ||
                 getQuestionType().equals(QuestionType.SELECT_MULTIPLE_WRITE_OTHER);
     }
@@ -434,7 +469,11 @@ public class Question extends ReceiveModel {
 //            }
 
             question.setRemoteId(remoteId);
-            question.setDeleted(jsonObject.optBoolean("deleted_at", false));
+            if (jsonObject.isNull("deleted_at")) {
+                question.setDeleted(false);
+            } else {
+                question.setDeleted(true);
+            }
             question.setCritical(jsonObject.optBoolean("critical", false));
             question.setRemoteOptionSetId(jsonObject.optLong("option_set_id"));
             question.setRemoteSpecialOptionSetId(jsonObject.optLong("special_option_set_id"));
@@ -471,10 +510,6 @@ public class Question extends ReceiveModel {
         }
     }
 
-    public static Question findByRemoteId(Long id) {
-        return new Select().from(Question.class).where("RemoteId = ?", id).executeSingle();
-    }
-
     private void setIdentifiesSurvey(boolean identifiesSurvey) {
         mIdentifiesSurvey = identifiesSurvey;
     }
@@ -485,15 +520,6 @@ public class Question extends ReceiveModel {
 
     private void setValidationId(Long validationId) {
         mValidationId = validationId;
-    }
-
-    public static boolean validQuestionType(String questionType) {
-        for (QuestionType type : QuestionType.values()) {
-            if (type.name().equals(questionType)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /*
@@ -527,9 +553,7 @@ public class Question extends ReceiveModel {
     public List<Question> questionsToSkip() {
         List<Question> toBeSkipped = new ArrayList<Question>();
         for (Option option : options()) {
-            for (Question question : option.questionsToSkip()) {
-                toBeSkipped.add(question);
-            }
+            toBeSkipped.addAll(option.questionsToSkip());
         }
         return toBeSkipped;
     }
@@ -547,13 +571,6 @@ public class Question extends ReceiveModel {
     public Long getRemoteOptionSetId() {
         return mRemoteOptionSetId;
     }
-
-//    public Option specialOptionByText(String optionText) {
-//        return new Select().from(Option.class)
-//                .where("Question = ? AND Deleted != ? AND Special = ? AND Text = ?", getId(), 1,
-//                        1, optionText)
-//                .executeSingle();
-//    }
 
 //    public Option anyResponseOption() {
 //        return new Select().from(Option.class)
@@ -580,16 +597,26 @@ public class Question extends ReceiveModel {
                 .execute();
     }
 
-    public boolean hasSpecialSkips(Instrument instrument) {
-        if (!hasSpecialOptions()) return false;
-        List<NextQuestion> specialSkipOptions = new Select("NextQuestions.*")
+    private List<NextQuestion> nextQuestions(Instrument instrument) {
+        return new Select().from(NextQuestion.class)
+                .where("QuestionIdentifier = ? AND RemoteInstrumentId = ? AND Deleted = ?",
+                        getQuestionIdentifier(), instrument.getRemoteId(), 0)
+                .execute();
+    }
+
+    private List<NextQuestion> specialOptionSkips(Instrument instrument) {
+        return new Select("NextQuestions.*")
                 .from(NextQuestion.class)
                 .innerJoin(Option.class)
                 .on("Options.Identifier=NextQuestions.OptionIdentifier")
-                .where("QuestionIdentifier = ? AND RemoteInstrumentId = ?",
-                        getQuestionIdentifier(), instrument.getRemoteId())
+                .where("NextQuestions.QuestionIdentifier = ? AND " +
+                                "NextQuestions.RemoteInstrumentId = ? AND NextQuestions.Deleted = ?",
+                        getQuestionIdentifier(), instrument.getRemoteId(), 0)
                 .execute();
-        return (specialSkipOptions.size() > 0);
+    }
+
+    public boolean hasSpecialOptionSkips(Instrument instrument) {
+        return hasSpecialOptions() && (specialOptionSkips(instrument).size() > 0);
     }
 
     public boolean hasSpecialOptions() {
@@ -603,6 +630,28 @@ public class Question extends ReceiveModel {
                 .where("Options.Deleted != 1 AND OptionInOptionSets.Special = 1 AND " +
                         "OptionInOptionSets.RemoteOptionId = Options.RemoteId")
                 .orderBy("OptionInOptionSets.NumberInQuestion ASC")
+                .execute();
+    }
+
+    public Option specialOptionByText(String optionText) {
+        for (Option option : specialOptions()) {
+            if (option.getIdentifier().equals(optionText)) {
+                return option;
+            }
+        }
+        return null;
+    }
+
+    private boolean hasOptionConditionSkips(Option option) {
+        return optionConditionSkips(option).size() > 0;
+    }
+
+    public List<ConditionSkip> optionConditionSkips(Option option) {
+        return new Select().from(ConditionSkip.class)
+                .where("QuestionIdentifier = ? AND RemoteInstrumentId = ? AND " +
+                                "OptionIdentifier = ? AND Deleted = ?",
+                        getQuestionIdentifier(), getInstrument().getRemoteId(),
+                        option.getIdentifier(), false)
                 .execute();
     }
 
@@ -640,7 +689,7 @@ public class Question extends ReceiveModel {
         return mInstrumentVersion;
     }
 
-    public void setInstrumentVersion(int version) {
+    private void setInstrumentVersion(int version) {
         mInstrumentVersion = version;
     }
 
@@ -692,11 +741,11 @@ public class Question extends ReceiveModel {
         return belongsToGrid() && getNumberInGrid() == 1;
     }
 
-    public boolean belongsToGrid() {
+    private boolean belongsToGrid() {
         return getGrid() != null;
     }
 
-    public int getNumberInGrid() {
+    private int getNumberInGrid() {
         return mNumberInGrid;
     }
 
@@ -713,8 +762,8 @@ public class Question extends ReceiveModel {
     }
 
     public boolean isFirstQuestionInSection() {
-        if (getSection() == null || getSection().questions().size() == 0) return false;
-        return (getSection().questions().get(0) == this);
+        return getSection() != null && getSection().questions().size() != 0 &&
+                (getSection().questions().get(0) == this);
     }
 
     public Section getSection() {

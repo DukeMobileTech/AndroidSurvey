@@ -24,7 +24,7 @@ public class TimeQuestionFragment extends SingleQuestionFragment {
             public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
                 mHour = hourOfDay;
                 mMinute = minute;
-                setResponseText();
+                setResponse(null);
                 mSpecialResponses.clearCheck();
             }
         });
