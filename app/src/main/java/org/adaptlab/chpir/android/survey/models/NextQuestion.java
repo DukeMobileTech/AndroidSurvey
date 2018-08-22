@@ -30,6 +30,8 @@ public class NextQuestion extends ReceiveModel {
     private boolean mDeleted;
     @Column(name = "Value")
     private String mValue;
+    @Column(name = "CompleteSurvey")
+    private boolean mCompleteSurvey;
 
     @Override
     public void createObjectFromJSON(JSONObject jsonObject) {
@@ -45,6 +47,7 @@ public class NextQuestion extends ReceiveModel {
             nextQuestion.setNextQuestionIdentifier(jsonObject.getString("next_question_identifier"));
             nextQuestion.setRemoteQuestionId(jsonObject.getLong("question_id"));
             nextQuestion.setRemoteInstrumentId(jsonObject.getLong("instrument_id"));
+            nextQuestion.setCompleteSurvey(jsonObject.optBoolean("complete_survey", false));
             if (jsonObject.isNull("deleted_at")) {
                 nextQuestion.setDeleted(false);
             } else {
@@ -79,6 +82,10 @@ public class NextQuestion extends ReceiveModel {
         return mNextQuestionIdentifier;
     }
 
+    public boolean completeSurvey() {
+        return mCompleteSurvey;
+    }
+
     private void setRemoteId(Long id) {
         mRemoteId = id;
     }
@@ -109,5 +116,9 @@ public class NextQuestion extends ReceiveModel {
 
     private void setValue(String value) {
         mValue = value;
+    }
+
+    private void setCompleteSurvey(boolean completeSurvey) {
+        mCompleteSurvey = completeSurvey;
     }
 }

@@ -38,8 +38,8 @@ public class Option extends ReceiveModel {
 //    private boolean mSpecial;
     @Column(name = "Critical")
     private boolean mCritical;
-    @Column(name = "CompleteSurvey")
-    private boolean mCompleteSurvey;
+//    @Column(name = "CompleteSurvey")
+//    private boolean mCompleteSurvey;
 //    @Column(name = "RemoteOptionSetId")
 //    private Long mRemoteOptionSetId;
     @Column(name = "Identifier")
@@ -291,11 +291,4 @@ public class Option extends ReceiveModel {
         mCritical = critical;
     }
 
-    public boolean getCompleteSurvey() {
-        return mCompleteSurvey;
-    }
-
-    private void setCompleteSurvey(boolean completeSurvey) {
-        mCompleteSurvey = completeSurvey;
-    }
 }

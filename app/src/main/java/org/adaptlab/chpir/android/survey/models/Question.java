@@ -26,6 +26,7 @@ public class Question extends ReceiveModel {
     private static final String TAG = "QuestionModel";
     private static final String FOLLOW_UP_TRIGGER_STRING = "\\[followup\\]";
     private static final String RANDOMIZATION_TRIGGER = "\\[RANDOMIZED_FACTOR\\]";
+    public static final String COMPLETE_SURVEY = "COMPLETE_SURVEY";
 
     @Column(name = "Text")
     private String mText;
@@ -112,7 +113,9 @@ public class Question extends ReceiveModel {
     public String getNextQuestionIdentifier(Option option, Response response) {
         if (!TextUtils.isEmpty(response.getText())) {
             NextQuestion nextQuestion = NextQuestion.findByOptionAndQuestion(option, this);
-            if (nextQuestion != null) return nextQuestion.getNextQuestionIdentifier();
+            if (nextQuestion != null) {
+                return getNextQuestionString(nextQuestion);
+            }
             if (hasOptionConditionSkips(option)) {
                 String skipTo = null;
                 for (ConditionSkip conditionSkip : optionConditionSkips(option)) {
@@ -127,7 +130,9 @@ public class Question extends ReceiveModel {
         }
         if (!TextUtils.isEmpty(response.getSpecialResponse())) {
             NextQuestion nextQuestion = NextQuestion.findByOptionAndQuestion(option, this);
-            if (nextQuestion != null) return nextQuestion.getNextQuestionIdentifier();
+            if (nextQuestion != null) {
+                return getNextQuestionString(nextQuestion);
+            }
             if (hasOptionConditionSkips(option)) {
                 String skipTo = null;
                 for (ConditionSkip conditionSkip : optionConditionSkips(option)) {
@@ -143,10 +148,20 @@ public class Question extends ReceiveModel {
         return null;
     }
 
+    private String getNextQuestionString(NextQuestion nextQuestion) {
+        if (nextQuestion.completeSurvey()) {
+            return COMPLETE_SURVEY;
+        } else {
+            return nextQuestion.getNextQuestionIdentifier();
+        }
+    }
+
     public String getNextQuestionIdentifier(String value) {
         if (TextUtils.isEmpty(value)) return null;
         NextQuestion nextQuestion = NextQuestion.findByValueAndQuestion(value, this);
-        if (nextQuestion != null) return nextQuestion.getNextQuestionIdentifier();
+        if (nextQuestion != null) {
+            return getNextQuestionString(nextQuestion);
+        }
         return null;
     }
 

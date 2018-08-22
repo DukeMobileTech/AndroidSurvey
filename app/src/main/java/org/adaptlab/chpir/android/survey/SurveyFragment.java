@@ -666,6 +666,14 @@ public class SurveyFragment extends Fragment {
         hideQuestionsInDisplay();
     }
 
+    protected void startSurveyCompletion(Question question) {
+        List<Question> displayQuestions = getQuestions(mDisplay);
+        List<Question> skipList = new ArrayList<>(displayQuestions.subList(
+                displayQuestions.indexOf(question) + 1, displayQuestions.size()));
+        updateQuestionsToSkipMap(question.getQuestionIdentifier() + "/skipTo", skipList);
+        hideQuestionsInDisplay();
+    }
+
     protected void reAnimateFollowUpFragment(Question currentQuestion) {
         FragmentManager fm = getChildFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();

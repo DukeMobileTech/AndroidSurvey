@@ -295,8 +295,12 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         if (nextQuestion == null) {
             showAllSubsequentQuestions();
         } else {
-            mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(),
-                    nextQuestion, mQuestion.getQuestionIdentifier());
+            if (nextQuestion.equals(Question.COMPLETE_SURVEY)) {
+                mSurveyFragment.startSurveyCompletion(mQuestion);
+            } else {
+                mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(),
+                        nextQuestion, mQuestion.getQuestionIdentifier());
+            }
         }
         if (selectedOption != null && mQuestion.isMultipleSkipQuestion(mInstrument)) {
             mSurveyFragment.setMultipleSkipQuestions(selectedOption, mQuestion);
@@ -459,32 +463,6 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
             animateValidationTextView(true);
         } else {
             animateValidationTextView(false);
-        }
-    }
-
-    public void animateValidationTextView(boolean valid, String message) {
-        Animation animation = new AlphaAnimation(0, 0);
-
-        if (valid) {
-            if (mValidationTextView.getVisibility() == TextView.VISIBLE)
-                animation = new AlphaAnimation(1, 0);
-            mValidationTextView.setVisibility(TextView.GONE);
-        } else {
-            animation = new AlphaAnimation(0, 1);
-            mValidationTextView.setVisibility(TextView.VISIBLE);
-            if (!isEmpty(message))
-                mValidationTextView.setText(styleTextWithHtml(message));
-            else
-                mValidationTextView.setText(styleTextWithHtml(getString(R.string
-                        .not_valid_response)));
-        }
-
-        animation.setDuration(1000);
-        if (mValidationTextView.getAnimation() == null ||
-                mValidationTextView.getAnimation().hasEnded() ||
-                !mValidationTextView.getAnimation().hasStarted()) {
-            // Only animate if not currently animating
-            mValidationTextView.setAnimation(animation);
         }
     }
 
