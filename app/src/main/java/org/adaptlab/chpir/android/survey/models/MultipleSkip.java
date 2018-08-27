@@ -58,8 +58,8 @@ public class MultipleSkip extends ReceiveModel {
         return new Select().from(MultipleSkip.class).where("RemoteId = ?", id).executeSingle();
     }
 
-    public String getSkipQuestionIdentifier() {
-        return mSkipQuestionIdentifier;
+    public Question getSkipQuestion() {
+        return Question.findByQuestionIdentifier(mSkipQuestionIdentifier);
     }
 
     private void setRemoteId(Long id) {

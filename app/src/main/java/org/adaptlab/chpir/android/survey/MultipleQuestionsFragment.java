@@ -345,7 +345,7 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
     }
 
     private void setResponseSkips(Question question, int responseIndex) {
-        if (question.isSelectOneQuestionType() && question.hasRegularOptionSkips(
+        if (question.hasSingleResponse() && question.hasRegularOptionSkips(
                 question.getInstrument()) && responseIndex != -1) {
             if ((question.isOtherQuestionType() || question.isDropDownQuestionType()) &&
                     responseIndex == question.options().size()) {

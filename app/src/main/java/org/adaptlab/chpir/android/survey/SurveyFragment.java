@@ -691,19 +691,23 @@ public class SurveyFragment extends Fragment {
     protected void setMultipleSkipQuestions(Option selectedOption, Question currentQuestion) {
         List<Question> skipList = new ArrayList<>();
         if (selectedOption != null) {
-            List<MultipleSkip> multipleSkips = new Select().from(MultipleSkip.class)
-                    .where("OptionIdentifier = ? AND QuestionIdentifier = ? AND " +
-                                    "RemoteInstrumentId = ?",
-                            selectedOption.getIdentifier(), currentQuestion.getQuestionIdentifier(),
-                            mInstrument.getRemoteId())
-                    .execute();
-            for (MultipleSkip questionToSkip : multipleSkips) {
-                Question question = Question.findByQuestionIdentifier(questionToSkip
-                        .getSkipQuestionIdentifier());
-                skipList.add(question);
+            for (MultipleSkip questionToSkip : currentQuestion.optionMultipleSkips(selectedOption)) {
+                skipList.add(questionToSkip.getSkipQuestion());
             }
         }
         updateQuestionsToSkipMap(currentQuestion.getQuestionIdentifier() + "/multi", skipList);
+        hideQuestionsInDisplay();
+    }
+
+    protected void setMultipleSkipQuestions2(List<Option> options, Question currentQuestion) {
+        HashSet<Question> skipSet = new HashSet<>();
+        for (Option option : options) {
+            for (MultipleSkip skip : currentQuestion.optionMultipleSkips(option)) {
+                skipSet.add(skip.getSkipQuestion());
+            }
+        }
+        updateQuestionsToSkipMap(currentQuestion.getQuestionIdentifier() + "/multi",
+                new ArrayList<>(skipSet));
         hideQuestionsInDisplay();
     }
 

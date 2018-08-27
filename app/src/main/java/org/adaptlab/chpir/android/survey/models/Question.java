@@ -18,6 +18,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
@@ -100,7 +101,7 @@ public class Question extends ReceiveModel {
                 .executeSingle();
     }
 
-    public boolean isSelectOneQuestionType() {
+    public boolean hasSingleResponse() {
         return (getQuestionType() == QuestionType.SELECT_ONE ||
                 getQuestionType() == QuestionType.SELECT_ONE_WRITE_OTHER ||
                 getQuestionType() == QuestionType.DROP_DOWN);
@@ -165,6 +166,21 @@ public class Question extends ReceiveModel {
         return null;
     }
 
+    public String getNextQuestionIdentifier(List<Option> options) {
+        HashSet<String> nextQuestions = new HashSet<>();
+        for (Option option : options) {
+            NextQuestion nextQuestion = NextQuestion.findByOptionAndQuestion(option, this);
+            if (nextQuestion != null && !TextUtils.isEmpty(nextQuestion.getNextQuestionIdentifier())) {
+                nextQuestions.add(nextQuestion.getNextQuestionIdentifier());
+            }
+        }
+        if (nextQuestions.size() == 1) {
+            return nextQuestions.iterator().next();
+        } else {
+            return null;
+        }
+    }
+
     static boolean validQuestionType(String questionType) {
         for (QuestionType type : QuestionType.values()) {
             if (type.name().equals(questionType)) {
@@ -189,11 +205,23 @@ public class Question extends ReceiveModel {
     }
 
     public boolean isMultipleSkipQuestion(Instrument instrument) {
-        List<MultipleSkip> multipleSkips = new Select().from(MultipleSkip.class)
-                .where("QuestionIdentifier = ? AND RemoteInstrumentId = ?",
-                        getQuestionIdentifier(), instrument.getRemoteId())
+        return multipleSkips(instrument).size() > 0;
+    }
+
+    private List<MultipleSkip> multipleSkips(Instrument instrument) {
+        return new Select().from(MultipleSkip.class)
+                .where("QuestionIdentifier = ? AND RemoteInstrumentId = ? AND Deleted = ?",
+                        getQuestionIdentifier(), instrument.getRemoteId(), false)
                 .execute();
-        return multipleSkips.size() > 0;
+    }
+
+    public List<MultipleSkip> optionMultipleSkips(Option option) {
+        return new Select().from(MultipleSkip.class)
+                .where("OptionIdentifier = ? AND QuestionIdentifier = ? AND " +
+                                "RemoteInstrumentId = ? AND Deleted = ?",
+                        option.getIdentifier(), getQuestionIdentifier(),
+                        getInstrument().getRemoteId(), false)
+                .execute();
     }
 
 //    public boolean hasCompleteSurveyOption() {
@@ -214,6 +242,17 @@ public class Question extends ReceiveModel {
 
     public boolean hasRegularOptionSkips(Instrument instrument) {
         return (nextQuestions(instrument).size() > 0);
+    }
+
+    public boolean hasExclusiveOption() {
+        return exclusiveOptions().size() > 0;
+    }
+
+    public List<OptionInOptionSet> exclusiveOptions() {
+        return new Select().from(OptionInOptionSet.class)
+                .where("RemoteOptionSetId = ? AND Deleted = ? AND IsExclusive = ?",
+                        getRemoteOptionSetId(), false, true)
+                .execute();
     }
 
     /*

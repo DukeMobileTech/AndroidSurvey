@@ -6,7 +6,6 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,11 +19,10 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import org.adaptlab.chpir.android.survey.models.ConditionSkip;
 import org.adaptlab.chpir.android.survey.models.Display;
 import org.adaptlab.chpir.android.survey.models.DisplayInstruction;
 import org.adaptlab.chpir.android.survey.models.Instrument;
-import org.adaptlab.chpir.android.survey.models.NextQuestion;
+import org.adaptlab.chpir.android.survey.models.MultipleSkip;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.OptionSet;
 import org.adaptlab.chpir.android.survey.models.Question;
@@ -271,26 +269,36 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         Option selectedOption = null;
         String nextQuestion = null;
         String enteredValue = null;
+        List<Option> selectedOptions = new ArrayList<>();
         if (!TextUtils.isEmpty(mResponse.getText())) {
-            if (mQuestion.isSelectOneQuestionType()) {
-                int responseIndex = Integer.parseInt(mResponse.getText());
-                if (responseIndex < mQuestion.defaultOptions().size()) {
-                    selectedOption = mQuestion.defaultOptions().get(responseIndex);
-                }
+            if (mQuestion.hasSingleResponse()) {
+                selectedOption = getSelectedOption(mResponse.getText());
             } else if (mQuestion.getQuestionType().equals(Question.QuestionType.INTEGER)) {
                 enteredValue = mResponse.getText();
+            } else if (mQuestion.hasMultipleResponses()) {
+                String[] responses = mResponse.getText().split(Response.LIST_DELIMITER);
+                if (responses.length == 1) {
+                    selectedOption = getSelectedOption(responses[0]);
+                } else {
+                    for (String response : responses) {
+                        Option option = getSelectedOption(response);
+                        if (option != null) selectedOptions.add(option);
+                    }
+                }
             }
         }
         if (!TextUtils.isEmpty(mResponse.getSpecialResponse())) {
             selectedOption = Option.findByQuestionAndSpecialResponse(mQuestion,
                     mResponse.getSpecialResponse());
         }
-        if (selectedOption == null && enteredValue == null) {
+        if (selectedOption == null && enteredValue == null && selectedOptions.isEmpty()) {
             showAllSubsequentQuestions();
-        } else if (selectedOption != null && enteredValue == null) {
+        } else if (selectedOption != null && enteredValue == null && selectedOptions.isEmpty()) {
             nextQuestion = mQuestion.getNextQuestionIdentifier(selectedOption, mResponse);
-        } else if (selectedOption == null) {
+        } else if (selectedOption == null && enteredValue != null && selectedOptions.isEmpty()) {
             nextQuestion = mQuestion.getNextQuestionIdentifier(enteredValue);
+        } else if (!selectedOptions.isEmpty()) {
+            nextQuestion = mQuestion.getNextQuestionIdentifier(selectedOptions);
         }
         if (nextQuestion == null) {
             showAllSubsequentQuestions();
@@ -304,6 +312,17 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         }
         if (selectedOption != null && mQuestion.isMultipleSkipQuestion(mInstrument)) {
             mSurveyFragment.setMultipleSkipQuestions(selectedOption, mQuestion);
+        } else if (!selectedOptions.isEmpty() && mQuestion.isMultipleSkipQuestion(mInstrument)) {
+            mSurveyFragment.setMultipleSkipQuestions2(selectedOptions, mQuestion);
+        }
+    }
+
+    private Option getSelectedOption(String responseText) {
+        int responseIndex = Integer.parseInt(responseText);
+        if (responseIndex < mQuestion.defaultOptions().size()) {
+            return mQuestion.defaultOptions().get(responseIndex);
+        } else {
+            return null;
         }
     }
 

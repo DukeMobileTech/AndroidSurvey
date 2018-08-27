@@ -15,6 +15,7 @@ public class SelectMultipleQuestionFragment extends SingleQuestionFragment {
     private final static String TAG = "SelectMultipleFragment";
     private ArrayList<Integer> mResponseIndices;
     protected ArrayList<CheckBox> mCheckBoxes;
+    private ArrayList<CheckBox> mExclusiveCheckBoxes;
 
     // This is used to add additional UI components in subclasses.
     protected void beforeAddViewHook(ViewGroup questionComponent) {
@@ -24,9 +25,10 @@ public class SelectMultipleQuestionFragment extends SingleQuestionFragment {
     protected void createQuestionComponent(ViewGroup questionComponent) {
         mCheckBoxes = new ArrayList<>();
         mResponseIndices = new ArrayList<>();
+        mExclusiveCheckBoxes = new ArrayList<>();
         for (Option option : getOptions()) {
             final int optionId = getOptions().indexOf(option);
-            final CheckBox checkbox = new CheckBox(getActivity());
+            CheckBox checkbox = new CheckBox(getActivity());
             checkbox.setText(option.getText(getInstrument()));
             checkbox.setTypeface(getInstrument().getTypeFace(getActivity().getApplicationContext
                     ()));
@@ -37,6 +39,7 @@ public class SelectMultipleQuestionFragment extends SingleQuestionFragment {
                     if (mSpecialResponses != null) {
                         mSpecialResponses.clearCheck();
                     }
+                    checkOptionExclusivity(v);
                     toggleResponseIndex(v.getId());
                 }
             });
@@ -44,6 +47,31 @@ public class SelectMultipleQuestionFragment extends SingleQuestionFragment {
             questionComponent.addView(checkbox, optionId);
         }
         beforeAddViewHook(questionComponent);
+    }
+
+    protected void checkOptionExclusivity(View v) {
+        if (getQuestion().hasExclusiveOption()) {
+            Option selectedOption = getOptions().get(v.getId());
+            CheckBox selectedCheckbox = (CheckBox) v;
+            if (selectedCheckbox.isChecked() && selectedOption.isExclusive(getQuestion())) {
+                for (CheckBox checkBox : mCheckBoxes) {
+                    if (checkBox != selectedCheckbox && checkBox.isChecked()) {
+                        checkBox.setChecked(false);
+                    }
+                }
+                mResponseIndices.clear();
+            } else {
+                for (CheckBox checkBox : mCheckBoxes) {
+                    int index = checkBox.getId();
+                    if (checkBox.isChecked() && getOptions().get(index).isExclusive(getQuestion())) {
+                        checkBox.setChecked(false);
+                        if (mResponseIndices.contains(index)) {
+                            mResponseIndices.remove((Integer) index);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Override

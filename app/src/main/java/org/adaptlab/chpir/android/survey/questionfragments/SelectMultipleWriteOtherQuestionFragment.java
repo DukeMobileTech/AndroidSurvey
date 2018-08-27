@@ -24,14 +24,11 @@ public class SelectMultipleWriteOtherQuestionFragment extends
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     otherText.setEnabled(true);
-//                    otherText.requestFocus();
-//                    showKeyBoard();
                 } else {
                     otherText.setEnabled(false);
-//                    hideKeyBoard();
                     otherText.getText().clear();
                 }
-                toggleResponseIndex(otherId);
+//                toggleResponseIndex(otherId);
             }
         });
         checkbox.setOnClickListener(new View.OnClickListener() {
@@ -40,6 +37,8 @@ public class SelectMultipleWriteOtherQuestionFragment extends
                 if (mSpecialResponses != null) {
                     mSpecialResponses.clearCheck();
                 }
+                checkOptionExclusivity(v);
+                toggleResponseIndex(otherId);
             }
         });
         questionComponent.addView(checkbox, otherId);

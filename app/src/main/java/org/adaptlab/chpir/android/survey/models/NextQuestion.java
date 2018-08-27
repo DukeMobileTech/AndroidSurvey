@@ -66,8 +66,9 @@ public class NextQuestion extends ReceiveModel {
 
     public static NextQuestion findByOptionAndQuestion(Option option, Question question) {
         return new Select().from(NextQuestion.class).where("OptionIdentifier = ? AND " +
-                "QuestionIdentifier = ? AND " + "RemoteInstrumentId = ?", option.getIdentifier(),
-                question.getQuestionIdentifier(), question.getInstrument().getRemoteId())
+                "QuestionIdentifier = ? AND RemoteInstrumentId = ? AND Deleted = ?",
+                option.getIdentifier(), question.getQuestionIdentifier(),
+                question.getInstrument().getRemoteId(), false)
                 .executeSingle();
     }
 

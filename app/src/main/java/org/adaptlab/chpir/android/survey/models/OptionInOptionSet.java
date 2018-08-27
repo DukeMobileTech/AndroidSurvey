@@ -27,6 +27,8 @@ public class OptionInOptionSet extends ReceiveModel {
     private boolean mDeleted;
     @Column(name = "Special")
     private boolean mSpecial;
+    @Column(name = "IsExclusive")
+    private boolean mIsExclusive;
 
     @Override
     public void createObjectFromJSON(JSONObject jsonObject) {
@@ -41,8 +43,13 @@ public class OptionInOptionSet extends ReceiveModel {
             option.setRemoteOptionSetId(jsonObject.optLong("option_set_id"));
             option.setRemoteOptionId(jsonObject.optLong("option_id"));
             option.setNumberInQuestion(jsonObject.optInt("number_in_question"));
-            option.setDeleted(jsonObject.optBoolean("deleted_at", false));
+            if (jsonObject.isNull("deleted_at")) {
+                option.setDeleted(false);
+            } else {
+                option.setDeleted(true);
+            }
             option.setSpecial(jsonObject.optBoolean("special", false));
+            option.setIsExclusive(jsonObject.optBoolean("is_exclusive", false));
             option.save();
         } catch (JSONException je) {
             if (BuildConfig.DEBUG) Log.e(TAG, "Error parsing object json", je);
@@ -85,4 +92,11 @@ public class OptionInOptionSet extends ReceiveModel {
         mSpecial = special;
     }
 
+    private void setIsExclusive(boolean exclusive) {
+        mIsExclusive = exclusive;
+    }
+
+    public boolean isExclusive() {
+        return mIsExclusive;
+    }
 }

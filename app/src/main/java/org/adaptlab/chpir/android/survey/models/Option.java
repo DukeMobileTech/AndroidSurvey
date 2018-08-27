@@ -267,13 +267,14 @@ public class Option extends ReceiveModel {
         mInstrumentVersion = version;
     }
 
-//    public boolean getSpecial() {
-//        return mSpecial;
-//    }
-//
-//    private void setSpecial(boolean special) {
-//        mSpecial = special;
-//    }
+    public boolean isExclusive(Question question) {
+        for (OptionInOptionSet optionInOptionSet : question.exclusiveOptions()) {
+            if (optionInOptionSet.getRemoteOptionId().equals(getRemoteId())) {
+                return optionInOptionSet.isExclusive();
+            }
+        }
+        return false;
+    }
 
     public boolean getDeleted() {
         return mDeleted;
