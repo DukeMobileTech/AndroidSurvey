@@ -18,9 +18,10 @@ public class SelectOneWriteOtherQuestionFragment extends
     protected void beforeAddViewHook(ViewGroup questionComponent) {
         RadioButton radioButton = new RadioButton(getActivity());
         otherText = new EditText(getActivity());
-
+        radioButton.setTextColor(getResources().getColorStateList(R.color.states));
         radioButton.setText(R.string.other_specify);
-        radioButton.setTypeface(getInstrument().getTypeFace(getActivity().getApplicationContext()));
+        radioButton.setTypeface(getInstrument().getTypeFace(
+                getActivity().getApplicationContext()));
         final int otherId = getOptions().size();
         radioButton.setId(otherId);
         radioButton.setLayoutParams(new RadioGroup.LayoutParams(
@@ -39,11 +40,8 @@ public class SelectOneWriteOtherQuestionFragment extends
                 if (checkedId != -1) {
                     if (checkedId == otherId) {
                         otherText.setEnabled(true);
-//                        otherText.requestFocus();
-//                        showKeyBoard();
                     } else {
                         otherText.setEnabled(false);
-//                        hideKeyBoard();
                         otherText.getText().clear();
                     }
                     setResponseIndex(checkedId);

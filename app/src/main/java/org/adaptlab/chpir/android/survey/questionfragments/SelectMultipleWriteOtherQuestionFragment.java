@@ -17,7 +17,9 @@ public class SelectMultipleWriteOtherQuestionFragment extends
         CheckBox checkbox = new CheckBox(getActivity());
         otherText = new EditText(getActivity());
         checkbox.setText(R.string.other_specify);
-        checkbox.setTypeface(getInstrument().getTypeFace(getActivity().getApplicationContext()));
+        checkbox.setTypeface(getInstrument().getTypeFace(
+                getActivity().getApplicationContext()));
+        checkbox.setTextColor(getResources().getColorStateList(R.color.states));
         final int otherId = getOptions().size();
         checkbox.setId(otherId);
         checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -28,7 +30,6 @@ public class SelectMultipleWriteOtherQuestionFragment extends
                     otherText.setEnabled(false);
                     otherText.getText().clear();
                 }
-//                toggleResponseIndex(otherId);
             }
         });
         checkbox.setOnClickListener(new View.OnClickListener() {

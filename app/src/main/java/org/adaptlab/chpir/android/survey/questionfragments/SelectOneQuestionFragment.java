@@ -7,6 +7,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 
+import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
 import org.adaptlab.chpir.android.survey.models.Option;
 
@@ -32,8 +33,9 @@ public class SelectOneQuestionFragment extends SingleQuestionFragment {
             RadioButton radioButton = new RadioButton(getActivity());
             radioButton.setText(option.getText(getInstrument()));
             radioButton.setId(optionId);
-            radioButton.setTypeface(getInstrument().getTypeFace(getActivity()
-                    .getApplicationContext()));
+            radioButton.setTypeface(getInstrument().getTypeFace(
+                    getActivity().getApplicationContext()));
+            radioButton.setTextColor(getResources().getColorStateList(R.color.states));
             radioButton.setLayoutParams(new RadioGroup.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT));

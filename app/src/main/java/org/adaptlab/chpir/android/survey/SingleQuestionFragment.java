@@ -86,6 +86,12 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
 
         setSkipPatterns();
         refreshFollowUpQuestion();
+        setSpecialResponseUI(v);
+        deserializeSpecialResponse();
+        return v;
+    }
+
+    private void setSpecialResponseUI(View v) {
         if (!mQuestion.getDisplay().getMode().equals(Display.DisplayMode.TABLE.toString())) {
             mSpecialResponses = v.findViewById(R.id.special_responses_container);
             List<String> responses = new ArrayList<>();
@@ -100,8 +106,9 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
                 final Button button = new RadioButton(getActivity());
                 button.setText(response);
                 button.setId(responseId);
-                button.setTypeface(getInstrument().getTypeFace(getActivity()
-                        .getApplicationContext()));
+                button.setTypeface(getInstrument().getTypeFace(
+                        getActivity().getApplicationContext()));
+                button.setTextColor(getResources().getColorStateList(R.color.states));
 
                 mSpecialResponses.addView(button, responseId);
                 final List<String> finalResponses = responses;
@@ -115,8 +122,6 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
             }
             if (responses.size() == 0) mSpecialResponses.setVisibility(View.GONE);
         }
-        deserializeSpecialResponse();
-        return v;
     }
 
     @Override

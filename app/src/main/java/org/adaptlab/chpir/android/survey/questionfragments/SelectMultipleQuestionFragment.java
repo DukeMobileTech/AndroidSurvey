@@ -1,10 +1,10 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 
+import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.Response;
@@ -30,8 +30,9 @@ public class SelectMultipleQuestionFragment extends SingleQuestionFragment {
             final int optionId = getOptions().indexOf(option);
             CheckBox checkbox = new CheckBox(getActivity());
             checkbox.setText(option.getText(getInstrument()));
-            checkbox.setTypeface(getInstrument().getTypeFace(getActivity().getApplicationContext
-                    ()));
+            checkbox.setTypeface(getInstrument().getTypeFace(
+                    getActivity().getApplicationContext()));
+            checkbox.setTextColor(getResources().getColorStateList(R.color.states));
             checkbox.setId(optionId);
             checkbox.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -50,7 +51,7 @@ public class SelectMultipleQuestionFragment extends SingleQuestionFragment {
     }
 
     protected void checkOptionExclusivity(View v) {
-        if (getQuestion().hasExclusiveOption()) {
+        if (getQuestion().hasExclusiveOption() && (int) v.getId() < getOptions().size()) {
             Option selectedOption = getOptions().get(v.getId());
             CheckBox selectedCheckbox = (CheckBox) v;
             if (selectedCheckbox.isChecked() && selectedOption.isExclusive(getQuestion())) {
@@ -63,7 +64,8 @@ public class SelectMultipleQuestionFragment extends SingleQuestionFragment {
             } else {
                 for (CheckBox checkBox : mCheckBoxes) {
                     int index = checkBox.getId();
-                    if (checkBox.isChecked() && getOptions().get(index).isExclusive(getQuestion())) {
+                    if (checkBox.isChecked() && index < getOptions().size() &&
+                            getOptions().get(index).isExclusive(getQuestion())) {
                         checkBox.setChecked(false);
                         if (mResponseIndices.contains(index)) {
                             mResponseIndices.remove((Integer) index);
