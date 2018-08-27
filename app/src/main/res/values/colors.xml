@@ -3,8 +3,8 @@
     <color name="emphasis">#31b6e7</color>
     <color name="bg_gray">#cecbce</color>
     <color name="item_selected">#1C939D</color>
-    <color name="red">#FF0000</color>
-    <color name="green">#0C8C00</color>
+    <color name="red">#CD0000</color>
+    <color name="green">#006A4E</color>
     <color name="white">#FFFFFF</color>
     <color name="colorControlHighlight">#009587</color>
     <color name="colorButtonNormal">#2095F2</color>

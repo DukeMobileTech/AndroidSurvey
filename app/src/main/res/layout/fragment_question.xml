@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginBottom="@dimen/layout_margin_default"
     android:focusable="true"
     android:focusableInTouchMode="true"
     android:orientation="vertical">
@@ -22,7 +22,7 @@
             android:layout_margin="5dp"
             android:scrollbars="vertical"
             android:textColor="@color/primary_text"
-            android:textStyle="italic"/>
+            android:textStyle="italic" />
 
     </LinearLayout>
 
@@ -39,7 +39,7 @@
             android:layout_weight="3"
             android:gravity="start"
             android:maxLines="1"
-            android:textColor="@color/secondary_text"/>
+            android:textColor="@color/secondary_text" />
 
         <TextView
             android:id="@+id/questionIdentifier"
@@ -49,7 +49,7 @@
             android:layout_weight="1"
             android:gravity="end"
             android:maxLines="1"
-            android:textColor="@color/secondary_text"/>
+            android:textColor="@color/secondary_text" />
     </LinearLayout>
 
     <LinearLayout
@@ -66,7 +66,7 @@
             android:layout_margin="5dp"
             android:scrollbars="vertical"
             android:textColor="@color/secondary_text"
-            android:textStyle="italic"/>
+            android:textStyle="italic" />
 
         <TextView
             android:id="@+id/question_text"
@@ -74,7 +74,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:scrollbars="vertical"
-            android:textColor="@color/primary_text"/>
+            android:textColor="@color/primary_text" />
     </LinearLayout>
 
     <LinearLayout
@@ -95,7 +95,7 @@
             android:scrollbars="vertical"
             android:textColor="@color/secondary_text"
             android:textStyle="italic"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
         <LinearLayout
             android:id="@+id/question_component"
@@ -111,7 +111,7 @@
                 android:calendarViewShown="false"
                 android:datePickerMode="spinner"
                 android:visibility="gone"
-                tools:targetApi="lollipop"/>
+                tools:targetApi="lollipop" />
 
         </LinearLayout>
     </LinearLayout>
@@ -124,16 +124,36 @@
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:orientation="vertical"
-        android:visibility="gone">
-    </LinearLayout>
+        android:visibility="gone"></LinearLayout>
 
-    <RadioGroup
+    <LinearLayout
         android:id="@+id/special_responses_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/response_component_layout"
-        android:gravity="center"
-        android:orientation="horizontal"/>
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:weightSum="4">
+
+        <RadioGroup
+            android:id="@+id/specialResponseButtons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="3"
+            android:gravity="center"
+            android:orientation="horizontal" />
+
+        <Button
+            android:id="@+id/clearResponsesButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/red"
+            android:gravity="center"
+            android:text="@string/clear" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/validation_text"
@@ -144,11 +164,6 @@
         android:layout_marginTop="10dp"
         android:gravity="center_horizontal"
         android:textColor="@color/red"
-        android:visibility="gone"/>
-
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="2dp"
-        android:background="?android:attr/dividerHorizontal"/>
+        android:visibility="gone" />
 
 </LinearLayout>

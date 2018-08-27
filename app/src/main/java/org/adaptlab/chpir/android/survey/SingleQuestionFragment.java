@@ -93,7 +93,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
 
     private void setSpecialResponseUI(View v) {
         if (!mQuestion.getDisplay().getMode().equals(Display.DisplayMode.TABLE.toString())) {
-            mSpecialResponses = v.findViewById(R.id.special_responses_container);
+            mSpecialResponses = v.findViewById(R.id.specialResponseButtons);
             List<String> responses = new ArrayList<>();
             if (mQuestion.hasSpecialOptions()) {
                 for (Option option : mSpecialOptions) {
@@ -120,8 +120,17 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
                     }
                 });
             }
-            if (responses.size() == 0) mSpecialResponses.setVisibility(View.GONE);
         }
+
+        Button clearButton = v.findViewById(R.id.clearResponsesButton);
+        clearButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mSpecialResponses.clearCheck();
+                unSetResponse();
+                setResponse(Response.BLANK);
+            }
+        });
     }
 
     @Override
@@ -417,7 +426,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         if (specialResponse == null) {
             // Set responseText
             mResponse.setResponse(serialize());
-            mResponse.setSpecialResponse("");
+            mResponse.setSpecialResponse(Response.BLANK);
             validateResponse();
             if (!mQuestion.isTextEntryQuestionType()) {
                 removeTextFocus();
@@ -425,7 +434,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         } else {
             // Set specialResponse
             mResponse.setSpecialResponse(specialResponse);
-            mResponse.setResponse("");
+            mResponse.setResponse(Response.BLANK);
             deserialize(mResponse.getText());
             removeTextFocus();
             animateValidationTextView(true);
