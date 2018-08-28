@@ -4,7 +4,9 @@ import android.app.AlertDialog;
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -127,6 +129,7 @@ public class AppUtil {
         }
 
         setAdminSettingsInstance();
+        checkDatabaseVersionChange();
 
         ADMIN_PASSWORD_HASH = context.getResources().getString(R.string.admin_password_hash);
         ACCESS_TOKEN = adminSettingsInstance.getApiKey();
@@ -187,8 +190,23 @@ public class AppUtil {
 
     }
 
+    private static void checkDatabaseVersionChange() {
+        try {
+            ApplicationInfo ai = getContext().getPackageManager().getApplicationInfo(
+                    getContext().getPackageName(), PackageManager.GET_META_DATA);
+            int databaseVersion = (int) ai.metaData.get("AA_DB_VERSION");
+            if (databaseVersion != getAdminSettingsInstance().getDatabaseVersion()) {
+                getAdminSettingsInstance().resetLastSyncTime();
+                getAdminSettingsInstance().setDatabaseVersion(databaseVersion);
+            }
+        } catch (NameNotFoundException e) {
+            if (DEBUG) Log.e(TAG, e.getMessage());
+        }
+    }
+
     private static void setAdminSettingsInstance() {
-        if (getContext() != null && getContext().getResources() != null && getContext().getResources().getBoolean(R.bool.default_admin_settings)) {
+        if (getContext() != null && getContext().getResources() != null &&
+                getContext().getResources().getBoolean(R.bool.default_admin_settings)) {
             adminSettingsInstance = DefaultAdminSettings.getInstance();
         } else {
             adminSettingsInstance = AdminSettings.getInstance();

@@ -62,6 +62,8 @@ public class AdminSettings extends Model {
     private boolean mShowScores;
     @Column(name = "Language")
     private String mLanguage;
+    @Column(name = "DatabaseVersion")
+    private int mDatabaseVersion;
 
     /**
      * Typically a Singleton constructor is private, but in this case the constructor
@@ -352,4 +354,12 @@ public class AdminSettings extends Model {
         save();
     }
 
+    public int getDatabaseVersion() {
+        return mDatabaseVersion;
+    }
+
+    public void setDatabaseVersion(int version) {
+        mDatabaseVersion = version;
+        save();
+    }
 }
