@@ -166,12 +166,13 @@
     <string name="download_api_endpoint_settings">Download API Endpoint Settings</string>
     <string name="device_language">Device Language</string>
     <string name="language">Lugha</string>
-    <string name="submit_survey">Submit Survey</string>
+    <string name="submit_survey">Wasilisha Uchunguzi</string>
     <string name="submit_survey_message">Once a survey has been submitted successfully, it will be deleted from the device.</string>
-    <string name="start">Start</string>
-    <string name="end">End</string>
+    <string name="start">Mwanzo</string>
+    <string name="end">Mwisho</string>
     <string name="sum_of_parts">Total Sum of Parts</string>
-    <string name="clear">Clear</string>
-    <string name="signature_saved">Signature saved</string>
+    <string name="clear">Futa</string>
+    <string name="signature_saved">Saini imehifadhiwa</string>
     <string name="signature_not_saved">Signature NOT saved</string>
+    <string name="selected_date">Tarehe Iliyochaguliwa</string>
 </resources>
