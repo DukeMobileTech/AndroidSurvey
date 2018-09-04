@@ -47,7 +47,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.activeandroid.Model;
-import com.activeandroid.query.Select;
 import com.crashlytics.android.Crashlytics;
 
 import org.adaptlab.chpir.android.survey.location.LocationManager;
@@ -1164,7 +1163,7 @@ public class SurveyFragment extends Fragment {
                                  boolean isLastChild, View convertView, ViewGroup parent) {
             final String expandedListText = (String) getChild(listPosition, expandedListPosition);
             if (convertView == null) {
-                convertView = mLayoutInflater.inflate(R.layout.list_item, null);
+                convertView = mLayoutInflater.inflate(R.layout.list_item_text_view, null);
             }
             TextView expandedListTextView = convertView.findViewById(R.id.expandedListItem);
             expandedListTextView.setText(expandedListText);

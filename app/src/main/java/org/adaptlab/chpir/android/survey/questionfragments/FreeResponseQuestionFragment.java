@@ -9,6 +9,7 @@ import android.widget.EditText;
 
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
+import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Validation;
 import org.adaptlab.chpir.android.survey.utils.FormatUtils;
 import org.adaptlab.chpir.android.survey.verhoeff.ParticipantIdValidator;
@@ -77,8 +78,8 @@ public class FreeResponseQuestionFragment extends SingleQuestionFragment {
     @Override
     protected void unSetResponse() {
         mFreeText.removeTextChangedListener(mTextWatcher);
-        mFreeText.setText("");
-        mResponse.setResponse("");
+        mFreeText.setText(Response.BLANK);
+        setResponseTextBlank();
         mFreeText.addTextChangedListener(mTextWatcher);
     }
 }

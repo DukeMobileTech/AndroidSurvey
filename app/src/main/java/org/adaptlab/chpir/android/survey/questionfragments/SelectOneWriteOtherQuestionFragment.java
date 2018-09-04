@@ -9,6 +9,7 @@ import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 
 import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.models.Response;
 
 public class SelectOneWriteOtherQuestionFragment extends
         SelectOneQuestionFragment {
@@ -68,9 +69,7 @@ public class SelectOneWriteOtherQuestionFragment extends
         if(getRadioGroup()!=null){
             getRadioGroup().clearCheck();
         }
-        otherText.setText("");
-        if (mResponse != null) {
-            mResponse.setResponse("");
-        }
+        otherText.setText(Response.BLANK);
+        setResponseTextBlank();
     }
 }

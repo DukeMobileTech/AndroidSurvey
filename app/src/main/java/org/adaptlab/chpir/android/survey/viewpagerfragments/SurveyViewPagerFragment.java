@@ -46,7 +46,7 @@ public class SurveyViewPagerFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle
             savedInstanceState) {
-        View view = inflater.inflate(R.layout.view_pager_fragment, container, false);
+        View view = inflater.inflate(R.layout.recycler_view, container, false);
         mRecyclerView = view.findViewById(R.id.recyclerView);
         mSurveyAdapter = new SurveyAdapter();
         mRecyclerView.setAdapter(mSurveyAdapter);

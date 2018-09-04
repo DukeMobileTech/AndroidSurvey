@@ -1,5 +1,7 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -8,6 +10,7 @@ import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.Response;
+import org.adaptlab.chpir.android.survey.utils.FormatUtils;
 
 import java.util.ArrayList;
 
@@ -15,7 +18,6 @@ public class SelectMultipleQuestionFragment extends SingleQuestionFragment {
     private final static String TAG = "SelectMultipleFragment";
     private ArrayList<Integer> mResponseIndices;
     protected ArrayList<CheckBox> mCheckBoxes;
-    private ArrayList<CheckBox> mExclusiveCheckBoxes;
 
     // This is used to add additional UI components in subclasses.
     protected void beforeAddViewHook(ViewGroup questionComponent) {
@@ -25,7 +27,6 @@ public class SelectMultipleQuestionFragment extends SingleQuestionFragment {
     protected void createQuestionComponent(ViewGroup questionComponent) {
         mCheckBoxes = new ArrayList<>();
         mResponseIndices = new ArrayList<>();
-        mExclusiveCheckBoxes = new ArrayList<>();
         for (Option option : getOptions()) {
             final int optionId = getOptions().indexOf(option);
             CheckBox checkbox = new CheckBox(getActivity());
@@ -42,6 +43,9 @@ public class SelectMultipleQuestionFragment extends SingleQuestionFragment {
                     }
                     checkOptionExclusivity(v);
                     toggleResponseIndex(v.getId());
+                    if (getQuestion().rankResponses()) {
+                        optionToggled(v.getId());
+                    }
                 }
             });
             mCheckBoxes.add(checkbox);
@@ -78,12 +82,7 @@ public class SelectMultipleQuestionFragment extends SingleQuestionFragment {
 
     @Override
     protected String serialize() {
-        StringBuilder serialized = new StringBuilder();
-        for (int i = 0; i < mResponseIndices.size(); i++) {
-            serialized.append(mResponseIndices.get(i));
-            if (i < mResponseIndices.size() - 1) serialized.append(Response.LIST_DELIMITER);
-        }
-        return serialized.toString();
+        return FormatUtils.arrayListToString(mResponseIndices);
     }
 
     @Override
@@ -121,11 +120,13 @@ public class SelectMultipleQuestionFragment extends SingleQuestionFragment {
 
     @Override
     protected void unSetResponse() {
-        if (mResponse != null) {
-            mResponse.setResponse("");
-        }
         for (CheckBox oneBox : mCheckBoxes) {
             oneBox.setChecked(false);
         }
+        setResponseTextBlank();
+        if (getQuestion().rankResponses()) {
+            getResponse().setRankOrder(Response.BLANK);
+        }
     }
+
 }

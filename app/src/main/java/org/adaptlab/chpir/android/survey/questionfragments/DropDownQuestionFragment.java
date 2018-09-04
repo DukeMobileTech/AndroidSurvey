@@ -11,6 +11,7 @@ import android.widget.Spinner;
 import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.Option;
+import org.adaptlab.chpir.android.survey.models.Response;
 
 import java.util.ArrayList;
 
@@ -24,15 +25,13 @@ public class DropDownQuestionFragment extends SingleQuestionFragment {
     protected void unSetResponse() {
         clearAdapter();
         setSpinnerAdapter();
-        if (mResponse != null) {
-            mResponse.setResponse("");
-        }
+        setResponseTextBlank();
     }
 
     @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
-        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context
-                .LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(
+                Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.spinner, null);
         mSpinner = view.findViewById(R.id.options_spinner);
         setSpinnerAdapter();
@@ -41,7 +40,7 @@ public class DropDownQuestionFragment extends SingleQuestionFragment {
 
     @Override
     protected void deserialize(String responseText) {
-        if (responseText.equals("")) {
+        if (responseText.equals(Response.BLANK)) {
             clearAdapter();
             setSpinnerAdapter();
         } else {

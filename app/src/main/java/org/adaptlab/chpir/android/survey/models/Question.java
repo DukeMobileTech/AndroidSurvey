@@ -35,10 +35,6 @@ public class Question extends ReceiveModel {
     private QuestionType mQuestionType;
     @Column(name = "QuestionIdentifier")
     private String mQuestionIdentifier;
-    @Column(name = "FollowingUpQuestion")
-    private Question mFollowingUpQuestion;
-    @Column(name = "FollowUpPosition")
-    private int mFollowUpPosition;
     @Column(name = "OptionCount")
     private int mOptionCount;
     @Column(name = "InstrumentVersion")
@@ -77,6 +73,8 @@ public class Question extends ReceiveModel {
     private String mTableIdentifier;
     @Column(name = "ValidationId")
     private Long mValidationId;
+    @Column(name = "RankResponses")
+    private boolean mRankResponses;
 
     public Question() {
         super();
@@ -442,10 +440,6 @@ public class Question extends ReceiveModel {
                 getQuestionType().equals(QuestionType.SELECT_MULTIPLE_WRITE_OTHER);
     }
 
-    public void setFollowingUpQuestion(Question question) {
-        mFollowingUpQuestion = question;
-    }
-
     /*
      * Check that all of the options are loaded and that the instrument version
      * numbers of the question components match the expected instrument version
@@ -534,6 +528,7 @@ public class Question extends ReceiveModel {
             question.setTableIdentifier(jsonObject.getString("table_identifier"));
             if (!jsonObject.isNull("validation_id"))
                 question.setValidationId(jsonObject.getLong("validation_id"));
+            question.setRankResponses(jsonObject.optBoolean("rank_responses"));
             question.save();
 
             // Generate translations
@@ -755,14 +750,6 @@ public class Question extends ReceiveModel {
         mNumberInInstrument = number;
     }
 
-    public int getFollowUpPosition() {
-        return mFollowUpPosition;
-    }
-
-    private void setFollowUpPosition(int position) {
-        mFollowUpPosition = position;
-    }
-
     public boolean identifiesSurvey() {
         return mIdentifiesSurvey;
     }
@@ -883,6 +870,14 @@ public class Question extends ReceiveModel {
                 || type == QuestionType.INSTRUCTIONS || type == QuestionType.PHONE_NUMBER
                 || type == QuestionType.ADDRESS || type == QuestionType.RANGE
                 || type == QuestionType.SUM_OF_PARTS);
+    }
+
+    public boolean rankResponses() {
+        return mRankResponses;
+    }
+
+    private void setRankResponses(boolean rankResponses) {
+        mRankResponses = rankResponses;
     }
 
     public enum QuestionType {

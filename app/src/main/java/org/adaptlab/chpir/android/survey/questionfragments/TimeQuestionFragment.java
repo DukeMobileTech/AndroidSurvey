@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.TimePicker;
 
+import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.utils.FormatUtils;
 import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
 
@@ -45,11 +46,9 @@ public class TimeQuestionFragment extends SingleQuestionFragment {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
     @Override
     protected void unSetResponse() {
-        if (mResponse != null) {
-            mResponse.setResponse("");
-        }
+        setResponseTextBlank();
     }
+
 }

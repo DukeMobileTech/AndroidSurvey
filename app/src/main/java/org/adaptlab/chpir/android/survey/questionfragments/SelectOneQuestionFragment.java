@@ -10,6 +10,7 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
 import org.adaptlab.chpir.android.survey.models.Option;
+import org.adaptlab.chpir.android.survey.models.Response;
 
 import static org.adaptlab.chpir.android.survey.utils.FormatUtils.removeNonNumericCharacters;
 
@@ -90,9 +91,7 @@ public class SelectOneQuestionFragment extends SingleQuestionFragment {
         if (getRadioGroup() != null) {
             getRadioGroup().clearCheck();
         }
-        if (mResponse != null) {
-            mResponse.setResponse("");
-        }
+        setResponseTextBlank();
     }
 
 }

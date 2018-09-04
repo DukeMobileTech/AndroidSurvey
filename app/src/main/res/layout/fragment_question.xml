@@ -117,6 +117,31 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/responseRankingLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/response_component_layout"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/response_rank_title"
+            android:textColor="@color/primary_text"
+            android:textStyle="bold" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </android.support.v7.widget.RecyclerView>
+
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/responseLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -124,7 +149,9 @@
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:orientation="vertical"
-        android:visibility="gone"></LinearLayout>
+        android:visibility="gone">
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/special_responses_container"

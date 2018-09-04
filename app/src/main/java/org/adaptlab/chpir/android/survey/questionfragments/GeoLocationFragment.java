@@ -12,6 +12,7 @@ import android.widget.TextView;
 import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.location.LocationManager;
+import org.adaptlab.chpir.android.survey.models.Response;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -23,9 +24,9 @@ public class GeoLocationFragment extends SingleQuestionFragment {
 
     @Override
     protected void unSetResponse() {
-        mLatitude.setText("");
-        mLongitude.setText("");
-        mAltitude.setText("");
+        mLatitude.setText(Response.BLANK);
+        mLongitude.setText(Response.BLANK);
+        mAltitude.setText(Response.BLANK);
     }
 
     @Override

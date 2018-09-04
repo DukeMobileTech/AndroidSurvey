@@ -91,11 +91,9 @@ public abstract class ListOfItemsQuestionFragment extends SingleQuestionFragment
     @Override
     protected void unSetResponse() {
         for (EditText oneEditText : mResponses) {
-            oneEditText.setText("");
+            oneEditText.setText(Response.BLANK);
         }
-        if (mResponse != null) {
-            mResponse.setResponse("");
-        }
+        setResponseTextBlank();
     }
 
 }

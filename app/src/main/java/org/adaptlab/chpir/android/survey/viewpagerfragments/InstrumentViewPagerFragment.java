@@ -43,7 +43,7 @@ public class InstrumentViewPagerFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle
             savedInstanceState) {
-        View view = inflater.inflate(R.layout.view_pager_fragment, container, false);
+        View view = inflater.inflate(R.layout.recycler_view, container, false);
         RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
         mInstrumentAdapter = new InstrumentAdapter();
         recyclerView.setAdapter(mInstrumentAdapter);

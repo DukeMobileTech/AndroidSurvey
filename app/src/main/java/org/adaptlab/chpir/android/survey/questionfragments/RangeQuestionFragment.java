@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
+import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.utils.FormatUtils;
 
 public class RangeQuestionFragment extends SingleQuestionFragment {
@@ -20,9 +21,11 @@ public class RangeQuestionFragment extends SingleQuestionFragment {
 
     @Override
     protected void unSetResponse() {
-        mStart.setText("");
-        mEnd.setText("");
-        mResponse.setResponse("");
+        mStart.setText(Response.BLANK);
+        mEnd.setText(Response.BLANK);
+        if (getResponse() != null) {
+            getResponse().setResponse(Response.BLANK);
+        }
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -7,6 +8,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 
 import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.models.Response;
 
 public class SelectMultipleWriteOtherQuestionFragment extends
         SelectMultipleQuestionFragment {
@@ -50,12 +52,7 @@ public class SelectMultipleWriteOtherQuestionFragment extends
 
     @Override
     protected void unSetResponse() {
-        otherText.setText("");
-        for (CheckBox oneBox : mCheckBoxes) {
-            oneBox.setChecked(false);
-        }
-        if (mResponse != null) {
-            mResponse.setResponse("");
-        }
+        otherText.setText(Response.BLANK);
+        super.unSetResponse();
     }
 }

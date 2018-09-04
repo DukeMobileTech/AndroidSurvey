@@ -16,7 +16,7 @@ import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.ResponsePhoto;
 
 public class FrontPictureQuestionFragment extends PictureQuestionFragment {
-    private static final String TAG = "FrontPictureQuestionFragment";
+    private static final String TAG = "FrontPictureFragment";
     private ResponsePhoto mPhoto;
 
     @Override

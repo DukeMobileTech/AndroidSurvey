@@ -1,6 +1,7 @@
 package org.adaptlab.chpir.android.survey.utils;
 
 import android.content.Context;
+import android.os.Build;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -8,7 +9,9 @@ import android.text.TextUtils;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.Option;
+import org.adaptlab.chpir.android.survey.models.Response;
 
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -95,5 +98,18 @@ public class FormatUtils {
 
     public static boolean isEmpty(String string) {
         return (TextUtils.isEmpty(string) || string.toLowerCase().equals("null"));
+    }
+
+    public static String arrayListToString(ArrayList list) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            return String.join(Response.LIST_DELIMITER, list);
+        } else {
+            StringBuilder serialized = new StringBuilder();
+            for (int i = 0; i < list.size(); i++) {
+                serialized.append(list.get(i));
+                if (i < list.size() - 1) serialized.append(Response.LIST_DELIMITER);
+            }
+            return serialized.toString();
+        }
     }
 }

@@ -52,6 +52,8 @@ public class Response extends SendModel {
     private String mSurveyUUID;
     @Column(name = "RandomizedData")
     private String mRandomizedData;
+    @Column(name = "RankOrder")
+    private String mRankOrder;
 
     public Response() {
         super();
@@ -174,6 +176,7 @@ public class Response extends SendModel {
             jsonObject.put("uuid", getUUID());
             jsonObject.put("question_version", getQuestionVersion());
             jsonObject.put("randomized_data", getRandomizedData());
+            jsonObject.put("rank_order", getRankOrder());
             if (getDeviceUser() != null) {
                 jsonObject.put("device_user_id", getDeviceUser().getRemoteId());
             }
@@ -290,4 +293,11 @@ public class Response extends SendModel {
                 mSpecialResponse.equals(NA) || mSpecialResponse.equals(DK);
     }
 
+    public String getRankOrder() {
+        return mRankOrder;
+    }
+
+    public void setRankOrder(String order) {
+        mRankOrder = order;
+    }
 }

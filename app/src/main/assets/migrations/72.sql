@@ -1,0 +1,2 @@
+ALTER TABLE Questions ADD COLUMN RankResponses BOOLEAN;
+ALTER TABLE Responses ADD COLUMN RankOrder STRING;

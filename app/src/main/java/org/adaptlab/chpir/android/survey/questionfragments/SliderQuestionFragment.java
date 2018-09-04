@@ -7,6 +7,7 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
 import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
+import org.adaptlab.chpir.android.survey.models.Response;
 
 public class SliderQuestionFragment extends SingleQuestionFragment {
     private int mProgress;
@@ -64,8 +65,6 @@ public class SliderQuestionFragment extends SingleQuestionFragment {
     @Override
     protected void unSetResponse() {
         mSlider.setProgress(0);
-        if (mResponse != null) {
-            mResponse.setResponse("");
-        }
+        setResponseTextBlank();
     }
 }

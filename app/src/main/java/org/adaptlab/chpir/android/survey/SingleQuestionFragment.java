@@ -1,11 +1,19 @@
 package org.adaptlab.chpir.android.survey;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v7.util.DiffUtil;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,9 +37,15 @@ import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.ResponsePhoto;
 import org.adaptlab.chpir.android.survey.models.Survey;
+import org.adaptlab.chpir.android.survey.questionfragments.SelectMultipleQuestionFragment;
 import org.adaptlab.chpir.android.survey.utils.AuthUtils;
+import org.adaptlab.chpir.android.survey.utils.FormatUtils;
+import org.adaptlab.chpir.android.survey.utils.looper.ItemTouchHelperExtension;
+import org.adaptlab.chpir.android.survey.viewpagerfragments.SurveyViewPagerFragment;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -48,8 +62,8 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
             ".question_id";
     private final static String TAG = "SingleQuestionFragment";
     public TextView mValidationTextView;
-    public Response mResponse;
     protected RadioGroup mSpecialResponses;
+    private Response mResponse;
     private Question mQuestion;
     private Survey mSurvey;
     private Instrument mInstrument;
@@ -58,6 +72,9 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
     private TextView mQuestionText;
     private TextView mQuestionInstructions;
     private TextView mDisplayInstructionsText;
+    private OptionsAdapter mOptionsAdapter;
+    private View mFragmentView;
+    private ViewGroup mRankLayout;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
@@ -79,16 +96,82 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         ViewGroup questionComponent = (LinearLayout) v.findViewById(R.id.question_component);
         setChoiceSelectionInstructions(v);
         createQuestionComponent(questionComponent);
-
-        if (mResponse != null) {
+        if (mResponse != null)
             deserialize(mResponse.getText());
-        }
-
         setSkipPatterns();
         refreshFollowUpQuestion();
+        setResponseRanking(v);
         setSpecialResponseUI(v);
         deserializeSpecialResponse();
+        mFragmentView = v;
         return v;
+    }
+
+    private void setResponseRanking(View view) {
+        if (getQuestion().rankResponses() && getSelectedOptions().size() > 1) {
+            mRankLayout = view.findViewById(R.id.responseRankingLayout);
+            mRankLayout.setVisibility(View.VISIBLE);
+            RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
+            mOptionsAdapter = new OptionsAdapter(getSelectedOptions());
+            recyclerView.setAdapter(mOptionsAdapter);
+            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
+                    recyclerView.getContext(), DividerItemDecoration.VERTICAL);
+            recyclerView.addItemDecoration(dividerItemDecoration);
+            ItemTouchHelperExtension.Callback callback = new ItemTouchHelperCallback();
+            ItemTouchHelperExtension itemTouchHelper = new ItemTouchHelperExtension(callback);
+            itemTouchHelper.attachToRecyclerView(recyclerView);
+        }
+    }
+
+    protected void optionToggled(int index) {
+        updateRankOrder(index);
+        if (getSelectedOptions().size() < 2) {
+            if (mRankLayout != null) {
+                mRankLayout.setVisibility(View.GONE);
+                if (mOptionsAdapter != null) mOptionsAdapter.updateOptions(getSelectedOptions());
+            }
+        } else {
+            if (mOptionsAdapter == null) {
+                setResponseRanking(mFragmentView);
+            } else {
+                if (mRankLayout != null) mRankLayout.setVisibility(View.VISIBLE);
+                mOptionsAdapter.updateOptions(getSelectedOptions());
+            }
+        }
+    }
+
+    private void updateRankOrder(int index) {
+        String indexInteger = String.valueOf(index);
+        ArrayList<String> rankOrder = new ArrayList<>(Arrays.asList(
+                mResponse.getRankOrder().split(Response.LIST_DELIMITER)));
+        if (rankOrder.contains(indexInteger)) {
+            rankOrder.remove(indexInteger);
+        } else {
+            rankOrder.add(indexInteger);
+        }
+        mResponse.setRankOrder(FormatUtils.arrayListToString(rankOrder));
+    }
+
+    private List<Option> getSelectedOptions() {
+        List<Option> options = new ArrayList<>();
+        if (mResponse != null) {
+            String[] order = new String[0];
+            if (!TextUtils.isEmpty(mResponse.getRankOrder())) {
+                order = mResponse.getRankOrder().split(Response.LIST_DELIMITER);
+            } else if (!TextUtils.isEmpty(mResponse.getText())) {
+                order = mResponse.getText().split(Response.LIST_DELIMITER);
+            }
+            for (String response : order) {
+                if (!response.equals(Response.BLANK)) {
+                    int index = Integer.parseInt(response);
+                    if (index < getOptions().size()) {
+                        options.add(getOptions().get(index));
+                    }
+                }
+            }
+        }
+        return options;
     }
 
     private void setSpecialResponseUI(View v) {
@@ -128,6 +211,12 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
             public void onClick(View view) {
                 mSpecialResponses.clearCheck();
                 unSetResponse();
+                if (getQuestion().rankResponses()) {
+                    if (mRankLayout != null && mOptionsAdapter != null) {
+                        mOptionsAdapter.clear();
+                        mRankLayout.setVisibility(View.GONE);
+                    }
+                }
                 setResponse(Response.BLANK);
             }
         });
@@ -496,6 +585,138 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
             animateValidationTextView(true);
         } else {
             animateValidationTextView(false);
+        }
+    }
+
+    protected void setResponseTextBlank() {
+        if (getResponse() != null) {
+            getResponse().setResponse(Response.BLANK);
+        }
+    }
+
+    private class ItemTouchHelperCallback extends ItemTouchHelperExtension.Callback {
+
+        @Override
+        public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+            return makeMovementFlags(ItemTouchHelper.UP | ItemTouchHelper.DOWN,
+                    ItemTouchHelper.END);
+        }
+
+        @Override
+        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
+                              RecyclerView.ViewHolder target) {
+            return mOptionsAdapter.onItemMove(viewHolder.getAdapterPosition(),
+                    target.getAdapterPosition());
+        }
+
+        @Override
+        public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+
+        }
+    }
+
+    private class OptionsAdapter extends RecyclerView.Adapter<OptionsViewHolder> {
+        private List<Option> mOptions;
+
+        OptionsAdapter(List<Option> options) {
+            mOptions = options;
+            saveRankOrder();
+        }
+
+        void updateOptions(List<Option> options) {
+            final List<Option> oldOptions = new ArrayList<>(this.mOptions);
+            this.mOptions.clear();
+            if (options != null) {
+                this.mOptions.addAll(options);
+            }
+
+            DiffUtil.calculateDiff(new DiffUtil.Callback() {
+
+                @Override
+                public int getOldListSize() {
+                    return oldOptions.size();
+                }
+
+                @Override
+                public int getNewListSize() {
+                    return mOptions.size();
+                }
+
+                @Override
+                public boolean areItemsTheSame(int oldPosition, int newPosition) {
+                    return oldOptions.get(oldPosition).equals(mOptions.get(newPosition));
+                }
+
+                @Override
+                public boolean areContentsTheSame(int oldPosition, int newPosition) {
+                    Option oldOption = oldOptions.get(oldPosition);
+                    Option newOption = mOptions.get(newPosition);
+                    return oldOption.getIdentifier().equals(newOption.getIdentifier());
+                }
+            }).dispatchUpdatesTo(this);
+        }
+
+        @NonNull
+        @Override
+        public OptionsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View optionView = LayoutInflater.from(parent.getContext()).inflate(
+                    R.layout.list_item_option_view, parent, false);
+            return new OptionsViewHolder(optionView);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull OptionsViewHolder holder, int position) {
+            holder.setOption(mOptions.get(position));
+        }
+
+        @Override
+        public int getItemCount() {
+            return mOptions.size();
+        }
+
+        public boolean onItemMove(int fromPosition, int toPosition) {
+            if (fromPosition < toPosition) {
+                for (int i = fromPosition; i < toPosition; i++) {
+                    Collections.swap(mOptions, i, i + 1);
+                }
+            } else {
+                for (int i = fromPosition; i > toPosition; i--) {
+                    Collections.swap(mOptions, i, i - 1);
+                }
+            }
+            this.notifyItemMoved(fromPosition, toPosition);
+            saveRankOrder();
+            return true;
+        }
+
+        private void saveRankOrder() {
+            StringBuilder order = new StringBuilder();
+            for (int i = 0; i < mOptions.size(); i++) {
+                int index = getOptions().indexOf(mOptions.get(i));
+                order.append(index);
+                if (i < mOptions.size() - 1) order.append(Response.LIST_DELIMITER);
+            }
+            mResponse.setRankOrder(order.toString());
+        }
+
+        public void clear() {
+            final int size = mOptions.size();
+            mOptions.clear();
+            notifyItemRangeRemoved(0, size);
+        }
+
+    }
+
+    private class OptionsViewHolder extends RecyclerView.ViewHolder {
+        TextView mTextView;
+
+        private OptionsViewHolder(View itemView) {
+            super(itemView);
+            mTextView = itemView.findViewById(R.id.optionTextListItem);
+        }
+
+        private void setOption(Option option) {
+            mTextView.setText(option.getText(getInstrument()));
         }
     }
 

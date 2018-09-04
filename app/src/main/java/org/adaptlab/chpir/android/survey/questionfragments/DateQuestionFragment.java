@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.utils.FormatUtils;
 import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
 import org.adaptlab.chpir.android.survey.views.ScrollableDatePicker;
@@ -64,7 +65,7 @@ public class DateQuestionFragment extends SingleQuestionFragment {
 
     private void setSelectedDate() {
         String dateTitle = getString(R.string.selected_date);
-        String string = dateTitle + "\n" + mResponse.getText();
+        String string = dateTitle + "\n" + getResponse().getText();
         SpannableString spannableString = new SpannableString(string);
         spannableString.setSpan(new StyleSpan(Typeface.BOLD), dateTitle.length(), string.length(),
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -100,10 +101,8 @@ public class DateQuestionFragment extends SingleQuestionFragment {
 
     @Override
     protected void unSetResponse() {
-        if (mResponse != null) {
-            mResponse.setResponse("");
-            setSelectedDate();
-        }
+        setResponseTextBlank();
+        setSelectedDate();
         Calendar calendar = Calendar.getInstance();
         mDatePicker.init(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH), mListener);
