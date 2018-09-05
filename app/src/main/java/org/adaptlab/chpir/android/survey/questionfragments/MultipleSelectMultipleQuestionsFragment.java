@@ -181,7 +181,6 @@ public class MultipleSelectMultipleQuestionsFragment extends MultipleQuestionsFr
         response.setSpecialResponse("");
         response.setTimeEnded(new Date());
         response.save();
-        getSurvey().setLastQuestion(question);
         getSurvey().save();
     }
 

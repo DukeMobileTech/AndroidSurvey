@@ -163,7 +163,6 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
             response.setResponse("");
             response.setDeviceUser(AuthUtils.getCurrentUser());
             response.setTimeEnded(new Date());
-            mSurvey.setLastQuestion(question);
             mSurvey.setLastUpdated(new Date());
             saveResponseInBackground(response);
             setSpecialResponseSkips(question);
@@ -442,7 +441,6 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
         }
         response.setResponse(String.valueOf(checkedId));
         response.setTimeEnded(new Date());
-        mSurvey.setLastQuestion(question);
         mSurvey.setLastUpdated(new Date());
         saveResponseInBackground(response);
     }

@@ -133,6 +133,10 @@ public class Response extends SendModel {
         }
     }
 
+    public boolean isResponseEmpty() {
+        return isEmpty(getText()) && isEmpty(getSpecialResponse()) && isEmpty(getOtherResponse());
+    }
+
     public Question getQuestion() {
         return mQuestion;
     }
@@ -146,16 +150,16 @@ public class Response extends SendModel {
         return Survey.findByUUID(getSurveyUUID());
     }
 
+    public void setSurvey(Survey survey) {
+        mSurveyUUID = survey.getUUID();
+    }
+
     public String getText() {
         return mText;
     }
 
     private String getSurveyUUID() {
         return mSurveyUUID;
-    }
-
-    public void setSurvey(Survey survey) {
-        mSurveyUUID = survey.getUUID();
     }
 
     @Override
@@ -216,6 +220,10 @@ public class Response extends SendModel {
         return mTimeEnded;
     }
 
+    public void setTimeEnded(Date time) {
+        mTimeEnded = time;
+    }
+
     public String getUUID() {
         return mUUID;
     }
@@ -232,20 +240,16 @@ public class Response extends SendModel {
         return mRandomizedData;
     }
 
+    public void setRandomizedData(String data) {
+        mRandomizedData = data;
+    }
+
     public DeviceUser getDeviceUser() {
         return mDeviceUser;
     }
 
     public void setDeviceUser(DeviceUser deviceUser) {
         mDeviceUser = deviceUser;
-    }
-
-    public void setRandomizedData(String data) {
-        mRandomizedData = data;
-    }
-
-    public void setTimeEnded(Date time) {
-        mTimeEnded = time;
     }
 
     @Override

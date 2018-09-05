@@ -50,8 +50,6 @@ public class Survey extends SendModel {
     private String mLongitude;
     @Column(name = "LastUpdated")
     private Date mLastUpdated;
-    @Column(name = "LastQuestion")
-    private Long mLastQuestionRemoteId;
     @Column(name = "Metadata")
     private String mMetadata;
     @Column(name = "ProjectId")
@@ -195,7 +193,10 @@ public class Survey extends SendModel {
      * Relationships
      */
     public List<Response> responses() {
-        return new Select().from(Response.class).where("SurveyUUID = ?", getUUID()).execute();
+        return new Select().from(Response.class)
+                .where("SurveyUUID = ?", getUUID())
+                .orderBy("TimeEnded")
+                .execute();
     }
 
     public List<Response> emptyResponses() {
@@ -218,7 +219,7 @@ public class Survey extends SendModel {
 
     public HashMap<Question, Response> responsesMap() {
         int capacity = (int) Math.ceil(responseCount()/0.75);
-        HashMap<Question, Response> map = new HashMap<Question, Response>(capacity);
+        HashMap<Question, Response> map = new HashMap<>(capacity);
         for (Response response : responses()) {
             map.put(response.getQuestion(), response);
         }
@@ -302,16 +303,12 @@ public class Survey extends SendModel {
     }
 
     public Question getLastQuestion() {
-        if (getInstrument().questions().size() == 0) return null;
-        if (mLastQuestionRemoteId == null) {
+        List<Response> responses = responses();
+        if (responses.size() == 0) {
             return getInstrument().questions().get(0);
         } else {
-            return Question.findByRemoteId(mLastQuestionRemoteId);
+            return responses.get(responses.size() - 1).getQuestion();
         }
-    }
-
-    public void setLastQuestion(Question question) {
-        mLastQuestionRemoteId = question.getRemoteId();
     }
 
     public void deleteIfComplete() {

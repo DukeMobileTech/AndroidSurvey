@@ -529,7 +529,6 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
             animateValidationTextView(true);
         }
         mResponse.setTimeEnded(new Date());
-        mSurvey.setLastQuestion(mQuestion);
         mResponse.setDeviceUser(AuthUtils.getCurrentUser());
         saveResponseInBackground(mResponse);
         setSkipPatterns();
