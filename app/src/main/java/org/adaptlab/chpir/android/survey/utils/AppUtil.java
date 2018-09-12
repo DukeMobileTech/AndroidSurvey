@@ -314,24 +314,4 @@ public class AppUtil {
         }
     }
 
-    public static void orderInstrumentsSections() {
-        new OrderInstrumentSectionsTask().execute();
-    }
-
-    private static class OrderInstrumentSectionsTask extends AsyncTask<Void, Void, Void> {
-
-        public OrderInstrumentSectionsTask() {
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            List<Instrument> instruments = Instrument.getAllProjectInstruments(
-                    Long.valueOf(adminSettingsInstance.getProjectId()));
-            for (Instrument instrument : instruments) {
-                instrument.orderSections();
-            }
-            return null;
-        }
-    }
-
 }

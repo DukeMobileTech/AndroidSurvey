@@ -8,6 +8,8 @@ import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
 import org.adaptlab.chpir.android.survey.BuildConfig;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -26,8 +28,8 @@ public class Display extends ReceiveModel {
     private Long mInstrumentId;
     @Column(name = "Title")
     private String mTitle;
-    @Column(name = "SectionTitle")
-    private String mSectionTitle;
+    @Column(name = "SectionId")
+    private Long mSectionId;
     @Column(name = "Deleted")
     private boolean mDeleted;
 
@@ -40,11 +42,14 @@ public class Display extends ReceiveModel {
     }
 
     public String getSectionTitle() {
-        return mSectionTitle;
+        Section section = new Select().from(Section.class)
+                .where("RemoteId = ?", mSectionId).executeSingle();
+        if (section == null) return null;
+        return section.getTitle();
     }
 
-    private void setSectionTitle(String mSectionTitle) {
-        this.mSectionTitle = mSectionTitle;
+    private void setSectionId(Long sectionId) {
+        mSectionId = sectionId;
     }
 
     @Override
@@ -61,12 +66,29 @@ public class Display extends ReceiveModel {
             display.setPosition(jsonObject.optInt("position"));
             display.setInstrumentId(jsonObject.optLong("instrument_id"));
             display.setTitle(jsonObject.optString("title"));
-            display.setSectionTitle(jsonObject.optString("section_title"));
+            display.setSectionId(jsonObject.optLong("section_id"));
             if (jsonObject.isNull("deleted_at"))
                 display.setDeleted(false);
             else
                 display.setDeleted(true);
             display.save();
+
+            JSONArray translationsArray = jsonObject.optJSONArray("display_translations");
+            if (translationsArray != null) {
+                for (int i = 0; i < translationsArray.length(); i++) {
+                    JSONObject translationJSON = translationsArray.getJSONObject(i);
+                    Long translationRemoteId = translationJSON.getLong("id");
+                    DisplayTranslation translation = DisplayTranslation.findByRemoteId(translationRemoteId);
+                    if (translation == null) {
+                        translation = new DisplayTranslation();
+                    }
+                    translation.setRemoteId(translationRemoteId);
+                    translation.setLanguage(translationJSON.getString("language"));
+                    translation.setDisplay(display);
+                    translation.setText(translationJSON.getString("text"));
+                    translation.save();
+                }
+            }
         } catch (JSONException je) {
             if (BuildConfig.DEBUG) Log.e(TAG, "Error parsing object json", je);
         }
@@ -137,7 +159,22 @@ public class Display extends ReceiveModel {
     }
 
     public String getTitle() {
+        if (getInstrument().getLanguage().equals(AppUtil.getDeviceLanguage())) return mTitle;
+        for (DisplayTranslation translation : translations()) {
+            if (translation.getLanguage().equals(AppUtil.getDeviceLanguage())) {
+                return translation.getText();
+            }
+        }
+        //Default
         return mTitle;
+    }
+
+    public List<DisplayTranslation> translations() {
+        return getMany(DisplayTranslation.class, "Display");
+    }
+
+    public Instrument getInstrument() {
+        return Instrument.findByRemoteId(mInstrumentId);
     }
 
     private void setTitle(String title) {

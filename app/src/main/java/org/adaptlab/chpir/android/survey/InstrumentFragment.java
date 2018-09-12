@@ -948,7 +948,6 @@ public class InstrumentFragment extends ListFragment {
             }
             AppUtil.getAdminSettingsInstance().setLastSyncTime(ActiveRecordCloudSync
                     .getLastSyncTime());
-            AppUtil.orderInstrumentsSections();
             if (isAdded() && !getActivity().isFinishing() && mProgressDialog != null &&
                     mProgressDialog.isShowing()) {
                 mProgressDialog.dismiss();

@@ -480,15 +480,6 @@ public class Instrument extends ReceiveModel {
         mSpecialOptions = specialOptions.replaceAll("[^A-Za-z0-9,]", "");
     }
 
-    public void orderSections() {
-        for (Section section : sections()) {
-            if (section.questions().size() > 0) {
-                section.setFirstQuestionNumber(section.questions().get(0).getNumberInInstrument());
-                section.save();
-            }
-        }
-    }
-
     public List<Section> sections() {
         return new Select()
                 .from(Section.class)

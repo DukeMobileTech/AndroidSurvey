@@ -173,7 +173,6 @@ public class Instrument2Activity extends AppCompatActivity {
                                     if (last) {
                                         AppUtil.getAdminSettingsInstance().setLastSyncTime(
                                                 ActiveRecordCloudSync.getLastSyncTime());
-                                        AppUtil.orderInstrumentsSections();
                                         dismissProgressDialog();
                                     }
                                 }

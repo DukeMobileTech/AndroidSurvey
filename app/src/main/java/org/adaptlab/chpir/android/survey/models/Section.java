@@ -23,9 +23,7 @@ public class Section extends ReceiveModel {
     private Long mRemoteId;
 	@Column(name = "Title")
     private String mTitle;
-	@Column(name = "FirstQuestionNumber")
-	private int mFirstQuestionNumber;
-    @Column(name = "InstrumentRemoteId")
+	@Column(name = "InstrumentRemoteId")
     private Long mInstrumentRemoteId;
     @Column(name = "Deleted")
     private boolean mDeleted;
@@ -41,10 +39,7 @@ public class Section extends ReceiveModel {
             section.setRemoteId(remoteId);
             section.setInstrumentRemoteId(jsonObject.getLong("instrument_id"));
             section.setTitle(jsonObject.getString("title"));
-			if (!jsonObject.isNull(jsonObject.getString("first_question_number"))) {
-                section.setFirstQuestionNumber(jsonObject.getInt("first_question_number"));
-            }
-            if (jsonObject.isNull("deleted_at")) {
+			if (jsonObject.isNull("deleted_at")) {
                 section.setDeleted(false);
             } else {
                 section.setDeleted(true);
@@ -65,8 +60,6 @@ public class Section extends ReceiveModel {
                     translation.setLanguage(translationJSON.getString("language"));
                     translation.setSection(section);
                     translation.setText(translationJSON.getString("text"));
-                    translation.setInstrumentTranslation(InstrumentTranslation.findByRemoteId(
-                            translationJSON.optLong("instrument_translation_id")));
                     translation.save();
                 }
             }
@@ -99,13 +92,6 @@ public class Section extends ReceiveModel {
     	return getMany(SectionTranslation.class, "Section");
     }
 
-    public List<Question> questions() {
-        return new Select().from(Question.class)
-                .where("Section = ? AND Deleted != ?", getId(), 1)
-                .orderBy("NumberInInstrument")
-                .execute();
-    }
-
 	public void setInstrumentRemoteId(Long instrumentId) {
 		mInstrumentRemoteId = instrumentId;
 	}
@@ -124,10 +110,6 @@ public class Section extends ReceiveModel {
 	
 	public void setTitle(String title) {
 		mTitle = title;
-	}
-
-	public void setFirstQuestionNumber(int questionNumber) {
-		mFirstQuestionNumber = questionNumber;
 	}
 
     private Long getInstrumentRemoteId() {

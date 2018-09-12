@@ -802,11 +802,6 @@ public class Question extends ReceiveModel {
         mGrid = grid;
     }
 
-    public boolean isFirstQuestionInSection() {
-        return getSection() != null && getSection().questions().size() != 0 &&
-                (getSection().questions().get(0) == this);
-    }
-
     public Section getSection() {
         return mSection;
     }
