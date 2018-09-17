@@ -40,8 +40,8 @@
     <string name="custom_locale">ISO-639-1 Code</string>
     <string name="not_valid_response">Jibu hili hauruhusiwi kwa swali hili.</string>
     <string name="of">ya</string>
-    <string name="instrument_loading_progress_header">Loading</string>
-    <string name="background_process_progress_message">Please wait one moment.</string>
+    <string name="instrument_loading_progress_header">Upakuzi</string>
+    <string name="background_process_progress_message">Tafadhali subiri kwa muda mfupi.</string>
     <string name="instrument_not_loaded">There was an issue loading this instrument.  Please re-sync the device and try again.</string>
     <string name="and">and</string>
     <string name="comma">,</string>

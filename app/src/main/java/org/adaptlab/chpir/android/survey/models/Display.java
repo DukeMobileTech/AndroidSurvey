@@ -67,10 +67,11 @@ public class Display extends ReceiveModel {
             display.setInstrumentId(jsonObject.optLong("instrument_id"));
             display.setTitle(jsonObject.optString("title"));
             display.setSectionId(jsonObject.optLong("section_id"));
-            if (jsonObject.isNull("deleted_at"))
+            if (jsonObject.isNull("deleted_at")) {
                 display.setDeleted(false);
-            else
+            } else {
                 display.setDeleted(true);
+            }
             display.save();
 
             JSONArray translationsArray = jsonObject.optJSONArray("display_translations");

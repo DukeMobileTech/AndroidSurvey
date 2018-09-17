@@ -47,8 +47,8 @@ public class Question extends ReceiveModel {
     private Long mRemoteId;
     @Column(name = "ImageCount")
     private int mImageCount;
-    @Column(name = "Instructions")
-    private String mInstructions;
+    @Column(name = "InstructionId")
+    private Long mInstructionId;
     @Column(name = "QuestionVersion")
     private int mQuestionVersion;
     @Column(name = "Grid")
@@ -501,7 +501,7 @@ public class Question extends ReceiveModel {
 //            if (!jsonObject.isNull("follow_up_position")) {
 //                question.setFollowUpPosition(jsonObject.getInt("follow_up_position"));
 //            }
-            question.setInstructions(jsonObject.getString("instructions"));
+            question.setInstruction(jsonObject.optLong("instruction_id"));
             question.setQuestionVersion(jsonObject.getInt("question_version"));
             question.setDisplay(jsonObject.optLong("display_id"));
 //            question.setFollowingUpQuestion(Question.findByQuestionIdentifier(jsonObject
@@ -755,19 +755,13 @@ public class Question extends ReceiveModel {
     }
 
     public String getInstructions() {
-        if (getInstrument().getLanguage().equals(AppUtil.getDeviceLanguage())) return mInstructions;
-        if (activeTranslation() != null) return activeTranslation().getInstructions();
-        for (QuestionTranslation translation : translations()) {
-            if (translation.getLanguage().equals(AppUtil.getDeviceLanguage())) {
-                return translation.getInstructions();
-            }
-        }
-        // Fall back to default
-        return mInstructions;
+        Instruction instruction = Instruction.findByRemoteId(mInstructionId);
+        if (instruction == null) return null;
+        return instruction.getText(getInstrument());
     }
 
-    private void setInstructions(String instructions) {
-        mInstructions = instructions;
+    private void setInstruction(Long id) {
+        mInstructionId = id;
     }
 
     public int getQuestionVersion() {

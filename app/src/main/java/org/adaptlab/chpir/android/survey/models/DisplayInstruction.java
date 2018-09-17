@@ -13,15 +13,15 @@ import org.json.JSONObject;
 
 @Table(name = "DisplayInstructions")
 public class DisplayInstruction extends ReceiveModel {
-    private static final String TAG = "Display";
+    private static final String TAG = "DisplayInstruction";
     @Column(name = "RemoteId")
     private Long mRemoteId;
     @Column(name = "Position")
     private int mPosition;
     @Column(name = "RemoteDisplayId")
     private Long mRemoteDisplayId;
-    @Column(name = "Instructions")
-    private String mInstructions;
+    @Column(name = "InstructionId")
+    private Long mInstructionId;
     @Column(name = "Deleted")
     private boolean mDeleted;
 
@@ -41,8 +41,12 @@ public class DisplayInstruction extends ReceiveModel {
             display.setRemoteId(remoteId);
             display.setPosition(jsonObject.optInt("position"));
             display.setDisplayId(jsonObject.optLong("display_id"));
-            display.setInstructions(jsonObject.optString("instructions"));
-            display.setDeleted(jsonObject.optBoolean("deleted"));
+            display.setInstructionId(jsonObject.optLong("instruction_id"));
+            if (jsonObject.isNull("deleted_at")) {
+                display.setDeleted(false);
+            } else {
+                display.setDeleted(true);
+            }
             display.save();
         } catch (JSONException je) {
             if (BuildConfig.DEBUG) Log.e(TAG, "Error parsing object json", je);
@@ -61,7 +65,17 @@ public class DisplayInstruction extends ReceiveModel {
         return mRemoteId;
     }
 
-    public String getInstructions(){ return mInstructions; }
+    public String getInstructions() {
+        Instruction instruction = Instruction.findByRemoteId(mInstructionId);
+        if (instruction == null) return null;
+        return instruction.getText(getInstrument());
+    }
+
+    private Instrument getInstrument() {
+        Display display = Display.findByRemoteId(mRemoteDisplayId);
+        if (display == null) return null;
+        return display.getInstrument();
+    }
 
     private void setRemoteId(Long id) {
        mRemoteId = id;
@@ -79,6 +93,8 @@ public class DisplayInstruction extends ReceiveModel {
         mRemoteDisplayId = id;
     }
 
-    private void setInstructions(String instructions) { mInstructions = instructions; }
+    private void setInstructionId(Long instructionId) {
+        mInstructionId = instructionId;
+    }
 
 }
