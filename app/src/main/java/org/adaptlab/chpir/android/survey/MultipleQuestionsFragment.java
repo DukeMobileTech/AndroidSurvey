@@ -93,11 +93,11 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_question, parent, false);
-        mDisplayInstructionsText = v.findViewById(R.id.displayInstructions);
+        mDisplayInstructionsText = (TextView) v.findViewById(R.id.displayInstructions);
         setDisplayInstructions();
-        TextView questionNumber = v.findViewById(R.id.questionNumber);
+        TextView questionNumber = (TextView) v.findViewById(R.id.questionNumber);
         questionNumber.setText(getQuestionRange());
-        TextView questionInstructions = v.findViewById(R.id.question_instructions);
+        TextView questionInstructions = (TextView) v.findViewById(R.id.question_instructions);
         questionInstructions.setTypeface(getInstrument().getTypeFace(getActivity()));
         if (isEmpty(getInstructions())) {
             ((LinearLayout) questionInstructions.getParent()).setVisibility(View.GONE);
@@ -109,7 +109,7 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
                 viewGroup.setBackground(getResources().getDrawable(R.drawable.response_component_layout));
             }
         }
-        TextView questionText = v.findViewById(R.id.question_text);
+        TextView questionText = (TextView) v.findViewById(R.id.question_text);
         if (questionText != null) questionText.setVisibility(View.GONE);
         ViewGroup questionComponent1 = (LinearLayout) v.findViewById(R.id.responseLayout1);
         questionComponent1.setVisibility(View.GONE);
@@ -225,7 +225,7 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
 //    }
 
     protected void setTableHeaderOptions(View v) {
-        LinearLayout headerTableLayout = v.findViewById(R.id.table_options_header);
+        LinearLayout headerTableLayout = (LinearLayout) v.findViewById(R.id.table_options_header);
         List<Option> headerLabels = getDisplay().tableOptions(getTableIdentifier());
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);

@@ -630,7 +630,7 @@ public class InstrumentFragment extends ListFragment {
             Instrument instrument = Instrument.findByRemoteId(remoteId);
             int numQuestions = instrument.questions().size();
 
-            TextView instrumentProperties = view.findViewById(R.id.instrumentProperties);
+            TextView instrumentProperties = (TextView) view.findViewById(R.id.instrumentProperties);
             String title = instrument.getTitle() + "\n";
             String questionCount = numQuestions + " " + FormatUtils.pluralize(numQuestions,
                     getString(R.string.question), getString(R.string.questions)) + "  ";
@@ -705,7 +705,7 @@ public class InstrumentFragment extends ListFragment {
             String surveyUUID = cursor.getString(cursor.getColumnIndexOrThrow("UUID"));
             Survey survey = Survey.findByUUID(surveyUUID);
 
-            TextView surveyTextView = view.findViewById(R.id.surveyProperties);
+            TextView surveyTextView = (TextView) view.findViewById(R.id.surveyProperties);
             String surveyTitle = survey.identifier(AppUtil.getContext()) + "\n";
             String instrumentTitle = survey.getInstrument().getTitle() + "\n";
             String lastUpdated = DateFormat.getDateTimeInstance().format(survey.getLastUpdated())

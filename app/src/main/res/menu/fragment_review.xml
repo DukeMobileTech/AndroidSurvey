@@ -4,13 +4,13 @@
 
     <item
         android:id="@+id/menu_item_back"
-        android:icon="@drawable/ic_menu_item_previous_item"
+        android:icon="@drawable/previous_item"
         android:title="@string/previous_button"
         app:showAsAction="ifRoom|withText"/>
 
     <item
         android:id="@+id/menu_item_complete"
-        android:icon="@drawable/ic_menu_item_accept"
+        android:icon="@drawable/accept"
         android:title="@string/finish_button"
         android:visibility="gone"
         app:showAsAction="always|withText"/>

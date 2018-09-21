@@ -272,16 +272,16 @@ public class SurveyFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_survey, parent, false);
-        mDisplayTitle = v.findViewById(R.id.display_title);
+        mDisplayTitle = (TextView) v.findViewById(R.id.display_title);
         mQuestionViewLayout = (LinearLayout) v.findViewById(R.id.question_component_layout);
         mParticipantLabel = (TextView) v.findViewById(R.id.participant_label);
         mDisplayIndexLabel = (TextView) v.findViewById(R.id.display_index_label);
         mProgressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
-        mIndeterminateProgressBar = v.findViewById(R.id.indeterminateProgressBar);
+        mIndeterminateProgressBar = (ProgressBar) v.findViewById(R.id.indeterminateProgressBar);
         ActivityCompat.invalidateOptionsMenu(getActivity());
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (actionBar != null) actionBar.setTitle(mInstrument.getTitle());
-        mScrollView = v.findViewById(R.id.survey_fragment_scroll_view);
+        mScrollView = (NestedScrollView) v.findViewById(R.id.survey_fragment_scroll_view);
         return v;
     }
 
@@ -388,9 +388,9 @@ public class SurveyFragment extends Fragment {
 
     private void setupNavigationDrawer() {
         updateHiddenDisplayNumberSet();
-        mDrawerLayout = getActivity().findViewById(R.id.drawer_layout);
+        mDrawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-        mExpandableListView = getActivity().findViewById(R.id.navigation);
+        mExpandableListView = (ExpandableListView) getActivity().findViewById(R.id.navigation);
         setDrawerListViewWidth();
         mExpandableListData = getListData();
         mExpandableListTitle = new ArrayList(mExpandableListData.keySet());
@@ -807,7 +807,7 @@ public class SurveyFragment extends Fragment {
                     qfTag = mSurvey.getId().toString() + "-" + question.getTableIdentifier();
                 }
 
-                FrameLayout frameLayout = getActivity().findViewById(frameLayoutId);
+                FrameLayout frameLayout = (FrameLayout) getActivity().findViewById(frameLayoutId);
                 if (frameLayout == null) {
                     frameLayout = new FrameLayout(getContext());
                     frameLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup
@@ -1165,7 +1165,7 @@ public class SurveyFragment extends Fragment {
             if (convertView == null) {
                 convertView = mLayoutInflater.inflate(R.layout.list_item_text_view, null);
             }
-            TextView expandedListTextView = convertView.findViewById(R.id.expandedListItem);
+            TextView expandedListTextView = (TextView) convertView.findViewById(R.id.expandedListItem);
             expandedListTextView.setText(expandedListText);
             return convertView;
         }
@@ -1196,7 +1196,7 @@ public class SurveyFragment extends Fragment {
             if (convertView == null) {
                 convertView = mLayoutInflater.inflate(R.layout.list_group, null);
             }
-            TextView listTitleTextView = convertView.findViewById(R.id.listTitle);
+            TextView listTitleTextView = (TextView) convertView.findViewById(R.id.listTitle);
             listTitleTextView.setTypeface(mInstrument.getTypeFace(mContext), Typeface.BOLD);
             listTitleTextView.setText(listTitle);
             return convertView;

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.DrawerLayout
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/drawer_layout"
-    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -16,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <ProgressBar
             android:id="@+id/indeterminateProgressBar"
@@ -24,8 +23,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:indeterminate="true"
-            android:visibility="visible"
-            />
+            android:visibility="visible" />
 
         <android.support.v4.widget.NestedScrollView
             android:id="@+id/survey_fragment_scroll_view"
@@ -72,7 +70,7 @@
                         android:layout_marginStart="10dp"
                         android:layout_weight="1"
                         android:gravity="start|bottom"
-                        android:textColor="@color/secondary_text"/>
+                        android:textColor="@color/secondary_text" />
 
                     <TextView
                         android:id="@+id/display_index_label"
@@ -82,7 +80,7 @@
                         android:layout_marginRight="10dp"
                         android:layout_weight="1"
                         android:gravity="end|bottom"
-                        android:textColor="@color/secondary_text"/>
+                        android:textColor="@color/secondary_text" />
 
                 </LinearLayout>
 
@@ -91,7 +89,7 @@
                     style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="5dp"/>
+                    android:layout_margin="5dp" />
             </LinearLayout>
         </android.support.v4.widget.NestedScrollView>
 
@@ -102,9 +100,9 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="@drawable/fragments_background"
+        android:background="@color/white"
         android:divider="@color/divider"
         android:dividerHeight="0.5dp"
-        android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft"/>
+        android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft" />
 
 </android.support.v4.widget.DrawerLayout>

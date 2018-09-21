@@ -7,7 +7,7 @@
     <item
         android:id="@+id/add_participant"
         android:title="@string/new_participant"
-        android:icon="@drawable/ic_person_add"
+        android:icon="@drawable/person_add"
         app:showAsAction="ifRoom|withText" />
 
 </menu>
