@@ -132,15 +132,16 @@ public class Option extends ReceiveModel {
 //            option.setNumberInQuestion(jsonObject.optInt("number_in_question", -1));
 //            option.setInstrumentVersion(jsonObject.getInt("instrument_version"));
 //            option.setSpecial(jsonObject.optBoolean("special", false));
-//            if (!jsonObject.isNull("deleted_at")) {
-//                option.setDeleted(true);
-//            }
+            if (jsonObject.isNull("deleted_at")) {
+                option.setDeleted(false);
+            } else {
+                option.setDeleted(true);
+            }
 //            if (!jsonObject.isNull("critical")) {
 //                option.setCritical(jsonObject.getBoolean("critical"));
 //            }
 //            option.setCompleteSurvey(jsonObject.optBoolean("complete_survey"));
 //            option.setRemoteOptionSetId(jsonObject.optLong("option_set_id"));
-            option.setDeleted(jsonObject.optBoolean("deleted_at", false));
             option.setIdentifier(jsonObject.optString("identifier"));
             option.save();
 

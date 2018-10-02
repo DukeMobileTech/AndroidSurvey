@@ -130,8 +130,8 @@ public class AdminFragment extends Fragment {
 //        mShowRostersCheckBox = (CheckBox) v.findViewById(R.id.show_rosters_checkbox);
 //        mShowRostersCheckBox.setChecked(AppUtil.getAdminSettingsInstance().getShowRosters());
 
-        mShowScoresCheckBox = (CheckBox) v.findViewById(R.id.show_scores_checkbox);
-        mShowScoresCheckBox.setChecked(AppUtil.getAdminSettingsInstance().getShowScores());
+//        mShowScoresCheckBox = (CheckBox) v.findViewById(R.id.show_scores_checkbox);
+//        mShowScoresCheckBox.setChecked(AppUtil.getAdminSettingsInstance().getShowScores());
 
 //        mShowSkipCheckBox = (CheckBox) v.findViewById(R.id.show_skip_checkbox);
 //        mShowSkipCheckBox.setChecked(AppUtil.getAdminSettingsInstance().getShowSkip());
@@ -175,7 +175,7 @@ public class AdminFragment extends Fragment {
 //            mShowRFCheckBox.setEnabled(false);
 //            mShowNACheckBox.setEnabled(false);
 //            mShowSkipCheckBox.setEnabled(false);
-            mShowScoresCheckBox.setEnabled(false);
+//            mShowScoresCheckBox.setEnabled(false);
 //            mShowRostersCheckBox.setEnabled(false);
             mShowSurveysCheckBox.setEnabled(false);
 //            mRosterEndPointCheckBox.setEnabled(false);
@@ -525,7 +525,7 @@ public class AdminFragment extends Fragment {
 
             AppUtil.getAdminSettingsInstance().setShowSurveys(mShowSurveysCheckBox.isChecked());
 //            AppUtil.getAdminSettingsInstance().setShowRosters(mShowRostersCheckBox.isChecked());
-            AppUtil.getAdminSettingsInstance().setShowScores(mShowScoresCheckBox.isChecked());
+//            AppUtil.getAdminSettingsInstance().setShowScores(mShowScoresCheckBox.isChecked());
 //            AppUtil.getAdminSettingsInstance().setShowSkip(mShowSkipCheckBox.isChecked());
 //            AppUtil.getAdminSettingsInstance().setShowNA(mShowNACheckBox.isChecked());
 //            AppUtil.getAdminSettingsInstance().setShowRF(mShowRFCheckBox.isChecked());

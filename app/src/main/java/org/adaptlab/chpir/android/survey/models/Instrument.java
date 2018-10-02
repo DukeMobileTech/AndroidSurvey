@@ -404,7 +404,7 @@ public class Instrument extends ReceiveModel {
 
     public HashMap<Long, List<Option>> specialOptionsMap() {
         HashMap<Long, List<Option>> map = new HashMap<>();
-        List<OptionInOptionSet> specialOptionInOptionSet = new Select().from(OptionInOptionSet.class).where("Special = 1").execute();
+        List<OptionInOptionSet> specialOptionInOptionSet = new Select().from(OptionInOptionSet.class).where("Special = 1 AND Deleted = 0").execute();
         for (OptionInOptionSet optionInOptionSet : specialOptionInOptionSet) {
             List<Option> options = map.get(optionInOptionSet.getRemoteOptionSetId());
             if (options == null) {
