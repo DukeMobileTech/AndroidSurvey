@@ -177,4 +177,5 @@
     <string name="signature_not_saved">Signature NOT saved</string>
     <string name="selected_date">Selected Date</string>
     <string name="response_rank_title">Please rank your responses in order of importance</string>
+    <string name="drag_left">Drag left</string>
 </resources>
