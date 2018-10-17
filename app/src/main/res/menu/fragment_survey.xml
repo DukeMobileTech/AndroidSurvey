@@ -8,17 +8,17 @@
         app:showAsAction="always" />
     <item
         android:id="@+id/menu_item_previous"
-        android:icon="@drawable/previous_item"
+        android:icon="@drawable/ic_chevron_left_black_24dp"
         android:title="@string/previous_button"
         app:showAsAction="ifRoom|withText"/>
     <item
         android:id="@+id/menu_item_next"
-        android:icon="@drawable/next_item"
+        android:icon="@drawable/ic_chevron_right_black_24dp"
         android:title="@string/next_button"
         app:showAsAction="ifRoom|withText"/>
     <item
         android:id="@+id/menu_item_finish"
-        android:icon="@drawable/accept"
+        android:icon="@drawable/ic_check_black_24dp"
         android:title="@string/finish_button"
         android:visibility="gone"
         app:showAsAction="ifRoom|withText"/>

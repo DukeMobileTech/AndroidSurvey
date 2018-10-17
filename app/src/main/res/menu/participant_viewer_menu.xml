@@ -3,22 +3,22 @@
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/submitted_participant"
-        android:icon="@drawable/backup"
+        android:icon="@drawable/ic_cloud_upload_black_24dp"
         android:title="@string/sent"
         app:showAsAction="ifRoom|withText"/>
     <item
         android:id="@+id/completed_participant"
-        android:icon="@drawable/done"
+        android:icon="@drawable/ic_check_black_24dp"
         android:title="@string/completed"
         app:showAsAction="ifRoom|withText"/>
     <item
         android:id="@+id/delete_participant"
-        android:icon="@drawable/delete"
+        android:icon="@drawable/ic_delete_forever_black_24dp"
         android:title="@string/delete"
         app:showAsAction="ifRoom|withText"/>
     <item
         android:id="@+id/edit_participant"
-        android:icon="@drawable/edit"
+        android:icon="@drawable/ic_edit_black_24dp"
         android:title="@string/edit"
         app:showAsAction="ifRoom|withText"/>
 

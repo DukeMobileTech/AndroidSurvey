@@ -19,4 +19,5 @@
     <color name="divider">#BDBDBD</color>
     <color name="yellow">#FEF035</color>
     <color name="transparent">#00000000</color>
+    <color name="background">#FFFFFF</color>
 </resources>

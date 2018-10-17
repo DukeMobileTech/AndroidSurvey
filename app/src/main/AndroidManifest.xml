@@ -27,7 +27,7 @@
     <application
         android:name="org.adaptlab.chpir.android.survey.SurveyApp"
         android:allowBackup="false"
-        android:icon="@drawable/launcher"
+        android:icon="@drawable/ic_assignment_black_24dp"
         android:label="@string/app_name"
         android:theme="@style/Theme.Survey">
         <!--<activity-->

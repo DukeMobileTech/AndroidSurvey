@@ -50,6 +50,7 @@ public class InstrumentViewPagerFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView
                 .getContext(), DividerItemDecoration.VERTICAL);
+        dividerItemDecoration.setDrawable(getResources().getDrawable(R.drawable.border));
         recyclerView.addItemDecoration(dividerItemDecoration);
 
         return view;

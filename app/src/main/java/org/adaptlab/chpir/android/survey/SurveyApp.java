@@ -2,6 +2,7 @@ package org.adaptlab.chpir.android.survey;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.support.v7.app.AppCompatDelegate;
 
 import org.adaptlab.chpir.android.survey.utils.LocaleManager;
 
@@ -17,6 +18,7 @@ public class SurveyApp extends com.activeandroid.app.Application {
 
     @Override
     public void onCreate() {
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
         super.onCreate();
         mInstance = this;
     }

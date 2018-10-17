@@ -101,15 +101,11 @@ public class FormatUtils {
     }
 
     public static String arrayListToString(ArrayList list) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            return String.join(Response.LIST_DELIMITER, list);
-        } else {
-            StringBuilder serialized = new StringBuilder();
-            for (int i = 0; i < list.size(); i++) {
-                serialized.append(list.get(i));
-                if (i < list.size() - 1) serialized.append(Response.LIST_DELIMITER);
-            }
-            return serialized.toString();
+        StringBuilder serialized = new StringBuilder();
+        for (int i = 0; i < list.size(); i++) {
+            serialized.append(list.get(i));
+            if (i < list.size() - 1) serialized.append(Response.LIST_DELIMITER);
         }
+        return serialized.toString();
     }
 }

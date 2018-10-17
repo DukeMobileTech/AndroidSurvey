@@ -389,7 +389,6 @@ public class SurveyFragment extends Fragment {
     private void setupNavigationDrawer() {
         updateHiddenDisplayNumberSet();
         mDrawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
-        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         mExpandableListView = (ExpandableListView) getActivity().findViewById(R.id.navigation);
         setDrawerListViewWidth();
         mExpandableListData = getListData();

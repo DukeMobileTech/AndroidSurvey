@@ -55,6 +55,7 @@ public class SurveyViewPagerFragment extends Fragment {
         mRecyclerView.setLayoutManager(layoutManager);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
                 mRecyclerView.getContext(), DividerItemDecoration.VERTICAL);
+        dividerItemDecoration.setDrawable(getResources().getDrawable(R.drawable.border));
         mRecyclerView.addItemDecoration(dividerItemDecoration);
         setSurveyLeftSwipe();
         return view;
