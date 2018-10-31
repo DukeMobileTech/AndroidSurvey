@@ -833,8 +833,8 @@ public class Question extends ReceiveModel {
         return mTableIdentifier;
     }
 
-    private void setTableIdentifier(String mTableIdentifier) {
-        mTableIdentifier = mTableIdentifier;
+    private void setTableIdentifier(String tableIdentifier) {
+        mTableIdentifier = tableIdentifier;
     }
 
     public Validation getValidation() {

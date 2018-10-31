@@ -18,7 +18,7 @@ public class SurveyApp extends com.activeandroid.app.Application {
 
     @Override
     public void onCreate() {
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO);
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         super.onCreate();
         mInstance = this;
     }
