@@ -75,6 +75,12 @@ public class Question extends ReceiveModel {
     private Long mValidationId;
     @Column(name = "RankResponses")
     private boolean mRankResponses;
+    @Column(name = "LoopQuestionCount")
+    private int mLoopQuestionCount;
+    @Column(name = "LoopSource")
+    private String mLoopSource;
+    @Column(name = "LoopNumber")
+    private int mLoopNumber;
 
     public Question() {
         super();
@@ -529,6 +535,7 @@ public class Question extends ReceiveModel {
             if (!jsonObject.isNull("validation_id"))
                 question.setValidationId(jsonObject.getLong("validation_id"));
             question.setRankResponses(jsonObject.optBoolean("rank_responses"));
+            question.setLoopQuestionCount(jsonObject.optInt("loop_question_count", 0));
             question.save();
 
             // Generate translations
@@ -554,6 +561,30 @@ public class Question extends ReceiveModel {
                     translation.save();
                 }
             }
+            if (question.getLoopQuestionCount() > 0) {
+                JSONArray loopsArray = jsonObject.optJSONArray("loop_questions");
+                if (loopsArray != null) {
+                    for (int i = 0; i < loopsArray.length(); i++) {
+                        JSONObject loopJSON = loopsArray.getJSONObject(i);
+                        Long loopRemoteId = loopJSON.getLong("id");
+                        LoopQuestion loopQuestion = LoopQuestion.findByRemoteId(loopRemoteId);
+                        if (loopQuestion == null) {
+                            loopQuestion = new LoopQuestion();
+                        }
+                        loopQuestion.setRemoteId(loopRemoteId);
+                        loopQuestion.setQuestion(question);
+                        loopQuestion.setParent(loopJSON.optString("parent"));
+                        loopQuestion.setLooped(loopJSON.optString("looped"));
+                        if (loopJSON.isNull("deleted_at")) {
+                            loopQuestion.setDeleted(false);
+                        } else {
+                            loopQuestion.setDeleted(true);
+                        }
+                        loopQuestion.save();
+                    }
+                }
+            }
+
         } catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);
         }
@@ -746,7 +777,7 @@ public class Question extends ReceiveModel {
         return mNumberInInstrument;
     }
 
-    private void setNumberInInstrument(int number) {
+    public void setNumberInInstrument(int number) {
         mNumberInInstrument = number;
     }
 
@@ -760,7 +791,7 @@ public class Question extends ReceiveModel {
         return instruction.getText(getInstrument());
     }
 
-    private void setInstruction(Long id) {
+    void setInstruction(Long id) {
         mInstructionId = id;
     }
 
@@ -867,6 +898,55 @@ public class Question extends ReceiveModel {
 
     private void setRankResponses(boolean rankResponses) {
         mRankResponses = rankResponses;
+    }
+
+    public int getLoopQuestionCount() {
+        return mLoopQuestionCount;
+    }
+
+    private void setLoopQuestionCount(int count) {
+        mLoopQuestionCount = count;
+    }
+
+    public String getLoopSource() {
+        return mLoopSource;
+    }
+
+    void setLoopSource(String source) {
+        mLoopSource = source;
+    }
+
+    public int getLoopNumber() {
+        return mLoopNumber;
+    }
+
+    void setLoopNumber(int number) {
+        mLoopNumber = number;
+    }
+
+    public List<LoopQuestion> loopQuestions() {
+        return new Select().from(LoopQuestion.class).where("Question = ? AND Deleted = 0",
+                getId()).execute();
+    }
+
+    public Question(Question question) {
+        this.mText = question.mText;
+        this.mQuestionType = question.mQuestionType;
+        this.mOptionCount = question.mOptionCount;
+        this.mInstrumentVersion = question.mInstrumentVersion;
+        this.mIdentifiesSurvey = question.mIdentifiesSurvey;
+        this.mInstructionId = question.mInstructionId;
+        this.mQuestionVersion = question.mQuestionVersion;
+        this.mDeleted = question.mDeleted;
+        this.mSection = question.mSection;
+        this.mInstrumentRemoteId = question.mInstrumentRemoteId;
+        this.mRemoteOptionSetId = question.mRemoteOptionSetId;
+        this.mDisplayId = question.mDisplayId;
+        this.mRemoteSpecialOptionSetId = question.mRemoteSpecialOptionSetId;
+        this.mTableIdentifier = question.mTableIdentifier;
+        this.mValidationId = question.mValidationId;
+        this.mRankResponses = question.mRankResponses;
+        this.mLoopQuestionCount = question.mLoopQuestionCount;
     }
 
     public enum QuestionType {

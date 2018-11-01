@@ -25,6 +25,7 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -54,6 +55,7 @@ import org.adaptlab.chpir.android.survey.models.Display;
 import org.adaptlab.chpir.android.survey.models.DisplayInstruction;
 import org.adaptlab.chpir.android.survey.models.FollowUpQuestion;
 import org.adaptlab.chpir.android.survey.models.Instrument;
+import org.adaptlab.chpir.android.survey.models.LoopQuestion;
 import org.adaptlab.chpir.android.survey.models.MultipleSkip;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.Question;
@@ -596,8 +598,7 @@ public class SurveyFragment extends Fragment {
         }
     }
 
-    private void updateQuestionsToSkipMap(String questionIdentifier, List<Question>
-            questionsToSkip) {
+    private void updateQuestionsToSkipMap(String questionIdentifier, List<Question> questionsToSkip) {
         if (questionsToSkip == null || questionsToSkip.size() == 0) {
             if (mQuestionsToSkipMap.containsKey(questionIdentifier)) {
                 mQuestionsToSkipMap.remove(questionIdentifier);
@@ -649,6 +650,27 @@ public class SurveyFragment extends Fragment {
             }
             ft.commit();
         }
+    }
+
+    protected void setIntegerLoopQuestions(Question question, String response) {
+        List<LoopQuestion> loopQuestions = question.loopQuestions();
+        List<Question> questionsToHide = new ArrayList<>();
+        int start = 0;
+        if (!TextUtils.isEmpty(response)) {
+            start = Integer.parseInt(response);
+        }
+        for (int k = start; k <= Instrument.LOOP_MAX; k++) {
+            for (LoopQuestion lq : loopQuestions) {
+                if (k == 0) {
+                    questionsToHide.add(Question.findByQuestionIdentifier(lq.getLooped()));
+                } else {
+                    String identifier = lq.getLooped() + "_" + (k + 1);
+                    questionsToHide.add(Question.findByQuestionIdentifier(identifier));
+                }
+            }
+        }
+        mQuestionsToSkipMap.put(question.getQuestionIdentifier(), questionsToHide);
+        hideQuestionsInDisplay();
     }
 
     protected void setNextQuestion(String currentQuestionIdentifier, String nextQuestionIdentifier,

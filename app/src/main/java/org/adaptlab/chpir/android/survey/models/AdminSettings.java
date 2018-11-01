@@ -280,7 +280,7 @@ public class AdminSettings extends Model {
     }
 
     /*
-     * Show DONT KNOW special response for each question if true
+     * Show DON'T KNOW special response for each question if true
      */
     public boolean getShowDK() {
         return mShowDK;
