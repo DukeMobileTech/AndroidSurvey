@@ -302,6 +302,7 @@ public class Instrument2Activity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Object... params) {
             ((Instrument) params[0]).sanitize();
+            ((Instrument) params[0]).setLoops();
             return ((Boolean) params[1]);
         }
 

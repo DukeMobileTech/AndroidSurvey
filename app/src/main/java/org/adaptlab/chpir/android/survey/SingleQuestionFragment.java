@@ -103,6 +103,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         setResponseRanking(v);
         setSpecialResponseUI(v);
         deserializeSpecialResponse();
+        setLoopQuestions();
         mFragmentView = v;
         return v;
     }
@@ -143,8 +144,11 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
 
     private void updateRankOrder(int index) {
         String indexInteger = String.valueOf(index);
-        ArrayList<String> rankOrder = new ArrayList<>(Arrays.asList(
-                mResponse.getRankOrder().split(Response.LIST_DELIMITER)));
+        ArrayList<String> rankOrder = new ArrayList<>();
+        if (mResponse.getRankOrder() != null) {
+            rankOrder = new ArrayList<>(Arrays.asList(
+                    mResponse.getRankOrder().split(Response.LIST_DELIMITER)));
+        }
         if (rankOrder.contains(indexInteger)) {
             rankOrder.remove(indexInteger);
         } else {
@@ -368,6 +372,20 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         }
     }
 
+    private void setLoopQuestions() {
+        if (mQuestion.getQuestionType().equals(Question.QuestionType.INTEGER) &&
+                mQuestion.getLoopQuestionCount() > 0) {
+
+            if (TextUtils.isEmpty(mResponse.getText()) || mResponse.getText().equals("0")) {
+                // hide all loop questions
+            } else {
+                // show based on text
+            }
+
+            mSurveyFragment.setIntegerLoopQuestions(mQuestion, mResponse.getText());
+        }
+    }
+
     private void setSkipPatterns() {
         Option selectedOption = null;
         String nextQuestion = null;
@@ -533,6 +551,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         saveResponseInBackground(mResponse);
         setSkipPatterns();
         refreshFollowUpQuestion();
+        setLoopQuestions();
     }
 
     protected ResponsePhoto getResponsePhoto() {

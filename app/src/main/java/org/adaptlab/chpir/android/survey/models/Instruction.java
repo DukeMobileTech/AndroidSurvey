@@ -76,15 +76,15 @@ public class Instruction extends ReceiveModel {
         return mRemoteId;
     }
 
-    private void setRemoteId(Long id) {
+    void setRemoteId(Long id) {
        mRemoteId = id;
     }
 
-    private void setDeleted(boolean status) {
+    void setDeleted(boolean status) {
         mDeleted = status;
     }
 
-    private void setText(String text) {
+    void setText(String text) {
         mText = text;
     }
 
