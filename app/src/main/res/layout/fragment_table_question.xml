@@ -1,84 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    android:id="@+id/grid_layout"
+<android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/grid_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/question_text_layout"
-    android:orientation="horizontal">
+    android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/table_header"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/tableRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:orientation="horizontal"
-        android:weightSum="2.0">
+        android:layout_height="wrap_content"/>
 
-        <TextView
-            android:id="@+id/table_header_question_text"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.0"
-            android:gravity="start"/>
+</android.support.constraint.ConstraintLayout>
 
-        <!-- Important!!! fillViewPort allows child views to stretch and fill the view -->
-        <LinearLayout
-            android:id="@+id/table_options_header_view"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.0"
-            android:background="@drawable/response_component_layout"
-            android:fillViewport="true"
-            >
+    <!--<LinearLayout-->
+        <!--android:id="@+id/table_header"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentLeft="true"-->
+        <!--android:layout_alignParentStart="true"-->
+        <!--android:layout_alignParentTop="true"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:weightSum="2.0">-->
 
-            <LinearLayout
-                android:id="@+id/table_options_header"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"/>
+        <!--<TextView-->
+            <!--android:id="@+id/table_header_question_text"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1.0"-->
+            <!--android:gravity="start"/>-->
 
-        </LinearLayout>
-    </LinearLayout>
+        <!--&lt;!&ndash; Important!!! fillViewPort allows child views to stretch and fill the view &ndash;&gt;-->
+        <!--<LinearLayout-->
+            <!--android:id="@+id/table_options_header_view"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_weight="1.0"-->
+            <!--android:background="@drawable/response_component_layout"-->
+            <!--android:fillViewport="true"-->
+            <!--&gt;-->
 
-    <!-- The layout_height has to be specified in order for the NestedScrollView to scroll - Done programmatically -->
-    <android.support.v4.widget.NestedScrollView
-        android:id="@+id/grid_scroll_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/table_header">
+            <!--<LinearLayout-->
+                <!--android:id="@+id/table_options_header"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:orientation="horizontal"/>-->
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="2.0">
+        <!--</LinearLayout>-->
+    <!--</LinearLayout>-->
 
-            <LinearLayout
-                android:id="@+id/table_body_question_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.0"
-                android:orientation="vertical"/>
+    <!--&lt;!&ndash; The layout_height has to be specified in order for the NestedScrollView to scroll - Done programmatically &ndash;&gt;-->
+    <!--<android.support.v4.widget.NestedScrollView-->
+        <!--android:id="@+id/grid_scroll_view"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_below="@+id/table_header">-->
 
-            <LinearLayout
-                android:id="@+id/table_body_options_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.0"
-                android:fillViewport="true">
+        <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="horizontal"-->
+            <!--android:weightSum="2.0">-->
 
-                <LinearLayout
-                    android:id="@+id/table_body_options_choice"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/response_component_layout"
-                    android:orientation="vertical"/>
+            <!--<LinearLayout-->
+                <!--android:id="@+id/table_body_question_text"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_weight="1.0"-->
+                <!--android:orientation="vertical"/>-->
 
-            </LinearLayout>
-        </LinearLayout>
-    </android.support.v4.widget.NestedScrollView>
+            <!--<LinearLayout-->
+                <!--android:id="@+id/table_body_options_view"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_weight="1.0"-->
+                <!--android:fillViewport="true">-->
 
-</RelativeLayout>
+                <!--<LinearLayout-->
+                    <!--android:id="@+id/table_body_options_choice"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:background="@drawable/response_component_layout"-->
+                    <!--android:orientation="vertical"/>-->
+
+            <!--</LinearLayout>-->
+        <!--</LinearLayout>-->
+    <!--</android.support.v4.widget.NestedScrollView>-->
+
+<!--</RelativeLayout>-->

@@ -224,36 +224,36 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
 //        });
 //    }
 
-    protected void setTableHeaderOptions(View v) {
-        LinearLayout headerTableLayout = (LinearLayout) v.findViewById(R.id.table_options_header);
-        List<Option> headerLabels = getDisplay().tableOptions(getTableIdentifier());
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        float margin = getActivity().getResources().getDimension(R.dimen.activity_horizontal_margin);
-        float totalWidth = (displayMetrics.widthPixels - margin * 2) / 2;
-
-        int headerCount = headerLabels.size();
-        for (Question question : getQuestions()) {
-            if (question.hasSpecialOptions()) {
-                headerCount += 1;
-                break;
-            }
-        }
-        mOptionWidth = (int) totalWidth / headerCount;
-
-        for (int k = 0; k < headerLabels.size(); k++) {
-            TextView textView = getHeaderTextView(headerLabels.get(k).getText(getInstrument()));
-            textView.setWidth(mOptionWidth);
-            headerTableLayout.addView(textView);
-        }
-
-        if (headerCount != headerLabels.size()) {
-            TextView textView = getHeaderTextView(getString(R.string.special_response_abbrv));
-            textView.setWidth(mOptionWidth);
-            headerTableLayout.addView(textView);
-        }
-
-    }
+//    protected void setTableHeaderOptions(View v) {
+//        LinearLayout headerTableLayout = (LinearLayout) v.findViewById(R.id.table_options_header);
+//        List<Option> headerLabels = getDisplay().tableOptions(getTableIdentifier());
+//        DisplayMetrics displayMetrics = new DisplayMetrics();
+//        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+//        float margin = getActivity().getResources().getDimension(R.dimen.activity_horizontal_margin);
+//        float totalWidth = (displayMetrics.widthPixels - margin * 2) / 2;
+//
+//        int headerCount = headerLabels.size();
+//        for (Question question : getQuestions()) {
+//            if (question.hasSpecialOptions()) {
+//                headerCount += 1;
+//                break;
+//            }
+//        }
+//        mOptionWidth = (int) totalWidth / headerCount;
+//
+//        for (int k = 0; k < headerLabels.size(); k++) {
+//            TextView textView = getHeaderTextView(headerLabels.get(k).getText(getInstrument()));
+//            textView.setWidth(mOptionWidth);
+//            headerTableLayout.addView(textView);
+//        }
+//
+//        if (headerCount != headerLabels.size()) {
+//            TextView textView = getHeaderTextView(getString(R.string.special_response_abbrv));
+//            textView.setWidth(mOptionWidth);
+//            headerTableLayout.addView(textView);
+//        }
+//
+//    }
 
     protected TextView getHeaderTextView(String text) {
         TextView textView = new TextView(getActivity());

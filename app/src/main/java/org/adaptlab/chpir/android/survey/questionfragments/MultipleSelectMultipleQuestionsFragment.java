@@ -1,15 +1,26 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
+import android.content.Context;
 import android.graphics.Typeface;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.GridLayout;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import org.adaptlab.chpir.android.survey.MultipleQuestionsFragment;
 import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 
@@ -24,10 +35,12 @@ import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithH
 
 public class MultipleSelectMultipleQuestionsFragment extends MultipleQuestionsFragment {
 
-    private static final String TAG = "MultipleSelectMultipleQuestionsFragment";
+    private static final String TAG = "MultiSelMultiQuestFrag";
     private List<List<CheckBox>> mCheckBoxes;
     private Integer[] rowHeights;
     private int mIndex;
+    private RecyclerView mRecyclerView;
+
 
     @Override
     protected void deserialize(String responseText) {
@@ -50,15 +63,15 @@ public class MultipleSelectMultipleQuestionsFragment extends MultipleQuestionsFr
     }
 
     private void setTableBodyContent(View v) {
-        LinearLayout questionTextLayout = v.findViewById(R.id.table_body_question_text);
-        LinearLayout optionsListLinearLayout = v.findViewById(R.id.table_body_options_choice);
+//        LinearLayout questionTextLayout = v.findViewById(R.id.table_body_question_text);
+//        LinearLayout optionsListLinearLayout = v.findViewById(R.id.table_body_options_choice);
         mCheckBoxes = new ArrayList<>();
         List<Question> questionList = getQuestionExcludingSkip();
         rowHeights = new Integer[questionList.size()];
         for (int k = 0; k < questionList.size(); k++) {
             final Question q = questionList.get(k);
-            setQuestionText(questionTextLayout, k, q);
-            setCheckBoxes(optionsListLinearLayout, k, q);
+//            setQuestionText(questionTextLayout, k, q);
+//            setCheckBoxes(optionsListLinearLayout, k, q);
             mIndex = k;
             Response response = getSurvey().getResponseByQuestion(q);
             if (response != null) {
@@ -186,10 +199,28 @@ public class MultipleSelectMultipleQuestionsFragment extends MultipleQuestionsFr
 
     @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
-        View v = getLayoutInflater().inflate(R.layout.fragment_table_question, null);
-        setTableHeaderOptions(v);
-        setTableBodyContent(v);
-        questionComponent.addView(v);
+        View mView = getLayoutInflater().inflate(R.layout.fragment_table_question, null);
+//        setTableHeaderOptions(v);
+//        setTableBodyContent(v);
+//        questionComponent.addView(v);
+        mRecyclerView = mView.findViewById(R.id.tableRecyclerView);
+        LinearLayoutManager recyclerLayoutManager = new LinearLayoutManager(getActivity());
+        mRecyclerView.setLayoutManager(recyclerLayoutManager);
+
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(),
+                recyclerLayoutManager.getOrientation());
+        mRecyclerView.addItemDecoration(dividerItemDecoration);
+
+        String[] headers = new String[getDisplay().tableOptions(getTableIdentifier()).size()];
+        for (int k = 0; k < getDisplay().tableOptions(getTableIdentifier()).size(); k++) {
+            headers[k] = getDisplay().tableOptions(getTableIdentifier()).get(k).getText(getInstrument());
+        }
+
+        QuestionRecyclerViewAdapter recyclerViewAdapter = new QuestionRecyclerViewAdapter(getQuestions(),
+                headers, getActivity());
+        mRecyclerView.setAdapter(recyclerViewAdapter);
+
+        questionComponent.addView(mView);
     }
 
     @Override
@@ -202,4 +233,98 @@ public class MultipleSelectMultipleQuestionsFragment extends MultipleQuestionsFr
         }
     }
 
+    private class QuestionRecyclerViewAdapter extends RecyclerView.Adapter<QuestionRecyclerViewAdapter.ViewHolder> {
+        private List<List<CheckBox>> mCheckBoxes;
+        private List<Question> questions;
+        private Context context;
+        private String[] options;
+
+        public QuestionRecyclerViewAdapter(List<Question> questionList, String[] optionList, Context ctx) {
+            questions = questionList;
+            context = ctx;
+            options = optionList;
+            mCheckBoxes = new ArrayList<>();
+        }
+
+        @Override
+        public QuestionRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.checkbox_table_row_layout, parent, false);
+            QuestionRecyclerViewAdapter.ViewHolder viewHolder = new QuestionRecyclerViewAdapter.ViewHolder(view);
+            return viewHolder;
+        }
+
+        @Override
+        public void onBindViewHolder(QuestionRecyclerViewAdapter.ViewHolder holder, int position) {
+            Question question = questions.get(position);
+            holder.questionText.setText(question.getText());
+//            holder.position = position;
+//            int id = (position + 1) * 100;
+//            for(Option option : options){
+//                RadioButton rb = new RadioButton(QuestionRecyclerViewAdapter.this.context);
+//                rb.setId(id++);
+//                rb.setText(option.getText(question.getInstrument()));
+//                holder.optionsGroup.addView(rb);
+//            }
+//            radioGroups.add(position, holder.optionsGroup);
+
+            List<CheckBox> checkBoxes = new ArrayList<>();
+            for (int i = 0; i < options.length; i++) {
+                CheckBox checkBox = new CheckBox(getActivity());
+//                checkBox.setSaveEnabled(false);
+                checkBox.setId((question.getNumberInInstrument() * 100) + i);
+//                checkBox.setText(options[i]);
+//                Log.i(TAG,"TEXT: " + options[i]);
+//                checkBox.setText(options.get(i).getText(question.getInstrument()));
+                checkBoxes.add(checkBox);
+//                holder.optionsGroup.addView(checkBox, i);
+
+                holder.optionsGroup.addView(checkBox);
+//                GridLayout.LayoutParams params = (GridLayout.LayoutParams) checkBox.getLayoutParams();
+//                params.rowSpec = GridLayout.spec(0, 3);
+//                params.columnSpec = GridLayout.spec(i, 1);
+//                params.setGravity(Gravity.FILL_HORIZONTAL);
+//                checkBox.setLayoutParams(params);
+            }
+            mCheckBoxes.add(position, checkBoxes);
+        }
+
+        @Override
+        public int getItemCount() {
+            return questions.size();
+        }
+
+        public class ViewHolder extends RecyclerView.ViewHolder {
+            public TextView questionText;
+            public LinearLayout optionsGroup;
+
+            public ViewHolder(View view) {
+                super(view);
+                questionText = view.findViewById(R.id.questionColumn);
+                optionsGroup = view.findViewById(R.id.optionsPart);
+
+//                optionsGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+//                    @Override
+//                    public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                        //since only one package is allowed to be selected
+                        //this logic clears previous selection
+                        //it checks state of last radiogroup and
+                        // clears it if it meets conditions
+//                        if (lastCheckedRadioGroup != null
+//                                && lastCheckedRadioGroup.getCheckedRadioButtonId()
+//                                != radioGroup.getCheckedRadioButtonId()
+//                                && lastCheckedRadioGroup.getCheckedRadioButtonId() != -1) {
+//                            lastCheckedRadioGroup.clearCheck();
+//
+//                            Toast.makeText(QuestionRecyclerViewAdapter.this.context,
+//                                    "Radio button clicked " + radioGroup.getCheckedRadioButtonId(),
+//                                    Toast.LENGTH_SHORT).show();
+//
+//                        }
+//                        lastCheckedRadioGroup = radioGroup;
+
+//                    }
+//                });
+            }
+        }
+    }
 }
