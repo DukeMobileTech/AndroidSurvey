@@ -9,7 +9,11 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -95,22 +99,18 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
         View v = inflater.inflate(R.layout.fragment_question, parent, false);
         mDisplayInstructionsText = (TextView) v.findViewById(R.id.displayInstructions);
         setDisplayInstructions();
-        TextView questionNumber = (TextView) v.findViewById(R.id.questionNumber);
-        questionNumber.setText(getQuestionRange());
-        TextView questionInstructions = (TextView) v.findViewById(R.id.question_instructions);
-        questionInstructions.setTypeface(getInstrument().getTypeFace(getActivity()));
-        if (isEmpty(getInstructions())) {
-            ((LinearLayout) questionInstructions.getParent()).setVisibility(View.GONE);
-        } else {
-            questionInstructions.append(styleTextWithHtml(getInstructions()));
-            questionInstructions.setGravity(Gravity.END);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                ViewGroup viewGroup = (ViewGroup) questionInstructions.getParent();
-                viewGroup.setBackground(getResources().getDrawable(R.drawable.response_component_layout));
-            }
-        }
-        TextView questionText = (TextView) v.findViewById(R.id.question_text);
-        if (questionText != null) questionText.setVisibility(View.GONE);
+        String questionRange = getQuestionRange() + "\n";
+        String questionInstructions = getInstructions();
+        SpannableString spannableText = new SpannableString(questionRange + questionInstructions);
+        spannableText.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.secondary_text)),
+                0, spannableText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannableText.setSpan(new StyleSpan(Typeface.BOLD), 0, questionRange.length(),
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannableText.setSpan(new StyleSpan(Typeface.ITALIC), questionRange.length(),
+                spannableText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        TextView textView = v.findViewById(R.id.spannedTextView);
+        textView.setText(spannableText);
+
         ViewGroup questionComponent1 = (LinearLayout) v.findViewById(R.id.responseLayout1);
         questionComponent1.setVisibility(View.GONE);
         ViewGroup questionComponent2 = (LinearLayout) v.findViewById(R.id.responseLayout2);
@@ -126,9 +126,14 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
         List<DisplayInstruction> displayInstructions = mSurveyFragment.getDisplayInstructions(mDisplay);
         if (displayInstructions != null && displayInstructions.size() > 0) {
             StringBuilder instructions = new StringBuilder();
+            int index = 0;
             for (DisplayInstruction instruction : displayInstructions) {
+                index += 1;
                 if (instruction.getPosition() == mQuestions.get(0).getNumberInInstrument()) {
-                    instructions.append(instruction.getInstructions()).append("<br>");
+                    instructions.append(instruction.getInstructions());
+                    if (index != displayInstructions.size()) {
+                        instructions.append("\n");
+                    }
                 }
             }
             if (instructions.length() > 0) {
@@ -147,11 +152,11 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
         StringBuilder instructions = new StringBuilder();
         Question question = mQuestions.get(0);
         if (!isEmpty(question.getInstructions())) {
-            instructions.append(question.getInstructions()).append("<br>");
+            instructions.append(question.getInstructions());
         }
         OptionSet optionSet = OptionSet.findByRemoteId(mQuestions.get(0).getRemoteOptionSetId());
         if (optionSet != null && !isEmpty(optionSet.getInstructions())) {
-            instructions.append(optionSet.getInstructions());
+            instructions.append("\n").append(optionSet.getInstructions());
         }
         return instructions.toString();
     }

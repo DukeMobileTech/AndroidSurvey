@@ -1,7 +1,7 @@
 package org.adaptlab.chpir.android.survey;
 
 import android.content.Context;
-import android.os.Build;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.util.DiffUtil;
@@ -11,8 +11,14 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.InputType;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,18 +36,15 @@ import android.widget.TextView;
 import org.adaptlab.chpir.android.survey.models.Display;
 import org.adaptlab.chpir.android.survey.models.DisplayInstruction;
 import org.adaptlab.chpir.android.survey.models.Instrument;
-import org.adaptlab.chpir.android.survey.models.MultipleSkip;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.OptionSet;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.ResponsePhoto;
 import org.adaptlab.chpir.android.survey.models.Survey;
-import org.adaptlab.chpir.android.survey.questionfragments.SelectMultipleQuestionFragment;
 import org.adaptlab.chpir.android.survey.utils.AuthUtils;
 import org.adaptlab.chpir.android.survey.utils.FormatUtils;
 import org.adaptlab.chpir.android.survey.utils.looper.ItemTouchHelperExtension;
-import org.adaptlab.chpir.android.survey.viewpagerfragments.SurveyViewPagerFragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -69,28 +72,46 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
     private Instrument mInstrument;
     private List<Option> mOptions;
     private List<Option> mSpecialOptions;
-    private TextView mQuestionText;
-    private TextView mQuestionInstructions;
     private TextView mDisplayInstructionsText;
     private OptionsAdapter mOptionsAdapter;
     private View mFragmentView;
     private ViewGroup mRankLayout;
+    private TextView mTextView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_question, parent, false);
-        TextView questionNumber = v.findViewById(R.id.questionNumber);
-        questionNumber.setText(String.valueOf(mQuestion.getNumberInInstrument()));
-        TextView questionIdentifier = v.findViewById(R.id.questionIdentifier);
-        questionIdentifier.setText(mQuestion.getQuestionIdentifier());
-        mQuestionInstructions = v.findViewById(R.id.question_instructions);
-        mQuestionText = v.findViewById(R.id.question_text);
+        String number = mQuestion.getNumberInInstrument() + ": ";
+        int numLen = number.length();
+        String identifier = mQuestion.getQuestionIdentifier() + "\n";
+        int idLen = identifier.length();
+        String instructions = getQuestionInstructions();
+        if (instructions.length() != 0) {
+            instructions = instructions + "\n";
+        }
+        int insLen = instructions.length();
+        Spanned text = getQuestionText();
+        int textLen = text.length();
+        SpannableString spannableText = new SpannableString(number + identifier + instructions + text);
+        spannableText.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.secondary_text)),
+                0, numLen + idLen + insLen, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannableText.setSpan(new StyleSpan(Typeface.BOLD), 0, numLen,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannableText.setSpan(new StyleSpan(Typeface.ITALIC), numLen + idLen,
+                numLen + idLen + insLen, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannableText.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.primary_text)),
+                numLen + idLen + insLen, numLen + idLen + insLen + textLen,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannableText.setSpan(new RelativeSizeSpan(1.2f),
+                numLen + idLen + insLen, numLen + idLen + insLen + textLen,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        mTextView = v.findViewById(R.id.spannedTextView);
+        mTextView.setText(spannableText);
+
         mValidationTextView = v.findViewById(R.id.validation_text);
         mDisplayInstructionsText = v.findViewById(R.id.displayInstructions);
-        mQuestionText.setTypeface(mInstrument.getTypeFace(getActivity().getApplicationContext()));
         setDisplayInstructions();
-        setQuestionInstructions();
-        setQuestionText();
 
         // Overridden by subclasses to place their graphical elements on the fragment.
         ViewGroup questionComponent = (LinearLayout) v.findViewById(R.id.question_component);
@@ -325,13 +346,12 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         }
     }
 
-    private void setQuestionInstructions() {
-        if (!TextUtils.isEmpty(mQuestion.getInstructions()) && !mQuestion.getInstructions()
-                .equals("null")) {
-            mQuestionInstructions.setText(styleTextWithHtml(mQuestion.getInstructions()));
-        } else {
-            mQuestionInstructions.setVisibility(View.GONE);
+    private String getQuestionInstructions() {
+        Spanned instructions = new SpannableString("");
+        if (!TextUtils.isEmpty(mQuestion.getInstructions()) && !mQuestion.getInstructions().equals("null")) {
+            instructions = styleTextWithHtml(mQuestion.getInstructions());
         }
+        return instructions.toString();
     }
 
     /*
@@ -346,19 +366,18 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
      * If this question is not a following up question, then just
      * set the text as normal.
      */
-    protected void setQuestionText() {
+
+    protected Spanned getQuestionText() {
+        String text = "";
         if (mQuestion.isFollowUpQuestion()) {
-            String followUpText = mQuestion.getFollowingUpText(mSurveyFragment.getResponses(),
-                    getActivity());
-            if (followUpText != null) {
-                mQuestionText.append(styleTextWithHtml(followUpText));
-            }
+            String followUpText = mQuestion.getFollowingUpText(mSurveyFragment.getResponses(), getActivity());
+            if (followUpText != null) { text = followUpText; }
         } else if (mQuestion.hasRandomizedFactors()) {
-            mQuestionText.append(styleTextWithHtml(mQuestion.getRandomizedText(mSurveyFragment
-                    .getResponses().get(mQuestion))));
+            text = mQuestion.getRandomizedText(mSurveyFragment.getResponses().get(mQuestion));
         } else {
-            mQuestionText.append(styleTextWithHtml(mQuestion.getText()));
+            text = mQuestion.getText();
         }
+        return styleTextWithHtml(text);
     }
 
     private void setChoiceSelectionInstructions(View view) {
@@ -375,13 +394,6 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
     private void setLoopQuestions() {
         if (mQuestion.getQuestionType().equals(Question.QuestionType.INTEGER) &&
                 mQuestion.getLoopQuestionCount() > 0) {
-
-            if (TextUtils.isEmpty(mResponse.getText()) || mResponse.getText().equals("0")) {
-                // hide all loop questions
-            } else {
-                // show based on text
-            }
-
             mSurveyFragment.setIntegerLoopQuestions(mQuestion, mResponse.getText());
         }
     }

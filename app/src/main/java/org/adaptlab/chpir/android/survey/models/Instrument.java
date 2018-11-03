@@ -185,7 +185,7 @@ public class Instrument extends ReceiveModel {
 
     // TODO: 5/1/18 Fix
     public void sanitize() {
-        if (questionCount() != getQuestionCount()) {
+        if (questionCount() < getQuestionCount()) {
             setLoaded(false);
         } else {
             setLoaded(true);
