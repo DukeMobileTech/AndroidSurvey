@@ -1,6 +1,7 @@
 package org.adaptlab.chpir.android.survey;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
@@ -9,7 +10,12 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -50,9 +56,6 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
             "org.adaptlab.chpir.android.survey.extra_skipped_id_list";
     public final static String EXTRA_TABLE_ID =
             "org.adaptlab.chpir.android.survey.table_id";
-    public static final int MIN_HEIGHT = 80;
-    public static final int MARGIN_10 = 10;
-    public static final int MARGIN_0 = 0;
 
     protected abstract void createQuestionComponent(ViewGroup questionComponent);
     protected abstract void clearRegularResponseUI(int position);
@@ -95,22 +98,19 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
         View v = inflater.inflate(R.layout.fragment_question, parent, false);
         mDisplayInstructionsText = (TextView) v.findViewById(R.id.displayInstructions);
         setDisplayInstructions();
-        TextView questionNumber = (TextView) v.findViewById(R.id.questionNumber);
-        questionNumber.setText(getQuestionRange());
-        TextView questionInstructions = (TextView) v.findViewById(R.id.question_instructions);
-        questionInstructions.setTypeface(getInstrument().getTypeFace(getActivity()));
-        if (isEmpty(getInstructions())) {
-            ((LinearLayout) questionInstructions.getParent()).setVisibility(View.GONE);
-        } else {
-            questionInstructions.append(styleTextWithHtml(getInstructions()));
-            questionInstructions.setGravity(Gravity.END);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                ViewGroup viewGroup = (ViewGroup) questionInstructions.getParent();
-                viewGroup.setBackground(getResources().getDrawable(R.drawable.response_component_layout));
-            }
-        }
-        TextView questionText = (TextView) v.findViewById(R.id.question_text);
-        if (questionText != null) questionText.setVisibility(View.GONE);
+        setOptionWidth();
+        String questionRange = getQuestionRange() + "\n";
+        String questionInstructions = getInstructions();
+        SpannableString spannableText = new SpannableString(questionRange + questionInstructions);
+        spannableText.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.secondary_text)),
+                0, spannableText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannableText.setSpan(new StyleSpan(Typeface.BOLD), 0, questionRange.length(),
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannableText.setSpan(new StyleSpan(Typeface.ITALIC), questionRange.length(),
+                spannableText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        TextView textView = v.findViewById(R.id.spannedTextView);
+        textView.setText(spannableText);
+
         ViewGroup questionComponent1 = (LinearLayout) v.findViewById(R.id.responseLayout1);
         questionComponent1.setVisibility(View.GONE);
         ViewGroup questionComponent2 = (LinearLayout) v.findViewById(R.id.responseLayout2);
@@ -126,9 +126,14 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
         List<DisplayInstruction> displayInstructions = mSurveyFragment.getDisplayInstructions(mDisplay);
         if (displayInstructions != null && displayInstructions.size() > 0) {
             StringBuilder instructions = new StringBuilder();
+            int index = 0;
             for (DisplayInstruction instruction : displayInstructions) {
+                index += 1;
                 if (instruction.getPosition() == mQuestions.get(0).getNumberInInstrument()) {
-                    instructions.append(instruction.getInstructions()).append("<br>");
+                    instructions.append(instruction.getInstructions());
+                    if (index != displayInstructions.size()) {
+                        instructions.append("\n");
+                    }
                 }
             }
             if (instructions.length() > 0) {
@@ -147,11 +152,11 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
         StringBuilder instructions = new StringBuilder();
         Question question = mQuestions.get(0);
         if (!isEmpty(question.getInstructions())) {
-            instructions.append(question.getInstructions()).append("<br>");
+            instructions.append(question.getInstructions());
         }
         OptionSet optionSet = OptionSet.findByRemoteId(mQuestions.get(0).getRemoteOptionSetId());
         if (optionSet != null && !isEmpty(optionSet.getInstructions())) {
-            instructions.append(optionSet.getInstructions());
+            instructions.append("\n").append(optionSet.getInstructions());
         }
         return instructions.toString();
     }
@@ -184,76 +189,29 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
         }
     }
 
-//    @Override
-//    public void onViewCreated(@NonNull final View view, Bundle savedInstanceState) {
-//        super.onViewCreated(view, savedInstanceState);
-//        final NestedScrollView nestedScrollView = view.findViewById(R.id.grid_scroll_view);
-//        nestedScrollView.post(new Runnable() {
-//            @Override
-//            public void run() {
-//                final int screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
-//                int tableHeaderHeight = view.findViewById(R.id.table_header).getHeight();
-//
-//                int tableBodyHeight = view.findViewById(R.id.table_body_question_text).getHeight();
-//                NestedScrollView tableScrollView = view.findViewById(R.id.grid_scroll_view);
-//                int scrollViewHeight = tableScrollView.getHeight();
-//                int activityVerticalMargin = (int) getActivity().getResources().getDimension(R
-//                        .dimen.activity_vertical_margin);
-//                int progressBarHeight = getActivity().findViewById(R.id.progress_bar).getHeight();
-//                int remainingScreenHeight = screenHeight - activityVerticalMargin -
-//                        progressBarHeight;
-//                int viewHeight = tableScrollView.getHeight();
-//                if (scrollViewHeight < tableBodyHeight && remainingScreenHeight >
-//                        tableBodyHeight) {
-//                    viewHeight = tableBodyHeight;
-//                } else if (scrollViewHeight < tableBodyHeight && remainingScreenHeight >
-//                        scrollViewHeight) {
-//                    viewHeight = remainingScreenHeight;
-//                } else if (remainingScreenHeight < 0 && scrollViewHeight < tableBodyHeight &&
-//                        tableBodyHeight < screenHeight) {
-//                    viewHeight = tableBodyHeight;
-//                } else if (remainingScreenHeight < 0 && scrollViewHeight < tableBodyHeight &&
-//                        tableBodyHeight > screenHeight) {
-//                    viewHeight = screenHeight - activityVerticalMargin - progressBarHeight -
-//                            tableHeaderHeight;
-//                }
-//                ViewGroup.LayoutParams params = tableScrollView.getLayoutParams();
-//                params.height = viewHeight;
-//                tableScrollView.setLayoutParams(params);
-//            }
-//        });
-//    }
+    private void setOptionWidth() {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        float margin = getActivity().getResources().getDimension(R.dimen.activity_horizontal_margin);
+        float totalWidth = (displayMetrics.widthPixels - (margin * 2)) / 2;
+        int headerCount = getDisplay().tableOptions(getTableIdentifier()).size();
+        for (Question question : getQuestions()) {
+            if (question.hasSpecialOptions()) {
+                headerCount += 1;
+                break;
+            }
+        }
+        mOptionWidth = (int) totalWidth / headerCount;
+    }
 
-//    protected void setTableHeaderOptions(View v) {
-//        LinearLayout headerTableLayout = (LinearLayout) v.findViewById(R.id.table_options_header);
-//        List<Option> headerLabels = getDisplay().tableOptions(getTableIdentifier());
-//        DisplayMetrics displayMetrics = new DisplayMetrics();
-//        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-//        float margin = getActivity().getResources().getDimension(R.dimen.activity_horizontal_margin);
-//        float totalWidth = (displayMetrics.widthPixels - margin * 2) / 2;
-//
-//        int headerCount = headerLabels.size();
-//        for (Question question : getQuestions()) {
-//            if (question.hasSpecialOptions()) {
-//                headerCount += 1;
-//                break;
-//            }
-//        }
-//        mOptionWidth = (int) totalWidth / headerCount;
-//
-//        for (int k = 0; k < headerLabels.size(); k++) {
-//            TextView textView = getHeaderTextView(headerLabels.get(k).getText(getInstrument()));
-//            textView.setWidth(mOptionWidth);
-//            headerTableLayout.addView(textView);
-//        }
-//
-//        if (headerCount != headerLabels.size()) {
-//            TextView textView = getHeaderTextView(getString(R.string.special_response_abbrv));
-//            textView.setWidth(mOptionWidth);
-//            headerTableLayout.addView(textView);
-//        }
-//
-//    }
+    protected String[] getTableHeaders() {
+        List<Option> options = getDisplay().tableOptions(getTableIdentifier());
+        String[] headers = new String[options.size()];
+        for (int k = 0; k < options.size(); k++) {
+            headers[k] = options.get(k).getText(getInstrument());
+        }
+        return headers;
+    }
 
     protected TextView getHeaderTextView(String text) {
         TextView textView = new TextView(getActivity());
@@ -266,31 +224,15 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
         return mOptionWidth;
     }
 
-    protected void addSpecialResponseUI(final int k, final Question q, LinearLayout choiceRow, final Button specialResponseButton) {
+    protected void addSpecialResponseUI(final int k, final Question q, LinearLayout linearLayout, final Button specialResponseButton) {
         if (q.hasSpecialOptions()) {
-            LinearLayout specialResponseLayout = new LinearLayout(getActivity());
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
-            params.gravity = Gravity.CENTER;
-            specialResponseLayout.setLayoutParams(params);
-
             specialResponseButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     createDialog(specialResponseButton, q, k);
                 }
             });
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                GradientDrawable gd = new GradientDrawable();
-                gd.setColor(Color.TRANSPARENT);
-                gd.setStroke(1, 0xFF000000);
-                specialResponseButton.setBackground(gd);
-            } else {
-                specialResponseButton.setBackgroundColor(Color.TRANSPARENT);
-            }
-            specialResponseLayout.addView(specialResponseButton);
-            choiceRow.addView(specialResponseLayout);
+            linearLayout.addView(specialResponseButton);
             deserializeSpecialResponse(q, specialResponseButton);
         }
     }
@@ -421,28 +363,54 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
     }
 
     protected void createResponse(Question question) {
-        Response response = getSurvey().getResponseByQuestion(question);
+        Response response = mSurveyFragment.getResponses().get(question);
         if (response == null) {
-            response = new Response();
-            response.setQuestion(question);
-            response.setSurvey(getSurvey());
-            response.setTimeStarted(new Date());
+            response = getResponse(question);
             getSurvey().setLastUpdated(new Date());
             saveResponseInBackground(response);
+            mSurveyFragment.getResponses().put(question, response);
         }
     }
 
+    @NonNull
+    private Response getResponse(Question question) {
+        Response response = new Response();
+        response.setQuestion(question);
+        response.setSurvey(getSurvey());
+        response.setTimeStarted(new Date());
+        return response;
+    }
+
     protected void saveResponse(Question question, int checkedId, boolean isChecked) {
-        Response response = mSurvey.getResponseByQuestion(question);
+        Response response = mSurveyFragment.getResponses().get(question);
         if (response == null) {
-            response = new Response();
-            response.setQuestion(question);
-            response.setSurvey(mSurvey);
+            response = getResponse(question);
         }
         response.setResponse(String.valueOf(checkedId));
         response.setTimeEnded(new Date());
         mSurvey.setLastUpdated(new Date());
         saveResponseInBackground(response);
+    }
+
+    protected class HeaderHolder extends RecyclerView.ViewHolder {
+        public TextView questionText;
+        public LinearLayout optionsPart;
+
+        public HeaderHolder(View view) {
+            super(view);
+            questionText = view.findViewById(R.id.questionColumn);
+            optionsPart = view.findViewById(R.id.optionsPart);
+        }
+    }
+
+    protected void setResponseHeader(HeaderHolder holder, String text, Context context) {
+        TextView textView = new TextView(context);
+        textView.setText(text);
+        textView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+        textView.setGravity(Gravity.CENTER|Gravity.CENTER_VERTICAL);
+        textView.setWidth(getOptionWidth());
+        textView.setPadding(1,1,1,1);
+        holder.optionsPart.addView(textView);
     }
 
 }

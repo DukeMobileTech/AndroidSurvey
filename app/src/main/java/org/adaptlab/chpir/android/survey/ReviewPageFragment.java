@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ListFragment;
 import android.text.Html;
 import android.view.Menu;
@@ -91,9 +92,10 @@ public class ReviewPageFragment extends ListFragment {
 
     private void sortReviewQuestions() {
         Collections.sort(mSkippedQuestions, new Comparator<Question>() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public int compare(Question lhs, Question rhs) {
-                return lhs.getNumberInInstrument() < rhs.getNumberInInstrument() ? -1 : 1;
+                return Integer.compare(lhs.getNumberInInstrument(), rhs.getNumberInInstrument());
             }
         });
     }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest package="org.adaptlab.chpir.android.survey"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:versionCode="99"
-    android:versionName="2.1.14">
+    android:versionCode="100"
+    android:versionName="2.1.15">
 
     <permission
         android:name="org.adaptlab.chpir.android.survey.LAUNCH_SURVEY"

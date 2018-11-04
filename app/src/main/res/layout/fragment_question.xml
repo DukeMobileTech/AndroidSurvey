@@ -8,74 +8,20 @@
     android:focusableInTouchMode="true"
     android:orientation="vertical">
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/displayInstructions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/display_instructions_layout"
-        android:orientation="vertical"
-        android:visibility="gone">
+        android:layout_margin="5dp"
+        android:scrollbars="vertical"
+        android:textColor="@color/primary_text"
+        android:textStyle="italic"
+        android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/displayInstructions"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:scrollbars="vertical"
-            android:textColor="@color/primary_text"
-            android:textStyle="italic" />
-
-    </LinearLayout>
-
-    <LinearLayout
+    <TextView
+        android:id="@+id/spannedTextView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/questionNumber"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="fill"
-            android:layout_weight="3"
-            android:gravity="start"
-            android:maxLines="1"
-            android:textColor="@color/secondary_text" />
-
-        <TextView
-            android:id="@+id/questionIdentifier"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="fill"
-            android:layout_weight="1"
-            android:gravity="end"
-            android:maxLines="1"
-            android:textColor="@color/secondary_text" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/linear_layout_for_question_text_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/question_text_layout"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/question_instructions"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:scrollbars="vertical"
-            android:textColor="@color/secondary_text"
-            android:textStyle="italic" />
-
-        <TextView
-            android:id="@+id/question_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:scrollbars="vertical"
-            android:textColor="@color/primary_text" />
-    </LinearLayout>
+        android:layout_height="wrap_content" />
 
     <LinearLayout
         android:id="@+id/responseLayout1"
@@ -193,8 +139,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
         android:layout_marginTop="10dp"
+        android:layout_marginRight="16dp"
         android:gravity="center_horizontal"
         android:textColor="@color/red"
         android:visibility="gone" />
@@ -202,8 +148,8 @@
     <View
         android:layout_width="fill_parent"
         android:layout_height="2dp"
-        android:layout_marginBottom="20dp"
         android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
         android:background="@color/primary_text" />
 
 </LinearLayout>

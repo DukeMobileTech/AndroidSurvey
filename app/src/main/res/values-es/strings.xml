@@ -154,7 +154,7 @@
     <string name="longitude">Longitude</string>
     <string name="altitude">Altitude</string>
     <string name="update_location">Update Location</string>
-    <string name="special_response_abbrv">SR</string>
+    <string name="special_response">SR</string>
     <string name="select_special_response">Select Special Response</string>
     <string name="invalid_url">Invalid URL</string>
     <string name="device_user_login">Login Using Device User Credentials</string>
