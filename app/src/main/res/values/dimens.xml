@@ -5,4 +5,5 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="layout_margin_default">10dp</dimen>
     <dimen name="layout_padding_default">10dp</dimen>
+    <dimen name="row_height">100dp</dimen>
 </resources>

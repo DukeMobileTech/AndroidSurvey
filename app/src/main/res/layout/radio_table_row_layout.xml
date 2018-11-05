@@ -8,7 +8,7 @@
     <TextView
         android:id="@+id/questionColumn"
         android:layout_width="0dp"
-        android:layout_height="75dp"
+        android:layout_height="@dimen/row_height"
         android:gravity="center_vertical"
         android:scrollbars="vertical"
         app:layout_constraintEnd_toStartOf="@+id/optionsPart"
@@ -18,7 +18,7 @@
     <LinearLayout
         android:id="@+id/optionsPart"
         android:layout_width="0dp"
-        android:layout_height="75dp"
+        android:layout_height="@dimen/row_height"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
