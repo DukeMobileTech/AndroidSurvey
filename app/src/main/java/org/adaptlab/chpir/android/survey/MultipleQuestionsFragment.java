@@ -83,9 +83,9 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
             }
         }
 
-        // Allow both portrait and landscape orientations
+        // Only allow landscape orientation
         if (getActivity() != null) {
-            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
         mQuestions = mDisplay.tableQuestions(mTableIdentifier);
         for(Question curQuestion: mQuestions){

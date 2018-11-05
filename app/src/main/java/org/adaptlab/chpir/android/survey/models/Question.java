@@ -81,6 +81,8 @@ public class Question extends ReceiveModel {
     private String mLoopSource;
     @Column(name = "LoopNumber")
     private int mLoopNumber;
+    @Column(name = "QuestionId")
+    private Long mQuestionId;
 
     public Question() {
         super();
@@ -356,7 +358,6 @@ public class Question extends ReceiveModel {
      */
     public String getText() {
         if (getInstrument().getLanguage().equals(AppUtil.getDeviceLanguage())) return mText;
-        if (activeTranslation() != null) return activeTranslation().getText();
         for (QuestionTranslation translation : translations()) {
             if (translation.getLanguage().equals(AppUtil.getDeviceLanguage())) {
                 return translation.getText();
@@ -388,7 +389,7 @@ public class Question extends ReceiveModel {
     }
 
     public List<QuestionTranslation> translations() {
-        return getMany(QuestionTranslation.class, "Question");
+        return new Select().from(QuestionTranslation.class).where("QuestionId = ?", mQuestionId).execute();
     }
 
     private Long getInstrumentRemoteId() {
@@ -485,13 +486,12 @@ public class Question extends ReceiveModel {
     public void createObjectFromJSON(JSONObject jsonObject) {
         try {
             Long remoteId = jsonObject.getLong("id");
-
             // If a question already exists, update it from the remote
             Question question = Question.findByRemoteId(remoteId);
             if (question == null) {
                 question = this;
             }
-
+            question.setRemoteId(remoteId);
             if (AppUtil.DEBUG) Log.i(TAG, "Creating object from JSON Object: " + jsonObject);
             question.setText(jsonObject.getString("text"));
             question.setQuestionType(jsonObject.getString("question_type"));
@@ -504,25 +504,9 @@ public class Question extends ReceiveModel {
             if (!jsonObject.isNull("number_in_instrument")) {
                 question.setNumberInInstrument(jsonObject.getInt("number_in_instrument"));
             }
-//            if (!jsonObject.isNull("follow_up_position")) {
-//                question.setFollowUpPosition(jsonObject.getInt("follow_up_position"));
-//            }
             question.setInstruction(jsonObject.optLong("instruction_id"));
             question.setQuestionVersion(jsonObject.getInt("question_version"));
             question.setDisplay(jsonObject.optLong("display_id"));
-//            question.setFollowingUpQuestion(Question.findByQuestionIdentifier(jsonObject
-// .getString("following_up_question_identifier")));
-//            if (!jsonObject.isNull("grid_id")) {
-//                question.setGrid(Grid.findByRemoteId(jsonObject.getLong("grid_id")));
-//            }
-//            if (!jsonObject.isNull("number_in_grid")) {
-//                question.setNumberInGrid(jsonObject.getInt("number_in_grid"));
-//            }
-//            if (!jsonObject.isNull("section_id")) {
-//                question.setSection(Section.findByRemoteId(jsonObject.getLong("section_id")));
-//            }
-
-            question.setRemoteId(remoteId);
             if (jsonObject.isNull("deleted_at")) {
                 question.setDeleted(false);
             } else {
@@ -532,10 +516,12 @@ public class Question extends ReceiveModel {
             question.setRemoteOptionSetId(jsonObject.optLong("option_set_id"));
             question.setRemoteSpecialOptionSetId(jsonObject.optLong("special_option_set_id"));
             question.setTableIdentifier(jsonObject.getString("table_identifier"));
-            if (!jsonObject.isNull("validation_id"))
+            if (!jsonObject.isNull("validation_id")) {
                 question.setValidationId(jsonObject.getLong("validation_id"));
+            }
             question.setRankResponses(jsonObject.optBoolean("rank_responses"));
             question.setLoopQuestionCount(jsonObject.optInt("loop_question_count", 0));
+            question.setQuestionId(jsonObject.optLong("question_id"));
             question.save();
 
             // Generate translations
@@ -544,20 +530,14 @@ public class Question extends ReceiveModel {
                 for (int i = 0; i < translationsArray.length(); i++) {
                     JSONObject translationJSON = translationsArray.getJSONObject(i);
                     Long translationRemoteId = translationJSON.getLong("id");
-                    QuestionTranslation translation = QuestionTranslation.findByRemoteId
-                            (translationRemoteId);
+                    QuestionTranslation translation = QuestionTranslation.findByRemoteId(translationRemoteId);
                     if (translation == null) {
                         translation = new QuestionTranslation();
                     }
                     translation.setRemoteId(translationRemoteId);
                     translation.setLanguage(translationJSON.getString("language"));
-                    translation.setQuestion(question);
                     translation.setText(translationJSON.getString("text"));
-                    translation.setInstrumentTranslation(InstrumentTranslation.findByRemoteId
-                            (translationJSON.optLong("instrument_translation_id")));
-                    if (!translationJSON.isNull("instructions")) {
-                        translation.setInstructions(translationJSON.getString("instructions"));
-                    }
+                    translation.setQuestionId(jsonObject.optLong("question_id"));
                     translation.save();
                 }
             }
@@ -584,10 +564,13 @@ public class Question extends ReceiveModel {
                     }
                 }
             }
-
         } catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);
         }
+    }
+
+    private void setQuestionId(long id) {
+        mQuestionId = id;
     }
 
     private void setIdentifiesSurvey(boolean identifiesSurvey) {

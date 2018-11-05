@@ -247,7 +247,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         if (mInstrument != null) {
             outState.putLong(EXTRA_INSTRUMENT_ID, mInstrument.getId());

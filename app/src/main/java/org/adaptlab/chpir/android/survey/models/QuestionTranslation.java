@@ -9,14 +9,12 @@ import com.activeandroid.query.Select;
 public class QuestionTranslation extends Model {
     private static final String TAG = "QuestionTranslation";
 
-    @Column(name = "Question")
-    private Question mQuestion;
+    @Column(name = "QuestionId")
+    private Long mQuestionId;
     @Column(name = "Language")
     private String mLanguage;
     @Column(name = "Text")
     private String mText;
-    @Column(name = "InstrumentTranslation")
-    private InstrumentTranslation mInstrumentTranslation;
     @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
     private Long mRemoteId;
     @Column(name = "Instructions")
@@ -36,14 +34,6 @@ public class QuestionTranslation extends Model {
                 .executeSingle();
     }
 
-    public Question getQuestion() {
-        return mQuestion;
-    }
-
-    public void setQuestion(Question question) {
-        mQuestion = question;
-    }
-
     public String getLanguage() {
         return mLanguage;
     }
@@ -60,14 +50,6 @@ public class QuestionTranslation extends Model {
         mText = text;
     }
 
-    public InstrumentTranslation getInstrumentTranslation() {
-        return mInstrumentTranslation;
-    }
-
-    public void setInstrumentTranslation(InstrumentTranslation translation) {
-        mInstrumentTranslation = translation;
-    }
-
     public void setRemoteId(Long id) {
         mRemoteId = id;
     }
@@ -78,5 +60,9 @@ public class QuestionTranslation extends Model {
 
     public void setInstructions(String instructions) {
         mInstructions = instructions;
+    }
+
+    public void setQuestionId(long id) {
+        mQuestionId = id;
     }
 }
