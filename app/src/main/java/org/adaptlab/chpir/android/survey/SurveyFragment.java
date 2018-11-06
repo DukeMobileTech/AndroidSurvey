@@ -673,6 +673,46 @@ public class SurveyFragment extends Fragment {
         hideQuestionsInDisplay();
     }
 
+    protected void setMultipleResponseLoopQuestions(Question question, String text) {
+        List<String> responses;
+        if (question.hasListResponses()) {
+            responses = Arrays.asList(text.split(Response.LIST_DELIMITER, -1)); // Keep empty values
+        } else {
+            responses = Arrays.asList(text.split(Response.LIST_DELIMITER)); // Ignore empty values
+        }
+        List<LoopQuestion> loopQuestions = question.loopQuestions();
+        List<Question> questionsToHide = new ArrayList<>();
+        int optionsSize = question.defaultOptions().size() - 1;
+        if (question.isOtherQuestionType()) {
+            optionsSize += 1;
+        }
+        for (int k = 0; k <= optionsSize; k++) {
+            for (LoopQuestion lq : loopQuestions) {
+                if (question.hasMultipleResponses()) {
+                    if (!responses.contains(String.valueOf(k))) {
+                        questionsToHide.add(getQuestionToHide(k, lq));
+                    }
+                } else if (question.hasListResponses()) {
+                    if (TextUtils.isEmpty(text) || TextUtils.isEmpty(responses.get(k))) {
+                        questionsToHide.add(getQuestionToHide(k, lq));
+                    }
+                }
+            }
+        }
+        mQuestionsToSkipMap.put(question.getQuestionIdentifier(), questionsToHide);
+        hideQuestionsInDisplay();
+    }
+
+    private Question getQuestionToHide(int k, LoopQuestion lq) {
+        String identifier;
+        if (k == 0) {
+            identifier = lq.getLooped();
+        } else {
+            identifier = lq.getLooped() + "_" + (k);
+        }
+        return Question.findByQuestionIdentifier(identifier);
+    }
+
     protected void setNextQuestion(String currentQuestionIdentifier, String nextQuestionIdentifier,
                                    String questionIdentifier) {
         List<Question> skipList = new ArrayList<>();

@@ -34,20 +34,20 @@ public class DisplayInstruction extends ReceiveModel {
         if (BuildConfig.DEBUG) Log.i(TAG, "Creating DisplayInstruction: " + jsonObject);
         try {
             Long remoteId = jsonObject.getLong("id");
-            DisplayInstruction display = DisplayInstruction.findByRemoteId(remoteId);
-            if (display == null) {
-                display = new DisplayInstruction();
+            DisplayInstruction displayInstruction = DisplayInstruction.findByRemoteId(remoteId);
+            if (displayInstruction == null) {
+                displayInstruction = new DisplayInstruction();
             }
-            display.setRemoteId(remoteId);
-            display.setPosition(jsonObject.optInt("position"));
-            display.setDisplayId(jsonObject.optLong("display_id"));
-            display.setInstructionId(jsonObject.optLong("instruction_id"));
+            displayInstruction.setRemoteId(remoteId);
+            displayInstruction.setPosition(jsonObject.optInt("position"));
+            displayInstruction.setDisplayId(jsonObject.optLong("display_id"));
+            displayInstruction.setInstructionId(jsonObject.optLong("instruction_id"));
             if (jsonObject.isNull("deleted_at")) {
-                display.setDeleted(false);
+                displayInstruction.setDeleted(false);
             } else {
-                display.setDeleted(true);
+                displayInstruction.setDeleted(true);
             }
-            display.save();
+            displayInstruction.save();
         } catch (JSONException je) {
             if (BuildConfig.DEBUG) Log.e(TAG, "Error parsing object json", je);
         }

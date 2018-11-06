@@ -447,6 +447,11 @@ public class Question extends ReceiveModel {
                 getQuestionType().equals(QuestionType.SELECT_MULTIPLE_WRITE_OTHER);
     }
 
+    public boolean hasListResponses() {
+        return getQuestionType().equals(QuestionType.LIST_OF_INTEGER_BOXES) ||
+                getQuestionType().equals(QuestionType.LIST_OF_TEXT_BOXES);
+    }
+
     /*
      * Check that all of the options are loaded and that the instrument version
      * numbers of the question components match the expected instrument version
@@ -858,7 +863,8 @@ public class Question extends ReceiveModel {
     }
 
     public boolean isOtherQuestionType() {
-        return (mQuestionType == QuestionType.SELECT_ONE_WRITE_OTHER);
+        return (mQuestionType == QuestionType.SELECT_ONE_WRITE_OTHER ||
+                mQuestionType == QuestionType.SELECT_MULTIPLE_WRITE_OTHER);
     }
 
     public boolean isDropDownQuestionType() {
@@ -873,6 +879,12 @@ public class Question extends ReceiveModel {
                 || type == QuestionType.INSTRUCTIONS || type == QuestionType.PHONE_NUMBER
                 || type == QuestionType.ADDRESS || type == QuestionType.RANGE
                 || type == QuestionType.SUM_OF_PARTS);
+    }
+
+    public boolean isMultipleResponseLoop() {
+        QuestionType type = getQuestionType();
+        return (type == QuestionType.SELECT_MULTIPLE || type == QuestionType.SELECT_MULTIPLE_WRITE_OTHER ||
+        type == QuestionType.LIST_OF_INTEGER_BOXES || type == QuestionType.LIST_OF_TEXT_BOXES);
     }
 
     public boolean rankResponses() {

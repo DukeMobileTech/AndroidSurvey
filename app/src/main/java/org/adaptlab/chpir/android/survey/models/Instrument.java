@@ -27,9 +27,9 @@ import java.util.List;
 import java.util.Random;
 
 /*
-* Content Providers require column _id i.e. BaseColumns._ID which is different from the primary key
-* used by ActiveAndroid. As a result, the expected ActiveAndroid relationships do not work
-* and therefore have to be handled using the custom primary key or another key.
+ * Content Providers require column _id i.e. BaseColumns._ID which is different from the primary key
+ * used by ActiveAndroid. As a result, the expected ActiveAndroid relationships do not work
+ * and therefore have to be handled using the custom primary key or another key.
  */
 @Table(name = "Instruments", id = BaseColumns._ID)
 public class Instrument extends ReceiveModel {
@@ -71,8 +71,6 @@ public class Instrument extends ReceiveModel {
     private boolean mRoster;
     @Column(name = "Scorable")
     private boolean mScorable;
-    @Column(name = "LoopsSet")
-    private boolean mLoopsSet;
 
     public Instrument() {
         super();
@@ -515,39 +513,63 @@ public class Instrument extends ReceiveModel {
     }
 
     public void setLoops() {
-        if (isLoopsSet()) return;
         for (Question question : questions()) {
             if (question.getLoopQuestionCount() > 0) {
                 List<LoopQuestion> loopQuestions = question.loopQuestions();
                 if (loopQuestions.size() > 0) {
-                    for (LoopQuestion loopQuestion : loopQuestions) {
-                        Question loopedQuestion = loopQuestion.loopedQuestion();
-                        loopedQuestion.setLoopNumber(1);
-                        loopedQuestion.setLoopSource(question.getQuestionIdentifier());
-                        loopedQuestion.setInstruction(createLoopInstruction(
-                                "Loop 1 for " + question.getQuestionIdentifier()).getRemoteId());
-                        loopedQuestion.save();
-                    }
-                    for (int k = 2; k <= LOOP_MAX; k++) {
-                        int offset = k * loopQuestions.size();
+                    if (question.getQuestionType().equals(Question.QuestionType.INTEGER)) {
                         for (LoopQuestion loopQuestion : loopQuestions) {
-                            Question source = loopQuestion.loopedQuestion();
-                            Question loopedQuestion = new Question(source);
-                            loopedQuestion.setRemoteId(source.getRemoteId() + 1000000 + offset);
-                            loopedQuestion.setLoopNumber(k);
-                            loopedQuestion.setLoopSource(question.getQuestionIdentifier());
-                            loopedQuestion.setNumberInInstrument(source.getNumberInInstrument() + offset);
-                            loopedQuestion.setQuestionIdentifier(source.getQuestionIdentifier() + "_" + k);
-                            loopedQuestion.setInstruction(createLoopInstruction(
-                                    "Loop " + k + " for " + question.getQuestionIdentifier()).getRemoteId());
-                            loopedQuestion.save();
+                            firstLoop(question, loopQuestion, "Loop 1 for " + question.getQuestionIdentifier());
+                            for (int k = 2; k <= LOOP_MAX; k++) {
+                                int offset = k * loopQuestions.size();
+                                otherLoops(question, k, offset, loopQuestion,
+                                        "Loop " + k + " for " + question.getQuestionIdentifier());
+                            }
+                        }
+                    } else if (question.isMultipleResponseLoop()) {
+                        for (LoopQuestion loopQuestion : loopQuestions) {
+                            firstLoop(question, loopQuestion, question.defaultOptions().get(0).getText(this)
+                                    + " for " + question.getQuestionIdentifier());
+                            for (int k = 1; k < question.defaultOptions().size(); k++) {
+                                int offset = k * loopQuestions.size();
+                                otherLoops(question, k, offset, loopQuestion,
+                                        question.defaultOptions().get(k).getText(this)
+                                                + " for " + question.getQuestionIdentifier());
+                            }
+                            if (question.isOtherQuestionType()) {
+                                int offset = question.defaultOptions().size() * loopQuestions.size();
+                                otherLoops(question, question.defaultOptions().size(), offset, loopQuestion,
+                                        "Other for " + question.getQuestionIdentifier());
+                            }
                         }
                     }
                 }
             }
         }
-        setLoopsSet(true);
-        save();
+    }
+
+    private void otherLoops(Question question, int k, int offset, LoopQuestion loopQuestion, String text) {
+        Question source = loopQuestion.loopedQuestion();
+        String identifier = source.getQuestionIdentifier() + "_" + k;
+        Question loopedQuestion = Question.findByQuestionIdentifier(identifier);
+        if (loopedQuestion == null) {
+            loopedQuestion = new Question(source);
+            loopedQuestion.setRemoteId(source.getRemoteId() + 1000000 + offset);
+            loopedQuestion.setLoopNumber(k);
+            loopedQuestion.setLoopSource(question.getQuestionIdentifier());
+            loopedQuestion.setNumberInInstrument(source.getNumberInInstrument());
+            loopedQuestion.setQuestionIdentifier(identifier);
+            loopedQuestion.setInstruction(createLoopInstruction(text).getRemoteId());
+            loopedQuestion.save();
+        }
+    }
+
+    private void firstLoop(Question question, LoopQuestion loopQuestion, String instructions) {
+        Question loopedQuestion = loopQuestion.loopedQuestion();
+        loopedQuestion.setLoopNumber(1);
+        loopedQuestion.setLoopSource(question.getQuestionIdentifier());
+        loopedQuestion.setInstruction(createLoopInstruction(instructions).getRemoteId());
+        loopedQuestion.save();
     }
 
     private Instruction createLoopInstruction(String text) {
@@ -568,11 +590,4 @@ public class Instrument extends ReceiveModel {
         return remoteId;
     }
 
-    private boolean isLoopsSet() {
-        return mLoopsSet;
-    }
-
-    private void setLoopsSet(boolean status) {
-       mLoopsSet = status;
-    }
 }

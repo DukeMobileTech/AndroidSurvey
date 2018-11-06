@@ -264,17 +264,19 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
     }
 
     protected void setDisplayInstructions() {
-        List<DisplayInstruction> displayInstructions = mSurveyFragment.getDisplayInstructions
-                (mQuestion.getDisplay());
+        List<DisplayInstruction> displayInstructions = mSurveyFragment.getDisplayInstructions(mQuestion.getDisplay());
         if (displayInstructions != null && displayInstructions.size() > 0) {
             StringBuilder instructions = new StringBuilder();
-            for (DisplayInstruction instruction : displayInstructions) {
-                if (instruction.getPosition() == mQuestion.getNumberInInstrument()) {
-                    instructions.append(instruction.getInstructions()).append("<br>");
+            for (int k = 0; k < displayInstructions.size(); k++) {
+                if (displayInstructions.get(k).getPosition() == mQuestion.getNumberInInstrument()) {
+                    instructions.append(displayInstructions.get(k).getInstructions()).append("<br>");
+                }
+                if (k < displayInstructions.size() - 1) {
+                    instructions.append("<br>");
                 }
             }
             if (instructions.length() > 0) {
-                ((LinearLayout) mDisplayInstructionsText.getParent()).setVisibility(View.VISIBLE);
+                mDisplayInstructionsText.setVisibility(View.VISIBLE);
                 mDisplayInstructionsText.setText(styleTextWithHtml(instructions.toString()));
             }
         }
@@ -394,6 +396,9 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         if (mQuestion.getQuestionType().equals(Question.QuestionType.INTEGER) &&
                 mQuestion.getLoopQuestionCount() > 0) {
             mSurveyFragment.setIntegerLoopQuestions(mQuestion, mResponse.getText());
+        } else if (mQuestion.isMultipleResponseLoop() && mQuestion.getLoopQuestionCount() > 0) {
+            Log.i(TAG, "Multiple Response Loop");
+            mSurveyFragment.setMultipleResponseLoopQuestions(mQuestion, mResponse.getText());
         }
     }
 
