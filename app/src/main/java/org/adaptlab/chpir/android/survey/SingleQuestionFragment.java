@@ -123,7 +123,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         setResponseRanking(v);
         setSpecialResponseUI(v);
         deserializeSpecialResponse();
-        setLoopQuestions();
+        setLoopQuestions(mQuestion, mResponse);
         mFragmentView = v;
         return v;
     }
@@ -392,16 +392,6 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         }
     }
 
-    private void setLoopQuestions() {
-        if (mQuestion.getQuestionType().equals(Question.QuestionType.INTEGER) &&
-                mQuestion.getLoopQuestionCount() > 0) {
-            mSurveyFragment.setIntegerLoopQuestions(mQuestion, mResponse.getText());
-        } else if (mQuestion.isMultipleResponseLoop() && mQuestion.getLoopQuestionCount() > 0) {
-            Log.i(TAG, "Multiple Response Loop");
-            mSurveyFragment.setMultipleResponseLoopQuestions(mQuestion, mResponse.getText());
-        }
-    }
-
     private void setSkipPatterns() {
         Option selectedOption = null;
         String nextQuestion = null;
@@ -567,7 +557,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         saveResponseInBackground(mResponse);
         setSkipPatterns();
         refreshFollowUpQuestion();
-        setLoopQuestions();
+        setLoopQuestions(mQuestion, mResponse);
     }
 
     protected ResponsePhoto getResponsePhoto() {

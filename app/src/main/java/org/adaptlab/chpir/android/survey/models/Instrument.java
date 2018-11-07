@@ -3,7 +3,9 @@ package org.adaptlab.chpir.android.survey.models;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.provider.BaseColumns;
+import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -25,6 +27,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /*
  * Content Providers require column _id i.e. BaseColumns._ID which is different from the primary key
@@ -512,6 +515,7 @@ public class Instrument extends ReceiveModel {
         return mScorable;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void setLoops() {
         for (Question question : questions()) {
             if (question.getLoopQuestionCount() > 0) {
@@ -521,8 +525,7 @@ public class Instrument extends ReceiveModel {
                         for (LoopQuestion loopQuestion : loopQuestions) {
                             firstLoop(question, loopQuestion, "Loop 1 for " + question.getQuestionIdentifier());
                             for (int k = 2; k <= LOOP_MAX; k++) {
-                                int offset = k * loopQuestions.size();
-                                otherLoops(question, k, offset, loopQuestion,
+                                otherLoops(question, k, loopQuestion,
                                         "Loop " + k + " for " + question.getQuestionIdentifier());
                             }
                         }
@@ -531,14 +534,12 @@ public class Instrument extends ReceiveModel {
                             firstLoop(question, loopQuestion, question.defaultOptions().get(0).getText(this)
                                     + " for " + question.getQuestionIdentifier());
                             for (int k = 1; k < question.defaultOptions().size(); k++) {
-                                int offset = k * loopQuestions.size();
-                                otherLoops(question, k, offset, loopQuestion,
+                                otherLoops(question, k, loopQuestion,
                                         question.defaultOptions().get(k).getText(this)
                                                 + " for " + question.getQuestionIdentifier());
                             }
                             if (question.isOtherQuestionType()) {
-                                int offset = question.defaultOptions().size() * loopQuestions.size();
-                                otherLoops(question, question.defaultOptions().size(), offset, loopQuestion,
+                                otherLoops(question, question.defaultOptions().size(), loopQuestion,
                                         "Other for " + question.getQuestionIdentifier());
                             }
                         }
@@ -548,13 +549,14 @@ public class Instrument extends ReceiveModel {
         }
     }
 
-    private void otherLoops(Question question, int k, int offset, LoopQuestion loopQuestion, String text) {
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void otherLoops(Question question, int k, LoopQuestion loopQuestion, String text) {
         Question source = loopQuestion.loopedQuestion();
         String identifier = source.getQuestionIdentifier() + "_" + k;
         Question loopedQuestion = Question.findByQuestionIdentifier(identifier);
         if (loopedQuestion == null) {
             loopedQuestion = new Question(source);
-            loopedQuestion.setRemoteId(source.getRemoteId() + 1000000 + offset);
+            loopedQuestion.setRemoteId(ThreadLocalRandom.current().nextLong(10000));
             loopedQuestion.setLoopNumber(k);
             loopedQuestion.setLoopSource(question.getQuestionIdentifier());
             loopedQuestion.setNumberInInstrument(source.getNumberInInstrument());

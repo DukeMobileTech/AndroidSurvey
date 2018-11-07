@@ -74,8 +74,8 @@ public class MultipleSelectMultipleQuestionsFragment extends MultipleQuestionsFr
         response.setResponse(serialized.toString());
         response.setSpecialResponse("");
         response.setTimeEnded(new Date());
-        response.save();
-        getSurvey().save();
+        saveResponseInBackground(response);
+        setLoopQuestions(question, response);
     }
 
     @Override

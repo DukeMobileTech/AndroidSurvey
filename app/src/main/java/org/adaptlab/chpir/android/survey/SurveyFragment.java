@@ -126,7 +126,7 @@ public class SurveyFragment extends Fragment {
     private HashMap<String, List<Question>> mQuestionsToSkipMap;
     private HashMap<Long, List<Option>> mSpecialOptions;
     private HashMap<Display, List<DisplayInstruction>> mDisplayInstructions;
-    private HashSet<Question> mQuestionsToSkipSet;
+    private HashSet<String> mQuestionsToSkipSet;
     private TextView mDisplayIndexLabel;
     private TextView mParticipantLabel;
     private ProgressBar mProgressBar;
@@ -426,7 +426,7 @@ public class SurveyFragment extends Fragment {
         for (Map.Entry<Display, List<Question>> curEntry : mDisplayQuestions.entrySet()) {
             boolean isSkip = true;
             for (Question curQuestion : curEntry.getValue()) {
-                if (!mQuestionsToSkipSet.contains(curQuestion)) {
+                if (!mQuestionsToSkipSet.contains(curQuestion.getQuestionIdentifier())) {
                     isSkip = false;
                     break;
                 }
@@ -570,7 +570,7 @@ public class SurveyFragment extends Fragment {
         for (int i = mDisplayNumber + 1; i < mDisplays.size(); i++) {
             boolean skipDisplay = true;
             for (Question curQuestion : mDisplayQuestions.get(mDisplays.get(i))) {
-                if (!mQuestionsToSkipSet.contains(curQuestion)) {
+                if (!mQuestionsToSkipSet.contains(curQuestion.getQuestionIdentifier())) {
                     skipDisplay = false;
                     break;
                 }
@@ -611,14 +611,16 @@ public class SurveyFragment extends Fragment {
     private void updateQuestionsToSkipSet() {
         mQuestionsToSkipSet = new HashSet<>();
         for (HashMap.Entry<String, List<Question>> curPair : mQuestionsToSkipMap.entrySet()) {
-            mQuestionsToSkipSet.addAll(curPair.getValue());
+            for (Question q: curPair.getValue()) {
+                if (q != null) mQuestionsToSkipSet.add(q.getQuestionIdentifier());
+            }
         }
     }
 
     private void unSetSkipQuestionResponse() {
-        for (Question curSkip : mQuestionsToSkipSet) {
+        for (String curSkip : mQuestionsToSkipSet) {
             if (curSkip != null) {
-                Response curResponse = mResponses.get(curSkip);
+                Response curResponse = mResponses.get(Question.findByQuestionIdentifier(curSkip));
                 if (curResponse != null) {
                     curResponse.setResponse("");
                     curResponse.setSpecialResponse("");
@@ -636,8 +638,12 @@ public class SurveyFragment extends Fragment {
             FragmentManager fm = getChildFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
             HashSet<Integer> hideSet = new HashSet<>();
-            for (Question curSkip : mQuestionsToSkipSet) {
-                int index = mDisplay.questions().indexOf(curSkip);
+            List<String> ids = new ArrayList<>();
+            for (Question q : mDisplay.questions()) {
+                ids.add(q.getQuestionIdentifier());
+            }
+            for (String curSkip : mQuestionsToSkipSet) {
+                int index = ids.indexOf(curSkip);
                 if (index != -1) {
                     hideSet.add(index);
                     ft.hide(mQuestionFragments.get(index));
@@ -856,8 +862,7 @@ public class SurveyFragment extends Fragment {
                 String qfTag;
                 if (isEmpty(question.getTableIdentifier())) {
                     // Add large offset to avoid id conflicts
-                    frameLayoutId = new BigDecimal(question.getRemoteId()).intValueExact() +
-                            OFFSET;
+                    frameLayoutId = new BigDecimal(question.getRemoteId()).intValueExact() + OFFSET;
                     qfTag = mSurvey.getId().toString() + "-" + question.getId().toString();
                 } else {
                     long sumId = 0;
@@ -897,9 +902,9 @@ public class SurveyFragment extends Fragment {
                         }
                         Bundle bundle = new Bundle();
                         ArrayList<String> questionsToSkip = new ArrayList<>();
-                        for (Question curSkip : mQuestionsToSkipSet) {
+                        for (String curSkip : mQuestionsToSkipSet) {
                             if (curSkip != null)
-                                questionsToSkip.add(curSkip.getQuestionIdentifier());
+                                questionsToSkip.add(curSkip);
                         }
                         bundle.putStringArrayList(MultipleQuestionsFragment
                                 .EXTRA_SKIPPED_QUESTION_ID_LIST, questionsToSkip);
@@ -933,7 +938,7 @@ public class SurveyFragment extends Fragment {
         return null;
     }
 
-    public HashSet<Question> getQuestionsToSkipSet() {
+    public HashSet<String> getQuestionsToSkipSet() {
         return mQuestionsToSkipSet;
     }
 
@@ -1075,8 +1080,8 @@ public class SurveyFragment extends Fragment {
 
     private void goToReviewPage() {
         ArrayList<String> questionsToSkip = new ArrayList<>();
-        for (Question curSkip : mQuestionsToSkipSet) {
-            if (curSkip != null) questionsToSkip.add(curSkip.getQuestionIdentifier());
+        for (String curSkip : mQuestionsToSkipSet) {
+            if (curSkip != null) questionsToSkip.add(curSkip);
         }
         Intent i = new Intent(getActivity(), ReviewPageActivity.class);
         Bundle b = new Bundle();

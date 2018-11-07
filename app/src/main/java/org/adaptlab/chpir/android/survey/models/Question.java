@@ -389,6 +389,7 @@ public class Question extends ReceiveModel {
     }
 
     public List<QuestionTranslation> translations() {
+        if (mQuestionId == null) return new ArrayList<>(); // TODO: 11/7/18 Placeholder that needs fixing
         return new Select().from(QuestionTranslation.class).where("QuestionId = ?", mQuestionId).execute();
     }
 

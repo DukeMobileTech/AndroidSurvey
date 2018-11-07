@@ -42,7 +42,7 @@ public class SingleSelectMultipleQuestionsFragment extends MultipleQuestionsFrag
     private void updateViewToHideSet() {
         mViewToHideSet = new HashSet<>();
         for (int i = 0; i < mRecyclerViewAdapter.mQuestionList.size(); i++) {
-            if (mSurveyFragment.getQuestionsToSkipSet().contains(mRecyclerViewAdapter.mQuestionList.get(i))) {
+            if (mSurveyFragment.getQuestionsToSkipSet().contains(mRecyclerViewAdapter.mQuestionList.get(i).getQuestionIdentifier())) {
                 mViewToHideSet.add(i);
             }
         }

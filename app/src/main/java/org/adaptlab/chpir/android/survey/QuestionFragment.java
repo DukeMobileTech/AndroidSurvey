@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.ViewGroup;
 
+import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 
 public abstract class QuestionFragment extends Fragment {
@@ -39,6 +40,15 @@ public abstract class QuestionFragment extends Fragment {
         super.onHiddenChanged(hidden);
         if (!hidden) {
             hideIndeterminateProgressBar();
+        }
+    }
+
+    protected void setLoopQuestions(Question question, Response response) {
+        if (question.getQuestionType().equals(Question.QuestionType.INTEGER) &&
+                question.getLoopQuestionCount() > 0) {
+            mSurveyFragment.setIntegerLoopQuestions(question, response.getText());
+        } else if (question.isMultipleResponseLoop() && question.getLoopQuestionCount() > 0) {
+            mSurveyFragment.setMultipleResponseLoopQuestions(question, response.getText());
         }
     }
 

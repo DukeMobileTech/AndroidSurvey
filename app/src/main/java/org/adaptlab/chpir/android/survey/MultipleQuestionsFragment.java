@@ -270,7 +270,7 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
     protected List<Question> getQuestionExcludingSkip() {
         List<Question> questionLst = new ArrayList<>();
         for (Question curQuestion : mQuestions) {
-            if (!mSurveyFragment.getQuestionsToSkipSet().contains(curQuestion)) {
+            if (!mSurveyFragment.getQuestionsToSkipSet().contains(curQuestion.getQuestionIdentifier())) {
                 questionLst.add(curQuestion);
             }
         }
