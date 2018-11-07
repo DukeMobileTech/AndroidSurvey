@@ -137,7 +137,7 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
                 }
             }
             if (instructions.length() > 0) {
-                ((LinearLayout) mDisplayInstructionsText.getParent()).setVisibility(View.VISIBLE);
+                mDisplayInstructionsText.setVisibility(View.VISIBLE);
                 mDisplayInstructionsText.setText(styleTextWithHtml(instructions.toString()));
             }
         }
@@ -152,11 +152,11 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
         StringBuilder instructions = new StringBuilder();
         Question question = mQuestions.get(0);
         if (!isEmpty(question.getInstructions())) {
-            instructions.append(question.getInstructions());
+            instructions.append(styleTextWithHtml(question.getInstructions()));
         }
         OptionSet optionSet = OptionSet.findByRemoteId(mQuestions.get(0).getRemoteOptionSetId());
         if (optionSet != null && !isEmpty(optionSet.getInstructions())) {
-            instructions.append("\n").append(optionSet.getInstructions());
+            instructions.append("\n").append(styleTextWithHtml(optionSet.getInstructions()));
         }
         return instructions.toString();
     }

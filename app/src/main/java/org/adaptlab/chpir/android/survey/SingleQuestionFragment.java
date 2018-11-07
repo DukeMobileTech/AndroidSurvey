@@ -111,13 +111,11 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         mValidationTextView = v.findViewById(R.id.validation_text);
         mDisplayInstructionsText = v.findViewById(R.id.displayInstructions);
         setDisplayInstructions();
-
         // Overridden by subclasses to place their graphical elements on the fragment.
         ViewGroup questionComponent = (LinearLayout) v.findViewById(R.id.question_component);
         setChoiceSelectionInstructions(v);
         createQuestionComponent(questionComponent);
-        if (mResponse != null)
-            deserialize(mResponse.getText());
+        deserialize(mResponse.getText());
         setSkipPatterns();
         refreshFollowUpQuestion();
         setResponseRanking(v);
@@ -295,17 +293,15 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         if (savedInstanceState == null) {
             init();
         } else {
-            mInstrument = Instrument.load(Instrument.class, savedInstanceState.getLong
-                    (EXTRA_INSTRUMENT_ID));
+            mInstrument = Instrument.load(Instrument.class, savedInstanceState.getLong(EXTRA_INSTRUMENT_ID));
             mSurvey = Survey.load(Survey.class, savedInstanceState.getLong(EXTRA_SURVEY_ID));
-            mQuestion = Question.load(Question.class, savedInstanceState.getLong
-                    (EXTRA_QUESTION_ID));
-            mResponse = Response.load(Response.class, savedInstanceState.getLong
-                    (EXTRA_RESPONSE_ID));
+            mQuestion = Question.load(Question.class, savedInstanceState.getLong(EXTRA_QUESTION_ID));
+            mResponse = Response.load(Response.class, savedInstanceState.getLong(EXTRA_RESPONSE_ID));
             mOptions = mSurveyFragment.getOptions().get(mQuestion);
         }
-        mSpecialOptions = mSurveyFragment.getSpecialOptions().get(mQuestion
-                .getRemoteSpecialOptionSetId());
+        if (mSurveyFragment.getSpecialOptions() != null && mQuestion != null) {
+            mSpecialOptions = mSurveyFragment.getSpecialOptions().get(mQuestion.getRemoteSpecialOptionSetId());
+        }
     }
 
     public void init() {
@@ -335,7 +331,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
             response = new Response();
             response.setQuestion(mQuestion);
             response.setSurvey(mSurvey);
-            saveResponseInBackground(response);
+            response.save();
             mSurveyFragment.getResponses().put(mQuestion, response);
         }
         return response;

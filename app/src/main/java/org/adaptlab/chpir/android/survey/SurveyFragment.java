@@ -213,7 +213,12 @@ public class SurveyFragment extends Fragment {
             if (!mInstrument.isRoster()) {
                 loadOrCreateSurvey();
             }
-            mDisplayNumber = mSurvey.getLastQuestion().getDisplay().getPosition() - 1;
+            if (mSurvey != null && mSurvey.getLastQuestion() != null &&
+                    mSurvey.getLastQuestion().getDisplay() != null) {
+                mDisplayNumber = mSurvey.getLastQuestion().getDisplay().getPosition() - 1;
+            } else {
+                mDisplayNumber = 0;
+            }
         }
         mDisplays = (ArrayList<Display>) mInstrument.displays();
         mDisplay = mDisplays.get(mDisplayNumber);

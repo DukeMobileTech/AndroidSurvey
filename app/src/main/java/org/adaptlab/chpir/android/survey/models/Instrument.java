@@ -531,8 +531,10 @@ public class Instrument extends ReceiveModel {
                         }
                     } else if (question.isMultipleResponseLoop()) {
                         for (LoopQuestion loopQuestion : loopQuestions) {
-                            firstLoop(question, loopQuestion, question.defaultOptions().get(0).getText(this)
-                                    + " for " + question.getQuestionIdentifier());
+                            if (question.defaultOptions().size() > 0) {
+                                firstLoop(question, loopQuestion, question.defaultOptions().get(0).getText(this)
+                                        + " for " + question.getQuestionIdentifier());
+                            }
                             for (int k = 1; k < question.defaultOptions().size(); k++) {
                                 otherLoops(question, k, loopQuestion,
                                         question.defaultOptions().get(k).getText(this)
@@ -556,7 +558,7 @@ public class Instrument extends ReceiveModel {
         Question loopedQuestion = Question.findByQuestionIdentifier(identifier);
         if (loopedQuestion == null) {
             loopedQuestion = new Question(source);
-            loopedQuestion.setRemoteId(ThreadLocalRandom.current().nextLong(10000));
+            loopedQuestion.setRemoteId(getBoundedRemoteId());
             loopedQuestion.setLoopNumber(k);
             loopedQuestion.setLoopSource(question.getQuestionIdentifier());
             loopedQuestion.setNumberInInstrument(source.getNumberInInstrument());
@@ -566,14 +568,28 @@ public class Instrument extends ReceiveModel {
         }
     }
 
-    private void firstLoop(Question question, LoopQuestion loopQuestion, String instructions) {
-        Question loopedQuestion = loopQuestion.loopedQuestion();
-        loopedQuestion.setLoopNumber(1);
-        loopedQuestion.setLoopSource(question.getQuestionIdentifier());
-        loopedQuestion.setInstruction(createLoopInstruction(instructions).getRemoteId());
-        loopedQuestion.save();
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private long getBoundedRemoteId() {
+        long remoteId = ThreadLocalRandom.current().nextLong(100000);
+        Question question = Question.findByRemoteId(remoteId);
+        if (question != null) {
+            getBoundedRemoteId();
+        }
+        return remoteId;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void firstLoop(Question question, LoopQuestion loopQuestion, String instructions) {
+        Question loopedQuestion = loopQuestion.loopedQuestion();
+        if (loopedQuestion != null) {
+            loopedQuestion.setLoopNumber(1);
+            loopedQuestion.setLoopSource(question.getQuestionIdentifier());
+            loopedQuestion.setInstruction(createLoopInstruction(instructions).getRemoteId());
+            loopedQuestion.save();
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private Instruction createLoopInstruction(String text) {
         Instruction instruction = new Instruction();
         instruction.setRemoteId(getUnusedRemoteId());
@@ -583,8 +599,9 @@ public class Instrument extends ReceiveModel {
         return instruction;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private long getUnusedRemoteId() {
-        long remoteId = new Random().nextLong();
+        long remoteId = ThreadLocalRandom.current().nextLong();
         Instruction instruction = Instruction.findByRemoteId(remoteId);
         if (instruction != null) {
             getUnusedRemoteId();
