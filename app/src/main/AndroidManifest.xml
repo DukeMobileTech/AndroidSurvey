@@ -2,8 +2,8 @@
 <manifest xmlns:tools="http://schemas.android.com/tools"
     package="org.adaptlab.chpir.android.survey"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:versionCode="109"
-    android:versionName="2.1.24">
+    android:versionCode="110"
+    android:versionName="2.1.25">
 
     <permission
         android:name="org.adaptlab.chpir.android.survey.LAUNCH_SURVEY"

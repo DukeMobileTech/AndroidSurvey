@@ -18,6 +18,7 @@ import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
+import org.apache.commons.lang3.RandomUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -515,7 +516,6 @@ public class Instrument extends ReceiveModel {
         return mScorable;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void setLoops() {
         List<Display> mDisplays = displays();
         for (Question question : questions()) {
@@ -530,7 +530,9 @@ public class Instrument extends ReceiveModel {
                                 createLoopQuestion(question, loopQuestion, instruction, k, display);
                             }
                         }
-                        mDisplays.add(question.getDisplay().getPosition(), display);
+                        if (!mDisplays.contains(display)) {
+                            mDisplays.add(question.getDisplay().getPosition(), display);
+                        }
                     } else if (question.isMultipleResponseLoop()) {
                         Display display = getDisplay(question);
                         for (LoopQuestion loopQuestion : loopQuestions) {
@@ -556,7 +558,9 @@ public class Instrument extends ReceiveModel {
                                 }
                             }
                         }
-                        mDisplays.add(question.getDisplay().getPosition(), display);
+                        if (!mDisplays.contains(display)) {
+                            mDisplays.add(question.getDisplay().getPosition(), display);
+                        }
                     }
                     for (int k = 0; k < mDisplays.size(); k++) {
                         Display display = mDisplays.get(k);
@@ -568,7 +572,6 @@ public class Instrument extends ReceiveModel {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private Display getDisplay(Question question) {
         Display parent = question.getDisplay();
         Display display = Display.findByTitleAndInstrument(parent.getTitle() + "...continued",
@@ -586,14 +589,13 @@ public class Instrument extends ReceiveModel {
         return display;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void createLoopQuestion(Question question, LoopQuestion lq, String instruction,
                                     int index, Display display) {
         Question source = lq.loopedQuestion();
         String identifier = question.getQuestionIdentifier() + "_" + source.getQuestionIdentifier() + "_" + index;
         Question loopedQuestion = Question.findByQuestionIdentifier(identifier);
         if (loopedQuestion == null) {
-            loopedQuestion = new Question(source);
+            loopedQuestion = new Question();
             loopedQuestion.setRemoteId(getBoundedRemoteId());
             loopedQuestion.setDisplay(display.getRemoteId());
             loopedQuestion.setLoopNumber(index);
@@ -601,6 +603,7 @@ public class Instrument extends ReceiveModel {
             loopedQuestion.setQuestionIdentifier(identifier);
             loopedQuestion.setInstruction(createLoopInstruction(instruction).getRemoteId());
         }
+        loopedQuestion = Question.copyAttributes(loopedQuestion, source);
         loopedQuestion.setNumberInInstrument(source.getNumberInInstrument() + (index * question.getLoopQuestionCount()));
         loopedQuestion.save();
         setLoopedQuestionSkips(question, source, loopedQuestion, index);
@@ -656,9 +659,13 @@ public class Instrument extends ReceiveModel {
                 "AND NextQuestionIdentifier = ?", qi, oi, nqi).executeSingle();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private long getBoundedRemoteId() {
-        long remoteId = ThreadLocalRandom.current().nextLong(100000);
+        long remoteId;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            remoteId = ThreadLocalRandom.current().nextLong(100000);
+        } else {
+            remoteId = RandomUtils.nextLong(0, 100000);
+        }
         Question question = Question.findByRemoteId(remoteId);
         if (question != null) {
             getBoundedRemoteId();
@@ -666,7 +673,6 @@ public class Instrument extends ReceiveModel {
         return remoteId;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private Instruction createLoopInstruction(String text) {
         Instruction instruction = new Instruction();
         instruction.setRemoteId(getUnusedRemoteId());
@@ -676,9 +682,13 @@ public class Instrument extends ReceiveModel {
         return instruction;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private long getUnusedRemoteId() {
-        long remoteId = ThreadLocalRandom.current().nextLong();
+        long remoteId;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            remoteId = ThreadLocalRandom.current().nextLong();
+        } else {
+            remoteId = new Random().nextLong();
+        }
         Instruction instruction = Instruction.findByRemoteId(remoteId);
         if (instruction != null) {
             getUnusedRemoteId();
@@ -686,9 +696,13 @@ public class Instrument extends ReceiveModel {
         return remoteId;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private long getBoundedDisplayId() {
-        long remoteId = ThreadLocalRandom.current().nextLong(1000, 10000);
+        long remoteId;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            remoteId = ThreadLocalRandom.current().nextLong(1000, 10000);
+        } else {
+            remoteId = RandomUtils.nextLong(1000, 10000);
+        }
         Display display = Display.findByRemoteId(remoteId);
         if (display != null) {
             getBoundedDisplayId();

@@ -928,25 +928,24 @@ public class Question extends ReceiveModel {
                 getId()).execute();
     }
 
-    public Question(Question question) {
-        this.mText = question.mText;
-        this.mQuestionType = question.mQuestionType;
-        this.mOptionCount = question.mOptionCount;
-        this.mInstrumentVersion = question.mInstrumentVersion;
-        this.mIdentifiesSurvey = question.mIdentifiesSurvey;
-        this.mInstructionId = question.mInstructionId;
-        this.mQuestionVersion = question.mQuestionVersion;
-        this.mDeleted = question.mDeleted;
-        this.mSection = question.mSection;
-        this.mInstrumentRemoteId = question.mInstrumentRemoteId;
-        this.mRemoteOptionSetId = question.mRemoteOptionSetId;
-        this.mDisplayId = question.mDisplayId;
-        this.mRemoteSpecialOptionSetId = question.mRemoteSpecialOptionSetId;
-        this.mTableIdentifier = question.mTableIdentifier;
-        this.mValidationId = question.mValidationId;
-        this.mRankResponses = question.mRankResponses;
-        this.mLoopQuestionCount = question.mLoopQuestionCount;
-        this.mQuestionId = question.mQuestionId;
+    static Question copyAttributes(Question destination, Question source) {
+        destination.mText = source.mText;
+        destination.mQuestionType = source.mQuestionType;
+        destination.mOptionCount = source.mOptionCount;
+        destination.mInstrumentVersion = source.mInstrumentVersion;
+        destination.mIdentifiesSurvey = source.mIdentifiesSurvey;
+        destination.mQuestionVersion = source.mQuestionVersion;
+        destination.mDeleted = source.mDeleted;
+        destination.mSection = source.mSection;
+        destination.mInstrumentRemoteId = source.mInstrumentRemoteId;
+        destination.mRemoteOptionSetId = source.mRemoteOptionSetId;
+        destination.mRemoteSpecialOptionSetId = source.mRemoteSpecialOptionSetId;
+        destination.mTableIdentifier = source.mTableIdentifier;
+        destination.mValidationId = source.mValidationId;
+        destination.mRankResponses = source.mRankResponses;
+        destination.mLoopQuestionCount = source.mLoopQuestionCount;
+        destination.mQuestionId = source.mQuestionId;
+        return destination;
     }
 
     public enum QuestionType {

@@ -702,16 +702,14 @@ public class SurveyFragment extends Fragment {
         }
         for (int k = 0; k <= optionsSize; k++) {
             for (LoopQuestion lq : loopQuestions) {
+                String id = question.getQuestionIdentifier() + "_" + lq.loopedQuestion().getQuestionIdentifier()
+                        + "_" + k;
                 if (question.hasMultipleResponses()) {
                     if (!responses.contains(String.valueOf(k))) {
-                        String id = question.getQuestionIdentifier() + "_" + lq.loopedQuestion().getQuestionIdentifier()
-                                + "_" + k;
                         questionsToHide.add(Question.findByQuestionIdentifier(id));
                     }
                 } else if (question.hasListResponses()) {
                     if (TextUtils.isEmpty(text) || TextUtils.isEmpty(responses.get(k))) {
-                        String id = question.getQuestionIdentifier() + "_" + lq.loopedQuestion().getQuestionIdentifier()
-                                + "_" + k;
                         questionsToHide.add(Question.findByQuestionIdentifier(id));
                     }
                 }
