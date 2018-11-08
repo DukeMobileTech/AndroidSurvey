@@ -29,6 +29,10 @@ public class MultipleSkip extends ReceiveModel {
     @Column(name = "Deleted")
     private boolean mDeleted;
 
+    public MultipleSkip() {
+        super();
+    }
+
     @Override
     public void createObjectFromJSON(JSONObject jsonObject) {
         try {
@@ -66,28 +70,43 @@ public class MultipleSkip extends ReceiveModel {
         mRemoteId = id;
     }
 
-    private void setQuestionIdentifier(String id) {
+    void setQuestionIdentifier(String id) {
         mQuestionIdentifier = id;
     }
 
-    private void setOptionIdentifier(String id) {
+    void setOptionIdentifier(String id) {
         mOptionIdentifier = id;
     }
 
-    private void setSkipQuestionIdentifier(String id) {
+    String getOptionIdentifier() {
+        return mOptionIdentifier;
+    }
+
+    void setSkipQuestionIdentifier(String id) {
         mSkipQuestionIdentifier = id;
+    }
+
+    String getSkipQuestionIdentifier() {
+        return mSkipQuestionIdentifier;
     }
 
     private void setRemoteQuestionId(Long id) {
         mRemoteQuestionId = id;
     }
 
-    private void setRemoteInstrumentId(Long id) {
+    void setRemoteInstrumentId(Long id) {
         mRemoteInstrumentId = id;
     }
 
-    private void setDeleted(boolean deleted) {
+    Long getRemoteInstrumentId() {
+        return mRemoteInstrumentId;
+    }
+
+    void setDeleted(boolean deleted) {
         mDeleted = deleted;
     }
 
+    boolean getDeleted() {
+        return mDeleted;
+    }
 }

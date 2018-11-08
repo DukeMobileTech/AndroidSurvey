@@ -33,6 +33,10 @@ public class NextQuestion extends ReceiveModel {
     @Column(name = "CompleteSurvey")
     private boolean mCompleteSurvey;
 
+    public NextQuestion() {
+        super();
+    }
+
     @Override
     public void createObjectFromJSON(JSONObject jsonObject) {
         try {
@@ -91,15 +95,19 @@ public class NextQuestion extends ReceiveModel {
         mRemoteId = id;
     }
 
-    private void setQuestionIdentifier(String id) {
+    void setQuestionIdentifier(String id) {
         mQuestionIdentifier = id;
     }
 
-    private void setOptionIdentifier(String id) {
+    void setOptionIdentifier(String id) {
         mOptionIdentifier = id;
     }
 
-    private void setNextQuestionIdentifier(String id) {
+    String getOptionIdentifier() {
+        return mOptionIdentifier;
+    }
+
+    void setNextQuestionIdentifier(String id) {
         mNextQuestionIdentifier = id;
     }
 
@@ -107,12 +115,20 @@ public class NextQuestion extends ReceiveModel {
         mRemoteQuestionId = id;
     }
 
-    private void setRemoteInstrumentId(Long id) {
+    void setRemoteInstrumentId(Long id) {
         mRemoteInstrumentId = id;
     }
 
-    private void setDeleted(boolean deleted) {
+    Long getRemoteInstrumentId() {
+        return mRemoteInstrumentId;
+    }
+
+    void setDeleted(boolean deleted) {
         mDeleted = deleted;
+    }
+
+    boolean getDeleted() {
+        return mDeleted;
     }
 
     private void setValue(String value) {

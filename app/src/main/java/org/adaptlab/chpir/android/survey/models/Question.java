@@ -214,7 +214,7 @@ public class Question extends ReceiveModel {
         return multipleSkips(instrument).size() > 0;
     }
 
-    private List<MultipleSkip> multipleSkips(Instrument instrument) {
+    List<MultipleSkip> multipleSkips(Instrument instrument) {
         return new Select().from(MultipleSkip.class)
                 .where("QuestionIdentifier = ? AND RemoteInstrumentId = ? AND Deleted = ?",
                         getQuestionIdentifier(), instrument.getRemoteId(), false)
@@ -669,7 +669,7 @@ public class Question extends ReceiveModel {
                 .execute();
     }
 
-    private List<NextQuestion> nextQuestions(Instrument instrument) {
+    List<NextQuestion> nextQuestions(Instrument instrument) {
         return new Select().from(NextQuestion.class)
                 .where("QuestionIdentifier = ? AND RemoteInstrumentId = ? AND Deleted = ?",
                         getQuestionIdentifier(), instrument.getRemoteId(), 0)

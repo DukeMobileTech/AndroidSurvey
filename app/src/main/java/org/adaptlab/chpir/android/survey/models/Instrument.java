@@ -603,6 +603,57 @@ public class Instrument extends ReceiveModel {
         }
         loopedQuestion.setNumberInInstrument(source.getNumberInInstrument() + (index * question.getLoopQuestionCount()));
         loopedQuestion.save();
+        setLoopedQuestionSkips(question, source, loopedQuestion, index);
+        setLoopedQuestionMultiSkips(question, source, loopedQuestion, index);
+    }
+
+    private void setLoopedQuestionMultiSkips(Question question, Question source,
+                                             Question loopedQuestion, int index) {
+        List<MultipleSkip> multipleSkips = source.multipleSkips(this);
+        String qi = loopedQuestion.getQuestionIdentifier();
+        for (MultipleSkip multipleSkip : multipleSkips) {
+            String oi = multipleSkip.getOptionIdentifier();
+            String sqi = question.getQuestionIdentifier() + "_" + multipleSkip.getSkipQuestionIdentifier() + "_" + index;
+            MultipleSkip ms = getMultipleSkip(qi, oi, sqi);
+            if (ms == null) {
+                ms = new MultipleSkip();
+                ms.setQuestionIdentifier(qi);
+                ms.setOptionIdentifier(oi);
+                ms.setSkipQuestionIdentifier(sqi);
+                ms.setDeleted(multipleSkip.getDeleted());
+                ms.setRemoteInstrumentId(multipleSkip.getRemoteInstrumentId());
+                ms.save();
+            }
+        }
+    }
+
+    private MultipleSkip getMultipleSkip(String qi, String oi, String sqi) {
+        return new Select().from(MultipleSkip.class).where("QuestionIdentifier = ? AND OptionIdentifier = ? " +
+                "AND SkipQuestionIdentifier = ?", qi, oi, sqi).executeSingle();
+    }
+
+    private void setLoopedQuestionSkips(Question question, Question source, Question loopedQuestion, int index) {
+        List<NextQuestion> nextQuestions = source.nextQuestions(this);
+        String qi = loopedQuestion.getQuestionIdentifier();
+        for (NextQuestion nextQuestion : nextQuestions) {
+            String oi = nextQuestion.getOptionIdentifier();
+            String nqi = question.getQuestionIdentifier() + "_" + nextQuestion.getNextQuestionIdentifier() + "_" + index;
+            NextQuestion nq = getNextQuestion(qi, oi, nqi);
+            if (nq == null) {
+                nq = new NextQuestion();
+                nq.setQuestionIdentifier(qi);
+                nq.setOptionIdentifier(oi);
+                nq.setNextQuestionIdentifier(nqi);
+                nq.setDeleted(nextQuestion.getDeleted());
+                nq.setRemoteInstrumentId(nextQuestion.getRemoteInstrumentId());
+                nq.save();
+            }
+        }
+    }
+
+    private NextQuestion getNextQuestion(String qi, String oi,String nqi) {
+        return new Select().from(NextQuestion.class).where("QuestionIdentifier = ? AND OptionIdentifier = ? " +
+                "AND NextQuestionIdentifier = ?", qi, oi, nqi).executeSingle();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
