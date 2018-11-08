@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
 
@@ -54,8 +55,9 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
 
     public void displayProjectName() {
         Project project = Project.findByRemoteId(getProjectId());
-        TextView textView = (TextView) findViewById(R.id.project_name);
+        TextView textView = (TextView) findViewById(R.id.projectName);
         if (project != null && textView != null) {
+            textView.setVisibility(View.GONE);
             textView.setText(project.getName());
         }
     }

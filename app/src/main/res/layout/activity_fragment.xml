@@ -17,7 +17,7 @@
     </FrameLayout>
 
     <TextView
-        android:id="@+id/project_name"
+        android:id="@+id/projectName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"

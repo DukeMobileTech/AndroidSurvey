@@ -18,6 +18,7 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
@@ -101,8 +102,9 @@ public class Instrument2Activity extends AppCompatActivity {
 
     public void displayProjectName() {
         Project project = Project.findByRemoteId(getProjectId());
-        TextView textView = findViewById(R.id.project_name);
+        TextView textView = findViewById(R.id.projectName);
         if (project != null && textView != null) {
+            textView.setVisibility(View.VISIBLE);
             textView.setText(project.getName());
         }
     }

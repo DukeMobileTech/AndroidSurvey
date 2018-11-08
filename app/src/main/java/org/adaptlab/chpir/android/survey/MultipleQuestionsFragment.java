@@ -83,10 +83,6 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
             }
         }
 
-        // Only allow landscape orientation
-        if (getActivity() != null) {
-            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        }
         mQuestions = mDisplay.tableQuestions(mTableIdentifier);
         for(Question curQuestion: mQuestions){
             setSpecialResponseSkips(curQuestion);

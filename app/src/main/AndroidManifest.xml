@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="org.adaptlab.chpir.android.survey"
+<manifest xmlns:tools="http://schemas.android.com/tools"
+    package="org.adaptlab.chpir.android.survey"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:versionCode="107"
-    android:versionName="2.1.22">
+    android:versionCode="108"
+    android:versionName="2.1.23">
 
     <permission
         android:name="org.adaptlab.chpir.android.survey.LAUNCH_SURVEY"
@@ -29,20 +30,12 @@
         android:allowBackup="false"
         android:icon="@drawable/ic_assignment_black_24dp"
         android:label="@string/app_name"
-        android:theme="@style/Theme.Survey">
-        <!--<activity-->
-        <!--android:name=".InstrumentActivity"-->
-        <!--android:configChanges="keyboardHidden|orientation|screenSize"-->
-        <!--android:label="@string/app_name">-->
-        <!--<intent-filter>-->
-        <!--<action android:name="android.intent.action.MAIN"/>-->
+        android:theme="@style/Theme.Survey"
+        tools:ignore="GoogleAppIndexingWarning">
 
-        <!--<category android:name="android.intent.category.LAUNCHER"/>-->
-        <!--</intent-filter>-->
-        <!--</activity>-->
         <activity
             android:name=".Instrument2Activity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="sensorLandscape"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -51,19 +44,29 @@
         </activity>
         <activity
             android:name=".SurveyActivity"
+            android:screenOrientation="sensorLandscape"
             android:uiOptions="splitActionBarWhenNarrow"/>
         <activity android:name=".AdminActivity"/>
         <activity
             android:name=".LoginActivity"
+            android:screenOrientation="sensorLandscape"
             android:noHistory="true"/>
-        <activity android:name=".ReviewPageActivity"/>
-        <activity android:name=".SectionActivity"/>
-        <activity android:name=".roster.RosterActivity"/>
-        <activity android:name=".roster.ParticipantEditorActivity"/>
-        <activity android:name=".roster.ParticipantViewerActivity"/>
-        <activity android:name=".roster.ResponseViewerActivity"/>
-        <activity android:name=".roster.ResponseEditorActivity"/>
-        <activity android:name=".ScoreUnitActivity"/>
+        <activity android:name=".ReviewPageActivity"
+            android:screenOrientation="sensorLandscape"/>
+        <activity android:name=".SectionActivity"
+            android:screenOrientation="sensorLandscape"/>
+        <activity android:name=".roster.RosterActivity"
+            android:screenOrientation="sensorLandscape"/>
+        <activity android:name=".roster.ParticipantEditorActivity"
+            android:screenOrientation="sensorLandscape"/>
+        <activity android:name=".roster.ParticipantViewerActivity"
+            android:screenOrientation="sensorLandscape"/>
+        <activity android:name=".roster.ResponseViewerActivity"
+            android:screenOrientation="sensorLandscape"/>
+        <activity android:name=".roster.ResponseEditorActivity"
+            android:screenOrientation="sensorLandscape"/>
+        <activity android:name=".ScoreUnitActivity"
+            android:screenOrientation="sensorLandscape"/>
 
         <provider
             android:name="com.activeandroid.content.ContentProvider"

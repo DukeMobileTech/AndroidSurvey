@@ -98,7 +98,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         spannableText.setSpan(new StyleSpan(Typeface.ITALIC), numLen + idLen,
                 numLen + idLen + insLen, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        spannableText.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.primary_text)),
+        spannableText.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.blue_text)),
                 numLen + idLen + insLen, numLen + idLen + insLen + textLen,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         spannableText.setSpan(new RelativeSizeSpan(1.2f),

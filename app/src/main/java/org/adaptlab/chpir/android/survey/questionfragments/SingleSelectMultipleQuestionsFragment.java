@@ -202,6 +202,7 @@ public class SingleSelectMultipleQuestionsFragment extends MultipleQuestionsFrag
             ViewHolder(View view) {
                 super(view);
                 questionText = view.findViewById(R.id.questionColumn);
+                questionText.setTextColor(context.getResources().getColor(R.color.blue_text));
                 radioGroup = view.findViewById(R.id.optionsRadioGroup);
                 optionsPart = view.findViewById(R.id.optionsPart);
             }
