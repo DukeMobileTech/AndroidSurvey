@@ -19,6 +19,8 @@ public class LoopQuestion extends Model {
     private String mLooped;
     @Column(name = "Deleted")
     private boolean mDeleted;
+    @Column(name = "OptionIndices")
+    private String mOptionIndices;
 
     public LoopQuestion() {
         super();
@@ -70,4 +72,11 @@ public class LoopQuestion extends Model {
                 getLooped()).executeSingle();
     }
 
+    public String getOptionIndices() {
+        return mOptionIndices;
+    }
+
+    public void setOptionIndices(String indices) {
+        mOptionIndices = indices;
+    }
 }

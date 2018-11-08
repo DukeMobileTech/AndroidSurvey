@@ -48,7 +48,11 @@ public class Display extends ReceiveModel {
         return section.getTitle();
     }
 
-    private void setSectionId(Long sectionId) {
+    Long getSectionId() {
+        return mSectionId;
+    }
+
+    void setSectionId(Long sectionId) {
         mSectionId = sectionId;
     }
 
@@ -95,15 +99,19 @@ public class Display extends ReceiveModel {
         }
     }
 
-    private void setDeleted(boolean deleted) {
+    void setDeleted(boolean deleted) {
         mDeleted = deleted;
+    }
+
+    public boolean getDeleted() {
+        return mDeleted;
     }
 
     public int getPosition() {
         return mPosition;
     }
 
-    private void setPosition(int position) {
+    void setPosition(int position) {
         mPosition = position;
     }
 
@@ -125,7 +133,7 @@ public class Display extends ReceiveModel {
         return mMode;
     }
 
-    private void setMode(String mode) {
+    void setMode(String mode) {
         mMode = mode;
     }
 
@@ -155,7 +163,7 @@ public class Display extends ReceiveModel {
         return mRemoteId;
     }
 
-    private void setRemoteId(Long id) {
+    void setRemoteId(Long id) {
         mRemoteId = id;
     }
 
@@ -178,11 +186,11 @@ public class Display extends ReceiveModel {
         return Instrument.findByRemoteId(mInstrumentId);
     }
 
-    private void setTitle(String title) {
+    void setTitle(String title) {
         mTitle = title;
     }
 
-    private void setInstrumentId(Long id) {
+    void setInstrumentId(Long id) {
         mInstrumentId = id;
     }
 

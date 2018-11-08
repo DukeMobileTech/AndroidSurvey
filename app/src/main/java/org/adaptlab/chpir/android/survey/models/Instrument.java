@@ -517,34 +517,51 @@ public class Instrument extends ReceiveModel {
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void setLoops() {
+        List<Display> mDisplays = displays();
         for (Question question : questions()) {
             if (question.getLoopQuestionCount() > 0) {
                 List<LoopQuestion> loopQuestions = question.loopQuestions();
                 if (loopQuestions.size() > 0) {
                     if (question.getQuestionType().equals(Question.QuestionType.INTEGER)) {
+                        Display display = getDisplay(question);
                         for (LoopQuestion loopQuestion : loopQuestions) {
-                            firstLoop(question, loopQuestion, "Loop 1 for " + question.getQuestionIdentifier());
-                            for (int k = 2; k <= LOOP_MAX; k++) {
-                                otherLoops(question, k, loopQuestion,
-                                        "Loop " + k + " for " + question.getQuestionIdentifier());
+                            for (int k = 1; k <= LOOP_MAX; k++) {
+                                String instruction = question.getText() + " : " + k;
+                                createLoopQuestion(question, loopQuestion, instruction, k, display);
                             }
                         }
+                        mDisplays.add(question.getDisplay().getPosition(), display);
                     } else if (question.isMultipleResponseLoop()) {
+                        Display display = getDisplay(question);
                         for (LoopQuestion loopQuestion : loopQuestions) {
-                            if (question.defaultOptions().size() > 0) {
-                                firstLoop(question, loopQuestion, question.defaultOptions().get(0).getText(this)
-                                        + " for " + question.getQuestionIdentifier());
-                            }
-                            for (int k = 1; k < question.defaultOptions().size(); k++) {
-                                otherLoops(question, k, loopQuestion,
-                                        question.defaultOptions().get(k).getText(this)
-                                                + " for " + question.getQuestionIdentifier());
-                            }
-                            if (question.isOtherQuestionType()) {
-                                otherLoops(question, question.defaultOptions().size(), loopQuestion,
-                                        "Other for " + question.getQuestionIdentifier());
+                            if (TextUtils.isEmpty(loopQuestion.getOptionIndices())) {
+                                for (int k = 0; k < question.defaultOptions().size(); k++) {
+                                    String instruction = question.getText() + " : " +
+                                            question.defaultOptions().get(k).getText(this);
+                                    createLoopQuestion(question, loopQuestion, instruction, k, display);
+                                }
+                                if (question.isOtherQuestionType()) {
+                                    String instruction = question.getText() + " : Other";
+                                    createLoopQuestion(question, loopQuestion, instruction,
+                                            question.defaultOptions().size(), display);
+                                }
+                            } else {
+                                // Loop only for particular options
+                                String[] indices = loopQuestion.getOptionIndices().split(Response.LIST_DELIMITER);
+                                for (String index : indices) {
+                                    int ind = Integer.parseInt(index);
+                                    String instruction = question.getText() + " : " +
+                                            question.defaultOptions().get(ind).getText(this);
+                                    createLoopQuestion(question, loopQuestion, instruction, ind, display);
+                                }
                             }
                         }
+                        mDisplays.add(question.getDisplay().getPosition(), display);
+                    }
+                    for (int k = 0; k < mDisplays.size(); k++) {
+                        Display display = mDisplays.get(k);
+                        display.setPosition(k + 1);
+                        display.save();
                     }
                 }
             }
@@ -552,18 +569,34 @@ public class Instrument extends ReceiveModel {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void otherLoops(Question question, int k, LoopQuestion loopQuestion, String text) {
-        Question source = loopQuestion.loopedQuestion();
-        String identifier = source.getQuestionIdentifier() + "_" + k;
+    private Display getDisplay(Question question) {
+        Display display = new Display();
+        Display parent = question.getDisplay();
+        display.setMode(parent.getMode());
+        display.setTitle(parent.getTitle() + "...continued");
+        display.setInstrumentId(question.getInstrument().getRemoteId());
+        display.setSectionId(parent.getSectionId());
+        display.setRemoteId(getBoundedDisplayId());
+        display.setDeleted(parent.getDeleted());
+        display.save();
+        return display;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void createLoopQuestion(Question question, LoopQuestion lq, String instruction,
+                                    int index, Display display) {
+        Question source = lq.loopedQuestion();
+        String identifier = question.getQuestionIdentifier() + "_" + source.getQuestionIdentifier() + "_" + index;
         Question loopedQuestion = Question.findByQuestionIdentifier(identifier);
         if (loopedQuestion == null) {
             loopedQuestion = new Question(source);
             loopedQuestion.setRemoteId(getBoundedRemoteId());
-            loopedQuestion.setLoopNumber(k);
+            loopedQuestion.setDisplay(display.getRemoteId());
+            loopedQuestion.setLoopNumber(index);
             loopedQuestion.setLoopSource(question.getQuestionIdentifier());
-            loopedQuestion.setNumberInInstrument(source.getNumberInInstrument());
+            loopedQuestion.setNumberInInstrument(source.getNumberInInstrument() + (index * question.getLoopQuestionCount()));
             loopedQuestion.setQuestionIdentifier(identifier);
-            loopedQuestion.setInstruction(createLoopInstruction(text).getRemoteId());
+            loopedQuestion.setInstruction(createLoopInstruction(instruction).getRemoteId());
             loopedQuestion.save();
         }
     }
@@ -576,17 +609,6 @@ public class Instrument extends ReceiveModel {
             getBoundedRemoteId();
         }
         return remoteId;
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void firstLoop(Question question, LoopQuestion loopQuestion, String instructions) {
-        Question loopedQuestion = loopQuestion.loopedQuestion();
-        if (loopedQuestion != null) {
-            loopedQuestion.setLoopNumber(1);
-            loopedQuestion.setLoopSource(question.getQuestionIdentifier());
-            loopedQuestion.setInstruction(createLoopInstruction(instructions).getRemoteId());
-            loopedQuestion.save();
-        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -605,6 +627,16 @@ public class Instrument extends ReceiveModel {
         Instruction instruction = Instruction.findByRemoteId(remoteId);
         if (instruction != null) {
             getUnusedRemoteId();
+        }
+        return remoteId;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private long getBoundedDisplayId() {
+        long remoteId = ThreadLocalRandom.current().nextLong(1000, 10000);
+        Display display = Display.findByRemoteId(remoteId);
+        if (display != null) {
+            getBoundedDisplayId();
         }
         return remoteId;
     }

@@ -561,6 +561,9 @@ public class Question extends ReceiveModel {
                         loopQuestion.setQuestion(question);
                         loopQuestion.setParent(loopJSON.optString("parent"));
                         loopQuestion.setLooped(loopJSON.optString("looped"));
+                        String indices = loopJSON.getString("option_indices");
+                        if (indices.equals("null")) { indices = null; }
+                        loopQuestion.setOptionIndices(indices);
                         if (loopJSON.isNull("deleted_at")) {
                             loopQuestion.setDeleted(false);
                         } else {
@@ -845,7 +848,7 @@ public class Question extends ReceiveModel {
         return Display.findByRemoteId(mDisplayId);
     }
 
-    private void setDisplay(long display) {
+    public void setDisplay(long display) {
         mDisplayId = display;
     }
 
@@ -943,6 +946,7 @@ public class Question extends ReceiveModel {
         this.mValidationId = question.mValidationId;
         this.mRankResponses = question.mRankResponses;
         this.mLoopQuestionCount = question.mLoopQuestionCount;
+        this.mQuestionId = question.mQuestionId;
     }
 
     public enum QuestionType {

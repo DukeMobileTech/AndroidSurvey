@@ -666,18 +666,18 @@ public class SurveyFragment extends Fragment {
     protected void setIntegerLoopQuestions(Question question, String response) {
         List<LoopQuestion> loopQuestions = question.loopQuestions();
         List<Question> questionsToHide = new ArrayList<>();
-        int start = 0;
+        for (LoopQuestion lq : loopQuestions) {
+            questionsToHide.add(lq.loopedQuestion());
+        }
+        int start = 1;
         if (!TextUtils.isEmpty(response)) {
             start = Integer.parseInt(response);
         }
-        for (int k = start; k <= Instrument.LOOP_MAX; k++) {
+        for (int k = start + 1; k <= Instrument.LOOP_MAX; k++) {
             for (LoopQuestion lq : loopQuestions) {
-                if (k == 0) {
-                    questionsToHide.add(Question.findByQuestionIdentifier(lq.getLooped()));
-                } else {
-                    String identifier = lq.getLooped() + "_" + (k + 1);
-                    questionsToHide.add(Question.findByQuestionIdentifier(identifier));
-                }
+                String id = question.getQuestionIdentifier() + "_" + lq.loopedQuestion().getQuestionIdentifier()
+                        + "_" + k;
+                questionsToHide.add(Question.findByQuestionIdentifier(id));
             }
         }
         mQuestionsToSkipMap.put(question.getQuestionIdentifier(), questionsToHide);
@@ -693,6 +693,9 @@ public class SurveyFragment extends Fragment {
         }
         List<LoopQuestion> loopQuestions = question.loopQuestions();
         List<Question> questionsToHide = new ArrayList<>();
+        for (LoopQuestion lq : loopQuestions) {
+            questionsToHide.add(lq.loopedQuestion());
+        }
         int optionsSize = question.defaultOptions().size() - 1;
         if (question.isOtherQuestionType()) {
             optionsSize += 1;
@@ -701,27 +704,21 @@ public class SurveyFragment extends Fragment {
             for (LoopQuestion lq : loopQuestions) {
                 if (question.hasMultipleResponses()) {
                     if (!responses.contains(String.valueOf(k))) {
-                        questionsToHide.add(getQuestionToHide(k, lq));
+                        String id = question.getQuestionIdentifier() + "_" + lq.loopedQuestion().getQuestionIdentifier()
+                                + "_" + k;
+                        questionsToHide.add(Question.findByQuestionIdentifier(id));
                     }
                 } else if (question.hasListResponses()) {
                     if (TextUtils.isEmpty(text) || TextUtils.isEmpty(responses.get(k))) {
-                        questionsToHide.add(getQuestionToHide(k, lq));
+                        String id = question.getQuestionIdentifier() + "_" + lq.loopedQuestion().getQuestionIdentifier()
+                                + "_" + k;
+                        questionsToHide.add(Question.findByQuestionIdentifier(id));
                     }
                 }
             }
         }
         mQuestionsToSkipMap.put(question.getQuestionIdentifier(), questionsToHide);
         hideQuestionsInDisplay();
-    }
-
-    private Question getQuestionToHide(int k, LoopQuestion lq) {
-        String identifier;
-        if (k == 0) {
-            identifier = lq.getLooped();
-        } else {
-            identifier = lq.getLooped() + "_" + (k);
-        }
-        return Question.findByQuestionIdentifier(identifier);
     }
 
     protected void setNextQuestion(String currentQuestionIdentifier, String nextQuestionIdentifier,
