@@ -41,6 +41,11 @@ public class Display extends ReceiveModel {
         return new Select().from(Display.class).where("RemoteId = ?", id).executeSingle();
     }
 
+    public static Display findByTitleAndInstrument(String title, Long instrumentId) {
+        return new Select().from(Display.class).where("Title = ? AND InstrumentId = ?",
+                title, instrumentId).executeSingle();
+    }
+
     public String getSectionTitle() {
         Section section = new Select().from(Section.class)
                 .where("RemoteId = ?", mSectionId).executeSingle();

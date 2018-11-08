@@ -570,15 +570,19 @@ public class Instrument extends ReceiveModel {
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private Display getDisplay(Question question) {
-        Display display = new Display();
         Display parent = question.getDisplay();
-        display.setMode(parent.getMode());
-        display.setTitle(parent.getTitle() + "...continued");
-        display.setInstrumentId(question.getInstrument().getRemoteId());
-        display.setSectionId(parent.getSectionId());
-        display.setRemoteId(getBoundedDisplayId());
-        display.setDeleted(parent.getDeleted());
-        display.save();
+        Display display = Display.findByTitleAndInstrument(parent.getTitle() + "...continued",
+                question.getInstrument().getRemoteId());
+        if (display == null) {
+            display = new Display();
+            display.setMode(parent.getMode());
+            display.setTitle(parent.getTitle() + "...continued");
+            display.setInstrumentId(question.getInstrument().getRemoteId());
+            display.setSectionId(parent.getSectionId());
+            display.setRemoteId(getBoundedDisplayId());
+            display.setDeleted(parent.getDeleted());
+            display.save();
+        }
         return display;
     }
 
@@ -594,11 +598,11 @@ public class Instrument extends ReceiveModel {
             loopedQuestion.setDisplay(display.getRemoteId());
             loopedQuestion.setLoopNumber(index);
             loopedQuestion.setLoopSource(question.getQuestionIdentifier());
-            loopedQuestion.setNumberInInstrument(source.getNumberInInstrument() + (index * question.getLoopQuestionCount()));
             loopedQuestion.setQuestionIdentifier(identifier);
             loopedQuestion.setInstruction(createLoopInstruction(instruction).getRemoteId());
-            loopedQuestion.save();
         }
+        loopedQuestion.setNumberInInstrument(source.getNumberInInstrument() + (index * question.getLoopQuestionCount()));
+        loopedQuestion.save();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
