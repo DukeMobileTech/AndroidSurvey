@@ -1,15 +1,18 @@
 package org.adaptlab.chpir.android.survey;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 import java.util.List;
 
-public class SurveyActivity extends AuthorizedActivity {
+public class SurveyActivity extends AuthorizedActivity implements DisplayFragment.OnFragmentInteractionListener {
+    private SurveyFragment surveyFragment;
 
     @Override
     protected Fragment createFragment() {
-        return new SurveyFragment();
+        surveyFragment = new SurveyFragment();
+        return surveyFragment;
     }
 
     @Override
@@ -32,4 +35,8 @@ public class SurveyActivity extends AuthorizedActivity {
         }
     }
 
+    @Override
+    public SurveyFragment getSurveyFragment() {
+        return surveyFragment;
+    }
 }

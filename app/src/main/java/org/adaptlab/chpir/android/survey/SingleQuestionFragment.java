@@ -78,7 +78,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
     private ViewGroup mRankLayout;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_question, parent, false);
         String number = mQuestion.getNumberInInstrument() + ": ";
         int numLen = number.length();
@@ -283,7 +283,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
     protected void hideIndeterminateProgressBar() {
         List<Question> displayQuestions = mSurveyFragment.getQuestions(mQuestion.getDisplay());
         if (displayQuestions.get(displayQuestions.size() - 1).equals(mQuestion)) {
-            mSurveyFragment.hideIndeterminateProgressBar();
+                mSurveyFragment.hideIndeterminateProgressBar();
         }
     }
 

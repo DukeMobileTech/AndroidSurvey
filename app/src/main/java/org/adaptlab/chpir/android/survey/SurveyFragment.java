@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -114,7 +115,7 @@ public class SurveyFragment extends Fragment {
     private static final int ACCESS_FINE_LOCATION_CODE = 1;
     public static final int OFFSET = 1000000;
 
-    private LinearLayout mQuestionViewLayout;
+    private LinearLayout mDisplayLayout;
     private Instrument mInstrument;
     private Survey mSurvey;
     private String mMetadata;
@@ -145,6 +146,7 @@ public class SurveyFragment extends Fragment {
     private ExpandableListView mExpandableListView;
     private List<String> mExpandableListTitle;
     private LinkedHashMap<String, List<String>> mExpandableListData;
+    private DisplayFragment mDisplayFragment;
 
     public void refreshView() {
         AuthorizedActivity authority = (AuthorizedActivity) getActivity();
@@ -168,7 +170,7 @@ public class SurveyFragment extends Fragment {
                 mDisplay = mDisplays.get(displayNum);
                 mDisplayNumber = displayNum;
                 if (mDisplay != null) {
-                    createQuestionFragments();
+                    createDisplayView();
                 } else {
                     checkForCriticalResponses();
                 }
@@ -179,7 +181,7 @@ public class SurveyFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
+        setRetainInstance(true); // TODO: 11/9/18 Why do this?
         getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         setHasOptionsMenu(true);
         if (AppUtil.getContext() == null) AppUtil.setContext(getActivity());
@@ -277,19 +279,28 @@ public class SurveyFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_survey, parent, false);
-        mDisplayTitle = (TextView) v.findViewById(R.id.display_title);
-        mQuestionViewLayout = (LinearLayout) v.findViewById(R.id.question_component_layout);
-        mParticipantLabel = (TextView) v.findViewById(R.id.participant_label);
-        mDisplayIndexLabel = (TextView) v.findViewById(R.id.display_index_label);
-        mProgressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
-        mIndeterminateProgressBar = (ProgressBar) v.findViewById(R.id.indeterminateProgressBar);
+        mDisplayTitle = v.findViewById(R.id.display_title);
+        mDisplayLayout = v.findViewById(R.id.question_component_layout);
+        mParticipantLabel = v.findViewById(R.id.participant_label);
+        mDisplayIndexLabel = v.findViewById(R.id.display_index_label);
+        mProgressBar = v.findViewById(R.id.progress_bar);
+        mIndeterminateProgressBar = v.findViewById(R.id.indeterminateProgressBar);
         ActivityCompat.invalidateOptionsMenu(getActivity());
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         if (actionBar != null) actionBar.setTitle(mInstrument.getTitle());
-        mScrollView = (NestedScrollView) v.findViewById(R.id.survey_fragment_scroll_view);
+        mScrollView = v.findViewById(R.id.survey_fragment_scroll_view);
         return v;
+    }
+
+    private void createDisplayView() {
+        if (getActivity() == null) return;
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        mDisplayFragment = DisplayFragment.newInstance(mSurvey.getId(), mDisplay.getId());
+        fragmentTransaction.replace(R.id.question_component_layout, mDisplayFragment);
+        fragmentTransaction.commit();
     }
 
     @Override
@@ -311,15 +322,7 @@ public class SurveyFragment extends Fragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        if (mDisplayQuestions.size() > 0) {
-            refreshView();
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(EXTRA_DISPLAY_NUMBER, mDisplayNumber);
         outState.putLong(EXTRA_INSTRUMENT_ID, mInstrument.getRemoteId());
@@ -376,7 +379,7 @@ public class SurveyFragment extends Fragment {
                         moveToDisplay(index);
                         break;
                     }
-                    index ++;
+                    index++;
                 }
 
                 mDrawerLayout.closeDrawer(GravityCompat.START);
@@ -387,7 +390,7 @@ public class SurveyFragment extends Fragment {
     }
 
     private void setDrawerListViewWidth() {
-        int width = getResources().getDisplayMetrics().widthPixels/2;
+        int width = getResources().getDisplayMetrics().widthPixels / 2;
         DrawerLayout.LayoutParams params = (android.support.v4.widget.DrawerLayout.LayoutParams) mExpandableListView.getLayoutParams();
         params.width = width;
         mExpandableListView.setLayoutParams(params);
@@ -395,11 +398,11 @@ public class SurveyFragment extends Fragment {
 
     private void setupNavigationDrawer() {
         updateHiddenDisplayNumberSet();
-        mDrawerLayout = (DrawerLayout) getActivity().findViewById(R.id.drawer_layout);
-        mExpandableListView = (ExpandableListView) getActivity().findViewById(R.id.navigation);
+        mDrawerLayout = getActivity().findViewById(R.id.drawer_layout);
+        mExpandableListView = getActivity().findViewById(R.id.navigation);
         setDrawerListViewWidth();
         mExpandableListData = getListData();
-        mExpandableListTitle = new ArrayList(mExpandableListData.keySet());
+        mExpandableListTitle = new ArrayList<>(mExpandableListData.keySet());
 
         setDrawerItems();
         mDrawerToggle = new ActionBarDrawerToggle(getActivity(), mDrawerLayout, R.string.drawer_open, R.string.drawer_close) {
@@ -449,7 +452,6 @@ public class SurveyFragment extends Fragment {
         if (!mNavDrawerSet) {
             setupNavigationDrawer();
         }
-        setSelectedDrawerItemChecked();
         setLanguageSelection(menu);
     }
 
@@ -489,7 +491,7 @@ public class SurveyFragment extends Fragment {
         Spinner spinner = (Spinner) item.getActionView();
         final List<String> languageCodes = Instrument.getLanguages();
         ArrayList<String> displayLanguages = new ArrayList<>();
-        for (String languageCode: languageCodes) {
+        for (String languageCode : languageCodes) {
             displayLanguages.add(new Locale(languageCode).getDisplayLanguage());
         }
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, displayLanguages);
@@ -506,7 +508,8 @@ public class SurveyFragment extends Fragment {
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) { }
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
         });
         spinner.setSelection(languageCodes.indexOf(AppUtil.getAdminSettingsInstance().getLanguage()));
     }
@@ -517,7 +520,6 @@ public class SurveyFragment extends Fragment {
         i.putExtra(SurveyFragment.EXTRA_SURVEY_ID, mSurvey.getId());
         i.putExtra(SurveyFragment.EXTRA_QUESTION_NUMBER, mSurvey.getLastQuestion().getNumberInInstrument() - 1);
         i.putExtra(SurveyFragment.EXTRA_AUTHORIZE_SURVEY, false);
-//        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
@@ -551,7 +553,7 @@ public class SurveyFragment extends Fragment {
     private void refreshUIComponents() {
         if (!isAdded()) return;
         hideSoftInputWindow();
-        createQuestionFragments();
+        createDisplayView();
         hideQuestionsInDisplay();
         updateDisplayLabels();
         setParticipantLabel();
@@ -616,7 +618,7 @@ public class SurveyFragment extends Fragment {
     private void updateQuestionsToSkipSet() {
         mQuestionsToSkipSet = new HashSet<>();
         for (HashMap.Entry<String, List<Question>> curPair : mQuestionsToSkipMap.entrySet()) {
-            for (Question q: curPair.getValue()) {
+            for (Question q : curPair.getValue()) {
                 if (q != null) mQuestionsToSkipSet.add(q.getQuestionIdentifier());
             }
         }
@@ -639,28 +641,7 @@ public class SurveyFragment extends Fragment {
 
     private void hideQuestionsInDisplay() {
         updateQuestionsToSkipSet();
-        if (!mDisplay.getMode().equals(Display.DisplayMode.TABLE.toString())) {
-            FragmentManager fm = getChildFragmentManager();
-            FragmentTransaction ft = fm.beginTransaction();
-            HashSet<Integer> hideSet = new HashSet<>();
-            List<String> ids = new ArrayList<>();
-            for (Question q : mDisplay.questions()) {
-                ids.add(q.getQuestionIdentifier());
-            }
-            for (String curSkip : mQuestionsToSkipSet) {
-                int index = ids.indexOf(curSkip);
-                if (index != -1) {
-                    hideSet.add(index);
-                    ft.hide(mQuestionFragments.get(index));
-                }
-            }
-            for (int i = 0; i < mQuestionFragments.size(); i++) {
-                if (!hideSet.contains(i)) {
-                    ft.show(mQuestionFragments.get(i));
-                }
-            }
-            ft.commit();
-        }
+        mDisplayFragment.hideQuestions();
     }
 
     protected void setIntegerLoopQuestions(Question question, String response) {
@@ -726,7 +707,8 @@ public class SurveyFragment extends Fragment {
         for (Question curQuestion : getQuestions(mDisplay)) {
             if (curQuestion.getQuestionIdentifier().equals(nextQuestionIdentifier)) break;
             if (toBeSkipped) skipList.add(curQuestion);
-            if (curQuestion.getQuestionIdentifier().equals(currentQuestionIdentifier)) toBeSkipped = true;
+            if (curQuestion.getQuestionIdentifier().equals(currentQuestionIdentifier))
+                toBeSkipped = true;
         }
         updateQuestionsToSkipMap(questionIdentifier + "/skipTo", skipList);
         hideQuestionsInDisplay();
@@ -824,109 +806,6 @@ public class SurveyFragment extends Fragment {
             mSurvey.save();
         } else {
             mSurvey = Model.load(Survey.class, surveyId);
-        }
-    }
-
-    private void setSelectedDrawerItemChecked() {
-//        if (mNavigationView != null) {
-//            int index = mDisplayNumber;
-//            for (int num : mHiddenDisplayNumberSet) {
-//                if (num < mDisplayNumber) {
-//                    index--;
-//                }
-//            }
-////            for (int i = 0; i < mDisplays.size() - mHiddenDisplayNumberSet.size(); i++) {
-////                mNavigationView.getMenu().getItem(i).setChecked(false);
-////            }
-//            for (int i = 0; i < mDisplayTitles.size() - mHiddenDisplayNumberSet.size(); i++) {
-//                mNavigationView.getMenu().getItem(i).setChecked(false);
-//            }
-//            if (index > -1 && index < mNavigationView.getMenu().size()) {
-//                mNavigationView.getMenu().getItem(index).setChecked(true);
-//            }
-//        }
-    }
-
-    protected void createQuestionFragments() {
-        if (!isActivityFinished) {
-            // Hide previous fragments
-            FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
-            fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-            for (Fragment fragment : mQuestionFragments) {
-                fragmentTransaction.hide(fragment);
-            }
-            fragmentTransaction.commitNow();
-
-            // Add/show new fragments
-            fragmentTransaction = getChildFragmentManager().beginTransaction();
-            fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-            mQuestionFragments.clear();
-            setSelectedDrawerItemChecked();
-            for (Question question : getQuestions(mDisplay)) {
-                int frameLayoutId;
-                String qfTag;
-                if (isEmpty(question.getTableIdentifier())) {
-                    // Add large offset to avoid id conflicts
-                    frameLayoutId = new BigDecimal(question.getRemoteId()).intValueExact() + OFFSET;
-                    qfTag = mSurvey.getId().toString() + "-" + question.getId().toString();
-                } else {
-                    long sumId = 0;
-                    for (Question q: mDisplay.tableQuestions(question.getTableIdentifier())) {
-                        sumId += q.getRemoteId();
-                    }
-                    frameLayoutId = new BigDecimal(sumId).intValueExact() + OFFSET;
-                    qfTag = mSurvey.getId().toString() + "-" + question.getTableIdentifier();
-                }
-
-                FrameLayout frameLayout = (FrameLayout) getActivity().findViewById(frameLayoutId);
-                if (frameLayout == null) {
-                    frameLayout = new FrameLayout(getContext());
-                    frameLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup
-                            .LayoutParams.MATCH_PARENT, ViewPager.LayoutParams.WRAP_CONTENT));
-                    frameLayout.setId(frameLayoutId);
-                    mQuestionViewLayout.addView(frameLayout);
-                }
-
-                QuestionFragment questionFragment = (QuestionFragment) getChildFragmentManager()
-                        .findFragmentByTag(qfTag);
-                if (questionFragment == null || isScreenRotated) {
-                    if (isEmpty(question.getTableIdentifier())) {
-                        Bundle bundle = new Bundle();
-                        bundle.putString("QuestionIdentifier", question.getQuestionIdentifier());
-
-                        questionFragment = (QuestionFragment) QuestionFragmentFactory
-                                .createQuestionFragment(question);
-                        questionFragment.setArguments(bundle);
-                        fragmentTransaction.add(frameLayout.getId(), questionFragment, qfTag);
-                    } else {
-                        if (question.getQuestionType() == Question.QuestionType.SELECT_ONE) {
-                            questionFragment = new SingleSelectMultipleQuestionsFragment();
-                        } else if (question.getQuestionType() == Question.QuestionType
-                                .SELECT_MULTIPLE) {
-                            questionFragment = new MultipleSelectMultipleQuestionsFragment();
-                        }
-                        Bundle bundle = new Bundle();
-                        ArrayList<String> questionsToSkip = new ArrayList<>();
-                        for (String curSkip : mQuestionsToSkipSet) {
-                            if (curSkip != null)
-                                questionsToSkip.add(curSkip);
-                        }
-                        bundle.putStringArrayList(MultipleQuestionsFragment
-                                .EXTRA_SKIPPED_QUESTION_ID_LIST, questionsToSkip);
-                        bundle.putLong(MultipleQuestionsFragment.EXTRA_DISPLAY_ID, mDisplay
-                                .getRemoteId());
-                        bundle.putLong(MultipleQuestionsFragment.EXTRA_SURVEY_ID, mSurvey.getId());
-                        bundle.putString(MultipleQuestionsFragment.EXTRA_TABLE_ID, question
-                                .getTableIdentifier());
-                        questionFragment.setArguments(bundle);
-                        fragmentTransaction.add(frameLayout.getId(), questionFragment, qfTag);
-                    }
-                } else {
-                    fragmentTransaction.show(questionFragment);
-                }
-                mQuestionFragments.add(questionFragment);
-            }
-            fragmentTransaction.commit();
         }
     }
 
