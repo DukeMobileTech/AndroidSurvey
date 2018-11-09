@@ -433,8 +433,8 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
                         nextQuestion, mQuestion.getQuestionIdentifier());
             }
         }
-        if (selectedOption != null && mQuestion.isMultipleSkipQuestion(mInstrument)) {
-            mSurveyFragment.setMultipleSkipQuestions(selectedOption, mQuestion);
+        if ((selectedOption != null || enteredValue != null) && mQuestion.isMultipleSkipQuestion(mInstrument)) {
+            mSurveyFragment.setMultipleSkipQuestions(selectedOption, enteredValue, mQuestion);
         } else if (!selectedOptions.isEmpty() && mQuestion.isMultipleSkipQuestion(mInstrument)) {
             mSurveyFragment.setMultipleSkipQuestions2(selectedOptions, mQuestion);
         }

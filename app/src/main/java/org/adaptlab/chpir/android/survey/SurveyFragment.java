@@ -754,10 +754,15 @@ public class SurveyFragment extends Fragment {
         }
     }
 
-    protected void setMultipleSkipQuestions(Option selectedOption, Question currentQuestion) {
+    protected void setMultipleSkipQuestions(Option selectedOption, String value, Question currentQuestion) {
         List<Question> skipList = new ArrayList<>();
         if (selectedOption != null) {
             for (MultipleSkip questionToSkip : currentQuestion.optionMultipleSkips(selectedOption)) {
+                skipList.add(questionToSkip.getSkipQuestion());
+            }
+        }
+        if (value != null) {
+            for (MultipleSkip questionToSkip : currentQuestion.integerMultipleSkips(value)) {
                 skipList.add(questionToSkip.getSkipQuestion());
             }
         }

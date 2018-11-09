@@ -7,6 +7,7 @@ import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -28,6 +29,8 @@ public class MultipleSkip extends ReceiveModel {
     private Long mRemoteInstrumentId;
     @Column(name = "Deleted")
     private boolean mDeleted;
+    @Column(name = "Value")
+    private String mValue;
 
     public MultipleSkip() {
         super();
@@ -41,6 +44,7 @@ public class MultipleSkip extends ReceiveModel {
             if (skipQuestion == null) {
                 skipQuestion = this;
             }
+            if (AppUtil.DEBUG) Log.i(TAG, "Creating object from JSON Object: " + jsonObject);
             skipQuestion.setRemoteId(remoteId);
             skipQuestion.setQuestionIdentifier(jsonObject.getString("question_identifier"));
             skipQuestion.setOptionIdentifier(jsonObject.getString("option_identifier"));
@@ -52,6 +56,7 @@ public class MultipleSkip extends ReceiveModel {
             } else {
                 skipQuestion.setDeleted(true);
             }
+            skipQuestion.setValue(jsonObject.optString("value", null));
             skipQuestion.save();
         } catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);
@@ -109,4 +114,13 @@ public class MultipleSkip extends ReceiveModel {
     boolean getDeleted() {
         return mDeleted;
     }
+
+    public String getValue() {
+        return mValue;
+    }
+
+    public void setValue(String value) {
+        mValue = value;
+    }
+
 }

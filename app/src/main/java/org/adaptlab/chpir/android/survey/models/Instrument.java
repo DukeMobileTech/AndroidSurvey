@@ -632,6 +632,7 @@ public class Instrument extends ReceiveModel {
         return loopedQuestion;
     }
 
+    // TODO: 11/8/18 Duplicate value for integer based skips
     private void setLoopedQuestionMultiSkips(Question question, Question source,
                                              Question loopedQuestion, int index) {
         List<MultipleSkip> multipleSkips = source.multipleSkips(this);

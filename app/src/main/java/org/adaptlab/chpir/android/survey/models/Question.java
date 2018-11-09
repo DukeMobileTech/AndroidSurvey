@@ -230,6 +230,14 @@ public class Question extends ReceiveModel {
                 .execute();
     }
 
+    public List<MultipleSkip> integerMultipleSkips(String value) {
+        return new Select().from(MultipleSkip.class)
+                .where("Value = ? AND QuestionIdentifier = ? AND " +
+                                "RemoteInstrumentId = ? AND Deleted = ?", value,
+                        getQuestionIdentifier(), getInstrument().getRemoteId(), false)
+                .execute();
+    }
+
 //    public boolean hasCompleteSurveyOption() {
 //        Option completeSurveyOption = new Select().from(Option.class)
 //                .where("Question = ? AND Deleted != ? AND Special = ? AND CompleteSurvey = ?",
