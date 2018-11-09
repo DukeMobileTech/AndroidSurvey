@@ -569,6 +569,7 @@ public class Question extends ReceiveModel {
                         } else {
                             loopQuestion.setDeleted(true);
                         }
+                        loopQuestion.setSameDisplay(loopJSON.optBoolean("same_display", false));
                         loopQuestion.save();
                     }
                 }

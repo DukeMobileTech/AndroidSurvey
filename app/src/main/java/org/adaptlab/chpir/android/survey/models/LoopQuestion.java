@@ -21,6 +21,8 @@ public class LoopQuestion extends Model {
     private boolean mDeleted;
     @Column(name = "OptionIndices")
     private String mOptionIndices;
+    @Column(name = "SameDisplay")
+    private boolean mSameDisplay;
 
     public LoopQuestion() {
         super();
@@ -78,5 +80,13 @@ public class LoopQuestion extends Model {
 
     public void setOptionIndices(String indices) {
         mOptionIndices = indices;
+    }
+
+    public boolean isSameDisplay() {
+        return mSameDisplay;
+    }
+
+    public void setSameDisplay(boolean sameDisplay) {
+        mSameDisplay = sameDisplay;
     }
 }
