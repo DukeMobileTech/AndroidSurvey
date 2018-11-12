@@ -2,8 +2,8 @@
 <manifest xmlns:tools="http://schemas.android.com/tools"
     package="org.adaptlab.chpir.android.survey"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:versionCode="114"
-    android:versionName="2.1.29">
+    android:versionCode="115"
+    android:versionName="2.1.30">
 
     <permission
         android:name="org.adaptlab.chpir.android.survey.LAUNCH_SURVEY"
@@ -46,7 +46,8 @@
             android:name=".SurveyActivity"
             android:screenOrientation="sensorLandscape"
             android:uiOptions="splitActionBarWhenNarrow"/>
-        <activity android:name=".AdminActivity"/>
+        <activity android:name=".AdminActivity"
+            android:screenOrientation="sensorLandscape"/>
         <activity
             android:name=".LoginActivity"
             android:screenOrientation="sensorLandscape"

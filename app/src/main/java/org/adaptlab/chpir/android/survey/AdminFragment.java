@@ -276,6 +276,7 @@ public class AdminFragment extends Fragment {
             final EditText versionEditText = dialog.findViewById(R.id.apiVersionEditText);
             final EditText projectEditText = dialog.findViewById(R.id.projectIdEditText);
             final CheckBox surveysCheckBox = dialog.findViewById(R.id.showSurveys);
+            final CheckBox recordSurveyLocation = dialog.findViewById(R.id.recordLocation);
             final AdminSettings adminSettings = AdminSettings.getInstance();
             if (TextUtils.isEmpty(adminSettings.getApiDomainName())) {
                 endpointEditText.setText(getString(R.string.default_api_domain_name));
@@ -293,6 +294,7 @@ public class AdminFragment extends Fragment {
                 projectEditText.setText(adminSettings.getProjectId());
             }
             surveysCheckBox.setChecked(true);
+            recordSurveyLocation.setChecked(true);
 
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -305,10 +307,12 @@ public class AdminFragment extends Fragment {
                         adminSettings.setApiVersion(version);
                         adminSettings.setProjectId(project);
                         adminSettings.setShowSurveys(surveysCheckBox.isChecked());
+                        adminSettings.setRecordSurveyLocation(recordSurveyLocation.isChecked());
                         mApiDomainNameEditText.setText(endpoint);
                         mApiVersionEditText.setText(version);
                         mProjectIdEditText.setText(project);
                         mShowSurveysCheckBox.setChecked(surveysCheckBox.isChecked());
+                        mRecordSurveyLocationCheckBox.setChecked(recordSurveyLocation.isChecked());
                         dialog.dismiss();
                         deviceUserLogin(adminSettings.getApiUrl());
                     } else {
@@ -357,7 +361,7 @@ public class AdminFragment extends Fragment {
     }
 
     private static class RemoteAuthenticationTask extends AsyncTask<String, Void, String> {
-        private final String TAG = "AdminFragment.RemoteAuthenticationTask";
+        private final String TAG = "RemoteAuthTask";
         private String uri;
         private String userName;
         private String password;
@@ -521,7 +525,6 @@ public class AdminFragment extends Fragment {
 
             ActiveRecordCloudSync.setAccessToken(getAdminSettingsInstanceApiKey());
             ActiveRecordCloudSync.setEndPoint(getAdminSettingsInstanceApiUrl());
-            AppUtil.appInit(getActivity());
 
             AppUtil.getAdminSettingsInstance().setShowSurveys(mShowSurveysCheckBox.isChecked());
 //            AppUtil.getAdminSettingsInstance().setShowRosters(mShowRostersCheckBox.isChecked());

@@ -122,6 +122,7 @@ public class AppUtil {
 
     public static void appInit(Context context) {
         mContext = context;
+        getContext();
         if (AppUtil.REQUIRE_SECURITY_CHECKS) {
             if (!AppUtil.runDeviceSecurityChecks(context)) {
                 // Device has failed security checks
@@ -221,16 +222,16 @@ public class AppUtil {
 
     /*
      * Security checks that must pass for the application to start.
-     * 
+     *
      * If the application fails any security checks, display
      * AlertDialog indicating why and immediately stop execution
      * of the application.
-     * 
+     *
      * Current security checks: require encryption
      */
-    public static final boolean runDeviceSecurityChecks(Context context) {
+    private static boolean runDeviceSecurityChecks(Context context) {
         DevicePolicyManager devicePolicyManager = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
-        if (devicePolicyManager.getStorageEncryptionStatus() != DevicePolicyManager.ENCRYPTION_STATUS_ACTIVE) {
+        if (devicePolicyManager == null || devicePolicyManager.getStorageEncryptionStatus() != DevicePolicyManager.ENCRYPTION_STATUS_ACTIVE) {
             new AlertDialog.Builder(context)
                     .setTitle(R.string.encryption_required_title)
                     .setMessage(R.string.encryption_required_text)

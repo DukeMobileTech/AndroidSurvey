@@ -219,6 +219,7 @@ public class SurveyFragment extends Fragment {
             }
         }
         mDisplays = (ArrayList<Display>) mInstrument.displays();
+        if (mDisplays == null || mDisplays.size() == 0) return;
         mDisplay = mDisplays.get(mDisplayNumber);
         mPreviousDisplays = new ArrayList<>();
         mQuestionFragments = new ArrayList<>();
