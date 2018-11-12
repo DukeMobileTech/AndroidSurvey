@@ -529,6 +529,7 @@ public class SurveyFragment extends Fragment {
     }
 
     private void moveToPreviousDisplay() {
+        mScrollView.scrollTo(0, 0);
         showIndeterminateProgressBar();
         if (mDisplayNumber >= 0 && mDisplayNumber < mDisplays.size() && mPreviousDisplays.size()
                 > 0) {
@@ -572,6 +573,7 @@ public class SurveyFragment extends Fragment {
     }
 
     private void moveToNextDisplay() {
+        mScrollView.scrollTo(0, 0);
         showIndeterminateProgressBar();
         mPreviousDisplays.add(mDisplayNumber);
         for (int i = mDisplayNumber + 1; i < mDisplays.size(); i++) {

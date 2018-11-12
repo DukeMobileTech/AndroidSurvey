@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 
+import com.activeandroid.ActiveAndroid;
 import com.activeandroid.Cache;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
@@ -517,78 +518,91 @@ public class Instrument extends ReceiveModel {
     }
 
     public void setLoops() {
-        List<Display> mDisplays = displays();
-        for (Question question : questions()) {
-            if (question.getLoopQuestionCount() > 0) {
-                List<LoopQuestion> loopQuestions = question.loopQuestions();
-                List<Question> displayQuestions = question.getDisplay().questions();
-                if (loopQuestions.size() > 0) {
-                    if (question.getQuestionType().equals(Question.QuestionType.INTEGER)) {
-                        for (LoopQuestion loopQuestion : loopQuestions) {
-                            Display display = getDisplay(question, loopQuestion);
-                            for (int k = 1; k <= LOOP_MAX; k++) {
-                                String instruction = question.getText() + " : " + k;
-                                createLoopQuestion(question, loopQuestion, instruction, k, display);
+        ActiveAndroid.beginTransaction();
+        try {
+            List<Display> mDisplays = displays();
+            for (Question question : questions()) {
+                if (question.getLoopQuestionCount() > 0 && question.getLoopSource() == null) {
+                    List<LoopQuestion> loopQuestions = question.loopQuestions();
+                    List<Question> displayQuestions = question.getDisplay().questions();
+                    if (loopQuestions.size() > 0) {
+                        if (question.getQuestionType().equals(Question.QuestionType.INTEGER)) {
+                            for (LoopQuestion loopQuestion : loopQuestions) {
+                                Display display = getDisplay(question, loopQuestion);
+                                for (int k = 1; k <= LOOP_MAX; k++) {
+                                    String instruction = question.getText() + " : " + k;
+                                    createLoopQuestion(question, loopQuestion, instruction, k, display);
+                                }
+                                updateDisplays(mDisplays, display, question, false);
                             }
-                            if (!mDisplays.contains(display)) {
-                                mDisplays.add(question.getDisplay().getPosition(), display);
+                        } else if (question.isMultipleResponseLoop()) {
+                            for (LoopQuestion loopQuestion : loopQuestions) {
+                                Display display = getDisplay(question, loopQuestion);
+                                if (TextUtils.isEmpty(loopQuestion.getOptionIndices())) {
+                                    for (int k = 0; k < question.defaultOptions().size(); k++) {
+                                        String instruction = question.getText() + " : " +
+                                                question.defaultOptions().get(k).getText(this);
+                                        Question looped = createLoopQuestion(question, loopQuestion, instruction, k, display);
+                                        if (loopQuestion.isSameDisplay() && !displayQuestions.contains(looped)) {
+                                            int parentIndex = displayQuestions.indexOf(question);
+                                            displayQuestions.add(parentIndex + 1 + k, looped);
+                                        }
+                                    }
+                                    if (question.isOtherQuestionType()) {
+                                        String instruction = question.getText() + " : Other";
+                                        Question looped = createLoopQuestion(question, loopQuestion, instruction,
+                                                question.defaultOptions().size(), display);
+                                        if (loopQuestion.isSameDisplay() && !displayQuestions.contains(looped)) {
+                                            int parentIndex = displayQuestions.indexOf(question);
+                                            displayQuestions.add(parentIndex + question.defaultOptions().size(), looped);
+                                        }
+                                    }
+                                } else {
+                                    // Loop only for particular options
+                                    String[] indices = loopQuestion.getOptionIndices().split(Response.LIST_DELIMITER);
+                                    int counter = 0;
+                                    for (String index : indices) {
+                                        int ind = Integer.parseInt(index);
+                                        String instruction = question.getText() + " : " +
+                                                question.defaultOptions().get(ind).getText(this);
+                                        Question looped = createLoopQuestion(question, loopQuestion, instruction, ind, display);
+                                        if (loopQuestion.isSameDisplay() && !displayQuestions.contains(looped)) {
+                                            int parentIndex = displayQuestions.indexOf(question);
+                                            displayQuestions.add(parentIndex + counter + 1, looped);
+                                        }
+                                        counter += 1;
+                                    }
+                                }
+                                updateDisplays(mDisplays, display, question, loopQuestion.isSameDisplay());
+                                int number = displayQuestions.get(0).getNumberInInstrument();
+                                for (int j = 0; j < displayQuestions.size(); j++) {
+                                    displayQuestions.get(j).setNumberInInstrument(number + j);
+                                    displayQuestions.get(j).save();
+                                }
                             }
                         }
-                    } else if (question.isMultipleResponseLoop()) {
-                        for (LoopQuestion loopQuestion : loopQuestions) {
-                            Display display = getDisplay(question, loopQuestion);
-                            if (TextUtils.isEmpty(loopQuestion.getOptionIndices())) {
-                                for (int k = 0; k < question.defaultOptions().size(); k++) {
-                                    String instruction = question.getText() + " : " +
-                                            question.defaultOptions().get(k).getText(this);
-                                    Question looped = createLoopQuestion(question, loopQuestion, instruction, k, display);
-                                    if (loopQuestion.isSameDisplay() && !displayQuestions.contains(looped)) {
-                                        int parentIndex = displayQuestions.indexOf(question);
-                                        displayQuestions.add(parentIndex + 1 + k, looped);
-                                    }
-                                }
-                                if (question.isOtherQuestionType()) {
-                                    String instruction = question.getText() + " : Other";
-                                    Question looped = createLoopQuestion(question, loopQuestion, instruction,
-                                            question.defaultOptions().size(), display);
-                                    if (loopQuestion.isSameDisplay() && !displayQuestions.contains(looped)) {
-                                        int parentIndex = displayQuestions.indexOf(question);
-                                        displayQuestions.add(parentIndex + question.defaultOptions().size(), looped);
-                                    }
-                                }
-                            } else {
-                                // Loop only for particular options
-                                String[] indices = loopQuestion.getOptionIndices().split(Response.LIST_DELIMITER);
-                                int counter = 0;
-                                for (String index : indices) {
-                                    int ind = Integer.parseInt(index);
-                                    String instruction = question.getText() + " : " +
-                                            question.defaultOptions().get(ind).getText(this);
-                                    Question looped = createLoopQuestion(question, loopQuestion, instruction, ind, display);
-                                    if (loopQuestion.isSameDisplay() && !displayQuestions.contains(looped)) {
-                                        int parentIndex = displayQuestions.indexOf(question);
-                                        displayQuestions.add(parentIndex + counter + 1, looped);
-                                    }
-                                    counter += 1;
-                                }
-                            }
-                            if (!mDisplays.contains(display)) {
-                                mDisplays.add(question.getDisplay().getPosition(), display);
-                            }
-                            int number = displayQuestions.get(0).getNumberInInstrument();
-                            for (int j = 0; j < displayQuestions.size(); j++) {
-                                displayQuestions.get(j).setNumberInInstrument(number + j);
-                                displayQuestions.get(j).save();
-                            }
+                        for (int k = 0; k < mDisplays.size(); k++) {
+                            Display display = mDisplays.get(k);
+                            display.setPosition(k + 1);
+                            display.save();
                         }
-                    }
-                    for (int k = 0; k < mDisplays.size(); k++) {
-                        Display display = mDisplays.get(k);
-                        display.setPosition(k + 1);
-                        display.save();
                     }
                 }
             }
+        } finally {
+            ActiveAndroid.endTransaction();
+        }
+    }
+
+    private void updateDisplays(List<Display> mDisplays, Display display, Question question, boolean sameDisplay) {
+        if (mDisplays.contains(display)) {
+            int index = mDisplays.indexOf(display);
+            if (!sameDisplay && index != question.getDisplay().getPosition()) {
+                mDisplays.remove(display);
+                mDisplays.add(question.getDisplay().getPosition(), display);
+            }
+        } else {
+            mDisplays.add(question.getDisplay().getPosition(), display);
         }
     }
 
@@ -611,7 +625,7 @@ public class Instrument extends ReceiveModel {
     }
 
     private Question createLoopQuestion(Question question, LoopQuestion lq, String instruction,
-                                    int index, Display display) {
+                                        int index, Display display) {
         Question source = lq.loopedQuestion();
         String identifier = question.getQuestionIdentifier() + "_" + source.getQuestionIdentifier() + "_" + index;
         Question loopedQuestion = Question.findByQuestionIdentifier(identifier);
@@ -619,6 +633,7 @@ public class Instrument extends ReceiveModel {
             loopedQuestion = new Question();
             loopedQuestion.setRemoteId(getBoundedRemoteId());
             loopedQuestion.setDisplay(display.getRemoteId());
+            // Only set loop number & loop source for duplicated loop questions
             loopedQuestion.setLoopNumber(index);
             loopedQuestion.setLoopSource(question.getQuestionIdentifier());
             loopedQuestion.setQuestionIdentifier(identifier);
@@ -677,7 +692,7 @@ public class Instrument extends ReceiveModel {
         }
     }
 
-    private NextQuestion getNextQuestion(String qi, String oi,String nqi) {
+    private NextQuestion getNextQuestion(String qi, String oi, String nqi) {
         return new Select().from(NextQuestion.class).where("QuestionIdentifier = ? AND OptionIdentifier = ? " +
                 "AND NextQuestionIdentifier = ?", qi, oi, nqi).executeSingle();
     }

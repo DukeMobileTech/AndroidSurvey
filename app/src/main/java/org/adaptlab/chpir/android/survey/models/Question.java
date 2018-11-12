@@ -924,7 +924,7 @@ public class Question extends ReceiveModel {
         mLoopSource = source;
     }
 
-    public int getLoopNumber() {
+    int getLoopNumber() {
         return mLoopNumber;
     }
 
