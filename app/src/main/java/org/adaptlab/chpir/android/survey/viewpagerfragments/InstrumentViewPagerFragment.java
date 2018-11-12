@@ -172,7 +172,7 @@ public class InstrumentViewPagerFragment extends Fragment {
 
         void setInstrument(Instrument instrument) {
             this.mInstrument = instrument;
-            int numQuestions = instrument.questions().size();
+            int numQuestions = instrument.getQuestionCount();
             String title = instrument.getTitle() + "\n";
             String questionCount = numQuestions + " " + FormatUtils.pluralize(numQuestions,
                     getString(R.string.question), getString(R.string.questions)) + "  ";

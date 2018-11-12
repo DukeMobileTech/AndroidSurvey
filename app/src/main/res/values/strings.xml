@@ -178,4 +178,6 @@
     <string name="selected_date">Selected Date</string>
     <string name="response_rank_title">Drag the responses below up/down to rank them from the most relevant to the least relevant</string>
     <string name="drag_left">Drag left</string>
+    <string name="respond">Respond</string>
+    <string name="response_prompt">Please provide a response for:</string>
 </resources>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 
-    <string name="app_name">iSEE CHPIR</string>
+    <string name="app_name">iSEE</string>
     <string name="start_survey">Anza uauzi</string>
     <string name="survey_title_label">Chagua chombo cha uauzi</string>
     <string name="next_button">Inayofuata</string>
@@ -177,4 +177,6 @@
     <string name="selected_date">Tarehe Iliyochaguliwa</string>
     <string name="response_rank_title">Please rank your responses in order of importance</string>
     <string name="drag_left">Drag left</string>
+    <string name="respond">Respond</string>
+    <string name="response_prompt">Please provide a response for:</string>
 </resources>

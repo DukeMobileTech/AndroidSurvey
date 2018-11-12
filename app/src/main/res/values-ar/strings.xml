@@ -178,4 +178,6 @@
     <string name="selected_date">Selected Date</string>
     <string name="response_rank_title">Please rank your responses in order of importance</string>
     <string name="drag_left">Drag left</string>
+    <string name="respond">Respond</string>
+    <string name="response_prompt">Please provide a response for:</string>
 </resources>

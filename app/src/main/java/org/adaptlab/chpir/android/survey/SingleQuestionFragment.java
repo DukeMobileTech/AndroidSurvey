@@ -267,10 +267,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
             StringBuilder instructions = new StringBuilder();
             for (int k = 0; k < displayInstructions.size(); k++) {
                 if (displayInstructions.get(k).getPosition() == mQuestion.getNumberInInstrument()) {
-                    instructions.append(displayInstructions.get(k).getInstructions()).append("<br>");
-                }
-                if (k < displayInstructions.size() - 1) {
-                    instructions.append("<br>");
+                    instructions.append(displayInstructions.get(k).getInstructions());
                 }
             }
             if (instructions.length() > 0) {
@@ -597,7 +594,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
      * Display warning to user if response does not match regular
      * expression in question.  Disable next button if not valid.
      */
-    public void validateResponse() {
+    protected void validateResponse() {
         if (mResponse.isValid()) {
             mResponse.setDeviceUser(AuthUtils.getCurrentUser());
             mResponse.setQuestionVersion(mQuestion.getQuestionVersion());

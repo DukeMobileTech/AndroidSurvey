@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">iSEE CHPIR</string>
+    <string name="app_name">iSEE</string>
     <string name="start_survey">开始调查</string>
     <string name="survey_title_label">选择工具</string>
     <string name="next_button">下一项</string>
@@ -178,4 +178,6 @@
     <string name="selected_date">Selected Date</string>
     <string name="response_rank_title">Please rank your responses in order of importance</string>
     <string name="drag_left">Drag left</string>
+    <string name="respond">Respond</string>
+    <string name="response_prompt">Please provide a response for:</string>
 </resources>

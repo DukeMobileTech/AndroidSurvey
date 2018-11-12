@@ -113,9 +113,7 @@ public class SurveyFragment extends Fragment {
     private static final int REVIEW_CODE = 100;
     public static final int AUTHORIZE_CODE = 300;
     private static final int ACCESS_FINE_LOCATION_CODE = 1;
-    public static final int OFFSET = 1000000;
 
-    private LinearLayout mDisplayLayout;
     private Instrument mInstrument;
     private Survey mSurvey;
     private String mMetadata;
@@ -141,8 +139,6 @@ public class SurveyFragment extends Fragment {
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private boolean mNavDrawerSet = false;
-    private boolean isActivityFinished = false;
-    private boolean isScreenRotated = false;
     private ExpandableListView mExpandableListView;
     private List<String> mExpandableListTitle;
     private LinkedHashMap<String, List<String>> mExpandableListData;
@@ -282,7 +278,7 @@ public class SurveyFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_survey, parent, false);
         mDisplayTitle = v.findViewById(R.id.display_title);
-        mDisplayLayout = v.findViewById(R.id.question_component_layout);
+        LinearLayout mDisplayLayout = v.findViewById(R.id.question_component_layout);
         mParticipantLabel = v.findViewById(R.id.participant_label);
         mDisplayIndexLabel = v.findViewById(R.id.display_index_label);
         mProgressBar = v.findViewById(R.id.progress_bar);
@@ -327,7 +323,6 @@ public class SurveyFragment extends Fragment {
         outState.putInt(EXTRA_DISPLAY_NUMBER, mDisplayNumber);
         outState.putLong(EXTRA_INSTRUMENT_ID, mInstrument.getRemoteId());
         outState.putLong(EXTRA_SURVEY_ID, mSurvey.getId());
-        isScreenRotated = true;
     }
 
     @Override
@@ -573,6 +568,15 @@ public class SurveyFragment extends Fragment {
     }
 
     private void moveToNextDisplay() {
+        String emptyResponses = mDisplayFragment.checkForEmptyResponses();
+        if (emptyResponses.length() > 0) {
+            promptForResponses(emptyResponses);
+        } else {
+            proceedToNextDisplay();
+        }
+    }
+
+    private void proceedToNextDisplay() {
         mScrollView.scrollTo(0, 0);
         showIndeterminateProgressBar();
         mPreviousDisplays.add(mDisplayNumber);
@@ -593,6 +597,20 @@ public class SurveyFragment extends Fragment {
             }
         }
         refreshUIComponents();
+    }
+
+    private void promptForResponses(String empty) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage(empty)
+                .setTitle(R.string.response_prompt)
+                .setNegativeButton(R.string.respond, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                    }
+                }).setPositiveButton(R.string.proceed, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        proceedToNextDisplay();
+                    }
+                }).create().show();
     }
 
     private void moveToDisplay(int position) {
@@ -652,7 +670,7 @@ public class SurveyFragment extends Fragment {
         for (LoopQuestion lq : loopQuestions) {
             questionsToHide.add(lq.loopedQuestion());
         }
-        int start = 1;
+        int start = 0;
         if (!TextUtils.isEmpty(response)) {
             start = Integer.parseInt(response);
         }
@@ -930,7 +948,6 @@ public class SurveyFragment extends Fragment {
     }
 
     private void scoreAndCompleteSurvey() {
-        isActivityFinished = true;
         if (mInstrument.isScorable()) {
             new ScoreSurveyTask().execute(mSurvey);
         } else {

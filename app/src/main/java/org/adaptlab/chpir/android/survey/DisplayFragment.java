@@ -3,8 +3,10 @@ package org.adaptlab.chpir.android.survey;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -19,12 +21,14 @@ import android.widget.ScrollView;
 
 import org.adaptlab.chpir.android.survey.models.Display;
 import org.adaptlab.chpir.android.survey.models.Question;
+import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Survey;
 import org.adaptlab.chpir.android.survey.questionfragments.MultipleSelectMultipleQuestionsFragment;
 import org.adaptlab.chpir.android.survey.questionfragments.SingleSelectMultipleQuestionsFragment;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -218,6 +222,21 @@ public class DisplayFragment extends Fragment {
             }
             ft.commit();
         }
+    }
+
+    protected String checkForEmptyResponses() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Question question : mSurveyFragment.getQuestions(mDisplay)) {
+            if (!mSurveyFragment.getQuestionsToSkipSet().contains(question.getQuestionIdentifier()) &&
+                    mSurveyFragment.getResponses().get(question).isResponseEmpty()) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    if (stringBuilder.length() > 0) stringBuilder.append(System.lineSeparator());
+                    stringBuilder.append(getResources().getString(R.string.question))
+                            .append(" # ").append(question.getNumberInInstrument());
+                }
+            }
+        }
+        return stringBuilder.toString();
     }
 
     /**
