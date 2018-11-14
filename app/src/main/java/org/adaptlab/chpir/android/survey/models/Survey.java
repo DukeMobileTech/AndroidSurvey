@@ -64,6 +64,8 @@ public class Survey extends SendModel {
     private String mLanguage;
     @Column(name = "SkippedQuestions")
     private String mSkippedQuestions;
+    @Column(name = "SkipMaps")
+    private String mSkipMaps;
 
     public Survey() {
         super();
@@ -382,5 +384,13 @@ public class Survey extends SendModel {
 
     public void setSkippedQuestions(String questionIdentifiers) {
         mSkippedQuestions = questionIdentifiers;
+    }
+
+    public String getSkipMaps() {
+        return mSkipMaps;
+    }
+
+    public void setSkipMaps(String skipMaps) {
+        mSkipMaps = skipMaps;
     }
 }
