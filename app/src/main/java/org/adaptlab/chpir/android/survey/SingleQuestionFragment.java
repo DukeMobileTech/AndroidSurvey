@@ -51,6 +51,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static org.adaptlab.chpir.android.survey.utils.FormatUtils.isEmpty;
 import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtml;
@@ -211,8 +213,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
                 final Button button = new RadioButton(getActivity());
                 button.setText(response);
                 button.setId(responseId);
-                button.setTypeface(getInstrument().getTypeFace(
-                        getActivity().getApplicationContext()));
+                button.setTypeface(getInstrument().getTypeFace(v.getContext()));
                 button.setTextColor(getResources().getColorStateList(R.color.states));
 
                 mSpecialResponses.addView(button, responseId);
@@ -280,7 +281,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
     protected void hideIndeterminateProgressBar() {
         List<Question> displayQuestions = mSurveyFragment.getQuestions(mQuestion.getDisplay());
         if (displayQuestions.get(displayQuestions.size() - 1).equals(mQuestion)) {
-                mSurveyFragment.hideIndeterminateProgressBar();
+            mSurveyFragment.hideIndeterminateProgressBar();
         }
     }
 
@@ -476,11 +477,12 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
      * not currently viewing.
      */
     private void removeTextFocus() {
-        if (getActivity().getCurrentFocus() != null) {
-            InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService
-                    (Context.INPUT_METHOD_SERVICE);
-            inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken()
-                    , InputMethodManager.HIDE_NOT_ALWAYS);
+        if (getActivity() == null) return;
+        InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(
+                Context.INPUT_METHOD_SERVICE);
+        if (inputManager != null && getActivity().getCurrentFocus() != null) {
+            inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
         }
     }
 
@@ -547,6 +549,8 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         }
         mResponse.setTimeEnded(new Date());
         mResponse.setDeviceUser(AuthUtils.getCurrentUser());
+        mResponse.setQuestionVersion(mQuestion.getQuestionVersion());
+        mSurvey.setLastUpdated(new Date());
         saveResponseInBackground(mResponse);
         setSkipPatterns();
         refreshFollowUpQuestion();
@@ -568,15 +572,23 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         otherText.setEnabled(false);
         otherText.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         otherText.addTextChangedListener(new TextWatcher() {
+            private Timer timer;
             // Required by interface
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
 
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                setOtherResponse(s.toString());
+                if (timer != null) timer.cancel();
             }
 
-            public void afterTextChanged(Editable s) {
+            public void afterTextChanged(final Editable s) {
+                timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        setOtherResponse(s.toString());
+                    }
+                }, 3000); // 3 second delay before saving to db
             }
         });
 
@@ -587,7 +599,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
 
     public void setOtherResponse(String response) {
         mResponse.setOtherResponse(response);
-        mResponse.setDeviceUser(AuthUtils.getCurrentUser());
+        setResponse(null); //Trigger a save
     }
 
     /*
@@ -596,9 +608,6 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
      */
     protected void validateResponse() {
         if (mResponse.isValid()) {
-            mResponse.setDeviceUser(AuthUtils.getCurrentUser());
-            mResponse.setQuestionVersion(mQuestion.getQuestionVersion());
-            mSurvey.setLastUpdated(new Date());
             animateValidationTextView(true);
         } else {
             animateValidationTextView(false);

@@ -62,6 +62,8 @@ public class Survey extends SendModel {
     private String mRosterUUID;
     @Column(name = "Language")
     private String mLanguage;
+    @Column(name = "SkippedQuestions")
+    private String mSkippedQuestions;
 
     public Survey() {
         super();
@@ -87,6 +89,7 @@ public class Survey extends SendModel {
             jsonObject.put("longitude", mLongitude);
             jsonObject.put("metadata", mMetadata);
             jsonObject.put("has_critical_responses", getCriticalResponses());
+            jsonObject.put("skipped_questions", getSkippedQuestions());
             if (mRosterUUID != null) {
                 jsonObject.put("roster_uuid", mRosterUUID);
             }
@@ -98,7 +101,7 @@ public class Survey extends SendModel {
         return json;
     }
 
-    public String getAdminInstanceDeviceIdentifier() {
+    private String getAdminInstanceDeviceIdentifier() {
         return AppUtil.getAdminSettingsInstance().getDeviceIdentifier();
     }
 
@@ -118,7 +121,7 @@ public class Survey extends SendModel {
      */
     public String identifier(Context context) {
         String surveyLabel = null;
-        String identifier = "";
+        StringBuilder identifier = new StringBuilder();
 
         if (!TextUtils.isEmpty(getMetadata())) {
             surveyLabel = getMetadataLabel();
@@ -129,14 +132,14 @@ public class Survey extends SendModel {
 
         for (Response response : responses()) {
             if (response.getQuestion().identifiesSurvey()) {
-                identifier += response.getText() + " ";
+                identifier.append(response.getText()).append(" ");
             }
         }
 
-        if (identifier.trim().isEmpty())
+        if (identifier.toString().trim().isEmpty())
             return context.getString(R.string.unidentified_survey) + " " + getId();
         else
-            return identifier;
+            return identifier.toString();
     }
 
     public String getIdentifier() {
@@ -180,7 +183,7 @@ public class Survey extends SendModel {
                 Long.valueOf(AppUtil.getAdminSettingsInstance().getProjectId())).execute();
     }
 
-    public static List<Survey> getIncomplete() {
+    static List<Survey> getIncomplete() {
         return new Select().from(Survey.class).where("Complete = ? AND ProjectID = ?", 0,
                 Long.valueOf(AppUtil.getAdminSettingsInstance().getProjectId())).execute();
     }
@@ -226,11 +229,7 @@ public class Survey extends SendModel {
         return map;
     }
 
-    /*
-     * Getters/Setters
-     */
-
-    public int responseCount() {
+    private int responseCount() {
         return new Select().from(Response.class).where("SurveyUUID = ?", getUUID()).count();
     }
 
@@ -277,8 +276,9 @@ public class Survey extends SendModel {
 
         NotificationManager notificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        notificationManager.notify(eventLog.getLogMessage(context), 1, notification);
+        if (notificationManager != null) {
+            notificationManager.notify(eventLog.getLogMessage(context), 1, notification);
+        }
     }
 
     @Override
@@ -311,7 +311,7 @@ public class Survey extends SendModel {
         }
     }
 
-    public void deleteIfComplete() {
+    void deleteIfComplete() {
         if (this.responses().size() == 0) {
             this.delete();
         }
@@ -374,5 +374,13 @@ public class Survey extends SendModel {
 
     public void setLanguage(String language) {
         mLanguage = language;
+    }
+
+    public String getSkippedQuestions() {
+        return mSkippedQuestions;
+    }
+
+    public void setSkippedQuestions(String questionIdentifiers) {
+        mSkippedQuestions = questionIdentifiers;
     }
 }

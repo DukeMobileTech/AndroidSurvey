@@ -64,6 +64,7 @@ public class DateQuestionFragment extends SingleQuestionFragment {
     }
 
     private void setSelectedDate() {
+        if (mSelectedDate == null) return;
         String dateTitle = getString(R.string.selected_date);
         String string = dateTitle + "\n" + getResponse().getText();
         SpannableString spannableString = new SpannableString(string);

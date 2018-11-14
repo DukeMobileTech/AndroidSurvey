@@ -5,9 +5,11 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ListFragment;
 import android.text.Html;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -22,6 +24,7 @@ import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Survey;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -29,27 +32,45 @@ import java.util.List;
 
 public class ReviewPageFragment extends ListFragment {
     public final static String EXTRA_REVIEW_SURVEY_ID = "org.adaptlab.chpir.android.survey.review_survey_id";
-    public final static String EXTRA_SKIPPED_QUESTION_ID_LIST = "org.adaptlab.chpir.android.survey.skipped_question_id_list";
     private static final String TAG = "ReviewPageFragment";
-    private ArrayList<Question> mSkippedQuestions;
+    private List<Question> mQuestionsWithoutResponses;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getActivity() == null) return;
         setHasOptionsMenu(true);
         Intent intent = getActivity().getIntent();
-        mSkippedQuestions = new ArrayList<>();
-        Survey mSurvey = Survey.load(Survey.class, intent.getExtras().getLong(EXTRA_REVIEW_SURVEY_ID));
-        HashSet<String> questionSkipSet = new HashSet<>((intent.getExtras().getStringArrayList(EXTRA_SKIPPED_QUESTION_ID_LIST)));
-        List<Response> emptyResponses = mSurvey.emptyResponses();
-        for (Response response : emptyResponses) {
-            Question curQuestion = response.getQuestion();
-            if (!questionSkipSet.contains(curQuestion.getQuestionIdentifier())) {
-                mSkippedQuestions.add(curQuestion);
+        if (intent.getExtras() == null) return;
+        Survey survey = Survey.load(Survey.class, intent.getExtras().getLong(EXTRA_REVIEW_SURVEY_ID));
+        if (survey == null) return;
+        mQuestionsWithoutResponses = survey.getInstrument().questions();
+
+        HashSet<String> questionSkipSet;
+        if (survey.getSkippedQuestions() == null) {
+            questionSkipSet = new HashSet<>();
+        } else {
+            questionSkipSet = new HashSet<>(Arrays.asList(
+                    survey.getSkippedQuestions().split(Response.LIST_DELIMITER)));
+        }
+
+        List<Question> answeredQuestions = new ArrayList<>();
+        for (Question question : mQuestionsWithoutResponses) {
+            if (questionSkipSet.size() == 0) break;
+            if (questionSkipSet.contains(question.getQuestionIdentifier())) {
+                answeredQuestions.add(question);
             }
         }
+        for (Response response : survey.responses()) {
+            if (!TextUtils.isEmpty(response.getText()) ||
+                    !TextUtils.isEmpty(response.getSpecialResponse())) {
+                answeredQuestions.add(response.getQuestion());
+            }
+        }
+        mQuestionsWithoutResponses.removeAll(answeredQuestions);
+
         sortReviewQuestions();
-        setListAdapter(new QuestionAdapter(mSkippedQuestions));
+        setListAdapter(new QuestionAdapter((ArrayList<Question>) mQuestionsWithoutResponses));
         getActivity().setTitle(getActivity().getResources().getString(R.string.skipped_questions));
     }
 
@@ -76,10 +97,10 @@ public class ReviewPageFragment extends ListFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_item_back:
-                if (mSkippedQuestions.size() == 0) {
+                if (mQuestionsWithoutResponses.size() == 0) {
                     setReturnResults(0);
                 } else {
-                    setReturnResults(mSkippedQuestions.get(0).getDisplay().getPosition() - 1);
+                    setReturnResults(mQuestionsWithoutResponses.get(0).getDisplay().getPosition() - 1);
                 }
                 return true;
             case R.id.menu_item_complete:
@@ -91,7 +112,7 @@ public class ReviewPageFragment extends ListFragment {
     }
 
     private void sortReviewQuestions() {
-        Collections.sort(mSkippedQuestions, new Comparator<Question>() {
+        Collections.sort(mQuestionsWithoutResponses, new Comparator<Question>() {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public int compare(Question lhs, Question rhs) {
@@ -117,7 +138,7 @@ public class ReviewPageFragment extends ListFragment {
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(int position, View convertView, @NonNull ViewGroup parent) {
             if (convertView == null) {
                 convertView = getActivity().getLayoutInflater().inflate(R.layout.review_page, null);
             }

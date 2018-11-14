@@ -3,7 +3,6 @@ package org.adaptlab.chpir.android.survey.questionfragments;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
@@ -20,6 +19,7 @@ public class FreeResponseQuestionFragment extends SingleQuestionFragment {
     private EditText mFreeText;
     private TextWatcher mTextWatcher = new TextWatcher() {
         private boolean backspacing = false;
+
         // Required by interface
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
         }
@@ -48,6 +48,14 @@ public class FreeResponseQuestionFragment extends SingleQuestionFragment {
     };
 
     @Override
+    protected void unSetResponse() {
+        mFreeText.removeTextChangedListener(mTextWatcher);
+        mFreeText.setText(Response.BLANK);
+        setResponseTextBlank();
+        mFreeText.addTextChangedListener(mTextWatcher);
+    }
+
+    @Override
     public void createQuestionComponent(ViewGroup questionComponent) {
         mFreeText = new EditText(getActivity());
         mFreeText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE |
@@ -73,13 +81,5 @@ public class FreeResponseQuestionFragment extends SingleQuestionFragment {
     @Override
     protected String serialize() {
         return mText;
-    }
-
-    @Override
-    protected void unSetResponse() {
-        mFreeText.removeTextChangedListener(mTextWatcher);
-        mFreeText.setText(Response.BLANK);
-        setResponseTextBlank();
-        mFreeText.addTextChangedListener(mTextWatcher);
     }
 }

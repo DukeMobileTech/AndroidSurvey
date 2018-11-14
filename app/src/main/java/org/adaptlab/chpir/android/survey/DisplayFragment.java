@@ -102,6 +102,12 @@ public class DisplayFragment extends Fragment {
     }
 
     @Override
+    public void onPause () {
+        super.onPause();
+        mSurveyFragment.persistSkippedQuestions();
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_display, container, false);

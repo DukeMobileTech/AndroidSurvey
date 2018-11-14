@@ -1,7 +1,9 @@
 package org.adaptlab.chpir.android.survey;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -19,6 +21,7 @@ public abstract class QuestionFragment extends Fragment {
     protected abstract String serialize();
     protected abstract void setDisplayInstructions();
     protected abstract void hideIndeterminateProgressBar();
+    private final String TAG = "QuestionFragment";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -56,7 +59,7 @@ public abstract class QuestionFragment extends Fragment {
     }
 
     protected void saveResponseInBackground(final Response response) {
-        new Handler().post(new Runnable() {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
             public void run() {
                 response.save();
                 response.getSurvey().save();

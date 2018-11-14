@@ -168,8 +168,7 @@ public class Response extends SendModel {
 
         try {
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("survey_uuid", (getSurvey() == null) ? getSurveyUUID() : getSurvey()
-                    .getUUID());
+            jsonObject.put("survey_uuid", (getSurvey() == null) ? getSurveyUUID() : getSurvey().getUUID());
             jsonObject.put("question_id", getQuestion().getRemoteId());
             jsonObject.put("text", getText());
             jsonObject.put("other_response", getOtherResponse());
@@ -292,7 +291,7 @@ public class Response extends SendModel {
         mText = text;
     }
 
-    public boolean hasSpecialResponse() {
+    boolean hasSpecialResponse() {
         return mSpecialResponse.equals(SKIP) || mSpecialResponse.equals(RF) ||
                 mSpecialResponse.equals(NA) || mSpecialResponse.equals(DK);
     }
@@ -303,5 +302,11 @@ public class Response extends SendModel {
 
     public void setRankOrder(String order) {
         mRankOrder = order;
+    }
+
+    public void clearResponse() {
+        mText = BLANK;
+        mOtherResponse = BLANK;
+        mSpecialResponse = BLANK;
     }
 }
