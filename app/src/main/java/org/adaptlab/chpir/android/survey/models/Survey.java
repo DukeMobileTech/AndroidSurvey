@@ -66,6 +66,10 @@ public class Survey extends SendModel {
     private String mSkippedQuestions;
     @Column(name = "SkipMaps")
     private String mSkipMaps;
+    @Column(name = "Identifier")
+    private String mIdentifier;
+    @Column(name = "CompletedResponseCount")
+    private int mCompletedResponseCount;
 
     public Survey() {
         super();
@@ -122,6 +126,7 @@ public class Survey extends SendModel {
      * Return Unidentified Survey string if no response for identifier questions.
      */
     public String identifier(Context context) {
+        if (isSent() && !TextUtils.isEmpty(getSubmittedIdentifier())) return getSubmittedIdentifier();
         String surveyLabel = null;
         StringBuilder identifier = new StringBuilder();
 
@@ -170,6 +175,10 @@ public class Survey extends SendModel {
                 .where("Surveys.ProjectId = ? AND RosterUUID IS null", projectId)
                 .orderBy("Surveys.LastUpdated DESC")
                 .execute();
+    }
+
+    public static List<Survey> getAll() {
+        return new Select().from(Survey.class).execute();
     }
 
     public static Cursor getProjectSurveysCursor(Long projectId) {
@@ -247,6 +256,10 @@ public class Survey extends SendModel {
         return mUUID;
     }
 
+    public void setUuid(String id) {
+        mUUID = id;
+    }
+
     public void setAsComplete(boolean status) {
         mComplete = status;
     }
@@ -310,12 +323,6 @@ public class Survey extends SendModel {
             return getInstrument().questions().get(0);
         } else {
             return responses.get(responses.size() - 1).getQuestion();
-        }
-    }
-
-    void deleteIfComplete() {
-        if (this.responses().size() == 0) {
-            this.delete();
         }
     }
 
@@ -393,4 +400,23 @@ public class Survey extends SendModel {
     public void setSkipMaps(String skipMaps) {
         mSkipMaps = skipMaps;
     }
+
+    public String getSubmittedIdentifier() {
+        return mIdentifier;
+    }
+
+    public void setSubmittedIdentifier(String identifier) {
+        mIdentifier = identifier;
+        save();
+    }
+
+    public int getCompletedResponseCount() {
+        return mCompletedResponseCount;
+    }
+
+    public void setCompletedResponseCount(int count) {
+        mCompletedResponseCount = count;
+        save();
+    }
+
 }

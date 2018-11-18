@@ -19,7 +19,6 @@ import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -100,7 +99,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         spannableText.setSpan(new StyleSpan(Typeface.ITALIC), numLen + idLen,
                 numLen + idLen + insLen, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        spannableText.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.blue_text)),
+        spannableText.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.blue)),
                 numLen + idLen + insLen, numLen + idLen + insLen + textLen,
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         spannableText.setSpan(new RelativeSizeSpan(1.2f),

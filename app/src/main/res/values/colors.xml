@@ -6,8 +6,6 @@
     <color name="red">#CD0000</color>
     <color name="green">#006A4E</color>
     <color name="white">#FFFFFF</color>
-    <color name="colorControlHighlight">#009587</color>
-    <color name="colorButtonNormal">#2095F2</color>
     <color name="primary">#006A4E</color>
     <color name="primary_dark">#0D4D42</color>
     <color name="primary_light">#C8E6C9</color>
@@ -20,5 +18,5 @@
     <color name="yellow">#FEF035</color>
     <color name="transparent">#00000000</color>
     <color name="background">#FFFFFF</color>
-    <color name="blue_text">#4981CE</color>
+    <color name="blue">#4981CE</color>
 </resources>

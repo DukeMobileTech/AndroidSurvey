@@ -225,7 +225,7 @@ public class MultipleSelectMultipleQuestionsFragment extends MultipleQuestionsFr
             ViewHolder(View view) {
                 super(view);
                 questionText = view.findViewById(R.id.questionColumn);
-                questionText.setTextColor(context.getResources().getColor(R.color.blue_text));
+                questionText.setTextColor(context.getResources().getColor(R.color.blue));
                 optionsPart = view.findViewById(R.id.optionsPart);
             }
         }

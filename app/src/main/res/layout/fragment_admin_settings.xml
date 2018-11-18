@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView android:id="@+id/survey_fragment_scroll_view"
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/survey_fragment_scroll_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginBottom="@dimen/layout_margin_default"
+    android:fillViewport="true">
 
     <LinearLayout
         android:id="@+id/linear_layout_for_scroll_view"
@@ -18,7 +19,7 @@
             style="@style/sectionHeader"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/configure_api_endpoint"/>
+            android:text="@string/configure_api_endpoint" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -29,7 +30,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/api_endpoint_instructions"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <Button
                 android:id="@+id/fetch_endpoint_settings"
@@ -40,7 +41,7 @@
                 android:background="@color/primary"
                 android:padding="10dp"
                 android:text="@string/download_api_endpoint_settings"
-                android:textColor="@color/primary_text"/>
+                android:textColor="@color/primary_text" />
 
         </LinearLayout>
 
@@ -49,7 +50,7 @@
             style="@style/sectionHeader"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/api_endpoint_settings"/>
+            android:text="@string/api_endpoint_settings" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -64,7 +65,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_weight="1"
                 android:maxLines="2"
-                android:text="@string/api_endpoint"/>
+                android:text="@string/api_endpoint" />
 
             <EditText
                 android:id="@+id/api_endpoint_text"
@@ -87,14 +88,14 @@
                 android:layout_gravity="fill"
                 android:layout_weight="1"
                 android:maxLines="2"
-                android:text="@string/api_version"/>
+                android:text="@string/api_version" />
 
             <EditText
                 android:id="@+id/api_version_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:inputType="text"/>
+                android:inputType="text" />
         </LinearLayout>
 
         <LinearLayout
@@ -109,14 +110,14 @@
                 android:layout_gravity="fill"
                 android:layout_weight="1"
                 android:maxLines="2"
-                android:text="@string/project_id"/>
+                android:text="@string/project_id" />
 
             <EditText
                 android:id="@+id/project_id_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:inputType="number"/>
+                android:inputType="number" />
         </LinearLayout>
 
         <LinearLayout
@@ -131,14 +132,14 @@
                 android:layout_gravity="fill"
                 android:layout_weight="1"
                 android:maxLines="2"
-                android:text="@string/api_key"/>
+                android:text="@string/api_key" />
 
             <EditText
                 android:id="@+id/api_key_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:inputType="text"/>
+                android:inputType="text" />
         </LinearLayout>
 
         <TextView
@@ -147,28 +148,28 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
-            android:text="@string/feature_toggle"/>
+            android:text="@string/feature_toggle" />
 
         <CheckBox
             android:id="@+id/show_surveys_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:text="@string/show_surveys"/>
+            android:text="@string/show_surveys" />
 
         <CheckBox
             android:id="@+id/require_password"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:text="@string/require_password"/>
+            android:text="@string/require_password" />
 
         <CheckBox
             android:id="@+id/record_survey_location_checkbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:text="@string/record_survey_location"/>
+            android:text="@string/record_survey_location" />
 
         <TextView
             android:id="@+id/device_settings_label"
@@ -176,7 +177,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
-            android:text="@string/device_settings"/>
+            android:text="@string/device_settings" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -190,7 +191,7 @@
                 android:layout_gravity="fill"
                 android:layout_weight="1"
                 android:maxLines="2"
-                android:text="@string/device_identifier"/>
+                android:text="@string/device_identifier" />
 
             <EditText
                 android:id="@+id/device_identifier_edit_text"
@@ -198,7 +199,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:ems="10"
-                android:inputType="textMultiLine"/>
+                android:inputType="textMultiLine" />
 
         </LinearLayout>
 
@@ -214,14 +215,14 @@
                 android:layout_gravity="fill"
                 android:layout_weight="1"
                 android:maxLines="2"
-                android:text="@string/device_label"/>
+                android:text="@string/device_label" />
 
             <EditText
                 android:id="@+id/device_label_edit_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:inputType="textMultiLine|textCapWords"/>
+                android:inputType="textMultiLine|textCapWords" />
         </LinearLayout>
 
         <LinearLayout
@@ -236,7 +237,7 @@
                 android:layout_gravity="fill"
                 android:layout_weight="1"
                 android:maxLines="2"
-                android:text="@string/custom_locale"/>
+                android:text="@string/custom_locale" />
 
             <EditText
                 android:id="@+id/custom_locale_edit_text"
@@ -244,7 +245,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:hint="@string/custom_code_hint"
-                android:inputType="text"/>
+                android:inputType="text" />
         </LinearLayout>
 
         <LinearLayout
@@ -259,13 +260,13 @@
                 android:layout_gravity="fill"
                 android:layout_weight="1"
                 android:maxLines="2"
-                android:text="@string/device_language"/>
+                android:text="@string/device_language" />
 
             <Spinner
                 android:id="@+id/device_language_spinner"
                 android:layout_width="0dp"
-                android:layout_weight="2"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:layout_weight="2" />
         </LinearLayout>
 
         <TextView
@@ -274,14 +275,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
-            android:text="@string/sync_settings"/>
+            android:text="@string/sync_settings" />
 
         <TextView
             android:id="@+id/last_update_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/reset_last_sync_time_button"
@@ -291,7 +292,7 @@
             android:background="@color/primary"
             android:padding="10dp"
             android:text="@string/reset_last_sync_time"
-            android:textColor="@color/primary_text"/>
+            android:textColor="@color/primary_text" />
 
         <TextView
             android:id="@+id/system_info_label"
@@ -299,7 +300,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
-            android:text="@string/system_information"/>
+            android:text="@string/system_information" />
 
         <TextView
             android:id="@+id/version_code_label"
@@ -307,14 +308,14 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:text="@string/version_code"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/version_name_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/updates_check_button"
@@ -324,7 +325,25 @@
             android:background="@color/primary"
             android:padding="10dp"
             android:text="@string/check_for_updates"
-            android:textColor="@color/primary_text"/>
+            android:textColor="@color/primary_text" />
+
+        <TextView
+            android:id="@+id/restoreResponsesLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="Use the button below to restore deleted surveys whose responses are still on the device"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/restoreResponsesButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:background="@color/primary"
+            android:padding="10dp"
+            android:text="Restore Survey Responses"
+            android:textColor="@color/primary_text" />
 
     </LinearLayout>
 </ScrollView>

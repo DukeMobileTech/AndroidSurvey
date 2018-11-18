@@ -158,7 +158,7 @@ public class Response extends SendModel {
         return mText;
     }
 
-    private String getSurveyUUID() {
+    public String getSurveyUUID() {
         return mSurveyUUID;
     }
 
@@ -269,7 +269,6 @@ public class Response extends SendModel {
         mSent = true;
         this.save();
         if (getResponsePhoto() == null) this.delete();
-        if (getSurvey() != null) getSurvey().deleteIfComplete();
     }
 
     @Override

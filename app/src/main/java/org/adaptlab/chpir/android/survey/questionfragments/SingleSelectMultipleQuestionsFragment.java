@@ -1,12 +1,9 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
 import android.content.Context;
-import android.graphics.Typeface;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,8 +15,6 @@ import android.widget.TextView;
 
 import org.adaptlab.chpir.android.survey.MultipleQuestionsFragment;
 import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.models.Instrument;
-import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 
@@ -202,7 +197,7 @@ public class SingleSelectMultipleQuestionsFragment extends MultipleQuestionsFrag
             ViewHolder(View view) {
                 super(view);
                 questionText = view.findViewById(R.id.questionColumn);
-                questionText.setTextColor(context.getResources().getColor(R.color.blue_text));
+                questionText.setTextColor(context.getResources().getColor(R.color.blue));
                 radioGroup = view.findViewById(R.id.optionsRadioGroup);
                 optionsPart = view.findViewById(R.id.optionsPart);
             }

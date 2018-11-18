@@ -2,6 +2,9 @@ package org.adaptlab.chpir.android.survey.viewpagerfragments;
 
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Canvas;
@@ -10,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,8 +29,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import org.adaptlab.chpir.android.activerecordcloudsync.HttpUtil;
+import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.activerecordcloudsync.NetworkNotificationUtils;
+import org.adaptlab.chpir.android.activerecordcloudsync.SendModel;
+import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.Instrument2Activity;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.SurveyActivity;
@@ -36,11 +42,21 @@ import org.adaptlab.chpir.android.survey.models.Survey;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.utils.looper.ItemTouchHelperExtension;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+
 public class SurveyViewPagerFragment extends Fragment {
+    private static final String TAG = "SurveyViewPagerFragment";
+    private static final String UPLOAD_CHANNEL = "UPLOAD_CHANNEL";
+    private static final int UPLOAD_ID = 100;
     private RecyclerView mRecyclerView;
     private SurveyAdapter mSurveyAdapter;
 
@@ -73,15 +89,22 @@ public class SurveyViewPagerFragment extends Fragment {
         mItemTouchHelper.attachToRecyclerView(mRecyclerView);
     }
 
-    private static class SubmitSurveyTask extends AsyncTask<Void, Void, Boolean> {
-        int position;
+    private static class SubmitSurveyTask extends AsyncTask<Void, Integer, Boolean> {
         SurveyAdapter surveyAdapter;
         Survey survey;
+        SurveyViewHolder viewHolder;
+        NotificationCompat.Builder builder;
+        NotificationManager notificationManager;
+        Context mContext;
+        int successCount = 0;
+        int nonSuccessCount = 0;
+        int totalItems = 0;
 
-        SubmitSurveyTask(SurveyAdapter adapter, int pos) {
+        SubmitSurveyTask(SurveyAdapter adapter, SurveyViewHolder holder, Context context) {
             surveyAdapter = adapter;
-            position = pos;
-            survey = surveyAdapter.mSurveys.get(position);
+            viewHolder = holder;
+            survey = surveyAdapter.mSurveys.get(viewHolder.getAdapterPosition());
+            mContext = context;
         }
 
         @Override
@@ -89,36 +112,113 @@ public class SurveyViewPagerFragment extends Fragment {
             if (survey == null) {
                 return false;
             } else {
-                if (NetworkNotificationUtils.checkForNetworkErrors(AppUtil.getContext())) {
+                if (NetworkNotificationUtils.checkForNetworkErrors(mContext)) {
                     if (survey.isPersistent()) {
-                        NetworkNotificationUtils.showNotification(AppUtil.getContext(),
-                                android.R.drawable.stat_sys_download,
-                                R.string.sync_notification_text);
-                        HttpUtil.postData(survey, "surveys");
-                        for (Response response : survey.responses()) {
-                            HttpUtil.postData(response, "responses");
+                        if (!survey.isSent()) {
+                            totalItems += 1;
+                            survey.setSubmittedIdentifier(survey.identifier(mContext));
+                        }
+                        List<Response> responses = survey.responses();
+                        if (survey.getCompletedResponseCount() == 0) {
+                            survey.setCompletedResponseCount(responses.size());
+                        }
+                        sendData(survey, "surveys");
+                        for (Response response : responses) {
+                            totalItems += 1;
+                            sendData(response, "responses");
                             if (response.getResponsePhoto() != null) {
-                                HttpUtil.postData(response.getResponsePhoto(),
-                                        "response_images");
+                                totalItems += 1;
+                                sendData(response.getResponsePhoto(), "response_images");
                             }
                         }
-                        NetworkNotificationUtils.showNotification(AppUtil.getContext(),
-                                android.R.drawable.stat_sys_download_done,
-                                R.string.sync_notification_complete_text);
+                    }
+                }
+                while (successCount + nonSuccessCount < totalItems) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        if (BuildConfig.DEBUG) Log.e(TAG, "Exception: ", e);
                     }
                 }
                 return true;
             }
         }
 
+        private void sendData(final SendModel element, String tableName) {
+            String url = ActiveRecordCloudSync.getEndPoint() + tableName + ActiveRecordCloudSync.getParams();
+            MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+            RequestBody body = RequestBody.create(JSON, element.toJSON().toString());
+            Request request = new okhttp3.Request.Builder().url(url).post(body).build();
+
+            AppUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    if (BuildConfig.DEBUG) Log.e(TAG, "onFailure: ", e);
+                    // TODO: 11/16/18 Retry call??
+                    nonSuccessCount += 1;
+                }
+
+                @Override
+                public void onResponse(Call call, final okhttp3.Response response) {
+                    if (response.isSuccessful()) {
+                        if (BuildConfig.DEBUG) Log.i(TAG, "Successfully submitted: " + element);
+                        if (element instanceof Survey && element.isSent()) {
+                            successCount -= 1;
+                        }
+                        element.setAsSent(mContext);
+                        successCount += 1;
+                        if (successCount % 10 == 0)
+                            publishProgress(successCount);
+                    } else {
+                        if (BuildConfig.DEBUG) Log.i(TAG, "Not Successful");
+                        // TODO: 11/16/18 Retry call??
+                        nonSuccessCount += 1;
+                    }
+                }
+            });
+        }
+
+        @Override
+        protected void onPreExecute() {
+            builder = new NotificationCompat.Builder(mContext, UPLOAD_CHANNEL)
+                    .setSmallIcon(R.drawable.ic_cloud_upload_black_24dp)
+                    .setContentTitle(mContext.getString(R.string.uploading_survey) + survey.identifier(mContext))
+                    .setContentText(mContext.getString(R.string.background_process_progress_message))
+                    .setPriority(NotificationCompat.PRIORITY_HIGH);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                notificationManager = mContext.getSystemService(NotificationManager.class);
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    NotificationChannel channel = new NotificationChannel(
+                            UPLOAD_CHANNEL, UPLOAD_CHANNEL, NotificationManager.IMPORTANCE_HIGH);
+                    notificationManager.createNotificationChannel(channel);
+                }
+                notificationManager.notify(UPLOAD_ID, builder.build());
+            }
+            builder.setProgress(survey.responses().size() + 1, 0, false);
+        }
+
         @Override
         protected void onPostExecute(Boolean status) {
             if (status) {
-                Survey deletedSurvey = Survey.findByUUID(survey.getUUID());
-                if (deletedSurvey == null) {
-                    surveyAdapter.remove(position);
+                surveyAdapter.notifyItemChanged(viewHolder.getAdapterPosition());
+                String message = mContext.getString(R.string.submitted) + " " +
+                        (survey.getCompletedResponseCount() - survey.responses().size())
+                        + " " + mContext.getString(R.string.of) + " " +
+                        survey.getCompletedResponseCount();
+                if (builder != null && notificationManager != null) {
+                    builder.setContentText(message).setProgress(totalItems, successCount, false);
+                    notificationManager.notify(UPLOAD_ID, builder.build());
                 }
             }
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            if (builder != null && notificationManager != null) {
+                builder.setProgress(totalItems, values[0], false);
+                notificationManager.notify(UPLOAD_ID, builder.build());
+            }
+            super.onProgressUpdate(values[0]);
         }
     }
 
@@ -251,7 +351,7 @@ public class SurveyViewPagerFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     Survey survey = mSurveys.get(viewHolder.getAdapterPosition());
-                    if (survey != null && survey.getInstrument().loaded()) {
+                    if (survey != null && survey.getInstrument().loaded() && !survey.isSent()) {
                         Intent i = new Intent(getActivity(), SurveyActivity.class);
                         i.putExtra(SurveyFragment.EXTRA_INSTRUMENT_ID,
                                 survey.getInstrument().getRemoteId());
@@ -280,17 +380,17 @@ public class SurveyViewPagerFragment extends Fragment {
                             .setMessage(R.string.submit_survey_message)
                             .setPositiveButton(R.string.submit,
                                     new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    new SubmitSurveyTask(mSurveyAdapter,
-                                            viewHolder.getAdapterPosition()).execute();
-                                }
-                            })
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            new SubmitSurveyTask(mSurveyAdapter, viewHolder,
+                                                    getActivity()).execute();
+                                        }
+                                    })
                             .setNegativeButton(R.string.cancel,
                                     new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    notifyItemChanged(viewHolder.getAdapterPosition());
-                                }
-                            })
+                                        public void onClick(DialogInterface dialog, int id) {
+                                            notifyItemChanged(viewHolder.getAdapterPosition());
+                                        }
+                                    })
                             .show();
                 }
             });
@@ -313,16 +413,18 @@ public class SurveyViewPagerFragment extends Fragment {
     }
 
     private class SurveyViewHolder extends RecyclerView.ViewHolder {
-        public View mViewContent;
-        public View mActionContainer;
-        public TextView mDeleteAction;
-        public TextView mSubmitAction;
+        View mViewContent;
+        View mActionContainer;
+        TextView mDeleteAction;
+        TextView mSubmitAction;
         TextView surveyTextView;
+        TextView progressTextView;
         Survey mSurvey;
 
         SurveyViewHolder(final View itemView) {
             super(itemView);
             surveyTextView = itemView.findViewById(R.id.surveyProperties);
+            progressTextView = itemView.findViewById(R.id.surveyProgress);
             mViewContent = itemView.findViewById(R.id.list_item_survey_main_content);
             mActionContainer = itemView.findViewById(R.id.list_item_survey_action_container);
             mDeleteAction = itemView.findViewById(R.id.list_item_survey_action_delete);
@@ -333,28 +435,22 @@ public class SurveyViewPagerFragment extends Fragment {
             this.mSurvey = survey;
             String surveyTitle = survey.identifier(AppUtil.getContext()) + "\n";
             String instrumentTitle = survey.getInstrument().getTitle() + "\n";
-            String lastUpdated = DateFormat.getDateTimeInstance().format(survey
-                    .getLastUpdated())
-                    + "  ";
-            String progress = survey.responses().size() + " " + getString(R.string.of) + " " +
-                    survey.getInstrument().questions().size();
-
+            String lastUpdated = DateFormat.getDateTimeInstance().format(
+                    survey.getLastUpdated()) + "  ";
             SpannableString spannableString = new SpannableString(surveyTitle +
-                    instrumentTitle +
-                    lastUpdated + progress);
+                    instrumentTitle + lastUpdated);
             // survey title
             spannableString.setSpan(new RelativeSizeSpan(1.2f), 0, surveyTitle.length(),
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            spannableString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color
-                    .primary_text)), 0, surveyTitle.length(), Spannable
-                    .SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableString.setSpan(new ForegroundColorSpan(getResources().getColor(
+                    R.color.primary_text)), 0, surveyTitle.length(),
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             // instrument title
             spannableString.setSpan(new RelativeSizeSpan(0.8f), surveyTitle.length(),
-                    surveyTitle
-                            .length() + instrumentTitle.length(), Spannable
-                            .SPAN_EXCLUSIVE_EXCLUSIVE);
-            spannableString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color
-                    .secondary_text)), surveyTitle.length(), surveyTitle.length() +
+                    surveyTitle.length() + instrumentTitle.length(),
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableString.setSpan(new ForegroundColorSpan(getResources().getColor(
+                    R.color.secondary_text)), surveyTitle.length(), surveyTitle.length() +
                     instrumentTitle.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             // last updated at
             spannableString.setSpan(new RelativeSizeSpan(0.8f), surveyTitle.length() +
@@ -366,31 +462,45 @@ public class SurveyViewPagerFragment extends Fragment {
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             // progress
             spannableString.setSpan(new RelativeSizeSpan(0.8f), surveyTitle.length() +
-                            instrumentTitle.length() + lastUpdated.length(), surveyTitle
-                            .length() +
-                            instrumentTitle.length() + lastUpdated.length() + progress.length(),
+                            instrumentTitle.length() + lastUpdated.length(),
+                    surveyTitle.length() + instrumentTitle.length() + lastUpdated.length(),
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             spannableString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color
                     .secondary_text)), surveyTitle.length() + instrumentTitle.length() +
                     lastUpdated.length(), surveyTitle.length() + instrumentTitle.length() +
-                    lastUpdated.length() + progress.length(), Spannable
-                    .SPAN_EXCLUSIVE_EXCLUSIVE);
+                    lastUpdated.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            surveyTextView.setText(spannableString);
 
-            if (survey.readyToSend()) {
-                spannableString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color
-                        .green)), surveyTitle.length() + instrumentTitle.length() + lastUpdated
-                        .length(), surveyTitle.length() + instrumentTitle.length() + lastUpdated
-                        .length() + progress.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            String progress;
+            if (survey.isSent()) {
+                progress = getString(R.string.submitted) + " " + (survey.getCompletedResponseCount() - survey.responses().size())
+                        + " " + getString(R.string.of) + " " + survey.getCompletedResponseCount();
+            } else {
+                progress = getString(R.string.progress) + " " + survey.responses().size() + " "
+                        + getString(R.string.of) + " " + survey.getInstrument().questions().size();
+            }
+            SpannableString progressString = new SpannableString(progress);
+            if (survey.isSent()) {
+                if (survey.responses().size() > 0) {
+                    mSubmitAction.setVisibility(View.VISIBLE);
+                    progressString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color
+                            .green)), 0, progress.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                } else {
+                    mSubmitAction.setVisibility(View.GONE);
+                    progressString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color
+                            .blue)), 0, progress.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
+            } else if (survey.readyToSend()) {
+                progressString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color
+                        .green)), 0, progress.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 mSubmitAction.setVisibility(View.VISIBLE);
             } else {
-                spannableString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color
-                        .red)), surveyTitle.length() + instrumentTitle.length() + lastUpdated
-                        .length(), surveyTitle.length() + instrumentTitle.length() + lastUpdated
-                        .length() + progress.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                progressString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color
+                        .red)), 0, progress.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 mSubmitAction.setVisibility(View.GONE);
             }
 
-            surveyTextView.setText(spannableString);
+            progressTextView.setText(progressString);
         }
 
     }

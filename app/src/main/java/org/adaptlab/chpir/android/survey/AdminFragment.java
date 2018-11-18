@@ -2,6 +2,9 @@ package org.adaptlab.chpir.android.survey;
 
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,6 +34,8 @@ import android.widget.Toast;
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.survey.models.AdminSettings;
 import org.adaptlab.chpir.android.survey.models.Instrument;
+import org.adaptlab.chpir.android.survey.models.Response;
+import org.adaptlab.chpir.android.survey.models.Survey;
 import org.adaptlab.chpir.android.survey.tasks.ApkUpdateTask;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.utils.LocaleManager;
@@ -47,11 +53,15 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class AdminFragment extends Fragment {
     private final String TAG = "AdminFragment";
+    private final String CHANNEL = "RESTORATION_CHANNEL";
+    private final int RESTORATION_ID = 12345;
     private EditText mDeviceIdentifierEditText;
     private EditText mDeviceLabelEditText;
     private EditText mApiDomainNameEditText;
@@ -220,13 +230,169 @@ public class AdminFragment extends Fragment {
             }
         });
 
+        Button restoreData = v.findViewById(R.id.restoreResponsesButton);
+        restoreData.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                restoreDeletedSurveys();
+            }
+        });
+
         return v;
+    }
+
+    private void restoreDeletedSurveys() {
+        if (getActivity() == null) return;
+        Set<String> surveyIds = new HashSet<>();
+        List<Survey> surveys = Survey.getAll();
+        List<Response> responses = Response.getAll();
+        int MAX = surveys.size() + responses.size();
+        NotificationManager notificationManager = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            notificationManager = getActivity().getSystemService(NotificationManager.class);
+        }
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity(), CHANNEL)
+                .setSmallIcon(R.drawable.ic_restore_black_24dp)
+                .setContentTitle("Restoring Data")
+                .setContentText("Please wait a moment as data is restored")
+                .setPriority(NotificationCompat.PRIORITY_HIGH);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            String description = "Restoring previously deleted surveys that still have their data on the device";
+            NotificationChannel channel = new NotificationChannel(CHANNEL, CHANNEL, NotificationManager.IMPORTANCE_HIGH);
+            channel.setDescription(description);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
+        builder.setProgress(MAX, 0, false);
+        if (notificationManager != null) {
+            notificationManager.notify(RESTORATION_ID, builder.build());
+        }
+
+        int counter = 0;
+        for (Survey survey : surveys) {
+            surveyIds.add(survey.getUUID());
+            counter +=1;
+            builder.setProgress(counter, MAX, false);
+        }
+        for (Response response : responses) {
+            counter +=1;
+            builder.setProgress(counter, MAX, false);
+            if (!surveyIds.contains(response.getSurveyUUID())) {
+                Survey survey = new Survey();
+                survey.setUuid(response.getSurveyUUID());
+                survey.setInstrumentRemoteId(response.getQuestion().getInstrument().getRemoteId());
+                survey.setProjectId(response.getQuestion().getInstrument().getProjectId());
+                survey.save();
+                surveyIds.add(response.getSurveyUUID());
+            }
+        }
+        builder.setContentText("Restoration complete").setProgress(0,0,false);
+        if (notificationManager != null) {
+            notificationManager.notify(RESTORATION_ID, builder.build());
+            notificationManager.cancel(RESTORATION_ID);
+        }
+        getActivity().finish();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.admin_setting_menu, menu);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        if (getActivity().getResources().getBoolean(R.bool.default_admin_settings)) {
+            menu.findItem(R.id.save_admin_settings_button).setEnabled(false).setVisible(false);
+            menu.findItem(R.id.delete_data_button).setEnabled(false).setVisible(false);
+        }
+        // TODO: 10/6/17 fix
+        menu.findItem(R.id.delete_data_button).setEnabled(false).setVisible(false);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.save_admin_settings_button:
+                saveAdminSettings();
+                finishActivity();
+                return true;
+            case R.id.delete_data_button:
+                deleteData();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void deleteData() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(R.string.delete_application_data)
+                .setMessage(R.string.delete_confirmation)
+                .setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int button) {
+                        new WipeDataTask().execute();
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .create().show();
+    }
+
+    public String getAdminSettingsInstanceApiDomainName() {
+        return AppUtil.getAdminSettingsInstance().getApiDomainName();
+    }
+
+//    private void toggleRosterSettingsVisibility(boolean isChecked) {
+//        if (isChecked) {
+//            mRosterSyncSettingsLabel.setVisibility(View.VISIBLE);
+//            mApi2DomainNameLabel.setVisibility(View.VISIBLE);
+//            mApi2VersionLabel.setVisibility(View.VISIBLE);
+//            mApi2KeyLabel.setVisibility(View.VISIBLE);
+//            mApi2DomainNameEditText.setVisibility(View.VISIBLE);
+//            mApi2VersionEditText.setVisibility(View.VISIBLE);
+//            mApi2KeyEditText.setVisibility(View.VISIBLE);
+//        } else {
+//            mRosterSyncSettingsLabel.setVisibility(View.GONE);
+//            mApi2DomainNameEditText.setVisibility(View.GONE);
+//            mApi2VersionEditText.setVisibility(View.GONE);
+//            mApi2KeyEditText.setVisibility(View.GONE);
+//            mApi2DomainNameLabel.setVisibility(View.GONE);
+//            mApi2VersionLabel.setVisibility(View.GONE);
+//            mApi2KeyLabel.setVisibility(View.GONE);
+//        }
+//    }
+
+    public String getAdminSettingsInstanceApiVersion() {
+        return AppUtil.getAdminSettingsInstance().getApiVersion();
+    }
+
+    public String getAdminSettingsInstanceProjectId() {
+        return AppUtil.getAdminSettingsInstance().getProjectId();
+    }
+
+    public String getAdminSettingsInstanceApiKey() {
+        return AppUtil.getAdminSettingsInstance().getApiKey();
+    }
+
+    public String getAdminSettingsInstanceDeviceId() {
+        return AppUtil.getAdminSettingsInstance().getDeviceIdentifier();
+    }
+
+    public String getAdminSettingsInstanceCustomLocaleCode() {
+        return AppUtil.getAdminSettingsInstance().getCustomLocaleCode();
     }
 
     private void setSpinnerAdapter() {
         final List<String> languageCodes = Instrument.getLanguages();
         ArrayList<String> displayLanguages = new ArrayList<>();
-        for (String languageCode: languageCodes) {
+        for (String languageCode : languageCodes) {
             displayLanguages.add(new Locale(languageCode).getDisplayLanguage());
         }
         final ArrayAdapter<String> mAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, displayLanguages);
@@ -247,17 +413,13 @@ public class AdminFragment extends Fragment {
         mSpinner.setSelection(languageCodes.indexOf(AppUtil.getAdminSettingsInstance().getLanguage()));
     }
 
-    private void updateLocale(String languageCode) {
-        AppUtil.getAdminSettingsInstance().setLanguage(languageCode);
-        LocaleManager.setNewLocale(getActivity(), languageCode);
-        Intent i = new Intent(getActivity(), AdminActivity.class);
-//        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
-        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
-        } else {
-            startActivity(i);
-        }
+    public String getLastUpdateTime() {
+        String last = AppUtil.getAdminSettingsInstance().getLastSyncTime();
+        if (last.isEmpty()) return last;
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(Long.parseLong(last));
+        DateFormat dateFormat = DateFormat.getDateTimeInstance();
+        return dateFormat.format(calendar.getTime());
     }
 
     private void showConfigurationsDialog() {
@@ -267,7 +429,8 @@ public class AdminFragment extends Fragment {
                     .setView(R.layout.fragment_api_settings)
                     .setPositiveButton(R.string.upper_case_OK, new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {}
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
                     });
             final AlertDialog dialog = builder.create();
             dialog.show();
@@ -323,6 +486,19 @@ public class AdminFragment extends Fragment {
         }
     }
 
+    private void updateLocale(String languageCode) {
+        AppUtil.getAdminSettingsInstance().setLanguage(languageCode);
+        LocaleManager.setNewLocale(getActivity(), languageCode);
+        Intent i = new Intent(getActivity(), AdminActivity.class);
+//        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_TASK_ON_HOME);
+        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
+        } else {
+            startActivity(i);
+        }
+    }
+
     private void deviceUserLogin(final String endpoint) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -360,6 +536,82 @@ public class AdminFragment extends Fragment {
         }
     }
 
+    private void saveAdminSettings() {
+        if (!requiredFieldIsEmpty()) {
+            AppUtil.getAdminSettingsInstance().setDeviceIdentifier(mDeviceIdentifierEditText.getText().toString());
+
+            AppUtil.getAdminSettingsInstance().setDeviceLabel(mDeviceLabelEditText.getText().toString());
+            AppUtil.getAdminSettingsInstance().setApiDomainName(mApiDomainNameEditText.getText().toString());
+            AppUtil.getAdminSettingsInstance().setApiVersion(mApiVersionEditText.getText().toString());
+            AppUtil.getAdminSettingsInstance().setProjectId(mProjectIdEditText.getText().toString
+                    ());
+            AppUtil.getAdminSettingsInstance().setApiKey(mApiKeyEditText.getText().toString());
+            // If this code is set, it will override the language selection on the device
+            // for all instrument translations.
+            AppUtil.getAdminSettingsInstance().setCustomLocaleCode(mCustomLocaleEditText.getText().toString());
+
+            ActiveRecordCloudSync.setAccessToken(getAdminSettingsInstanceApiKey());
+            ActiveRecordCloudSync.setEndPoint(getAdminSettingsInstanceApiUrl());
+
+            AppUtil.getAdminSettingsInstance().setShowSurveys(mShowSurveysCheckBox.isChecked());
+//            AppUtil.getAdminSettingsInstance().setShowRosters(mShowRostersCheckBox.isChecked());
+//            AppUtil.getAdminSettingsInstance().setShowScores(mShowScoresCheckBox.isChecked());
+//            AppUtil.getAdminSettingsInstance().setShowSkip(mShowSkipCheckBox.isChecked());
+//            AppUtil.getAdminSettingsInstance().setShowNA(mShowNACheckBox.isChecked());
+//            AppUtil.getAdminSettingsInstance().setShowRF(mShowRFCheckBox.isChecked());
+//            AppUtil.getAdminSettingsInstance().setShowDK(mShowDKCheckBox.isChecked());
+            AppUtil.getAdminSettingsInstance().setRequirePassword(mRequirePasswordCheckBox.isChecked());
+            AppUtil.getAdminSettingsInstance().setRecordSurveyLocation(mRecordSurveyLocationCheckBox.isChecked());
+
+            //Roster settings
+//            AppUtil.getAdminSettingsInstance().setUseEndpoint2(mRosterEndPointCheckBox.isChecked());
+//            AppUtil.getAdminSettingsInstance().setApi2DomainName(mApi2DomainNameEditText.getText().toString());
+//            AppUtil.getAdminSettingsInstance().setApi2Version(mApi2VersionEditText.getText().toString());
+//            AppUtil.getAdminSettingsInstance().setApi2Key(mApi2KeyEditText.getText().toString());
+
+        }
+    }
+
+    private void finishActivity() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getActivity().finishAfterTransition();
+        } else {
+            getActivity().finish();
+        }
+    }
+
+    private boolean requiredFieldIsEmpty() {
+        for (EditText editText : mRequiredFields) {
+            if (TextUtils.isEmpty(editText.getText())) {
+                editText.setError(getString(R.string.required_field));
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public String getAdminSettingsInstanceApiUrl() {
+        // Append forward slash to domain name if does not exist
+        String domainName = AppUtil.getAdminSettingsInstance().getApiDomainName();
+        char lastChar = domainName.charAt(domainName.length() - 1);
+        if (lastChar != '/') domainName = domainName + "/";
+
+        return domainName + "api/" + AppUtil.getAdminSettingsInstance().getApiVersion() + "/" +
+                "projects/" + AppUtil.getAdminSettingsInstance().getProjectId() + "/";
+    }
+
+    public String getAdminSettingsInstanceApi2DomainName() {
+        return AppUtil.getAdminSettingsInstance().getApi2DomainName();
+    }
+
+    public String getAdminSettingsInstanceApi2Version() {
+        return AppUtil.getAdminSettingsInstance().getApi2Version();
+    }
+
+    public String getAdminSettingsInstanceApi2Key() {
+        return AppUtil.getAdminSettingsInstance().getApi2Key();
+    }
+
     private static class RemoteAuthenticationTask extends AsyncTask<String, Void, String> {
         private final String TAG = "RemoteAuthTask";
         private String uri;
@@ -367,10 +619,6 @@ public class AdminFragment extends Fragment {
         private String password;
 
         private AsyncTaskListener mListener;
-
-        public interface AsyncTaskListener {
-            void onAsyncTaskFinished(String param);
-        }
 
         void setListener(AsyncTaskListener listener) {
             this.mListener = listener;
@@ -441,191 +689,16 @@ public class AdminFragment extends Fragment {
             return apiKey;
         }
 
+        public interface AsyncTaskListener {
+            void onAsyncTaskFinished(String param);
+        }
+
         @Override
         protected void onPostExecute(String param) {
             super.onPostExecute(param);
             mListener.onAsyncTaskFinished(param);
         }
 
-    }
-
-//    private void toggleRosterSettingsVisibility(boolean isChecked) {
-//        if (isChecked) {
-//            mRosterSyncSettingsLabel.setVisibility(View.VISIBLE);
-//            mApi2DomainNameLabel.setVisibility(View.VISIBLE);
-//            mApi2VersionLabel.setVisibility(View.VISIBLE);
-//            mApi2KeyLabel.setVisibility(View.VISIBLE);
-//            mApi2DomainNameEditText.setVisibility(View.VISIBLE);
-//            mApi2VersionEditText.setVisibility(View.VISIBLE);
-//            mApi2KeyEditText.setVisibility(View.VISIBLE);
-//        } else {
-//            mRosterSyncSettingsLabel.setVisibility(View.GONE);
-//            mApi2DomainNameEditText.setVisibility(View.GONE);
-//            mApi2VersionEditText.setVisibility(View.GONE);
-//            mApi2KeyEditText.setVisibility(View.GONE);
-//            mApi2DomainNameLabel.setVisibility(View.GONE);
-//            mApi2VersionLabel.setVisibility(View.GONE);
-//            mApi2KeyLabel.setVisibility(View.GONE);
-//        }
-//    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.admin_setting_menu, menu);
-    }
-
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-        if (getActivity().getResources().getBoolean(R.bool.default_admin_settings)) {
-            menu.findItem(R.id.save_admin_settings_button).setEnabled(false).setVisible(false);
-            menu.findItem(R.id.delete_data_button).setEnabled(false).setVisible(false);
-        }
-        // TODO: 10/6/17 fix
-        menu.findItem(R.id.delete_data_button).setEnabled(false).setVisible(false);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.save_admin_settings_button:
-                saveAdminSettings();
-                finishActivity();
-                return true;
-            case R.id.delete_data_button:
-                deleteData();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private void finishActivity() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getActivity().finishAfterTransition();
-        } else {
-            getActivity().finish();
-        }
-    }
-
-    private void saveAdminSettings() {
-        if (!requiredFieldIsEmpty()) {
-            AppUtil.getAdminSettingsInstance().setDeviceIdentifier(mDeviceIdentifierEditText.getText().toString());
-
-            AppUtil.getAdminSettingsInstance().setDeviceLabel(mDeviceLabelEditText.getText().toString());
-            AppUtil.getAdminSettingsInstance().setApiDomainName(mApiDomainNameEditText.getText().toString());
-            AppUtil.getAdminSettingsInstance().setApiVersion(mApiVersionEditText.getText().toString());
-            AppUtil.getAdminSettingsInstance().setProjectId(mProjectIdEditText.getText().toString
-                    ());
-            AppUtil.getAdminSettingsInstance().setApiKey(mApiKeyEditText.getText().toString());
-            // If this code is set, it will override the language selection on the device
-            // for all instrument translations.
-            AppUtil.getAdminSettingsInstance().setCustomLocaleCode(mCustomLocaleEditText.getText().toString());
-
-            ActiveRecordCloudSync.setAccessToken(getAdminSettingsInstanceApiKey());
-            ActiveRecordCloudSync.setEndPoint(getAdminSettingsInstanceApiUrl());
-
-            AppUtil.getAdminSettingsInstance().setShowSurveys(mShowSurveysCheckBox.isChecked());
-//            AppUtil.getAdminSettingsInstance().setShowRosters(mShowRostersCheckBox.isChecked());
-//            AppUtil.getAdminSettingsInstance().setShowScores(mShowScoresCheckBox.isChecked());
-//            AppUtil.getAdminSettingsInstance().setShowSkip(mShowSkipCheckBox.isChecked());
-//            AppUtil.getAdminSettingsInstance().setShowNA(mShowNACheckBox.isChecked());
-//            AppUtil.getAdminSettingsInstance().setShowRF(mShowRFCheckBox.isChecked());
-//            AppUtil.getAdminSettingsInstance().setShowDK(mShowDKCheckBox.isChecked());
-            AppUtil.getAdminSettingsInstance().setRequirePassword(mRequirePasswordCheckBox.isChecked());
-            AppUtil.getAdminSettingsInstance().setRecordSurveyLocation(mRecordSurveyLocationCheckBox.isChecked());
-
-            //Roster settings
-//            AppUtil.getAdminSettingsInstance().setUseEndpoint2(mRosterEndPointCheckBox.isChecked());
-//            AppUtil.getAdminSettingsInstance().setApi2DomainName(mApi2DomainNameEditText.getText().toString());
-//            AppUtil.getAdminSettingsInstance().setApi2Version(mApi2VersionEditText.getText().toString());
-//            AppUtil.getAdminSettingsInstance().setApi2Key(mApi2KeyEditText.getText().toString());
-
-        }
-    }
-
-    private boolean requiredFieldIsEmpty() {
-        for (EditText editText : mRequiredFields) {
-            if (TextUtils.isEmpty(editText.getText())) {
-                editText.setError(getString(R.string.required_field));
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void deleteData() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle(R.string.delete_application_data)
-                .setMessage(R.string.delete_confirmation)
-                .setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int button) {
-                        new WipeDataTask().execute();
-                    }
-                })
-                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                })
-                .create().show();
-    }
-
-    public String getAdminSettingsInstanceApiUrl() {
-        // Append forward slash to domain name if does not exist
-        String domainName = AppUtil.getAdminSettingsInstance().getApiDomainName();
-        char lastChar = domainName.charAt(domainName.length() - 1);
-        if (lastChar != '/') domainName = domainName + "/";
-
-        return domainName + "api/" + AppUtil.getAdminSettingsInstance().getApiVersion() + "/" +
-                "projects/" + AppUtil.getAdminSettingsInstance().getProjectId() + "/";
-    }
-
-    public String getAdminSettingsInstanceDeviceId() {
-        return AppUtil.getAdminSettingsInstance().getDeviceIdentifier();
-    }
-
-    public String getAdminSettingsInstanceApiDomainName() {
-        return AppUtil.getAdminSettingsInstance().getApiDomainName();
-    }
-
-    public String getAdminSettingsInstanceApiVersion() {
-        return AppUtil.getAdminSettingsInstance().getApiVersion();
-    }
-
-    public String getAdminSettingsInstanceProjectId() {
-        return AppUtil.getAdminSettingsInstance().getProjectId();
-    }
-
-    public String getAdminSettingsInstanceApiKey() {
-        return AppUtil.getAdminSettingsInstance().getApiKey();
-    }
-
-    public String getAdminSettingsInstanceCustomLocaleCode() {
-        return AppUtil.getAdminSettingsInstance().getCustomLocaleCode();
-    }
-
-    public String getAdminSettingsInstanceApi2DomainName() {
-        return AppUtil.getAdminSettingsInstance().getApi2DomainName();
-    }
-
-    public String getAdminSettingsInstanceApi2Version() {
-        return AppUtil.getAdminSettingsInstance().getApi2Version();
-    }
-
-    public String getAdminSettingsInstanceApi2Key() {
-        return AppUtil.getAdminSettingsInstance().getApi2Key();
-    }
-
-    public String getLastUpdateTime() {
-        String last = AppUtil.getAdminSettingsInstance().getLastSyncTime();
-        if (last.isEmpty()) return last;
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(Long.parseLong(last));
-        DateFormat dateFormat = DateFormat.getDateTimeInstance();
-        return dateFormat.format(calendar.getTime());
     }
 
     private class WipeDataTask extends AsyncTask<Void, Void, Void> {

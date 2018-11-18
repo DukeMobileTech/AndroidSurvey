@@ -180,4 +180,7 @@
     <string name="drag_left">Drag left</string>
     <string name="respond">Respond</string>
     <string name="response_prompt">Please provide a response for:</string>
+    <string name="progress">Progress</string>
+    <string name="submitted">Submitted</string>
+    <string name="uploading_survey">Uploading Survey</string>
 </resources>

@@ -72,17 +72,19 @@ import java.util.Locale;
 import java.util.UUID;
 
 import io.fabric.sdk.android.Fabric;
+import okhttp3.OkHttpClient;
 
 public class AppUtil {
     private final static String TAG = "AppUtil";
     public final static boolean PRODUCTION = !BuildConfig.DEBUG;
-    public final static boolean REQUIRE_SECURITY_CHECKS = PRODUCTION;
+    private final static boolean REQUIRE_SECURITY_CHECKS = PRODUCTION;
     public static boolean DEBUG = !PRODUCTION;
 
-    public static String ADMIN_PASSWORD_HASH;
-    public static String ACCESS_TOKEN;
+    private static String ADMIN_PASSWORD_HASH;
+    private static String ACCESS_TOKEN;
     private static Context mContext;
     private static AdminSettings adminSettingsInstance;
+    private static OkHttpClient okHttpClient;
 
     /*
      * Get the version code from the AndroidManifest
@@ -273,6 +275,13 @@ public class AppUtil {
             setAdminSettingsInstance();
         }
         return adminSettingsInstance;
+    }
+
+    public static OkHttpClient getOkHttpClient() {
+        if (okHttpClient == null) {
+            okHttpClient = new OkHttpClient();
+        }
+        return okHttpClient;
     }
 
     public static String getOsBuildNumber() {

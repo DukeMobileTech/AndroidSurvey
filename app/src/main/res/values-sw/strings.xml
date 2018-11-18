@@ -179,4 +179,7 @@
     <string name="drag_left">Drag left</string>
     <string name="respond">Jibu</string>
     <string name="response_prompt">Tafadhali toa jibu kwa:</string>
+    <string name="progress">Progress</string>
+    <string name="submitted">Submitted</string>
+    <string name="uploading_survey">Uploading Survey</string>
 </resources>

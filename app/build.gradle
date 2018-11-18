@@ -51,6 +51,7 @@ dependencies {
     implementation 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
     implementation 'com.google.android.gms:play-services-location:16.0.0'
     implementation 'com.github.gcacace:signature-pad:1.2.1'
+    implementation 'com.squareup.okhttp3:okhttp:3.11.0'
     implementation files('libs/core-1.51.0.0.jar')
     implementation files('libs/pg-1.51.0.0.jar')
     implementation files('libs/pkix-1.51.0.0.jar')
