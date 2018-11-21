@@ -2,6 +2,7 @@ package org.adaptlab.chpir.android.survey.viewpagerfragments;
 
 import android.app.ActivityOptions;
 import android.app.AlertDialog;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -184,7 +185,9 @@ public class SurveyViewPagerFragment extends Fragment {
                     .setSmallIcon(R.drawable.ic_cloud_upload_black_24dp)
                     .setContentTitle(mContext.getString(R.string.uploading_survey) + survey.identifier(mContext))
                     .setContentText(mContext.getString(R.string.background_process_progress_message))
+                    .setDefaults(Notification.DEFAULT_ALL)
                     .setPriority(NotificationCompat.PRIORITY_HIGH);
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 notificationManager = mContext.getSystemService(NotificationManager.class);
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -192,6 +195,9 @@ public class SurveyViewPagerFragment extends Fragment {
                             UPLOAD_CHANNEL, UPLOAD_CHANNEL, NotificationManager.IMPORTANCE_HIGH);
                     notificationManager.createNotificationChannel(channel);
                 }
+                notificationManager.notify(UPLOAD_ID, builder.build());
+            } else {
+                notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
                 notificationManager.notify(UPLOAD_ID, builder.build());
             }
             builder.setProgress(survey.responses().size() + 1, 0, false);

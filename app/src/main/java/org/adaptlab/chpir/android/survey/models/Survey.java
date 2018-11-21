@@ -278,22 +278,6 @@ public class Survey extends SendModel {
         eventLog.setInstrumentRemoteId(getInstrument().getRemoteId());
         eventLog.setSurveyIdentifier(identifier(context));
         eventLog.save();
-
-        Resources r = context.getResources();
-
-        Notification notification = new NotificationCompat.Builder(context)
-                .setTicker(r.getString(R.string.app_name))
-                .setSmallIcon(android.R.drawable.ic_dialog_info)
-                .setContentTitle(r.getString(R.string.app_name))
-                .setContentText(eventLog.getLogMessage(context))
-                .setAutoCancel(true)
-                .build();
-
-        NotificationManager notificationManager = (NotificationManager)
-                context.getSystemService(Context.NOTIFICATION_SERVICE);
-        if (notificationManager != null) {
-            notificationManager.notify(eventLog.getLogMessage(context), 1, notification);
-        }
     }
 
     @Override
