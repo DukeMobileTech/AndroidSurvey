@@ -32,6 +32,8 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
+
 import org.adaptlab.chpir.android.survey.models.Display;
 import org.adaptlab.chpir.android.survey.models.DisplayInstruction;
 import org.adaptlab.chpir.android.survey.models.Instrument;
@@ -41,6 +43,7 @@ import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.ResponsePhoto;
 import org.adaptlab.chpir.android.survey.models.Survey;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.utils.AuthUtils;
 import org.adaptlab.chpir.android.survey.utils.FormatUtils;
 import org.adaptlab.chpir.android.survey.utils.looper.ItemTouchHelperExtension;
@@ -52,6 +55,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import io.fabric.sdk.android.Fabric;
 
 import static org.adaptlab.chpir.android.survey.utils.FormatUtils.isEmpty;
 import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtml;
@@ -287,6 +292,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (mSurveyFragment == null) return;
         if (savedInstanceState == null) {
             init();
         } else {
@@ -298,6 +304,11 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         }
         if (mSurveyFragment.getSpecialOptions() != null && mQuestion != null) {
             mSpecialOptions = mSurveyFragment.getSpecialOptions().get(mQuestion.getRemoteSpecialOptionSetId());
+        }
+        if (AppUtil.PRODUCTION) {
+            Fabric.with(getActivity(), new Crashlytics());
+            Crashlytics.setString(getString(R.string.last_question),
+                    String.valueOf(mQuestion.getNumberInInstrument()));
         }
     }
 

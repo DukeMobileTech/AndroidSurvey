@@ -117,6 +117,7 @@ public class DisplayFragment extends Fragment {
     }
 
     private void createQuestionFragments() {
+        if (mSurveyFragment == null) return;
         FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         for (Question question : mSurveyFragment.getQuestions(mDisplay)) {

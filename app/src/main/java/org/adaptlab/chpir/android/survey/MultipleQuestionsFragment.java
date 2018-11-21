@@ -71,6 +71,7 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (mSurveyFragment == null) return;
         if (savedInstanceState != null) {
             mDisplay = Display.findByRemoteId(savedInstanceState.getLong(EXTRA_DISPLAY_ID));
             mSurvey = Model.load(Survey.class, savedInstanceState.getLong(EXTRA_SURVEY_ID));

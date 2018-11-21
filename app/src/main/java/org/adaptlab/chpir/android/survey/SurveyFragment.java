@@ -778,8 +778,11 @@ public class SurveyFragment extends Fragment {
 
     private void updateQuestionsToSkipSet() {
         for (int k = mDisplayNumber; k < mDisplays.size(); k++) {
-            for (Question question : mDisplayQuestions.get(mDisplays.get(k))) {
-                mQuestionsToSkipSet.remove(question.getQuestionIdentifier());
+            List<Question> questions = mDisplayQuestions.get(mDisplays.get(k));
+            if (questions != null) {
+                for (Question question : questions) {
+                    mQuestionsToSkipSet.remove(question.getQuestionIdentifier());
+                }
             }
         }
         for (HashMap.Entry<String, List<String>> curPair : mQuestionsToSkipMap.entrySet()) {
@@ -873,23 +876,31 @@ public class SurveyFragment extends Fragment {
         List<String> skipList = new ArrayList<>();
         if (selectedOption != null) {
             for (MultipleSkip questionToSkip : currentQuestion.optionMultipleSkips(selectedOption)) {
-                skipList.add(questionToSkip.getSkipQuestion().getQuestionIdentifier());
+                addToSkipList(skipList, questionToSkip);
             }
         }
         if (value != null) {
             for (MultipleSkip questionToSkip : currentQuestion.integerMultipleSkips(value)) {
-                skipList.add(questionToSkip.getSkipQuestion().getQuestionIdentifier());
+                addToSkipList(skipList, questionToSkip);
             }
         }
         updateQuestionsToSkipMap(currentQuestion.getQuestionIdentifier() + "/multi", skipList);
         hideQuestionsInDisplay();
     }
 
+    private void addToSkipList(List<String> skipList, MultipleSkip questionToSkip) {
+        if (questionToSkip.getSkipQuestion() != null) {
+            skipList.add(questionToSkip.getSkipQuestion().getQuestionIdentifier());
+        }
+    }
+
     protected void setMultipleSkipQuestions2(List<Option> options, Question currentQuestion) {
         HashSet<String> skipSet = new HashSet<>();
         for (Option option : options) {
             for (MultipleSkip skip : currentQuestion.optionMultipleSkips(option)) {
-                skipSet.add(skip.getSkipQuestion().getQuestionIdentifier());
+                if (skip.getSkipQuestion() != null) {
+                    skipSet.add(skip.getSkipQuestion().getQuestionIdentifier());
+                }
             }
         }
         updateQuestionsToSkipMap(currentQuestion.getQuestionIdentifier() + "/multi",

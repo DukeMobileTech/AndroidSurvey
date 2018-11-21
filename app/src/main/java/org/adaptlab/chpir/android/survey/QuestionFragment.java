@@ -28,7 +28,9 @@ public abstract class QuestionFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         DisplayFragment displayFragment = (DisplayFragment) getParentFragment();
-        mSurveyFragment = displayFragment.getSurveyFragment();
+        if (displayFragment != null) {
+            mSurveyFragment = displayFragment.getSurveyFragment();
+        }
     }
 
     @Override

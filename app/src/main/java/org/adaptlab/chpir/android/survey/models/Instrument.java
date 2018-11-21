@@ -530,7 +530,9 @@ public class Instrument extends ReceiveModel {
                             Display display = getDisplay(question, loopQuestion);
                             for (int k = 1; k <= LOOP_MAX; k++) {
                                 String instruction = question.getText() + " : " + k;
-                                createLoopQuestion(question, loopQuestion, instruction, k, display);
+                                if (loopQuestion.loopedQuestion() != null) {
+                                    createLoopQuestion(question, loopQuestion, instruction, k, display);
+                                }
                             }
                             updateDisplays(mDisplays, display, question, false);
                         }
@@ -541,19 +543,23 @@ public class Instrument extends ReceiveModel {
                                 for (int k = 0; k < question.defaultOptions().size(); k++) {
                                     String instruction = question.getText() + " : " +
                                             question.defaultOptions().get(k).getText(this);
-                                    Question looped = createLoopQuestion(question, loopQuestion, instruction, k, display);
-                                    int parentIndex = displayQuestions.indexOf(loopQuestion.loopedQuestion());
-                                    if (loopQuestion.isSameDisplay()) {
-                                        updateQuestionWithinDisplay(displayQuestions, looped, parentIndex + 1 + k);
+                                    if (loopQuestion.loopedQuestion() != null) {
+                                        Question looped = createLoopQuestion(question, loopQuestion, instruction, k, display);
+                                        int parentIndex = displayQuestions.indexOf(loopQuestion.loopedQuestion());
+                                        if (loopQuestion.isSameDisplay()) {
+                                            updateQuestionWithinDisplay(displayQuestions, looped, parentIndex + 1 + k);
+                                        }
                                     }
                                 }
                                 if (question.isOtherQuestionType()) {
                                     String instruction = question.getText() + " : Other";
-                                    Question looped = createLoopQuestion(question, loopQuestion, instruction,
-                                            question.defaultOptions().size(), display);
-                                    int parentIndex = displayQuestions.indexOf(loopQuestion.loopedQuestion());
-                                    if (loopQuestion.isSameDisplay()) {
-                                        updateQuestionWithinDisplay(displayQuestions, looped, parentIndex + question.defaultOptions().size());
+                                    if (loopQuestion.loopedQuestion() != null) {
+                                        Question looped = createLoopQuestion(question, loopQuestion, instruction,
+                                                question.defaultOptions().size(), display);
+                                        int parentIndex = displayQuestions.indexOf(loopQuestion.loopedQuestion());
+                                        if (loopQuestion.isSameDisplay()) {
+                                            updateQuestionWithinDisplay(displayQuestions, looped, parentIndex + question.defaultOptions().size());
+                                        }
                                     }
                                 }
                             } else {
@@ -564,10 +570,12 @@ public class Instrument extends ReceiveModel {
                                     int ind = Integer.parseInt(index);
                                     String instruction = question.getText() + " : " +
                                             question.defaultOptions().get(ind).getText(this);
-                                    Question looped = createLoopQuestion(question, loopQuestion, instruction, ind, display);
-                                    int parentIndex = displayQuestions.indexOf(loopQuestion.loopedQuestion());
-                                    if (loopQuestion.isSameDisplay()) {
-                                        updateQuestionWithinDisplay(displayQuestions, looped, parentIndex + counter);
+                                    if (loopQuestion.loopedQuestion() != null) {
+                                        Question looped = createLoopQuestion(question, loopQuestion, instruction, ind, display);
+                                        int parentIndex = displayQuestions.indexOf(loopQuestion.loopedQuestion());
+                                        if (loopQuestion.isSameDisplay()) {
+                                            updateQuestionWithinDisplay(displayQuestions, looped, parentIndex + counter);
+                                        }
                                     }
                                     counter += 1;
                                 }

@@ -128,7 +128,8 @@
     <string name="un_submit">Unsubmit</string>
     <string name="last_instrument">last instrument</string>
     <string name="last_survey">last survey</string>
-    <string name="last_display">last question</string>
+    <string name="last_display">last display</string>
+    <string name="last_question">last question</string>
     <string name="crashlytics_device_label">device label</string>
     <string name="check_for_updates">Check For Updates</string>
     <string name="up_to_date">Your application is up to date</string>
