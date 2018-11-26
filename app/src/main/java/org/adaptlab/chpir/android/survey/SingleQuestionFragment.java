@@ -347,7 +347,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
 
     private void refreshFollowUpQuestion() {
         if (mQuestion.isToFollowUpOnQuestion()) {
-            mSurveyFragment.reAnimateFollowUpFragment(mQuestion);
+            mDisplayFragment.reAnimateFollowUpFragment(mQuestion);
         }
     }
 

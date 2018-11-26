@@ -8,7 +8,6 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
@@ -67,9 +66,9 @@ import org.adaptlab.chpir.android.survey.models.Survey;
 import org.adaptlab.chpir.android.survey.models.Validation;
 import org.adaptlab.chpir.android.survey.vendor.BCrypt;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import io.fabric.sdk.android.Fabric;
 import okhttp3.OkHttpClient;
@@ -125,6 +124,7 @@ public class AppUtil {
     public static void appInit(Context context) {
         mContext = context;
         getContext();
+        getOkHttpClient();
         if (AppUtil.REQUIRE_SECURITY_CHECKS) {
             if (!AppUtil.runDeviceSecurityChecks(context)) {
                 // Device has failed security checks
@@ -279,7 +279,11 @@ public class AppUtil {
 
     public static OkHttpClient getOkHttpClient() {
         if (okHttpClient == null) {
-            okHttpClient = new OkHttpClient();
+            okHttpClient = new OkHttpClient().newBuilder()
+                    .connectTimeout(15, TimeUnit.SECONDS)
+                    .writeTimeout(15, TimeUnit.SECONDS)
+                    .readTimeout(30, TimeUnit.SECONDS)
+                    .build();
         }
         return okHttpClient;
     }

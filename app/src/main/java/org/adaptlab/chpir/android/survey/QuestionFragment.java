@@ -14,6 +14,7 @@ import org.adaptlab.chpir.android.survey.models.Response;
 
 public abstract class QuestionFragment extends Fragment {
     protected SurveyFragment mSurveyFragment;
+    protected DisplayFragment mDisplayFragment;
 
     protected abstract void unSetResponse();
     protected abstract void createQuestionComponent(ViewGroup questionComponent);
@@ -27,9 +28,9 @@ public abstract class QuestionFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        DisplayFragment displayFragment = (DisplayFragment) getParentFragment();
-        if (displayFragment != null) {
-            mSurveyFragment = displayFragment.getSurveyFragment();
+        mDisplayFragment = (DisplayFragment) getParentFragment();
+        if (mDisplayFragment != null) {
+            mSurveyFragment = mDisplayFragment.getSurveyFragment();
         }
     }
 

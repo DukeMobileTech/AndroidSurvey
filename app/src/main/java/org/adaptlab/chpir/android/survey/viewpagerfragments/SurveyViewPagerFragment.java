@@ -183,7 +183,7 @@ public class SurveyViewPagerFragment extends Fragment {
         protected void onPreExecute() {
             builder = new NotificationCompat.Builder(mContext, UPLOAD_CHANNEL)
                     .setSmallIcon(R.drawable.ic_cloud_upload_black_24dp)
-                    .setContentTitle(mContext.getString(R.string.uploading_survey) + survey.identifier(mContext))
+                    .setContentTitle(mContext.getString(R.string.uploading_survey) + " " + survey.identifier(mContext))
                     .setContentText(mContext.getString(R.string.background_process_progress_message))
                     .setDefaults(Notification.DEFAULT_ALL)
                     .setPriority(NotificationCompat.PRIORITY_HIGH);
@@ -387,8 +387,11 @@ public class SurveyViewPagerFragment extends Fragment {
                             .setPositiveButton(R.string.submit,
                                     new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {
-                                            new SubmitSurveyTask(mSurveyAdapter, viewHolder,
-                                                    getActivity()).execute();
+                                            int index = viewHolder.getAdapterPosition();
+                                            if (index > -1 && index < mSurveyAdapter.mSurveys.size()) {
+                                                new SubmitSurveyTask(mSurveyAdapter, viewHolder,
+                                                        getActivity()).execute();
+                                            }
                                         }
                                     })
                             .setNegativeButton(R.string.cancel,
@@ -403,11 +406,13 @@ public class SurveyViewPagerFragment extends Fragment {
         }
 
         public void remove(int position) {
-            Survey survey = mSurveys.get(position);
-            if (survey != null) {
-                mSurveys.remove(position);
-                survey.delete();
-                notifyItemRemoved(position);
+            if (position > -1 && position < mSurveys.size()) {
+                Survey survey = mSurveys.get(position);
+                if (survey != null) {
+                    mSurveys.remove(position);
+                    survey.delete();
+                    notifyItemRemoved(position);
+                }
             }
         }
 

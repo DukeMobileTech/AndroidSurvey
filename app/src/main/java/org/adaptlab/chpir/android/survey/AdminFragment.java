@@ -573,6 +573,7 @@ public class AdminFragment extends Fragment {
     }
 
     private void finishActivity() {
+        if (getActivity() == null) return;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getActivity().finishAfterTransition();
         } else {

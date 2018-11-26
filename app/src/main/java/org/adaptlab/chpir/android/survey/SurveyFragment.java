@@ -108,7 +108,6 @@ public class SurveyFragment extends Fragment {
     private Instrument mInstrument;
     private Survey mSurvey;
     private String mMetadata;
-    private ArrayList<QuestionFragment> mQuestionFragments;
     private ArrayList<Display> mDisplays;
     private HashMap<Question, Response> mResponses;
     private HashMap<Question, List<Option>> mOptions;
@@ -408,7 +407,6 @@ public class SurveyFragment extends Fragment {
 
     private void init() {
         mPreviousDisplays = new ArrayList<>();
-        mQuestionFragments = new ArrayList<>();
         mSpecialOptions = new HashMap<>();
         mDisplayQuestions = new HashMap<>();
         mResponses = new HashMap<>();
@@ -432,7 +430,6 @@ public class SurveyFragment extends Fragment {
     }
 
     private void createDisplayView() {
-        if (getActivity() == null) return;
         isLoadingDisplay = true;
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -646,7 +643,7 @@ public class SurveyFragment extends Fragment {
     }
 
     private void refreshUIComponents() {
-        if (!isAdded()) return;
+        if (getActivity() == null || !isResumed() || !isAdded() || isRemoving()) return;
         hideSoftInputWindow();
         createDisplayView();
         hideQuestionsInDisplay();
@@ -728,7 +725,10 @@ public class SurveyFragment extends Fragment {
     }
 
     private void unSetSkipQuestionResponse() {
-        for (String questionIdentifier : mQuestionsToSkipSet) {
+        // Use iterator to avoid concurrent modification exception
+        Iterator<String> iterator = mQuestionsToSkipSet.iterator();
+        while (iterator.hasNext()) {
+            String questionIdentifier = iterator.next();
             if (questionIdentifier != null) {
                 Response response = mResponses.get(Question.findByQuestionIdentifier(questionIdentifier));
                 if (response != null) {
@@ -812,15 +812,17 @@ public class SurveyFragment extends Fragment {
         }
         for (int k = 0; k <= optionsSize; k++) {
             for (LoopQuestion lq : loopQuestions) {
-                String id = question.getQuestionIdentifier() + "_" + lq.loopedQuestion().getQuestionIdentifier()
-                        + "_" + k;
-                if (question.hasMultipleResponses()) {
-                    if (!responses.contains(String.valueOf(k))) {
-                        questionsToHide.add(id);
-                    }
-                } else if (question.hasListResponses()) {
-                    if (TextUtils.isEmpty(text) || TextUtils.isEmpty(responses.get(k))) {
-                        questionsToHide.add(id);
+                if (lq.loopedQuestion() != null) {
+                    String id = question.getQuestionIdentifier() + "_" +
+                            lq.loopedQuestion().getQuestionIdentifier() + "_" + k;
+                    if (question.hasMultipleResponses()) {
+                        if (!responses.contains(String.valueOf(k))) {
+                            questionsToHide.add(id);
+                        }
+                    } else if (question.hasListResponses()) {
+                        if (TextUtils.isEmpty(text) || TextUtils.isEmpty(responses.get(k))) {
+                            questionsToHide.add(id);
+                        }
                     }
                 }
             }
@@ -856,20 +858,6 @@ public class SurveyFragment extends Fragment {
                 displayQuestions.indexOf(question.getQuestionIdentifier()) + 1, displayQuestions.size()));
         updateQuestionsToSkipMap(question.getQuestionIdentifier() + "/skipTo", skipList);
         hideQuestionsInDisplay();
-    }
-
-    protected void reAnimateFollowUpFragment(Question currentQuestion) {
-        FragmentManager fm = getChildFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-        for (FollowUpQuestion question : currentQuestion.toFollowUpOnQuestions()) {
-            int index = mDisplay.questions().indexOf(question.getFollowUpQuestion());
-            if (index > -1 && index <= mDisplay.questions().size() - 1) {
-                QuestionFragment qf = mQuestionFragments.get(index);
-                ft.detach(qf);
-                ft.attach(qf);
-                ft.commit();
-            }
-        }
     }
 
     protected void setMultipleSkipQuestions(Option selectedOption, String value, Question currentQuestion) {

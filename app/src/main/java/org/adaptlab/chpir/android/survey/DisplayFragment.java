@@ -1,34 +1,28 @@
 package org.adaptlab.chpir.android.survey;
 
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 
 import org.adaptlab.chpir.android.survey.models.Display;
+import org.adaptlab.chpir.android.survey.models.FollowUpQuestion;
 import org.adaptlab.chpir.android.survey.models.Question;
-import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Survey;
 import org.adaptlab.chpir.android.survey.questionfragments.MultipleSelectMultipleQuestionsFragment;
 import org.adaptlab.chpir.android.survey.questionfragments.SingleSelectMultipleQuestionsFragment;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -80,6 +74,17 @@ public class DisplayFragment extends Fragment {
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
+            mSurveyFragment = mListener.getSurveyFragment();
+        } else {
+            throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
@@ -87,6 +92,15 @@ public class DisplayFragment extends Fragment {
             mDisplay = Display.load(Display.class, getArguments().getLong(EXTRA_DISPLAY_ID));
         }
         mQuestionFragments = new ArrayList<>();
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_display, container, false);
+        mDisplayLayout = view.findViewById(R.id.displayFragmentsContainer);
+        createQuestionFragments();
+        return view;
     }
 
     @Override
@@ -102,18 +116,15 @@ public class DisplayFragment extends Fragment {
     }
 
     @Override
-    public void onPause () {
+    public void onPause() {
         super.onPause();
         mSurveyFragment.persistSkippedQuestions();
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_display, container, false);
-        mDisplayLayout = view.findViewById(R.id.displayFragmentsContainer);
-        createQuestionFragments();
-        return view;
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
     }
 
     private void createQuestionFragments() {
@@ -183,27 +194,6 @@ public class DisplayFragment extends Fragment {
         mSurveyFragment.getScrollView().fullScroll(View.FOCUS_UP);
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-            mSurveyFragment = mListener.getSurveyFragment();
-        } else {
-            throw new RuntimeException(context.toString() + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    protected SurveyFragment getSurveyFragment() {
-        return mSurveyFragment;
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
     public void hideQuestions() {
         if (!isAdded()) return;
         if (mDisplay != null && !mDisplay.getMode().equals(Display.DisplayMode.TABLE.toString())) {
@@ -231,6 +221,10 @@ public class DisplayFragment extends Fragment {
         }
     }
 
+    protected SurveyFragment getSurveyFragment() {
+        return mSurveyFragment;
+    }
+
     protected String checkForEmptyResponses() {
         StringBuilder stringBuilder = new StringBuilder();
         for (Question question : mSurveyFragment.getQuestions(mDisplay)) {
@@ -244,6 +238,20 @@ public class DisplayFragment extends Fragment {
             }
         }
         return stringBuilder.toString();
+    }
+
+    protected void reAnimateFollowUpFragment(Question currentQuestion) {
+        FragmentManager fm = getChildFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        for (FollowUpQuestion question : currentQuestion.toFollowUpOnQuestions()) {
+            int index = mDisplay.questions().indexOf(question.getFollowUpQuestion());
+            if (index > -1 && index <= mDisplay.questions().size() - 1) {
+                QuestionFragment qf = mQuestionFragments.get(index);
+                ft.detach(qf);
+                ft.attach(qf);
+                ft.commit();
+            }
+        }
     }
 
     /**
