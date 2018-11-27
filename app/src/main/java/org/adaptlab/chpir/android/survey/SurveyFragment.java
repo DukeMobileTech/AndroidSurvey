@@ -20,6 +20,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
@@ -123,7 +124,6 @@ public class SurveyFragment extends Fragment {
     private ArrayList<Integer> mPreviousDisplays;
     private LocationManager mLocationManager;
     private NestedScrollView mScrollView;
-    private TextView mDisplayTitle;
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private boolean mNavDrawerSet = false;
@@ -132,6 +132,8 @@ public class SurveyFragment extends Fragment {
     private List<String> mExpandableListTitle;
     private LinkedHashMap<String, List<String>> mExpandableListData;
     private DisplayFragment mDisplayFragment;
+    private boolean showProgressBar = true;
+    private MenuItem mProgressView;
 
     public void refreshView() {
         AuthorizedActivity authority = (AuthorizedActivity) getActivity();
@@ -235,11 +237,9 @@ public class SurveyFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_survey, parent, false);
-        mDisplayTitle = v.findViewById(R.id.display_title);
         mParticipantLabel = v.findViewById(R.id.participant_label);
         mDisplayIndexLabel = v.findViewById(R.id.display_index_label);
         mProgressBar = v.findViewById(R.id.progress_bar);
-        ActivityCompat.invalidateOptionsMenu(getActivity());
         updateActionBarTitle(mInstrument.getTitle());
         mScrollView = v.findViewById(R.id.survey_fragment_scroll_view);
         return v;
@@ -287,6 +287,7 @@ public class SurveyFragment extends Fragment {
             setupNavigationDrawer();
         }
         setLanguageSelection(menu);
+        mProgressView = menu.findItem(R.id.menu_item_progress);
     }
 
     @Override
@@ -298,6 +299,7 @@ public class SurveyFragment extends Fragment {
                 .setEnabled(true);
         menu.findItem(R.id.menu_item_finish).setVisible(mDisplayNumber == mDisplays.size() - 1)
                 .setEnabled(true);
+        menu.findItem(R.id.menu_item_progress).setVisible(showProgressBar);
     }
 
     @Override
@@ -629,11 +631,15 @@ public class SurveyFragment extends Fragment {
     }
 
     private void closeDrawer() {
+        showProgressBar = true;
         mDrawerLayout.closeDrawer(mExpandableListView);
+        mProgressView.setVisible(true);
     }
 
     protected void toggleLoadingStatus() {
         isLoadingDisplay = false;
+        showProgressBar = false;
+        mProgressView.setVisible(false);
         hideQuestionsInDisplay();
     }
 
@@ -1084,12 +1090,12 @@ public class SurveyFragment extends Fragment {
         if (mDisplay != null && mDisplay.questions().size() > 0) {
             // Screen title
             if (!mDisplay.getMode().equals(Display.DisplayMode.SINGLE.toString())) {
-                mDisplayTitle.setText(String.format(Locale.getDefault(), "%s %s%d %s %d%s",
+                updateActionBarTitle(String.format(Locale.getDefault(), "%s %s%d %s %d%s",
                         mDisplay.getTitle(), "(", mDisplay.questions().get(0)
                                 .getNumberInInstrument(), "-", mDisplay.questions().get(mDisplay
                                 .questions().size() - 1).getNumberInInstrument(), ")"));
             } else {
-                mDisplayTitle.setText(mDisplay.getTitle());
+                updateActionBarTitle(mDisplay.getTitle());
             }
             // Progress text
             mDisplayIndexLabel.setText(String.format(Locale.getDefault(), "%s %d %s %d %s%d %s" +
