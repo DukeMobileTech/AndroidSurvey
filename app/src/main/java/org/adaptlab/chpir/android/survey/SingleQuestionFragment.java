@@ -285,10 +285,10 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         }
     }
 
-    protected void hideIndeterminateProgressBar() {
+    protected void toggleLoadingStatus() {
         List<Question> displayQuestions = mSurveyFragment.getQuestions(mQuestion.getDisplay());
         if (displayQuestions.get(displayQuestions.size() - 1).equals(mQuestion)) {
-            mSurveyFragment.hideIndeterminateProgressBar();
+            mSurveyFragment.toggleLoadingStatus();
         }
     }
 

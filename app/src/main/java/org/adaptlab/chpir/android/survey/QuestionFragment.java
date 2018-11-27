@@ -1,12 +1,9 @@
 package org.adaptlab.chpir.android.survey;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.ViewGroup;
 
 import org.adaptlab.chpir.android.survey.models.Question;
@@ -21,7 +18,7 @@ public abstract class QuestionFragment extends Fragment {
     protected abstract void deserialize(String responseText);
     protected abstract String serialize();
     protected abstract void setDisplayInstructions();
-    protected abstract void hideIndeterminateProgressBar();
+    protected abstract void toggleLoadingStatus();
     private final String TAG = "QuestionFragment";
 
     @Override
@@ -37,7 +34,7 @@ public abstract class QuestionFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        hideIndeterminateProgressBar();
+        toggleLoadingStatus();
     }
 
     /*
@@ -48,7 +45,7 @@ public abstract class QuestionFragment extends Fragment {
     public void onHiddenChanged (boolean hidden) {
         super.onHiddenChanged(hidden);
         if (!hidden) {
-            hideIndeterminateProgressBar();
+            toggleLoadingStatus();
         }
     }
 

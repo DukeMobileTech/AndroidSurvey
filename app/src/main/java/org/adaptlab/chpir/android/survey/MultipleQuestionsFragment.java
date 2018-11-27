@@ -3,11 +3,7 @@ package org.adaptlab.chpir.android.survey;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.pm.ActivityInfo;
-import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.GradientDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -179,10 +175,10 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
         outState.putString(EXTRA_TABLE_ID, mTableIdentifier);
     }
 
-    protected void hideIndeterminateProgressBar() {
+    protected void toggleLoadingStatus() {
         List<Question> displayQuestions = mSurveyFragment.getQuestions(mDisplay);
         if (displayQuestions.get(displayQuestions.size() - 1).equals(mQuestions.get(mQuestions.size() - 1))) {
-            mSurveyFragment.hideIndeterminateProgressBar();
+            mSurveyFragment.toggleLoadingStatus();
         }
     }
 

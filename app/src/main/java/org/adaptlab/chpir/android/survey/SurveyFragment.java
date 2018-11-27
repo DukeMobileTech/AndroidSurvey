@@ -51,7 +51,6 @@ import com.crashlytics.android.Crashlytics;
 import org.adaptlab.chpir.android.survey.location.LocationManager;
 import org.adaptlab.chpir.android.survey.models.Display;
 import org.adaptlab.chpir.android.survey.models.DisplayInstruction;
-import org.adaptlab.chpir.android.survey.models.FollowUpQuestion;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.LoopQuestion;
 import org.adaptlab.chpir.android.survey.models.MultipleSkip;
@@ -119,7 +118,6 @@ public class SurveyFragment extends Fragment {
     private TextView mDisplayIndexLabel;
     private TextView mParticipantLabel;
     private ProgressBar mProgressBar;
-    private ProgressBar mIndeterminateProgressBar;
     private Display mDisplay;
     private int mDisplayNumber;
     private ArrayList<Integer> mPreviousDisplays;
@@ -241,7 +239,6 @@ public class SurveyFragment extends Fragment {
         mParticipantLabel = v.findViewById(R.id.participant_label);
         mDisplayIndexLabel = v.findViewById(R.id.display_index_label);
         mProgressBar = v.findViewById(R.id.progress_bar);
-        mIndeterminateProgressBar = v.findViewById(R.id.indeterminateProgressBar);
         ActivityCompat.invalidateOptionsMenu(getActivity());
         updateActionBarTitle(mInstrument.getTitle());
         mScrollView = v.findViewById(R.id.survey_fragment_scroll_view);
@@ -619,7 +616,7 @@ public class SurveyFragment extends Fragment {
 
     private void moveToPreviousDisplay() {
         mScrollView.scrollTo(0, 0);
-        showIndeterminateProgressBar();
+        closeDrawer();
         if (mDisplayNumber >= 0 && mDisplayNumber < mDisplays.size() && mPreviousDisplays.size()
                 > 0) {
             mDisplayNumber = mPreviousDisplays.remove(mPreviousDisplays.size() - 1);
@@ -631,13 +628,11 @@ public class SurveyFragment extends Fragment {
         refreshUIComponents();
     }
 
-    private void showIndeterminateProgressBar() {
+    private void closeDrawer() {
         mDrawerLayout.closeDrawer(mExpandableListView);
-        mIndeterminateProgressBar.setVisibility(View.VISIBLE);
     }
 
-    protected void hideIndeterminateProgressBar() {
-        mIndeterminateProgressBar.setVisibility(View.GONE);
+    protected void toggleLoadingStatus() {
         isLoadingDisplay = false;
         hideQuestionsInDisplay();
     }
@@ -678,7 +673,7 @@ public class SurveyFragment extends Fragment {
 
     private void proceedToNextDisplay() {
         mScrollView.scrollTo(0, 0);
-        showIndeterminateProgressBar();
+        closeDrawer();
         mPreviousDisplays.add(mDisplayNumber);
         for (int i = mDisplayNumber + 1; i < mDisplays.size(); i++) {
             boolean skipDisplay = true;
@@ -715,7 +710,7 @@ public class SurveyFragment extends Fragment {
 
     private void moveToDisplay(int position) {
         if (position < mDisplayNumber) {
-            showIndeterminateProgressBar();
+            closeDrawer();
             mPreviousDisplays.add(mDisplayNumber);
             mDisplayNumber = position;
             mDisplay = mDisplays.get(mDisplayNumber);
@@ -724,7 +719,7 @@ public class SurveyFragment extends Fragment {
             mDisplayNumber = position - 1;
             moveToNextDisplay();
         } else {
-            hideIndeterminateProgressBar();
+            toggleLoadingStatus();
         }
     }
 
