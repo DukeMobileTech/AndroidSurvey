@@ -643,12 +643,16 @@ public class SurveyFragment extends Fragment {
     }
 
     private void refreshUIComponents() {
-        if (getActivity() == null || !isResumed() || !isAdded() || isRemoving()) return;
+        if (isInIllegalState()) return;
         hideSoftInputWindow();
         createDisplayView();
         hideQuestionsInDisplay();
         updateDisplayLabels();
         setParticipantLabel();
+    }
+
+    private boolean isInIllegalState() {
+        return getActivity() == null || !isResumed() || !isAdded() || isRemoving();
     }
 
     private void hideSoftInputWindow() {
@@ -770,6 +774,7 @@ public class SurveyFragment extends Fragment {
     }
 
     private void hideQuestionsInDisplay() {
+        if (isInIllegalState()) return;
         if (!isLoadingDisplay) {
             updateQuestionsToSkipSet();
             mDisplayFragment.hideQuestions();

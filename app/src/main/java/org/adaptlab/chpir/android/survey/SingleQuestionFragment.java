@@ -82,6 +82,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
     private OptionsAdapter mOptionsAdapter;
     private View mFragmentView;
     private ViewGroup mRankLayout;
+    private boolean deserialization = false;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
@@ -121,7 +122,9 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         ViewGroup questionComponent = (LinearLayout) v.findViewById(R.id.question_component);
         setChoiceSelectionInstructions(v);
         createQuestionComponent(questionComponent);
+        deserialization = true;
         deserialize(mResponse.getText());
+        deserialization = false;
         setSkipPatterns();
         refreshFollowUpQuestion();
         setResponseRanking(v);
@@ -302,7 +305,8 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
             mResponse = Response.load(Response.class, savedInstanceState.getLong(EXTRA_RESPONSE_ID));
             mOptions = mSurveyFragment.getOptions().get(mQuestion);
         }
-        if (mSurveyFragment.getSpecialOptions() != null && mQuestion != null) {
+        if (isComponentNull()) return;
+        if (mSurveyFragment.getSpecialOptions() != null) {
             mSpecialOptions = mSurveyFragment.getSpecialOptions().get(mQuestion.getRemoteSpecialOptionSetId());
         }
         if (AppUtil.PRODUCTION) {
@@ -310,6 +314,10 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
             Crashlytics.setString(getString(R.string.last_question),
                     String.valueOf(mQuestion.getNumberInInstrument()));
         }
+    }
+
+    private boolean isComponentNull() {
+        return mSurvey == null || mQuestion == null || mInstrument == null || mResponse == null;
     }
 
     public void init() {
@@ -324,7 +332,6 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         mResponse = loadOrCreateResponse();
         mResponse.setQuestion(mQuestion);
         mResponse.setSurvey(mSurvey);
-        mResponse.setTimeStarted(new Date());
         mInstrument = mSurvey.getInstrument();
         if (mSurveyFragment.getOptions() != null) {
             mOptions = mSurveyFragment.getOptions().get(mQuestion);
@@ -337,6 +344,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         Response response = mSurveyFragment.getResponses().get(mQuestion);
         if (response == null) {
             response = new Response();
+            response.setTimeStarted(new Date());
             response.setQuestion(mQuestion);
             response.setSurvey(mSurvey);
             response.save();
@@ -540,7 +548,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
     }
 
     protected void setResponse(String specialResponse) {
-        if (mResponse == null) return;
+        if (deserialization) return;
         if (specialResponse == null) {
             // Set responseText
             mResponse.setResponse(serialize());
