@@ -891,7 +891,8 @@ public class Question extends ReceiveModel {
                 || type == QuestionType.EMAIL_ADDRESS || type == QuestionType.DECIMAL_NUMBER
                 || type == QuestionType.INSTRUCTIONS || type == QuestionType.PHONE_NUMBER
                 || type == QuestionType.ADDRESS || type == QuestionType.RANGE
-                || type == QuestionType.SUM_OF_PARTS);
+                || type == QuestionType.SUM_OF_PARTS || type == QuestionType.SELECT_ONE_WRITE_OTHER
+                || type == QuestionType.SELECT_MULTIPLE_WRITE_OTHER);
     }
 
     public boolean isMultipleResponseLoop() {

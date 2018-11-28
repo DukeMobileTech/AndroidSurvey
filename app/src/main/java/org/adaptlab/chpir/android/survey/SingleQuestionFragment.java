@@ -3,6 +3,7 @@ package org.adaptlab.chpir.android.survey;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.DividerItemDecoration;
@@ -19,9 +20,11 @@ import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.inputmethod.InputMethodManager;
@@ -86,6 +89,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
+        deserialization = true;
         View v = inflater.inflate(R.layout.fragment_question, parent, false);
         String number = mQuestion.getNumberInInstrument() + ": ";
         int numLen = number.length();
@@ -122,9 +126,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         ViewGroup questionComponent = (LinearLayout) v.findViewById(R.id.question_component);
         setChoiceSelectionInstructions(v);
         createQuestionComponent(questionComponent);
-        deserialization = true;
         deserialize(mResponse.getText());
-        deserialization = false;
         setSkipPatterns();
         refreshFollowUpQuestion();
         setResponseRanking(v);
@@ -132,6 +134,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         deserializeSpecialResponse();
         setLoopQuestions(mQuestion, mResponse);
         mFragmentView = v;
+        deserialization = false;
         return v;
     }
 
@@ -499,6 +502,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(
                 Context.INPUT_METHOD_SERVICE);
         if (inputManager != null && getActivity().getCurrentFocus() != null) {
+            mFragmentView.requestFocus();
             inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
                     InputMethodManager.HIDE_NOT_ALWAYS);
         }
@@ -601,12 +605,22 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
 
             public void afterTextChanged(final Editable s) {
                 timer = new Timer();
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        setOtherResponse(s.toString());
-                    }
-                }, 3000); // 3 second delay before saving to db
+                if (!deserialization) {
+                    timer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            // Run on UI Thread
+                            if (getActivity() != null) {
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        setOtherResponse(s.toString());
+                                    }
+                                });
+                            }
+                        }
+                    }, 1000); // 1 second delay before saving to db
+                }
             }
         });
 
