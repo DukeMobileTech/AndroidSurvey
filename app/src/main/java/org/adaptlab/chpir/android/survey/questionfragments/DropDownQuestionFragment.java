@@ -30,12 +30,15 @@ public class DropDownQuestionFragment extends SingleQuestionFragment {
 
     @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
+        if (getActivity() == null) return;
         LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(
                 Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.spinner, null);
-        mSpinner = view.findViewById(R.id.options_spinner);
-        setSpinnerAdapter();
-        questionComponent.addView(view);
+        if (inflater != null) {
+            View view = inflater.inflate(R.layout.spinner, null);
+            mSpinner = view.findViewById(R.id.options_spinner);
+            setSpinnerAdapter();
+            questionComponent.addView(view);
+        }
     }
 
     @Override

@@ -69,8 +69,10 @@ public class SelectOneWriteOtherQuestionFragment extends
         if (getRadioGroup() != null) {
             getRadioGroup().clearCheck();
         }
-        otherText.setText(Response.BLANK);
-        otherText.setEnabled(false);
+        if (otherText.getText().length() > 0) {
+            otherText.setText(Response.BLANK);
+            otherText.setEnabled(false);
+        }
         setResponseTextBlank();
     }
 

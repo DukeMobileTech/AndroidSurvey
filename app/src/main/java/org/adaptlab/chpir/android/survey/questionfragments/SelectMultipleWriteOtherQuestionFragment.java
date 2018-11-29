@@ -52,8 +52,10 @@ public class SelectMultipleWriteOtherQuestionFragment extends
 
     @Override
     protected void unSetResponse() {
-        otherText.setText(Response.BLANK);
-        otherText.setEnabled(false);
+        if (otherText.getText().length() > 0) {
+            otherText.setText(Response.BLANK);
+            otherText.setEnabled(false);
+        }
         super.unSetResponse();
     }
 

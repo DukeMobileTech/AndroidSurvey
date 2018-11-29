@@ -120,8 +120,10 @@ public class SelectMultipleQuestionFragment extends SingleQuestionFragment {
 
     @Override
     protected void unSetResponse() {
-        for (CheckBox oneBox : mCheckBoxes) {
-            oneBox.setChecked(false);
+        for (CheckBox box : mCheckBoxes) {
+            if (box.isChecked()) {
+                box.setChecked(false);
+            }
         }
         setResponseTextBlank();
         if (getQuestion().rankResponses()) {
