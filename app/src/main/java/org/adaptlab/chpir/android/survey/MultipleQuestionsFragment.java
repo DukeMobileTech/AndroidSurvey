@@ -104,14 +104,16 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
         TextView textView = v.findViewById(R.id.spannedTextView);
         textView.setText(spannableText);
 
-        ViewGroup questionComponent1 = (LinearLayout) v.findViewById(R.id.responseLayout1);
-        questionComponent1.setVisibility(View.GONE);
+        v.findViewById(R.id.optionSetInstructions).setVisibility(View.GONE);
+        v.findViewById(R.id.response_component).setVisibility(View.GONE);
+
         ViewGroup questionComponent2 = (LinearLayout) v.findViewById(R.id.responseLayout2);
         questionComponent2.setVisibility(View.VISIBLE);
         createQuestionComponent(questionComponent2);
 
         // Hide special responses UI
-        v.findViewById(R.id.special_responses_container).setVisibility(View.GONE);
+        v.findViewById(R.id.specialResponseButtons).setVisibility(View.GONE);
+        v.findViewById(R.id.clearResponsesButton).setVisibility(View.GONE);
         return v;
     }
 

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="@dimen/layout_margin_default"
@@ -29,35 +28,28 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/displayInstructions" />
 
-    <LinearLayout
-        android:id="@+id/responseLayout1"
+    <TextView
+        android:id="@+id/optionSetInstructions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
+        android:layout_margin="5dp"
+        android:scrollbars="vertical"
+        android:textColor="@color/secondary_text"
+        android:textStyle="italic"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/spannedTextView" />
+
+    <LinearLayout
+        android:id="@+id/response_component"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/spannedTextView">
+        app:layout_constraintTop_toBottomOf="@id/optionSetInstructions">
 
-        <TextView
-            android:id="@+id/optionSetInstructions"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:scrollbars="vertical"
-            android:textColor="@color/secondary_text"
-            android:textStyle="italic"
-            android:visibility="gone" />
-
-        <LinearLayout
-            android:id="@+id/question_component"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
@@ -68,7 +60,7 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/responseLayout1">
+        app:layout_constraintTop_toBottomOf="@id/response_component">
 
         <TextView
             android:layout_width="match_parent"
@@ -102,42 +94,34 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/special_responses_container"
-        android:layout_width="match_parent"
+    <RadioGroup
+        android:id="@+id/specialResponseButtons"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:baselineAligned="false"
+        android:layout_gravity="center_vertical"
         android:orientation="horizontal"
-        android:weightSum="4"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/clearResponsesButton"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/responseLayout2">
+        app:layout_constraintTop_toBottomOf="@id/responseLayout2" />
 
-        <RadioGroup
-            android:id="@+id/specialResponseButtons"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="3"
-            android:gravity="start"
-            android:orientation="horizontal" />
+    <Button
+        android:id="@+id/clearResponsesButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/clear"
+        android:textColor="@color/primary_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@id/specialResponseButtons"
+        app:layout_constraintTop_toBottomOf="@id/responseLayout2" />
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="end">
-
-            <Button
-                android:id="@+id/clearResponsesButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@string/clear"
-                android:textColor="@color/primary_text" />
-        </LinearLayout>
-
-    </LinearLayout>
+    <android.support.constraint.Barrier
+        android:id="@+id/barrier1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="specialResponseButtons,clearResponsesButton" />
 
     <TextView
         android:id="@+id/validation_text"
@@ -151,17 +135,23 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/special_responses_container" />
+        app:layout_constraintTop_toBottomOf="@id/barrier1" />
+
+    <android.support.constraint.Barrier
+        android:id="@+id/barrier2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="validation_text" />
 
     <View
         android:layout_width="fill_parent"
         android:layout_height="2dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
         android:background="@color/primary_text"
+        android:layout_margin="@dimen/layout_margin_default"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/validation_text" />
+        app:layout_constraintTop_toBottomOf="@id/barrier2" />
 
 </android.support.constraint.ConstraintLayout>

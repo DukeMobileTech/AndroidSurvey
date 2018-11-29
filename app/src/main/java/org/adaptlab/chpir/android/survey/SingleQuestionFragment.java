@@ -3,7 +3,6 @@ package org.adaptlab.chpir.android.survey;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.DividerItemDecoration;
@@ -20,11 +19,9 @@ import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.inputmethod.InputMethodManager;
@@ -123,7 +120,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         mDisplayInstructionsText = v.findViewById(R.id.displayInstructions);
         setDisplayInstructions();
         // Overridden by subclasses to place their graphical elements on the fragment.
-        ViewGroup questionComponent = (LinearLayout) v.findViewById(R.id.question_component);
+        ViewGroup questionComponent = (LinearLayout) v.findViewById(R.id.response_component);
         setChoiceSelectionInstructions(v);
         createQuestionComponent(questionComponent);
         deserialize(mResponse.getText());
