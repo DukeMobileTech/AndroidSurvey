@@ -31,53 +31,33 @@
 
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/linear_layout_for_question_index"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:orientation="vertical">
-                <!-- this expands to fill the empty space in scrollview if needed -->
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/participant_label_and_question_index"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/participant_label"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:textColor="@color/secondary_text"
+                app:layout_constraintBottom_toTopOf="@id/progress_bar"
+                app:layout_constraintEnd_toStartOf="@id/display_index_label"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/question_component_layout"
+                app:layout_constraintVertical_bias="1.0" />
+
+            <TextView
+                android:id="@+id/display_index_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/secondary_text"
                 app:layout_constraintBottom_toTopOf="@id/progress_bar"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/question_component_layout">
-
-                <TextView
-                    android:id="@+id/participant_label"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_weight="1"
-                    android:gravity="start|bottom"
-                    android:textColor="@color/secondary_text" />
-
-                <TextView
-                    android:id="@+id/display_index_label"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="10dp"
-                    android:layout_marginRight="10dp"
-                    android:layout_weight="1"
-                    android:gravity="end|bottom"
-                    android:textColor="@color/secondary_text" />
-
-            </LinearLayout>
+                app:layout_constraintStart_toEndOf="@id/participant_label"
+                app:layout_constraintTop_toBottomOf="@id/question_component_layout"
+                app:layout_constraintVertical_bias="1.0" />
 
             <ProgressBar
                 android:id="@+id/progress_bar"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />

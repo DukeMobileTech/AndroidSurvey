@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:layout_marginBottom="@dimen/layout_margin_default"
     android:focusable="true"
     android:focusableInTouchMode="true"
@@ -15,22 +16,30 @@
         android:scrollbars="vertical"
         android:textColor="@color/blue"
         android:textStyle="italic"
-        android:visibility="gone" />
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/spannedTextView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/displayInstructions" />
 
     <LinearLayout
         android:id="@+id/responseLayout1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
-        android:background="@drawable/response_component_layout"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/spannedTextView">
 
         <TextView
             android:id="@+id/optionSetInstructions"
@@ -65,9 +74,11 @@
         android:id="@+id/responseRankingLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/response_component_layout"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/responseLayout1">
 
         <TextView
             android:layout_width="match_parent"
@@ -94,7 +105,10 @@
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/responseRankingLayout">
 
     </LinearLayout>
 
@@ -102,10 +116,12 @@
         android:id="@+id/special_responses_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/response_component_layout"
         android:baselineAligned="false"
         android:orientation="horizontal"
-        android:weightSum="4">
+        android:weightSum="4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/responseLayout2">
 
         <RadioGroup
             android:id="@+id/specialResponseButtons"
@@ -142,13 +158,20 @@
         android:layout_marginRight="16dp"
         android:gravity="center_horizontal"
         android:textColor="@color/red"
-        android:visibility="gone" />
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/special_responses_container" />
 
     <View
         android:layout_width="fill_parent"
         android:layout_height="2dp"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="20dp"
-        android:background="@color/primary_text" />
+        android:background="@color/primary_text"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/validation_text" />
 
-</LinearLayout>
+</android.support.constraint.ConstraintLayout>

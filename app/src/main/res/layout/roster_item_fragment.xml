@@ -9,7 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
-        android:background="@drawable/question_text_layout"
         android:orientation="vertical">
 
         <TextView
@@ -26,7 +25,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
-        android:background="@drawable/response_component_layout"
         android:orientation="vertical"/>
 
 </LinearLayout>

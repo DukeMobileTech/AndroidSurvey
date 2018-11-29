@@ -226,6 +226,7 @@ public class DisplayFragment extends Fragment {
     }
 
     protected String checkForEmptyResponses() {
+        if (mSurveyFragment == null || mDisplay == null) return "";
         StringBuilder stringBuilder = new StringBuilder();
         for (Question question : mSurveyFragment.getQuestions(mDisplay)) {
             if (!mSurveyFragment.getQuestionsToSkipSet().contains(question.getQuestionIdentifier()) &&
