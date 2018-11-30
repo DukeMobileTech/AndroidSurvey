@@ -20,7 +20,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
@@ -50,11 +49,13 @@ import com.activeandroid.Model;
 import com.crashlytics.android.Crashlytics;
 
 import org.adaptlab.chpir.android.survey.location.LocationManager;
+import org.adaptlab.chpir.android.survey.models.ConditionSkip;
 import org.adaptlab.chpir.android.survey.models.Display;
 import org.adaptlab.chpir.android.survey.models.DisplayInstruction;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.LoopQuestion;
 import org.adaptlab.chpir.android.survey.models.MultipleSkip;
+import org.adaptlab.chpir.android.survey.models.NextQuestion;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.OptionSet;
 import org.adaptlab.chpir.android.survey.models.Question;
@@ -113,6 +114,9 @@ public class SurveyFragment extends Fragment {
     private HashMap<Long, List<Option>> mSpecialOptions;
     private HashMap<Display, List<DisplayInstruction>> mDisplayInstructions;
     private HashMap<Long, OptionSet> mOptionSets;
+    private HashMap<String, List<NextQuestion>> mNextQuestions;
+    private HashMap<String, List<ConditionSkip>> mConditionSkips;
+    private HashMap<String, List<MultipleSkip>> mMultipleSkips;
     private LinkedHashMap<String, List<String>> mExpandableListData;
     private List<String> mExpandableListTitle;
     private HashSet<String> mQuestionsToSkipSet;
@@ -413,6 +417,9 @@ public class SurveyFragment extends Fragment {
         mResponses = new HashMap<>();
         mOptions = new HashMap<>();
         mOptionSets = new HashMap<>();
+        mNextQuestions = new HashMap<>();
+        mConditionSkips = new HashMap<>();
+        mMultipleSkips = new HashMap<>();
     }
 
     private void registerCrashlytics() {
@@ -656,10 +663,6 @@ public class SurveyFragment extends Fragment {
         setParticipantLabel();
     }
 
-    private boolean isInIllegalState() {
-        return getActivity() == null || !isResumed() || !isAdded() || isRemoving();
-    }
-
     private void hideSoftInputWindow() {
         SurveyActivity activity = (SurveyActivity) getActivity();
         if (activity != null) {
@@ -786,6 +789,10 @@ public class SurveyFragment extends Fragment {
         }
     }
 
+    private boolean isInIllegalState() {
+        return getActivity() == null || !isResumed() || !isAdded() || isRemoving();
+    }
+
     private void updateQuestionsToSkipSet() {
         for (int k = mDisplayNumber; k < mDisplays.size(); k++) {
             List<Question> questions = mDisplayQuestions.get(mDisplays.get(k));
@@ -863,6 +870,14 @@ public class SurveyFragment extends Fragment {
         return mOptionSets.get(id);
     }
 
+    protected List<NextQuestion> getNextQuestions(String questionIdentifier) {
+        return mNextQuestions.get(questionIdentifier);
+    }
+
+    protected List<ConditionSkip> getConditionSkips(String questionIdentifier) {
+        return mConditionSkips.get(questionIdentifier);
+    }
+
     protected void startSurveyCompletion(Question question) {
         List<String> displayQuestions = new ArrayList<>();
         for (Question q : getQuestions(mDisplay)) {
@@ -876,32 +891,40 @@ public class SurveyFragment extends Fragment {
 
     protected void setMultipleSkipQuestions(Option selectedOption, String value, Question currentQuestion) {
         List<String> skipList = new ArrayList<>();
-        if (selectedOption != null) {
-            for (MultipleSkip questionToSkip : currentQuestion.optionMultipleSkips(selectedOption)) {
-                addToSkipList(skipList, questionToSkip);
+        List<MultipleSkip> multipleSkips = mMultipleSkips.get(currentQuestion.getQuestionIdentifier());
+        if (selectedOption != null && multipleSkips != null) {
+            for (MultipleSkip multipleSkip : multipleSkips) {
+                if (multipleSkip.getOptionIdentifier().equals(selectedOption.getIdentifier())) {
+                    addToSkipList(skipList, multipleSkip);
+                }
             }
         }
-        if (value != null) {
-            for (MultipleSkip questionToSkip : currentQuestion.integerMultipleSkips(value)) {
-                addToSkipList(skipList, questionToSkip);
+        if (value != null && multipleSkips != null) {
+            for (MultipleSkip multipleSkip : multipleSkips) {
+                if (multipleSkip.getValue().equals(value)) {
+                    addToSkipList(skipList, multipleSkip);
+                }
             }
         }
         updateQuestionsToSkipMap(currentQuestion.getQuestionIdentifier() + "/multi", skipList);
         hideQuestionsInDisplay();
     }
 
-    private void addToSkipList(List<String> skipList, MultipleSkip questionToSkip) {
-        if (questionToSkip.getSkipQuestion() != null) {
-            skipList.add(questionToSkip.getSkipQuestion().getQuestionIdentifier());
+    private void addToSkipList(List<String> skipList, MultipleSkip multipleSkip) {
+        if (multipleSkip.getSkipQuestionIdentifier() != null) {
+            skipList.add(multipleSkip.getSkipQuestionIdentifier());
         }
     }
 
     protected void setMultipleSkipQuestions2(List<Option> options, Question currentQuestion) {
         HashSet<String> skipSet = new HashSet<>();
+        List<MultipleSkip> multipleSkips = mMultipleSkips.get(currentQuestion.getQuestionIdentifier());
         for (Option option : options) {
-            for (MultipleSkip skip : currentQuestion.optionMultipleSkips(option)) {
-                if (skip.getSkipQuestion() != null) {
-                    skipSet.add(skip.getSkipQuestion().getQuestionIdentifier());
+            for (MultipleSkip multipleSkip : multipleSkips) {
+                if (multipleSkip.getOptionIdentifier().equals(option.getIdentifier())) {
+                    if (multipleSkip.getSkipQuestionIdentifier() != null) {
+                        skipSet.add(multipleSkip.getSkipQuestionIdentifier());
+                    }
                 }
             }
         }
@@ -1181,6 +1204,9 @@ public class SurveyFragment extends Fragment {
                 questions.addAll(list);
             }
             instrumentData.optionSets = ((Instrument) params[0]).optionSets(questions);
+            instrumentData.nextQuestions = ((Instrument) params[0]).nextQuestions();
+            instrumentData.conditionSkips = ((Instrument) params[0]).conditionSkips();
+            instrumentData.multipleSkips = ((Instrument) params[0]).multipleSkips();
             return instrumentData;
         }
 
@@ -1192,6 +1218,9 @@ public class SurveyFragment extends Fragment {
             mSpecialOptions = instrumentData.specialOptions;
             mDisplayInstructions = instrumentData.displayInstructions;
             mOptionSets = instrumentData.optionSets;
+            mNextQuestions = instrumentData.nextQuestions;
+            mConditionSkips = instrumentData.conditionSkips;
+            mMultipleSkips = instrumentData.multipleSkips;
             refreshView();
         }
     }
@@ -1203,6 +1232,9 @@ public class SurveyFragment extends Fragment {
         HashMap<Long, List<Option>> specialOptions;
         HashMap<Display, List<DisplayInstruction>> displayInstructions;
         HashMap<Long, OptionSet> optionSets;
+        HashMap<String, List<NextQuestion>> nextQuestions;
+        HashMap<String, List<ConditionSkip>> conditionSkips;
+        HashMap<String, List<MultipleSkip>> multipleSkips;
     }
 
     private class DisplayTitlesListAdapter extends BaseExpandableListAdapter {

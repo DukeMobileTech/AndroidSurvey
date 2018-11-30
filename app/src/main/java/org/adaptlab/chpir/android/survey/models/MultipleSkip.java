@@ -11,6 +11,8 @@ import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
+
 @Table(name = "MultipleSkips")
 public class MultipleSkip extends ReceiveModel {
     private static final String TAG = "MultipleSkip";
@@ -67,8 +69,9 @@ public class MultipleSkip extends ReceiveModel {
         return new Select().from(MultipleSkip.class).where("RemoteId = ?", id).executeSingle();
     }
 
-    public Question getSkipQuestion() {
-        return Question.findByQuestionIdentifier(mSkipQuestionIdentifier);
+    public static List<MultipleSkip> getAll(Long instrumentId) {
+        return new Select().from(MultipleSkip.class).where(
+                "RemoteInstrumentId = ? AND Deleted != ?", instrumentId, 1).execute();
     }
 
     private void setRemoteId(Long id) {
@@ -83,7 +86,7 @@ public class MultipleSkip extends ReceiveModel {
         mOptionIdentifier = id;
     }
 
-    String getOptionIdentifier() {
+    public String getOptionIdentifier() {
         return mOptionIdentifier;
     }
 
@@ -91,7 +94,7 @@ public class MultipleSkip extends ReceiveModel {
         mSkipQuestionIdentifier = id;
     }
 
-    String getSkipQuestionIdentifier() {
+    public String getSkipQuestionIdentifier() {
         return mSkipQuestionIdentifier;
     }
 
@@ -123,4 +126,7 @@ public class MultipleSkip extends ReceiveModel {
         mValue = value;
     }
 
+    public String getQuestionIdentifier() {
+        return mQuestionIdentifier;
+    }
 }

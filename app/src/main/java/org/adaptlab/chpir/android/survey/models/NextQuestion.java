@@ -10,8 +10,11 @@ import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
+
 @Table(name = "NextQuestions")
 public class NextQuestion extends ReceiveModel {
+    public static final String COMPLETE_SURVEY = "COMPLETE_SURVEY";
     private static final String TAG = "NextQuestion";
 
     @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
@@ -64,30 +67,20 @@ public class NextQuestion extends ReceiveModel {
         }
     }
 
+    public static List<NextQuestion> getAll(Long instrumentId) {
+        return new Select().from(NextQuestion.class).where(
+                "RemoteInstrumentId = ? AND Deleted != ?", instrumentId, 1).execute();
+    }
+
     public static NextQuestion findByRemoteId(Long id) {
         return new Select().from(NextQuestion.class).where("RemoteId = ?", id).executeSingle();
-    }
-
-    public static NextQuestion findByOptionAndQuestion(Option option, Question question) {
-        return new Select().from(NextQuestion.class).where("OptionIdentifier = ? AND " +
-                "QuestionIdentifier = ? AND RemoteInstrumentId = ? AND Deleted = ?",
-                option.getIdentifier(), question.getQuestionIdentifier(),
-                question.getInstrument().getRemoteId(), false)
-                .executeSingle();
-    }
-
-    public static NextQuestion findByValueAndQuestion(String value, Question question) {
-        return new Select().from(NextQuestion.class).where("Value = ? AND " +
-                        "QuestionIdentifier = ? AND RemoteInstrumentId = ? AND Deleted = ?", value,
-                question.getQuestionIdentifier(), question.getInstrument().getRemoteId(), false)
-                .executeSingle();
     }
 
     public String getNextQuestionIdentifier() {
         return mNextQuestionIdentifier;
     }
 
-    public boolean completeSurvey() {
+    private boolean completeSurvey() {
         return mCompleteSurvey;
     }
 
@@ -103,7 +96,7 @@ public class NextQuestion extends ReceiveModel {
         mOptionIdentifier = id;
     }
 
-    String getOptionIdentifier() {
+    public String getOptionIdentifier() {
         return mOptionIdentifier;
     }
 
@@ -135,7 +128,23 @@ public class NextQuestion extends ReceiveModel {
         mValue = value;
     }
 
+    public String getValue() {
+        return mValue;
+    }
+
     private void setCompleteSurvey(boolean completeSurvey) {
         mCompleteSurvey = completeSurvey;
+    }
+
+    public String getQuestionIdentifier() {
+        return mQuestionIdentifier;
+    }
+
+    public String getNextQuestionString() {
+        if (completeSurvey()) {
+            return COMPLETE_SURVEY;
+        } else {
+            return getNextQuestionIdentifier();
+        }
     }
 }

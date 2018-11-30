@@ -18,17 +18,15 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
 @Table(name = "Questions")
 public class Question extends ReceiveModel {
+    public static final String COMPLETE_SURVEY = "COMPLETE_SURVEY";
     private static final String TAG = "QuestionModel";
     private static final String FOLLOW_UP_TRIGGER_STRING = "\\[followup\\]";
     private static final String RANDOMIZATION_TRIGGER = "\\[RANDOMIZED_FACTOR\\]";
-    public static final String COMPLETE_SURVEY = "COMPLETE_SURVEY";
-
     @Column(name = "Text")
     private String mText;
     @Column(name = "QuestionType")
@@ -94,106 +92,36 @@ public class Question extends ReceiveModel {
                 .execute();
     }
 
-    public static Question findByNumberInInstrument(Integer questionNumber, Long
-            instrumentRemoteId) {
-        return new Select().from(Question.class).where("NumberInInstrument = ? AND " +
-                "InstrumentRemoteId = ? AND Deleted != ?", questionNumber, instrumentRemoteId, 1)
-                .executeSingle();
-    }
-
     public static Question findByQuestionIdentifier(String identifier) {
         if (identifier == null) return null;
         return new Select().from(Question.class).where("QuestionIdentifier = ?", identifier)
                 .executeSingle();
     }
 
+    static Question copyAttributes(Question destination, Question source) {
+        destination.mText = source.mText;
+        destination.mQuestionType = source.mQuestionType;
+        destination.mOptionCount = source.mOptionCount;
+        destination.mInstrumentVersion = source.mInstrumentVersion;
+        destination.mIdentifiesSurvey = source.mIdentifiesSurvey;
+        destination.mQuestionVersion = source.mQuestionVersion;
+        destination.mDeleted = source.mDeleted;
+        destination.mSection = source.mSection;
+        destination.mInstrumentRemoteId = source.mInstrumentRemoteId;
+        destination.mRemoteOptionSetId = source.mRemoteOptionSetId;
+        destination.mRemoteSpecialOptionSetId = source.mRemoteSpecialOptionSetId;
+        destination.mTableIdentifier = source.mTableIdentifier;
+        destination.mValidationId = source.mValidationId;
+        destination.mRankResponses = source.mRankResponses;
+        destination.mLoopQuestionCount = source.mLoopQuestionCount;
+        destination.mQuestionId = source.mQuestionId;
+        return destination;
+    }
+
     public boolean hasSingleResponse() {
         return (getQuestionType() == QuestionType.SELECT_ONE ||
                 getQuestionType() == QuestionType.SELECT_ONE_WRITE_OTHER ||
                 getQuestionType() == QuestionType.DROP_DOWN);
-    }
-
-    public static Question findByRemoteId(Long id) {
-        return new Select().from(Question.class).where("RemoteId = ?", id).executeSingle();
-    }
-
-    public String getNextQuestionIdentifier(Option option, Response response) {
-        if (!TextUtils.isEmpty(response.getText())) {
-            NextQuestion nextQuestion = NextQuestion.findByOptionAndQuestion(option, this);
-            if (nextQuestion != null) {
-                return getNextQuestionString(nextQuestion);
-            }
-            if (hasOptionConditionSkips(option)) {
-                String skipTo = null;
-                for (ConditionSkip conditionSkip : optionConditionSkips(option)) {
-                    String conditionSkipNextQuestion = conditionSkip.regularSkipTo(response);
-                    if (conditionSkipNextQuestion != null) {
-                        skipTo = conditionSkipNextQuestion;
-                        break;
-                    }
-                }
-                if (skipTo != null) return skipTo;
-            }
-        }
-        if (!TextUtils.isEmpty(response.getSpecialResponse())) {
-            NextQuestion nextQuestion = NextQuestion.findByOptionAndQuestion(option, this);
-            if (nextQuestion != null) {
-                return getNextQuestionString(nextQuestion);
-            }
-            if (hasOptionConditionSkips(option)) {
-                String skipTo = null;
-                for (ConditionSkip conditionSkip : optionConditionSkips(option)) {
-                    String conditionSkipNextQuestion = conditionSkip.specialSkipTo(response);
-                    if (conditionSkipNextQuestion != null) {
-                        skipTo = conditionSkipNextQuestion;
-                        break;
-                    }
-                }
-                if (skipTo != null) return skipTo;
-            }
-        }
-        return null;
-    }
-
-    private String getNextQuestionString(NextQuestion nextQuestion) {
-        if (nextQuestion.completeSurvey()) {
-            return COMPLETE_SURVEY;
-        } else {
-            return nextQuestion.getNextQuestionIdentifier();
-        }
-    }
-
-    public String getNextQuestionIdentifier(String value) {
-        if (TextUtils.isEmpty(value)) return null;
-        NextQuestion nextQuestion = NextQuestion.findByValueAndQuestion(value, this);
-        if (nextQuestion != null) {
-            return getNextQuestionString(nextQuestion);
-        }
-        return null;
-    }
-
-    public String getNextQuestionIdentifier(List<Option> options) {
-        HashSet<String> nextQuestions = new HashSet<>();
-        for (Option option : options) {
-            NextQuestion nextQuestion = NextQuestion.findByOptionAndQuestion(option, this);
-            if (nextQuestion != null && !TextUtils.isEmpty(nextQuestion.getNextQuestionIdentifier())) {
-                nextQuestions.add(nextQuestion.getNextQuestionIdentifier());
-            }
-        }
-        if (nextQuestions.size() == 1) {
-            return nextQuestions.iterator().next();
-        } else {
-            return null;
-        }
-    }
-
-    static boolean validQuestionType(String questionType) {
-        for (QuestionType type : QuestionType.values()) {
-            if (type.name().equals(questionType)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public QuestionType getQuestionType() {
@@ -221,31 +149,6 @@ public class Question extends ReceiveModel {
                 .execute();
     }
 
-    public List<MultipleSkip> optionMultipleSkips(Option option) {
-        return new Select().from(MultipleSkip.class)
-                .where("OptionIdentifier = ? AND QuestionIdentifier = ? AND " +
-                                "RemoteInstrumentId = ? AND Deleted = ?",
-                        option.getIdentifier(), getQuestionIdentifier(),
-                        getInstrument().getRemoteId(), false)
-                .execute();
-    }
-
-    public List<MultipleSkip> integerMultipleSkips(String value) {
-        return new Select().from(MultipleSkip.class)
-                .where("Value = ? AND QuestionIdentifier = ? AND " +
-                                "RemoteInstrumentId = ? AND Deleted = ?", value,
-                        getQuestionIdentifier(), getInstrument().getRemoteId(), false)
-                .execute();
-    }
-
-//    public boolean hasCompleteSurveyOption() {
-//        Option completeSurveyOption = new Select().from(Option.class)
-//                .where("Question = ? AND Deleted != ? AND Special = ? AND CompleteSurvey = ?",
-//                        getId(), 1, 0, 1)
-//                .executeSingle();
-//        return completeSurveyOption != null;
-//    }
-
     public String getQuestionIdentifier() {
         return mQuestionIdentifier;
     }
@@ -254,19 +157,46 @@ public class Question extends ReceiveModel {
         mQuestionIdentifier = questionIdentifier;
     }
 
+    public Instrument getInstrument() {
+        return Instrument.findByRemoteId(getInstrumentRemoteId());
+    }
+
+    private Long getInstrumentRemoteId() {
+        return mInstrumentRemoteId;
+    }
+
+    public void setInstrumentRemoteId(Long instrumentId) {
+        mInstrumentRemoteId = instrumentId;
+    }
+
     public boolean hasRegularOptionSkips(Instrument instrument) {
         return (nextQuestions(instrument).size() > 0);
+    }
+
+    List<NextQuestion> nextQuestions(Instrument instrument) {
+        return new Select().from(NextQuestion.class)
+                .where("QuestionIdentifier = ? AND RemoteInstrumentId = ? AND Deleted = ?",
+                        getQuestionIdentifier(), instrument.getRemoteId(), 0)
+                .execute();
     }
 
     public boolean hasExclusiveOption() {
         return exclusiveOptions().size() > 0;
     }
 
-    public List<OptionInOptionSet> exclusiveOptions() {
+    List<OptionInOptionSet> exclusiveOptions() {
         return new Select().from(OptionInOptionSet.class)
                 .where("RemoteOptionSetId = ? AND Deleted = ? AND IsExclusive = ?",
                         getRemoteOptionSetId(), false, true)
                 .execute();
+    }
+
+    public Long getRemoteOptionSetId() {
+        return mRemoteOptionSetId;
+    }
+
+    private void setRemoteOptionSetId(Long id) {
+        mRemoteOptionSetId = id;
     }
 
     /*
@@ -385,28 +315,10 @@ public class Question extends ReceiveModel {
                 .orderBy("Position ASC").execute();
     }
 
-    public Instrument getInstrument() {
-        return Instrument.findByRemoteId(getInstrumentRemoteId());
-    }
-
-    private QuestionTranslation activeTranslation() {
-        if (getInstrument().activeTranslation() == null) return null;
-        return new Select().from(QuestionTranslation.class)
-                .where("InstrumentTranslation = ? AND Question = ?",
-                        getInstrument().activeTranslation().getId(), getId()).executeSingle();
-    }
-
     public List<QuestionTranslation> translations() {
-        if (mQuestionId == null) return new ArrayList<>(); // TODO: 11/7/18 Placeholder that needs fixing
+        if (mQuestionId == null)
+            return new ArrayList<>(); // TODO: 11/7/18 Placeholder that needs fixing
         return new Select().from(QuestionTranslation.class).where("QuestionId = ?", mQuestionId).execute();
-    }
-
-    private Long getInstrumentRemoteId() {
-        return mInstrumentRemoteId;
-    }
-
-    public void setInstrumentRemoteId(Long instrumentId) {
-        mInstrumentRemoteId = instrumentId;
     }
 
     /*
@@ -466,34 +378,17 @@ public class Question extends ReceiveModel {
      * numbers of the question components match the expected instrument version
      * number.
      */
-    public boolean loaded() {
+    boolean loaded() {
         return true;
 //        return getOptionCount() == optionCount() && getImageCount() == imageCount();
-    }
-
-    private int getImageCount() {
-        return mImageCount;
     }
 
     private void setImageCount(int count) {
         mImageCount = count;
     }
 
-    public int imageCount() {
-        return new Select().from(Image.class).where("Question = ?", getId()).count();
-    }
-
-    private int getOptionCount() {
-        return mOptionCount;
-    }
-
     private void setOptionCount(int num) {
         mOptionCount = num;
-    }
-
-    public int optionCount() {
-        return new Select().from(Option.class).where("Question = ? AND Deleted != ?",
-                getId(), 1).count();
     }
 
     @Override
@@ -570,7 +465,9 @@ public class Question extends ReceiveModel {
                         loopQuestion.setParent(loopJSON.optString("parent"));
                         loopQuestion.setLooped(loopJSON.optString("looped"));
                         String indices = loopJSON.getString("option_indices");
-                        if (indices.equals("null")) { indices = null; }
+                        if (indices.equals("null")) {
+                            indices = null;
+                        }
                         loopQuestion.setOptionIndices(indices);
                         if (loopJSON.isNull("deleted_at")) {
                             loopQuestion.setDeleted(false);
@@ -587,36 +484,57 @@ public class Question extends ReceiveModel {
         }
     }
 
-    private void setQuestionId(long id) {
-        mQuestionId = id;
+    public static Question findByRemoteId(Long id) {
+        return new Select().from(Question.class).where("RemoteId = ?", id).executeSingle();
+    }
+
+    private void setInstrumentVersion(int version) {
+        mInstrumentVersion = version;
     }
 
     private void setIdentifiesSurvey(boolean identifiesSurvey) {
         mIdentifiesSurvey = identifiesSurvey;
     }
 
+    void setInstruction(Long id) {
+        mInstructionId = id;
+    }
+
     private void setDeleted(boolean deleted) {
         mDeleted = deleted;
+    }
+
+    private void setCritical(boolean critical) {
+        mCritical = critical;
     }
 
     private void setValidationId(Long validationId) {
         mValidationId = validationId;
     }
 
-    /*
-     * Find an existing translation, or return a new QuestionTranslation
-     * if a translation does not yet exist.
-     */
-    public QuestionTranslation getTranslationByLanguage(String language) {
-        for (QuestionTranslation translation : translations()) {
-            if (translation.getLanguage().equals(language)) {
-                return translation;
+    private void setRankResponses(boolean rankResponses) {
+        mRankResponses = rankResponses;
+    }
+
+    private void setQuestionId(long id) {
+        mQuestionId = id;
+    }
+
+    public int getLoopQuestionCount() {
+        return mLoopQuestionCount;
+    }
+
+    static boolean validQuestionType(String questionType) {
+        for (QuestionType type : QuestionType.values()) {
+            if (type.name().equals(questionType)) {
+                return true;
             }
         }
+        return false;
+    }
 
-        QuestionTranslation translation = new QuestionTranslation();
-        translation.setLanguage(language);
-        return translation;
+    private void setLoopQuestionCount(int count) {
+        mLoopQuestionCount = count;
     }
 
     public boolean isFollowUpQuestion() {
@@ -631,14 +549,6 @@ public class Question extends ReceiveModel {
                 .execute();
     }
 
-    public List<Question> questionsToSkip() {
-        List<Question> toBeSkipped = new ArrayList<Question>();
-        for (Option option : options()) {
-            toBeSkipped.addAll(option.questionsToSkip());
-        }
-        return toBeSkipped;
-    }
-
     public List<Option> options() {
         return new Select("Options.*").distinct().from(Option.class)
                 .innerJoin(OptionInOptionSet.class)
@@ -649,22 +559,7 @@ public class Question extends ReceiveModel {
                 .execute();
     }
 
-    public Long getRemoteOptionSetId() {
-        return mRemoteOptionSetId;
-    }
-
-//    public Option anyResponseOption() {
-//        return new Select().from(Option.class)
-//                .where("Question = ? AND Deleted != ? AND Special = ? AND Text = ?",
-//                        getId(), 1, 1, Option.ANY_RESPONSE)
-//                .executeSingle();
-//    }
-
-    private void setRemoteOptionSetId(Long id) {
-        mRemoteOptionSetId = id;
-    }
-
-    public boolean hasOptions() {
+    boolean hasOptions() {
         return !defaultOptions().isEmpty();
     }
 
@@ -678,11 +573,12 @@ public class Question extends ReceiveModel {
                 .execute();
     }
 
-    List<NextQuestion> nextQuestions(Instrument instrument) {
-        return new Select().from(NextQuestion.class)
-                .where("QuestionIdentifier = ? AND RemoteInstrumentId = ? AND Deleted = ?",
-                        getQuestionIdentifier(), instrument.getRemoteId(), 0)
-                .execute();
+    public boolean hasSpecialOptionSkips(Instrument instrument) {
+        return hasSpecialOptions() && (specialOptionSkips(instrument).size() > 0);
+    }
+
+    public boolean hasSpecialOptions() {
+        return (mRemoteSpecialOptionSetId > 0);
     }
 
     private List<NextQuestion> specialOptionSkips(Instrument instrument) {
@@ -696,12 +592,13 @@ public class Question extends ReceiveModel {
                 .execute();
     }
 
-    public boolean hasSpecialOptionSkips(Instrument instrument) {
-        return hasSpecialOptions() && (specialOptionSkips(instrument).size() > 0);
-    }
-
-    public boolean hasSpecialOptions() {
-        return (mRemoteSpecialOptionSetId > 0);
+    Option specialOptionByText(String optionText) {
+        for (Option option : specialOptions()) {
+            if (option.getIdentifier().equals(optionText)) {
+                return option;
+            }
+        }
+        return null;
     }
 
     public List<Option> specialOptions() {
@@ -711,28 +608,6 @@ public class Question extends ReceiveModel {
                 .where("Options.Deleted != 1 AND OptionInOptionSets.Special = 1 AND " +
                         "OptionInOptionSets.RemoteOptionId = Options.RemoteId")
                 .orderBy("OptionInOptionSets.NumberInQuestion ASC")
-                .execute();
-    }
-
-    public Option specialOptionByText(String optionText) {
-        for (Option option : specialOptions()) {
-            if (option.getIdentifier().equals(optionText)) {
-                return option;
-            }
-        }
-        return null;
-    }
-
-    private boolean hasOptionConditionSkips(Option option) {
-        return optionConditionSkips(option).size() > 0;
-    }
-
-    public List<ConditionSkip> optionConditionSkips(Option option) {
-        return new Select().from(ConditionSkip.class)
-                .where("QuestionIdentifier = ? AND RemoteInstrumentId = ? AND " +
-                                "OptionIdentifier = ? AND Deleted = ?",
-                        getQuestionIdentifier(), getInstrument().getRemoteId(),
-                        option.getIdentifier(), false)
                 .execute();
     }
 
@@ -766,19 +641,11 @@ public class Question extends ReceiveModel {
         mRemoteId = id;
     }
 
-    public int getInstrumentVersion() {
-        return mInstrumentVersion;
-    }
-
-    private void setInstrumentVersion(int version) {
-        mInstrumentVersion = version;
-    }
-
     public int getNumberInInstrument() {
         return mNumberInInstrument;
     }
 
-    public void setNumberInInstrument(int number) {
+    void setNumberInInstrument(int number) {
         mNumberInInstrument = number;
     }
 
@@ -793,10 +660,6 @@ public class Question extends ReceiveModel {
         return instruction.getText(getInstrument());
     }
 
-    void setInstruction(Long id) {
-        mInstructionId = id;
-    }
-
     public int getQuestionVersion() {
         return mQuestionVersion;
     }
@@ -805,28 +668,8 @@ public class Question extends ReceiveModel {
         mQuestionVersion = version;
     }
 
-    public boolean firstInGrid() {
-        return belongsToGrid() && getNumberInGrid() == 1;
-    }
-
-    private boolean belongsToGrid() {
-        return getGrid() != null;
-    }
-
-    private int getNumberInGrid() {
-        return mNumberInGrid;
-    }
-
-    private void setNumberInGrid(int num) {
-        mNumberInGrid = num;
-    }
-
     public Grid getGrid() {
         return mGrid;
-    }
-
-    private void setGrid(Grid grid) {
-        mGrid = grid;
     }
 
     public Section getSection() {
@@ -835,18 +678,6 @@ public class Question extends ReceiveModel {
 
     public void setSection(Section section) {
         mSection = section;
-    }
-
-    public boolean isLastQuestion() {
-        return (this == getInstrument().questions().get(getInstrument().getQuestionCount() - 1));
-    }
-
-    public boolean getCritical() {
-        return mCritical;
-    }
-
-    private void setCritical(boolean critical) {
-        mCritical = critical;
     }
 
     public boolean hasRandomizedFactors() {
@@ -899,35 +730,19 @@ public class Question extends ReceiveModel {
     public boolean isMultipleResponseLoop() {
         QuestionType type = getQuestionType();
         return (type == QuestionType.SELECT_MULTIPLE || type == QuestionType.SELECT_MULTIPLE_WRITE_OTHER ||
-        type == QuestionType.LIST_OF_INTEGER_BOXES || type == QuestionType.LIST_OF_TEXT_BOXES);
+                type == QuestionType.LIST_OF_INTEGER_BOXES || type == QuestionType.LIST_OF_TEXT_BOXES);
     }
 
     public boolean rankResponses() {
         return mRankResponses;
     }
 
-    private void setRankResponses(boolean rankResponses) {
-        mRankResponses = rankResponses;
-    }
-
-    public int getLoopQuestionCount() {
-        return mLoopQuestionCount;
-    }
-
-    private void setLoopQuestionCount(int count) {
-        mLoopQuestionCount = count;
-    }
-
-    public String getLoopSource() {
+    String getLoopSource() {
         return mLoopSource;
     }
 
     void setLoopSource(String source) {
         mLoopSource = source;
-    }
-
-    int getLoopNumber() {
-        return mLoopNumber;
     }
 
     void setLoopNumber(int number) {
@@ -937,26 +752,6 @@ public class Question extends ReceiveModel {
     public List<LoopQuestion> loopQuestions() {
         return new Select().from(LoopQuestion.class).where("Question = ? AND Deleted = 0",
                 getId()).execute();
-    }
-
-    static Question copyAttributes(Question destination, Question source) {
-        destination.mText = source.mText;
-        destination.mQuestionType = source.mQuestionType;
-        destination.mOptionCount = source.mOptionCount;
-        destination.mInstrumentVersion = source.mInstrumentVersion;
-        destination.mIdentifiesSurvey = source.mIdentifiesSurvey;
-        destination.mQuestionVersion = source.mQuestionVersion;
-        destination.mDeleted = source.mDeleted;
-        destination.mSection = source.mSection;
-        destination.mInstrumentRemoteId = source.mInstrumentRemoteId;
-        destination.mRemoteOptionSetId = source.mRemoteOptionSetId;
-        destination.mRemoteSpecialOptionSetId = source.mRemoteSpecialOptionSetId;
-        destination.mTableIdentifier = source.mTableIdentifier;
-        destination.mValidationId = source.mValidationId;
-        destination.mRankResponses = source.mRankResponses;
-        destination.mLoopQuestionCount = source.mLoopQuestionCount;
-        destination.mQuestionId = source.mQuestionId;
-        return destination;
     }
 
     public enum QuestionType {

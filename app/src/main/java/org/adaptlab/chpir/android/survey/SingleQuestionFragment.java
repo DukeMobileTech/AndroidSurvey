@@ -19,6 +19,7 @@ import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,9 +35,11 @@ import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
 
+import org.adaptlab.chpir.android.survey.models.ConditionSkip;
 import org.adaptlab.chpir.android.survey.models.Display;
 import org.adaptlab.chpir.android.survey.models.DisplayInstruction;
 import org.adaptlab.chpir.android.survey.models.Instrument;
+import org.adaptlab.chpir.android.survey.models.NextQuestion;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.OptionSet;
 import org.adaptlab.chpir.android.survey.models.Question;
@@ -52,6 +55,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -135,20 +139,20 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         return v;
     }
 
-    private void setResponseRanking(View view) {
-        if (getQuestion().rankResponses() && getSelectedOptions().size() > 1) {
-            mRankLayout = view.findViewById(R.id.responseRankingLayout);
-            mRankLayout.setVisibility(View.VISIBLE);
-            RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
-            mOptionsAdapter = new OptionsAdapter(getSelectedOptions());
-            recyclerView.setAdapter(mOptionsAdapter);
-            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-            DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
-                    recyclerView.getContext(), DividerItemDecoration.VERTICAL);
-            recyclerView.addItemDecoration(dividerItemDecoration);
-            ItemTouchHelperExtension.Callback callback = new ItemTouchHelperCallback();
-            ItemTouchHelperExtension itemTouchHelper = new ItemTouchHelperExtension(callback);
-            itemTouchHelper.attachToRecyclerView(recyclerView);
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mInstrument != null) {
+            outState.putLong(EXTRA_INSTRUMENT_ID, mInstrument.getId());
+        }
+        if (mSurvey != null) {
+            outState.putLong(EXTRA_SURVEY_ID, mSurvey.getId());
+        }
+        if (mQuestion != null) {
+            outState.putLong(EXTRA_QUESTION_ID, mQuestion.getId());
+        }
+        if (mResponse != null) {
+            outState.putLong(EXTRA_RESPONSE_ID, mResponse.getId());
         }
     }
 
@@ -205,6 +209,31 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         return options;
     }
 
+    private void setResponseRanking(View view) {
+        if (getQuestion().rankResponses() && getSelectedOptions().size() > 1) {
+            mRankLayout = view.findViewById(R.id.responseRankingLayout);
+            mRankLayout.setVisibility(View.VISIBLE);
+            RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
+            mOptionsAdapter = new OptionsAdapter(getSelectedOptions());
+            recyclerView.setAdapter(mOptionsAdapter);
+            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
+                    recyclerView.getContext(), DividerItemDecoration.VERTICAL);
+            recyclerView.addItemDecoration(dividerItemDecoration);
+            ItemTouchHelperExtension.Callback callback = new ItemTouchHelperCallback();
+            ItemTouchHelperExtension itemTouchHelper = new ItemTouchHelperExtension(callback);
+            itemTouchHelper.attachToRecyclerView(recyclerView);
+        }
+    }
+
+    public List<Option> getOptions() {
+        return mOptions;
+    }
+
+    public Question getQuestion() {
+        return mQuestion;
+    }
+
     private void setSpecialResponseUI(View v) {
         if (!mQuestion.getDisplay().getMode().equals(Display.DisplayMode.TABLE.toString())) {
             mSpecialResponses = v.findViewById(R.id.specialResponseButtons);
@@ -250,23 +279,6 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
                 setResponse(Response.BLANK);
             }
         });
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (mInstrument != null) {
-            outState.putLong(EXTRA_INSTRUMENT_ID, mInstrument.getId());
-        }
-        if (mSurvey != null) {
-            outState.putLong(EXTRA_SURVEY_ID, mSurvey.getId());
-        }
-        if (mQuestion != null) {
-            outState.putLong(EXTRA_QUESTION_ID, mQuestion.getId());
-        }
-        if (mResponse != null) {
-            outState.putLong(EXTRA_RESPONSE_ID, mResponse.getId());
-        }
     }
 
     protected void setDisplayInstructions() {
@@ -316,10 +328,6 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         }
     }
 
-    private boolean isComponentNull() {
-        return mSurvey == null || mQuestion == null || mInstrument == null || mResponse == null;
-    }
-
     public void init() {
         Bundle bundle = this.getArguments();
         String questionIdentifier = "";
@@ -338,6 +346,10 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         refreshFollowUpQuestion();
     }
 
+    private boolean isComponentNull() {
+        return mSurvey == null || mQuestion == null || mInstrument == null || mResponse == null;
+    }
+
     private Response loadOrCreateResponse() {
         Response response = mSurveyFragment.getResponses().get(mQuestion);
         if (response == null) {
@@ -350,6 +362,19 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         }
         return response;
     }
+
+    /*
+     * If this question is a follow up question, then attempt
+     * to get the response to the question that is being followed up on.
+     *
+     * If the question being followed up on was skipped by the user,
+     * then return false. This gives the calling function an opportunity
+     * to handle this accordingly.  Likely this will involve skipping
+     * the question that is a follow up question.
+     *
+     * If this question is not a following up question, then just
+     * set the text as normal.
+     */
 
     private void refreshFollowUpQuestion() {
         if (mQuestion.isToFollowUpOnQuestion()) {
@@ -366,24 +391,13 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         return instructions.toString();
     }
 
-    /*
-     * If this question is a follow up question, then attempt
-     * to get the response to the question that is being followed up on.
-     *
-     * If the question being followed up on was skipped by the user,
-     * then return false. This gives the calling function an opportunity
-     * to handle this accordingly.  Likely this will involve skipping
-     * the question that is a follow up question.
-     *
-     * If this question is not a following up question, then just
-     * set the text as normal.
-     */
-
     protected Spanned getQuestionText() {
         String text = "";
         if (mQuestion.isFollowUpQuestion()) {
             String followUpText = mQuestion.getFollowingUpText(mSurveyFragment.getResponses(), getActivity());
-            if (followUpText != null) { text = followUpText; }
+            if (followUpText != null) {
+                text = followUpText;
+            }
         } else if (mQuestion.hasRandomizedFactors()) {
             text = mQuestion.getRandomizedText(mSurveyFragment.getResponses().get(mQuestion));
         } else {
@@ -403,72 +417,6 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         }
     }
 
-    private void setSkipPatterns() {
-        Option selectedOption = null;
-        String nextQuestion = null;
-        String enteredValue = null;
-        List<Option> selectedOptions = new ArrayList<>();
-        if (!TextUtils.isEmpty(mResponse.getText())) {
-            if (mQuestion.hasSingleResponse()) {
-                selectedOption = getSelectedOption(mResponse.getText());
-            } else if (mQuestion.getQuestionType().equals(Question.QuestionType.INTEGER)) {
-                enteredValue = mResponse.getText();
-            } else if (mQuestion.hasMultipleResponses()) {
-                String[] responses = mResponse.getText().split(Response.LIST_DELIMITER);
-                if (responses.length == 1) {
-                    selectedOption = getSelectedOption(responses[0]);
-                } else {
-                    for (String response : responses) {
-                        Option option = getSelectedOption(response);
-                        if (option != null) selectedOptions.add(option);
-                    }
-                }
-            }
-        }
-        if (!TextUtils.isEmpty(mResponse.getSpecialResponse())) {
-            selectedOption = Option.findByQuestionAndSpecialResponse(mQuestion,
-                    mResponse.getSpecialResponse());
-        }
-        if (selectedOption == null && enteredValue == null && selectedOptions.isEmpty()) {
-            showAllSubsequentQuestions();
-        } else if (selectedOption != null && enteredValue == null && selectedOptions.isEmpty()) {
-            nextQuestion = mQuestion.getNextQuestionIdentifier(selectedOption, mResponse);
-        } else if (selectedOption == null && enteredValue != null && selectedOptions.isEmpty()) {
-            nextQuestion = mQuestion.getNextQuestionIdentifier(enteredValue);
-        } else if (!selectedOptions.isEmpty()) {
-            nextQuestion = mQuestion.getNextQuestionIdentifier(selectedOptions);
-        }
-        if (nextQuestion == null) {
-            showAllSubsequentQuestions();
-        } else {
-            if (nextQuestion.equals(Question.COMPLETE_SURVEY)) {
-                mSurveyFragment.startSurveyCompletion(mQuestion);
-            } else {
-                mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(),
-                        nextQuestion, mQuestion.getQuestionIdentifier());
-            }
-        }
-        if ((selectedOption != null || enteredValue != null) && mQuestion.isMultipleSkipQuestion(mInstrument)) {
-            mSurveyFragment.setMultipleSkipQuestions(selectedOption, enteredValue, mQuestion);
-        } else if (!selectedOptions.isEmpty() && mQuestion.isMultipleSkipQuestion(mInstrument)) {
-            mSurveyFragment.setMultipleSkipQuestions2(selectedOptions, mQuestion);
-        }
-    }
-
-    private Option getSelectedOption(String responseText) {
-        int responseIndex = Integer.parseInt(responseText);
-        if (responseIndex < mQuestion.defaultOptions().size()) {
-            return mQuestion.defaultOptions().get(responseIndex);
-        } else {
-            return null;
-        }
-    }
-
-    private void showAllSubsequentQuestions() {
-        mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(),
-                mQuestion.getQuestionIdentifier(), mQuestion.getQuestionIdentifier());
-    }
-
     protected Instrument getInstrument() {
         return mInstrument;
     }
@@ -483,96 +431,12 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         }
     }
 
-    public Question getQuestion() {
-        return mQuestion;
-    }
-
-    /*
-     * This will remove the focus of the input as the survey is
-     * traversed.  If this is not called, then it will be possible
-     * for someone to change the answer to a question that they are
-     * not currently viewing.
-     */
-    private void removeTextFocus() {
-        if (getActivity() == null) return;
-        InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(
-                Context.INPUT_METHOD_SERVICE);
-        if (inputManager != null && getActivity().getCurrentFocus() != null) {
-            mFragmentView.requestFocus();
-            inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
-                    InputMethodManager.HIDE_NOT_ALWAYS);
-        }
-    }
-
-    private void animateValidationTextView(boolean valid) {
-        Animation animation = new AlphaAnimation(0, 0);
-        if (valid) {
-            if (mValidationTextView.getVisibility() == TextView.VISIBLE)
-                animation = new AlphaAnimation(1, 0);
-            mValidationTextView.setVisibility(TextView.GONE);
-        } else {
-            animation = new AlphaAnimation(0, 1);
-            mValidationTextView.setVisibility(TextView.VISIBLE);
-            if (mQuestion.getValidation() != null) {
-                mValidationTextView.setText(styleTextWithHtml(mQuestion.getValidation()
-                        .getValidationMessage(mInstrument)));
-            } else {
-                mValidationTextView.setText(styleTextWithHtml(
-                        getString(R.string.not_valid_response)));
-            }
-        }
-
-        animation.setDuration(1000);
-        if (mValidationTextView.getAnimation() == null ||
-                mValidationTextView.getAnimation().hasEnded() ||
-                !mValidationTextView.getAnimation().hasStarted()) {
-            // Only animate if not currently animating
-            mValidationTextView.setAnimation(animation);
-        }
-    }
-
     protected SurveyFragment getSurveyFragment() {
         return mSurveyFragment;
     }
 
-    public List<Option> getOptions() {
-        return mOptions;
-    }
-
     protected Survey getSurvey() {
         return mSurvey;
-    }
-
-    public Response getResponse() {
-        return mResponse;
-    }
-
-    protected void setResponse(String specialResponse) {
-        if (deserialization) return;
-        if (specialResponse == null) {
-            // Set responseText
-            mResponse.setResponse(serialize());
-            mResponse.setSpecialResponse(Response.BLANK);
-            validateResponse();
-            if (!mQuestion.isTextEntryQuestionType()) {
-                removeTextFocus();
-            }
-        } else {
-            // Set specialResponse
-            mResponse.setSpecialResponse(specialResponse);
-            mResponse.setResponse(Response.BLANK);
-            deserialize(mResponse.getText());
-            removeTextFocus();
-            animateValidationTextView(true);
-        }
-        mResponse.setTimeEnded(new Date());
-        mResponse.setDeviceUser(AuthUtils.getCurrentUser());
-        mResponse.setQuestionVersion(mQuestion.getQuestionVersion());
-        mSurvey.setLastUpdated(new Date());
-        saveResponseInBackground(mResponse);
-        setSkipPatterns();
-        refreshFollowUpQuestion();
-        setLoopQuestions(mQuestion, mResponse);
     }
 
     protected ResponsePhoto getResponsePhoto() {
@@ -591,6 +455,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         otherText.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         otherText.addTextChangedListener(new TextWatcher() {
             private Timer timer;
+
             // Required by interface
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -642,10 +507,252 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         }
     }
 
+    /*
+     * This will remove the focus of the input as the survey is
+     * traversed.  If this is not called, then it will be possible
+     * for someone to change the answer to a question that they are
+     * not currently viewing.
+     */
+    private void removeTextFocus() {
+        if (getActivity() == null) return;
+        InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(
+                Context.INPUT_METHOD_SERVICE);
+        if (inputManager != null && getActivity().getCurrentFocus() != null) {
+            mFragmentView.requestFocus();
+            inputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+    }
+
+    private void animateValidationTextView(boolean valid) {
+        Animation animation = new AlphaAnimation(0, 0);
+        if (valid) {
+            if (mValidationTextView.getVisibility() == TextView.VISIBLE)
+                animation = new AlphaAnimation(1, 0);
+            mValidationTextView.setVisibility(TextView.GONE);
+        } else {
+            animation = new AlphaAnimation(0, 1);
+            mValidationTextView.setVisibility(TextView.VISIBLE);
+            if (mQuestion.getValidation() != null) {
+                mValidationTextView.setText(styleTextWithHtml(mQuestion.getValidation()
+                        .getValidationMessage(mInstrument)));
+            } else {
+                mValidationTextView.setText(styleTextWithHtml(
+                        getString(R.string.not_valid_response)));
+            }
+        }
+
+        animation.setDuration(1000);
+        if (mValidationTextView.getAnimation() == null ||
+                mValidationTextView.getAnimation().hasEnded() ||
+                !mValidationTextView.getAnimation().hasStarted()) {
+            // Only animate if not currently animating
+            mValidationTextView.setAnimation(animation);
+        }
+    }
+
+    private void setSkipPatterns() {
+        Option selectedOption = null;
+        String nextQuestion = null;
+        String enteredValue = null;
+        List<Option> selectedOptions = new ArrayList<>();
+        if (!TextUtils.isEmpty(mResponse.getText())) {
+            if (mQuestion.hasSingleResponse()) {
+                selectedOption = getSelectedOption(mResponse.getText());
+            } else if (mQuestion.getQuestionType().equals(Question.QuestionType.INTEGER)) {
+                enteredValue = mResponse.getText();
+            } else if (mQuestion.hasMultipleResponses()) {
+                String[] responses = mResponse.getText().split(Response.LIST_DELIMITER);
+                if (responses.length == 1) {
+                    selectedOption = getSelectedOption(responses[0]);
+                } else {
+                    for (String response : responses) {
+                        Option option = getSelectedOption(response);
+                        if (option != null) selectedOptions.add(option);
+                    }
+                }
+            }
+        }
+        if (!TextUtils.isEmpty(mResponse.getSpecialResponse())) {
+            for (Option option : mSpecialOptions) {
+                if (option.getNonTranslatedText().equals(mResponse.getSpecialResponse())) {
+                    selectedOption = option;
+                    break;
+                }
+            }
+        }
+        if (selectedOption == null && enteredValue == null && selectedOptions.isEmpty()) {
+            showAllSubsequentQuestions();
+        } else if (selectedOption != null && enteredValue == null && selectedOptions.isEmpty()) {
+            nextQuestion = getNextQuestionIdentifier(selectedOption, mResponse);
+        } else if (selectedOption == null && enteredValue != null && selectedOptions.isEmpty()) {
+            nextQuestion = getNextQuestionIdentifier(enteredValue);
+        } else if (!selectedOptions.isEmpty()) {
+            nextQuestion = getNextQuestionIdentifier(selectedOptions);
+        }
+        if (nextQuestion == null) {
+            showAllSubsequentQuestions();
+        } else {
+            if (nextQuestion.equals(Question.COMPLETE_SURVEY)) {
+                mSurveyFragment.startSurveyCompletion(mQuestion);
+            } else {
+                mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(),
+                        nextQuestion, mQuestion.getQuestionIdentifier());
+            }
+        }
+        if ((selectedOption != null || enteredValue != null) && mQuestion.isMultipleSkipQuestion(mInstrument)) {
+            mSurveyFragment.setMultipleSkipQuestions(selectedOption, enteredValue, mQuestion);
+        } else if (!selectedOptions.isEmpty() && mQuestion.isMultipleSkipQuestion(mInstrument)) {
+            mSurveyFragment.setMultipleSkipQuestions2(selectedOptions, mQuestion);
+        }
+    }
+
+    private Option getSelectedOption(String responseText) {
+        int responseIndex = Integer.parseInt(responseText);
+        if (responseIndex < mOptions.size()) {
+            return mOptions.get(responseIndex);
+        } else {
+            return null;
+        }
+    }
+
+    private void showAllSubsequentQuestions() {
+        mSurveyFragment.setNextQuestion(mQuestion.getQuestionIdentifier(),
+                mQuestion.getQuestionIdentifier(), mQuestion.getQuestionIdentifier());
+    }
+
+    private String getNextQuestionIdentifier(Option option, Response response) {
+        if (!TextUtils.isEmpty(response.getText())) {
+            NextQuestion nextQuestion = getNextQuestionForOption(option);
+            if (nextQuestion != null) {
+                return nextQuestion.getNextQuestionString();
+            }
+            List<ConditionSkip> conditionSkipList = optionConditionSkips(option);
+            if (conditionSkipList.size() > 0) {
+                String skipTo = null;
+                for (ConditionSkip conditionSkip : conditionSkipList) {
+                    String conditionSkipNextQuestion = conditionSkip.regularSkipTo(response);
+                    if (conditionSkipNextQuestion != null) {
+                        skipTo = conditionSkipNextQuestion;
+                        break;
+                    }
+                }
+                if (skipTo != null) return skipTo;
+            }
+        }
+        if (!TextUtils.isEmpty(response.getSpecialResponse())) {
+            NextQuestion nextQuestion = getNextQuestionForOption(option);
+            if (nextQuestion != null) {
+                return nextQuestion.getNextQuestionString();
+            }
+            List<ConditionSkip> conditionSkipList = optionConditionSkips(option);
+            if (conditionSkipList.size() > 0) {
+                String skipTo = null;
+                for (ConditionSkip conditionSkip : conditionSkipList) {
+                    String conditionSkipNextQuestion = conditionSkip.specialSkipTo(response);
+                    if (conditionSkipNextQuestion != null) {
+                        skipTo = conditionSkipNextQuestion;
+                        break;
+                    }
+                }
+                if (skipTo != null) return skipTo;
+            }
+        }
+        return null;
+    }
+
+    private String getNextQuestionIdentifier(String value) {
+        if (TextUtils.isEmpty(value)) return null;
+        NextQuestion nextQuestion = getNextQuestionForValue(value);
+        if (nextQuestion != null) {
+            return nextQuestion.getNextQuestionString();
+        }
+        return null;
+    }
+
+    private String getNextQuestionIdentifier(List<Option> options) {
+        HashSet<String> nextQuestions = new HashSet<>();
+        for (Option option : options) {
+            NextQuestion nextQuestion = getNextQuestionForOption(option);
+            if (nextQuestion != null && !TextUtils.isEmpty(nextQuestion.getNextQuestionIdentifier())) {
+                nextQuestions.add(nextQuestion.getNextQuestionIdentifier());
+            }
+        }
+        if (nextQuestions.size() == 1) {
+            return nextQuestions.iterator().next();
+        } else {
+            return null;
+        }
+    }
+
+    private NextQuestion getNextQuestionForOption(Option option) {
+        List<NextQuestion> nextQuestions = mSurveyFragment.getNextQuestions(mQuestion.getQuestionIdentifier());
+        if (nextQuestions == null) return null;
+        for (NextQuestion nextQuestion : nextQuestions) {
+            if (nextQuestion.getOptionIdentifier().equals(option.getIdentifier())) {
+                return nextQuestion;
+            }
+        }
+        return null;
+    }
+
+    private List<ConditionSkip> optionConditionSkips(Option option) {
+        List<ConditionSkip> conditionSkips = new ArrayList<>();
+        List<ConditionSkip> qcs = mSurveyFragment.getConditionSkips(mQuestion.getQuestionIdentifier());
+        if (qcs == null) return conditionSkips;
+        for (ConditionSkip conditionSkip : qcs) {
+            if (conditionSkip.getOptionIdentifier().equals(option.getIdentifier())) {
+                conditionSkips.add(conditionSkip);
+            }
+        }
+        return conditionSkips;
+    }
+
+    private NextQuestion getNextQuestionForValue(String value) {
+        for (NextQuestion nextQuestion : mSurveyFragment.getNextQuestions(mQuestion.getQuestionIdentifier())) {
+            if (nextQuestion.getValue().equals(value)) {
+                return nextQuestion;
+            }
+        }
+        return null;
+    }
+
     protected void setResponseTextBlank() {
         if (getResponse() != null) {
             getResponse().setResponse(Response.BLANK);
         }
+    }
+
+    public Response getResponse() {
+        return mResponse;
+    }
+
+    protected void setResponse(String specialResponse) {
+        if (deserialization) return;
+        if (specialResponse == null) {
+            // Set responseText
+            mResponse.setResponse(serialize());
+            mResponse.setSpecialResponse(Response.BLANK);
+            validateResponse();
+            if (!mQuestion.isTextEntryQuestionType()) {
+                removeTextFocus();
+            }
+        } else {
+            // Set specialResponse
+            mResponse.setSpecialResponse(specialResponse);
+            mResponse.setResponse(Response.BLANK);
+            deserialize(mResponse.getText());
+            removeTextFocus();
+            animateValidationTextView(true);
+        }
+        mResponse.setTimeEnded(new Date());
+        mResponse.setDeviceUser(AuthUtils.getCurrentUser());
+        mResponse.setQuestionVersion(mQuestion.getQuestionVersion());
+        mSurvey.setLastUpdated(new Date());
+        saveResponseInBackground(mResponse);
+        setSkipPatterns();
+        refreshFollowUpQuestion();
+        setLoopQuestions(mQuestion, mResponse);
     }
 
     private class ItemTouchHelperCallback extends ItemTouchHelperExtension.Callback {
@@ -675,6 +782,16 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         OptionsAdapter(List<Option> options) {
             mOptions = options;
             saveRankOrder();
+        }
+
+        private void saveRankOrder() {
+            StringBuilder order = new StringBuilder();
+            for (int i = 0; i < mOptions.size(); i++) {
+                int index = getOptions().indexOf(mOptions.get(i));
+                order.append(index);
+                if (i < mOptions.size() - 1) order.append(Response.LIST_DELIMITER);
+            }
+            mResponse.setRankOrder(order.toString());
         }
 
         void updateOptions(List<Option> options) {
@@ -741,16 +858,6 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
             this.notifyItemMoved(fromPosition, toPosition);
             saveRankOrder();
             return true;
-        }
-
-        private void saveRankOrder() {
-            StringBuilder order = new StringBuilder();
-            for (int i = 0; i < mOptions.size(); i++) {
-                int index = getOptions().indexOf(mOptions.get(i));
-                order.append(index);
-                if (i < mOptions.size() - 1) order.append(Response.LIST_DELIMITER);
-            }
-            mResponse.setRankOrder(order.toString());
         }
 
         public void clear() {

@@ -262,6 +262,45 @@ public class Instrument extends ReceiveModel {
         return optionSetHashMap;
     }
 
+    public HashMap<String, List<NextQuestion>> nextQuestions() {
+        HashMap<String, List<NextQuestion>> map = new HashMap<>();
+        for (NextQuestion nextQuestion : NextQuestion.getAll(mRemoteId)) {
+            List<NextQuestion> nextQuestions = map.get(nextQuestion.getQuestionIdentifier());
+            if (nextQuestions == null) {
+                nextQuestions = new ArrayList<>();
+            }
+            nextQuestions.add(nextQuestion);
+            map.put(nextQuestion.getQuestionIdentifier(), nextQuestions);
+        }
+        return map;
+    }
+
+    public HashMap<String, List<ConditionSkip>> conditionSkips() {
+        HashMap<String, List<ConditionSkip>> map = new HashMap<>();
+        for (ConditionSkip conditionSkip : ConditionSkip.getAll(mRemoteId)) {
+            List<ConditionSkip> conditionSkips = map.get(conditionSkip.getQuestionIdentifier());
+            if (conditionSkips == null) {
+                conditionSkips = new ArrayList<>();
+            }
+            conditionSkips.add(conditionSkip);
+            map.put(conditionSkip.getQuestionIdentifier(), conditionSkips);
+        }
+        return map;
+    }
+
+    public HashMap<String, List<MultipleSkip>> multipleSkips() {
+        HashMap<String, List<MultipleSkip>> map = new HashMap<>();
+        for (MultipleSkip multipleSkip : MultipleSkip.getAll(mRemoteId)) {
+            List<MultipleSkip> multipleSkips = map.get(multipleSkip.getQuestionIdentifier());
+            if (multipleSkips == null) {
+                multipleSkips = new ArrayList<>();
+            }
+            multipleSkips.add(multipleSkip);
+            map.put(multipleSkip.getQuestionIdentifier(), multipleSkips);
+        }
+        return map;
+    }
+
     public String getCriticalMessage() {
         if (getLanguage().equals(AppUtil.getDeviceLanguage())) return mCriticalMessage;
         if (activeTranslation() != null && !activeTranslation().getCriticalMessage().trim().equals("")) {

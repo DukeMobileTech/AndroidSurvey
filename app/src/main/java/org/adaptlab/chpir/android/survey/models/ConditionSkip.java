@@ -68,12 +68,17 @@ public class ConditionSkip extends ReceiveModel {
         }
     }
 
-    public static List<ConditionSkip> getAll() {
-        return new Select().from(ConditionSkip.class).execute();
+    public static List<ConditionSkip> getAll(Long instrumentId) {
+        return new Select().from(ConditionSkip.class).where(
+                "RemoteInstrumentId = ? AND Deleted != ?", instrumentId, 1).execute();
     }
 
     public String getQuestionIdentifier() {
         return mQuestionIdentifier;
+    }
+
+    public String getOptionIdentifier() {
+        return mOptionIdentifier;
     }
 
     public boolean getDeleted() {
