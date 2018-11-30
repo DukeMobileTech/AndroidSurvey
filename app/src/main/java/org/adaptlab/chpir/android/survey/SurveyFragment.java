@@ -56,6 +56,7 @@ import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.LoopQuestion;
 import org.adaptlab.chpir.android.survey.models.MultipleSkip;
 import org.adaptlab.chpir.android.survey.models.Option;
+import org.adaptlab.chpir.android.survey.models.OptionSet;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Score;
@@ -105,35 +106,36 @@ public class SurveyFragment extends Fragment {
     private static final int REVIEW_CODE = 100;
     private static final int ACCESS_FINE_LOCATION_CODE = 1;
 
-    private Instrument mInstrument;
-    private Survey mSurvey;
-    private String mMetadata;
-    private ArrayList<Display> mDisplays;
     private HashMap<Question, Response> mResponses;
     private HashMap<Question, List<Option>> mOptions;
     private HashMap<Display, List<Question>> mDisplayQuestions;
     private HashMap<String, List<String>> mQuestionsToSkipMap;
     private HashMap<Long, List<Option>> mSpecialOptions;
     private HashMap<Display, List<DisplayInstruction>> mDisplayInstructions;
+    private HashMap<Long, OptionSet> mOptionSets;
+    private LinkedHashMap<String, List<String>> mExpandableListData;
+    private List<String> mExpandableListTitle;
     private HashSet<String> mQuestionsToSkipSet;
+    private ArrayList<Integer> mPreviousDisplays;
+    private ArrayList<Display> mDisplays;
     private TextView mDisplayIndexLabel;
     private TextView mParticipantLabel;
     private ProgressBar mProgressBar;
     private Display mDisplay;
-    private int mDisplayNumber;
-    private ArrayList<Integer> mPreviousDisplays;
+    private Instrument mInstrument;
+    private Survey mSurvey;
+    private String mMetadata;
     private LocationManager mLocationManager;
     private NestedScrollView mScrollView;
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
+    private ExpandableListView mExpandableListView;
+    private DisplayFragment mDisplayFragment;
+    private MenuItem mProgressView;
+    private int mDisplayNumber;
     private boolean mNavDrawerSet = false;
     private boolean isLoadingDisplay = false;
-    private ExpandableListView mExpandableListView;
-    private List<String> mExpandableListTitle;
-    private LinkedHashMap<String, List<String>> mExpandableListData;
-    private DisplayFragment mDisplayFragment;
     private boolean showProgressBar = true;
-    private MenuItem mProgressView;
 
     public void refreshView() {
         AuthorizedActivity authority = (AuthorizedActivity) getActivity();
@@ -410,6 +412,7 @@ public class SurveyFragment extends Fragment {
         mDisplayQuestions = new HashMap<>();
         mResponses = new HashMap<>();
         mOptions = new HashMap<>();
+        mOptionSets = new HashMap<>();
     }
 
     private void registerCrashlytics() {
@@ -429,10 +432,11 @@ public class SurveyFragment extends Fragment {
     }
 
     private void createDisplayView() {
+        if (getActivity() == null) return;
         isLoadingDisplay = true;
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        mDisplayFragment = DisplayFragment.newInstance(mSurvey.getId(), mDisplay.getId());
+        mDisplayFragment = DisplayFragment.newInstance();
         fragmentTransaction.replace(R.id.question_component_layout, mDisplayFragment);
         fragmentTransaction.commit();
     }
@@ -855,6 +859,10 @@ public class SurveyFragment extends Fragment {
         return mDisplayQuestions.get(display);
     }
 
+    protected OptionSet getOptionSet(Long id) {
+        return mOptionSets.get(id);
+    }
+
     protected void startSurveyCompletion(Question question) {
         List<String> displayQuestions = new ArrayList<>();
         for (Question q : getQuestions(mDisplay)) {
@@ -927,6 +935,10 @@ public class SurveyFragment extends Fragment {
         return mSurvey;
     }
 
+    public Instrument getInstrument() {
+        return mInstrument;
+    }
+
     public HashMap<Question, Response> getResponses() {
         return mResponses;
     }
@@ -939,8 +951,8 @@ public class SurveyFragment extends Fragment {
         return mSpecialOptions;
     }
 
-    public List<DisplayInstruction> getDisplayInstructions(Display display) {
-        return mDisplayInstructions.get(display);
+    public List<DisplayInstruction> getDisplayInstructions() {
+        return mDisplayInstructions.get(mDisplay);
     }
 
     /*
@@ -1164,6 +1176,11 @@ public class SurveyFragment extends Fragment {
             instrumentData.options = ((Instrument) params[0]).optionsMap();
             instrumentData.specialOptions = ((Instrument) params[0]).specialOptionsMap();
             instrumentData.displayInstructions = ((Instrument) params[0]).displayInstructions();
+            List<Question> questions = new ArrayList<>();
+            for (List<Question> list : instrumentData.displayQuestions.values()) {
+                questions.addAll(list);
+            }
+            instrumentData.optionSets = ((Instrument) params[0]).optionSets(questions);
             return instrumentData;
         }
 
@@ -1174,16 +1191,18 @@ public class SurveyFragment extends Fragment {
             mOptions = instrumentData.options;
             mSpecialOptions = instrumentData.specialOptions;
             mDisplayInstructions = instrumentData.displayInstructions;
+            mOptionSets = instrumentData.optionSets;
             refreshView();
         }
     }
 
     private class InstrumentDataWrapper {
-        public HashMap<Question, Response> responses;
-        public HashMap<Question, List<Option>> options;
-        public HashMap<Display, List<Question>> displayQuestions;
-        public HashMap<Long, List<Option>> specialOptions;
-        public HashMap<Display, List<DisplayInstruction>> displayInstructions;
+        HashMap<Question, Response> responses;
+        HashMap<Question, List<Option>> options;
+        HashMap<Display, List<Question>> displayQuestions;
+        HashMap<Long, List<Option>> specialOptions;
+        HashMap<Display, List<DisplayInstruction>> displayInstructions;
+        HashMap<Long, OptionSet> optionSets;
     }
 
     private class DisplayTitlesListAdapter extends BaseExpandableListAdapter {

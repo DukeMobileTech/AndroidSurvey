@@ -27,6 +27,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -243,6 +244,22 @@ public class Instrument extends ReceiveModel {
             map.put(display, display.displayInstructions());
         }
         return map;
+    }
+
+    public HashMap<Long, OptionSet> optionSets(List<Question> questions) {
+        HashSet<Long> optionSetIds = new HashSet<>();
+        for (Question question : questions) {
+            if (question.getRemoteOptionSetId() != null) {
+                optionSetIds.add(question.getRemoteOptionSetId());
+            }
+        }
+        HashMap<Long, OptionSet> optionSetHashMap = new HashMap<>();
+        for (OptionSet optionSet : OptionSet.getAll()) {
+            if (optionSetIds.contains(optionSet.getRemoteId())) {
+                optionSetHashMap.put(optionSet.getRemoteId(), optionSet);
+            }
+        }
+        return optionSetHashMap;
     }
 
     public String getCriticalMessage() {

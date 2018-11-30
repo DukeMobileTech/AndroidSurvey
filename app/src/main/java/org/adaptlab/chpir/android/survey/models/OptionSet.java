@@ -11,6 +11,8 @@ import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
+
 @Table(name = "OptionSets")
 public class OptionSet extends ReceiveModel {
     private static final String TAG = "OptionSet";
@@ -48,6 +50,16 @@ public class OptionSet extends ReceiveModel {
 
     public static OptionSet findByRemoteId(Long id) {
         return new Select().from(OptionSet.class).where("RemoteId = ?", id).executeSingle();
+    }
+
+    public static List<OptionSet> getAll() {
+        return new Select().from(OptionSet.class).where("Deleted != ?", 1)
+                .orderBy("Id ASC")
+                .execute();
+    }
+
+    public Long getRemoteId() {
+        return mRemoteId;
     }
 
     private void setRemoteId(Long id) {

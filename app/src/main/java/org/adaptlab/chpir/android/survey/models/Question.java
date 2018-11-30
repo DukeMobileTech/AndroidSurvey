@@ -787,6 +787,7 @@ public class Question extends ReceiveModel {
     }
 
     public String getInstructions() {
+        if (mInstructionId == null) return null;
         Instruction instruction = Instruction.findByRemoteId(mInstructionId);
         if (instruction == null) return null;
         return instruction.getText(getInstrument());

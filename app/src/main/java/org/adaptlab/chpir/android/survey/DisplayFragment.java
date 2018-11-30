@@ -38,8 +38,6 @@ import static org.adaptlab.chpir.android.survey.utils.FormatUtils.isEmpty;
  * create an instance of this fragment.
  */
 public class DisplayFragment extends Fragment {
-    public final static String EXTRA_SURVEY_ID = "org.adaptlab.chpir.android.survey.survey_id";
-    public final static String EXTRA_DISPLAY_ID = "org.adaptlab.chpir.android.survey.display_id";
     private static final String TAG = "DisplayFragment";
     private static final int OFFSET = 1000000;
 
@@ -56,21 +54,8 @@ public class DisplayFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param surveyId  Parameter 1.
-     * @param displayId Parameter 2.
-     * @return A new instance of fragment DisplayFragment.
-     */
-    public static DisplayFragment newInstance(Long surveyId, Long displayId) {
-        DisplayFragment fragment = new DisplayFragment();
-        Bundle args = new Bundle();
-        args.putLong(EXTRA_SURVEY_ID, surveyId);
-        args.putLong(EXTRA_DISPLAY_ID, displayId);
-        fragment.setArguments(args);
-        return fragment;
+    public static DisplayFragment newInstance() {
+        return new DisplayFragment();
     }
 
     @Override
@@ -87,10 +72,9 @@ public class DisplayFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mSurvey = Survey.load(Survey.class, getArguments().getLong(EXTRA_SURVEY_ID));
-            mDisplay = Display.load(Display.class, getArguments().getLong(EXTRA_DISPLAY_ID));
-        }
+        if (mSurveyFragment == null) return;
+        mSurvey = mSurveyFragment.getSurvey();
+        mDisplay = mSurveyFragment.getDisplay();
         mQuestionFragments = new ArrayList<>();
     }
 
@@ -127,8 +111,18 @@ public class DisplayFragment extends Fragment {
         mListener = null;
     }
 
+    private List<Question> displayTableQuestions(String tableIdentifier) {
+        List<Question> questions = new ArrayList<>();
+        for (Question question : mSurveyFragment.getQuestions(mDisplay)) {
+            if (question.getTableIdentifier().equals(tableIdentifier)) {
+                questions.add(question);
+            }
+        }
+        return questions;
+    }
+
     private void createQuestionFragments() {
-        if (mSurveyFragment == null) return;
+        if (mSurveyFragment == null || getActivity() == null) return;
         FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         for (Question question : mSurveyFragment.getQuestions(mDisplay)) {
@@ -140,7 +134,7 @@ public class DisplayFragment extends Fragment {
                 qfTag = mSurvey.getId().toString() + "-" + question.getId().toString();
             } else {
                 long sumId = 0;
-                for (Question q : mDisplay.tableQuestions(question.getTableIdentifier())) {
+                for (Question q : displayTableQuestions(question.getTableIdentifier())) {
                     sumId += q.getRemoteId();
                 }
                 frameLayoutId = new BigDecimal(sumId).intValueExact() + OFFSET;

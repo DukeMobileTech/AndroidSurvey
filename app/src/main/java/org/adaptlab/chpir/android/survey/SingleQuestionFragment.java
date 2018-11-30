@@ -270,7 +270,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
     }
 
     protected void setDisplayInstructions() {
-        List<DisplayInstruction> displayInstructions = mSurveyFragment.getDisplayInstructions(mQuestion.getDisplay());
+        List<DisplayInstruction> displayInstructions = mSurveyFragment.getDisplayInstructions();
         if (displayInstructions != null && displayInstructions.size() > 0) {
             StringBuilder instructions = new StringBuilder();
             for (int k = 0; k < displayInstructions.size(); k++) {
@@ -328,11 +328,9 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         }
         mSurvey = mSurveyFragment.getSurvey();
         mQuestion = mSurveyFragment.getQuestion(questionIdentifier);
-        if (mSurvey == null || mQuestion == null) return;
+        mInstrument = mSurveyFragment.getInstrument();
+        if (mSurvey == null || mQuestion == null || mInstrument == null) return;
         mResponse = loadOrCreateResponse();
-        mResponse.setQuestion(mQuestion);
-        mResponse.setSurvey(mSurvey);
-        mInstrument = mSurvey.getInstrument();
         if (mSurveyFragment.getOptions() != null) {
             mOptions = mSurveyFragment.getOptions().get(mQuestion);
             if (mOptions == null) mOptions = new ArrayList<>();
@@ -361,8 +359,9 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
 
     private String getQuestionInstructions() {
         Spanned instructions = new SpannableString("");
-        if (!TextUtils.isEmpty(mQuestion.getInstructions()) && !mQuestion.getInstructions().equals("null")) {
-            instructions = styleTextWithHtml(mQuestion.getInstructions());
+        String qInstructions = mQuestion.getInstructions();
+        if (!TextUtils.isEmpty(qInstructions) && !qInstructions.equals("null")) {
+            instructions = styleTextWithHtml(qInstructions);
         }
         return instructions.toString();
     }
@@ -394,7 +393,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
     }
 
     private void setChoiceSelectionInstructions(View view) {
-        OptionSet optionSet = OptionSet.findByRemoteId(getQuestion().getRemoteOptionSetId());
+        OptionSet optionSet = mSurveyFragment.getOptionSet(getQuestion().getRemoteOptionSetId());
         if (optionSet != null && !isEmpty(optionSet.getInstructions())) {
             TextView instructionsView = view.findViewById(R.id.optionSetInstructions);
             if (instructionsView != null) {

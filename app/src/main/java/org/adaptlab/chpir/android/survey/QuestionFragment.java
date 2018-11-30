@@ -62,7 +62,7 @@ public abstract class QuestionFragment extends Fragment {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             public void run() {
                 response.save();
-                response.getSurvey().save();
+                mSurveyFragment.getSurvey().save();
             }
         });
     }

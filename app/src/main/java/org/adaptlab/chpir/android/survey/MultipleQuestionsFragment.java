@@ -118,7 +118,7 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
     }
 
     protected void setDisplayInstructions() {
-        List<DisplayInstruction> displayInstructions = mSurveyFragment.getDisplayInstructions(mDisplay);
+        List<DisplayInstruction> displayInstructions = mSurveyFragment.getDisplayInstructions();
         if (displayInstructions != null && displayInstructions.size() > 0) {
             StringBuilder instructions = new StringBuilder();
             int index = 0;
