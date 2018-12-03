@@ -165,11 +165,7 @@ public class SurveyFragment extends Fragment {
             } else {
                 mDisplay = mDisplays.get(displayNum);
                 mDisplayNumber = displayNum;
-                if (mDisplay != null) {
-                    refreshUIComponents();
-                } else {
-                    checkForCriticalResponses();
-                }
+                refreshUIComponents();
             }
         }
     }
@@ -471,14 +467,12 @@ public class SurveyFragment extends Fragment {
         mExpandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
             @Override
             public void onGroupExpand(int groupPosition) {
-                updateActionBarTitle(mExpandableListTitle.get(groupPosition));
             }
         });
 
         mExpandableListView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
             @Override
             public void onGroupCollapse(int groupPosition) {
-                updateActionBarTitle(mExpandableListTitle.get(groupPosition));
             }
         });
 
@@ -486,7 +480,6 @@ public class SurveyFragment extends Fragment {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
                 String selectedItem = ((List) (mExpandableListData.get(mExpandableListTitle.get(groupPosition)))).get(childPosition).toString();
-                updateActionBarTitle(selectedItem);
                 int index = 0;
                 for (Display display : mDisplays) {
                     if (display.getTitle().equals(selectedItem)) {
@@ -495,7 +488,6 @@ public class SurveyFragment extends Fragment {
                     }
                     index++;
                 }
-
                 mDrawerLayout.closeDrawer(GravityCompat.START);
                 mExpandableListView.collapseGroup(groupPosition);
                 return false;
@@ -790,7 +782,7 @@ public class SurveyFragment extends Fragment {
     }
 
     private boolean isInIllegalState() {
-        return getActivity() == null || !isResumed() || !isAdded() || isRemoving();
+        return getActivity() == null || !isAdded() || isRemoving();
     }
 
     private void updateQuestionsToSkipSet() {
@@ -854,12 +846,36 @@ public class SurveyFragment extends Fragment {
         boolean toBeSkipped = false;
         for (Question curQuestion : getQuestions(mDisplay)) {
             if (curQuestion.getQuestionIdentifier().equals(nextQuestionIdentifier)) break;
-            if (toBeSkipped) skipList.add(curQuestion.getQuestionIdentifier());
+            if (toBeSkipped) {
+                skipList.add(curQuestion.getQuestionIdentifier());
+                // Skip loop children questions
+                for (Question question : loopChildren(curQuestion.getQuestionIdentifier())) {
+                    skipList.add(question.getQuestionIdentifier());
+                }
+            }
             if (curQuestion.getQuestionIdentifier().equals(currentQuestionIdentifier))
                 toBeSkipped = true;
         }
         updateQuestionsToSkipMap(questionIdentifier + "/skipTo", skipList);
         hideQuestionsInDisplay();
+    }
+
+    private List<Question> loopChildren(String sourceIdentifier) {
+        List<Question> questions = new ArrayList<>();
+        if (mDisplayNumber + 1 < mDisplays.size()) {
+            questions.addAll(getQuestions(mDisplays.get(mDisplayNumber + 1)));
+        }
+        questions.addAll(getQuestions(mDisplay));
+        List<Question> loopChildren = new ArrayList<>();
+        if (sourceIdentifier != null) {
+            for (Question question : questions) {
+                if (question.getLoopSource() != null && !question.isDeleted() &&
+                        question.getLoopSource().equals(sourceIdentifier)) {
+                    loopChildren.add(question);
+                }
+            }
+        }
+        return loopChildren;
     }
 
     protected List<Question> getQuestions(Display display) {

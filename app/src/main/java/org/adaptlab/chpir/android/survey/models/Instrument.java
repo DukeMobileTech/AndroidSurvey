@@ -3,14 +3,11 @@ package org.adaptlab.chpir.android.survey.models;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Typeface;
-import android.os.Build;
 import android.provider.BaseColumns;
-import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 
-import com.activeandroid.ActiveAndroid;
 import com.activeandroid.Cache;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
@@ -42,8 +39,8 @@ public class Instrument extends ReceiveModel {
     public static final String KHMER_LANGUAGE_CODE = "km";
     public static final String KHMER_FONT_LOCATION = "fonts/khmerOS.ttf";
     public static final String LEFT_ALIGNMENT = "left";
-    private static final String TAG = "Instrument";
     public static final int LOOP_MAX = 12;
+    private static final String TAG = "Instrument";
     @Column(name = "Title")
     private String mTitle;
     // https://github.com/pardom/ActiveAndroid/issues/22
@@ -117,6 +114,18 @@ public class Instrument extends ReceiveModel {
         return mLoaded;
     }
 
+    public static List<String> getLanguages() {
+        List<String> languages = new ArrayList<>();
+        languages.add("en");
+        List<InstrumentTranslation> translations = new Select().from(InstrumentTranslation.class).groupBy("Language").execute();
+        for (InstrumentTranslation instrumentTranslation : translations) {
+            if (!TextUtils.isEmpty(instrumentTranslation.getLanguage()) && !languages.contains(instrumentTranslation.getLanguage().trim())) {
+                languages.add(instrumentTranslation.getLanguage().trim());
+            }
+        }
+        return languages;
+    }
+
     /*
      * If the language of the instrument is the same as the language setting on the
      * device (or through the admin settings), then return the default instrument title.
@@ -144,29 +153,17 @@ public class Instrument extends ReceiveModel {
         return mTitle;
     }
 
-    public static List<String> getLanguages() {
-        List<String> languages = new ArrayList<>();
-        languages.add("en");
-        List<InstrumentTranslation> translations = new Select().from(InstrumentTranslation.class).groupBy("Language").execute();
-        for (InstrumentTranslation instrumentTranslation : translations) {
-            if (!TextUtils.isEmpty(instrumentTranslation.getLanguage()) && !languages.contains(instrumentTranslation.getLanguage().trim())) {
-                languages.add(instrumentTranslation.getLanguage().trim());
-            }
-        }
-        return languages;
-    }
-
-    public InstrumentTranslation activeTranslation() {
-        return new Select().from(InstrumentTranslation.class)
-                .where("InstrumentRemoteId = ? AND Language = ? AND Active = ?", mRemoteId, AppUtil.getDeviceLanguage(), 1).executeSingle();
-    }
-
     public void setTitle(String title) {
         mTitle = title;
     }
 
     public String getLanguage() {
         return mLanguage;
+    }
+
+    public InstrumentTranslation activeTranslation() {
+        return new Select().from(InstrumentTranslation.class)
+                .where("InstrumentRemoteId = ? AND Language = ? AND Active = ?", mRemoteId, AppUtil.getDeviceLanguage(), 1).executeSingle();
     }
 
     public List<InstrumentTranslation> translations() {
@@ -236,6 +233,13 @@ public class Instrument extends ReceiveModel {
             map.put(display, display.questions());
         }
         return map;
+    }
+
+    public List<Display> displays() {
+        return new Select().from(Display.class)
+                .where("InstrumentId = ? AND Deleted != ?", getRemoteId(), 1)
+                .orderBy("Position ASC")
+                .execute();
     }
 
     public HashMap<Display, List<DisplayInstruction>> displayInstructions() {
@@ -327,6 +331,10 @@ public class Instrument extends ReceiveModel {
         }
     }
 
+    /*
+     * Getters/Setters
+     */
+
     public int getDefaultGravity() {
         if (getAlignment().equals(LEFT_ALIGNMENT)) {
             return Gravity.LEFT;
@@ -334,10 +342,6 @@ public class Instrument extends ReceiveModel {
             return Gravity.RIGHT;
         }
     }
-
-    /*
-     * Getters/Setters
-     */
 
     public String getAlignment() {
         if (getLanguage().equals(AppUtil.getDeviceLanguage())) return mAlignment;
@@ -458,13 +462,6 @@ public class Instrument extends ReceiveModel {
         return map;
     }
 
-    public List<Display> displays() {
-        return new Select().from(Display.class)
-                .where("InstrumentId = ? AND Deleted != ?", getRemoteId(), 1)
-                .orderBy("Position ASC")
-                .execute();
-    }
-
     public HashMap<Long, List<Option>> specialOptionsMap() {
         HashMap<Long, List<Option>> map = new HashMap<>();
         List<OptionInOptionSet> specialOptionInOptionSet = new Select().from(OptionInOptionSet.class).where("Special = 1 AND Deleted = 0").execute();
@@ -551,12 +548,12 @@ public class Instrument extends ReceiveModel {
                 .execute();
     }
 
-    private void setRoster(boolean isRoster) {
-        mRoster = isRoster;
-    }
-
     public boolean isRoster() {
         return mRoster;
+    }
+
+    private void setRoster(boolean isRoster) {
+        mRoster = isRoster;
     }
 
     public List<ScoreScheme> scoreSchemes() {
@@ -565,12 +562,12 @@ public class Instrument extends ReceiveModel {
                 .execute();
     }
 
-    private void setScorable(boolean status) {
-        mScorable = status;
-    }
-
     public boolean isScorable() {
         return mScorable;
+    }
+
+    private void setScorable(boolean status) {
+        mScorable = status;
     }
 
     public void setLoops() {
@@ -601,7 +598,7 @@ public class Instrument extends ReceiveModel {
                                 if (question.isOtherQuestionType()) {
                                     String instruction = question.getText() + " : Other";
                                     createLoopQuestion(question, loopQuestion, instruction,
-                                                question.defaultOptions().size(), display);
+                                            question.defaultOptions().size(), display);
                                 }
                             } else {
                                 // Loop only for particular options
@@ -659,7 +656,7 @@ public class Instrument extends ReceiveModel {
     }
 
     private void createLoopQuestion(Question question, LoopQuestion lq, String instruction,
-                                        int index, Display display) {
+                                    int index, Display display) {
         Question source = lq.loopedQuestion();
         if (source == null) return;
         String identifier = question.getQuestionIdentifier() + "_" + source.getQuestionIdentifier() + "_" + index;
@@ -668,12 +665,11 @@ public class Instrument extends ReceiveModel {
             loopedQuestion = new Question();
             loopedQuestion.setRemoteId(getBoundedRemoteId());
             loopedQuestion.setDisplay(display.getRemoteId());
-            // Only set loop number & loop source for duplicated loop questions
             loopedQuestion.setLoopNumber(index);
-            loopedQuestion.setLoopSource(question.getQuestionIdentifier());
             loopedQuestion.setQuestionIdentifier(identifier);
             loopedQuestion.setInstruction(createLoopInstruction(instruction).getRemoteId());
         }
+        loopedQuestion.setLoopSource(source.getQuestionIdentifier());
         loopedQuestion = Question.copyAttributes(loopedQuestion, source);
         if (lq.isSameDisplay()) {
             loopedQuestion.setNumberInInstrument(source.getNumberInInstrument());
@@ -682,22 +678,23 @@ public class Instrument extends ReceiveModel {
         }
         loopedQuestion.save();
         setLoopedQuestionSkips(question, source, loopedQuestion, index);
-        setLoopedQuestionMultiSkips(question, source, loopedQuestion, index);
+        setLoopedQuestionMultipleSkips(question, source, loopedQuestion, index);
+        setSkipsLoopedQuestion(source, loopedQuestion);
     }
 
-    // TODO: 11/8/18 Duplicate value for integer based skips
-    private void setLoopedQuestionMultiSkips(Question question, Question source,
-                                             Question loopedQuestion, int index) {
-        List<MultipleSkip> multipleSkips = source.multipleSkips(this);
-        String qi = loopedQuestion.getQuestionIdentifier();
-        for (MultipleSkip multipleSkip : multipleSkips) {
+    private void setSkipsLoopedQuestion(Question source, Question loopedQuestion) {
+        List<MultipleSkip> skipsQuestion = source.skipsQuestion();
+        String sqi = loopedQuestion.getQuestionIdentifier();
+        for (MultipleSkip multipleSkip : skipsQuestion) {
+            String qi = multipleSkip.getQuestionIdentifier();
             String oi = multipleSkip.getOptionIdentifier();
-            String sqi = question.getQuestionIdentifier() + "_" + multipleSkip.getSkipQuestionIdentifier() + "_" + index;
-            MultipleSkip ms = getMultipleSkip(qi, oi, sqi);
+            String val = multipleSkip.getValue();
+            MultipleSkip ms = getMultipleSkip(sqi, oi, sqi, val);
             if (ms == null) {
                 ms = new MultipleSkip();
                 ms.setQuestionIdentifier(qi);
                 ms.setOptionIdentifier(oi);
+                ms.setValue(val);
                 ms.setSkipQuestionIdentifier(sqi);
                 ms.setDeleted(multipleSkip.getDeleted());
                 ms.setRemoteInstrumentId(multipleSkip.getRemoteInstrumentId());
@@ -706,9 +703,32 @@ public class Instrument extends ReceiveModel {
         }
     }
 
-    private MultipleSkip getMultipleSkip(String qi, String oi, String sqi) {
-        return new Select().from(MultipleSkip.class).where("QuestionIdentifier = ? AND OptionIdentifier = ? " +
-                "AND SkipQuestionIdentifier = ?", qi, oi, sqi).executeSingle();
+    private void setLoopedQuestionMultipleSkips(Question question, Question source,
+                                                Question loopedQuestion, int index) {
+        List<MultipleSkip> multipleSkips = source.multipleSkips(this);
+        String qi = loopedQuestion.getQuestionIdentifier();
+        for (MultipleSkip multipleSkip : multipleSkips) {
+            String oi = multipleSkip.getOptionIdentifier();
+            String val = multipleSkip.getValue();
+            String sqi = question.getQuestionIdentifier() + "_" + multipleSkip.getSkipQuestionIdentifier() + "_" + index;
+            MultipleSkip ms = getMultipleSkip(qi, oi, sqi, val);
+            if (ms == null) {
+                ms = new MultipleSkip();
+                ms.setQuestionIdentifier(qi);
+                ms.setOptionIdentifier(oi);
+                ms.setValue(val);
+                ms.setSkipQuestionIdentifier(sqi);
+                ms.setDeleted(multipleSkip.getDeleted());
+                ms.setRemoteInstrumentId(multipleSkip.getRemoteInstrumentId());
+                ms.save();
+            }
+        }
+    }
+
+    private MultipleSkip getMultipleSkip(String qi, String oi, String sqi, String value) {
+        return new Select().from(MultipleSkip.class).where("QuestionIdentifier = ? AND " +
+                        "OptionIdentifier = ? AND SkipQuestionIdentifier = ? AND Value = ?",
+                qi, oi, sqi, value).executeSingle();
     }
 
     private void setLoopedQuestionSkips(Question question, Question source, Question loopedQuestion, int index) {

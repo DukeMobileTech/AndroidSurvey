@@ -149,6 +149,12 @@ public class Question extends ReceiveModel {
                 .execute();
     }
 
+    List<MultipleSkip> skipsQuestion() {
+        return new Select().from(MultipleSkip.class).where(
+                "SkipQuestionIdentifier = ? AND RemoteInstrumentId = ? AND Deleted = ?",
+                getQuestionIdentifier(), mInstrumentRemoteId, false).execute();
+    }
+
     public String getQuestionIdentifier() {
         return mQuestionIdentifier;
     }
@@ -500,6 +506,10 @@ public class Question extends ReceiveModel {
         mInstructionId = id;
     }
 
+    public boolean isDeleted() {
+        return mDeleted;
+    }
+
     private void setDeleted(boolean deleted) {
         mDeleted = deleted;
     }
@@ -737,7 +747,7 @@ public class Question extends ReceiveModel {
         return mRankResponses;
     }
 
-    String getLoopSource() {
+    public String getLoopSource() {
         return mLoopSource;
     }
 

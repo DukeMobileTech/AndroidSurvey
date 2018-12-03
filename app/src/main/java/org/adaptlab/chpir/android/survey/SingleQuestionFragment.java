@@ -90,6 +90,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
+        if (isComponentNull()) return null;
         deserialization = true;
         View v = inflater.inflate(R.layout.fragment_question, parent, false);
         String number = mQuestion.getNumberInInstrument() + ": ";
@@ -709,7 +710,9 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
     }
 
     private NextQuestion getNextQuestionForValue(String value) {
-        for (NextQuestion nextQuestion : mSurveyFragment.getNextQuestions(mQuestion.getQuestionIdentifier())) {
+        List<NextQuestion> nextQuestions = mSurveyFragment.getNextQuestions(mQuestion.getQuestionIdentifier());
+        if (nextQuestions == null) return null;
+        for (NextQuestion nextQuestion : nextQuestions) {
             if (nextQuestion.getValue().equals(value)) {
                 return nextQuestion;
             }
