@@ -38,6 +38,7 @@ import com.crashlytics.android.Crashlytics;
 import org.adaptlab.chpir.android.survey.models.ConditionSkip;
 import org.adaptlab.chpir.android.survey.models.Display;
 import org.adaptlab.chpir.android.survey.models.DisplayInstruction;
+import org.adaptlab.chpir.android.survey.models.FollowUpQuestion;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.NextQuestion;
 import org.adaptlab.chpir.android.survey.models.Option;
@@ -73,6 +74,8 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
     public final static String EXTRA_SURVEY_ID = "org.adaptlab.chpir.android.survey.survey_id";
     public final static String EXTRA_QUESTION_ID = "org.adaptlab.chpir.android.survey" +
             ".question_id";
+    public final static String EXTRA_DISPLAY_ID = "org.adaptlab.chpir.android.survey" +
+            ".display_id";
     private final static String TAG = "SingleQuestionFragment";
     public TextView mValidationTextView;
     protected RadioGroup mSpecialResponses;
@@ -80,6 +83,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
     private Question mQuestion;
     private Survey mSurvey;
     private Instrument mInstrument;
+    private Display mDisplay;
     private List<Option> mOptions;
     private List<Option> mSpecialOptions;
     private TextView mDisplayInstructionsText;
@@ -154,6 +158,9 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         }
         if (mResponse != null) {
             outState.putLong(EXTRA_RESPONSE_ID, mResponse.getId());
+        }
+        if (mDisplay != null) {
+            outState.putLong(EXTRA_DISPLAY_ID, mDisplay.getId());
         }
     }
 
@@ -236,12 +243,12 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
     }
 
     private void setSpecialResponseUI(View v) {
-        if (!mQuestion.getDisplay().getMode().equals(Display.DisplayMode.TABLE.toString())) {
+        if (!mDisplay.getMode().equals(Display.DisplayMode.TABLE.toString())) {
             mSpecialResponses = v.findViewById(R.id.specialResponseButtons);
             List<String> responses = new ArrayList<>();
             if (mQuestion.hasSpecialOptions()) {
                 for (Option option : mSpecialOptions) {
-                    responses.add(option.getText(mQuestion.getInstrument()));
+                    responses.add(option.getText(mInstrument));
                 }
             }
 
@@ -250,7 +257,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
                 final Button button = new RadioButton(getActivity());
                 button.setText(response);
                 button.setId(responseId);
-                button.setTypeface(getInstrument().getTypeFace(v.getContext()));
+                button.setTypeface(mInstrument.getTypeFace(v.getContext()));
                 button.setTextColor(getResources().getColorStateList(R.color.states));
 
                 mSpecialResponses.addView(button, responseId);
@@ -271,7 +278,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
             public void onClick(View view) {
                 mSpecialResponses.clearCheck();
                 unSetResponse();
-                if (getQuestion().rankResponses()) {
+                if (mQuestion.rankResponses()) {
                     if (mRankLayout != null && mOptionsAdapter != null) {
                         mOptionsAdapter.clear();
                         mRankLayout.setVisibility(View.GONE);
@@ -299,7 +306,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
     }
 
     protected void toggleLoadingStatus() {
-        List<Question> displayQuestions = mSurveyFragment.getQuestions(mQuestion.getDisplay());
+        List<Question> displayQuestions = mSurveyFragment.getQuestions(mDisplay);
         if (displayQuestions.get(displayQuestions.size() - 1).equals(mQuestion)) {
             mSurveyFragment.toggleLoadingStatus();
         }
@@ -316,6 +323,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
             mSurvey = Survey.load(Survey.class, savedInstanceState.getLong(EXTRA_SURVEY_ID));
             mQuestion = Question.load(Question.class, savedInstanceState.getLong(EXTRA_QUESTION_ID));
             mResponse = Response.load(Response.class, savedInstanceState.getLong(EXTRA_RESPONSE_ID));
+            mDisplay = Display.load(Display.class, savedInstanceState.getLong(EXTRA_DISPLAY_ID));
             mOptions = mSurveyFragment.getOptions().get(mQuestion);
         }
         if (isComponentNull()) return;
@@ -338,7 +346,8 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         mSurvey = mSurveyFragment.getSurvey();
         mQuestion = mSurveyFragment.getQuestion(questionIdentifier);
         mInstrument = mSurveyFragment.getInstrument();
-        if (mSurvey == null || mQuestion == null || mInstrument == null) return;
+        mDisplay = mSurveyFragment.getDisplay();
+        if (mSurvey == null || mQuestion == null || mInstrument == null || mDisplay == null) return;
         mResponse = loadOrCreateResponse();
         if (mSurveyFragment.getOptions() != null) {
             mOptions = mSurveyFragment.getOptions().get(mQuestion);
@@ -348,7 +357,8 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
     }
 
     private boolean isComponentNull() {
-        return mSurvey == null || mQuestion == null || mInstrument == null || mResponse == null;
+        return mSurvey == null || mQuestion == null || mInstrument == null || mResponse == null ||
+                mDisplay == null;
     }
 
     private Response loadOrCreateResponse() {
@@ -378,14 +388,15 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
      */
 
     private void refreshFollowUpQuestion() {
-        if (mQuestion.isToFollowUpOnQuestion()) {
+        List<FollowUpQuestion> fuq = mSurveyFragment.getFollowUpQuestions(mQuestion.getQuestionIdentifier());
+        if (fuq != null && fuq.size() > 0) {
             mDisplayFragment.reAnimateFollowUpFragment(mQuestion);
         }
     }
 
     private String getQuestionInstructions() {
         Spanned instructions = new SpannableString("");
-        String qInstructions = mQuestion.getInstructions();
+        String qInstructions = mQuestion.getInstructions(); // TODO: 12/4/18 remove db call
         if (!TextUtils.isEmpty(qInstructions) && !qInstructions.equals("null")) {
             instructions = styleTextWithHtml(qInstructions);
         }
@@ -394,7 +405,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
 
     protected Spanned getQuestionText() {
         String text = "";
-        if (mQuestion.isFollowUpQuestion()) {
+        if (mQuestion.isFollowUpQuestion()) { // TODO: 12/4/18 Remove db call
             String followUpText = mQuestion.getFollowingUpText(mSurveyFragment.getResponses(), getActivity());
             if (followUpText != null) {
                 text = followUpText;

@@ -69,7 +69,6 @@ public class Option extends ReceiveModel {
      */
     public String getText(Instrument instrument) {
         if (instrument.getLanguage().equals(getDeviceLanguage())) return mText;
-        if (activeTranslation(instrument) != null) return activeTranslation(instrument).getText();
         for (OptionTranslation translation : translations()) {
             if (translation.getLanguage().equals(getDeviceLanguage())) {
                 return translation.getText();
@@ -85,13 +84,6 @@ public class Option extends ReceiveModel {
 
     public String getDeviceLanguage() {
         return AppUtil.getDeviceLanguage();
-    }
-
-    private OptionTranslation activeTranslation(Instrument instrument) {
-        if (instrument.activeTranslation() == null) return null;
-        return new Select().from(OptionTranslation.class)
-                .where("InstrumentTranslation = ? AND Option = ?",
-                        instrument.activeTranslation().getId(), getId()).executeSingle();
     }
 
     private List<OptionTranslation> translations() {

@@ -305,6 +305,19 @@ public class Instrument extends ReceiveModel {
         return map;
     }
 
+    public HashMap<String, List<FollowUpQuestion>> followUpQuestions() {
+        HashMap<String, List<FollowUpQuestion>> map = new HashMap<>();
+        for (FollowUpQuestion followUpQuestion : FollowUpQuestion.getAll(mRemoteId)) {
+            List<FollowUpQuestion> followUpQuestions = map.get(followUpQuestion.getQuestionIdentifier());
+            if (followUpQuestions == null) {
+                followUpQuestions = new ArrayList<>();
+            }
+            followUpQuestions.add(followUpQuestion);
+            map.put(followUpQuestion.getQuestionIdentifier(), followUpQuestions);
+        }
+        return map;
+    }
+
     public String getCriticalMessage() {
         if (getLanguage().equals(AppUtil.getDeviceLanguage())) return mCriticalMessage;
         if (activeTranslation() != null && !activeTranslation().getCriticalMessage().trim().equals("")) {

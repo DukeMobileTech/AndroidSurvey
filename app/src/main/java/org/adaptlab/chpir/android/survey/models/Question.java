@@ -238,18 +238,6 @@ public class Question extends ReceiveModel {
         return questionText;
     }
 
-    public boolean isToFollowUpOnQuestion() {
-        return (toFollowUpOnQuestions().size() > 0);
-    }
-
-    public List<FollowUpQuestion> toFollowUpOnQuestions() {
-        return new Select().from(FollowUpQuestion.class)
-                .where("FollowingUpQuestionIdentifier = ? AND RemoteInstrumentId = ? ",
-                        mQuestionIdentifier, mInstrumentRemoteId)
-                .orderBy("Position")
-                .execute();
-    }
-
     /*
      * position in QuestionRandomizedFactor starts from 1, hence k + 1
      * save response at the end as a fallback for INSTRUCTIONS questions type which has no
@@ -584,11 +572,11 @@ public class Question extends ReceiveModel {
     }
 
     public boolean hasSpecialOptionSkips(Instrument instrument) {
-        return hasSpecialOptions() && (specialOptionSkips(instrument).size() > 0);
+        return hasSpecialOptions() && specialOptionSkips(instrument).size() > 0;
     }
 
     public boolean hasSpecialOptions() {
-        return (mRemoteSpecialOptionSetId > 0);
+        return mRemoteSpecialOptionSetId > 0;
     }
 
     private List<NextQuestion> specialOptionSkips(Instrument instrument) {

@@ -235,16 +235,20 @@ public class DisplayFragment extends Fragment {
         return stringBuilder.toString();
     }
 
-    protected void reAnimateFollowUpFragment(Question currentQuestion) {
+    protected void reAnimateFollowUpFragment(Question q) {
         FragmentManager fm = getChildFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
-        for (FollowUpQuestion question : currentQuestion.toFollowUpOnQuestions()) {
-            int index = mDisplay.questions().indexOf(question.getFollowUpQuestion());
-            if (index > -1 && index <= mDisplay.questions().size() - 1) {
-                QuestionFragment qf = mQuestionFragments.get(index);
-                ft.detach(qf);
-                ft.attach(qf);
-                ft.commit();
+        List<FollowUpQuestion> fuqs = mSurveyFragment.getFollowUpQuestions(q.getQuestionIdentifier());
+        if (fuqs != null) {
+            for (FollowUpQuestion fuq : fuqs) {
+                Question question = mSurveyFragment.getQuestion(fuq.getFollowingUpQuestionIdentifier());
+                int index = mSurveyFragment.getQuestions(mDisplay).indexOf(question);
+                if (index > -1 && index < mSurveyFragment.getQuestions(mDisplay).size()) {
+                    QuestionFragment qf = mQuestionFragments.get(index);
+                    ft.detach(qf);
+                    ft.attach(qf);
+                    ft.commit();
+                }
             }
         }
     }

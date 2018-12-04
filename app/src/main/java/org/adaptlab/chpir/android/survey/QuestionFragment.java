@@ -50,6 +50,7 @@ public abstract class QuestionFragment extends Fragment {
     }
 
     protected void setLoopQuestions(Question question, Response response) {
+        if (question == null || response == null) return;
         if (question.getQuestionType().equals(Question.QuestionType.INTEGER) &&
                 question.getLoopQuestionCount() > 0) {
             mSurveyFragment.setIntegerLoopQuestions(question, response.getText());

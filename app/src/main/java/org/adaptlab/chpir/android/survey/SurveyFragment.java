@@ -52,6 +52,7 @@ import org.adaptlab.chpir.android.survey.location.LocationManager;
 import org.adaptlab.chpir.android.survey.models.ConditionSkip;
 import org.adaptlab.chpir.android.survey.models.Display;
 import org.adaptlab.chpir.android.survey.models.DisplayInstruction;
+import org.adaptlab.chpir.android.survey.models.FollowUpQuestion;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.LoopQuestion;
 import org.adaptlab.chpir.android.survey.models.MultipleSkip;
@@ -117,6 +118,7 @@ public class SurveyFragment extends Fragment {
     private HashMap<String, List<NextQuestion>> mNextQuestions;
     private HashMap<String, List<ConditionSkip>> mConditionSkips;
     private HashMap<String, List<MultipleSkip>> mMultipleSkips;
+    private HashMap<String, List<FollowUpQuestion>> mFollowUpQuestions;
     private LinkedHashMap<String, List<String>> mExpandableListData;
     private List<String> mExpandableListTitle;
     private HashSet<String> mQuestionsToSkipSet;
@@ -416,6 +418,7 @@ public class SurveyFragment extends Fragment {
         mNextQuestions = new HashMap<>();
         mConditionSkips = new HashMap<>();
         mMultipleSkips = new HashMap<>();
+        mFollowUpQuestions = new HashMap<>();
     }
 
     private void registerCrashlytics() {
@@ -786,20 +789,9 @@ public class SurveyFragment extends Fragment {
     }
 
     private void updateQuestionsToSkipSet() {
-        for (int k = mDisplayNumber; k < mDisplays.size(); k++) {
-            List<Question> questions = mDisplayQuestions.get(mDisplays.get(k));
-            if (questions != null) {
-                for (Question question : questions) {
-                    mQuestionsToSkipSet.remove(question.getQuestionIdentifier());
-                }
-            }
-        }
+        mQuestionsToSkipSet = new HashSet<>();
         for (HashMap.Entry<String, List<String>> curPair : mQuestionsToSkipMap.entrySet()) {
-            for (String q : curPair.getValue()) {
-                if (q != null) {
-                    mQuestionsToSkipSet.add(q);
-                }
-            }
+            mQuestionsToSkipSet.addAll(curPair.getValue());
         }
     }
 
@@ -894,6 +886,10 @@ public class SurveyFragment extends Fragment {
         return mConditionSkips.get(questionIdentifier);
     }
 
+    protected List<FollowUpQuestion> getFollowUpQuestions(String questionIdentifier) {
+        return mFollowUpQuestions.get(questionIdentifier);
+    }
+
     protected void startSurveyCompletion(Question question) {
         List<String> displayQuestions = new ArrayList<>();
         for (Question q : getQuestions(mDisplay)) {
@@ -957,6 +953,17 @@ public class SurveyFragment extends Fragment {
         for (Question question : mDisplayQuestions.get(mDisplay)) {
             if (question.getQuestionIdentifier().equals(identifier)) {
                 return question;
+            }
+        }
+        return null;
+    }
+
+    public Question getQuestionByIdentifier(String identifier) {
+        for (HashMap.Entry<Display, List<Question>> entry : mDisplayQuestions.entrySet()) {
+            for (Question question : entry.getValue()) {
+                if (question.getQuestionIdentifier().equals(identifier)) {
+                    return question;
+                }
             }
         }
         return null;
@@ -1223,6 +1230,7 @@ public class SurveyFragment extends Fragment {
             instrumentData.nextQuestions = ((Instrument) params[0]).nextQuestions();
             instrumentData.conditionSkips = ((Instrument) params[0]).conditionSkips();
             instrumentData.multipleSkips = ((Instrument) params[0]).multipleSkips();
+            instrumentData.followUpQuestions = ((Instrument) params[0]).followUpQuestions();
             return instrumentData;
         }
 
@@ -1237,6 +1245,7 @@ public class SurveyFragment extends Fragment {
             mNextQuestions = instrumentData.nextQuestions;
             mConditionSkips = instrumentData.conditionSkips;
             mMultipleSkips = instrumentData.multipleSkips;
+            mFollowUpQuestions = instrumentData.followUpQuestions;
             refreshView();
         }
     }
@@ -1251,6 +1260,7 @@ public class SurveyFragment extends Fragment {
         HashMap<String, List<NextQuestion>> nextQuestions;
         HashMap<String, List<ConditionSkip>> conditionSkips;
         HashMap<String, List<MultipleSkip>> multipleSkips;
+        HashMap<String, List<FollowUpQuestion>> followUpQuestions;
     }
 
     private class DisplayTitlesListAdapter extends BaseExpandableListAdapter {

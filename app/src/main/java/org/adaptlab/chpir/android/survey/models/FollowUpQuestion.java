@@ -10,10 +10,12 @@ import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
+
 @Table(name = "FollowUpQuestions")
 public class FollowUpQuestion extends ReceiveModel {
     private static final String TAG = "FollowUpQuestion";
-
+    // TODO: 12/4/18 Add deleted attribute
     @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
     private Long mRemoteId;
     @Column(name = "QuestionIdentifier")
@@ -55,15 +57,16 @@ public class FollowUpQuestion extends ReceiveModel {
         return new Select().from(Question.class).where("QuestionIdentifier = ? AND InstrumentRemoteId = ? AND Deleted != 1", mFollowingUpQuestionIdentifier, mRemoteInstrumentId).executeSingle();
     }
 
-    public Question getFollowUpQuestion() {
-        return new Select().from(Question.class).where("QuestionIdentifier = ? AND InstrumentRemoteId = ? AND Deleted != 1", mQuestionIdentifier, mRemoteInstrumentId).executeSingle();
+    public static List<FollowUpQuestion> getAll(Long instrumentId) {
+        return new Select().from(FollowUpQuestion.class).where(
+                "RemoteInstrumentId = ?", instrumentId).execute();
     }
 
-    private String getQuestionIdentifier() {
+    public String getQuestionIdentifier() {
         return mQuestionIdentifier;
     }
 
-    private String getFollowingUpQuestionIdentifier() {
+    public String getFollowingUpQuestionIdentifier() {
         return mFollowingUpQuestionIdentifier;
     }
 
