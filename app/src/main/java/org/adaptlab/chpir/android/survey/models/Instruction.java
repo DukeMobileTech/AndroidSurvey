@@ -72,6 +72,10 @@ public class Instruction extends ReceiveModel {
         return new Select().from(Instruction.class).where("RemoteId = ?", id).executeSingle();
     }
 
+    public static List<Instruction> getAll() {
+        return new Select().from(Instruction.class).where("Deleted = 0").execute();
+    }
+
     public Long getRemoteId() {
         return mRemoteId;
     }

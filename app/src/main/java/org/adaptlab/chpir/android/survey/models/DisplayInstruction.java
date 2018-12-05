@@ -57,40 +57,32 @@ public class DisplayInstruction extends ReceiveModel {
         return new Select().from(DisplayInstruction.class).where("RemoteId = ?", id).executeSingle();
     }
 
-    public int getPosition() {
-        return mPosition;
-    }
-
-    public Long getRemoteId() {
-        return mRemoteId;
-    }
-
-    public String getInstructions() {
-        Instruction instruction = Instruction.findByRemoteId(mInstructionId);
-        if (instruction == null) return null;
-        return instruction.getText(getInstrument());
-    }
-
-    private Instrument getInstrument() {
-        Display display = Display.findByRemoteId(mRemoteDisplayId);
-        if (display == null) return null;
-        return display.getInstrument();
-    }
-
-    private void setRemoteId(Long id) {
-       mRemoteId = id;
+    private void setDisplayId(Long id) {
+        mRemoteDisplayId = id;
     }
 
     private void setDeleted(boolean status) {
         mDeleted = status;
     }
 
+    public int getPosition() {
+        return mPosition;
+    }
+
     private void setPosition(int position) {
         mPosition = position;
     }
 
-    private void setDisplayId(Long id) {
-        mRemoteDisplayId = id;
+    public Long getRemoteId() {
+        return mRemoteId;
+    }
+
+    private void setRemoteId(Long id) {
+        mRemoteId = id;
+    }
+
+    public Long getInstructionId() {
+        return mInstructionId;
     }
 
     private void setInstructionId(Long instructionId) {

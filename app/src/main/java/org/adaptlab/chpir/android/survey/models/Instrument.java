@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Typeface;
 import android.provider.BaseColumns;
+import android.support.v4.util.LongSparseArray;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -250,20 +251,20 @@ public class Instrument extends ReceiveModel {
         return map;
     }
 
-    public HashMap<Long, OptionSet> optionSets(List<Question> questions) {
-        HashSet<Long> optionSetIds = new HashSet<>();
-        for (Question question : questions) {
-            if (question.getRemoteOptionSetId() != null) {
-                optionSetIds.add(question.getRemoteOptionSetId());
-            }
-        }
-        HashMap<Long, OptionSet> optionSetHashMap = new HashMap<>();
+    public LongSparseArray<OptionSet> optionSets() {
+        LongSparseArray<OptionSet> optionSets = new LongSparseArray<>();
         for (OptionSet optionSet : OptionSet.getAll()) {
-            if (optionSetIds.contains(optionSet.getRemoteId())) {
-                optionSetHashMap.put(optionSet.getRemoteId(), optionSet);
-            }
+            optionSets.append(optionSet.getRemoteId(), optionSet);
         }
-        return optionSetHashMap;
+        return optionSets;
+    }
+
+    public LongSparseArray<Instruction> instructions() {
+        LongSparseArray<Instruction> instructions = new LongSparseArray<>();
+        for (Instruction instruction : Instruction.getAll()) {
+            instructions.append(instruction.getRemoteId(), instruction);
+        }
+        return instructions;
     }
 
     public HashMap<String, List<NextQuestion>> nextQuestions() {

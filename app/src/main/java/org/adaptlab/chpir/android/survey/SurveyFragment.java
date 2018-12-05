@@ -14,11 +14,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.util.LongSparseArray;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.NestedScrollView;
@@ -53,6 +55,7 @@ import org.adaptlab.chpir.android.survey.models.ConditionSkip;
 import org.adaptlab.chpir.android.survey.models.Display;
 import org.adaptlab.chpir.android.survey.models.DisplayInstruction;
 import org.adaptlab.chpir.android.survey.models.FollowUpQuestion;
+import org.adaptlab.chpir.android.survey.models.Instruction;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.LoopQuestion;
 import org.adaptlab.chpir.android.survey.models.MultipleSkip;
@@ -114,7 +117,8 @@ public class SurveyFragment extends Fragment {
     private HashMap<String, List<String>> mQuestionsToSkipMap;
     private HashMap<Long, List<Option>> mSpecialOptions;
     private HashMap<Display, List<DisplayInstruction>> mDisplayInstructions;
-    private HashMap<Long, OptionSet> mOptionSets;
+    private LongSparseArray<OptionSet> mOptionSets;
+    private LongSparseArray<Instruction> mInstructions;
     private HashMap<String, List<NextQuestion>> mNextQuestions;
     private HashMap<String, List<ConditionSkip>> mConditionSkips;
     private HashMap<String, List<MultipleSkip>> mMultipleSkips;
@@ -414,7 +418,8 @@ public class SurveyFragment extends Fragment {
         mDisplayQuestions = new HashMap<>();
         mResponses = new HashMap<>();
         mOptions = new HashMap<>();
-        mOptionSets = new HashMap<>();
+        mOptionSets = new LongSparseArray<>();
+        mInstructions = new LongSparseArray<>();
         mNextQuestions = new HashMap<>();
         mConditionSkips = new HashMap<>();
         mMultipleSkips = new HashMap<>();
@@ -878,6 +883,10 @@ public class SurveyFragment extends Fragment {
         return mOptionSets.get(id);
     }
 
+    protected Instruction getInstruction(Long id) {
+        return mInstructions.get(id);
+    }
+
     protected List<NextQuestion> getNextQuestions(String questionIdentifier) {
         return mNextQuestions.get(questionIdentifier);
     }
@@ -1214,6 +1223,7 @@ public class SurveyFragment extends Fragment {
     }
 
     private class InstrumentDataTask extends AsyncTask<Object, Void, InstrumentDataWrapper> {
+
         @Override
         protected InstrumentDataWrapper doInBackground(Object... params) {
             InstrumentDataWrapper instrumentData = new InstrumentDataWrapper();
@@ -1222,11 +1232,8 @@ public class SurveyFragment extends Fragment {
             instrumentData.options = ((Instrument) params[0]).optionsMap();
             instrumentData.specialOptions = ((Instrument) params[0]).specialOptionsMap();
             instrumentData.displayInstructions = ((Instrument) params[0]).displayInstructions();
-            List<Question> questions = new ArrayList<>();
-            for (List<Question> list : instrumentData.displayQuestions.values()) {
-                questions.addAll(list);
-            }
-            instrumentData.optionSets = ((Instrument) params[0]).optionSets(questions);
+            instrumentData.optionSets = ((Instrument) params[0]).optionSets();
+            instrumentData.instructions = ((Instrument) params[0]).instructions();
             instrumentData.nextQuestions = ((Instrument) params[0]).nextQuestions();
             instrumentData.conditionSkips = ((Instrument) params[0]).conditionSkips();
             instrumentData.multipleSkips = ((Instrument) params[0]).multipleSkips();
@@ -1246,6 +1253,7 @@ public class SurveyFragment extends Fragment {
             mConditionSkips = instrumentData.conditionSkips;
             mMultipleSkips = instrumentData.multipleSkips;
             mFollowUpQuestions = instrumentData.followUpQuestions;
+            mInstructions = instrumentData.instructions;
             refreshView();
         }
     }
@@ -1256,11 +1264,12 @@ public class SurveyFragment extends Fragment {
         HashMap<Display, List<Question>> displayQuestions;
         HashMap<Long, List<Option>> specialOptions;
         HashMap<Display, List<DisplayInstruction>> displayInstructions;
-        HashMap<Long, OptionSet> optionSets;
+        LongSparseArray<OptionSet> optionSets;
         HashMap<String, List<NextQuestion>> nextQuestions;
         HashMap<String, List<ConditionSkip>> conditionSkips;
         HashMap<String, List<MultipleSkip>> multipleSkips;
         HashMap<String, List<FollowUpQuestion>> followUpQuestions;
+        LongSparseArray<Instruction> instructions;
     }
 
     private class DisplayTitlesListAdapter extends BaseExpandableListAdapter {

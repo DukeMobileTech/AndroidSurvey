@@ -39,6 +39,7 @@ import org.adaptlab.chpir.android.survey.models.ConditionSkip;
 import org.adaptlab.chpir.android.survey.models.Display;
 import org.adaptlab.chpir.android.survey.models.DisplayInstruction;
 import org.adaptlab.chpir.android.survey.models.FollowUpQuestion;
+import org.adaptlab.chpir.android.survey.models.Instruction;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.NextQuestion;
 import org.adaptlab.chpir.android.survey.models.Option;
@@ -295,7 +296,10 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
             StringBuilder instructions = new StringBuilder();
             for (int k = 0; k < displayInstructions.size(); k++) {
                 if (displayInstructions.get(k).getPosition() == mQuestion.getNumberInInstrument()) {
-                    instructions.append(displayInstructions.get(k).getInstructions());
+                    Instruction instruction = mSurveyFragment.getInstruction(displayInstructions.get(k).getInstructionId());
+                    if (instruction != null) {
+                        instructions.append(instruction.getText(mInstrument));
+                    }
                 }
             }
             if (instructions.length() > 0) {
@@ -396,7 +400,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
 
     private String getQuestionInstructions() {
         Spanned instructions = new SpannableString("");
-        String qInstructions = mQuestion.getInstructions(); // TODO: 12/4/18 remove db call
+        String qInstructions = getQuestionInstructions(mQuestion);
         if (!TextUtils.isEmpty(qInstructions) && !qInstructions.equals("null")) {
             instructions = styleTextWithHtml(qInstructions);
         }

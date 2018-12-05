@@ -494,6 +494,10 @@ public class Question extends ReceiveModel {
         mInstructionId = id;
     }
 
+    public Long getInstructionId() {
+        return mInstructionId;
+    }
+
     public boolean isDeleted() {
         return mDeleted;
     }
@@ -649,13 +653,6 @@ public class Question extends ReceiveModel {
 
     public boolean identifiesSurvey() {
         return mIdentifiesSurvey;
-    }
-
-    public String getInstructions() {
-        if (mInstructionId == null) return null;
-        Instruction instruction = Instruction.findByRemoteId(mInstructionId);
-        if (instruction == null) return null;
-        return instruction.getText(getInstrument());
     }
 
     public int getQuestionVersion() {

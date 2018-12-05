@@ -6,6 +6,7 @@ import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.view.ViewGroup;
 
+import org.adaptlab.chpir.android.survey.models.Instruction;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 
@@ -66,6 +67,21 @@ public abstract class QuestionFragment extends Fragment {
                 mSurveyFragment.getSurvey().save();
             }
         });
+    }
+
+    protected String getQuestionInstructions(Question question) {
+        String qInstructions;
+        if (question.getInstructionId() == null) {
+            qInstructions = null;
+        } else {
+            Instruction instruction = mSurveyFragment.getInstruction(question.getInstructionId());
+            if (instruction == null) {
+                qInstructions = null;
+            } else {
+                qInstructions = instruction.getText(mSurveyFragment.getInstrument());
+            }
+        }
+        return qInstructions;
     }
 
 }

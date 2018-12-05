@@ -26,6 +26,7 @@ import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.survey.models.Display;
 import org.adaptlab.chpir.android.survey.models.DisplayInstruction;
+import org.adaptlab.chpir.android.survey.models.Instruction;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.NextQuestion;
 import org.adaptlab.chpir.android.survey.models.Option;
@@ -69,17 +70,12 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
         super.onCreate(savedInstanceState);
         if (mSurveyFragment == null) return;
         if (savedInstanceState != null) {
-            mDisplay = Display.findByRemoteId(savedInstanceState.getLong(EXTRA_DISPLAY_ID));
-            mSurvey = Model.load(Survey.class, savedInstanceState.getLong(EXTRA_SURVEY_ID));
             mTableIdentifier = savedInstanceState.getString(EXTRA_TABLE_ID);
-        } else {
-            if (getArguments() != null) {
-                mDisplay = Display.findByRemoteId(getArguments().getLong(EXTRA_DISPLAY_ID));
-                mSurvey = Model.load(Survey.class, getArguments().getLong(EXTRA_SURVEY_ID));
-                mTableIdentifier = getArguments().getString(EXTRA_TABLE_ID);
-            }
+        } else if (getArguments() != null) {
+            mTableIdentifier = getArguments().getString(EXTRA_TABLE_ID);
         }
-
+        mDisplay = mSurveyFragment.getDisplay();
+        mSurvey = mSurveyFragment.getSurvey();
         mQuestions = mDisplay.tableQuestions(mTableIdentifier);
         for(Question curQuestion: mQuestions){
             setSpecialResponseSkips(curQuestion);
@@ -122,12 +118,15 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
         if (displayInstructions != null && displayInstructions.size() > 0) {
             StringBuilder instructions = new StringBuilder();
             int index = 0;
-            for (DisplayInstruction instruction : displayInstructions) {
+            for (DisplayInstruction displayInstruction : displayInstructions) {
                 index += 1;
-                if (instruction.getPosition() == mQuestions.get(0).getNumberInInstrument()) {
-                    instructions.append(instruction.getInstructions());
-                    if (index != displayInstructions.size()) {
-                        instructions.append("\n");
+                if (displayInstruction.getPosition() == mQuestions.get(0).getNumberInInstrument()) {
+                    Instruction instruction = mSurveyFragment.getInstruction(displayInstruction.getInstructionId());
+                    if (instruction != null) {
+                        instructions.append(instruction.getText(getInstrument()));
+                        if (index != displayInstructions.size()) {
+                            instructions.append("\n");
+                        }
                     }
                 }
             }
@@ -145,11 +144,11 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
 
     private String getInstructions() {
         StringBuilder instructions = new StringBuilder();
-        Question question = mQuestions.get(0);
-        if (!isEmpty(question.getInstructions())) {
-            instructions.append(styleTextWithHtml(question.getInstructions()));
+        String instructionsText = getQuestionInstructions(mQuestions.get(0));
+        if (!isEmpty(instructionsText)) {
+            instructions.append(styleTextWithHtml(instructionsText));
         }
-        OptionSet optionSet = OptionSet.findByRemoteId(mQuestions.get(0).getRemoteOptionSetId());
+        OptionSet optionSet = mSurveyFragment.getOptionSet(mQuestions.get(0).getRemoteOptionSetId());
         if (optionSet != null && !isEmpty(optionSet.getInstructions())) {
             instructions.append("\n").append(styleTextWithHtml(optionSet.getInstructions()));
         }
@@ -354,7 +353,7 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
     }
 
     protected Instrument getInstrument() {
-        return mSurvey.getInstrument();
+        return mSurveyFragment.getInstrument();
     }
 
     protected void createResponse(Question question) {
