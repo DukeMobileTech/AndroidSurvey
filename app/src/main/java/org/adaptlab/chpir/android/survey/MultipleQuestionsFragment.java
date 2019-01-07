@@ -384,6 +384,7 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
         response.setTimeEnded(new Date());
         mSurvey.setLastUpdated(new Date());
         saveResponseInBackground(response);
+        checkForCriticalResponses(question, response);
     }
 
     protected class HeaderHolder extends RecyclerView.ViewHolder {

@@ -57,8 +57,6 @@ public class Question extends ReceiveModel {
     private Section mSection;
     @Column(name = "InstrumentRemoteId")
     private Long mInstrumentRemoteId;
-    @Column(name = "Critical")
-    private boolean mCritical;
     @Column(name = "NumberInGrid")
     private int mNumberInGrid;
     @Column(name = "RemoteOptionSetId")
@@ -415,7 +413,6 @@ public class Question extends ReceiveModel {
             } else {
                 question.setDeleted(true);
             }
-            question.setCritical(jsonObject.optBoolean("critical", false));
             question.setRemoteOptionSetId(jsonObject.optLong("option_set_id"));
             question.setRemoteSpecialOptionSetId(jsonObject.optLong("special_option_set_id"));
             question.setTableIdentifier(jsonObject.getString("table_identifier"));
@@ -473,6 +470,27 @@ public class Question extends ReceiveModel {
                     }
                 }
             }
+            JSONArray criticalResponsesArray = jsonObject.optJSONArray("critical_responses");
+            if (criticalResponsesArray != null) {
+                for (int i = 0; i < criticalResponsesArray.length(); i++) {
+                    JSONObject criticalResponseJSON = criticalResponsesArray.getJSONObject(i);
+                    Long criticalResponseRemoteId = criticalResponseJSON.getLong("id");
+                    CriticalResponse criticalResponse = CriticalResponse.findByRemoteId(criticalResponseRemoteId);
+                    if (criticalResponse == null) {
+                        criticalResponse = new CriticalResponse();
+                    }
+                    criticalResponse.setRemoteId(criticalResponseRemoteId);
+                    criticalResponse.setQuestionIdentifier(criticalResponseJSON.getString("question_identifier"));
+                    criticalResponse.setOptionIdentifier(criticalResponseJSON.getString("option_identifier"));
+                    criticalResponse.setInstructionId(criticalResponseJSON.getLong("instruction_id"));
+                    if (jsonObject.isNull("deleted_at")) {
+                        criticalResponse.setDeleted(false);
+                    } else {
+                        criticalResponse.setDeleted(true);
+                    }
+                    criticalResponse.save();
+                }
+            }
         } catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);
         }
@@ -504,10 +522,6 @@ public class Question extends ReceiveModel {
 
     private void setDeleted(boolean deleted) {
         mDeleted = deleted;
-    }
-
-    private void setCritical(boolean critical) {
-        mCritical = critical;
     }
 
     private void setValidationId(Long validationId) {
@@ -623,16 +637,6 @@ public class Question extends ReceiveModel {
 
     public List<Image> images() {
         return new Select().from(Image.class).where("Question = ?", getId()).execute();
-    }
-
-    public List<Option> criticalOptions() {
-        return new Select("Options.*").distinct().from(Option.class)
-                .innerJoin(OptionInOptionSet.class)
-                .on("OptionInOptionSets.RemoteOptionSetId = ?", getRemoteOptionSetId())
-                .where("Options.Deleted != 1 AND Options.Critical = 1 AND OptionInOptionSets" +
-                        ".RemoteOptionId = Options.RemoteId")
-                .orderBy("OptionInOptionSets.NumberInQuestion ASC")
-                .execute();
     }
 
     public Long getRemoteId() {

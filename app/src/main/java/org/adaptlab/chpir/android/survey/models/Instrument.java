@@ -67,8 +67,6 @@ public class Instrument extends ReceiveModel {
     private boolean mDirectReviewNavigation;
     @Column(name = "SpecialOptions")
     private String mSpecialOptions;
-    @Column(name = "CriticalMessage")
-    private String mCriticalMessage;
     @Column(name = "Loaded")
     private boolean mLoaded;
     @Column(name = "Roster")
@@ -293,6 +291,19 @@ public class Instrument extends ReceiveModel {
         return map;
     }
 
+    public HashMap<String, List<CriticalResponse>> criticalResponses() {
+        HashMap<String, List<CriticalResponse>> map = new HashMap<>();
+        for (CriticalResponse criticalResponse : CriticalResponse.getAll()) {
+            List<CriticalResponse> criticalResponses = map.get(criticalResponse.getQuestionIdentifier());
+            if (criticalResponses == null) {
+                criticalResponses = new ArrayList<>();
+            }
+            criticalResponses.add(criticalResponse);
+            map.put(criticalResponse.getQuestionIdentifier(), criticalResponses);
+        }
+        return map;
+    }
+
     public HashMap<String, List<MultipleSkip>> multipleSkips() {
         HashMap<String, List<MultipleSkip>> map = new HashMap<>();
         for (MultipleSkip multipleSkip : MultipleSkip.getAll(mRemoteId)) {
@@ -317,24 +328,6 @@ public class Instrument extends ReceiveModel {
             map.put(followUpQuestion.getQuestionIdentifier(), followUpQuestions);
         }
         return map;
-    }
-
-    public String getCriticalMessage() {
-        if (getLanguage().equals(AppUtil.getDeviceLanguage())) return mCriticalMessage;
-        if (activeTranslation() != null && !activeTranslation().getCriticalMessage().trim().equals("")) {
-            return activeTranslation().getCriticalMessage();
-        }
-        for (InstrumentTranslation translation : translations()) {
-            if (translation.getLanguage().equals(AppUtil.getDeviceLanguage())
-                    && !translation.getCriticalMessage().trim().equals("")) {
-                return translation.getCriticalMessage();
-            }
-        }
-        return mCriticalMessage;
-    }
-
-    private void setCriticalMessage(String message) {
-        mCriticalMessage = message;
     }
 
     public Typeface getTypeFace(Context context) {
@@ -396,7 +389,6 @@ public class Instrument extends ReceiveModel {
             instrument.setPublished(jsonObject.optBoolean("published"));
             instrument.setShowSectionsFragment(jsonObject.getBoolean("show_sections_page"));
             instrument.setDirectReviewNavigation(jsonObject.getBoolean("navigate_to_review_page"));
-            instrument.setCriticalMessage(jsonObject.getString("critical_message"));
             instrument.setSpecialOptions(jsonObject.getString("special_options"));
             instrument.setRoster(jsonObject.optBoolean("roster"));
             instrument.setScorable(jsonObject.optBoolean("scorable"));
@@ -422,7 +414,6 @@ public class Instrument extends ReceiveModel {
                     translation.setInstrumentRemoteId(instrument.getRemoteId());
                     translation.setAlignment(translationJSON.getString("alignment"));
                     translation.setTitle(translationJSON.getString("title"));
-                    translation.setCriticalMessage(translationJSON.getString("critical_message"));
                     translation.setActive(translationJSON.optBoolean("active"));
                     translation.save();
                 }

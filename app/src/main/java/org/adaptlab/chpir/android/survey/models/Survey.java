@@ -1,12 +1,8 @@
 package org.adaptlab.chpir.android.survey.models;
 
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.content.Context;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.provider.BaseColumns;
-import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -18,8 +14,8 @@ import com.activeandroid.query.From;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.SendModel;
-import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -30,9 +26,9 @@ import java.util.List;
 import java.util.UUID;
 
 /*
-* Content Providers require column _id i.e. BaseColumns._ID which is different from the primary key
-* used by ActiveAndroid. As a result, the expected ActiveAndroid relationships do not work
-* and therefore have to be handled using the custom primary key or another key.
+ * Content Providers require column _id i.e. BaseColumns._ID which is different from the primary key
+ * used by ActiveAndroid. As a result, the expected ActiveAndroid relationships do not work
+ * and therefore have to be handled using the custom primary key or another key.
  */
 @Table(name = "Surveys", id = BaseColumns._ID)
 public class Survey extends SendModel {
@@ -56,8 +52,6 @@ public class Survey extends SendModel {
     private Long mProjectId;
     @Column(name = "InstrumentRemoteId")
     private Long mInstrumentRemoteId;
-    @Column(name = "CriticalResponses")
-    private boolean mCriticalResponses;
     @Column(name = "RosterUUID")
     private String mRosterUUID;
     @Column(name = "Language")
@@ -94,7 +88,6 @@ public class Survey extends SendModel {
             jsonObject.put("latitude", mLatitude);
             jsonObject.put("longitude", mLongitude);
             jsonObject.put("metadata", mMetadata);
-            jsonObject.put("has_critical_responses", getCriticalResponses());
             jsonObject.put("skipped_questions", getSkippedQuestions());
             if (mRosterUUID != null) {
                 jsonObject.put("roster_uuid", mRosterUUID);
@@ -126,7 +119,8 @@ public class Survey extends SendModel {
      * Return Unidentified Survey string if no response for identifier questions.
      */
     public String identifier(Context context) {
-        if (isSent() && !TextUtils.isEmpty(getSubmittedIdentifier())) return getSubmittedIdentifier();
+        if (isSent() && !TextUtils.isEmpty(getSubmittedIdentifier()))
+            return getSubmittedIdentifier();
         String surveyLabel = null;
         StringBuilder identifier = new StringBuilder();
 
@@ -232,7 +226,7 @@ public class Survey extends SendModel {
     }
 
     public HashMap<Question, Response> responsesMap() {
-        int capacity = (int) Math.ceil(responseCount()/0.75);
+        int capacity = (int) Math.ceil(responseCount() / 0.75);
         HashMap<Question, Response> map = new HashMap<>(capacity);
         for (Response response : responses()) {
             map.put(response.getQuestion(), response);
@@ -327,10 +321,6 @@ public class Survey extends SendModel {
         mProjectId = id;
     }
 
-    public void setCriticalResponses(boolean status) {
-        mCriticalResponses = status;
-    }
-
     private String getMetadataLabel() {
         try {
             JSONObject metadata = new JSONObject(getMetadata());
@@ -346,10 +336,6 @@ public class Survey extends SendModel {
 
     private Long getInstrumentRemoteId() {
         return mInstrumentRemoteId;
-    }
-
-    private boolean getCriticalResponses() {
-        return mCriticalResponses;
     }
 
     public void setRosterUUID(String uuid) {

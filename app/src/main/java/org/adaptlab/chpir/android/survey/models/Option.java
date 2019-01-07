@@ -20,15 +20,12 @@ public class Option extends ReceiveModel {
 
     @Column(name = "Text")
     private String mText;
-    // https://github.com/pardom/ActiveAndroid/issues/22
     @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
     private Long mRemoteId;
     @Column(name = "InstrumentVersion")
     private int mInstrumentVersion;
     @Column(name = "Deleted")
     private boolean mDeleted;
-    @Column(name = "Critical")
-    private boolean mCritical;
     @Column(name = "Identifier")
     private String mIdentifier;
 
@@ -212,14 +209,6 @@ public class Option extends ReceiveModel {
 
     private void setDeleted(boolean deleted) {
         mDeleted = deleted;
-    }
-
-    public boolean getCritical() {
-        return mCritical;
-    }
-
-    private void setCritical(boolean critical) {
-        mCritical = critical;
     }
 
 }

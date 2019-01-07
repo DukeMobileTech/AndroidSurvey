@@ -1,14 +1,30 @@
 package org.adaptlab.chpir.android.survey;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
+import org.adaptlab.chpir.android.survey.models.CriticalResponse;
 import org.adaptlab.chpir.android.survey.models.Instruction;
+import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtml;
 
 public abstract class QuestionFragment extends Fragment {
     protected SurveyFragment mSurveyFragment;
@@ -82,6 +98,63 @@ public abstract class QuestionFragment extends Fragment {
             }
         }
         return qInstructions;
+    }
+
+    protected void checkForCriticalResponses(Question question, Response response) {
+        if (question.hasSingleResponse() || question.hasMultipleResponses() || question.hasListResponses()) {
+            if (TextUtils.isEmpty(response.getText())) return;
+            List<CriticalResponse> criticalResponses = mSurveyFragment.getCriticalResponses(question.getQuestionIdentifier());
+            if (criticalResponses == null || criticalResponses.size() == 0) return;
+            List<Option> options = mSurveyFragment.getOptions().get(question);
+            if (options == null || options.size() == 0) return;
+            String[] indices = response.getText().split(Response.LIST_DELIMITER);
+            List<Option> selectedOptions = new ArrayList<>();
+            for (int k = 0; k < indices.length; k++) {
+                int index = Integer.parseInt(indices[k]);
+                selectedOptions.add(options.get(index));
+            }
+            List<CriticalResponse> activatedResponses = new ArrayList<>();
+
+            for (Option option : selectedOptions) {
+                for (CriticalResponse criticalResponse : criticalResponses) {
+                    if (criticalResponse.getOptionIdentifier().equals(option.getIdentifier())) {
+                        activatedResponses.add(criticalResponse);
+                    }
+                }
+            }
+
+            if (activatedResponses.size() > 0) {
+                String[] warnings = new String[activatedResponses.size()];
+                for (int k = 0; k < activatedResponses.size(); k++) {
+                    Instruction instruction = mSurveyFragment.getInstruction(activatedResponses.get(k).getInstructionId());
+                    warnings[k] = activatedResponses.get(k).getOptionIdentifier() + ": " +
+                            styleTextWithHtml(instruction.getText(mSurveyFragment.getInstrument()));
+                }
+
+                final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                View content = LayoutInflater.from(getActivity()).inflate(R.layout
+                        .critical_responses_dialog, null);
+                ListView listView = content.findViewById(R.id.critical_list);
+                listView.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout
+                        .simple_selectable_list_item, warnings));
+
+                builder.setTitle(R.string.critical_message_title)
+                        .setView(content)
+                        .setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int button) {
+                            }
+                        });
+                final AlertDialog criticalDialog = builder.create();
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        criticalDialog.dismiss();
+                    }
+                });
+                criticalDialog.show();
+            }
+        }
     }
 
 }

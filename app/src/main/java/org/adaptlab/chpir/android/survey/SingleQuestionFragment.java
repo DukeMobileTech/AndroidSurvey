@@ -771,6 +771,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         setSkipPatterns();
         refreshFollowUpQuestion();
         setLoopQuestions(mQuestion, mResponse);
+        checkForCriticalResponses(mQuestion, mResponse);
     }
 
     private class ItemTouchHelperCallback extends ItemTouchHelperExtension.Callback {
