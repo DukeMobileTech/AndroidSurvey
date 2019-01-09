@@ -14,7 +14,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -27,6 +26,7 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -40,6 +40,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.Button;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ListView;
@@ -88,11 +89,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import io.fabric.sdk.android.Fabric;
 
 import static org.adaptlab.chpir.android.survey.utils.FormatUtils.isEmpty;
+import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtml;
 
 public class SurveyFragment extends Fragment {
     public final static String EXTRA_INSTRUMENT_ID = "org.adaptlab.chpir.android.survey" +
@@ -120,6 +121,7 @@ public class SurveyFragment extends Fragment {
     private HashMap<Display, List<DisplayInstruction>> mDisplayInstructions;
     private LongSparseArray<OptionSet> mOptionSets;
     private LongSparseArray<Instruction> mInstructions;
+    private HashMap<String, Question> mQuestions;
     private HashMap<String, List<NextQuestion>> mNextQuestions;
     private HashMap<String, List<ConditionSkip>> mConditionSkips;
     private HashMap<String, List<MultipleSkip>> mMultipleSkips;
@@ -169,7 +171,7 @@ public class SurveyFragment extends Fragment {
                 displayNum = data.getExtras().getInt(EXTRA_DISPLAY_NUMBER);
             }
             if (displayNum == Integer.MIN_VALUE) {
-                scoreAndCompleteSurvey();
+                showCriticalResponses();
             } else {
                 mDisplay = mDisplays.get(displayNum);
                 mDisplayNumber = displayNum;
@@ -681,7 +683,7 @@ public class SurveyFragment extends Fragment {
     private void moveToNextDisplay() {
         String emptyResponses = mDisplayFragment.checkForEmptyResponses();
         if (emptyResponses.length() > 0) {
-            promptForResponses(emptyResponses);
+            promptForResponses(emptyResponses, false);
         } else {
             proceedToNextDisplay();
         }
@@ -710,7 +712,7 @@ public class SurveyFragment extends Fragment {
         refreshUIComponents();
     }
 
-    private void promptForResponses(String empty) {
+    private void promptForResponses(String empty, final boolean finish) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage(empty)
                 .setTitle(R.string.response_prompt)
@@ -719,7 +721,11 @@ public class SurveyFragment extends Fragment {
                     }
                 }).setPositiveButton(R.string.proceed, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                proceedToNextDisplay();
+                if (finish) {
+                    proceedFinishingSurvey();
+                } else {
+                    proceedToNextDisplay();
+                }
             }
         }).create().show();
     }
@@ -844,7 +850,7 @@ public class SurveyFragment extends Fragment {
                                    String questionIdentifier) {
         List<String> skipList = new ArrayList<>();
         boolean toBeSkipped = false;
-        for (Question curQuestion : getQuestions(mDisplay)) {
+        for (Question curQuestion : getDisplayQuestions(mDisplay)) {
             if (curQuestion.getQuestionIdentifier().equals(nextQuestionIdentifier)) break;
             if (toBeSkipped) {
                 skipList.add(curQuestion.getQuestionIdentifier());
@@ -863,9 +869,9 @@ public class SurveyFragment extends Fragment {
     private List<Question> loopChildren(String sourceIdentifier) {
         List<Question> questions = new ArrayList<>();
         if (mDisplayNumber + 1 < mDisplays.size()) {
-            questions.addAll(getQuestions(mDisplays.get(mDisplayNumber + 1)));
+            questions.addAll(getDisplayQuestions(mDisplays.get(mDisplayNumber + 1)));
         }
-        questions.addAll(getQuestions(mDisplay));
+        questions.addAll(getDisplayQuestions(mDisplay));
         List<Question> loopChildren = new ArrayList<>();
         if (sourceIdentifier != null) {
             for (Question question : questions) {
@@ -878,7 +884,7 @@ public class SurveyFragment extends Fragment {
         return loopChildren;
     }
 
-    protected List<Question> getQuestions(Display display) {
+    protected List<Question> getDisplayQuestions(Display display) {
         return mDisplayQuestions.get(display);
     }
 
@@ -908,7 +914,7 @@ public class SurveyFragment extends Fragment {
 
     protected void startSurveyCompletion(Question question) {
         List<String> displayQuestions = new ArrayList<>();
-        for (Question q : getQuestions(mDisplay)) {
+        for (Question q : getDisplayQuestions(mDisplay)) {
             displayQuestions.add(q.getQuestionIdentifier());
         }
         List<String> skipList = new ArrayList<>(displayQuestions.subList(
@@ -974,17 +980,6 @@ public class SurveyFragment extends Fragment {
         return null;
     }
 
-    public Question getQuestionByIdentifier(String identifier) {
-        for (HashMap.Entry<Display, List<Question>> entry : mDisplayQuestions.entrySet()) {
-            for (Question question : entry.getValue()) {
-                if (question.getQuestionIdentifier().equals(identifier)) {
-                    return question;
-                }
-            }
-        }
-        return null;
-    }
-
     public HashSet<String> getQuestionsToSkipSet() {
         return mQuestionsToSkipSet;
     }
@@ -1017,11 +1012,16 @@ public class SurveyFragment extends Fragment {
         return mDisplayInstructions.get(mDisplay);
     }
 
-    /*
-     * Destroy this activity, and save the survey and mark it as
-     * complete.  Send to server if network is available.
-     */
     public void finishSurvey() {
+        String emptyResponses = mDisplayFragment.checkForEmptyResponses();
+        if (emptyResponses.length() > 0) {
+            promptForResponses(emptyResponses, true);
+        } else {
+            proceedFinishingSurvey();
+        }
+    }
+
+    private void proceedFinishingSurvey() {
         unSetSkipQuestionResponse();
         if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) {
             setSurveyLocation();
@@ -1029,7 +1029,7 @@ public class SurveyFragment extends Fragment {
         if (mSurvey.emptyResponses().size() > 0) {
             goToReviewPage();
         } else {
-            scoreAndCompleteSurvey();
+            showCriticalResponses();
         }
     }
 
@@ -1040,6 +1040,66 @@ public class SurveyFragment extends Fragment {
             mSurvey.setAsComplete(true);
             mSurvey.save();
             finishActivity();
+        }
+    }
+
+    private void showCriticalResponses() {
+        List<CriticalResponse> activatedResponses = new ArrayList<>();
+        for (Question question : mQuestions.values()) {
+            List<CriticalResponse> criticalResponses = getCriticalResponses(question.getQuestionIdentifier());
+            if (criticalResponses != null && criticalResponses.size() > 0) {
+                Response response = mResponses.get(question);
+                if (response != null) {
+                    String[] indices = response.getText().split(Response.LIST_DELIMITER);
+                    List<Option> selectedOptions = new ArrayList<>();
+                    for (int k = 0; k < indices.length; k++) {
+                        int index = Integer.parseInt(indices[k]);
+                        selectedOptions.add(mOptions.get(question).get(index));
+                    }
+                    for (Option option : selectedOptions) {
+                        for (CriticalResponse criticalResponse : criticalResponses) {
+                            if (criticalResponse.getOptionIdentifier().equals(option.getIdentifier())) {
+                                activatedResponses.add(criticalResponse);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (activatedResponses.size() > 0) {
+            Spanned[] warnings = new Spanned[activatedResponses.size()];
+            for (int k = 0; k < activatedResponses.size(); k++) {
+                Instruction instruction = mInstructions.get(activatedResponses.get(k).getInstructionId());
+                String string = "<i>Question " + "<b>" + activatedResponses.get(k).getQuestionIdentifier() + "</b>" +
+                        " has response " + "<b>" + activatedResponses.get(k).getOptionIdentifier() +
+                        "</b> which requires the following action: </i><b>" + instruction.getText(mInstrument) + "</b>";
+                warnings[k] = styleTextWithHtml(string);
+            }
+
+            final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            View content = LayoutInflater.from(getActivity()).inflate(R.layout
+                    .critical_responses_dialog, null);
+            ListView listView = content.findViewById(R.id.critical_list);
+            listView.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout
+                    .simple_selectable_list_item, warnings));
+
+            builder.setTitle(R.string.critical_message_title)
+                    .setView(content)
+                    .setCancelable(false)
+                    .setPositiveButton(R.string.okay, null);
+            final AlertDialog criticalDialog = builder.create();
+            criticalDialog.show();
+            Button button = criticalDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    criticalDialog.dismiss();
+                    scoreAndCompleteSurvey();
+                }
+            });
+        } else {
+            scoreAndCompleteSurvey();
         }
     }
 
@@ -1171,6 +1231,7 @@ public class SurveyFragment extends Fragment {
         @Override
         protected void onPostExecute(InstrumentDataWrapper instrumentData) {
             mDisplayQuestions = instrumentData.displayQuestions;
+            setQuestions();
             mResponses = instrumentData.responses;
             mOptions = instrumentData.options;
             mSpecialOptions = instrumentData.specialOptions;
@@ -1183,6 +1244,15 @@ public class SurveyFragment extends Fragment {
             mInstructions = instrumentData.instructions;
             mCriticalResponses = instrumentData.criticalResponses;
             refreshView();
+        }
+
+        private void setQuestions() {
+            mQuestions = new HashMap<>();
+            for (Map.Entry<Display, List<Question>> mapEntry : mDisplayQuestions.entrySet()) {
+                for (Question question : mapEntry.getValue()) {
+                    mQuestions.put(question.getQuestionIdentifier(), question);
+                }
+            }
         }
     }
 

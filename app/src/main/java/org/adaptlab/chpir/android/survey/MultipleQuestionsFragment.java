@@ -21,7 +21,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.activeandroid.Model;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.survey.models.Display;
@@ -177,7 +176,7 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
     }
 
     protected void toggleLoadingStatus() {
-        List<Question> displayQuestions = mSurveyFragment.getQuestions(mDisplay);
+        List<Question> displayQuestions = mSurveyFragment.getDisplayQuestions(mDisplay);
         if (displayQuestions.get(displayQuestions.size() - 1).equals(mQuestions.get(mQuestions.size() - 1))) {
             mSurveyFragment.toggleLoadingStatus();
         }

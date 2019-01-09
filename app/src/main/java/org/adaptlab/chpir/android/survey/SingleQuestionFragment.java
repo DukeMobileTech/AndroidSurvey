@@ -19,7 +19,6 @@ import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -310,7 +309,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
     }
 
     protected void toggleLoadingStatus() {
-        List<Question> displayQuestions = mSurveyFragment.getQuestions(mDisplay);
+        List<Question> displayQuestions = mSurveyFragment.getDisplayQuestions(mDisplay);
         if (displayQuestions.get(displayQuestions.size() - 1).equals(mQuestion)) {
             mSurveyFragment.toggleLoadingStatus();
         }

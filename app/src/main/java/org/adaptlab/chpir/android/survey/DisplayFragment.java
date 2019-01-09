@@ -113,7 +113,7 @@ public class DisplayFragment extends Fragment {
 
     private List<Question> displayTableQuestions(String tableIdentifier) {
         List<Question> questions = new ArrayList<>();
-        for (Question question : mSurveyFragment.getQuestions(mDisplay)) {
+        for (Question question : mSurveyFragment.getDisplayQuestions(mDisplay)) {
             if (question.getTableIdentifier().equals(tableIdentifier)) {
                 questions.add(question);
             }
@@ -125,7 +125,7 @@ public class DisplayFragment extends Fragment {
         if (mSurveyFragment == null || getActivity() == null) return;
         FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-        for (Question question : mSurveyFragment.getQuestions(mDisplay)) {
+        for (Question question : mSurveyFragment.getDisplayQuestions(mDisplay)) {
             int frameLayoutId;
             String qfTag;
             if (isEmpty(question.getTableIdentifier())) {
@@ -195,7 +195,7 @@ public class DisplayFragment extends Fragment {
             FragmentTransaction ft = fm.beginTransaction();
             HashSet<Integer> hideSet = new HashSet<>();
             List<String> ids = new ArrayList<>();
-            for (Question q : getSurveyFragment().getQuestions(mDisplay)) {
+            for (Question q : getSurveyFragment().getDisplayQuestions(mDisplay)) {
                 ids.add(q.getQuestionIdentifier());
             }
 
@@ -222,7 +222,7 @@ public class DisplayFragment extends Fragment {
     protected String checkForEmptyResponses() {
         if (mSurveyFragment == null || mDisplay == null) return "";
         StringBuilder stringBuilder = new StringBuilder();
-        for (Question question : mSurveyFragment.getQuestions(mDisplay)) {
+        for (Question question : mSurveyFragment.getDisplayQuestions(mDisplay)) {
             if (!mSurveyFragment.getQuestionsToSkipSet().contains(question.getQuestionIdentifier()) &&
                     mSurveyFragment.getResponses().get(question).isResponseEmpty()) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -242,8 +242,8 @@ public class DisplayFragment extends Fragment {
         if (fuqs != null) {
             for (FollowUpQuestion fuq : fuqs) {
                 Question question = mSurveyFragment.getQuestion(fuq.getFollowingUpQuestionIdentifier());
-                int index = mSurveyFragment.getQuestions(mDisplay).indexOf(question);
-                if (index > -1 && index < mSurveyFragment.getQuestions(mDisplay).size()) {
+                int index = mSurveyFragment.getDisplayQuestions(mDisplay).indexOf(question);
+                if (index > -1 && index < mSurveyFragment.getDisplayQuestions(mDisplay).size()) {
                     QuestionFragment qf = mQuestionFragments.get(index);
                     ft.detach(qf);
                     ft.attach(qf);
