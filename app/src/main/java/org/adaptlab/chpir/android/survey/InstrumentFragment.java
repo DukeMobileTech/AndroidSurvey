@@ -54,6 +54,7 @@ import com.activeandroid.query.Delete;
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.activerecordcloudsync.NetworkNotificationUtils;
 import org.adaptlab.chpir.android.survey.models.AdminSettings;
+import org.adaptlab.chpir.android.survey.models.DeviceSyncEntry;
 import org.adaptlab.chpir.android.survey.models.Image;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.Response;
@@ -421,7 +422,6 @@ public class InstrumentFragment extends ListFragment {
                 return true;
             case R.id.menu_item_refresh:
                 new RefreshInstrumentsTask().execute();
-//                new SendResponsesTask(getActivity()).execute();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -973,8 +973,7 @@ public class InstrumentFragment extends ListFragment {
         protected void onPostExecute(Void param) {
             List<Instrument> instruments = Instrument.getAllProjectInstruments(getProjectId());
             for (int k = 0; k < instruments.size(); k++) {
-                new InstrumentSanitizerTask().execute(instruments.get(k), (k == instruments.size
-                        () - 1));
+                new InstrumentSanitizerTask().execute(instruments.get(k), (k == instruments.size() - 1));
             }
             if (instruments.size() == 0) {
                 if (isAdded() && !getActivity().isFinishing() && mProgressDialog != null &&

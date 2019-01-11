@@ -3,13 +3,19 @@ package org.adaptlab.chpir.android.survey.models;
 import android.content.Context;
 import android.util.Log;
 
+import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.activerecordcloudsync.SendModel;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.BuildConfig;
+import org.apache.commons.codec.CharEncoding;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.adaptlab.chpir.android.survey.location.LocationManager;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -39,8 +45,7 @@ public class DeviceSyncEntry extends SendModel {
             jsonObject.put("instrument_versions", instrumentVersions().toString());
             jsonObject.put("device_uuid", AdminSettings.getInstance().getDeviceIdentifier());
             jsonObject.put("api_key", AdminSettings.getInstance().getApiKey());
-            jsonObject.put("timezone", TimeZone.getDefault().getDisplayName() + " " + TimeZone
-                    .getDefault().getID());
+            jsonObject.put("timezone", TimeZone.getDefault().getDisplayName() + " " + TimeZone.getDefault().getID());
             jsonObject.put("project_id", AdminSettings.getInstance().getProjectId());
             jsonObject.put("device_label", AdminSettings.getInstance().getDeviceLabel());
             jsonObject.put("os_build_number", AppUtil.getOsBuildNumber());
@@ -89,4 +94,42 @@ public class DeviceSyncEntry extends SendModel {
 
         return json;
     }
+
+    public void pushRemote() {
+        if (BuildConfig.DEBUG) Log.i(TAG, "Pushing sync entry");
+        HttpURLConnection connection = null;
+        String endPoint = ActiveRecordCloudSync.getEndPoint() + "device_sync_entries" +
+                ActiveRecordCloudSync.getParams();
+        try {
+            connection = (HttpURLConnection) new URL(endPoint).openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setRequestProperty("Accept", "application/json");
+            connection.setConnectTimeout(10000);
+            connection.setReadTimeout(10000);
+            connection.setDoOutput(true);
+
+            JSONObject json = toJSON();
+            byte[] outputInBytes = json.toString().getBytes(CharEncoding.UTF_8);
+            OutputStream outputStream = connection.getOutputStream();
+            outputStream.write(outputInBytes);
+            outputStream.close();
+
+            if (AppUtil.DEBUG) {
+                int responseCode = connection.getResponseCode();
+                if (responseCode >= 200 && responseCode < 300) {
+                    Log.i(TAG, "Received OK HTTP code for " + json);
+                } else {
+                    Log.e(TAG, "Received BAD HTTP code " + responseCode + " for " + json);
+                }
+            }
+        } catch (IOException e) {
+            Log.e(TAG, "IOException " + e);
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+    }
+
 }

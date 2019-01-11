@@ -38,6 +38,7 @@ import org.adaptlab.chpir.android.survey.Instrument2Activity;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.SurveyActivity;
 import org.adaptlab.chpir.android.survey.SurveyFragment;
+import org.adaptlab.chpir.android.survey.models.DeviceSyncEntry;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Survey;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
@@ -115,6 +116,7 @@ public class SurveyViewPagerFragment extends Fragment {
             } else {
                 if (NetworkNotificationUtils.checkForNetworkErrors(mContext)) {
                     if (survey.isPersistent()) {
+                        DeviceSyncEntry deviceSyncEntry = new DeviceSyncEntry();
                         if (!survey.isSent()) {
                             totalItems += 1;
                             survey.setSubmittedIdentifier(survey.identifier(mContext));
@@ -132,6 +134,7 @@ public class SurveyViewPagerFragment extends Fragment {
                                 sendData(response.getResponsePhoto(), "response_images");
                             }
                         }
+                        deviceSyncEntry.pushRemote();
                     }
                 }
                 while (successCount + nonSuccessCount < totalItems) {
