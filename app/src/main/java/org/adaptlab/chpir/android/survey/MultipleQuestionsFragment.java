@@ -356,12 +356,12 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
     }
 
     protected void createResponse(Question question) {
-        Response response = mSurveyFragment.getResponses().get(question);
+        Response response = mSurveyFragment.getResponses().get(question.getQuestionIdentifier());
         if (response == null) {
             response = getResponse(question);
             getSurvey().setLastUpdated(new Date());
             saveResponseInBackground(response);
-            mSurveyFragment.getResponses().put(question, response);
+            mSurveyFragment.getResponses().put(question.getQuestionIdentifier(), response);
         }
     }
 
@@ -375,7 +375,7 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
     }
 
     protected void saveResponse(Question question, int checkedId, boolean isChecked) {
-        Response response = mSurveyFragment.getResponses().get(question);
+        Response response = mSurveyFragment.getResponses().get(question.getQuestionIdentifier());
         if (response == null) {
             response = getResponse(question);
         }

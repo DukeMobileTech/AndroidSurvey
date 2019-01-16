@@ -138,7 +138,7 @@ public class MultipleSelectMultipleQuestionsFragment extends MultipleQuestionsFr
             final Question question = questionList.get(position);
             if (viewHolder instanceof MultipleSelectMultipleQuestionsFragment.QuestionRecyclerViewAdapter.ViewHolder) {
                 MultipleSelectMultipleQuestionsFragment.QuestionRecyclerViewAdapter.ViewHolder holder = (MultipleSelectMultipleQuestionsFragment.QuestionRecyclerViewAdapter.ViewHolder) viewHolder;
-                String questionText = "<b>" + question.getNumberInInstrument() + "</b>: " + question.getText();
+                String questionText = "<b>" + question.getNumberInInstrument() + "</b>: " + getQuestionText(question);
                 holder.questionText.setText(styleTextWithHtml(questionText));
                 final Button specialResponseButton = new Button(context);
                 List<CheckBox> checkBoxes = new ArrayList<>();

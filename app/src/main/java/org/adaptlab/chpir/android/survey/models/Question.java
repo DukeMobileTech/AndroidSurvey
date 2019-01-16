@@ -79,6 +79,8 @@ public class Question extends ReceiveModel {
     private int mLoopNumber;
     @Column(name = "QuestionId")
     private Long mQuestionId;
+    @Column(name = "TextToReplace")
+    private String mTextToReplace;
 
     public Question() {
         super();
@@ -213,11 +215,10 @@ public class Question extends ReceiveModel {
      * If the question that is being followed up on was skipped by the user,
      * then return nothing.  This question will be skipped in that case.
      */
-    public String getFollowingUpText(HashMap<Question, Response> responses, Context context) {
+    public String getFollowingUpText(HashMap<String, Response> responses, Context context) {
         String questionText = getText();
         for (FollowUpQuestion followingUpQuestion : followingUpQuestions()) {
-            Response followUpResponse = responses.get(followingUpQuestion
-                    .getFollowingUpOnQuestion());
+            Response followUpResponse = responses.get(followingUpQuestion.getFollowingUpQuestionIdentifier());
 
             if (followUpResponse == null || followUpResponse.getText().equals("") ||
                     followUpResponse.hasSpecialResponse()) {
@@ -466,6 +467,7 @@ public class Question extends ReceiveModel {
                             loopQuestion.setDeleted(true);
                         }
                         loopQuestion.setSameDisplay(loopJSON.optBoolean("same_display", false));
+                        loopQuestion.setTextToReplace(loopJSON.optString("replacement_text", null));
                         loopQuestion.save();
                     }
                 }
@@ -746,6 +748,18 @@ public class Question extends ReceiveModel {
 
     void setLoopNumber(int number) {
         mLoopNumber = number;
+    }
+
+    public int getLoopNumber() {
+        return mLoopNumber;
+    }
+
+    public String getTextToReplace() {
+        return mTextToReplace;
+    }
+
+    public void setTextToReplace(String text) {
+        mTextToReplace = text;
     }
 
     public List<LoopQuestion> loopQuestions() {

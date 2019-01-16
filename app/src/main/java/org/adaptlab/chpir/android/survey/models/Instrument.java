@@ -216,9 +216,6 @@ public class Instrument extends ReceiveModel {
         save();
     }
 
-    /*
-     * Relationships
-     */
     public List<Question> questions() {
         return new Select().from(Question.class)
                 .where("InstrumentRemoteId = ? AND Deleted != ?", getRemoteId(), 1)
@@ -328,6 +325,19 @@ public class Instrument extends ReceiveModel {
             map.put(followUpQuestion.getQuestionIdentifier(), followUpQuestions);
         }
         return map;
+    }
+
+    public HashMap<String, List<LoopQuestion>> loopQuestions() {
+        HashMap<String, List<LoopQuestion>> hashMap = new HashMap<>();
+        for (Question question : questions()) {
+            if (question.getLoopQuestionCount() > 0) {
+                List<LoopQuestion> loopQuestions = question.loopQuestions();
+                if (loopQuestions.size() > 0) {
+                    hashMap.put(question.getQuestionIdentifier(), loopQuestions);
+                }
+            }
+        }
+        return hashMap;
     }
 
     public Typeface getTypeFace(Context context) {
@@ -681,6 +691,7 @@ public class Instrument extends ReceiveModel {
         } else {
             loopedQuestion.setNumberInInstrument(source.getNumberInInstrument() + (index * question.getLoopQuestionCount()));
         }
+        loopedQuestion.setTextToReplace(lq.getTextToReplace());
         loopedQuestion.save();
         setLoopedQuestionSkips(question, source, loopedQuestion, index);
         setLoopedQuestionMultipleSkips(question, source, loopedQuestion, index);

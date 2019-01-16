@@ -19,6 +19,7 @@ import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +41,7 @@ import org.adaptlab.chpir.android.survey.models.DisplayInstruction;
 import org.adaptlab.chpir.android.survey.models.FollowUpQuestion;
 import org.adaptlab.chpir.android.survey.models.Instruction;
 import org.adaptlab.chpir.android.survey.models.Instrument;
+import org.adaptlab.chpir.android.survey.models.LoopQuestion;
 import org.adaptlab.chpir.android.survey.models.NextQuestion;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.OptionSet;
@@ -58,6 +60,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -106,7 +109,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
             instructions = instructions + "\n";
         }
         int insLen = instructions.length();
-        Spanned text = getQuestionText();
+        Spanned text = getQuestionText(mQuestion);
         int textLen = text.length();
         SpannableString spannableText = new SpannableString(number + identifier + instructions + text);
         spannableText.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.secondary_text)),
@@ -365,14 +368,14 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
     }
 
     private Response loadOrCreateResponse() {
-        Response response = mSurveyFragment.getResponses().get(mQuestion);
+        Response response = mSurveyFragment.getResponses().get(mQuestion.getQuestionIdentifier());
         if (response == null) {
             response = new Response();
             response.setTimeStarted(new Date());
             response.setQuestion(mQuestion);
             response.setSurvey(mSurvey);
             response.save();
-            mSurveyFragment.getResponses().put(mQuestion, response);
+            mSurveyFragment.getResponses().put(mQuestion.getQuestionIdentifier(), response);
         }
         return response;
     }
@@ -404,21 +407,6 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
             instructions = styleTextWithHtml(qInstructions);
         }
         return instructions.toString();
-    }
-
-    protected Spanned getQuestionText() {
-        String text = "";
-        if (mQuestion.isFollowUpQuestion()) { // TODO: 12/4/18 Remove db call
-            String followUpText = mQuestion.getFollowingUpText(mSurveyFragment.getResponses(), getActivity());
-            if (followUpText != null) {
-                text = followUpText;
-            }
-        } else if (mQuestion.hasRandomizedFactors()) {
-            text = mQuestion.getRandomizedText(mSurveyFragment.getResponses().get(mQuestion));
-        } else {
-            text = mQuestion.getText();
-        }
-        return styleTextWithHtml(text);
     }
 
     private void setChoiceSelectionInstructions(View view) {

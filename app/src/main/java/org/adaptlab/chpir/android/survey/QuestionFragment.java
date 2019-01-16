@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.Fragment;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -155,6 +156,38 @@ public abstract class QuestionFragment extends Fragment {
                 criticalDialog.show();
             }
         }
+    }
+
+    protected Spanned getQuestionText(Question question) {
+        String text = "";
+        if (question.isFollowUpQuestion()) { // TODO: 12/4/18 Remove db call
+            String followUpText = question.getFollowingUpText(mSurveyFragment.getResponses(), getActivity());
+            if (followUpText != null) {
+                text = followUpText;
+            }
+        } else if (question.hasRandomizedFactors()) {
+            text = question.getRandomizedText(mSurveyFragment.getResponses().get(question.getQuestionIdentifier()));
+        } else if (!TextUtils.isEmpty(question.getLoopSource())) {
+            String causeId = question.getQuestionIdentifier().split("_")[0];
+            Response response = mSurveyFragment.getResponses().get(causeId);
+            if (response == null || TextUtils.isEmpty(response.getText())) {
+                text = question.getText();
+            } else {
+                String responseText = "";
+                String[] responses = response.getText().split(Response.LIST_DELIMITER, -1);
+                if (question.getLoopNumber() < responses.length) {
+                    responseText = responses[question.getLoopNumber()]; //Keep empty values
+                }
+                if (TextUtils.isEmpty(responseText)) {
+                    text = question.getText();
+                } else {
+                    text = question.getText().replace(question.getTextToReplace(), responseText);
+                }
+            }
+        } else {
+            text = question.getText();
+        }
+        return styleTextWithHtml(text);
     }
 
 }

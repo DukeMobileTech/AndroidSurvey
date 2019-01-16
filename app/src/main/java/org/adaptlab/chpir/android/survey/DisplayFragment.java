@@ -224,7 +224,7 @@ public class DisplayFragment extends Fragment {
         StringBuilder stringBuilder = new StringBuilder();
         for (Question question : mSurveyFragment.getDisplayQuestions(mDisplay)) {
             if (!mSurveyFragment.getQuestionsToSkipSet().contains(question.getQuestionIdentifier()) &&
-                    mSurveyFragment.getResponses().get(question).isResponseEmpty()) {
+                    mSurveyFragment.getResponses().get(question.getQuestionIdentifier()).isResponseEmpty()) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                     if (stringBuilder.length() > 0) stringBuilder.append(System.lineSeparator());
                     stringBuilder.append(getResources().getString(R.string.question))

@@ -108,7 +108,7 @@ public class SingleSelectMultipleQuestionsFragment extends MultipleQuestionsFrag
             final Question question = mQuestionList.get(position);
             if (viewHolder instanceof ViewHolder) {
                 QuestionRecyclerViewAdapter.ViewHolder holder = (QuestionRecyclerViewAdapter.ViewHolder) viewHolder;
-                String questionText = "<b>" + question.getNumberInInstrument() + "</b>: " + question.getText();
+                String questionText = "<b>" + question.getNumberInInstrument() + "</b>: " + getQuestionText(question);
                 holder.questionText.setText(styleTextWithHtml(questionText));
                 final Button specialResponseButton = new Button(context);
                 for (int k = 0; k < options.length; k++) {

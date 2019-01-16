@@ -225,11 +225,11 @@ public class Survey extends SendModel {
         return responses;
     }
 
-    public HashMap<Question, Response> responsesMap() {
+    public HashMap<String, Response> responsesMap() {
         int capacity = (int) Math.ceil(responseCount() / 0.75);
-        HashMap<Question, Response> map = new HashMap<>(capacity);
+        HashMap<String, Response> map = new HashMap<>(capacity);
         for (Response response : responses()) {
-            map.put(response.getQuestion(), response);
+            map.put(response.getQuestion().getQuestionIdentifier(), response);
         }
         return map;
     }

@@ -113,7 +113,7 @@ public class SurveyFragment extends Fragment {
     private static final int REVIEW_CODE = 100;
     private static final int ACCESS_FINE_LOCATION_CODE = 1;
 
-    private HashMap<Question, Response> mResponses;
+    private HashMap<String, Response> mResponses;
     private HashMap<Question, List<Option>> mOptions;
     private HashMap<Display, List<Question>> mDisplayQuestions;
     private HashMap<String, List<String>> mQuestionsToSkipMap;
@@ -127,6 +127,7 @@ public class SurveyFragment extends Fragment {
     private HashMap<String, List<MultipleSkip>> mMultipleSkips;
     private HashMap<String, List<FollowUpQuestion>> mFollowUpQuestions;
     private HashMap<String, List<CriticalResponse>> mCriticalResponses;
+    private HashMap<String, List<LoopQuestion>> mLoopQuestions;
     private LinkedHashMap<String, List<String>> mExpandableListData;
     private List<String> mExpandableListTitle;
     private HashSet<String> mQuestionsToSkipSet;
@@ -429,6 +430,7 @@ public class SurveyFragment extends Fragment {
         mMultipleSkips = new HashMap<>();
         mFollowUpQuestions = new HashMap<>();
         mCriticalResponses = new HashMap<>();
+        mLoopQuestions = new HashMap<>();
     }
 
     private void registerCrashlytics() {
@@ -751,7 +753,7 @@ public class SurveyFragment extends Fragment {
         while (iterator.hasNext()) {
             String questionIdentifier = iterator.next();
             if (questionIdentifier != null) {
-                Response response = mResponses.get(Question.findByQuestionIdentifier(questionIdentifier));
+                Response response = mResponses.get(questionIdentifier);
                 if (response != null) {
                     response.clearResponse();
                     response.setDeviceUser(AuthUtils.getCurrentUser());
@@ -996,7 +998,7 @@ public class SurveyFragment extends Fragment {
         return mInstrument;
     }
 
-    public HashMap<Question, Response> getResponses() {
+    public HashMap<String, Response> getResponses() {
         return mResponses;
     }
 
@@ -1010,6 +1012,10 @@ public class SurveyFragment extends Fragment {
 
     public List<DisplayInstruction> getDisplayInstructions() {
         return mDisplayInstructions.get(mDisplay);
+    }
+
+    public HashMap<String, List<LoopQuestion>> getLoopQuestions() {
+        return mLoopQuestions;
     }
 
     public void finishSurvey() {
@@ -1048,7 +1054,7 @@ public class SurveyFragment extends Fragment {
         for (Question question : mQuestions.values()) {
             List<CriticalResponse> criticalResponses = getCriticalResponses(question.getQuestionIdentifier());
             if (criticalResponses != null && criticalResponses.size() > 0) {
-                Response response = mResponses.get(question);
+                Response response = mResponses.get(question.getQuestionIdentifier());
                 if (response != null) {
                     String[] indices = response.getText().split(Response.LIST_DELIMITER);
                     List<Option> selectedOptions = new ArrayList<>();
@@ -1225,6 +1231,7 @@ public class SurveyFragment extends Fragment {
             instrumentData.multipleSkips = ((Instrument) params[0]).multipleSkips();
             instrumentData.followUpQuestions = ((Instrument) params[0]).followUpQuestions();
             instrumentData.criticalResponses = ((Instrument) params[0]).criticalResponses();
+            instrumentData.loopQuestions = ((Instrument) params[0]).loopQuestions();
             return instrumentData;
         }
 
@@ -1243,6 +1250,7 @@ public class SurveyFragment extends Fragment {
             mFollowUpQuestions = instrumentData.followUpQuestions;
             mInstructions = instrumentData.instructions;
             mCriticalResponses = instrumentData.criticalResponses;
+            mLoopQuestions = instrumentData.loopQuestions;
             refreshView();
         }
 
@@ -1257,7 +1265,7 @@ public class SurveyFragment extends Fragment {
     }
 
     private class InstrumentDataWrapper {
-        HashMap<Question, Response> responses;
+        HashMap<String, Response> responses;
         HashMap<Question, List<Option>> options;
         HashMap<Display, List<Question>> displayQuestions;
         HashMap<Long, List<Option>> specialOptions;
@@ -1269,6 +1277,7 @@ public class SurveyFragment extends Fragment {
         HashMap<String, List<FollowUpQuestion>> followUpQuestions;
         LongSparseArray<Instruction> instructions;
         HashMap<String, List<CriticalResponse>> criticalResponses;
+        HashMap<String, List<LoopQuestion>> loopQuestions;
     }
 
     private class DisplayTitlesListAdapter extends BaseExpandableListAdapter {

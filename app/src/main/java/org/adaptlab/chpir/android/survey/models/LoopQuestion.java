@@ -23,6 +23,8 @@ public class LoopQuestion extends Model {
     private String mOptionIndices;
     @Column(name = "SameDisplay")
     private boolean mSameDisplay;
+    @Column(name = "TextToReplace")
+    private String mTextToReplace;
 
     public LoopQuestion() {
         super();
@@ -88,5 +90,13 @@ public class LoopQuestion extends Model {
 
     public void setSameDisplay(boolean sameDisplay) {
         mSameDisplay = sameDisplay;
+    }
+
+    public String getTextToReplace() {
+        return mTextToReplace;
+    }
+
+    public void setTextToReplace(String text) {
+        mTextToReplace = text;
     }
 }
