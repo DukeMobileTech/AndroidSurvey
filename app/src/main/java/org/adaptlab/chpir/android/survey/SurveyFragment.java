@@ -612,7 +612,7 @@ public class SurveyFragment extends Fragment {
         }
     }
 
-    private void persistSkipMaps() {
+    protected void persistSkipMaps() {
         try {
             JSONObject jsonObject = new JSONObject();
             for (HashMap.Entry<String, List<String>> pair : mQuestionsToSkipMap.entrySet()) {

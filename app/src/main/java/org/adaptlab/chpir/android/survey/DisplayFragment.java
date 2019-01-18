@@ -28,15 +28,6 @@ import java.util.List;
 
 import static org.adaptlab.chpir.android.survey.utils.FormatUtils.isEmpty;
 
-
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link DisplayFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link DisplayFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class DisplayFragment extends Fragment {
     private static final String TAG = "DisplayFragment";
     private static final int OFFSET = 1000000;
@@ -103,6 +94,7 @@ public class DisplayFragment extends Fragment {
     public void onPause() {
         super.onPause();
         mSurveyFragment.persistSkippedQuestions();
+        mSurveyFragment.persistSkipMaps();
     }
 
     @Override

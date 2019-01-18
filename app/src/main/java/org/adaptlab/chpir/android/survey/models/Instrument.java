@@ -682,7 +682,12 @@ public class Instrument extends ReceiveModel {
             loopedQuestion.setDisplay(display.getRemoteId());
             loopedQuestion.setLoopNumber(index);
             loopedQuestion.setQuestionIdentifier(identifier);
+        }
+        if ((TextUtils.isEmpty(source.getTextToReplace()) || source.getInstructionId() == null) &&
+                loopedQuestion.getInstructionId() == null) {
             loopedQuestion.setInstruction(createLoopInstruction(instruction).getRemoteId());
+        } else {
+            loopedQuestion.setInstruction(null);
         }
         loopedQuestion.setLoopSource(source.getQuestionIdentifier());
         loopedQuestion = Question.copyAttributes(loopedQuestion, source);
