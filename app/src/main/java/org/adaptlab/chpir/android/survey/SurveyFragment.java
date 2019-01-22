@@ -764,10 +764,10 @@ public class SurveyFragment extends Fragment {
     }
 
     protected void setIntegerLoopQuestions(Question question, String response) {
-        List<LoopQuestion> loopQuestions = question.loopQuestions();
+        List<LoopQuestion> loopQuestions = mLoopQuestions.get(question.getQuestionIdentifier());
         List<String> questionsToHide = new ArrayList<>();
         for (LoopQuestion lq : loopQuestions) {
-            questionsToHide.add(lq.loopedQuestion().getQuestionIdentifier());
+            questionsToHide.add(lq.getLooped());
         }
         int start = 0;
         if (!TextUtils.isEmpty(response)) {
@@ -775,8 +775,7 @@ public class SurveyFragment extends Fragment {
         }
         for (int k = start + 1; k <= Instrument.LOOP_MAX; k++) {
             for (LoopQuestion lq : loopQuestions) {
-                String id = question.getQuestionIdentifier() + "_" + lq.loopedQuestion().getQuestionIdentifier()
-                        + "_" + k;
+                String id = question.getQuestionIdentifier() + "_" + lq.getLooped() + "_" + k;
                 questionsToHide.add(id);
             }
         }
@@ -818,20 +817,20 @@ public class SurveyFragment extends Fragment {
         } else {
             responses = Arrays.asList(text.split(Response.LIST_DELIMITER)); // Ignore empty values
         }
-        List<LoopQuestion> loopQuestions = question.loopQuestions();
+        List<LoopQuestion> loopQuestions = mLoopQuestions.get(question.getQuestionIdentifier());
         List<String> questionsToHide = new ArrayList<>();
         for (LoopQuestion lq : loopQuestions) {
-            questionsToHide.add(lq.loopedQuestion().getQuestionIdentifier());
+            questionsToHide.add(lq.getLooped());
         }
-        int optionsSize = question.defaultOptions().size() - 1;
+        int optionsSize = mOptions.get(question).size() - 1;
         if (question.isOtherQuestionType()) {
             optionsSize += 1;
         }
         for (int k = 0; k <= optionsSize; k++) {
             for (LoopQuestion lq : loopQuestions) {
-                if (lq.loopedQuestion() != null) {
+                if (!TextUtils.isEmpty(lq.getLooped())) {
                     String id = question.getQuestionIdentifier() + "_" +
-                            lq.loopedQuestion().getQuestionIdentifier() + "_" + k;
+                            lq.getLooped() + "_" + k;
                     if (question.hasMultipleResponses()) {
                         if (!responses.contains(String.valueOf(k))) {
                             questionsToHide.add(id);

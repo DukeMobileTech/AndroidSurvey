@@ -42,6 +42,7 @@ public class Instrument extends ReceiveModel {
     public static final String LEFT_ALIGNMENT = "left";
     public static final int LOOP_MAX = 12;
     private static final String TAG = "Instrument";
+    public static final int BOUND = 1000000;
     @Column(name = "Title")
     private String mTitle;
     // https://github.com/pardom/ActiveAndroid/issues/22
@@ -590,7 +591,7 @@ public class Instrument extends ReceiveModel {
         for (Question question : questions()) {
             if (question.getLoopQuestionCount() > 0 && question.getLoopSource() == null
                     && question.getDisplay() != null) {
-                List<LoopQuestion> loopQuestions = question.loopQuestions();
+                List<LoopQuestion> loopQuestions = question.loopQuestionsWithDeleted();
                 if (loopQuestions.size() > 0) {
                     if (question.getQuestionType().equals(Question.QuestionType.INTEGER)) {
                         for (LoopQuestion loopQuestion : loopQuestions) {
@@ -697,6 +698,11 @@ public class Instrument extends ReceiveModel {
             loopedQuestion.setNumberInInstrument(source.getNumberInInstrument() + (index * question.getLoopQuestionCount()));
         }
         loopedQuestion.setTextToReplace(lq.getTextToReplace());
+        if (lq.isDeleted()) {
+            loopedQuestion.setDeleted(true);
+            source.setLoopQuestionCount(source.loopQuestions().size());
+            source.save();
+        }
         loopedQuestion.save();
         setLoopedQuestionSkips(question, source, loopedQuestion, index);
         setLoopedQuestionMultipleSkips(question, source, loopedQuestion, index);
@@ -779,9 +785,9 @@ public class Instrument extends ReceiveModel {
     private long getBoundedRemoteId() {
         long remoteId;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            remoteId = ThreadLocalRandom.current().nextLong(100000);
+            remoteId = ThreadLocalRandom.current().nextLong(BOUND);
         } else {
-            remoteId = RandomUtils.nextLong(0, 100000);
+            remoteId = RandomUtils.nextLong(0, BOUND);
         }
         Question question = Question.findByRemoteId(remoteId);
         if (question != null) {

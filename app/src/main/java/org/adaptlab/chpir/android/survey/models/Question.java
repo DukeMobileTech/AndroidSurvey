@@ -522,7 +522,7 @@ public class Question extends ReceiveModel {
         return mDeleted;
     }
 
-    private void setDeleted(boolean deleted) {
+    public void setDeleted(boolean deleted) {
         mDeleted = deleted;
     }
 
@@ -551,7 +551,7 @@ public class Question extends ReceiveModel {
         return false;
     }
 
-    private void setLoopQuestionCount(int count) {
+    public void setLoopQuestionCount(int count) {
         mLoopQuestionCount = count;
     }
 
@@ -764,6 +764,11 @@ public class Question extends ReceiveModel {
 
     public List<LoopQuestion> loopQuestions() {
         return new Select().from(LoopQuestion.class).where("Question = ? AND Deleted = 0",
+                getId()).execute();
+    }
+
+    public List<LoopQuestion> loopQuestionsWithDeleted() {
+        return new Select().from(LoopQuestion.class).where("Question = ?",
                 getId()).execute();
     }
 
