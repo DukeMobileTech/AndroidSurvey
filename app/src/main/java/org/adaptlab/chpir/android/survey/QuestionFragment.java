@@ -181,7 +181,14 @@ public abstract class QuestionFragment extends Fragment {
                 if (TextUtils.isEmpty(responseText)) {
                     text = question.getText();
                 } else {
+                    text = question.getText();
+                    int begin = text.indexOf("[");
+                    int last = text.indexOf("]");
+                    if (begin != -1 && last != -1 && begin < last) {
+                        text = text.replace(text.substring(begin, last + 1), responseText);
+                    } else {
                     text = question.getText().replace(question.getTextToReplace(), responseText);
+                    }
                 }
             }
         } else {
