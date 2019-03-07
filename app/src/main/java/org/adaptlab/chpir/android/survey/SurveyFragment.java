@@ -851,17 +851,24 @@ public class SurveyFragment extends Fragment {
                                    String questionIdentifier) {
         List<String> skipList = new ArrayList<>();
         boolean toBeSkipped = false;
-        for (Question curQuestion : getDisplayQuestions(mDisplay)) {
-            if (curQuestion.getQuestionIdentifier().equals(nextQuestionIdentifier)) break;
-            if (toBeSkipped) {
-                skipList.add(curQuestion.getQuestionIdentifier());
-                // Skip loop children questions
-                for (Question question : loopChildren(curQuestion.getQuestionIdentifier())) {
-                    skipList.add(question.getQuestionIdentifier());
+        boolean found = false;
+        for (int k = mDisplayNumber; k < mDisplays.size(); k++) {
+            if (found) break;
+            for (Question curQuestion : getDisplayQuestions(mDisplays.get(k))) {
+                if (curQuestion.getQuestionIdentifier().equals(nextQuestionIdentifier)) {
+                    found = true;
+                    break;
                 }
+                if (toBeSkipped) {
+                    skipList.add(curQuestion.getQuestionIdentifier());
+                    // Skip loop children questions
+                    for (Question question : loopChildren(curQuestion.getQuestionIdentifier())) {
+                        skipList.add(question.getQuestionIdentifier());
+                    }
+                }
+                if (curQuestion.getQuestionIdentifier().equals(currentQuestionIdentifier))
+                    toBeSkipped = true;
             }
-            if (curQuestion.getQuestionIdentifier().equals(currentQuestionIdentifier))
-                toBeSkipped = true;
         }
         updateQuestionsToSkipMap(questionIdentifier + "/skipTo", skipList);
         hideQuestionsInDisplay();
