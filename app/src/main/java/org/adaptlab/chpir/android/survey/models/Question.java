@@ -578,7 +578,7 @@ public class Question extends ReceiveModel {
     }
 
     boolean hasOptions() {
-        return !defaultOptions().isEmpty();
+        return mRemoteOptionSetId > 0;
     }
 
     public List<Option> defaultOptions() {
@@ -586,7 +586,7 @@ public class Question extends ReceiveModel {
                 .innerJoin(OptionInOptionSet.class)
                 .on("OptionInOptionSets.RemoteOptionSetId = ?", getRemoteOptionSetId())
                 .where("Options.Deleted != 1 AND OptionInOptionSets.Special = 0 AND " +
-                        "OptionInOptionSets.RemoteOptionId = Options.RemoteId")
+                        "OptionInOptionSets.RemoteOptionId = Options.RemoteId AND OptionInOptionSets.Deleted != 1")
                 .orderBy("OptionInOptionSets.NumberInQuestion ASC")
                 .execute();
     }
@@ -732,6 +732,11 @@ public class Question extends ReceiveModel {
         QuestionType type = getQuestionType();
         return (type == QuestionType.SELECT_MULTIPLE || type == QuestionType.SELECT_MULTIPLE_WRITE_OTHER ||
                 type == QuestionType.LIST_OF_INTEGER_BOXES || type == QuestionType.LIST_OF_TEXT_BOXES);
+    }
+
+    public boolean isSingleSelect() {
+        QuestionType type = getQuestionType();
+        return (type == QuestionType.SELECT_ONE || type == QuestionType.SELECT_ONE_WRITE_OTHER);
     }
 
     public boolean rankResponses() {

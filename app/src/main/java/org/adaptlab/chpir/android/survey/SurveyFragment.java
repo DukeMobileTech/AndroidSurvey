@@ -979,13 +979,8 @@ public class SurveyFragment extends Fragment {
         return mDisplay;
     }
 
-    public Question getQuestion(String identifier) {
-        for (Question question : mDisplayQuestions.get(mDisplay)) {
-            if (question.getQuestionIdentifier().equals(identifier)) {
-                return question;
-            }
-        }
-        return null;
+    public HashMap<String, Question> getQuestions() {
+        return mQuestions;
     }
 
     public HashSet<String> getQuestionsToSkipSet() {

@@ -350,7 +350,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
             questionIdentifier = bundle.getString("QuestionIdentifier");
         }
         mSurvey = mSurveyFragment.getSurvey();
-        mQuestion = mSurveyFragment.getQuestion(questionIdentifier);
+        mQuestion = mSurveyFragment.getQuestions().get(questionIdentifier);
         mInstrument = mSurveyFragment.getInstrument();
         mDisplay = mSurveyFragment.getDisplay();
         if (mSurvey == null || mQuestion == null || mInstrument == null || mDisplay == null) return;

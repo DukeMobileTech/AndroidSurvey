@@ -213,7 +213,7 @@ public class Instrument2Activity extends AppCompatActivity {
     }
 
     private void dismissProgressDialog() {
-        if (mProgressDialog != null && mProgressDialog.isShowing()) mProgressDialog.dismiss();
+        if (mProgressDialog != null && !this.isFinishing() && mProgressDialog.isShowing()) mProgressDialog.dismiss();
         refreshInstrumentsView();
     }
 

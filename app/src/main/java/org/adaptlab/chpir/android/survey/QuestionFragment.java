@@ -23,6 +23,7 @@ import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtml;
@@ -32,11 +33,17 @@ public abstract class QuestionFragment extends Fragment {
     protected DisplayFragment mDisplayFragment;
 
     protected abstract void unSetResponse();
+
     protected abstract void createQuestionComponent(ViewGroup questionComponent);
+
     protected abstract void deserialize(String responseText);
+
     protected abstract String serialize();
+
     protected abstract void setDisplayInstructions();
+
     protected abstract void toggleLoadingStatus();
+
     private final String TAG = "QuestionFragment";
 
     @Override
@@ -60,7 +67,7 @@ public abstract class QuestionFragment extends Fragment {
     added and hidden. The onStart lifecycle event is not called when using the method FragmentTransaction.show(fragment)
      */
     @Override
-    public void onHiddenChanged (boolean hidden) {
+    public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
         if (!hidden) {
             toggleLoadingStatus();
@@ -175,8 +182,18 @@ public abstract class QuestionFragment extends Fragment {
             } else {
                 String responseText = "";
                 String[] responses = response.getText().split(Response.LIST_DELIMITER, -1);
-                if (question.getLoopNumber() < responses.length) {
-                    responseText = responses[question.getLoopNumber()]; //Keep empty values
+                Question causeQuestion = mSurveyFragment.getQuestions().get(causeId);
+                if (causeQuestion.isSingleSelect()) {
+                    int index = Integer.parseInt(responses[question.getLoopNumber()]);
+                    responseText = mSurveyFragment.getOptions().get(causeQuestion).get(index).getText(mSurveyFragment.getInstrument());
+                } else if (causeQuestion.hasMultipleResponses()) {
+                    if (Arrays.asList(responses).contains(Integer.toString(question.getLoopNumber()))) {
+                        responseText = mSurveyFragment.getOptions().get(causeQuestion).get(question.getLoopNumber()).getText(mSurveyFragment.getInstrument());
+                    }
+                } else {
+                    if (question.getLoopNumber() < responses.length) {
+                        responseText = responses[question.getLoopNumber()]; //Keep empty values
+                    }
                 }
                 if (TextUtils.isEmpty(responseText)) {
                     text = question.getText();
@@ -187,7 +204,7 @@ public abstract class QuestionFragment extends Fragment {
                     if (begin != -1 && last != -1 && begin < last) {
                         text = text.replace(text.substring(begin, last + 1), responseText);
                     } else {
-                    text = question.getText().replace(question.getTextToReplace(), responseText);
+                        text = question.getText().replace(question.getTextToReplace(), responseText);
                     }
                 }
             }

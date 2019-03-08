@@ -233,7 +233,7 @@ public class DisplayFragment extends Fragment {
         List<FollowUpQuestion> fuqs = mSurveyFragment.getFollowUpQuestions(q.getQuestionIdentifier());
         if (fuqs != null) {
             for (FollowUpQuestion fuq : fuqs) {
-                Question question = mSurveyFragment.getQuestion(fuq.getFollowingUpQuestionIdentifier());
+                Question question = mSurveyFragment.getQuestions().get(fuq.getFollowingUpQuestionIdentifier());
                 int index = mSurveyFragment.getDisplayQuestions(mDisplay).indexOf(question);
                 if (index > -1 && index < mSurveyFragment.getDisplayQuestions(mDisplay).size()) {
                     QuestionFragment qf = mQuestionFragments.get(index);
