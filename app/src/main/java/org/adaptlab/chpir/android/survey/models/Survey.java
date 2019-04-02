@@ -64,6 +64,8 @@ public class Survey extends SendModel {
     private String mIdentifier;
     @Column(name = "CompletedResponseCount")
     private int mCompletedResponseCount;
+    @Column(name = "Queued")
+    private boolean mQueued;
 
     public Survey() {
         super();
@@ -93,6 +95,7 @@ public class Survey extends SendModel {
                 jsonObject.put("roster_uuid", mRosterUUID);
             }
             jsonObject.put("language", mLanguage);
+            jsonObject.put("completed_responses_count", mCompletedResponseCount);
             json.put("survey", jsonObject);
         } catch (JSONException je) {
             Log.e(TAG, "JSON exception", je);
@@ -267,11 +270,6 @@ public class Survey extends SendModel {
     public void setAsSent(Context context) {
         mSent = true;
         this.save();
-
-        EventLog eventLog = new EventLog(EventLog.EventType.SENT_SURVEY, context);
-        eventLog.setInstrumentRemoteId(getInstrument().getRemoteId());
-        eventLog.setSurveyIdentifier(identifier(context));
-        eventLog.save();
     }
 
     @Override
@@ -386,6 +384,15 @@ public class Survey extends SendModel {
 
     public void setCompletedResponseCount(int count) {
         mCompletedResponseCount = count;
+        save();
+    }
+
+    public boolean isQueued() {
+        return mQueued;
+    }
+
+    public void setQueued(boolean queued) {
+        mQueued = queued;
         save();
     }
 

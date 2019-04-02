@@ -18,6 +18,7 @@ import com.crashlytics.android.Crashlytics;
 import com.newrelic.agent.android.NewRelic;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
+import org.adaptlab.chpir.android.activerecordcloudsync.PollService;
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.SurveyApp;
@@ -191,6 +192,7 @@ public class AppUtil {
         ActiveRecordCloudSync.addSendTable("scores", Score.class);
         ActiveRecordCloudSync.addSendTable("raw_scores", RawScore.class);
 
+        PollService.setServiceAlarm(context.getApplicationContext(), true);
     }
 
     private static void checkDatabaseVersionChange() {

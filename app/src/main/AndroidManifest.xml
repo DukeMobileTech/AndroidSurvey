@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:tools="http://schemas.android.com/tools"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="org.adaptlab.chpir.android.survey"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:versionCode="131"
-    android:versionName="2.1.46">
+    android:versionCode="132"
+    android:versionName="2.1.47">
 
     <permission
         android:name="org.adaptlab.chpir.android.survey.LAUNCH_SURVEY"
-        android:protectionLevel="signature"/>
+        android:protectionLevel="signature" />
     <permission
         android:name="org.adaptlab.chpir.android.survey.LIST_INSTRUMENTS"
-        android:protectionLevel="signature"/>
+        android:protectionLevel="signature" />
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <uses-feature
         android:name="android.hardware.location.gps"
-        android:required="true"/>
-    <uses-feature android:name="android.hardware.camera"/>
+        android:required="true" />
+    <uses-feature android:name="android.hardware.camera" />
 
     <application
         android:name="org.adaptlab.chpir.android.survey.SurveyApp"
@@ -35,78 +35,93 @@
 
         <activity
             android:name=".Instrument2Activity"
-            android:screenOrientation="sensorLandscape"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:screenOrientation="sensorLandscape">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".SurveyActivity"
             android:screenOrientation="sensorLandscape"
-            android:uiOptions="splitActionBarWhenNarrow"/>
-        <activity android:name=".AdminActivity"
-            android:screenOrientation="sensorLandscape"/>
+            android:uiOptions="splitActionBarWhenNarrow" />
+        <activity
+            android:name=".AdminActivity"
+            android:screenOrientation="sensorLandscape" />
         <activity
             android:name=".LoginActivity"
-            android:screenOrientation="sensorLandscape"
-            android:noHistory="true"/>
-        <activity android:name=".ReviewPageActivity"
-            android:screenOrientation="sensorLandscape"/>
-        <activity android:name=".SectionActivity"
-            android:screenOrientation="sensorLandscape"/>
-        <activity android:name=".roster.RosterActivity"
-            android:screenOrientation="sensorLandscape"/>
-        <activity android:name=".roster.ParticipantEditorActivity"
-            android:screenOrientation="sensorLandscape"/>
-        <activity android:name=".roster.ParticipantViewerActivity"
-            android:screenOrientation="sensorLandscape"/>
-        <activity android:name=".roster.ResponseViewerActivity"
-            android:screenOrientation="sensorLandscape"/>
-        <activity android:name=".roster.ResponseEditorActivity"
-            android:screenOrientation="sensorLandscape"/>
-        <activity android:name=".ScoreUnitActivity"
-            android:screenOrientation="sensorLandscape"/>
+            android:noHistory="true"
+            android:screenOrientation="sensorLandscape" />
+        <activity
+            android:name=".ReviewPageActivity"
+            android:screenOrientation="sensorLandscape" />
+        <activity
+            android:name=".SectionActivity"
+            android:screenOrientation="sensorLandscape" />
+        <activity
+            android:name=".roster.RosterActivity"
+            android:screenOrientation="sensorLandscape" />
+        <activity
+            android:name=".roster.ParticipantEditorActivity"
+            android:screenOrientation="sensorLandscape" />
+        <activity
+            android:name=".roster.ParticipantViewerActivity"
+            android:screenOrientation="sensorLandscape" />
+        <activity
+            android:name=".roster.ResponseViewerActivity"
+            android:screenOrientation="sensorLandscape" />
+        <activity
+            android:name=".roster.ResponseEditorActivity"
+            android:screenOrientation="sensorLandscape" />
+        <activity
+            android:name=".ScoreUnitActivity"
+            android:screenOrientation="sensorLandscape" />
 
         <provider
             android:name="com.activeandroid.content.ContentProvider"
             android:authorities="org.adaptlab.chpir.android.survey"
-            android:exported="false"/>
+            android:exported="false" />
 
-        <service android:name="org.adaptlab.chpir.android.activerecordcloudsync.NotificationService"/>
+        <service android:name="org.adaptlab.chpir.android.activerecordcloudsync.PollService" />
+        <service android:name="org.adaptlab.chpir.android.activerecordcloudsync.NotificationService" />
 
+        <receiver android:name=".receivers.StartupReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
         <receiver
             android:name=".receivers.SurveyLaunchReceiver"
             android:permission="org.adaptlab.chpir.android.survey.LAUNCH_SURVEY">
             <intent-filter>
-                <action android:name="org.adaptlab.chpir.android.survey.start_survey"/>
+                <action android:name="org.adaptlab.chpir.android.survey.start_survey" />
             </intent-filter>
         </receiver>
         <receiver
             android:name=".receivers.InstrumentListReceiver"
             android:permission="org.adaptlab.chpir.android.survey.LIST_INSTRUMENTS">
             <intent-filter>
-                <action android:name="org.adaptlab.chpir.android.survey.get_instrument_list"/>
+                <action android:name="org.adaptlab.chpir.android.survey.get_instrument_list" />
 
-                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".receivers.NotificationReceiver"/>
+        <receiver android:name=".receivers.NotificationReceiver" />
 
         <meta-data
             android:name="AA_DB_NAME"
-            android:value="Survey.db"/>
+            android:value="Survey.db" />
         <meta-data
             android:name="AA_DB_VERSION"
-            android:value="83"/>
+            android:value="84" />
         <meta-data
             android:name="SEED_DB"
-            android:value="false"/>
+            android:value="false" />
 
         <meta-data
             android:name="AA_MODELS"
-            android:value="org.adaptlab.chpir.android.survey.models.AdminSettings, org.adaptlab.chpir.android.survey.models.DeviceSyncEntry, org.adaptlab.chpir.android.survey.models.Project, org.adaptlab.chpir.android.survey.models.Instrument, org.adaptlab.chpir.android.survey.models.Section, org.adaptlab.chpir.android.survey.models.Grid, org.adaptlab.chpir.android.survey.models.Question, org.adaptlab.chpir.android.survey.models.Option, org.adaptlab.chpir.android.survey.models.RandomizedFactor, org.adaptlab.chpir.android.survey.models.RandomizedOption, org.adaptlab.chpir.android.survey.models.QuestionRandomizedFactor, org.adaptlab.chpir.android.survey.models.GridLabel, org.adaptlab.chpir.android.survey.models.Image, org.adaptlab.chpir.android.survey.models.DeviceUser, org.adaptlab.chpir.android.survey.models.Skip, org.adaptlab.chpir.android.survey.models.Rule, org.adaptlab.chpir.android.survey.models.ScoreScheme, org.adaptlab.chpir.android.survey.models.ScoreUnit, org.adaptlab.chpir.android.survey.models.OptionScore, org.adaptlab.chpir.android.survey.models.ScoreUnitQuestion, org.adaptlab.chpir.android.survey.models.Survey, org.adaptlab.chpir.android.survey.models.Response, org.adaptlab.chpir.android.survey.models.ResponsePhoto, org.adaptlab.chpir.android.survey.models.Roster, org.adaptlab.chpir.android.survey.models.Score, org.adaptlab.chpir.android.survey.models.RawScore, org.adaptlab.chpir.android.survey.models.GridLabelTranslation, org.adaptlab.chpir.android.survey.models.InstrumentTranslation, org.adaptlab.chpir.android.survey.models.OptionTranslation, org.adaptlab.chpir.android.survey.models.QuestionTranslation, org.adaptlab.chpir.android.survey.models.LoopQuestion, org.adaptlab.chpir.android.survey.models.SectionTranslation, org.adaptlab.chpir.android.survey.models.DefaultAdminSettings, org.adaptlab.chpir.android.survey.models.EventLog, org.adaptlab.chpir.android.survey.models.GridTranslation, org.adaptlab.chpir.android.survey.models.RosterLog, org.adaptlab.chpir.android.survey.models.RandomizedOptionTranslation, org.adaptlab.chpir.android.survey.models.Display, org.adaptlab.chpir.android.survey.models.DisplayTranslation, org.adaptlab.chpir.android.survey.models.NextQuestion, org.adaptlab.chpir.android.survey.models.MultipleSkip, org.adaptlab.chpir.android.survey.models.FollowUpQuestion, org.adaptlab.chpir.android.survey.models.OptionInOptionSet, org.adaptlab.chpir.android.survey.models.OptionSet, org.adaptlab.chpir.android.survey.models.Instruction, org.adaptlab.chpir.android.survey.models.InstructionTranslation, org.adaptlab.chpir.android.survey.models.DisplayInstruction, org.adaptlab.chpir.android.survey.models.Validation, org.adaptlab.chpir.android.survey.models.ValidationTranslation, org.adaptlab.chpir.android.survey.models.ConditionSkip, org.adaptlab.chpir.android.survey.models.CriticalResponse"/>
+            android:value="org.adaptlab.chpir.android.survey.models.AdminSettings, org.adaptlab.chpir.android.survey.models.DeviceSyncEntry, org.adaptlab.chpir.android.survey.models.Project, org.adaptlab.chpir.android.survey.models.Instrument, org.adaptlab.chpir.android.survey.models.Section, org.adaptlab.chpir.android.survey.models.Grid, org.adaptlab.chpir.android.survey.models.Question, org.adaptlab.chpir.android.survey.models.Option, org.adaptlab.chpir.android.survey.models.RandomizedFactor, org.adaptlab.chpir.android.survey.models.RandomizedOption, org.adaptlab.chpir.android.survey.models.QuestionRandomizedFactor, org.adaptlab.chpir.android.survey.models.GridLabel, org.adaptlab.chpir.android.survey.models.Image, org.adaptlab.chpir.android.survey.models.DeviceUser, org.adaptlab.chpir.android.survey.models.Skip, org.adaptlab.chpir.android.survey.models.Rule, org.adaptlab.chpir.android.survey.models.ScoreScheme, org.adaptlab.chpir.android.survey.models.ScoreUnit, org.adaptlab.chpir.android.survey.models.OptionScore, org.adaptlab.chpir.android.survey.models.ScoreUnitQuestion, org.adaptlab.chpir.android.survey.models.Survey, org.adaptlab.chpir.android.survey.models.Response, org.adaptlab.chpir.android.survey.models.ResponsePhoto, org.adaptlab.chpir.android.survey.models.Roster, org.adaptlab.chpir.android.survey.models.Score, org.adaptlab.chpir.android.survey.models.RawScore, org.adaptlab.chpir.android.survey.models.GridLabelTranslation, org.adaptlab.chpir.android.survey.models.InstrumentTranslation, org.adaptlab.chpir.android.survey.models.OptionTranslation, org.adaptlab.chpir.android.survey.models.QuestionTranslation, org.adaptlab.chpir.android.survey.models.LoopQuestion, org.adaptlab.chpir.android.survey.models.SectionTranslation, org.adaptlab.chpir.android.survey.models.DefaultAdminSettings, org.adaptlab.chpir.android.survey.models.EventLog, org.adaptlab.chpir.android.survey.models.GridTranslation, org.adaptlab.chpir.android.survey.models.RosterLog, org.adaptlab.chpir.android.survey.models.RandomizedOptionTranslation, org.adaptlab.chpir.android.survey.models.Display, org.adaptlab.chpir.android.survey.models.DisplayTranslation, org.adaptlab.chpir.android.survey.models.NextQuestion, org.adaptlab.chpir.android.survey.models.MultipleSkip, org.adaptlab.chpir.android.survey.models.FollowUpQuestion, org.adaptlab.chpir.android.survey.models.OptionInOptionSet, org.adaptlab.chpir.android.survey.models.OptionSet, org.adaptlab.chpir.android.survey.models.Instruction, org.adaptlab.chpir.android.survey.models.InstructionTranslation, org.adaptlab.chpir.android.survey.models.DisplayInstruction, org.adaptlab.chpir.android.survey.models.Validation, org.adaptlab.chpir.android.survey.models.ValidationTranslation, org.adaptlab.chpir.android.survey.models.ConditionSkip, org.adaptlab.chpir.android.survey.models.CriticalResponse" />
     </application>
 
 </manifest>

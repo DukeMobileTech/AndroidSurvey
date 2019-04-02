@@ -1060,8 +1060,10 @@ public class SurveyFragment extends Fragment {
                     String[] indices = response.getText().split(Response.LIST_DELIMITER);
                     List<Option> selectedOptions = new ArrayList<>();
                     for (int k = 0; k < indices.length; k++) {
-                        int index = Integer.parseInt(indices[k]);
-                        selectedOptions.add(mOptions.get(question).get(index));
+                        if (!TextUtils.isEmpty(indices[k])) {
+                            int index = Integer.parseInt(indices[k]);
+                            selectedOptions.add(mOptions.get(question).get(index));
+                        }
                     }
                     for (Option option : selectedOptions) {
                         for (CriticalResponse criticalResponse : criticalResponses) {

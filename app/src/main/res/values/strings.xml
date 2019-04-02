@@ -183,5 +183,5 @@
     <string name="response_prompt">Please provide a response for:</string>
     <string name="progress">Progress</string>
     <string name="submitted">Submitted</string>
-    <string name="uploading_survey">Uploading Survey</string>
+    <string name="uploading_surveys">Survey Upload</string>
 </resources>
