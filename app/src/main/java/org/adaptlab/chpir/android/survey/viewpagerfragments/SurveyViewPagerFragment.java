@@ -105,7 +105,7 @@ public class SurveyViewPagerFragment extends Fragment {
             view.findViewById(R.id.submitAll).setVisibility(View.GONE);
         }
         if (submittedSurveys.size() == 0)
-            view.findViewById(R.id.submittedSurveys).setVisibility(View.GONE);
+            view.findViewById(R.id.submittedHeader).setVisibility(View.GONE);
     }
 
     private void submitAll() {
@@ -121,7 +121,9 @@ public class SurveyViewPagerFragment extends Fragment {
                                         for (Survey survey : completedSurveys) {
                                             prepareForSubmission(survey);
                                         }
-                                        new SubmitSurveyTask(getActivity(), true).execute();
+                                        new SubmitSurveyTask(getActivity()).execute();
+                                        startActivity(new Intent(getActivity(), Instrument2Activity.class));
+                                        getActivity().finish();
                                     }
                                 })
                         .setNegativeButton(R.string.cancel,
@@ -139,7 +141,7 @@ public class SurveyViewPagerFragment extends Fragment {
         completedSurveys = new ArrayList<>();
         submittedSurveys = new ArrayList<>();
         for (Survey survey : Survey.getAllProjectSurveys(AppUtil.getProjectId())) {
-            if (survey.isSent()) {
+            if (survey.isSent() || survey.isQueued()) {
                 submittedSurveys.add(survey);
             } else if (survey.readyToSend()) {
                 completedSurveys.add(survey);
@@ -303,7 +305,7 @@ public class SurveyViewPagerFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     Survey survey = mSurveys.get(viewHolder.getAdapterPosition());
-                    if (survey != null && survey.getInstrument().loaded() && !survey.isSent()) {
+                    if (survey != null && survey.getInstrument().loaded() && !survey.isQueued() && !survey.isSent()) {
                         Intent i = new Intent(getActivity(), SurveyActivity.class);
                         i.putExtra(SurveyFragment.EXTRA_INSTRUMENT_ID,
                                 survey.getInstrument().getRemoteId());
@@ -335,7 +337,7 @@ public class SurveyViewPagerFragment extends Fragment {
                                         public void onClick(DialogInterface dialog, int id) {
                                             Survey survey = mSurveys.get(viewHolder.getAdapterPosition());
                                             prepareForSubmission(survey);
-                                            new SubmitSurveyTask(getActivity(), true).execute();
+                                            new SubmitSurveyTask(getActivity()).execute();
                                             notifyItemChanged(viewHolder.getAdapterPosition());
                                         }
                                     })
@@ -431,21 +433,23 @@ public class SurveyViewPagerFragment extends Fragment {
             if (survey.isSent()) {
                 progress = getString(R.string.submitted) + " " + (survey.getCompletedResponseCount() - survey.responses().size())
                         + " " + getString(R.string.of) + " " + survey.getCompletedResponseCount();
+            } else if (survey.isQueued()) {
+                progress = getString(R.string.submitted) + " " +
+                        (survey.getCompletedResponseCount() - survey.responses().size()) + " "
+                        + getString(R.string.of) + " " + survey.getCompletedResponseCount();
             } else {
                 progress = getString(R.string.progress) + " " + survey.responses().size() + " "
                         + getString(R.string.of) + " " + survey.getInstrument().questions().size();
             }
             SpannableString progressString = new SpannableString(progress);
-            if (survey.isSent()) {
+            if (survey.isSent() || survey.isQueued()) {
                 if (survey.responses().size() > 0) {
                     mSubmitAction.setVisibility(View.VISIBLE);
-                    progressString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color
-                            .green)), 0, progress.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 } else {
                     mSubmitAction.setVisibility(View.GONE);
-                    progressString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color
-                            .blue)), 0, progress.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
+                progressString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color
+                        .blue)), 0, progress.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             } else if (survey.readyToSend()) {
                 progressString.setSpan(new ForegroundColorSpan(getResources().getColor(R.color
                         .green)), 0, progress.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);

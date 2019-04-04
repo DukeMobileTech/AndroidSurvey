@@ -118,6 +118,19 @@ public class Question extends ReceiveModel {
         return destination;
     }
 
+    public static Question findByRemoteId(Long id) {
+        return new Select().from(Question.class).where("RemoteId = ?", id).executeSingle();
+    }
+
+    static boolean validQuestionType(String questionType) {
+        for (QuestionType type : QuestionType.values()) {
+            if (type.name().equals(questionType)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean hasSingleResponse() {
         return (getQuestionType() == QuestionType.SELECT_ONE ||
                 getQuestionType() == QuestionType.SELECT_ONE_WRITE_OTHER ||
@@ -498,10 +511,6 @@ public class Question extends ReceiveModel {
         }
     }
 
-    public static Question findByRemoteId(Long id) {
-        return new Select().from(Question.class).where("RemoteId = ?", id).executeSingle();
-    }
-
     private void setInstrumentVersion(int version) {
         mInstrumentVersion = version;
     }
@@ -540,15 +549,6 @@ public class Question extends ReceiveModel {
 
     public int getLoopQuestionCount() {
         return mLoopQuestionCount;
-    }
-
-    static boolean validQuestionType(String questionType) {
-        for (QuestionType type : QuestionType.values()) {
-            if (type.name().equals(questionType)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public void setLoopQuestionCount(int count) {
@@ -751,12 +751,12 @@ public class Question extends ReceiveModel {
         mLoopSource = source;
     }
 
-    void setLoopNumber(int number) {
-        mLoopNumber = number;
-    }
-
     public int getLoopNumber() {
         return mLoopNumber;
+    }
+
+    void setLoopNumber(int number) {
+        mLoopNumber = number;
     }
 
     public String getTextToReplace() {
@@ -765,6 +765,10 @@ public class Question extends ReceiveModel {
 
     public void setTextToReplace(String text) {
         mTextToReplace = text;
+    }
+
+    public Long getDisplayId() {
+        return mDisplayId;
     }
 
     public List<LoopQuestion> loopQuestions() {

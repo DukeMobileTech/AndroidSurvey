@@ -52,10 +52,6 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
             "org.adaptlab.chpir.android.survey.extra_skipped_id_list";
     public final static String EXTRA_TABLE_ID =
             "org.adaptlab.chpir.android.survey.table_id";
-
-    protected abstract void createQuestionComponent(ViewGroup questionComponent);
-    protected abstract void clearRegularResponseUI(int position);
-
     private static final String TAG = "MultipleQuestionsFragment";
     private Display mDisplay;
     private Survey mSurvey;
@@ -63,6 +59,10 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
     private String mTableIdentifier;
     private TextView mDisplayInstructionsText;
     private int mOptionWidth;
+
+    protected abstract void createQuestionComponent(ViewGroup questionComponent);
+
+    protected abstract void clearRegularResponseUI(int position);
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -75,10 +75,23 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
         }
         mDisplay = mSurveyFragment.getDisplay();
         mSurvey = mSurveyFragment.getSurvey();
-        mQuestions = mDisplay.tableQuestions(mTableIdentifier);
-        for(Question curQuestion: mQuestions){
+        mQuestions = getTableQuestions();
+        for (Question curQuestion : mQuestions) {
             setSpecialResponseSkips(curQuestion);
         }
+    }
+
+    protected List<Question> getTableQuestions() {
+        List<Question> tableQuestions = new ArrayList<>();
+        for (Question question : mSurveyFragment.getDisplayQuestions(mDisplay)) {
+            if (question.getTableIdentifier().equals(mTableIdentifier))
+                tableQuestions.add(question);
+        }
+        return tableQuestions;
+    }
+
+    protected List<Option> getTableOptions() {
+        return mSurveyFragment.getOptions().get(mQuestions.get(0));
     }
 
     @Override
@@ -187,8 +200,8 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         float margin = getActivity().getResources().getDimension(R.dimen.activity_horizontal_margin);
         float totalWidth = (displayMetrics.widthPixels - (margin * 2)) / 2;
-        int headerCount = getDisplay().tableOptions(getTableIdentifier()).size();
-        for (Question question : getQuestions()) {
+        int headerCount = getTableOptions().size();
+        for (Question question : mQuestions) {
             if (question.hasSpecialOptions()) {
                 headerCount += 1;
                 break;
@@ -198,19 +211,12 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
     }
 
     protected String[] getTableHeaders() {
-        List<Option> options = getDisplay().tableOptions(getTableIdentifier());
+        List<Option> options = getTableOptions();
         String[] headers = new String[options.size()];
         for (int k = 0; k < options.size(); k++) {
             headers[k] = options.get(k).getText(getInstrument());
         }
         return headers;
-    }
-
-    protected TextView getHeaderTextView(String text) {
-        TextView textView = new TextView(getActivity());
-        textView.setText(text);
-        textView.setTypeface(Typeface.DEFAULT_BOLD);
-        return textView;
     }
 
     protected int getOptionWidth() {
@@ -260,16 +266,6 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
         return mQuestions;
     }
 
-    protected List<Question> getQuestionExcludingSkip() {
-        List<Question> questionLst = new ArrayList<>();
-        for (Question curQuestion : mQuestions) {
-            if (!mSurveyFragment.getQuestionsToSkipSet().contains(curQuestion.getQuestionIdentifier())) {
-                questionLst.add(curQuestion);
-            }
-        }
-        return questionLst;
-    }
-
     private NextQuestion getNextQuestion(Question question, Option selectedOption) {
         return new Select().from(NextQuestion.class).where("OptionIdentifier = ? AND " +
                 "QuestionIdentifier = ? AND " + "RemoteInstrumentId = ?", selectedOption
@@ -315,7 +311,7 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
                         .innerJoin(OptionInOptionSet.class)
                         .on("OptionInOptionSets.RemoteOptionSetId = ?", question.getRemoteSpecialOptionSetId())
                         .where("Options.Text = ? AND OptionInOptionSets.RemoteOptionId = Options" +
-                                        ".RemoteId", curResponse.getSpecialResponse())
+                                ".RemoteId", curResponse.getSpecialResponse())
                         .executeSingle();
                 if (specialOption != null) {
                     NextQuestion specialSkipOption = getNextQuestion(question, specialOption);
@@ -340,10 +336,6 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
 
     protected Survey getSurvey() {
         return mSurvey;
-    }
-
-    protected String getTableIdentifier() {
-        return mTableIdentifier;
     }
 
     protected void setResponseIndex(Question q, int checkedId) {
@@ -386,6 +378,16 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
         checkForCriticalResponses(question, response);
     }
 
+    protected void setResponseHeader(HeaderHolder holder, String text, Context context) {
+        TextView textView = new TextView(context);
+        textView.setText(text);
+        textView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+        textView.setGravity(Gravity.CENTER | Gravity.CENTER_VERTICAL);
+        textView.setWidth(getOptionWidth());
+        textView.setPadding(1, 1, 1, 1);
+        holder.optionsPart.addView(textView);
+    }
+
     protected class HeaderHolder extends RecyclerView.ViewHolder {
         public TextView questionText;
         public LinearLayout optionsPart;
@@ -395,16 +397,6 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
             questionText = view.findViewById(R.id.questionColumn);
             optionsPart = view.findViewById(R.id.optionsPart);
         }
-    }
-
-    protected void setResponseHeader(HeaderHolder holder, String text, Context context) {
-        TextView textView = new TextView(context);
-        textView.setText(text);
-        textView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
-        textView.setGravity(Gravity.CENTER|Gravity.CENTER_VERTICAL);
-        textView.setWidth(getOptionWidth());
-        textView.setPadding(1,1,1,1);
-        holder.optionsPart.addView(textView);
     }
 
 }

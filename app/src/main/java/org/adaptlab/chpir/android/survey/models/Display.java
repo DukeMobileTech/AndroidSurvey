@@ -104,12 +104,12 @@ public class Display extends ReceiveModel {
         }
     }
 
-    void setDeleted(boolean deleted) {
-        mDeleted = deleted;
-    }
-
     public boolean getDeleted() {
         return mDeleted;
+    }
+
+    void setDeleted(boolean deleted) {
+        mDeleted = deleted;
     }
 
     public int getPosition() {
@@ -120,44 +120,12 @@ public class Display extends ReceiveModel {
         mPosition = position;
     }
 
-    public List<Question> questions() {
-        return new Select().from(Question.class)
-                .where("DisplayId = ? AND Deleted != ?", getRemoteId(), 1)
-                .orderBy("NumberInInstrument ASC")
-                .execute();
-    }
-
-    public List<Question> tableQuestions(String tableIdentifier) {
-        return new Select().from(Question.class)
-                .where("DisplayId = ? AND Deleted != ? AND TableIdentifier = ?", getRemoteId(), 1, tableIdentifier)
-                .orderBy("NumberInInstrument ASC")
-                .execute();
-    }
-
     public String getMode() {
         return mMode;
     }
 
     void setMode(String mode) {
         mMode = mode;
-    }
-
-    public List<Option> options() {
-        return new Select("Options.*").distinct().from(Option.class)
-                .innerJoin(OptionInOptionSet.class)
-                .on("OptionInOptionSets.RemoteOptionSetId = ?", questions().get(0).getRemoteOptionSetId())
-                .where("Options.Deleted != 1 AND OptionInOptionSets.Special = 0 AND OptionInOptionSets.RemoteOptionId = Options.RemoteId")
-                .orderBy("OptionInOptionSets.NumberInQuestion ASC")
-                .execute();
-    }
-
-    public List<Option> tableOptions(String tableIdentifier) {
-        return new Select("Options.*").distinct().from(Option.class)
-                .innerJoin(OptionInOptionSet.class)
-                .on("OptionInOptionSets.RemoteOptionSetId = ?", tableQuestions(tableIdentifier).get(0).getRemoteOptionSetId())
-                .where("Options.Deleted != 1 AND OptionInOptionSets.Special = 0 AND OptionInOptionSets.RemoteOptionId = Options.RemoteId")
-                .orderBy("OptionInOptionSets.NumberInQuestion ASC")
-                .execute();
     }
 
     public List<DisplayInstruction> displayInstructions() {
@@ -183,16 +151,16 @@ public class Display extends ReceiveModel {
         return mTitle;
     }
 
+    void setTitle(String title) {
+        mTitle = title;
+    }
+
     public List<DisplayTranslation> translations() {
         return getMany(DisplayTranslation.class, "Display");
     }
 
     public Instrument getInstrument() {
         return Instrument.findByRemoteId(mInstrumentId);
-    }
-
-    void setTitle(String title) {
-        mTitle = title;
     }
 
     void setInstrumentId(Long id) {

@@ -52,9 +52,8 @@ import com.activeandroid.content.ContentProvider;
 import com.activeandroid.query.Delete;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
-import org.adaptlab.chpir.android.activerecordcloudsync.NetworkNotificationUtils;
+import org.adaptlab.chpir.android.activerecordcloudsync.NotificationUtils;
 import org.adaptlab.chpir.android.survey.models.AdminSettings;
-import org.adaptlab.chpir.android.survey.models.DeviceSyncEntry;
 import org.adaptlab.chpir.android.survey.models.Image;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.Response;
@@ -887,7 +886,7 @@ public class InstrumentFragment extends ListFragment {
 
         @Override
         protected Integer doInBackground(Void... params) {
-            if (isAdded() && NetworkNotificationUtils.checkForNetworkErrors(getActivity())) {
+            if (isAdded() && NotificationUtils.checkForNetworkErrors(getActivity())) {
                 List<Instrument> instruments = Instrument.getAllProjectInstruments(getProjectId());
                 for (int k = 0; k < instruments.size(); k++) {
                     if (!instruments.get(k).loaded()) {
@@ -963,7 +962,7 @@ public class InstrumentFragment extends ListFragment {
 
         @Override
         protected Void doInBackground(Void... arg0) {
-            if (isAdded() && NetworkNotificationUtils.checkForNetworkErrors(getActivity())) {
+            if (isAdded() && NotificationUtils.checkForNetworkErrors(getActivity())) {
                 downloadImages();
             }
             return null;

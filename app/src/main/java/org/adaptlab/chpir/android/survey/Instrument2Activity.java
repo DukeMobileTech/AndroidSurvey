@@ -23,7 +23,7 @@ import android.widget.TextView;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.activerecordcloudsync.HttpUtil;
-import org.adaptlab.chpir.android.activerecordcloudsync.NetworkNotificationUtils;
+import org.adaptlab.chpir.android.activerecordcloudsync.NotificationUtils;
 import org.adaptlab.chpir.android.survey.models.AdminSettings;
 import org.adaptlab.chpir.android.survey.models.Image;
 import org.adaptlab.chpir.android.survey.models.Instrument;
@@ -230,7 +230,7 @@ public class Instrument2Activity extends AppCompatActivity {
 
         @Override
         protected Integer doInBackground(Void... params) {
-            if (NetworkNotificationUtils.checkForNetworkErrors(AppUtil.getContext())) {
+            if (NotificationUtils.checkForNetworkErrors(AppUtil.getContext())) {
                 List<Instrument> instruments = Instrument.getAllProjectInstruments(getProjectId());
                 for (int k = 0; k < instruments.size(); k++) {
                     if (!instruments.get(k).loaded()) {
@@ -267,16 +267,16 @@ public class Instrument2Activity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... arg0) {
-            if (NetworkNotificationUtils.checkForNetworkErrors(AppUtil.getContext())) {
+            if (NotificationUtils.checkForNetworkErrors(AppUtil.getContext())) {
                 ActiveRecordCloudSync.setAccessToken(AppUtil.getAdminSettingsInstance().getApiKey());
                 ActiveRecordCloudSync.setVersionCode(AppUtil.getVersionCode(AppUtil.getContext()));
-                NetworkNotificationUtils.showNotification(AppUtil.getContext(),
+                NotificationUtils.showNotification(AppUtil.getContext(),
                         android.R.drawable.stat_sys_download,
                         R.string.sync_notification_text);
                 for (Image image : Image.getAll()) {
                     HttpUtil.getFile(image);
                 }
-                NetworkNotificationUtils.showNotification(AppUtil.getContext(),
+                NotificationUtils.showNotification(AppUtil.getContext(),
                         android.R.drawable.stat_sys_download_done,
                         R.string.sync_notification_complete_text);
             }

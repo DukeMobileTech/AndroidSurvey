@@ -69,7 +69,7 @@ public class ActiveRecordCloudSync {
     }
 
     public static void syncReceiveTables(Context context) {
-        NetworkNotificationUtils.showNotification(context, android.R.drawable.stat_sys_download,
+        NotificationUtils.showNotification(context, android.R.drawable.stat_sys_download,
                 R.string.sync_notification_text);
         Date currentTime = new Date();
         ActiveRecordCloudSync.setLastSyncTime(Long.toString(currentTime.getTime()));
@@ -81,7 +81,7 @@ public class ActiveRecordCloudSync {
             httpFetchr.fetch();
         }
         deviceSyncEntry.pushRemote();
-        NetworkNotificationUtils.showNotification(context, android.R.drawable.stat_sys_download_done, R.string.sync_notification_complete_text);
+        NotificationUtils.showNotification(context, android.R.drawable.stat_sys_download_done, R.string.sync_notification_complete_text);
     }
 
     public static boolean isApiAvailable() {

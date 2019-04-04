@@ -1,7 +1,6 @@
 package org.adaptlab.chpir.android.survey.models;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Typeface;
 import android.provider.BaseColumns;
 import android.support.v4.util.LongSparseArray;
@@ -9,10 +8,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 
-import com.activeandroid.Cache;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
-import com.activeandroid.query.From;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
@@ -25,7 +22,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -41,8 +37,8 @@ public class Instrument extends ReceiveModel {
     public static final String KHMER_FONT_LOCATION = "fonts/khmerOS.ttf";
     public static final String LEFT_ALIGNMENT = "left";
     public static final int LOOP_MAX = 12;
-    private static final String TAG = "Instrument";
     public static final int BOUND = 1000000;
+    private static final String TAG = "Instrument";
     @Column(name = "Title")
     private String mTitle;
     // https://github.com/pardom/ActiveAndroid/issues/22
@@ -86,32 +82,12 @@ public class Instrument extends ReceiveModel {
                 .execute(); //sqlite saves booleans as integers
     }
 
-    public static Cursor getProjectInstrumentsCursor(Long projectId) {
-        From instrumentsQuery = new Select("Instruments.*")
-                .from(Instrument.class)
-                .where("ProjectID = ? AND Published = ? AND Deleted = ?", projectId, true, false)
-                .orderBy("Title");
-        return Cache.openDatabase().rawQuery(instrumentsQuery.toSql(), instrumentsQuery.getArguments());
-    }
-
-    public static List<Instrument> loadedInstruments() {
-        List<Instrument> instrumentList = new ArrayList<Instrument>();
-        for (Instrument instrument : Instrument.getAll()) {
-            if (instrument.loaded()) instrumentList.add(instrument);
-        }
-        return instrumentList;
-    }
-
     /*
      * Finders
      */
     public static List<Instrument> getAll() {
         return new Select().from(Instrument.class).where("Deleted != ?", 1).orderBy("Title")
                 .execute();
-    }
-
-    public boolean loaded() {
-        return mLoaded;
     }
 
     public static List<String> getLanguages() {
@@ -124,6 +100,14 @@ public class Instrument extends ReceiveModel {
             }
         }
         return languages;
+    }
+
+    public static Instrument findByRemoteId(Long id) {
+        return new Select().from(Instrument.class).where("RemoteId = ?", id).executeSingle();
+    }
+
+    public boolean loaded() {
+        return mLoaded;
     }
 
     /*
@@ -161,6 +145,10 @@ public class Instrument extends ReceiveModel {
         return mLanguage;
     }
 
+    public void setLanguage(String language) {
+        mLanguage = language;
+    }
+
     public InstrumentTranslation activeTranslation() {
         return new Select().from(InstrumentTranslation.class)
                 .where("InstrumentRemoteId = ? AND Language = ? AND Active = ?", mRemoteId, AppUtil.getDeviceLanguage(), 1).executeSingle();
@@ -178,10 +166,6 @@ public class Instrument extends ReceiveModel {
 
     public void setRemoteId(Long id) {
         mRemoteId = id;
-    }
-
-    public void setLanguage(String language) {
-        mLanguage = language;
     }
 
     // TODO: 5/1/18 Fix
@@ -222,14 +206,6 @@ public class Instrument extends ReceiveModel {
                 .where("InstrumentRemoteId = ? AND Deleted != ?", getRemoteId(), 1)
                 .orderBy("NumberInInstrument ASC")
                 .execute();
-    }
-
-    public HashMap<Display, List<Question>> displayQuestions() {
-        HashMap<Display, List<Question>> map = new HashMap<>();
-        for (Display display : displays()) {
-            map.put(display, display.questions());
-        }
-        return map;
     }
 
     public List<Display> displays() {
@@ -341,6 +317,10 @@ public class Instrument extends ReceiveModel {
         return hashMap;
     }
 
+    /*
+     * Getters/Setters
+     */
+
     public Typeface getTypeFace(Context context) {
         if (AppUtil.getDeviceLanguage().equals(KHMER_LANGUAGE_CODE)) {
             return Typeface.createFromAsset(context.getAssets(), KHMER_FONT_LOCATION);
@@ -348,10 +328,6 @@ public class Instrument extends ReceiveModel {
             return Typeface.DEFAULT;
         }
     }
-
-    /*
-     * Getters/Setters
-     */
 
     public int getDefaultGravity() {
         if (getAlignment().equals(LEFT_ALIGNMENT)) {
@@ -432,10 +408,6 @@ public class Instrument extends ReceiveModel {
         } catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);
         }
-    }
-
-    public static Instrument findByRemoteId(Long id) {
-        return new Select().from(Instrument.class).where("RemoteId = ?", id).executeSingle();
     }
 
     private void setDeleted(boolean deleted) {

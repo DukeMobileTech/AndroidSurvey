@@ -16,7 +16,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
-import org.adaptlab.chpir.android.activerecordcloudsync.NetworkNotificationUtils;
+import org.adaptlab.chpir.android.activerecordcloudsync.NotificationUtils;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.R;
 import org.json.JSONException;
@@ -53,7 +53,7 @@ public class ApkUpdateTask extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... params) {
-        if (NetworkNotificationUtils.checkForNetworkErrors(mContext)) {
+        if (NotificationUtils.checkForNetworkErrors(mContext)) {
             checkLatestApk();
         }
         return null;
@@ -150,7 +150,7 @@ public class ApkUpdateTask extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected Void doInBackground(Void... params) {
-            if (NetworkNotificationUtils.checkForNetworkErrors(mContext)) {
+            if (NotificationUtils.checkForNetworkErrors(mContext)) {
                 downloadLatestApk();
             }
             return null;

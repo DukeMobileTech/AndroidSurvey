@@ -115,7 +115,7 @@ public class SurveyFragment extends Fragment {
 
     private HashMap<String, Response> mResponses;
     private HashMap<Question, List<Option>> mOptions;
-    private HashMap<Display, List<Question>> mDisplayQuestions;
+    private HashMap<Long, List<Question>> mDisplayQuestions;
     private HashMap<String, List<String>> mQuestionsToSkipMap;
     private HashMap<Long, List<Option>> mSpecialOptions;
     private HashMap<Display, List<DisplayInstruction>> mDisplayInstructions;
@@ -552,7 +552,7 @@ public class SurveyFragment extends Fragment {
 
     private void updateHiddenDisplayNumberSet() {
         HashSet<Integer> mHiddenDisplayNumberSet = new HashSet<>();
-        for (Map.Entry<Display, List<Question>> curEntry : mDisplayQuestions.entrySet()) {
+        for (Map.Entry<Long, List<Question>> curEntry : mDisplayQuestions.entrySet()) {
             boolean isSkip = true;
             for (Question curQuestion : curEntry.getValue()) {
                 if (!mQuestionsToSkipSet.contains(curQuestion.getQuestionIdentifier())) {
@@ -697,10 +697,13 @@ public class SurveyFragment extends Fragment {
         mPreviousDisplays.add(mDisplayNumber);
         for (int i = mDisplayNumber + 1; i < mDisplays.size(); i++) {
             boolean skipDisplay = true;
-            for (Question curQuestion : mDisplayQuestions.get(mDisplays.get(i))) {
-                if (!mQuestionsToSkipSet.contains(curQuestion.getQuestionIdentifier())) {
-                    skipDisplay = false;
-                    break;
+            List<Question> displayQuestions = mDisplayQuestions.get(mDisplays.get(i).getRemoteId());
+            if (displayQuestions != null) {
+                for (Question curQuestion : displayQuestions) {
+                    if (!mQuestionsToSkipSet.contains(curQuestion.getQuestionIdentifier())) {
+                        skipDisplay = false;
+                        break;
+                    }
                 }
             }
             if (!skipDisplay) {
@@ -893,7 +896,7 @@ public class SurveyFragment extends Fragment {
     }
 
     protected List<Question> getDisplayQuestions(Display display) {
-        return mDisplayQuestions.get(display);
+        return mDisplayQuestions.get(display.getRemoteId());
     }
 
     protected OptionSet getOptionSet(Long id) {
@@ -1149,22 +1152,21 @@ public class SurveyFragment extends Fragment {
     }
 
     private void updateDisplayLabels() {
-        if (mDisplay != null && mDisplay.questions().size() > 0) {
+        List<Question> questions = mDisplayQuestions.get(mDisplay.getRemoteId());
+        if (mDisplay != null && questions.size() > 0) {
             // Screen title
             if (!mDisplay.getMode().equals(Display.DisplayMode.SINGLE.toString())) {
                 updateActionBarTitle(String.format(Locale.getDefault(), "%s %s%d %s %d%s",
-                        mDisplay.getTitle(), "(", mDisplay.questions().get(0)
-                                .getNumberInInstrument(), "-", mDisplay.questions().get(mDisplay
-                                .questions().size() - 1).getNumberInInstrument(), ")"));
+                        mDisplay.getTitle(), "(", questions.get(0).getNumberInInstrument(),
+                        "-", questions.get(questions.size() - 1).getNumberInInstrument(), ")"));
             } else {
                 updateActionBarTitle(mDisplay.getTitle());
             }
             // Progress text
             mDisplayIndexLabel.setText(String.format(Locale.getDefault(), "%s %d %s %d %s%d %s" +
-                    " %d%s", getString(R.string.screen), mDisplayNumber + 1, getString(R.string
-                    .of), mDisplays.size(), "(", mDisplay
-                    .questions().get(0).getNumberInInstrument(), "-", mDisplay.questions().get
-                    (mDisplay.questions().size() - 1).getNumberInInstrument(), ")"));
+                            " %d%s", getString(R.string.screen), mDisplayNumber + 1, getString(R.string
+                            .of), mDisplays.size(), "(", questions.get(0).getNumberInInstrument(), "-",
+                    questions.get(questions.size() - 1).getNumberInInstrument(), ")"));
             // Progress bar
             mProgressBar.setProgress((int) (100 * (mDisplayNumber + 1) / (float) mDisplays.size()));
         }
@@ -1222,7 +1224,7 @@ public class SurveyFragment extends Fragment {
         @Override
         protected InstrumentDataWrapper doInBackground(Object... params) {
             InstrumentDataWrapper instrumentData = new InstrumentDataWrapper();
-            instrumentData.displayQuestions = ((Instrument) params[0]).displayQuestions();
+            instrumentData.questions = (ArrayList<Question>) ((Instrument) params[0]).questions();
             instrumentData.responses = ((Survey) params[1]).responsesMap();
             instrumentData.options = ((Instrument) params[0]).optionsMap();
             instrumentData.specialOptions = ((Instrument) params[0]).specialOptionsMap();
@@ -1240,8 +1242,7 @@ public class SurveyFragment extends Fragment {
 
         @Override
         protected void onPostExecute(InstrumentDataWrapper instrumentData) {
-            mDisplayQuestions = instrumentData.displayQuestions;
-            setQuestions();
+            setQuestions(instrumentData.questions);
             mResponses = instrumentData.responses;
             mOptions = instrumentData.options;
             mSpecialOptions = instrumentData.specialOptions;
@@ -1257,12 +1258,16 @@ public class SurveyFragment extends Fragment {
             refreshView();
         }
 
-        private void setQuestions() {
+        private void setQuestions(List<Question> questions) {
             mQuestions = new HashMap<>();
-            for (Map.Entry<Display, List<Question>> mapEntry : mDisplayQuestions.entrySet()) {
-                for (Question question : mapEntry.getValue()) {
-                    mQuestions.put(question.getQuestionIdentifier(), question);
+            for (Question question : questions) {
+                mQuestions.put(question.getQuestionIdentifier(), question);
+                List<Question> displayQuestions = mDisplayQuestions.get(question.getDisplayId());
+                if (displayQuestions == null) {
+                    displayQuestions = new ArrayList<>();
                 }
+                displayQuestions.add(question);
+                mDisplayQuestions.put(question.getDisplayId(), displayQuestions);
             }
         }
     }
@@ -1270,7 +1275,6 @@ public class SurveyFragment extends Fragment {
     private class InstrumentDataWrapper {
         HashMap<String, Response> responses;
         HashMap<Question, List<Option>> options;
-        HashMap<Display, List<Question>> displayQuestions;
         HashMap<Long, List<Option>> specialOptions;
         HashMap<Display, List<DisplayInstruction>> displayInstructions;
         LongSparseArray<OptionSet> optionSets;
@@ -1281,6 +1285,7 @@ public class SurveyFragment extends Fragment {
         LongSparseArray<Instruction> instructions;
         HashMap<String, List<CriticalResponse>> criticalResponses;
         HashMap<String, List<LoopQuestion>> loopQuestions;
+        ArrayList<Question> questions;
     }
 
     private class DisplayTitlesListAdapter extends BaseExpandableListAdapter {

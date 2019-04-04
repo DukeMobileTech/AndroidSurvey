@@ -169,7 +169,7 @@
     <string name="device_language">Device Language</string>
     <string name="language">Language</string>
     <string name="submit_survey">Submit Survey</string>
-    <string name="submit_survey_message">Once a survey has been submitted successfully, it will be deleted from the device.</string>
+    <string name="submit_survey_message">Once you press the SUBMIT button, you will no longer be able to edit the survey(s).</string>
     <string name="start">Start</string>
     <string name="end">End</string>
     <string name="sum_of_parts">Total Sum of Parts</string>
@@ -184,4 +184,5 @@
     <string name="progress">Progress</string>
     <string name="submitted">Submitted</string>
     <string name="uploading_surveys">Survey Upload</string>
+    <string name="survey_upload">surveys will be uploaded</string>
 </resources>
