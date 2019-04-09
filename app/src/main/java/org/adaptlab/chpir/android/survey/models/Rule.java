@@ -30,7 +30,7 @@ public class Rule extends ReceiveModel {
     @Column(name = "Deleted")
     private boolean mDeleted;
 
-    public static enum RuleType {
+    public enum RuleType {
       INSTRUMENT_SURVEY_LIMIT_RULE, INSTRUMENT_TIMING_RULE, INSTRUMENT_SURVEY_LIMIT_PER_MINUTE_RULE,
       INSTRUMENT_LAUNCH_RULE, PARTICIPANT_TYPE_RULE, PARTICIPANT_AGE_RULE
     };

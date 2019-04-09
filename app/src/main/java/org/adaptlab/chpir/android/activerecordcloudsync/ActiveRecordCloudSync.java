@@ -1,6 +1,9 @@
 package org.adaptlab.chpir.android.activerecordcloudsync;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Context;
+import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -69,19 +72,26 @@ public class ActiveRecordCloudSync {
     }
 
     public static void syncReceiveTables(Context context) {
-        NotificationUtils.showNotification(context, android.R.drawable.stat_sys_download,
-                R.string.sync_notification_text);
+        downloadNotification(context, android.R.drawable.stat_sys_download, R.string.sync_notification_text);
         Date currentTime = new Date();
         ActiveRecordCloudSync.setLastSyncTime(Long.toString(currentTime.getTime()));
         DeviceSyncEntry deviceSyncEntry = new DeviceSyncEntry();
         for (Map.Entry<String, Class<? extends ReceiveModel>> entry : mReceiveTables.entrySet()) {
-            if (AppUtil.DEBUG)
+            if (AppUtil.DEBUG) {
                 Log.i(TAG, "Syncing " + entry.getValue() + " from remote table " + entry.getKey());
+            }
             HttpFetchr httpFetchr = new HttpFetchr(entry.getKey(), entry.getValue());
             httpFetchr.fetch();
         }
         deviceSyncEntry.pushRemote();
-        NotificationUtils.showNotification(context, android.R.drawable.stat_sys_download_done, R.string.sync_notification_complete_text);
+        downloadNotification(context, android.R.drawable.stat_sys_download_done, R.string.sync_notification_complete_text);
+    }
+
+    public static void downloadNotification(Context context, int title, int text) {
+        NotificationUtils.showNotification(context, title,
+                R.string.app_name, context.getString(text),
+                Notification.BADGE_ICON_SMALL, NotificationCompat.PRIORITY_DEFAULT,
+                NotificationManager.IMPORTANCE_DEFAULT);
     }
 
     public static boolean isApiAvailable() {

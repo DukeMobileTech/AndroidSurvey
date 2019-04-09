@@ -24,7 +24,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import org.adaptlab.chpir.android.survey.Instrument2Activity;
+import org.adaptlab.chpir.android.survey.InstrumentActivity;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.SurveyActivity;
 import org.adaptlab.chpir.android.survey.SurveyFragment;
@@ -122,7 +122,7 @@ public class SurveyViewPagerFragment extends Fragment {
                                             prepareForSubmission(survey);
                                         }
                                         new SubmitSurveyTask(getActivity()).execute();
-                                        startActivity(new Intent(getActivity(), Instrument2Activity.class));
+                                        startActivity(new Intent(getActivity(), InstrumentActivity.class));
                                         getActivity().finish();
                                     }
                                 })
@@ -313,7 +313,7 @@ public class SurveyViewPagerFragment extends Fragment {
                         i.putExtra(SurveyFragment.EXTRA_QUESTION_NUMBER,
                                 survey.getLastQuestion().getNumberInInstrument() - 1);
                         i.putExtra(SurveyFragment.EXTRA_AUTHORIZE_SURVEY,
-                                ((Instrument2Activity) getActivity()).isAuthorizeSurvey());
+                                ((InstrumentActivity) getActivity()).isAuthorizeSurvey());
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             startActivity(i, ActivityOptions.makeSceneTransitionAnimation
                                     (getActivity()).toBundle());

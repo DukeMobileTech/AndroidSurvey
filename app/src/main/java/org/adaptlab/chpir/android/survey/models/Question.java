@@ -397,6 +397,10 @@ public class Question extends ReceiveModel {
         mOptionCount = num;
     }
 
+    public int getOptionCount() {
+        return mOptionCount;
+    }
+
     @Override
     public void createObjectFromJSON(JSONObject jsonObject) {
         try {

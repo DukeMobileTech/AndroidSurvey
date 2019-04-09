@@ -32,6 +32,9 @@ public class Display extends ReceiveModel {
     private Long mSectionId;
     @Column(name = "Deleted")
     private boolean mDeleted;
+    @Column(name = "QuestionCount")
+    private int mQuestionCount;
+
 
     public Display() {
         super();
@@ -76,6 +79,7 @@ public class Display extends ReceiveModel {
             display.setInstrumentId(jsonObject.optLong("instrument_id"));
             display.setTitle(jsonObject.optString("title"));
             display.setSectionId(jsonObject.optLong("section_id"));
+            display.setQuestionCount(jsonObject.optInt("question_count"));
             if (jsonObject.isNull("deleted_at")) {
                 display.setDeleted(false);
             } else {
@@ -165,6 +169,14 @@ public class Display extends ReceiveModel {
 
     void setInstrumentId(Long id) {
         mInstrumentId = id;
+    }
+
+    public int getQuestionCount() {
+        return mQuestionCount;
+    }
+
+    public void setQuestionCount(int count) {
+        mQuestionCount = count;
     }
 
     public enum DisplayMode {

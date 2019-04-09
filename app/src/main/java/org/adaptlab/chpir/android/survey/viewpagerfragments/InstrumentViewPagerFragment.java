@@ -177,27 +177,25 @@ public class InstrumentViewPagerFragment extends Fragment {
             String questionCount = numQuestions + " " + FormatUtils.pluralize(numQuestions,
                     getString(R.string.question), getString(R.string.questions)) + "  ";
             String version = getString(R.string.version) + ": " + instrument.getVersionNumber();
-            SpannableString spannableText = new SpannableString(title + questionCount +
-                    version);
+            SpannableString spannableText = new SpannableString(title + questionCount + version);
             // Title styling
-            spannableText.setSpan(new RelativeSizeSpan(1.2f), 0, title.length(), Spannable
-                    .SPAN_EXCLUSIVE_EXCLUSIVE);
-            spannableText.setSpan(new ForegroundColorSpan(getResources().getColor(R.color
-                    .primary_text)), 0, title.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableText.setSpan(new RelativeSizeSpan(1.2f), 0, title.length(),
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableText.setSpan(new ForegroundColorSpan(getResources().getColor(
+                    R.color.primary_text)), 0, title.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             // Question count styling
             spannableText.setSpan(new RelativeSizeSpan(0.8f), title.length(), title.length() +
                     questionCount.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            spannableText.setSpan(new ForegroundColorSpan(getResources().getColor(R.color
-                            .secondary_text)), title.length(), title.length() + questionCount
-                            .length(),
-                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableText.setSpan(new ForegroundColorSpan(getResources().getColor(
+                    R.color.secondary_text)), title.length(),
+                    title.length() + questionCount.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             spannableText.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_NORMAL),
-                    title.length(), title.length() + questionCount.length(), Spannable
-                            .SPAN_EXCLUSIVE_EXCLUSIVE);
+                    title.length(), title.length() + questionCount.length(),
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             // Version styling
-            spannableText.setSpan(new RelativeSizeSpan(0.8f), title.length() + questionCount
-                            .length(), title.length() + questionCount.length() + version
-                            .length(),
+            spannableText.setSpan(new RelativeSizeSpan(0.8f), title.length() +
+                            questionCount.length(), title.length() + questionCount.length() +
+                            version.length(),
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             spannableText.setSpan(new ForegroundColorSpan(getResources().getColor(R.color
                     .secondary_text)), title.length() + questionCount.length(), title.length() +
@@ -226,10 +224,12 @@ public class InstrumentViewPagerFragment extends Fragment {
         @Override
         protected void onPostExecute(InstrumentListLabel instrumentListLabel) {
             if (isAdded()) {
-                if (instrumentListLabel.isLoaded()) {
-                    instrumentListLabel.getTextView().setTextColor(Color.BLACK);
-                } else {
-                    instrumentListLabel.getTextView().setTextColor(Color.RED);
+                if (!instrumentListLabel.isLoaded()) {
+                    CharSequence text = instrumentListLabel.getTextView().getText();
+                    Spannable spannable = new SpannableString(text);
+                    spannable.setSpan(new ForegroundColorSpan(Color.RED), 0, text.length(),
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    instrumentListLabel.getTextView().setText(spannable);
                 }
             }
         }

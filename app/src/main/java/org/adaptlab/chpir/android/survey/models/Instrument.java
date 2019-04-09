@@ -3,6 +3,7 @@ package org.adaptlab.chpir.android.survey.models;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.provider.BaseColumns;
+import android.support.annotation.NonNull;
 import android.support.v4.util.LongSparseArray;
 import android.text.TextUtils;
 import android.util.Log;
@@ -22,6 +23,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -168,24 +170,31 @@ public class Instrument extends ReceiveModel {
         mRemoteId = id;
     }
 
-    // TODO: 5/1/18 Fix
+
     public void sanitize() {
-        if (questionCount() < getQuestionCount()) {
-            setLoaded(false);
-        } else {
-            setLoaded(true);
-        }
-        for (Question question : questions()) {
-            if (!question.loaded()) {
+        HashMap<Long, List<Question>> mDisplayQuestions = getDisplayQuestions();
+        for (Display display : displays()) {
+            if ( mDisplayQuestions.get(display.getRemoteId()) == null || display.getQuestionCount()
+                    != mDisplayQuestions.get(display.getRemoteId()).size()) {
                 setLoaded(false);
-                break;
+                return;
             }
         }
+        setLoaded(true);
     }
 
-    public int questionCount() {
-        return new Select().from(Question.class)
-                .where("InstrumentRemoteId = ? AND Deleted != ?", getRemoteId(), 1).count();
+    @NonNull
+    private HashMap<Long, List<Question>> getDisplayQuestions() {
+        HashMap<Long, List<Question>> mDisplayQuestions = new HashMap<>();
+        for (Question question : questions()) {
+            List<Question> displayQuestions = mDisplayQuestions.get(question.getDisplayId());
+            if (displayQuestions == null) {
+                displayQuestions = new ArrayList<>();
+            }
+            displayQuestions.add(question);
+            mDisplayQuestions.put(question.getDisplayId(), displayQuestions);
+        }
+        return mDisplayQuestions;
     }
 
     public int getQuestionCount() {
@@ -567,7 +576,7 @@ public class Instrument extends ReceiveModel {
                 if (loopQuestions.size() > 0) {
                     if (question.getQuestionType().equals(Question.QuestionType.INTEGER)) {
                         for (LoopQuestion loopQuestion : loopQuestions) {
-                            Display display = getDisplay(question, loopQuestion);
+                            Display display = getDisplay(question, loopQuestion, loopQuestions);
                             for (int k = 1; k <= LOOP_MAX; k++) {
                                 String instruction = question.getText() + " : " + k;
                                 createLoopQuestion(question, loopQuestion, instruction, k, display);
@@ -576,9 +585,9 @@ public class Instrument extends ReceiveModel {
                         }
                     } else if (question.isMultipleResponseLoop()) {
                         for (LoopQuestion loopQuestion : loopQuestions) {
-                            Display display = getDisplay(question, loopQuestion);
+                            Display display = getDisplay(question, loopQuestion, loopQuestions);
                             if (TextUtils.isEmpty(loopQuestion.getOptionIndices())) {
-                                for (int k = 0; k < question.defaultOptions().size(); k++) {
+                                for (int k = 0; k < question.getOptionCount(); k++) {
                                     String instruction = question.getText() + " : " +
                                             question.defaultOptions().get(k).getText(this);
                                     createLoopQuestion(question, loopQuestion, instruction, k, display);
@@ -586,7 +595,7 @@ public class Instrument extends ReceiveModel {
                                 if (question.isOtherQuestionType()) {
                                     String instruction = question.getText() + " : Other";
                                     createLoopQuestion(question, loopQuestion, instruction,
-                                            question.defaultOptions().size(), display);
+                                            question.getOptionCount(), display);
                                 }
                             } else {
                                 // Loop only for particular options
@@ -601,14 +610,28 @@ public class Instrument extends ReceiveModel {
                             updateDisplays(mDisplays, display, question, loopQuestion.isSameDisplay());
                         }
                     }
-                    for (int k = 0; k < mDisplays.size(); k++) {
-                        Display display = mDisplays.get(k);
-                        if (display.getPosition() != k + 1) {
-                            display.setPosition(k + 1);
-                            display.save();
-                        }
-                    }
+                    sanitizeDisplays(mDisplays);
                 }
+            }
+        }
+    }
+
+    private void sanitizeDisplays(List<Display> mDisplays) {
+        HashMap<Long, List<Question>> displayQuestions = getDisplayQuestions();
+        for (Iterator<Display> iterator = mDisplays.iterator(); iterator.hasNext(); ) {
+            Display display = iterator.next();
+            if (displayQuestions.get(display.getRemoteId()) == null) {
+                // Display has no questions, so delete it
+                display.delete();
+                iterator.remove();
+            }
+        }
+        // Ensure they are numbered consecutively
+        for (int k = 0; k < mDisplays.size(); k++) {
+            Display display = mDisplays.get(k);
+            if (display.getPosition() != k + 1) {
+                display.setPosition(k + 1);
+                display.save();
             }
         }
     }
@@ -625,22 +648,51 @@ public class Instrument extends ReceiveModel {
         }
     }
 
-    private Display getDisplay(Question question, LoopQuestion loopQuestion) {
-        Display parent = question.getDisplay();
-        if (loopQuestion.isSameDisplay()) return parent;
+    private Display getDisplay(Question q, LoopQuestion lq, List<LoopQuestion> lqs) {
+        Display parent = q.getDisplay();
+        if (lq.isDeleted()) return parent;
+        if (lq.isSameDisplay()) {
+            parent.setQuestionCount(parent.getQuestionCount() + getDisplayQuestionCount(q, lq, lqs));
+            parent.save();
+            return parent;
+        }
         Display display = Display.findByTitleAndInstrument(parent.getTitle() + " p2",
-                question.getInstrument().getRemoteId());
+                q.getInstrument().getRemoteId());
         if (display == null) {
             display = new Display();
             display.setMode(parent.getMode());
             display.setTitle(parent.getTitle() + " p2");
-            display.setInstrumentId(question.getInstrument().getRemoteId());
+            display.setInstrumentId(q.getInstrument().getRemoteId());
             display.setSectionId(parent.getSectionId());
             display.setRemoteId(getBoundedDisplayId());
             display.setDeleted(parent.getDeleted());
-            display.save();
         }
+        display.setQuestionCount(getDisplayQuestionCount(q, lq, lqs));
+        display.save();
         return display;
+    }
+
+    private int getDisplayQuestionCount(Question q, LoopQuestion lq, List<LoopQuestion> list) {
+        int count = 0;
+        for (LoopQuestion loopQuestion : list) {
+            if (!loopQuestion.isDeleted()) {
+                count++;
+            }
+        }
+        if (q.getQuestionType().equals(Question.QuestionType.INTEGER)) {
+            return LOOP_MAX * count;
+        } else {
+            if (TextUtils.isEmpty(lq.getOptionIndices())) {
+                if (q.isOtherQuestionType()) {
+                    return (q.getOptionCount() + 1) * count;
+                } else {
+                    return q.getOptionCount() * count;
+                }
+            } else {
+                String[] indices = lq.getOptionIndices().split(Response.LIST_DELIMITER);
+                return indices.length * count;
+            }
+        }
     }
 
     private void createLoopQuestion(Question question, LoopQuestion lq, String instruction,

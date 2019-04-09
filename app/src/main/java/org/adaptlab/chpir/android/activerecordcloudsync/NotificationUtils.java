@@ -20,26 +20,6 @@ public class NotificationUtils {
     /*
      * Place a notification in the notification tray
      */
-    public static void showNotification(Context context, int iconId, int textId) {
-        if (context == null) return;
-
-        Resources r = context.getResources();
-
-        Notification notification = new NotificationCompat.Builder(context)
-                .setTicker(r.getString(R.string.app_name))
-                .setSmallIcon(iconId)
-                .setContentTitle(r.getString(R.string.app_name))
-                .setContentText(r.getString(textId))
-                .setAutoCancel(true)
-                .build();
-
-        NotificationManager notificationManager = (NotificationManager)
-                context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        notificationManager.notify(0, notification);
-        NotificationService.setServiceAlarm(context, 0);
-    }
-
     public static void showNotification(Context context, int iconId, int titleId, String message,
                                         int defaults, int priority, int importance) {
         if (context == null) return;

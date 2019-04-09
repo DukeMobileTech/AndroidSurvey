@@ -312,6 +312,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
     }
 
     protected void toggleLoadingStatus() {
+        if (mSurveyFragment == null) return;
         List<Question> displayQuestions = mSurveyFragment.getDisplayQuestions(mDisplay);
         if (displayQuestions.get(displayQuestions.size() - 1).equals(mQuestion)) {
             mSurveyFragment.toggleLoadingStatus();

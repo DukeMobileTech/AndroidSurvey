@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="org.adaptlab.chpir.android.survey"
-    android:versionCode="133"
-    android:versionName="2.1.48">
+    android:versionCode="134"
+    android:versionName="2.1.49">
 
     <permission
         android:name="org.adaptlab.chpir.android.survey.LAUNCH_SURVEY"
@@ -34,7 +34,7 @@
         tools:ignore="GoogleAppIndexingWarning">
 
         <activity
-            android:name=".Instrument2Activity"
+            android:name=".InstrumentActivity"
             android:label="@string/app_name"
             android:screenOrientation="sensorLandscape">
             <intent-filter>
@@ -114,7 +114,7 @@
             android:value="Survey.db" />
         <meta-data
             android:name="AA_DB_VERSION"
-            android:value="84" />
+            android:value="85" />
         <meta-data
             android:name="SEED_DB"
             android:value="false" />
