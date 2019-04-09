@@ -571,7 +571,7 @@ public class Instrument extends ReceiveModel {
         List<Display> mDisplays = displays();
         for (Question question : questions()) {
             if (question.getLoopQuestionCount() > 0 && question.getLoopSource() == null
-                    && question.getDisplay() != null) {
+                    && question.getDisplayId() != null) {
                 List<LoopQuestion> loopQuestions = question.loopQuestionsWithDeleted();
                 if (loopQuestions.size() > 0) {
                     if (question.getQuestionType().equals(Question.QuestionType.INTEGER)) {
@@ -650,19 +650,18 @@ public class Instrument extends ReceiveModel {
 
     private Display getDisplay(Question q, LoopQuestion lq, List<LoopQuestion> lqs) {
         Display parent = q.getDisplay();
-        if (lq.isDeleted()) return parent;
         if (lq.isSameDisplay()) {
             parent.setQuestionCount(parent.getQuestionCount() + getDisplayQuestionCount(q, lq, lqs));
             parent.save();
             return parent;
         }
         Display display = Display.findByTitleAndInstrument(parent.getTitle() + " p2",
-                q.getInstrument().getRemoteId());
+                q.getInstrumentRemoteId());
         if (display == null) {
             display = new Display();
             display.setMode(parent.getMode());
             display.setTitle(parent.getTitle() + " p2");
-            display.setInstrumentId(q.getInstrument().getRemoteId());
+            display.setInstrumentId(q.getInstrumentRemoteId());
             display.setSectionId(parent.getSectionId());
             display.setRemoteId(getBoundedDisplayId());
             display.setDeleted(parent.getDeleted());

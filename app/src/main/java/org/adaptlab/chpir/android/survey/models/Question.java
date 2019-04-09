@@ -180,7 +180,7 @@ public class Question extends ReceiveModel {
         return Instrument.findByRemoteId(getInstrumentRemoteId());
     }
 
-    private Long getInstrumentRemoteId() {
+    public Long getInstrumentRemoteId() {
         return mInstrumentRemoteId;
     }
 
