@@ -19,7 +19,6 @@ import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +40,6 @@ import org.adaptlab.chpir.android.survey.models.DisplayInstruction;
 import org.adaptlab.chpir.android.survey.models.FollowUpQuestion;
 import org.adaptlab.chpir.android.survey.models.Instruction;
 import org.adaptlab.chpir.android.survey.models.Instrument;
-import org.adaptlab.chpir.android.survey.models.LoopQuestion;
 import org.adaptlab.chpir.android.survey.models.NextQuestion;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.OptionSet;
@@ -60,7 +58,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -332,6 +329,9 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
             mResponse = Response.load(Response.class, savedInstanceState.getLong(EXTRA_RESPONSE_ID));
             mDisplay = Display.load(Display.class, savedInstanceState.getLong(EXTRA_DISPLAY_ID));
             mOptions = mSurveyFragment.getOptions().get(mQuestion);
+            if (mQuestion.getRemoteOptionSetId() != null) {
+                setOptionSetTranslations(mQuestion, mOptions);
+            }
         }
         if (isComponentNull()) return;
         if (mSurveyFragment.getSpecialOptions() != null) {
@@ -359,6 +359,9 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         if (mSurveyFragment.getOptions() != null) {
             mOptions = mSurveyFragment.getOptions().get(mQuestion);
             if (mOptions == null) mOptions = new ArrayList<>();
+            if (mQuestion.getRemoteOptionSetId() != null) {
+                setOptionSetTranslations(mQuestion, mOptions);
+            }
         }
         refreshFollowUpQuestion();
     }

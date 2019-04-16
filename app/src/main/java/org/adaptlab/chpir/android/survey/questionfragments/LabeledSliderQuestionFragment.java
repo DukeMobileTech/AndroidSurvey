@@ -24,7 +24,7 @@ public class LabeledSliderQuestionFragment extends SliderQuestionFragment {
                 TextView optionText = new TextView(getActivity());
                 optionText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
                 optionText.setGravity(getGravityByPosition(option));
-                optionText.setText(option.getText(getInstrument()));
+                optionText.setText(getOptionText(option));
                 tableRow.addView(optionText);
             }
 

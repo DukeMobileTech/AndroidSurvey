@@ -21,7 +21,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -174,7 +173,7 @@ public class Instrument extends ReceiveModel {
     public void sanitize() {
         HashMap<Long, List<Question>> mDisplayQuestions = getDisplayQuestions();
         for (Display display : displays()) {
-            if ( mDisplayQuestions.get(display.getRemoteId()) == null || display.getQuestionCount()
+            if (mDisplayQuestions.get(display.getRemoteId()) == null || display.getQuestionCount()
                     != mDisplayQuestions.get(display.getRemoteId()).size()) {
                 setLoaded(false);
                 return;
@@ -326,9 +325,44 @@ public class Instrument extends ReceiveModel {
         return hashMap;
     }
 
-    /*
-     * Getters/Setters
-     */
+    public HashMap<Question, List<Option>> optionsMap(List<Question> questions) {
+        int capacity = (int) Math.ceil(getQuestionCount() / 0.75);
+        HashMap<Question, List<Option>> map = new HashMap<>(capacity);
+        for (Question question : questions) {
+            if (question.hasOptions()) {
+                map.put(question, question.defaultOptions());
+            }
+        }
+        return map;
+    }
+
+    public HashMap<Long, List<Option>> specialOptionsMap() {
+        HashMap<Long, List<Option>> map = new HashMap<>();
+        List<OptionInOptionSet> specialOptionInOptionSet = new Select().from(OptionInOptionSet.class).where("Special = 1 AND Deleted = 0").execute();
+        for (OptionInOptionSet optionInOptionSet : specialOptionInOptionSet) {
+            List<Option> options = map.get(optionInOptionSet.getRemoteOptionSetId());
+            if (options == null) {
+                List<Option> list = new ArrayList<>();
+                list.add(Option.findByRemoteId(optionInOptionSet.getRemoteOptionId()));
+                map.put(optionInOptionSet.getRemoteOptionSetId(), list);
+            } else {
+                options.add(Option.findByRemoteId(optionInOptionSet.getRemoteOptionId()));
+                map.put(optionInOptionSet.getRemoteOptionSetId(), options);
+            }
+        }
+        return map;
+    }
+
+    public HashMap<Long, List<OptionSetTranslation>> optionSetTranslations() {
+        HashMap<Long, List<OptionSetTranslation>> map = new HashMap<>();
+        for (OptionSetTranslation optionSetTranslation : OptionSetTranslation.getAll()) {
+            List<OptionSetTranslation> list = map.get(optionSetTranslation.getOptionSetId());
+            if (list == null) list = new ArrayList<>();
+            list.add(optionSetTranslation);
+            map.put(optionSetTranslation.getOptionSetId(), list);
+        }
+        return map;
+    }
 
     public Typeface getTypeFace(Context context) {
         if (AppUtil.getDeviceLanguage().equals(KHMER_LANGUAGE_CODE)) {
@@ -423,57 +457,10 @@ public class Instrument extends ReceiveModel {
         mDeleted = deleted;
     }
 
-    public InstrumentTranslation getTranslationByLanguage(String language) {
-        for (InstrumentTranslation translation : translations()) {
-            if (translation.getLanguage().equals(language)) {
-                return translation;
-            }
-        }
-        InstrumentTranslation translation = new InstrumentTranslation();
-        translation.setLanguage(language);
-        return translation;
-    }
-
     public List<Survey> surveys() {
         return new Select().from(Survey.class)
                 .where("InstrumentRemoteId = ?", getRemoteId())
                 .execute();
-    }
-
-    public List<Question> criticalQuestions() {
-        return new Select().from(Question.class)
-                .where("InstrumentRemoteId = ? AND Deleted != ? AND Critical = ?", getRemoteId(),
-                        1, 1)
-                .orderBy("NumberInInstrument ASC")
-                .execute();
-    }
-
-    public HashMap<Question, List<Option>> optionsMap() {
-        int capacity = (int) Math.ceil(getQuestionCount() / 0.75);
-        HashMap<Question, List<Option>> map = new HashMap<>(capacity);
-        for (Question question : questions()) {
-            if (question.hasOptions()) {
-                map.put(question, question.defaultOptions());
-            }
-        }
-        return map;
-    }
-
-    public HashMap<Long, List<Option>> specialOptionsMap() {
-        HashMap<Long, List<Option>> map = new HashMap<>();
-        List<OptionInOptionSet> specialOptionInOptionSet = new Select().from(OptionInOptionSet.class).where("Special = 1 AND Deleted = 0").execute();
-        for (OptionInOptionSet optionInOptionSet : specialOptionInOptionSet) {
-            List<Option> options = map.get(optionInOptionSet.getRemoteOptionSetId());
-            if (options == null) {
-                List<Option> list = new ArrayList<>();
-                list.add(Option.findByRemoteId(optionInOptionSet.getRemoteOptionId()));
-                map.put(optionInOptionSet.getRemoteOptionSetId(), list);
-            } else {
-                options.add(Option.findByRemoteId(optionInOptionSet.getRemoteOptionId()));
-                map.put(optionInOptionSet.getRemoteOptionSetId(), options);
-            }
-        }
-        return map;
     }
 
     @Override
@@ -497,52 +484,20 @@ public class Instrument extends ReceiveModel {
         mProjectId = id;
     }
 
-    public boolean getPublished() {
-        return mPublished;
-    }
-
     public void setPublished(boolean published) {
         mPublished = published;
-    }
-
-    public boolean getShowSectionsFragment() {
-        return mShowSectionsFragment;
     }
 
     private void setShowSectionsFragment(boolean showSectionsFragment) {
         mShowSectionsFragment = showSectionsFragment;
     }
 
-    public boolean getDirectReviewNavigation() {
-        return mDirectReviewNavigation;
-    }
-
     private void setDirectReviewNavigation(boolean directReviewNavigation) {
         mDirectReviewNavigation = directReviewNavigation;
     }
 
-    public List<String> getSpecialOptionStrings() {
-        if (TextUtils.isEmpty(getSpecialOptions())) {
-            return AppUtil.getAdminSettingsInstance().getSpecialOptions();
-        } else {
-            return Arrays.asList(getSpecialOptions().split(","));
-        }
-    }
-
-    public String getSpecialOptions() {
-        return mSpecialOptions;
-    }
-
     private void setSpecialOptions(String specialOptions) {
         mSpecialOptions = specialOptions.replaceAll("[^A-Za-z0-9,]", "");
-    }
-
-    public List<Section> sections() {
-        return new Select()
-                .from(Section.class)
-                .where("InstrumentRemoteId = ? AND Deleted != ?", getRemoteId(), 1)
-                .orderBy("FirstQuestionNumber IS NULL, FirstQuestionNumber")
-                .execute();
     }
 
     public boolean isRoster() {

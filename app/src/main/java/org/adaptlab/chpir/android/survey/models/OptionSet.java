@@ -4,10 +4,12 @@ import android.util.Log;
 
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
 import org.adaptlab.chpir.android.survey.BuildConfig;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -28,6 +30,16 @@ public class OptionSet extends ReceiveModel {
     @Column(name = "Instructions")
     private String mInstructions;
 
+    public static OptionSet findByRemoteId(Long id) {
+        return new Select().from(OptionSet.class).where("RemoteId = ?", id).executeSingle();
+    }
+
+    public static List<OptionSet> getAll() {
+        return new Select().from(OptionSet.class).where("Deleted != ?", 1)
+                .orderBy("Id ASC")
+                .execute();
+    }
+
     @Override
     public void createObjectFromJSON(JSONObject jsonObject) {
         try {
@@ -43,19 +55,28 @@ public class OptionSet extends ReceiveModel {
             optionSet.setSpecial(jsonObject.optBoolean("special", false));
             optionSet.setInstructions(jsonObject.optString("instructions"));
             optionSet.save();
+
+            JSONArray translationsArray = jsonObject.optJSONArray("option_set_translations");
+            if (translationsArray != null) {
+                new Delete().from(OptionSetTranslation.class).where("OptionSetId = ?", optionSet.getRemoteId()).execute();
+                for (int i = 0; i < translationsArray.length(); i++) {
+                    JSONObject translationJSON = translationsArray.getJSONObject(i);
+                    Long translationRemoteId = translationJSON.getLong("id");
+                    OptionSetTranslation translation = OptionSetTranslation.findByRemoteId(translationRemoteId);
+                    if (translation == null) {
+                        translation = new OptionSetTranslation();
+                    }
+                    translation.setRemoteId(translationRemoteId);
+                    translation.setOptionSetId(translationJSON.getLong("option_set_id"));
+                    translation.setOptionTranslationId(translationJSON.getLong("option_translation_id"));
+                    translation.setOptionId(translationJSON.getLong("option_id"));
+                    translation.setLanguage(translationJSON.getString("language"));
+                    translation.save();
+                }
+            }
         } catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);
         }
-    }
-
-    public static OptionSet findByRemoteId(Long id) {
-        return new Select().from(OptionSet.class).where("RemoteId = ?", id).executeSingle();
-    }
-
-    public static List<OptionSet> getAll() {
-        return new Select().from(OptionSet.class).where("Deleted != ?", 1)
-                .orderBy("Id ASC")
-                .execute();
     }
 
     public Long getRemoteId() {
@@ -78,11 +99,15 @@ public class OptionSet extends ReceiveModel {
         mSpecial = special;
     }
 
+    public String getInstructions() {
+        return mInstructions;
+    }
+
     private void setInstructions(String instructions) {
         mInstructions = instructions;
     }
 
-    public String getInstructions() {
-        return mInstructions;
+    public String getTitle() {
+        return mTitle;
     }
 }

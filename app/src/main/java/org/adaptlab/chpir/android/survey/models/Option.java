@@ -22,8 +22,6 @@ public class Option extends ReceiveModel {
     private String mText;
     @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
     private Long mRemoteId;
-    @Column(name = "InstrumentVersion")
-    private int mInstrumentVersion;
     @Column(name = "Deleted")
     private boolean mDeleted;
     @Column(name = "Identifier")
@@ -37,21 +35,8 @@ public class Option extends ReceiveModel {
         return new Select().from(Option.class).where("Deleted != ?", 1).orderBy("Id ASC").execute();
     }
 
-    public static Option findByIdentifier(String identifier) {
-        if (identifier == null) return null;
-        return new Select().from(Option.class)
-                .where("Identifier = ?", identifier)
-                .executeSingle();
-    }
-
-    public static Option findByQuestionAndSpecialResponse(Question question, String specialResponse) {
-        return new Select("Options.*").distinct().from(Option.class)
-                .innerJoin(OptionInOptionSet.class)
-                .on("OptionInOptionSets.RemoteOptionSetId = ?",
-                        question.getRemoteSpecialOptionSetId())
-                .where("Options.Text = ? AND OptionInOptionSets.RemoteOptionId = Options" +
-                        ".RemoteId", specialResponse)
-                .executeSingle();
+    public static Option findByRemoteId(Long id) {
+        return new Select().from(Option.class).where("RemoteId = ?", id).executeSingle();
     }
 
     /*
@@ -123,18 +108,12 @@ public class Option extends ReceiveModel {
                     translation.setLanguage(translationJSON.getString("language"));
                     translation.setOption(option);
                     translation.setText(translationJSON.getString("text"));
-                    translation.setInstrumentTranslation(InstrumentTranslation.findByRemoteId(
-                            translationJSON.optLong("instrument_translation_id")));
                     translation.save();
                 }
             }
         } catch (JSONException je) {
             if (AppUtil.DEBUG) Log.e(TAG, "Error parsing object json", je);
         }
-    }
-
-    public static Option findByRemoteId(Long id) {
-        return new Select().from(Option.class).where("RemoteId = ?", id).executeSingle();
     }
 
     public void setText(String text) {
@@ -147,43 +126,6 @@ public class Option extends ReceiveModel {
 
     private void setIdentifier(String id) {
         mIdentifier = id;
-    }
-
-    /*
-     * Find an existing translation, or return a new OptionTranslation
-     * if a translation does not yet exist.
-     */
-    public OptionTranslation getTranslationByLanguage(String language) {
-        for (OptionTranslation translation : translations()) {
-            if (translation.getLanguage().equals(language)) {
-                return translation;
-            }
-        }
-
-        OptionTranslation translation = new OptionTranslation();
-        translation.setLanguage(language);
-        return translation;
-    }
-
-    public Question findByQuestionIdentifier(String question) {
-        return Question.findByQuestionIdentifier(question);
-    }
-
-    public List<Skip> skips() {
-        return getMany(Skip.class, "Option");
-    }
-
-    public List<Question> questionsToSkip() {
-        return new Select("Questions.*").from(Question.class).innerJoin(Skip.class).on("Questions" +
-                ".Id = Skips.Question AND Skips.Option =?", getId()).execute();
-    }
-
-    public int getInstrumentVersion() {
-        return mInstrumentVersion;
-    }
-
-    private void setInstrumentVersion(int version) {
-        mInstrumentVersion = version;
     }
 
     public boolean isExclusive(Question question) {

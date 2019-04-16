@@ -64,6 +64,8 @@ import org.adaptlab.chpir.android.survey.models.MultipleSkip;
 import org.adaptlab.chpir.android.survey.models.NextQuestion;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.OptionSet;
+import org.adaptlab.chpir.android.survey.models.OptionSetTranslation;
+import org.adaptlab.chpir.android.survey.models.OptionTranslation;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Score;
@@ -128,6 +130,7 @@ public class SurveyFragment extends Fragment {
     private HashMap<String, List<FollowUpQuestion>> mFollowUpQuestions;
     private HashMap<String, List<CriticalResponse>> mCriticalResponses;
     private HashMap<String, List<LoopQuestion>> mLoopQuestions;
+    private HashMap<Long, List<OptionSetTranslation>> mOptionSetTranslation;
     private LinkedHashMap<String, List<String>> mExpandableListData;
     private List<String> mExpandableListTitle;
     private HashSet<String> mQuestionsToSkipSet;
@@ -431,6 +434,7 @@ public class SurveyFragment extends Fragment {
         mFollowUpQuestions = new HashMap<>();
         mCriticalResponses = new HashMap<>();
         mLoopQuestions = new HashMap<>();
+        mOptionSetTranslation = new HashMap<>();
     }
 
     private void registerCrashlytics() {
@@ -880,9 +884,11 @@ public class SurveyFragment extends Fragment {
     private List<Question> loopChildren(String sourceIdentifier) {
         List<Question> questions = new ArrayList<>();
         if (mDisplayNumber + 1 < mDisplays.size()) {
-            questions.addAll(getDisplayQuestions(mDisplays.get(mDisplayNumber + 1)));
+            List<Question> dQuestions = getDisplayQuestions(mDisplays.get(mDisplayNumber + 1));
+            if (dQuestions != null) questions.addAll(dQuestions);
         }
-        questions.addAll(getDisplayQuestions(mDisplay));
+        List disQuestions = getDisplayQuestions(mDisplay);
+        if (disQuestions != null) questions.addAll(disQuestions);
         List<Question> loopChildren = new ArrayList<>();
         if (sourceIdentifier != null) {
             for (Question question : questions) {
@@ -1193,6 +1199,10 @@ public class SurveyFragment extends Fragment {
         });
     }
 
+    public HashMap<Long, List<OptionSetTranslation>> getOptionSetTranslation() {
+        return mOptionSetTranslation;
+    }
+
     private class ScoreSurveyTask extends AsyncTask<Survey, Void, Survey> {
         @Override
         protected Survey doInBackground(Survey... params) {
@@ -1226,7 +1236,7 @@ public class SurveyFragment extends Fragment {
             InstrumentDataWrapper instrumentData = new InstrumentDataWrapper();
             instrumentData.questions = (ArrayList<Question>) ((Instrument) params[0]).questions();
             instrumentData.responses = ((Survey) params[1]).responsesMap();
-            instrumentData.options = ((Instrument) params[0]).optionsMap();
+            instrumentData.options = ((Instrument) params[0]).optionsMap(instrumentData.questions);
             instrumentData.specialOptions = ((Instrument) params[0]).specialOptionsMap();
             instrumentData.displayInstructions = ((Instrument) params[0]).displayInstructions();
             instrumentData.optionSets = ((Instrument) params[0]).optionSets();
@@ -1237,6 +1247,7 @@ public class SurveyFragment extends Fragment {
             instrumentData.followUpQuestions = ((Instrument) params[0]).followUpQuestions();
             instrumentData.criticalResponses = ((Instrument) params[0]).criticalResponses();
             instrumentData.loopQuestions = ((Instrument) params[0]).loopQuestions();
+            instrumentData.optionSetTranslation = ((Instrument) params[0]).optionSetTranslations();
             return instrumentData;
         }
 
@@ -1255,6 +1266,7 @@ public class SurveyFragment extends Fragment {
             mInstructions = instrumentData.instructions;
             mCriticalResponses = instrumentData.criticalResponses;
             mLoopQuestions = instrumentData.loopQuestions;
+            mOptionSetTranslation = instrumentData.optionSetTranslation;
             refreshView();
         }
 
@@ -1286,6 +1298,7 @@ public class SurveyFragment extends Fragment {
         HashMap<String, List<CriticalResponse>> criticalResponses;
         HashMap<String, List<LoopQuestion>> loopQuestions;
         ArrayList<Question> questions;
+        HashMap<Long, List<OptionSetTranslation>> optionSetTranslation;
     }
 
     private class DisplayTitlesListAdapter extends BaseExpandableListAdapter {

@@ -214,7 +214,7 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
         List<Option> options = getTableOptions();
         String[] headers = new String[options.size()];
         for (int k = 0; k < options.size(); k++) {
-            headers[k] = options.get(k).getText(getInstrument());
+            headers[k] = getOptionText(options.get(k));
         }
         return headers;
     }

@@ -1,5 +1,6 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -10,11 +11,14 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
 import org.adaptlab.chpir.android.survey.models.Option;
+import org.adaptlab.chpir.android.survey.models.OptionTranslation;
 import org.adaptlab.chpir.android.survey.models.Response;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
 
 import static org.adaptlab.chpir.android.survey.utils.FormatUtils.removeNonNumericCharacters;
 
 public class SelectOneQuestionFragment extends SingleQuestionFragment {
+    private static final String TAG = "SelectOneQuestionFrag";
     private RadioGroup mRadioGroup;
     private int mResponseIndex;
 
@@ -32,7 +36,7 @@ public class SelectOneQuestionFragment extends SingleQuestionFragment {
         for (Option option : getOptions()) {
             int optionId = getOptions().indexOf(option);
             RadioButton radioButton = new RadioButton(getActivity());
-            radioButton.setText(option.getText(getInstrument()));
+            radioButton.setText(getOptionText(option));
             radioButton.setId(optionId);
             radioButton.setTypeface(getInstrument().getTypeFace(
                     getActivity().getApplicationContext()));

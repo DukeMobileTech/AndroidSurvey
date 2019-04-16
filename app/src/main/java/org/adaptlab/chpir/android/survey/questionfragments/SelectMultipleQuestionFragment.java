@@ -1,7 +1,5 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -30,7 +28,7 @@ public class SelectMultipleQuestionFragment extends SingleQuestionFragment {
         for (Option option : getOptions()) {
             final int optionId = getOptions().indexOf(option);
             CheckBox checkbox = new CheckBox(getActivity());
-            checkbox.setText(option.getText(getInstrument()));
+            checkbox.setText(getOptionText(option));
             checkbox.setTypeface(getInstrument().getTypeFace(
                     getActivity().getApplicationContext()));
             checkbox.setTextColor(getResources().getColorStateList(R.color.states));

@@ -24,7 +24,7 @@ import java.util.Random;
 @Table(name = "Questions")
 public class Question extends ReceiveModel {
     public static final String COMPLETE_SURVEY = "COMPLETE_SURVEY";
-    private static final String TAG = "QuestionModel";
+    private static final String TAG = "Question";
     private static final String FOLLOW_UP_TRIGGER_STRING = "\\[followup\\]";
     private static final String RANDOMIZATION_TRIGGER = "\\[RANDOMIZED_FACTOR\\]";
     @Column(name = "Text")

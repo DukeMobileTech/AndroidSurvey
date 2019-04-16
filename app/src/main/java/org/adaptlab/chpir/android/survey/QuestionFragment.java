@@ -19,18 +19,24 @@ import android.widget.ListView;
 import org.adaptlab.chpir.android.survey.models.CriticalResponse;
 import org.adaptlab.chpir.android.survey.models.Instruction;
 import org.adaptlab.chpir.android.survey.models.Option;
+import org.adaptlab.chpir.android.survey.models.OptionSetTranslation;
+import org.adaptlab.chpir.android.survey.models.OptionTranslation;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtml;
 
 public abstract class QuestionFragment extends Fragment {
+    private final String TAG = "QuestionFragment";
     protected SurveyFragment mSurveyFragment;
     protected DisplayFragment mDisplayFragment;
+    private HashMap<Long, OptionSetTranslation> mOptionSetTranslation;
 
     protected abstract void unSetResponse();
 
@@ -43,8 +49,6 @@ public abstract class QuestionFragment extends Fragment {
     protected abstract void setDisplayInstructions();
 
     protected abstract void toggleLoadingStatus();
-
-    private final String TAG = "QuestionFragment";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -204,7 +208,11 @@ public abstract class QuestionFragment extends Fragment {
                     if (begin != -1 && last != -1 && begin < last) {
                         text = text.replace(text.substring(begin, last + 1), responseText);
                     } else {
-                        text = question.getText().replace(question.getTextToReplace(), responseText);
+                        if (question.getTextToReplace() == null) {
+                            text = question.getText();
+                        } else {
+                            text = question.getText().replace(question.getTextToReplace(), responseText);
+                        }
                     }
                 }
             }
@@ -212,6 +220,33 @@ public abstract class QuestionFragment extends Fragment {
             text = question.getText();
         }
         return styleTextWithHtml(text);
+    }
+
+    protected void setOptionSetTranslations(Question question, List<Option> options) {
+        List<OptionSetTranslation> list = mSurveyFragment.getOptionSetTranslation().get(question.getRemoteOptionSetId());
+        if (options != null && options.size() > 0 && list != null && list.size() > 0) {
+            mOptionSetTranslation = new HashMap<>();
+            for (OptionSetTranslation ost : list) {
+                mOptionSetTranslation.put(ost.getOptionId(), ost);
+            }
+        }
+    }
+
+    protected HashMap<Long, OptionSetTranslation> getOptionSetTranslation() {
+        return mOptionSetTranslation;
+    }
+
+    protected String getOptionText(Option option) {
+        String optionText = option.getText(mSurveyFragment.getInstrument());
+        if (getOptionSetTranslation() != null && getOptionSetTranslation().get(option.getRemoteId()) != null &&
+                getOptionSetTranslation().get(option.getRemoteId()).getLanguage().equals(AppUtil.getDeviceLanguage())) {
+            OptionTranslation optionTranslation = OptionTranslation.findByRemoteId(
+                    getOptionSetTranslation().get(option.getRemoteId()).getOptionTranslationId());
+            if (optionTranslation != null && !TextUtils.isEmpty(optionTranslation.getText())) {
+                optionText = optionTranslation.getText();
+            }
+        }
+        return optionText;
     }
 
 }
