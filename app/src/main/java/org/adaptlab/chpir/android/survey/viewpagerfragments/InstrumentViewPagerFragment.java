@@ -3,8 +3,6 @@ package org.adaptlab.chpir.android.survey.viewpagerfragments;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -23,6 +21,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.SurveyActivity;
@@ -31,8 +30,10 @@ import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.rules.InstrumentLaunchRule;
 import org.adaptlab.chpir.android.survey.rules.RuleBuilder;
 import org.adaptlab.chpir.android.survey.rules.RuleCallback;
+import org.adaptlab.chpir.android.survey.tasks.SetInstrumentLabelTask;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.utils.FormatUtils;
+import org.adaptlab.chpir.android.survey.utils.InstrumentListLabel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -140,23 +141,19 @@ public class InstrumentViewPagerFragment extends Fragment {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (mInstrument != null && mInstrument.loaded() && mInstrument.questions()
-                            .size() > 0) {
+                    if (mInstrument == null || !mInstrument.loaded() || mInstrument.questions().size() == 0) {
+                        Toast.makeText(getActivity(), R.string.instrument_not_loaded, Toast.LENGTH_LONG).show();
+                    } else {
                         new RuleBuilder(getActivity())
                                 .addRule(new InstrumentLaunchRule(mInstrument,
-                                        getActivity().getString(R.string
-                                                .rule_failure_instrument_launch)))
+                                        getActivity().getString(R.string.rule_failure_instrument_launch)))
                                 .showToastOnFailure(true)
                                 .setCallbacks(new RuleCallback() {
                                     public void onRulesPass() {
-                                        Intent i = new Intent(getActivity(),
-                                                SurveyActivity.class);
-                                        i.putExtra(SurveyFragment.EXTRA_INSTRUMENT_ID,
-                                                mInstrument.getRemoteId());
+                                        Intent i = new Intent(getActivity(), SurveyActivity.class);
+                                        i.putExtra(SurveyFragment.EXTRA_INSTRUMENT_ID, mInstrument.getRemoteId());
                                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                            startActivity(i, ActivityOptions
-                                                    .makeSceneTransitionAnimation(getActivity())
-                                                    .toBundle());
+                                            startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
                                         } else {
                                             startActivity(i);
                                         }
@@ -205,60 +202,8 @@ public class InstrumentViewPagerFragment extends Fragment {
                             .length() + version.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
             instrumentPropertiesTextView.setText(spannableText);
-            new SetInstrumentLabelTask().execute(new InstrumentListLabel(instrument,
-                    instrumentPropertiesTextView));
-        }
-    }
-
-    private class SetInstrumentLabelTask extends AsyncTask<InstrumentListLabel, Void,
-            InstrumentListLabel> {
-
-        @Override
-        protected InstrumentListLabel doInBackground(InstrumentListLabel... params) {
-            InstrumentListLabel instrumentListLabel = params[0];
-            Instrument instrument = instrumentListLabel.getInstrument();
-            instrumentListLabel.setLoaded(instrument.loaded());
-            return instrumentListLabel;
-        }
-
-        @Override
-        protected void onPostExecute(InstrumentListLabel instrumentListLabel) {
-            if (isAdded()) {
-                if (!instrumentListLabel.isLoaded()) {
-                    CharSequence text = instrumentListLabel.getTextView().getText();
-                    Spannable spannable = new SpannableString(text);
-                    spannable.setSpan(new ForegroundColorSpan(Color.RED), 0, text.length(),
-                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    instrumentListLabel.getTextView().setText(spannable);
-                }
-            }
-        }
-    }
-
-    private class InstrumentListLabel {
-        private Instrument mInstrument;
-        private TextView mTextView;
-        private Boolean mLoaded;
-
-        InstrumentListLabel(Instrument instrument, TextView textView) {
-            this.mInstrument = instrument;
-            this.mTextView = textView;
-        }
-
-        public Instrument getInstrument() {
-            return mInstrument;
-        }
-
-        public TextView getTextView() {
-            return mTextView;
-        }
-
-        public void setLoaded(boolean loaded) {
-            mLoaded = loaded;
-        }
-
-        public Boolean isLoaded() {
-            return mLoaded;
+            new SetInstrumentLabelTask(InstrumentViewPagerFragment.this).execute(
+                    new InstrumentListLabel(instrument, instrumentPropertiesTextView));
         }
     }
 

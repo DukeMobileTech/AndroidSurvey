@@ -23,14 +23,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.adaptlab.chpir.android.survey.InstrumentActivity;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.SurveyActivity;
 import org.adaptlab.chpir.android.survey.SurveyFragment;
 import org.adaptlab.chpir.android.survey.models.Survey;
+import org.adaptlab.chpir.android.survey.tasks.SetInstrumentLabelTask;
 import org.adaptlab.chpir.android.survey.tasks.SubmitSurveyTask;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
+import org.adaptlab.chpir.android.survey.utils.InstrumentListLabel;
 import org.adaptlab.chpir.android.survey.utils.looper.ItemTouchHelperExtension;
 
 import java.text.DateFormat;
@@ -305,7 +308,12 @@ public class SurveyViewPagerFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     Survey survey = mSurveys.get(viewHolder.getAdapterPosition());
-                    if (survey != null && survey.getInstrument().loaded() && !survey.isQueued() && !survey.isSent()) {
+                    if (survey == null) return;
+                    if (survey.isQueued() || survey.isSent()) {
+                        Toast.makeText(getActivity(), R.string.survey_submitted, Toast.LENGTH_LONG).show();
+                    } else if (!survey.getInstrument().loaded()) {
+                        Toast.makeText(getActivity(), R.string.instrument_not_loaded, Toast.LENGTH_LONG).show();
+                    } else {
                         Intent i = new Intent(getActivity(), SurveyActivity.class);
                         i.putExtra(SurveyFragment.EXTRA_INSTRUMENT_ID,
                                 survey.getInstrument().getRemoteId());
@@ -315,8 +323,7 @@ public class SurveyViewPagerFragment extends Fragment {
                         i.putExtra(SurveyFragment.EXTRA_AUTHORIZE_SURVEY,
                                 ((InstrumentActivity) getActivity()).isAuthorizeSurvey());
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            startActivity(i, ActivityOptions.makeSceneTransitionAnimation
-                                    (getActivity()).toBundle());
+                            startActivity(i, ActivityOptions.makeSceneTransitionAnimation(getActivity()).toBundle());
                         } else {
                             startActivity(i);
                         }
@@ -428,6 +435,10 @@ public class SurveyViewPagerFragment extends Fragment {
                     lastUpdated.length(), surveyTitle.length() + instrumentTitle.length() +
                     lastUpdated.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             surveyTextView.setText(spannableString);
+            if (!survey.isQueued()) {
+                new SetInstrumentLabelTask(SurveyViewPagerFragment.this).execute(
+                        new InstrumentListLabel(survey.getInstrument(), surveyTextView));
+            }
 
             String progress;
             if (survey.isSent()) {

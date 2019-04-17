@@ -183,4 +183,5 @@
     <string name="submitted">Submitted</string>
     <string name="uploading_surveys">Survey Upload</string>
     <string name="survey_upload">surveys will be uploaded</string>
+    <string name="survey_submitted">This survey has been marked for submission or is already submitted</string>
 </resources>
