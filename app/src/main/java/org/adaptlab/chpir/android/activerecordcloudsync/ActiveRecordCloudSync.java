@@ -7,6 +7,7 @@ import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
+import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.models.DeviceSyncEntry;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.R;
@@ -50,7 +51,7 @@ public class ActiveRecordCloudSync {
     }
 
     public static void setEndPoint(String endPoint) {
-        if (AppUtil.DEBUG) Log.i(TAG, "Api End point is: " + endPoint);
+        if (BuildConfig.DEBUG) Log.i(TAG, "Api End point is: " + endPoint);
 
         char lastChar = endPoint.charAt(endPoint.length() - 1);
         if (lastChar != '/') endPoint = endPoint + "/";
@@ -63,12 +64,12 @@ public class ActiveRecordCloudSync {
     }
 
     static String getProjectsEndPoint() {
-        String domainName = AppUtil.getAdminSettingsInstance().getApiDomainName();
+        String domainName = AppUtil.getSettings().getApiUrl();
         if (TextUtils.isEmpty(domainName)) return null;
         char lastChar = domainName.charAt(domainName.length() - 1);
         if (lastChar != '/') domainName = domainName + "/";
 
-        return domainName + "api/" + AppUtil.getAdminSettingsInstance().getApiVersion() + "/projects/";
+        return domainName + "api/" + AppUtil.getSettings().getApiVersion() + "/projects/";
     }
 
     public static void syncReceiveTables(Context context) {
@@ -77,7 +78,7 @@ public class ActiveRecordCloudSync {
         ActiveRecordCloudSync.setLastSyncTime(Long.toString(currentTime.getTime()));
         DeviceSyncEntry deviceSyncEntry = new DeviceSyncEntry();
         for (Map.Entry<String, Class<? extends ReceiveModel>> entry : mReceiveTables.entrySet()) {
-            if (AppUtil.DEBUG) {
+            if (BuildConfig.DEBUG) {
                 Log.i(TAG, "Syncing " + entry.getValue() + " from remote table " + entry.getKey());
             }
             HttpFetchr httpFetchr = new HttpFetchr(entry.getKey(), entry.getValue());
@@ -135,15 +136,15 @@ public class ActiveRecordCloudSync {
      */
     public static String getParams() {
         return "?access_token=" + getAccessToken() + "&version_code=" + getVersionCode() +
-                "&last_sync_time=" + AppUtil.getAdminSettingsInstance().getLastSyncTime();
+                "&last_sync_time=" + AppUtil.getSettings().getLastSyncTime();
     }
 
     public static String getEndPoint2() {
-        return AppUtil.getAdminSettingsInstance().getApi2url();
+        return AppUtil.getSettings().getApi2Url();
     }
 
     public static String getParams2() {
-        return "?access_token=" + AppUtil.getAdminSettingsInstance().getApi2Key() +
+        return "?access_token=" + AppUtil.getSettings().getApi2Key() +
                 "&version_code=" + getVersionCode();
     }
 
@@ -168,7 +169,7 @@ public class ActiveRecordCloudSync {
             connection.setReadTimeout(timeout);
             connection.setRequestMethod("HEAD");
             int responseCode = connection.getResponseCode();
-            if (AppUtil.DEBUG)
+            if (BuildConfig.DEBUG)
                 Log.i(TAG, "Received response code " + responseCode + " for api endpoint");
             return responseCode;
         } catch (IOException exception) {

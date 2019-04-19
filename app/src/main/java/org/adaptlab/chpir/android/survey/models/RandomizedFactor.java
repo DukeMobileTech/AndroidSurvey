@@ -7,6 +7,7 @@ import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
+import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,7 +40,7 @@ public class RandomizedFactor extends ReceiveModel{
                 factor = this;
             }
 
-            if (AppUtil.DEBUG) Log.i(TAG, "Creating object from JSON Object: " + jsonObject);
+            if (BuildConfig.DEBUG) Log.i(TAG, "Creating object from JSON Object: " + jsonObject);
             factor.setTitle(jsonObject.getString("title"));
             factor.setInstrument(jsonObject.getLong("instrument_id"));
             factor.setRemoteId(remoteId);

@@ -7,6 +7,7 @@ import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
+import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,7 +42,7 @@ public class RandomizedOption extends ReceiveModel {
                 option = this;
             }
 
-            if (AppUtil.DEBUG) Log.i(TAG, "Creating object from JSON Object: " + jsonObject);
+            if (BuildConfig.DEBUG) Log.i(TAG, "Creating object from JSON Object: " + jsonObject);
             option.setText(jsonObject.getString("text"));
             option.setRandomizedFactor(RandomizedFactor.findByRemoteId(jsonObject.getLong("randomized_factor_id")));
             option.setRemoteId(remoteId);
@@ -66,7 +67,7 @@ public class RandomizedOption extends ReceiveModel {
                 }
             }
         } catch (JSONException je) {
-            Log.e(TAG, "Error parsing object json", je);
+            if (BuildConfig.DEBUG) Log.e(TAG, "Error parsing object json", je);
         }
     }
 

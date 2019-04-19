@@ -157,8 +157,8 @@ public class SurveyFragment extends Fragment {
 
     public void refreshView() {
         AuthorizedActivity authority = (AuthorizedActivity) getActivity();
-        if (authority != null && authority.getAuthorize() && AppUtil.getAdminSettingsInstance() != null && AppUtil
-                .getAdminSettingsInstance().getRequirePassword() && !AuthUtils.isSignedIn()) {
+        if (authority != null && authority.getAuthorize() && AppUtil.getSettings() != null &&
+                AppUtil.getSettings().isRequirePassword() && !AuthUtils.isSignedIn()) {
             authority.setAuthorize(false);
             Intent i = new Intent(getContext(), LoginActivity.class);
             getActivity().startActivityForResult(i, AUTHORIZE_CODE);
@@ -203,7 +203,6 @@ public class SurveyFragment extends Fragment {
         setRetainInstance(true); // TODO: 11/9/18 Why do this?
         getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         setHasOptionsMenu(true);
-        if (AppUtil.getContext() == null) AppUtil.setContext(getActivity());
         boolean authority = getActivity().getIntent().getBooleanExtra(EXTRA_AUTHORIZE_SURVEY,
                 false);
         if (authority) {
@@ -268,7 +267,7 @@ public class SurveyFragment extends Fragment {
     }
 
     private void requestLocationUpdates() {
-        if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) {
+        if (AppUtil.getSettings().isRecordSurveyLocation()) {
             if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission
                     .ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 startLocationUpdates();
@@ -586,8 +585,8 @@ public class SurveyFragment extends Fragment {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position != languageCodes.indexOf(AppUtil.getAdminSettingsInstance().getLanguage())) {
-                    AppUtil.getAdminSettingsInstance().setLanguage(languageCodes.get(position));
+                if (position != languageCodes.indexOf(AppUtil.getSettings().getLanguage())) {
+                    AppUtil.getSettings().setLanguage(languageCodes.get(position));
                     LocaleManager.setNewLocale(getActivity(), languageCodes.get(position));
                     recreateActivity();
                 }
@@ -597,7 +596,7 @@ public class SurveyFragment extends Fragment {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
-        spinner.setSelection(languageCodes.indexOf(AppUtil.getAdminSettingsInstance().getLanguage()));
+        spinner.setSelection(languageCodes.indexOf(AppUtil.getSettings().getLanguage()));
     }
 
     private void recreateActivity() {
@@ -1039,7 +1038,7 @@ public class SurveyFragment extends Fragment {
 
     private void proceedFinishingSurvey() {
         unSetSkipQuestionResponse();
-        if (AppUtil.getAdminSettingsInstance().getRecordSurveyLocation()) {
+        if (AppUtil.getSettings().isRecordSurveyLocation()) {
             setSurveyLocation();
         }
         if (mSurvey.emptyResponses().size() > 0) {
@@ -1213,7 +1212,7 @@ public class SurveyFragment extends Fragment {
                     score = new Score();
                     score.setSurvey(survey);
                     score.setScoreScheme(scheme);
-                    score.setSurveyIdentifier(survey.identifier(AppUtil.getContext()));
+                    score.setSurveyIdentifier(survey.identifier(SurveyApp.getInstance()));
                     score.save();
                 }
                 score.score();

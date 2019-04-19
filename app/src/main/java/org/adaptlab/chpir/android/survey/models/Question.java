@@ -411,7 +411,7 @@ public class Question extends ReceiveModel {
                 question = this;
             }
             question.setRemoteId(remoteId);
-            if (AppUtil.DEBUG) Log.i(TAG, "Creating object from JSON Object: " + jsonObject);
+            if (BuildConfig.DEBUG) Log.i(TAG, "Creating object from JSON Object: " + jsonObject);
             question.setText(jsonObject.getString("text"));
             question.setQuestionType(jsonObject.getString("question_type"));
             question.setQuestionIdentifier(jsonObject.getString("question_identifier"));

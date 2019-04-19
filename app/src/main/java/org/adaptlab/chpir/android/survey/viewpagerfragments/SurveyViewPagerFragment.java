@@ -28,6 +28,7 @@ import android.widget.Toast;
 import org.adaptlab.chpir.android.survey.InstrumentActivity;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.SurveyActivity;
+import org.adaptlab.chpir.android.survey.SurveyApp;
 import org.adaptlab.chpir.android.survey.SurveyFragment;
 import org.adaptlab.chpir.android.survey.models.Survey;
 import org.adaptlab.chpir.android.survey.tasks.SetInstrumentLabelTask;
@@ -398,7 +399,7 @@ public class SurveyViewPagerFragment extends Fragment {
 
         public void setSurvey(Survey survey) {
             this.mSurvey = survey;
-            String surveyTitle = survey.identifier(AppUtil.getContext()) + "\n";
+            String surveyTitle = survey.identifier(SurveyApp.getInstance()) + "\n";
             String instrumentTitle = survey.getInstrument().getTitle() + "\n";
             String lastUpdated = DateFormat.getDateTimeInstance().format(
                     survey.getLastUpdated()) + "  ";
@@ -436,8 +437,8 @@ public class SurveyViewPagerFragment extends Fragment {
                     lastUpdated.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             surveyTextView.setText(spannableString);
             if (!survey.isQueued()) {
-                new SetInstrumentLabelTask(SurveyViewPagerFragment.this).execute(
-                        new InstrumentListLabel(survey.getInstrument(), surveyTextView));
+//                new SetInstrumentLabelTask(SurveyViewPagerFragment.this).execute(
+//                        new InstrumentListLabel(survey.getInstrument(), surveyTextView));
             }
 
             String progress;

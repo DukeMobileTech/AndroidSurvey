@@ -47,7 +47,7 @@
             android:screenOrientation="sensorLandscape"
             android:uiOptions="splitActionBarWhenNarrow" />
         <activity
-            android:name=".AdminActivity"
+            android:name=".SettingsActivity"
             android:screenOrientation="sensorLandscape" />
         <activity
             android:name=".LoginActivity"

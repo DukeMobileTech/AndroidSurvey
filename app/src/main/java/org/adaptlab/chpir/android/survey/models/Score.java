@@ -151,8 +151,8 @@ public class Score extends SendModel {
         JSONObject json = new JSONObject();
         try {
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("device_uuid", AppUtil.getAdminSettingsInstance().getDeviceIdentifier());
-            jsonObject.put("device_label", AppUtil.getAdminSettingsInstance().getDeviceLabel());
+            jsonObject.put("device_uuid", AppUtil.getSettings().getDeviceIdentifier());
+            jsonObject.put("device_label", AppUtil.getSettings().getDeviceLabel());
             jsonObject.put("uuid", mUUID);
             jsonObject.put("survey_uuid", mSurveyUUID);
             jsonObject.put("score_scheme_id", mScoreSchemeRemoteId);

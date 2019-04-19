@@ -11,6 +11,8 @@ import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.SendModel;
+import org.adaptlab.chpir.android.survey.BuildConfig;
+import org.adaptlab.chpir.android.survey.SurveyApp;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -61,7 +63,7 @@ public class ResponsePhoto extends SendModel implements Serializable {
     private String getEncodedImage() {
         String encodedImage = "";
         if (getPicturePath() != null && !getPicturePath().equals("")) {
-            String filepath = AppUtil.getContext().getFileStreamPath(getPicturePath()).getAbsolutePath();
+            String filepath = SurveyApp.getInstance().getFileStreamPath(getPicturePath()).getAbsolutePath();
             Bitmap bitmap = BitmapFactory.decodeFile(filepath);
             encodedImage = encodeImage(bitmap);
         } else {
@@ -119,7 +121,7 @@ public class ResponsePhoto extends SendModel implements Serializable {
         mSent = true;
         this.delete();
         if (getResponse() != null) getResponse().delete();
-        if (AppUtil.DEBUG) Log.d(TAG, getAll().size() + " response photos left on device");
+        if (BuildConfig.DEBUG) Log.d(TAG, getAll().size() + " response photos left on device");
     }
 
     public int getCameraOrientation() {

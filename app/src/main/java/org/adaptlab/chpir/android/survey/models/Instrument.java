@@ -14,6 +14,7 @@ import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
+import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.apache.commons.lang3.RandomUtils;
 import org.json.JSONArray;
@@ -408,7 +409,7 @@ public class Instrument extends ReceiveModel {
                 instrument = this;
             }
 
-            if (AppUtil.DEBUG) Log.i(TAG, "Creating object from JSON Object: " + jsonObject);
+            if (BuildConfig.DEBUG) Log.i(TAG, "Creating object from JSON Object: " + jsonObject);
             instrument.setRemoteId(remoteId);
             instrument.setTitle(jsonObject.getString("title"));
             instrument.setLanguage(jsonObject.getString("language"));

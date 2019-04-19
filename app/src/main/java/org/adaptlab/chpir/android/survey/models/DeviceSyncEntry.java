@@ -5,6 +5,7 @@ import android.util.Log;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.activerecordcloudsync.SendModel;
+import org.adaptlab.chpir.android.survey.SurveyApp;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.apache.commons.codec.CharEncoding;
@@ -24,7 +25,7 @@ public class DeviceSyncEntry extends SendModel {
     private LocationManager mLocationManager;
 
     public DeviceSyncEntry() {
-        mLocationManager = new LocationManager(AppUtil.getContext());
+        mLocationManager = new LocationManager(SurveyApp.getInstance());
         mLocationManager.startLocationUpdates();
     }
 
@@ -37,8 +38,8 @@ public class DeviceSyncEntry extends SendModel {
 
             jsonObject.put("latitude", mLocationManager.getLatitude());
             jsonObject.put("longitude", mLocationManager.getLongitude());
-            jsonObject.put("current_version_code", AppUtil.getVersionCode(AppUtil.getContext()));
-            jsonObject.put("current_version_name", AppUtil.getVersionName(AppUtil.getContext()));
+            jsonObject.put("current_version_code", AppUtil.getVersionCode());
+            jsonObject.put("current_version_name", AppUtil.getVersionName());
             jsonObject.put("num_complete_surveys", Survey.getCompleted().size());
             jsonObject.put("num_incomplete_surveys", Survey.getIncomplete().size());
             jsonObject.put("current_language", new Locale(AppUtil.getDeviceLanguage()).getDisplayLanguage());
@@ -115,7 +116,7 @@ public class DeviceSyncEntry extends SendModel {
             outputStream.write(outputInBytes);
             outputStream.close();
 
-            if (AppUtil.DEBUG) {
+            if (BuildConfig.DEBUG) {
                 int responseCode = connection.getResponseCode();
                 if (responseCode >= 200 && responseCode < 300) {
                     Log.i(TAG, "Received OK HTTP code for " + json);

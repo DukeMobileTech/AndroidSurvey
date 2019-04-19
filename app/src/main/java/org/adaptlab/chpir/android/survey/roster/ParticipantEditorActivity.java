@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.adaptlab.chpir.android.survey.SurveyApp;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.Question;
@@ -206,7 +207,7 @@ public class ParticipantEditorActivity extends AppCompatActivity {
             log.setSurveyUUID(mSurvey.getUUID());
         }
         log.setComplete(true);
-        log.setIdentifier(mSurvey.identifier(AppUtil.getContext()));
+        log.setIdentifier(mSurvey.identifier(SurveyApp.getInstance()));
         log.save();
     }
 

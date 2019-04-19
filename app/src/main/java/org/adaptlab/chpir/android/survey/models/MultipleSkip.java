@@ -7,6 +7,7 @@ import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
+import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,7 +47,7 @@ public class MultipleSkip extends ReceiveModel {
             if (skipQuestion == null) {
                 skipQuestion = this;
             }
-            if (AppUtil.DEBUG) Log.i(TAG, "Creating object from JSON Object: " + jsonObject);
+            if (BuildConfig.DEBUG) Log.i(TAG, "Creating object from JSON Object: " + jsonObject);
             skipQuestion.setRemoteId(remoteId);
             skipQuestion.setQuestionIdentifier(jsonObject.getString("question_identifier"));
             skipQuestion.setOptionIdentifier(jsonObject.getString("option_identifier"));

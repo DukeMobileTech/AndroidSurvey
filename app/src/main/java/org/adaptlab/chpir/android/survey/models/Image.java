@@ -3,6 +3,7 @@ package org.adaptlab.chpir.android.survey.models;
 import java.util.List;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
+import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,7 +36,7 @@ public class Image extends ReceiveModel {
 
 	@Override
 	public void createObjectFromJSON(JSONObject jsonObject) {
-	    if (AppUtil.DEBUG) Log.i(TAG, jsonObject.toString());
+	    if (BuildConfig.DEBUG) Log.i(TAG, jsonObject.toString());
 		try {
             Long remoteId = jsonObject.getLong("id");
             Image image = Image.findByRemoteId(remoteId);
@@ -46,7 +47,7 @@ public class Image extends ReceiveModel {
             image.setQuestion(Question.findByRemoteId(jsonObject.getLong("question_id")));
             image.setPhotoUrl(jsonObject.getString("photo_url"));
             image.save();
-            if (AppUtil.DEBUG) Log.i(TAG, image.getPhotoUrl());
+            if (BuildConfig.DEBUG) Log.i(TAG, image.getPhotoUrl());
 		} catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);
         }   

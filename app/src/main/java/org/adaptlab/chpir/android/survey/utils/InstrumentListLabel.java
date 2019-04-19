@@ -2,7 +2,7 @@ package org.adaptlab.chpir.android.survey.utils;
 
 import android.widget.TextView;
 
-import org.adaptlab.chpir.android.survey.models.Instrument;
+import org.adaptlab.chpir.android.survey.entities.Instrument;
 
 public class InstrumentListLabel {
     private Instrument mInstrument;

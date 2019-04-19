@@ -7,6 +7,7 @@ import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
+import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -78,7 +79,7 @@ public class Validation extends ReceiveModel {
                 }
             }
         } catch (JSONException je) {
-            if (AppUtil.DEBUG) Log.e(TAG, "Error parsing object json", je);
+            if (BuildConfig.DEBUG) Log.e(TAG, "Error parsing object json", je);
         }
     }
 

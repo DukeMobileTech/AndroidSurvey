@@ -1,0 +1,75 @@
+package org.adaptlab.chpir.android.survey.entities;
+
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
+
+import com.google.gson.annotations.SerializedName;
+
+import static android.arch.persistence.room.ForeignKey.CASCADE;
+
+@Entity(tableName = "InstrumentTranslations",
+        foreignKeys = @ForeignKey(entity = Instrument.class,
+        parentColumns = "RemoteId", childColumns = "InstrumentRemoteId", onDelete = CASCADE))
+public class InstrumentTranslation {
+    @PrimaryKey
+    @NonNull
+    @SerializedName("id")
+    @ColumnInfo(name = "RemoteId")
+    private Long mRemoteId;
+    @SerializedName("title")
+    @ColumnInfo(name = "Title")
+    private String mTitle;
+    @SerializedName("language")
+    @ColumnInfo(name = "Language")
+    private String mLanguage;
+    @SerializedName("alignment")
+    @ColumnInfo(name = "Alignment")
+    private String mAlignment;
+    @SerializedName("instrument_id")
+    @ColumnInfo(name = "InstrumentRemoteId", index = true)
+    private Long mInstrumentRemoteId;
+
+    @NonNull
+    public Long getRemoteId() {
+        return mRemoteId;
+    }
+
+    public void setRemoteId(@NonNull Long id) {
+        this.mRemoteId = id;
+    }
+
+    public String getTitle() {
+        return mTitle;
+    }
+
+    public void setTitle(String title) {
+        this.mTitle = title;
+    }
+
+    public String getLanguage() {
+        return mLanguage;
+    }
+
+    public void setLanguage(String language) {
+        this.mLanguage = language;
+    }
+
+    public String getAlignment() {
+        return mAlignment;
+    }
+
+    public void setAlignment(String alignment) {
+        this.mAlignment = alignment;
+    }
+
+    public Long getInstrumentRemoteId() {
+        return mInstrumentRemoteId;
+    }
+
+    public void setInstrumentRemoteId(Long instrumentRemoteId) {
+        this.mInstrumentRemoteId = instrumentRemoteId;
+    }
+}

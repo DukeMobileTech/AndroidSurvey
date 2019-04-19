@@ -7,6 +7,7 @@ import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
+import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -83,7 +84,7 @@ public class Rule extends ReceiveModel {
                 rule = this;
             }
             
-            if (AppUtil.DEBUG) Log.i(TAG, "Creating object from JSON Object: " + jsonObject);
+            if (BuildConfig.DEBUG) Log.i(TAG, "Creating object from JSON Object: " + jsonObject);
             rule.setRuleType(jsonObject.getString("rule_type"));
             rule.setInstrumentRemoteId(jsonObject.getLong("instrument_id"));
             rule.setParams(jsonObject.getString("rule_params"));
@@ -124,12 +125,12 @@ public class Rule extends ReceiveModel {
         try {
             JSONObject jsonObject = mStoredValues.equals("") ? new JSONObject() : new JSONObject(mStoredValues);
             
-            if (AppUtil.DEBUG) Log.i(TAG, "Setting k: " + key + " to v: " + value);
+            if (BuildConfig.DEBUG) Log.i(TAG, "Setting k: " + key + " to v: " + value);
             
             jsonObject.put(key, value);
             mStoredValues = jsonObject.toString();
         } catch (JSONException je) {
-            if (AppUtil.DEBUG) Log.e(TAG, "Error setting json for stored value: (k: " + key +", v: " + value + ") :" + je);
+            if (BuildConfig.DEBUG) Log.e(TAG, "Error setting json for stored value: (k: " + key +", v: " + value + ") :" + je);
         }
     }
     
@@ -137,7 +138,7 @@ public class Rule extends ReceiveModel {
         try {
             JSONObject jsonObject = mStoredValues.equals("") ? new JSONObject() : new JSONObject(mStoredValues);
             
-            if (AppUtil.DEBUG) Log.i(TAG, "Getting value for k: " + key);
+            if (BuildConfig.DEBUG) Log.i(TAG, "Getting value for k: " + key);
             
             if (jsonObject.has(key)) {
                 return (T) jsonObject.get(key);
@@ -145,7 +146,7 @@ public class Rule extends ReceiveModel {
                 return null;
             }
         } catch (JSONException je) {
-            if (AppUtil.DEBUG) Log.e(TAG, "Error getting json value for stored value: (k: " + key +") :" + je);
+            if (BuildConfig.DEBUG) Log.e(TAG, "Error getting json value for stored value: (k: " + key +") :" + je);
             return null;
         }
     }

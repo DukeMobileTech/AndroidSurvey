@@ -1,6 +1,7 @@
 package org.adaptlab.chpir.android.survey.models;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
+import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.vendor.BCrypt;
 import org.json.JSONException;
@@ -80,7 +81,7 @@ public class DeviceUser extends ReceiveModel {
                 deviceUser = this;
             }
             
-            if (AppUtil.DEBUG) Log.i(TAG, "Creating object from JSON Object: " + jsonObject);
+            if (BuildConfig.DEBUG) Log.i(TAG, "Creating object from JSON Object: " + jsonObject);
             
             deviceUser.setRemoteId(remoteId);
             deviceUser.setName(jsonObject.getString("name"));

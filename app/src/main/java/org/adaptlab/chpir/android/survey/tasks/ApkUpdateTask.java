@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.activerecordcloudsync.NotificationUtils;
+import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.R;
 import org.json.JSONException;
@@ -60,30 +61,30 @@ public class ApkUpdateTask extends AsyncTask<Void, Void, Void> {
     }
 
     private void checkLatestApk() {
-        ActiveRecordCloudSync.setAccessToken(AppUtil.getAdminSettingsInstance().getApiKey());
+        ActiveRecordCloudSync.setAccessToken(AppUtil.getAccessToken());
         ActiveRecordCloudSync.setVersionCode(AppUtil.getVersionCode(mContext));
-        String url = AppUtil.getAdminSettingsInstance().getApiUrl() + "android_updates" +
+        String url = AppUtil.getFullApiUrl() + "android_updates" +
                 ActiveRecordCloudSync.getParams();
         try {
             String jsonString = getUrl(url);
-            if (AppUtil.DEBUG) Log.i(TAG, "Got JSON String: " + jsonString);
+            if (BuildConfig.DEBUG) Log.i(TAG, "Got JSON String: " + jsonString);
             if (!jsonString.trim().equals("null")) {
                 JSONObject obj = new JSONObject(jsonString);
                 mLatestVersion = obj.getInt("version");
                 mApkId = obj.getInt("id");
                 mFileName = UUID.randomUUID().toString() + ".apk";
-                if (AppUtil.DEBUG)
+                if (BuildConfig.DEBUG)
                     Log.i(TAG, "Latest version is: " + mLatestVersion + ". Old version is: " +
                             AppUtil.getVersionCode(mContext));
             }
         } catch (ConnectException cre) {
-            if (AppUtil.DEBUG) Log.e(TAG, "Connection was refused", cre);
+            if (BuildConfig.DEBUG) Log.e(TAG, "Connection was refused", cre);
         } catch (IOException ioe) {
-            if (AppUtil.DEBUG) Log.e(TAG, "Failed to fetch items", ioe);
+            if (BuildConfig.DEBUG) Log.e(TAG, "Failed to fetch items", ioe);
         } catch (NullPointerException npe) {
-            if (AppUtil.DEBUG) Log.e(TAG, "Url is null", npe);
+            if (BuildConfig.DEBUG) Log.e(TAG, "Url is null", npe);
         } catch (JSONException je) {
-            if (AppUtil.DEBUG) Log.e(TAG, "Failed to parse items", je);
+            if (BuildConfig.DEBUG) Log.e(TAG, "Failed to parse items", je);
         }
     }
 
@@ -166,7 +167,7 @@ public class ApkUpdateTask extends AsyncTask<Void, Void, Void> {
         }
 
         private void downloadLatestApk() {
-            String url = AppUtil.getAdminSettingsInstance().getApiUrl() + "android_updates/" +
+            String url = AppUtil.getFullApiUrl() + "android_updates/" +
                     mApkId + "/" + ActiveRecordCloudSync.getParams();
             File path = Environment.getExternalStoragePublicDirectory(Environment
                     .DIRECTORY_DOWNLOADS);

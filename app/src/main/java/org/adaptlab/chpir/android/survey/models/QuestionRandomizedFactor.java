@@ -7,13 +7,14 @@ import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
+import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 @Table(name = "QuestionRandomizedFactors")
 public class QuestionRandomizedFactor extends ReceiveModel {
-    private static final String TAG = "QuestionRandomizedFactor";
+    private static final String TAG = "QuestionRandomizedF";
     @Column(name = "Question")
     private Question mQuestion;
     @Column(name = "RandomizedFactor")
@@ -39,7 +40,7 @@ public class QuestionRandomizedFactor extends ReceiveModel {
                 qrFactor = this;
             }
 
-            if (AppUtil.DEBUG) Log.i(TAG, "Creating object from JSON Object: " + jsonObject);
+            if (BuildConfig.DEBUG) Log.i(TAG, "Creating object from JSON Object: " + jsonObject);
             qrFactor.setPosition(jsonObject.getInt("position"));
             qrFactor.setQuestion(Question.findByRemoteId(jsonObject.getLong("question_id")));
             qrFactor.setRandomizedFactor(RandomizedFactor.findByRemoteId(jsonObject.getLong("randomized_factor_id")));

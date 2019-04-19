@@ -83,8 +83,8 @@ public class Survey extends SendModel {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("instrument_id", getInstrument().getRemoteId());
             jsonObject.put("instrument_version_number", getInstrument().getVersionNumber());
-            jsonObject.put("device_uuid", getAdminInstanceDeviceIdentifier());
-            jsonObject.put("device_label", AppUtil.getAdminSettingsInstance().getDeviceLabel());
+            jsonObject.put("device_uuid", AppUtil.getSettings().getDeviceIdentifier());
+            jsonObject.put("device_label", AppUtil.getSettings().getDeviceLabel());
             jsonObject.put("uuid", mUUID);
             jsonObject.put("instrument_title", getInstrument().getTitle());
             jsonObject.put("latitude", mLatitude);
@@ -101,10 +101,6 @@ public class Survey extends SendModel {
             Log.e(TAG, "JSON exception", je);
         }
         return json;
-    }
-
-    private String getAdminInstanceDeviceIdentifier() {
-        return AppUtil.getAdminSettingsInstance().getDeviceIdentifier();
     }
 
     @Override
@@ -188,12 +184,12 @@ public class Survey extends SendModel {
 
     public static List<Survey> getCompleted() {
         return new Select().from(Survey.class).where("Complete = ? AND ProjectID = ?", 1,
-                Long.valueOf(AppUtil.getAdminSettingsInstance().getProjectId())).execute();
+                AppUtil.getProjectId()).execute();
     }
 
     static List<Survey> getIncomplete() {
         return new Select().from(Survey.class).where("Complete = ? AND ProjectID = ?", 0,
-                Long.valueOf(AppUtil.getAdminSettingsInstance().getProjectId())).execute();
+                AppUtil.getProjectId()).execute();
     }
 
     public static Survey findByUUID(String uuid) {

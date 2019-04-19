@@ -1,41 +1,33 @@
 package org.adaptlab.chpir.android.survey.tasks;
 
 import android.os.AsyncTask;
-import android.support.v4.app.Fragment;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
 
-import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.models.Instrument;
+import org.adaptlab.chpir.android.survey.entities.Instrument;
 import org.adaptlab.chpir.android.survey.utils.InstrumentListLabel;
 
-public class SetInstrumentLabelTask extends AsyncTask<InstrumentListLabel, Void,
-        InstrumentListLabel> {
-    private Fragment mFragment;
+public class SetInstrumentLabelTask extends AsyncTask<InstrumentListLabel, Void, InstrumentListLabel> {
+    private AsyncTaskListener mListener;
 
-    public SetInstrumentLabelTask(Fragment fragment) {
-        mFragment = fragment;
+    public void setListener(AsyncTaskListener listener) {
+        this.mListener = listener;
     }
 
     @Override
     protected InstrumentListLabel doInBackground(InstrumentListLabel... params) {
         InstrumentListLabel instrumentListLabel = params[0];
         Instrument instrument = instrumentListLabel.getInstrument();
-        instrumentListLabel.setLoaded(instrument.loaded());
+        instrumentListLabel.setLoaded(instrument.isLoaded());
         return instrumentListLabel;
     }
 
     @Override
     protected void onPostExecute(InstrumentListLabel instrumentListLabel) {
-        if (mFragment.isAdded()) {
-            if (!instrumentListLabel.isLoaded()) {
-                CharSequence text = instrumentListLabel.getTextView().getText();
-                Spannable spannable = new SpannableString(text);
-                spannable.setSpan(new ForegroundColorSpan(mFragment.getResources().getColor(
-                        R.color.red)), 0, text.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                instrumentListLabel.getTextView().setText(spannable);
-            }
-        }
+        super.onPostExecute(instrumentListLabel);
+        mListener.onAsyncTaskFinished(instrumentListLabel);
     }
+
+    public interface AsyncTaskListener {
+        void onAsyncTaskFinished(InstrumentListLabel instrumentListLabel);
+    }
+
 }

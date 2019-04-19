@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import org.adaptlab.chpir.android.survey.BuildConfig;
+import org.adaptlab.chpir.android.survey.SurveyApp;
 import org.adaptlab.chpir.android.survey.models.Image;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.apache.commons.codec.CharEncoding;
@@ -42,11 +43,11 @@ public class HttpUtil {
 
                 int responseCode = connection.getResponseCode();
                 if (responseCode >= 200 && responseCode < 300) {
-                    if (AppUtil.DEBUG) Log.i(TAG, "Received OK HTTP code for " +
+                    if (BuildConfig.DEBUG) Log.i(TAG, "Received OK HTTP code for " +
                             element.toJSON());
-                    element.setAsSent(AppUtil.getContext());
+                    element.setAsSent(SurveyApp.getInstance());
                 } else {
-                    if (AppUtil.DEBUG) Log.e(TAG, "Received BAD HTTP code " + responseCode +
+                    if (BuildConfig.DEBUG) Log.e(TAG, "Received BAD HTTP code " + responseCode +
                             " for " + element.toJSON());
                 }
             } catch (IOException e) {
@@ -69,7 +70,7 @@ public class HttpUtil {
         try {
             byte[] imageBytes = getUrlBytes(url);
             if (imageBytes != null) {
-                fileWriter = AppUtil.getContext().openFileOutput(filename, Context.MODE_PRIVATE);
+                fileWriter = SurveyApp.getInstance().openFileOutput(filename, Context.MODE_PRIVATE);
                 fileWriter.write(imageBytes);
                 image.setBitmapPath(filename);
                 image.save();

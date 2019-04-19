@@ -3,13 +3,15 @@ package org.adaptlab.chpir.android.survey;
 import android.Manifest;
 import android.app.ActivityOptions;
 import android.app.ProgressDialog;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -25,10 +27,13 @@ import android.widget.TextView;
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.activerecordcloudsync.HttpUtil;
 import org.adaptlab.chpir.android.activerecordcloudsync.NotificationUtils;
+import org.adaptlab.chpir.android.survey.adapters.FragmentPagerAdapter;
 import org.adaptlab.chpir.android.survey.models.AdminSettings;
 import org.adaptlab.chpir.android.survey.models.Image;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.Project;
+import org.adaptlab.chpir.android.survey.entities.Settings;
+import org.adaptlab.chpir.android.survey.viewmodels.SettingsViewModel;
 import org.adaptlab.chpir.android.survey.tasks.SetScoreUnitOrderingQuestionTask;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.utils.LocaleManager;
@@ -48,14 +53,27 @@ public class InstrumentActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        AppUtil.appInit(this);
+        AppUtil.appInit(getApplication());
         setContentView(R.layout.activity_instrument2);
         if (getIntent() != null) {
             mAuthorizeSurvey = getIntent().getBooleanExtra(EXTRA_AUTHORIZE_SURVEY, false);
         }
+        setSettings();
         requestNeededPermissions();
-        checkApiEndpointSettings();
         setupViewPager();
+    }
+
+    private void setSettings() {
+        SettingsViewModel settingsViewModel = ViewModelProviders.of(this).get(SettingsViewModel.class);
+        settingsViewModel.getSettings().observe(this, new Observer<Settings>() {
+            @Override
+            public void onChanged(@Nullable Settings settings) {
+                if (TextUtils.isEmpty(settings.getApiUrl()) || TextUtils.isEmpty(settings.getApiVersion()) ||
+                TextUtils.isEmpty(settings.getProjectId()) || TextUtils.isEmpty(settings.getApiKey())) {
+                    startActivity(new Intent(InstrumentActivity.this, SettingsActivity.class));
+                }
+            }
+        });
     }
 
     private void requestNeededPermissions() {
@@ -64,15 +82,6 @@ public class InstrumentActivity extends AppCompatActivity {
         };
         if (!hasPermission(permissions)) {
             ActivityCompat.requestPermissions(this, permissions, 1);
-        }
-    }
-
-    private void checkApiEndpointSettings() {
-        AdminSettings adminSettings = AdminSettings.getInstance();
-        if (TextUtils.isEmpty(adminSettings.getApiDomainName()) || TextUtils.isEmpty
-                (adminSettings.getApiVersion()) || TextUtils.isEmpty(adminSettings.getProjectId()
-        ) || TextUtils.isEmpty(adminSettings.getApiKey())) {
-            startActivity(new Intent(this, AdminActivity.class));
         }
     }
 
@@ -135,7 +144,7 @@ public class InstrumentActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_item_settings:
-                Intent i = new Intent(this, AdminActivity.class);
+                Intent i = new Intent(this, SettingsActivity.class);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     startActivity(i, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
                 } else {
@@ -143,7 +152,8 @@ public class InstrumentActivity extends AppCompatActivity {
                 }
                 return true;
             case R.id.menu_item_refresh:
-                downloadInstruments();
+//                downloadInstruments();
+                AppUtil.downloadData(this.getApplication());
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -174,7 +184,7 @@ public class InstrumentActivity extends AppCompatActivity {
                                 @Override
                                 public void onAsyncTaskFinished(Boolean last) {
                                     if (last) {
-                                        AppUtil.getAdminSettingsInstance().setLastSyncTime(
+                                        AppUtil.getSettings().setLastSyncTime(
                                                 ActiveRecordCloudSync.getLastSyncTime());
                                         finishProgressDialog();
                                     }
@@ -201,15 +211,15 @@ public class InstrumentActivity extends AppCompatActivity {
         }
     }
 
-    private void refreshInstrumentsView() {
-        if (mFragmentPagerAdapter != null &&
-                mFragmentPagerAdapter.getInstrumentViewPagerFragment() != null) {
-            mFragmentPagerAdapter.getInstrumentViewPagerFragment().refreshRecyclerView();
-        } else {
-            startActivity(new Intent(this, InstrumentActivity.class));
-            finish();
-        }
-    }
+//    private void refreshInstrumentsView() {
+//        if (mFragmentPagerAdapter != null &&
+//                mFragmentPagerAdapter.getInstrumentViewPagerFragment() != null) {
+//            mFragmentPagerAdapter.getInstrumentViewPagerFragment().refreshRecyclerView();
+//        } else {
+//            startActivity(new Intent(this, InstrumentActivity.class));
+//            finish();
+//        }
+//    }
 
     private void showProgressDialog() {
         mProgressDialog = new ProgressDialog(this);
@@ -225,7 +235,7 @@ public class InstrumentActivity extends AppCompatActivity {
         if (mProgressDialog != null && !this.isFinishing() && mProgressDialog.isShowing()) {
             mProgressDialog.dismiss();
         }
-        refreshInstrumentsView();
+//        refreshInstrumentsView();
     }
 
     private static class RefreshInstrumentsTask extends AsyncTask<Void, Void, Integer> {
@@ -241,7 +251,7 @@ public class InstrumentActivity extends AppCompatActivity {
 
         @Override
         protected Integer doInBackground(Void... params) {
-            if (NotificationUtils.checkForNetworkErrors(AppUtil.getContext())) {
+            if (NotificationUtils.checkForNetworkErrors(SurveyApp.getInstance())) {
                 List<Instrument> instruments = Instrument.getAllProjectInstruments(getProjectId());
                 for (int k = 0; k < instruments.size(); k++) {
                     if (!instruments.get(k).loaded()) {
@@ -249,7 +259,7 @@ public class InstrumentActivity extends AppCompatActivity {
                         break;
                     }
                 }
-                ActiveRecordCloudSync.syncReceiveTables(AppUtil.getContext());
+                ActiveRecordCloudSync.syncReceiveTables(SurveyApp.getInstance());
                 return 0;
             } else {
                 return -1;
@@ -278,15 +288,15 @@ public class InstrumentActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... arg0) {
-            if (NotificationUtils.checkForNetworkErrors(AppUtil.getContext())) {
-                ActiveRecordCloudSync.setAccessToken(AppUtil.getAdminSettingsInstance().getApiKey());
-                ActiveRecordCloudSync.setVersionCode(AppUtil.getVersionCode(AppUtil.getContext()));
-                ActiveRecordCloudSync.downloadNotification(AppUtil.getContext(),
+            if (NotificationUtils.checkForNetworkErrors(SurveyApp.getInstance())) {
+                ActiveRecordCloudSync.setAccessToken(AppUtil.getAccessToken());
+                ActiveRecordCloudSync.setVersionCode(AppUtil.getVersionCode());
+                ActiveRecordCloudSync.downloadNotification(SurveyApp.getInstance(),
                         android.R.drawable.stat_sys_download, R.string.sync_notification_text);
                 for (Image image : Image.getAll()) {
                     HttpUtil.getFile(image);
                 }
-                ActiveRecordCloudSync.downloadNotification(AppUtil.getContext(),
+                ActiveRecordCloudSync.downloadNotification(SurveyApp.getInstance(),
                         android.R.drawable.stat_sys_download_done, R.string.sync_notification_complete_text);
 
             }

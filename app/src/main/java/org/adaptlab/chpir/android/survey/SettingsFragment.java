@@ -1,0 +1,468 @@
+package org.adaptlab.chpir.android.survey;
+
+import android.app.AlertDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
+import android.content.DialogInterface;
+import android.os.Build;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.webkit.URLUtil;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
+import org.adaptlab.chpir.android.survey.models.Response;
+import org.adaptlab.chpir.android.survey.models.Survey;
+import org.adaptlab.chpir.android.survey.entities.InstrumentTranslation;
+import org.adaptlab.chpir.android.survey.entities.Settings;
+import org.adaptlab.chpir.android.survey.viewmodels.SettingsViewModel;
+import org.adaptlab.chpir.android.survey.tasks.ApkUpdateTask;
+import org.adaptlab.chpir.android.survey.tasks.RemoteAuthenticationTask;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
+import org.adaptlab.chpir.android.survey.utils.LocaleManager;
+
+import java.net.HttpURLConnection;
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+
+public class SettingsFragment extends Fragment {
+    private final String TAG = "SettingsFragment";
+    private final String CHANNEL = "RESTORATION_CHANNEL";
+    private final int RESTORATION_ID = 12345;
+    private EditText mDeviceIdentifierEditText;
+    private EditText mDeviceLabelEditText;
+    private EditText mApiDomainNameEditText;
+    private EditText mApiVersionEditText;
+    private EditText mProjectIdEditText;
+    private EditText mApiKeyEditText;
+    private EditText mCustomLocaleEditText;
+    private CheckBox mShowSurveysCheckBox;
+    private CheckBox mRequirePasswordCheckBox;
+    private CheckBox mRecordSurveyLocationCheckBox;
+    private TextView mLastUpdateTextView;
+    private ArrayList<EditText> mRequiredFields;
+    private AlertDialog mDialog;
+    private Spinner mSpinner;
+    private Settings mSettings;
+    private SettingsViewModel mSettingsViewModel;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+        if (getActivity() == null) return;
+        getActivity().setTitle(R.string.admin_settings);
+        mSettingsViewModel = ViewModelProviders.of(getActivity()).get(SettingsViewModel.class);
+        mSettingsViewModel.getSettings().observe(this, new Observer<Settings>() {
+            @Override
+            public void onChanged(@Nullable Settings settings) {
+                mSettings = settings;
+                mApiDomainNameEditText.setText(mSettings.getApiUrl());
+                mApiVersionEditText.setText(mSettings.getApiVersion());
+                mProjectIdEditText.setText(mSettings.getProjectId());
+                mApiKeyEditText.setText(mSettings.getApiKey());
+                mShowSurveysCheckBox.setChecked(mSettings.isShowSurveys());
+                mRequirePasswordCheckBox.setChecked(mSettings.isRequirePassword());
+                mRecordSurveyLocationCheckBox.setChecked(mSettings.isRecordSurveyLocation());
+                mDeviceIdentifierEditText.setText(mSettings.getDeviceIdentifier());
+                mDeviceIdentifierEditText.setSelection(mDeviceIdentifierEditText.getText().length());
+                mDeviceLabelEditText.setText(mSettings.getDeviceLabel());
+                mCustomLocaleEditText.setText(mSettings.getCustomLocaleCode());
+                mLastUpdateTextView.setText(String.format(Locale.getDefault(), "%s%s%s",
+                        getString(R.string.last_update), " ", getLastUpdateTime()));
+            }
+        });
+
+        mSettingsViewModel.getAllLanguages().observe(this, new Observer<List<InstrumentTranslation>>() {
+            @Override
+            public void onChanged(@Nullable List<InstrumentTranslation> instrumentTranslations) {
+                setSpinnerAdapter(instrumentTranslations);
+            }
+        });
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.fragment_settings, parent, false);
+
+        mApiDomainNameEditText = v.findViewById(R.id.api_endpoint_text);
+//        mApiDomainNameEditText.setText(mSettings.getApiUrl());
+        mApiVersionEditText = v.findViewById(R.id.api_version_text);
+//        mApiVersionEditText.setText(mSettings.getApiVersion());
+        mProjectIdEditText = v.findViewById(R.id.project_id_text);
+//        mProjectIdEditText.setText(mSettings.getProjectId());
+        mApiKeyEditText = v.findViewById(R.id.api_key_text);
+//        mApiKeyEditText.setText(mSettings.getApiKey());
+        mRequiredFields = new ArrayList<>(Arrays.asList(mApiDomainNameEditText, mApiVersionEditText, mProjectIdEditText, mApiKeyEditText));
+        mShowSurveysCheckBox = v.findViewById(R.id.show_surveys_checkbox);
+//        mShowSurveysCheckBox.setChecked(mSettings.isShowSurveys());
+        mRequirePasswordCheckBox = v.findViewById(R.id.require_password);
+//        mRequirePasswordCheckBox.setChecked(mSettings.isRequirePassword());
+        mRecordSurveyLocationCheckBox = v.findViewById(R.id.record_survey_location_checkbox);
+//        mRecordSurveyLocationCheckBox.setChecked(mSettings.isRecordSurveyLocation());
+        mDeviceIdentifierEditText = v.findViewById(R.id.device_identifier_edit_text);
+//        mDeviceIdentifierEditText.setText(mSettings.getDeviceIdentifier());
+//        mDeviceIdentifierEditText.setSelection(mDeviceIdentifierEditText.getText().length());
+        mDeviceLabelEditText = v.findViewById(R.id.device_label_edit_text);
+//        mDeviceLabelEditText.setText(mSettings.getDeviceLabel());
+        mCustomLocaleEditText = v.findViewById(R.id.custom_locale_edit_text);
+//        mCustomLocaleEditText.setText(mSettings.getCustomLocaleCode());
+        mSpinner = v.findViewById(R.id.device_language_spinner);
+//        setSpinnerAdapter();
+
+        // Disable edits if using default settings
+        if (getResources().getBoolean(R.bool.default_admin_settings)) {
+            mDeviceIdentifierEditText.setEnabled(false);
+            mDeviceLabelEditText.setEnabled(false);
+            mCustomLocaleEditText.setEnabled(false);
+            mRecordSurveyLocationCheckBox.setEnabled(false);
+            mRequirePasswordCheckBox.setEnabled(false);
+            mShowSurveysCheckBox.setEnabled(false);
+        }
+
+        mLastUpdateTextView = v.findViewById(R.id.last_update_label);
+//        mLastUpdateTextView.setText(String.format(Locale.getDefault(), "%s%s%s",
+//                getString(R.string.last_update), " ", getLastUpdateTime()));
+
+        Button resetLastSyncTime = v.findViewById(R.id.reset_last_sync_time_button);
+        resetLastSyncTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSettings.setLastSyncTime(null);
+                mLastUpdateTextView.setText(String.format(Locale.getDefault(), "%s%s%s",
+                        getString(R.string.last_update), " ", getLastUpdateTime()));
+            }
+        });
+
+        TextView versionCodeTextView = v.findViewById(R.id.version_code_label);
+        versionCodeTextView.setText(String.format(Locale.getDefault(), "%s%s%d",
+                getString(R.string.version_code), " ", AppUtil.getVersionCode(getActivity())));
+
+        TextView versionNameTextView = v.findViewById(R.id.version_name_label);
+        versionNameTextView.setText(String.format(Locale.getDefault(), "%s%s%s",
+                getString(R.string.version_name), " ", AppUtil.getVersionName()));
+
+        Button updatesCheck = v.findViewById(R.id.updates_check_button);
+        updatesCheck.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                new ApkUpdateTask(getActivity()).execute();
+            }
+        });
+
+        Button settingsDownload = v.findViewById(R.id.fetch_endpoint_settings);
+        settingsDownload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showConfigurationsDialog();
+            }
+        });
+
+        Button restoreData = v.findViewById(R.id.restoreResponsesButton);
+        restoreData.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                restoreDeletedSurveys();
+            }
+        });
+
+        return v;
+    }
+
+    private void restoreDeletedSurveys() {
+        if (getActivity() == null) return;
+        Set<String> surveyIds = new HashSet<>();
+        List<Survey> surveys = Survey.getAll();
+        List<Response> responses = Response.getAll();
+        int MAX = surveys.size() + responses.size();
+        NotificationManager notificationManager = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            notificationManager = getActivity().getSystemService(NotificationManager.class);
+        }
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity(), CHANNEL)
+                .setSmallIcon(R.drawable.ic_restore_black_24dp)
+                .setContentTitle("Restoring Data")
+                .setContentText("Please wait a moment as data is restored")
+                .setPriority(NotificationCompat.PRIORITY_HIGH);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            String description = "Restoring previously deleted surveys that still have their data on the device";
+            NotificationChannel channel = new NotificationChannel(CHANNEL, CHANNEL, NotificationManager.IMPORTANCE_HIGH);
+            channel.setDescription(description);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
+        builder.setProgress(MAX, 0, false);
+        if (notificationManager != null) {
+            notificationManager.notify(RESTORATION_ID, builder.build());
+        }
+
+        int counter = 0;
+        for (Survey survey : surveys) {
+            surveyIds.add(survey.getUUID());
+            counter += 1;
+            builder.setProgress(counter, MAX, false);
+        }
+        for (Response response : responses) {
+            counter += 1;
+            builder.setProgress(counter, MAX, false);
+            if (!surveyIds.contains(response.getSurveyUUID())) {
+                Survey survey = new Survey();
+                survey.setUuid(response.getSurveyUUID());
+                survey.setInstrumentRemoteId(response.getQuestion().getInstrument().getRemoteId());
+                survey.setProjectId(response.getQuestion().getInstrument().getProjectId());
+                survey.save();
+                surveyIds.add(response.getSurveyUUID());
+            }
+        }
+        builder.setContentText("Restoration complete").setProgress(0, 0, false);
+        if (notificationManager != null) {
+            notificationManager.notify(RESTORATION_ID, builder.build());
+            notificationManager.cancel(RESTORATION_ID);
+        }
+        getActivity().finish();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.admin_setting_menu, menu);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        if (getResources().getBoolean(R.bool.default_admin_settings)) {
+            menu.findItem(R.id.save_admin_settings_button).setEnabled(false).setVisible(false);
+            menu.findItem(R.id.delete_data_button).setEnabled(false).setVisible(false);
+        }
+        menu.findItem(R.id.delete_data_button).setEnabled(false).setVisible(false);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.save_admin_settings_button:
+                saveSettings();
+                finishActivity();
+                return true;
+            case R.id.delete_data_button:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void setSpinnerAdapter(List<InstrumentTranslation> instrumentTranslations) {
+        if (getActivity() == null) return;
+        final List<String> languageCodes = new ArrayList<>();
+        languageCodes.add("en");
+        for(InstrumentTranslation instrumentTranslation : instrumentTranslations) {
+            languageCodes.add(instrumentTranslation.getLanguage());
+        }
+        ArrayList<String> displayLanguages = new ArrayList<>();
+        for (String languageCode : languageCodes) {
+            displayLanguages.add(new Locale(languageCode).getDisplayLanguage());
+        }
+        final ArrayAdapter<String> mAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, displayLanguages);
+        mAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSpinner.setAdapter(mAdapter);
+        mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (mSettings != null && position != languageCodes.indexOf(mSettings.getLanguage())) {
+                    mSettings.setLanguage(languageCodes.get(position));
+                    LocaleManager.setNewLocale(getActivity(), languageCodes.get(position));
+                    mSettingsViewModel.updateSettings(mSettings);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+        if (mSettings != null) {
+            mSpinner.setSelection(languageCodes.indexOf(mSettings.getLanguage()));
+        }
+    }
+
+    public String getLastUpdateTime() {
+        String last = mSettings.getLastSyncTime();
+        if (TextUtils.isEmpty(last)) return "";
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(Long.parseLong(last));
+        DateFormat dateFormat = DateFormat.getDateTimeInstance();
+        return dateFormat.format(calendar.getTime());
+    }
+
+    private void showConfigurationsDialog() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder.setTitle(R.string.api_endpoint_settings)
+                    .setView(R.layout.fragment_api_settings)
+                    .setPositiveButton(R.string.upper_case_OK, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
+            final AlertDialog dialog = builder.create();
+            dialog.show();
+
+            final EditText endpointEditText = dialog.findViewById(R.id.apiEndpointEditText);
+            final EditText versionEditText = dialog.findViewById(R.id.apiVersionEditText);
+            final EditText projectEditText = dialog.findViewById(R.id.projectIdEditText);
+            final CheckBox surveysCheckBox = dialog.findViewById(R.id.showSurveys);
+            final CheckBox recordSurveyLocation = dialog.findViewById(R.id.recordLocation);
+
+            if (TextUtils.isEmpty(mSettings.getApiUrl())) {
+                endpointEditText.setText(getString(R.string.default_api_domain_name));
+            } else {
+                endpointEditText.setText(mSettings.getApiUrl());
+            }
+            if (TextUtils.isEmpty(mSettings.getApiVersion())) {
+                versionEditText.setText(getString(R.string.default_api_version));
+            } else {
+                versionEditText.setText(mSettings.getApiVersion());
+            }
+            if (TextUtils.isEmpty(mSettings.getProjectId())) {
+                projectEditText.setText(getString(R.string.default_project_id));
+            } else {
+                projectEditText.setText(mSettings.getProjectId());
+            }
+            surveysCheckBox.setChecked(true);
+            recordSurveyLocation.setChecked(true);
+
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String endpoint = endpointEditText.getText().toString();
+                    String version = versionEditText.getText().toString();
+                    String project = projectEditText.getText().toString();
+                    if (URLUtil.isValidUrl(endpoint)) {
+                        mSettings.setApiUrl(endpoint);
+                        AppUtil.setDomainName(endpoint);
+                        mSettings.setApiVersion(version);
+                        AppUtil.setApiVersion(version);
+                        mSettings.setProjectId(project);
+                        AppUtil.setProjectId(Integer.parseInt(project));
+                        mSettings.setShowSurveys(surveysCheckBox.isChecked());
+                        mSettings.setRecordSurveyLocation(recordSurveyLocation.isChecked());
+                        mSettingsViewModel.updateSettings(mSettings);
+                        mApiDomainNameEditText.setText(endpoint);
+                        mApiVersionEditText.setText(version);
+                        mProjectIdEditText.setText(project);
+                        mShowSurveysCheckBox.setChecked(surveysCheckBox.isChecked());
+                        mRecordSurveyLocationCheckBox.setChecked(recordSurveyLocation.isChecked());
+                        dialog.dismiss();
+                        deviceUserLogin(mSettings.getFullApiUrl());
+                    } else {
+                        endpointEditText.setError(getString(R.string.invalid_url));
+                    }
+                }
+            });
+        }
+    }
+
+    private void deviceUserLogin(final String endpoint) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder.setTitle(R.string.device_user_login)
+                    .setView(R.layout.fragment_login);
+            mDialog = builder.create();
+            mDialog.show();
+
+            final EditText username = mDialog.findViewById(R.id.login_username_edit_text);
+            final EditText password = mDialog.findViewById(R.id.login_password_edit_text);
+            final Button login = mDialog.findViewById(R.id.login_button);
+            login.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    RemoteAuthenticationTask task = new RemoteAuthenticationTask();
+                    task.setListener(new RemoteAuthenticationTask.AsyncTaskListener() {
+                        @Override
+                        public void onAsyncTaskFinished(String param) {
+                            if (param == null || param.equals(HttpURLConnection.HTTP_UNAUTHORIZED + "")) {
+                                Toast.makeText(getActivity(), R.string.invalid_user_credentials, Toast.LENGTH_LONG).show();
+                            } else {
+                                mSettings.setApiKey(param);
+                                AppUtil.setAccessToken(param);
+                                mApiKeyEditText.setText(param);
+                                if (mDialog != null) mDialog.dismiss();
+                                saveSettings();
+                                finishActivity();
+                            }
+                        }
+                    });
+                    task.execute(endpoint, username.getText().toString(),
+                            password.getText().toString());
+                }
+            });
+        }
+    }
+
+    private void saveSettings() {
+        if (!requiredFieldIsEmpty()) {
+            mSettings.setDeviceIdentifier(mDeviceIdentifierEditText.getText().toString());
+            mSettings.setDeviceLabel(mDeviceLabelEditText.getText().toString());
+            mSettings.setApiUrl(mApiDomainNameEditText.getText().toString());
+            mSettings.setApiVersion(mApiVersionEditText.getText().toString());
+            mSettings.setProjectId(mProjectIdEditText.getText().toString());
+            mSettings.setApiKey(mApiKeyEditText.getText().toString());
+            // If this code is set, it will override the language selection on the device for all instrument translations.
+            mSettings.setCustomLocaleCode(mCustomLocaleEditText.getText().toString());
+            mSettings.setShowSurveys(mShowSurveysCheckBox.isChecked());
+            mSettings.setRequirePassword(mRequirePasswordCheckBox.isChecked());
+            mSettings.setRecordSurveyLocation(mRecordSurveyLocationCheckBox.isChecked());
+
+            mSettingsViewModel.updateSettings(mSettings);
+
+            ActiveRecordCloudSync.setAccessToken(mSettings.getApiKey());
+            ActiveRecordCloudSync.setEndPoint(mSettings.getFullApiUrl());
+        }
+    }
+
+    private void finishActivity() {
+        if (getActivity() == null) return;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getActivity().finishAfterTransition();
+        } else {
+            getActivity().finish();
+        }
+    }
+
+    private boolean requiredFieldIsEmpty() {
+        for (EditText editText : mRequiredFields) {
+            if (TextUtils.isEmpty(editText.getText())) {
+                editText.setError(getString(R.string.required_field));
+                return true;
+            }
+        }
+        return false;
+    }
+
+}

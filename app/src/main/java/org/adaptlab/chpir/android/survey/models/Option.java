@@ -7,6 +7,7 @@ import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
+import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -84,7 +85,7 @@ public class Option extends ReceiveModel {
             }
             option.setRemoteId(remoteId);
 
-            if (AppUtil.DEBUG) Log.i(TAG, "Creating object from JSON Object: " + jsonObject);
+            if (BuildConfig.DEBUG) Log.i(TAG, "Creating object from JSON Object: " + jsonObject);
             option.setText(jsonObject.getString("text"));
             if (jsonObject.isNull("deleted_at")) {
                 option.setDeleted(false);
@@ -112,7 +113,7 @@ public class Option extends ReceiveModel {
                 }
             }
         } catch (JSONException je) {
-            if (AppUtil.DEBUG) Log.e(TAG, "Error parsing object json", je);
+            if (BuildConfig.DEBUG) Log.e(TAG, "Error parsing object json", je);
         }
     }
 
