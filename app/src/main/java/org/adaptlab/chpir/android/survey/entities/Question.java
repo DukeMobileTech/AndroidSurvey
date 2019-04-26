@@ -3,6 +3,8 @@ package org.adaptlab.chpir.android.survey.entities;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
 import android.support.annotation.NonNull;
@@ -14,11 +16,14 @@ import org.adaptlab.chpir.android.survey.converters.Converters;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.List;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
 @Entity(tableName = "Questions", foreignKeys = @ForeignKey(entity = Instrument.class,
-        parentColumns = "RemoteId", childColumns = "InstrumentRemoteId", onDelete = CASCADE))
+        parentColumns = "RemoteId", childColumns = "InstrumentRemoteId", onDelete = CASCADE),
+        indices = {@Index(name = "questions_remote_id_index", value = {"RemoteId"}, unique = true),
+        @Index(name = "questions_identifier_index", value = {"QuestionIdentifier"}, unique = true)})
 public class Question {
     @PrimaryKey
     @NonNull
@@ -92,6 +97,15 @@ public class Question {
     private int mLoopNumber;
     @ColumnInfo(name = "TextToReplace")
     private String mTextToReplace;
+    @Ignore
+    @SerializedName("question_translations")
+    private List<QuestionTranslation> mQuestionTranslations;
+    @Ignore
+    @SerializedName("loop_questions")
+    private List<LoopQuestion> mLoopQuestions;
+    @Ignore
+    @SerializedName("critical_responses")
+    private List<CriticalResponse> mCriticalResponses;
 
     @NonNull
     public Long getRemoteId() {
@@ -284,6 +298,30 @@ public class Question {
 
     public void setTextToReplace(String textToReplace) {
         this.mTextToReplace = textToReplace;
+    }
+
+    public List<QuestionTranslation> getQuestionTranslations() {
+        return mQuestionTranslations;
+    }
+
+    public void setQuestionTranslations(List<QuestionTranslation> translations) {
+        this.mQuestionTranslations = translations;
+    }
+
+    public List<LoopQuestion> getLoopQuestions() {
+        return mLoopQuestions;
+    }
+
+    public void setLoopQuestions(List<LoopQuestion> mLoopQuestions) {
+        this.mLoopQuestions = mLoopQuestions;
+    }
+
+    public List<CriticalResponse> getCriticalResponses() {
+        return mCriticalResponses;
+    }
+
+    public void setCriticalResponses(List<CriticalResponse> mCriticalResponses) {
+        this.mCriticalResponses = mCriticalResponses;
     }
 
     public static class QuestionType {

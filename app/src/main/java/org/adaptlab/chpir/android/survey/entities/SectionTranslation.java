@@ -1,0 +1,65 @@
+package org.adaptlab.chpir.android.survey.entities;
+
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
+
+import com.google.gson.annotations.SerializedName;
+
+import static android.arch.persistence.room.ForeignKey.CASCADE;
+
+@Entity(tableName = "SectionTranslations",
+        foreignKeys = @ForeignKey(entity = Section.class,
+        parentColumns = "RemoteId", childColumns = "SectionRemoteId", onDelete = CASCADE))
+public class SectionTranslation {
+    @PrimaryKey
+    @NonNull
+    @SerializedName("id")
+    @ColumnInfo(name = "RemoteId")
+    private Long mRemoteId;
+    @SerializedName("text")
+    @ColumnInfo(name = "Text")
+    private String mText;
+    @SerializedName("language")
+    @ColumnInfo(name = "Language")
+    private String mLanguage;
+    @SerializedName("section_id")
+    @ColumnInfo(name = "SectionRemoteId", index = true)
+    private Long mSectionRemoteId;
+
+    @NonNull
+    public Long getRemoteId() {
+        return mRemoteId;
+    }
+
+    public void setRemoteId(@NonNull Long id) {
+        this.mRemoteId = id;
+    }
+
+    public String getText() {
+        return mText;
+    }
+
+    public void setText(String title) {
+        this.mText = title;
+    }
+
+    public String getLanguage() {
+        return mLanguage;
+    }
+
+    public void setLanguage(String language) {
+        this.mLanguage = language;
+    }
+
+    public Long getSectionRemoteId() {
+        return mSectionRemoteId;
+    }
+
+    public void setSectionRemoteId(Long mSectionRemoteId) {
+        this.mSectionRemoteId = mSectionRemoteId;
+    }
+
+}

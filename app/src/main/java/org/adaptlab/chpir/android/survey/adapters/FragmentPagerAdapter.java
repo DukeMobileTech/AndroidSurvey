@@ -33,9 +33,11 @@ public class FragmentPagerAdapter extends android.support.v4.app.FragmentPagerAd
             public void onChanged(@Nullable Settings settings) {
                 mTabs = new ArrayList<>();
                 mTabs.add(mContext.getString(R.string.instruments));
-                if (settings.isShowSurveys()) mTabs.add(mContext.getString(R.string.surveys));
-                if (settings.isShowRosters()) mTabs.add(mContext.getString(R.string.rosters));
-                if (settings.isShowScores()) mTabs.add(mContext.getString(R.string.rosters));
+                if (settings != null) {
+                    if (settings.isShowSurveys()) mTabs.add(mContext.getString(R.string.surveys));
+                    if (settings.isShowRosters()) mTabs.add(mContext.getString(R.string.rosters));
+                    if (settings.isShowScores()) mTabs.add(mContext.getString(R.string.rosters));
+                }
                 notifyDataSetChanged();
             }
         });

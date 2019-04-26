@@ -11,31 +11,45 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 
 import org.adaptlab.chpir.android.survey.converters.Converters;
+import org.adaptlab.chpir.android.survey.daos.CriticalResponseDao;
+import org.adaptlab.chpir.android.survey.daos.DisplayDao;
+import org.adaptlab.chpir.android.survey.daos.DisplayInstructionDao;
+import org.adaptlab.chpir.android.survey.daos.DisplayTranslationDao;
+import org.adaptlab.chpir.android.survey.daos.InstructionDao;
+import org.adaptlab.chpir.android.survey.daos.InstructionTranslationDao;
 import org.adaptlab.chpir.android.survey.daos.InstrumentDao;
 import org.adaptlab.chpir.android.survey.daos.InstrumentTranslationDao;
+import org.adaptlab.chpir.android.survey.daos.LoopQuestionDao;
 import org.adaptlab.chpir.android.survey.daos.QuestionDao;
+import org.adaptlab.chpir.android.survey.daos.QuestionTranslationDao;
+import org.adaptlab.chpir.android.survey.daos.SectionDao;
+import org.adaptlab.chpir.android.survey.daos.SectionTranslationDao;
 import org.adaptlab.chpir.android.survey.daos.SettingsDao;
+import org.adaptlab.chpir.android.survey.entities.CriticalResponse;
+import org.adaptlab.chpir.android.survey.entities.Display;
+import org.adaptlab.chpir.android.survey.entities.DisplayInstruction;
+import org.adaptlab.chpir.android.survey.entities.DisplayTranslation;
+import org.adaptlab.chpir.android.survey.entities.Instruction;
+import org.adaptlab.chpir.android.survey.entities.InstructionTranslation;
 import org.adaptlab.chpir.android.survey.entities.Instrument;
 import org.adaptlab.chpir.android.survey.entities.InstrumentTranslation;
+import org.adaptlab.chpir.android.survey.entities.LoopQuestion;
 import org.adaptlab.chpir.android.survey.entities.Question;
+import org.adaptlab.chpir.android.survey.entities.QuestionTranslation;
+import org.adaptlab.chpir.android.survey.entities.Section;
+import org.adaptlab.chpir.android.survey.entities.SectionTranslation;
 import org.adaptlab.chpir.android.survey.entities.Settings;
 
 import java.util.UUID;
 
-@Database(entities = {Instrument.class, InstrumentTranslation.class, Question.class, Settings.class},
+@Database(entities = {Instrument.class, InstrumentTranslation.class, Question.class, Settings.class,
+        QuestionTranslation.class, LoopQuestion.class, CriticalResponse.class, Display.class,
+        DisplayTranslation.class, DisplayInstruction.class, Instruction.class, InstructionTranslation.class,
+        Section.class, SectionTranslation.class},
         version = 1)
 @TypeConverters({Converters.class})
 public abstract class SurveyRoomDatabase extends RoomDatabase {
-    public abstract InstrumentDao instrumentDao();
-
-    public abstract InstrumentTranslationDao instrumentTranslationDao();
-
-    public abstract QuestionDao questionDao();
-
-    public abstract SettingsDao settingsDao();
-
     private static volatile SurveyRoomDatabase INSTANCE;
-
     private static RoomDatabase.Callback sRoomDatabaseCallback =
             new RoomDatabase.Callback(){
                 @Override
@@ -58,6 +72,34 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
         }
         return INSTANCE;
     }
+
+    public abstract InstrumentDao instrumentDao();
+
+    public abstract InstrumentTranslationDao instrumentTranslationDao();
+
+    public abstract QuestionDao questionDao();
+
+    public abstract SettingsDao settingsDao();
+
+    public abstract QuestionTranslationDao questionTranslationDao();
+
+    public abstract LoopQuestionDao loopQuestionDao();
+
+    public abstract CriticalResponseDao criticalResponseDao();
+
+    public abstract DisplayDao displayDao();
+
+    public abstract DisplayTranslationDao displayTranslationDao();
+
+    public abstract DisplayInstructionDao displayInstructionDao();
+
+    public abstract InstructionDao instructionDao();
+
+    public abstract InstructionTranslationDao instructionTranslationDao();
+
+    public abstract SectionDao sectionDao();
+
+    public abstract SectionTranslationDao sectionTranslationDao();
 
     private static class CreateSettingsInstanceTask extends AsyncTask<Void, Void, Void> {
         private SettingsDao mSettingsDao;

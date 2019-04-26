@@ -13,8 +13,16 @@ import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
 import org.adaptlab.chpir.android.survey.converters.QuestionDeserializer;
+import org.adaptlab.chpir.android.survey.daos.CriticalResponseDao;
+import org.adaptlab.chpir.android.survey.daos.LoopQuestionDao;
 import org.adaptlab.chpir.android.survey.daos.QuestionDao;
+import org.adaptlab.chpir.android.survey.daos.QuestionTranslationDao;
+import org.adaptlab.chpir.android.survey.entities.CriticalResponse;
+import org.adaptlab.chpir.android.survey.entities.Instrument;
+import org.adaptlab.chpir.android.survey.entities.InstrumentTranslation;
+import org.adaptlab.chpir.android.survey.entities.LoopQuestion;
 import org.adaptlab.chpir.android.survey.entities.Question;
+import org.adaptlab.chpir.android.survey.entities.QuestionTranslation;
 import org.adaptlab.chpir.android.survey.entities.Settings;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 
@@ -27,26 +35,33 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Request;
 
-public class QuestionRepository {
+public class QuestionRepository implements Downloadable {
     private static final String TAG = "QuestionRepository";
     private QuestionDao mQuestionDao;
+    private QuestionTranslationDao mQuestionTranslationDao;
+    private LoopQuestionDao mLoopQuestionDao;
+    private CriticalResponseDao mCriticalResponseDao;
     private LiveData<List<Question>> mAllQuestions;
 
     public QuestionRepository(Application application) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);
         mQuestionDao = db.questionDao();
+        mQuestionTranslationDao = db.questionTranslationDao();
+        mLoopQuestionDao = db.loopQuestionDao();
+        mCriticalResponseDao = db.criticalResponseDao();
         mAllQuestions = mQuestionDao.getAllQuestions();
     }
 
-    public void downloadQuestions() {
-        DownloadQuestionsTask downloadInstrumentsTask = new DownloadQuestionsTask(mQuestionDao);
-        downloadInstrumentsTask.setListener(new DownloadQuestionsTask.AsyncTaskListener() {
+    public void download() {
+        DownloadQuestionsTask task = new DownloadQuestionsTask(
+                mQuestionDao, mQuestionTranslationDao, mLoopQuestionDao, mCriticalResponseDao);
+        task.setListener(new DownloadQuestionsTask.AsyncTaskListener() {
             @Override
             public void onAsyncTaskFinished() {
                 mAllQuestions = mQuestionDao.getAllQuestions();
             }
         });
-        downloadInstrumentsTask.execute();
+        task.execute();
     }
 
     public LiveData<List<Question>> getmAllQuestions() {
@@ -56,10 +71,17 @@ public class QuestionRepository {
     private static class DownloadQuestionsTask extends AsyncTask<Void, Void, Void> {
         private static final String TAG = "DownloadQuestionsTask";
         private QuestionDao mQuestionDao;
+        private QuestionTranslationDao mQuestionTranslationDao;
+        private LoopQuestionDao mLoopQuestionDao;
+        private CriticalResponseDao mCriticalResponseDao;
         private AsyncTaskListener mListener;
 
-        DownloadQuestionsTask(QuestionDao questionDao) {
+        DownloadQuestionsTask(QuestionDao questionDao, QuestionTranslationDao questionTranslationDao,
+                              LoopQuestionDao loopQuestionDao, CriticalResponseDao criticalResponseDao) {
             mQuestionDao = questionDao;
+            mQuestionTranslationDao = questionTranslationDao;
+            mLoopQuestionDao = loopQuestionDao;
+            mCriticalResponseDao = criticalResponseDao;
         }
 
         void setListener(AsyncTaskListener listener) {
@@ -96,6 +118,20 @@ public class QuestionRepository {
                             List<Question> questions = gson.fromJson(responseString, type);
                             mQuestionDao.updateAll(questions);
                             mQuestionDao.insertAll(questions);
+                            List<QuestionTranslation> translations = new ArrayList<>();
+                            List<LoopQuestion> loopQuestions = new ArrayList<>();
+                            List<CriticalResponse> criticalResponses = new ArrayList<>();
+                            for (Question question : questions) {
+                                translations.addAll(question.getQuestionTranslations());
+                                loopQuestions.addAll(question.getLoopQuestions());
+                                criticalResponses.addAll(question.getCriticalResponses());
+                            }
+                            mQuestionTranslationDao.updateAll(translations);
+                            mQuestionTranslationDao.insertAll(translations);
+                            mLoopQuestionDao.updateAll(loopQuestions);
+                            mLoopQuestionDao.insertAll(loopQuestions);
+                            mCriticalResponseDao.updateAll(criticalResponses);
+                            mCriticalResponseDao.insertAll(criticalResponses);
                         } catch (IOException e) {
                             if (BuildConfig.DEBUG) Log.e(TAG, "IOException: ", e);
                         }

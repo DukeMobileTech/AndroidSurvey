@@ -1,6 +1,7 @@
 package org.adaptlab.chpir.android.survey.tasks;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.adaptlab.chpir.android.survey.daos.SettingsDao;
 import org.adaptlab.chpir.android.survey.entities.Settings;
@@ -20,7 +21,9 @@ public class GetSettingsTask extends AsyncTask<SettingsDao, Void, Settings> {
     @Override
     protected void onPostExecute(Settings settings) {
         super.onPostExecute(settings);
-        mListener.onAsyncTaskFinished(settings);
+        if (settings != null) {
+            mListener.onAsyncTaskFinished(settings);
+        }
     }
 
     public interface AsyncTaskListener {

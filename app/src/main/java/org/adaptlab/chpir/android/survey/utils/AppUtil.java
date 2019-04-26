@@ -19,8 +19,12 @@ import org.adaptlab.chpir.android.activerecordcloudsync.PollService;
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.entities.Settings;
+import org.adaptlab.chpir.android.survey.repositories.DisplayInstructionRepository;
+import org.adaptlab.chpir.android.survey.repositories.DisplayRepository;
+import org.adaptlab.chpir.android.survey.repositories.InstructionRepository;
 import org.adaptlab.chpir.android.survey.repositories.InstrumentRepository;
 import org.adaptlab.chpir.android.survey.repositories.QuestionRepository;
+import org.adaptlab.chpir.android.survey.repositories.SectionRepository;
 import org.adaptlab.chpir.android.survey.repositories.SettingsRepository;
 import org.adaptlab.chpir.android.survey.tasks.GetSettingsTask;
 
@@ -47,18 +51,18 @@ public class AppUtil {
     private static Settings mSettings;
     private static SettingsRepository mSettingsRepository;
 
-    public static void appInit(Context context) {
+    public static void appInit(Application application) {
         if (AppUtil.REQUIRE_SECURITY_CHECKS) {
-            if (!AppUtil.runDeviceSecurityChecks(context)) {
+            if (!AppUtil.runDeviceSecurityChecks(application)) {
                 // Device has failed security checks
                 return;
             }
         }
-        setSettings(context);
-        setVersionCode(context);
-        setVersionName(context);
+        setSettings(application);
+        setVersionCode(application);
+        setVersionName(application);
         getOkHttpClient();
-        PollService.setServiceAlarm(context.getApplicationContext(), true);
+        PollService.setServiceAlarm(application, true);
     }
 
     private static void setVersionName(Context context) {
@@ -181,8 +185,12 @@ public class AppUtil {
     }
 
     public static void downloadData(Application application) {
-        new InstrumentRepository(application).downloadInstruments();
-        new QuestionRepository(application).downloadQuestions();
+        new InstrumentRepository(application).download();
+        new QuestionRepository(application).download();
+        new DisplayRepository(application).download();
+        new DisplayInstructionRepository(application).download();
+        new InstructionRepository(application).download();
+        new SectionRepository(application).download();
     }
 
     public static String getAccessToken() {
@@ -251,8 +259,8 @@ public class AppUtil {
         return mSettings;
     }
 
-    private static void setSettings(final Context context) {
-        mSettingsRepository = new SettingsRepository((Application) context);
+    private static void setSettings(final Application application) {
+        mSettingsRepository = new SettingsRepository(application);
         GetSettingsTask getSettingsTask = new GetSettingsTask();
         getSettingsTask.setListener(new GetSettingsTask.AsyncTaskListener() {
             @Override
@@ -262,9 +270,9 @@ public class AppUtil {
                 LAST_SYNC_TIME = mSettings.getLastSyncTime();
                 DOMAIN_NAME = mSettings.getApiUrl();
                 API_VERSION = mSettings.getApiVersion();
-                PROJECT_ID = Long.parseLong(mSettings.getProjectId());
-                checkDatabaseVersionChange(context);
-                setCrashLogs(context);
+                if (mSettings.getProjectId() != null) PROJECT_ID = Long.valueOf(mSettings.getProjectId());
+                checkDatabaseVersionChange(application);
+                setCrashLogs(application);
                 setDeviceLanguage();
             }
         });

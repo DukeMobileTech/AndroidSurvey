@@ -27,7 +27,7 @@ public class Instrument {
     @SerializedName("alignment")
     @ColumnInfo(name = "Alignment")
     private String mAlignment;
-    @SerializedName("version_number")
+    @SerializedName("current_version_number")
     @ColumnInfo(name = "VersionNumber")
     private int mVersionNumber;
     @SerializedName("question_count")

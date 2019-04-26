@@ -27,7 +27,7 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Request;
 
-public class InstrumentRepository {
+public class InstrumentRepository implements Downloadable {
     private InstrumentDao mInstrumentDao;
     private InstrumentTranslationDao mInstrumentTranslationDao;
     private LiveData<List<Instrument>> mAllInstruments;
@@ -53,7 +53,7 @@ public class InstrumentRepository {
         return mInstrumentDao;
     }
 
-    public void downloadInstruments() {
+    public void download() {
         DownloadInstrumentsTask downloadInstrumentsTask = new DownloadInstrumentsTask(
                 mInstrumentDao, mInstrumentTranslationDao);
         downloadInstrumentsTask.setListener(new DownloadInstrumentsTask.AsyncTaskListener() {

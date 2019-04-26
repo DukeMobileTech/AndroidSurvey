@@ -68,9 +68,14 @@ public class InstrumentActivity extends AppCompatActivity {
         settingsViewModel.getSettings().observe(this, new Observer<Settings>() {
             @Override
             public void onChanged(@Nullable Settings settings) {
-                if (TextUtils.isEmpty(settings.getApiUrl()) || TextUtils.isEmpty(settings.getApiVersion()) ||
-                TextUtils.isEmpty(settings.getProjectId()) || TextUtils.isEmpty(settings.getApiKey())) {
-                    startActivity(new Intent(InstrumentActivity.this, SettingsActivity.class));
+                if (settings == null) {
+                    startActivity(new Intent(InstrumentActivity.this, InstrumentActivity.class));
+                    finish();
+                } else {
+                    if (TextUtils.isEmpty(settings.getApiUrl()) || TextUtils.isEmpty(settings.getApiVersion()) ||
+                            TextUtils.isEmpty(settings.getProjectId()) || TextUtils.isEmpty(settings.getApiKey())) {
+                        startActivity(new Intent(InstrumentActivity.this, SettingsActivity.class));
+                    }
                 }
             }
         });
