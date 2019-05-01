@@ -5,7 +5,6 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Query;
 
 import org.adaptlab.chpir.android.survey.entities.Display;
-import org.adaptlab.chpir.android.survey.entities.Instrument;
 
 import java.util.List;
 

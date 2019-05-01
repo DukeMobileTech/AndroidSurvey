@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "86ae7d9ad09313e6b5d633e120d3ef12",
+    "identityHash": "a00f9f2af66627f6dfa600a39f3ae334",
     "entities": [
       {
         "tableName": "Instruments",
@@ -1145,11 +1145,765 @@
             ]
           }
         ]
+      },
+      {
+        "tableName": "Options",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Text` TEXT, `Identifier` TEXT, `Deleted` INTEGER NOT NULL, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mText",
+            "columnName": "Text",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mIdentifier",
+            "columnName": "Identifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "options_id_index",
+            "unique": true,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE UNIQUE INDEX `options_id_index` ON `${TABLE_NAME}` (`RemoteId`)"
+          },
+          {
+            "name": "options_identifier_index",
+            "unique": true,
+            "columnNames": [
+              "Identifier"
+            ],
+            "createSql": "CREATE UNIQUE INDEX `options_identifier_index` ON `${TABLE_NAME}` (`Identifier`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "OptionSets",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Title` TEXT, `Deleted` INTEGER NOT NULL, `InstructionRemoteId` INTEGER, `Special` INTEGER NOT NULL, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mTitle",
+            "columnName": "Title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mInstructionRemoteId",
+            "columnName": "InstructionRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mSpecial",
+            "columnName": "Special",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "option_sets_index",
+            "unique": true,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE UNIQUE INDEX `option_sets_index` ON `${TABLE_NAME}` (`RemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "OptionSetOptions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Position` INTEGER NOT NULL, `OptionSetRemoteId` INTEGER, `OptionRemoteId` INTEGER, `Special` INTEGER NOT NULL, `Deleted` INTEGER NOT NULL, `Exclusive` INTEGER NOT NULL, PRIMARY KEY(`RemoteId`), FOREIGN KEY(`OptionSetRemoteId`) REFERENCES `OptionSets`(`RemoteId`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`OptionRemoteId`) REFERENCES `Options`(`RemoteId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mPosition",
+            "columnName": "Position",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mOptionSetRemoteId",
+            "columnName": "OptionSetRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mOptionRemoteId",
+            "columnName": "OptionRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mSpecial",
+            "columnName": "Special",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mExclusive",
+            "columnName": "Exclusive",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_OptionSetOptions_OptionSetRemoteId",
+            "unique": false,
+            "columnNames": [
+              "OptionSetRemoteId"
+            ],
+            "createSql": "CREATE  INDEX `index_OptionSetOptions_OptionSetRemoteId` ON `${TABLE_NAME}` (`OptionSetRemoteId`)"
+          },
+          {
+            "name": "index_OptionSetOptions_OptionRemoteId",
+            "unique": false,
+            "columnNames": [
+              "OptionRemoteId"
+            ],
+            "createSql": "CREATE  INDEX `index_OptionSetOptions_OptionRemoteId` ON `${TABLE_NAME}` (`OptionRemoteId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "OptionSets",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "OptionSetRemoteId"
+            ],
+            "referencedColumns": [
+              "RemoteId"
+            ]
+          },
+          {
+            "table": "Options",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "OptionRemoteId"
+            ],
+            "referencedColumns": [
+              "RemoteId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "OptionSetTranslations",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Language` TEXT, `OptionSetRemoteId` INTEGER, `OptionRemoteId` INTEGER, `OptionTranslationRemoteId` INTEGER, PRIMARY KEY(`RemoteId`), FOREIGN KEY(`OptionSetRemoteId`) REFERENCES `OptionSets`(`RemoteId`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`OptionRemoteId`) REFERENCES `Options`(`RemoteId`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`OptionTranslationRemoteId`) REFERENCES `OptionTranslations`(`RemoteId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mLanguage",
+            "columnName": "Language",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mOptionSetRemoteId",
+            "columnName": "OptionSetRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mOptionRemoteId",
+            "columnName": "OptionRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mOptionTranslationRemoteId",
+            "columnName": "OptionTranslationRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_OptionSetTranslations_OptionSetRemoteId",
+            "unique": false,
+            "columnNames": [
+              "OptionSetRemoteId"
+            ],
+            "createSql": "CREATE  INDEX `index_OptionSetTranslations_OptionSetRemoteId` ON `${TABLE_NAME}` (`OptionSetRemoteId`)"
+          },
+          {
+            "name": "index_OptionSetTranslations_OptionRemoteId",
+            "unique": false,
+            "columnNames": [
+              "OptionRemoteId"
+            ],
+            "createSql": "CREATE  INDEX `index_OptionSetTranslations_OptionRemoteId` ON `${TABLE_NAME}` (`OptionRemoteId`)"
+          },
+          {
+            "name": "index_OptionSetTranslations_OptionTranslationRemoteId",
+            "unique": false,
+            "columnNames": [
+              "OptionTranslationRemoteId"
+            ],
+            "createSql": "CREATE  INDEX `index_OptionSetTranslations_OptionTranslationRemoteId` ON `${TABLE_NAME}` (`OptionTranslationRemoteId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "OptionSets",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "OptionSetRemoteId"
+            ],
+            "referencedColumns": [
+              "RemoteId"
+            ]
+          },
+          {
+            "table": "Options",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "OptionRemoteId"
+            ],
+            "referencedColumns": [
+              "RemoteId"
+            ]
+          },
+          {
+            "table": "OptionTranslations",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "OptionTranslationRemoteId"
+            ],
+            "referencedColumns": [
+              "RemoteId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "OptionTranslations",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Text` TEXT, `Language` TEXT, `OptionRemoteId` INTEGER, PRIMARY KEY(`RemoteId`), FOREIGN KEY(`OptionRemoteId`) REFERENCES `Options`(`RemoteId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mText",
+            "columnName": "Text",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mLanguage",
+            "columnName": "Language",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mOptionRemoteId",
+            "columnName": "OptionRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_OptionTranslations_OptionRemoteId",
+            "unique": false,
+            "columnNames": [
+              "OptionRemoteId"
+            ],
+            "createSql": "CREATE  INDEX `index_OptionTranslations_OptionRemoteId` ON `${TABLE_NAME}` (`OptionRemoteId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "Options",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "OptionRemoteId"
+            ],
+            "referencedColumns": [
+              "RemoteId"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "ConditionSkips",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `QuestionIdentifier` TEXT, `OptionIdentifier` TEXT, `ConditionQuestionIdentifier` TEXT, `ConditionOptionIdentifier` TEXT, `NextQuestionIdentifier` TEXT, `QuestionId` INTEGER, `InstrumentRemoteId` INTEGER, `Deleted` INTEGER NOT NULL, `Condition` TEXT, PRIMARY KEY(`RemoteId`), FOREIGN KEY(`QuestionIdentifier`) REFERENCES `Questions`(`QuestionIdentifier`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mQuestionIdentifier",
+            "columnName": "QuestionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mOptionIdentifier",
+            "columnName": "OptionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mConditionQuestionIdentifier",
+            "columnName": "ConditionQuestionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mConditionOptionIdentifier",
+            "columnName": "ConditionOptionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mNextQuestionIdentifier",
+            "columnName": "NextQuestionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mQuestionId",
+            "columnName": "QuestionId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mInstrumentRemoteId",
+            "columnName": "InstrumentRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mCondition",
+            "columnName": "Condition",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_ConditionSkips_QuestionIdentifier",
+            "unique": false,
+            "columnNames": [
+              "QuestionIdentifier"
+            ],
+            "createSql": "CREATE  INDEX `index_ConditionSkips_QuestionIdentifier` ON `${TABLE_NAME}` (`QuestionIdentifier`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "Questions",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "QuestionIdentifier"
+            ],
+            "referencedColumns": [
+              "QuestionIdentifier"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "DeviceUser",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Active` INTEGER NOT NULL, `Name` TEXT, `UserName` TEXT, `PasswordDigest` TEXT, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mActive",
+            "columnName": "Active",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mName",
+            "columnName": "Name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mUserName",
+            "columnName": "UserName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mPasswordDigest",
+            "columnName": "PasswordDigest",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "FollowUpQuestions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `QuestionIdentifier` TEXT, `FollowingUpQuestionIdentifier` TEXT, `QuestionId` INTEGER, `InstrumentRemoteId` INTEGER, `Deleted` INTEGER NOT NULL, `Position` INTEGER, PRIMARY KEY(`RemoteId`), FOREIGN KEY(`QuestionIdentifier`) REFERENCES `Questions`(`QuestionIdentifier`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mQuestionIdentifier",
+            "columnName": "QuestionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mFollowingUpQuestionIdentifier",
+            "columnName": "FollowingUpQuestionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mQuestionId",
+            "columnName": "QuestionId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mInstrumentRemoteId",
+            "columnName": "InstrumentRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mPosition",
+            "columnName": "Position",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_FollowUpQuestions_QuestionIdentifier",
+            "unique": false,
+            "columnNames": [
+              "QuestionIdentifier"
+            ],
+            "createSql": "CREATE  INDEX `index_FollowUpQuestions_QuestionIdentifier` ON `${TABLE_NAME}` (`QuestionIdentifier`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "Questions",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "QuestionIdentifier"
+            ],
+            "referencedColumns": [
+              "QuestionIdentifier"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "MultipleSkips",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `QuestionIdentifier` TEXT, `OptionIdentifier` TEXT, `SkipQuestionIdentifier` TEXT, `QuestionId` INTEGER, `InstrumentRemoteId` INTEGER, `Deleted` INTEGER NOT NULL, `Value` TEXT, PRIMARY KEY(`RemoteId`), FOREIGN KEY(`QuestionIdentifier`) REFERENCES `Questions`(`QuestionIdentifier`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mQuestionIdentifier",
+            "columnName": "QuestionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mOptionIdentifier",
+            "columnName": "OptionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mSkipQuestionIdentifier",
+            "columnName": "SkipQuestionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mQuestionId",
+            "columnName": "QuestionId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mInstrumentRemoteId",
+            "columnName": "InstrumentRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mValue",
+            "columnName": "Value",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_MultipleSkips_QuestionIdentifier",
+            "unique": false,
+            "columnNames": [
+              "QuestionIdentifier"
+            ],
+            "createSql": "CREATE  INDEX `index_MultipleSkips_QuestionIdentifier` ON `${TABLE_NAME}` (`QuestionIdentifier`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "Questions",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "QuestionIdentifier"
+            ],
+            "referencedColumns": [
+              "QuestionIdentifier"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "NextQuestions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `QuestionIdentifier` TEXT, `OptionIdentifier` TEXT, `NextQuestionIdentifier` TEXT, `QuestionId` INTEGER, `InstrumentRemoteId` INTEGER, `Deleted` INTEGER NOT NULL, `CompleteSurvey` INTEGER NOT NULL, `Value` TEXT, PRIMARY KEY(`RemoteId`), FOREIGN KEY(`QuestionIdentifier`) REFERENCES `Questions`(`QuestionIdentifier`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mQuestionIdentifier",
+            "columnName": "QuestionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mOptionIdentifier",
+            "columnName": "OptionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mNextQuestionIdentifier",
+            "columnName": "NextQuestionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mQuestionId",
+            "columnName": "QuestionId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mInstrumentRemoteId",
+            "columnName": "InstrumentRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mCompleteSurvey",
+            "columnName": "CompleteSurvey",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mValue",
+            "columnName": "Value",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_NextQuestions_QuestionIdentifier",
+            "unique": false,
+            "columnNames": [
+              "QuestionIdentifier"
+            ],
+            "createSql": "CREATE  INDEX `index_NextQuestions_QuestionIdentifier` ON `${TABLE_NAME}` (`QuestionIdentifier`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "Questions",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "QuestionIdentifier"
+            ],
+            "referencedColumns": [
+              "QuestionIdentifier"
+            ]
+          }
+        ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"86ae7d9ad09313e6b5d633e120d3ef12\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"a00f9f2af66627f6dfa600a39f3ae334\")"
     ]
   }
 }

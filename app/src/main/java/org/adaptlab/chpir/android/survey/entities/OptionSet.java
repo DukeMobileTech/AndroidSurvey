@@ -1,7 +1,6 @@
 package org.adaptlab.chpir.android.survey.entities;
 
 import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
@@ -16,12 +15,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.arch.persistence.room.ForeignKey.CASCADE;
-
-@android.arch.persistence.room.Entity(tableName = "Sections", indices = {@Index(name = "sections_index", value = {"RemoteId"}, unique = true)},
-        foreignKeys = @ForeignKey(entity = Instrument.class, parentColumns = "RemoteId",
-                childColumns = "InstrumentRemoteId", onDelete = CASCADE))
-public class Section implements Entity {
+@android.arch.persistence.room.Entity(tableName = "OptionSets", indices = {@Index(name = "option_sets_index", value = {"RemoteId"}, unique = true)})
+public class OptionSet implements Entity {
     @PrimaryKey
     @NonNull
     @SerializedName("id")
@@ -33,12 +28,15 @@ public class Section implements Entity {
     @SerializedName("deleted_at")
     @ColumnInfo(name = "Deleted")
     private boolean mDeleted;
-    @SerializedName("instrument_id")
-    @ColumnInfo(name = "InstrumentRemoteId", index = true)
-    private Long mInstrumentRemoteId;
+    @SerializedName("instruction_id")
+    @ColumnInfo(name = "InstructionRemoteId")
+    private Long mInstructionRemoteId;
+    @SerializedName("special")
+    @ColumnInfo(name = "Special")
+    private boolean mSpecial;
     @Ignore
-    @SerializedName("section_translations")
-    private List<SectionTranslation> mSectionTranslations;
+    @SerializedName("option_set_translations")
+    private List<OptionSetTranslation> mOptionSetTranslations;
 
     @NonNull
     public Long getRemoteId() {
@@ -65,31 +63,39 @@ public class Section implements Entity {
         this.mDeleted = mDeleted;
     }
 
-    public Long getInstrumentRemoteId() {
-        return mInstrumentRemoteId;
+    public Long getInstructionRemoteId() {
+        return mInstructionRemoteId;
     }
 
-    public void setInstrumentRemoteId(Long mInstrumentRemoteId) {
-        this.mInstrumentRemoteId = mInstrumentRemoteId;
+    public void setInstructionRemoteId(Long mInstructionRemoteId) {
+        this.mInstructionRemoteId = mInstructionRemoteId;
     }
 
-    public List<SectionTranslation> getSectionTranslations() {
-        return mSectionTranslations;
+    public boolean isSpecial() {
+        return mSpecial;
     }
 
-    public void setSectionTranslations(List<SectionTranslation> mSectionTranslations) {
-        this.mSectionTranslations = mSectionTranslations;
+    public void setSpecial(boolean mSpecial) {
+        this.mSpecial = mSpecial;
+    }
+
+    public List<OptionSetTranslation> getOptionSetTranslations() {
+        return mOptionSetTranslations;
+    }
+
+    public void setOptionSetTranslations(List<OptionSetTranslation> mOptionSetTranslations) {
+        this.mOptionSetTranslations = mOptionSetTranslations;
     }
 
     @Override
     public Type getType() {
-        return new TypeToken<ArrayList<Section>>() {
+        return new TypeToken<ArrayList<OptionSet>>() {
         }.getType();
     }
 
     @Override
-    public List<SectionTranslation> getTranslations() {
-        return mSectionTranslations;
+    public List<OptionSetTranslation> getTranslations() {
+        return mOptionSetTranslations;
     }
 
     @Override

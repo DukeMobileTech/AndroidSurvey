@@ -15,8 +15,9 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-@android.arch.persistence.room.Entity(tableName = "Instructions", indices = {@Index(name = "instructions_index", value = {"RemoteId"}, unique = true)})
-public class Instruction implements Entity {
+@android.arch.persistence.room.Entity(tableName = "Options", indices = {@Index(name = "options_id_index", value = {"RemoteId"}, unique = true),
+        @Index(name = "options_identifier_index", value = {"Identifier"}, unique = true)})
+public class Option implements Entity {
     @PrimaryKey
     @NonNull
     @SerializedName("id")
@@ -25,12 +26,16 @@ public class Instruction implements Entity {
     @SerializedName("text")
     @ColumnInfo(name = "Text")
     private String mText;
+    @SerializedName("identifier")
+    @ColumnInfo(name = "Identifier")
+    private String mIdentifier;
     @SerializedName("deleted_at")
     @ColumnInfo(name = "Deleted")
     private boolean mDeleted;
     @Ignore
-    @SerializedName("instruction_translations")
-    private List<InstructionTranslation> mInstructionTranslations;
+    @SerializedName("option_translations")
+    private List<OptionTranslation> mOptionTranslations;
+
 
     @NonNull
     public Long getRemoteId() {
@@ -49,6 +54,14 @@ public class Instruction implements Entity {
         this.mText = mText;
     }
 
+    public String getIdentifier() {
+        return mIdentifier;
+    }
+
+    public void setIdentifier(String mIdentifier) {
+        this.mIdentifier = mIdentifier;
+    }
+
     public boolean isDeleted() {
         return mDeleted;
     }
@@ -57,23 +70,23 @@ public class Instruction implements Entity {
         this.mDeleted = mDeleted;
     }
 
-    public List<InstructionTranslation> getInstructionTranslations() {
-        return mInstructionTranslations;
+    public List<OptionTranslation> getOptionTranslations() {
+        return mOptionTranslations;
     }
 
-    public void setInstructionTranslations(List<InstructionTranslation> mInstructionTranslations) {
-        this.mInstructionTranslations = mInstructionTranslations;
+    public void setOptionTranslations(List<OptionTranslation> mOptionTranslations) {
+        this.mOptionTranslations = mOptionTranslations;
     }
 
     @Override
     public Type getType() {
-        return new TypeToken<ArrayList<Instruction>>() {
+        return new TypeToken<ArrayList<Option>>() {
         }.getType();
     }
 
     @Override
-    public List<InstructionTranslation> getTranslations() {
-        return mInstructionTranslations;
+    public List<OptionTranslation> getTranslations() {
+        return mOptionTranslations;
     }
 
     @Override
@@ -81,5 +94,4 @@ public class Instruction implements Entity {
         dao.updateAll(list);
         dao.insertAll(list);
     }
-
 }

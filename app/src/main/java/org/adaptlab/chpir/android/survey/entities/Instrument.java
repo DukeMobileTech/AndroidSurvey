@@ -1,18 +1,22 @@
 package org.adaptlab.chpir.android.survey.entities;
 
 import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
+import com.google.gson.reflect.TypeToken;
 
+import org.adaptlab.chpir.android.survey.daos.BaseDao;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
-@Entity(tableName = "Instruments", indices = {@Index(name = "instruments_index", value = {"RemoteId"}, unique = true)})
-public class Instrument {
+@android.arch.persistence.room.Entity(tableName = "Instruments", indices = {@Index(name = "instruments_index", value = {"RemoteId"}, unique = true)})
+public class Instrument implements Entity {
     @PrimaryKey
     @NonNull
     @SerializedName("id")
@@ -44,7 +48,8 @@ public class Instrument {
     private boolean mDeleted;
     @ColumnInfo(name = "Loaded")
     private boolean mLoaded;
-    @Ignore // This field is not saved into the database, but is required by Gson to correctly deserialize nested translations
+    @Ignore
+    // This field is not saved into the database, but is required by Gson to correctly deserialize nested translations
     @SerializedName("instrument_translations")
     private List<InstrumentTranslation> mInstrumentTranslations;
 
@@ -135,5 +140,22 @@ public class Instrument {
 
     public void setInstrumentTranslations(List<InstrumentTranslation> translations) {
         this.mInstrumentTranslations = translations;
+    }
+
+    @Override
+    public Type getType() {
+        return new TypeToken<ArrayList<Instrument>>() {
+        }.getType();
+    }
+
+    @Override
+    public List<InstrumentTranslation> getTranslations() {
+        return mInstrumentTranslations;
+    }
+
+    @Override
+    public void save(BaseDao dao, List list) {
+        dao.updateAll(list);
+        dao.insertAll(list);
     }
 }

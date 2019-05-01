@@ -16,35 +16,36 @@ import java.util.List;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
-@android.arch.persistence.room.Entity(tableName = "CriticalResponses",
+@android.arch.persistence.room.Entity(tableName = "MultipleSkips",
         foreignKeys = @ForeignKey(entity = Question.class,
                 parentColumns = "QuestionIdentifier", childColumns = "QuestionIdentifier", onDelete = CASCADE))
-public class CriticalResponse implements Entity {
+public class MultipleSkip implements Entity {
     @PrimaryKey
     @NonNull
     @SerializedName("id")
     @ColumnInfo(name = "RemoteId")
     private Long mRemoteId;
-    @SerializedName("instruction_id")
-    @ColumnInfo(name = "InstructionId")
-    private Long mInstructionId;
     @SerializedName("question_identifier")
     @ColumnInfo(name = "QuestionIdentifier", index = true)
     private String mQuestionIdentifier;
     @SerializedName("option_identifier")
     @ColumnInfo(name = "OptionIdentifier")
     private String mOptionIdentifier;
+    @SerializedName("skip_question_identifier")
+    @ColumnInfo(name = "SkipQuestionIdentifier")
+    private String mSkipQuestionIdentifier;
+    @SerializedName("question_id")
+    @ColumnInfo(name = "QuestionId")
+    private Long mQuestionId;
+    @SerializedName("instrument_id")
+    @ColumnInfo(name = "InstrumentRemoteId")
+    private Long mInstrumentRemoteId;
     @SerializedName("deleted_at")
     @ColumnInfo(name = "Deleted")
     private boolean mDeleted;
-
-    public boolean isDeleted() {
-        return mDeleted;
-    }
-
-    public void setDeleted(boolean mDeleted) {
-        this.mDeleted = mDeleted;
-    }
+    @SerializedName("value")
+    @ColumnInfo(name = "Value")
+    private String mValue;
 
     @NonNull
     public Long getRemoteId() {
@@ -53,14 +54,6 @@ public class CriticalResponse implements Entity {
 
     public void setRemoteId(@NonNull Long mRemoteId) {
         this.mRemoteId = mRemoteId;
-    }
-
-    public Long getInstructionId() {
-        return mInstructionId;
-    }
-
-    public void setInstructionId(Long mInstructionId) {
-        this.mInstructionId = mInstructionId;
     }
 
     public String getQuestionIdentifier() {
@@ -79,9 +72,49 @@ public class CriticalResponse implements Entity {
         this.mOptionIdentifier = mOptionIdentifier;
     }
 
+    public String getSkipQuestionIdentifier() {
+        return mSkipQuestionIdentifier;
+    }
+
+    public void setSkipQuestionIdentifier(String identifier) {
+        this.mSkipQuestionIdentifier = identifier;
+    }
+
+    public Long getQuestionId() {
+        return mQuestionId;
+    }
+
+    public void setQuestionId(Long mQuestionId) {
+        this.mQuestionId = mQuestionId;
+    }
+
+    public Long getInstrumentRemoteId() {
+        return mInstrumentRemoteId;
+    }
+
+    public void setInstrumentRemoteId(Long mInstrumentRemoteId) {
+        this.mInstrumentRemoteId = mInstrumentRemoteId;
+    }
+
+    public boolean isDeleted() {
+        return mDeleted;
+    }
+
+    public void setDeleted(boolean mDeleted) {
+        this.mDeleted = mDeleted;
+    }
+
+    public String getValue() {
+        return mValue;
+    }
+
+    public void setValue(String mValue) {
+        this.mValue = mValue;
+    }
+
     @Override
     public Type getType() {
-        return new TypeToken<ArrayList<CriticalResponse>>() {
+        return new TypeToken<ArrayList<MultipleSkip>>() {
         }.getType();
     }
 

@@ -20,4 +20,9 @@ public abstract class BaseDao<T> {
 
     @Update(onConflict = OnConflictStrategy.IGNORE)
     public abstract void updateAll(List<T> t);
+
+    public void save(List<T> t) {
+        insertAll(t);
+    }
+
 }

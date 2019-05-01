@@ -16,10 +16,10 @@ import java.util.List;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
-@android.arch.persistence.room.Entity(tableName = "InstructionTranslations",
-        foreignKeys = @ForeignKey(entity = Instruction.class,
-                parentColumns = "RemoteId", childColumns = "InstructionRemoteId", onDelete = CASCADE))
-public class InstructionTranslation implements Entity {
+@android.arch.persistence.room.Entity(tableName = "OptionTranslations",
+        foreignKeys = @ForeignKey(entity = Option.class,
+                parentColumns = "RemoteId", childColumns = "OptionRemoteId", onDelete = CASCADE))
+public class OptionTranslation implements Entity {
     @PrimaryKey
     @NonNull
     @SerializedName("id")
@@ -31,9 +31,9 @@ public class InstructionTranslation implements Entity {
     @SerializedName("language")
     @ColumnInfo(name = "Language")
     private String mLanguage;
-    @SerializedName("instruction_id")
-    @ColumnInfo(name = "InstructionRemoteId", index = true)
-    private Long mInstructionRemoteId;
+    @SerializedName("option_id")
+    @ColumnInfo(name = "OptionRemoteId", index = true)
+    private Long mOptionRemoteId;
 
     @NonNull
     public Long getRemoteId() {
@@ -60,17 +60,17 @@ public class InstructionTranslation implements Entity {
         this.mLanguage = language;
     }
 
-    public Long getInstructionRemoteId() {
-        return mInstructionRemoteId;
+    public Long getOptionRemoteId() {
+        return mOptionRemoteId;
     }
 
-    public void setInstructionRemoteId(Long id) {
-        this.mInstructionRemoteId = id;
+    public void setOptionRemoteId(Long id) {
+        this.mOptionRemoteId = id;
     }
 
     @Override
     public Type getType() {
-        return new TypeToken<ArrayList<InstructionTranslation>>() {
+        return new TypeToken<ArrayList<OptionTranslation>>() {
         }.getType();
     }
 

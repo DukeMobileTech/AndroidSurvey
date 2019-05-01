@@ -1,19 +1,25 @@
 package org.adaptlab.chpir.android.survey.entities;
 
 import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
+import com.google.gson.reflect.TypeToken;
+
+import org.adaptlab.chpir.android.survey.daos.BaseDao;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
-@Entity(tableName = "DisplayTranslations",
+@android.arch.persistence.room.Entity(tableName = "DisplayTranslations",
         foreignKeys = @ForeignKey(entity = Display.class,
-        parentColumns = "RemoteId", childColumns = "DisplayRemoteId", onDelete = CASCADE))
-public class DisplayTranslation {
+                parentColumns = "RemoteId", childColumns = "DisplayRemoteId", onDelete = CASCADE))
+public class DisplayTranslation implements Entity {
     @PrimaryKey
     @NonNull
     @SerializedName("id")
@@ -62,4 +68,20 @@ public class DisplayTranslation {
         this.mDisplayRemoteId = remoteId;
     }
 
+    @Override
+    public Type getType() {
+        return new TypeToken<ArrayList<DisplayTranslation>>() {
+        }.getType();
+    }
+
+    @Override
+    public List<? extends Entity> getTranslations() {
+        return null;
+    }
+
+    @Override
+    public void save(BaseDao dao, List list) {
+        dao.updateAll(list);
+        dao.insertAll(list);
+    }
 }

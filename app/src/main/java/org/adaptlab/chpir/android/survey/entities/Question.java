@@ -1,7 +1,6 @@
 package org.adaptlab.chpir.android.survey.entities;
 
 import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
@@ -11,20 +10,24 @@ import android.support.annotation.NonNull;
 import android.support.annotation.StringDef;
 
 import com.google.gson.annotations.SerializedName;
+import com.google.gson.reflect.TypeToken;
 
 import org.adaptlab.chpir.android.survey.converters.Converters;
+import org.adaptlab.chpir.android.survey.daos.BaseDao;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
-@Entity(tableName = "Questions", foreignKeys = @ForeignKey(entity = Instrument.class,
+@android.arch.persistence.room.Entity(tableName = "Questions", foreignKeys = @ForeignKey(entity = Instrument.class,
         parentColumns = "RemoteId", childColumns = "InstrumentRemoteId", onDelete = CASCADE),
         indices = {@Index(name = "questions_remote_id_index", value = {"RemoteId"}, unique = true),
-        @Index(name = "questions_identifier_index", value = {"QuestionIdentifier"}, unique = true)})
-public class Question {
+                @Index(name = "questions_identifier_index", value = {"QuestionIdentifier"}, unique = true)})
+public class Question implements Entity {
     @PrimaryKey
     @NonNull
     @SerializedName("id")
@@ -100,12 +103,6 @@ public class Question {
     @Ignore
     @SerializedName("question_translations")
     private List<QuestionTranslation> mQuestionTranslations;
-    @Ignore
-    @SerializedName("loop_questions")
-    private List<LoopQuestion> mLoopQuestions;
-    @Ignore
-    @SerializedName("critical_responses")
-    private List<CriticalResponse> mCriticalResponses;
 
     @NonNull
     public Long getRemoteId() {
@@ -308,32 +305,24 @@ public class Question {
         this.mQuestionTranslations = translations;
     }
 
-    public List<LoopQuestion> getLoopQuestions() {
-        return mLoopQuestions;
+    @Override
+    public Type getType() {
+        return new TypeToken<ArrayList<Question>>() {
+        }.getType();
     }
 
-    public void setLoopQuestions(List<LoopQuestion> mLoopQuestions) {
-        this.mLoopQuestions = mLoopQuestions;
+    @Override
+    public List<QuestionTranslation> getTranslations() {
+        return mQuestionTranslations;
     }
 
-    public List<CriticalResponse> getCriticalResponses() {
-        return mCriticalResponses;
-    }
-
-    public void setCriticalResponses(List<CriticalResponse> mCriticalResponses) {
-        this.mCriticalResponses = mCriticalResponses;
+    @Override
+    public void save(BaseDao dao, List list) {
+        dao.updateAll(list);
+        dao.insertAll(list);
     }
 
     public static class QuestionType {
-        public final String questionType;
-        @Retention(RetentionPolicy.SOURCE)
-        @StringDef({SELECT_ONE, SELECT_MULTIPLE, SELECT_ONE_WRITE_OTHER, SELECT_MULTIPLE_WRITE_OTHER,
-                FREE_RESPONSE, SLIDER, FRONT_PICTURE, REAR_PICTURE, DATE, RATING, TIME, LIST_OF_TEXT_BOXES,
-                INTEGER, EMAIL_ADDRESS, DECIMAL_NUMBER, INSTRUCTIONS, MONTH_AND_YEAR, YEAR, PHONE_NUMBER,
-                ADDRESS, SELECT_ONE_IMAGE, SELECT_MULTIPLE_IMAGE, LIST_OF_INTEGER_BOXES, LABELED_SLIDER,
-                GEO_LOCATION, DROP_DOWN, RANGE, SUM_OF_PARTS, SIGNATURE})
-        public @interface QuestionTypeDef {}
-
         public static final String SELECT_ONE = "SELECT_ONE";
         public static final String SELECT_MULTIPLE = "SELECT_MULTIPLE";
         public static final String SELECT_ONE_WRITE_OTHER = "SELECT_ONE_WRITE_OTHER";
@@ -363,9 +352,18 @@ public class Question {
         public static final String RANGE = "RANGE";
         public static final String SUM_OF_PARTS = "SUM_OF_PARTS";
         public static final String SIGNATURE = "SIGNATURE";
-
+        public final String questionType;
         public QuestionType(@QuestionTypeDef String type) {
             this.questionType = type;
+        }
+
+        @Retention(RetentionPolicy.SOURCE)
+        @StringDef({SELECT_ONE, SELECT_MULTIPLE, SELECT_ONE_WRITE_OTHER, SELECT_MULTIPLE_WRITE_OTHER,
+                FREE_RESPONSE, SLIDER, FRONT_PICTURE, REAR_PICTURE, DATE, RATING, TIME, LIST_OF_TEXT_BOXES,
+                INTEGER, EMAIL_ADDRESS, DECIMAL_NUMBER, INSTRUCTIONS, MONTH_AND_YEAR, YEAR, PHONE_NUMBER,
+                ADDRESS, SELECT_ONE_IMAGE, SELECT_MULTIPLE_IMAGE, LIST_OF_INTEGER_BOXES, LABELED_SLIDER,
+                GEO_LOCATION, DROP_DOWN, RANGE, SUM_OF_PARTS, SIGNATURE})
+        public @interface QuestionTypeDef {
         }
     }
 }

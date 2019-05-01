@@ -19,10 +19,19 @@ import org.adaptlab.chpir.android.activerecordcloudsync.PollService;
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.entities.Settings;
+import org.adaptlab.chpir.android.survey.repositories.ConditionSkipRepository;
+import org.adaptlab.chpir.android.survey.repositories.CriticalResponseRepository;
+import org.adaptlab.chpir.android.survey.repositories.DeviceUserRepository;
 import org.adaptlab.chpir.android.survey.repositories.DisplayInstructionRepository;
 import org.adaptlab.chpir.android.survey.repositories.DisplayRepository;
+import org.adaptlab.chpir.android.survey.repositories.FollowUpQuestionRepository;
 import org.adaptlab.chpir.android.survey.repositories.InstructionRepository;
 import org.adaptlab.chpir.android.survey.repositories.InstrumentRepository;
+import org.adaptlab.chpir.android.survey.repositories.LoopQuestionRepository;
+import org.adaptlab.chpir.android.survey.repositories.MultipleSkipRepository;
+import org.adaptlab.chpir.android.survey.repositories.OptionRepository;
+import org.adaptlab.chpir.android.survey.repositories.OptionSetOptionRepository;
+import org.adaptlab.chpir.android.survey.repositories.OptionSetRepository;
 import org.adaptlab.chpir.android.survey.repositories.QuestionRepository;
 import org.adaptlab.chpir.android.survey.repositories.SectionRepository;
 import org.adaptlab.chpir.android.survey.repositories.SettingsRepository;
@@ -38,6 +47,7 @@ public class AppUtil {
     public final static boolean PRODUCTION = !BuildConfig.DEBUG;
     private final static String TAG = "AppUtil";
     private final static boolean REQUIRE_SECURITY_CHECKS = PRODUCTION;
+    private static volatile int REMOTE_DOWNLOAD_COUNT = 0;
 
     private static String ACCESS_TOKEN;
     private static String LAST_SYNC_TIME;
@@ -63,16 +73,6 @@ public class AppUtil {
         setVersionName(application);
         getOkHttpClient();
         PollService.setServiceAlarm(application, true);
-    }
-
-    private static void setVersionName(Context context) {
-        VERSION_NAME = "";
-        try {
-            PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-            VERSION_NAME = pInfo.versionName;
-        } catch (NameNotFoundException nnfe) {
-            Log.e(TAG, "Error finding version code: " + nnfe);
-        }
     }
 
     private static void setDeviceLanguage() {
@@ -122,6 +122,16 @@ public class AppUtil {
 
     public static String getVersionName() {
         return VERSION_NAME;
+    }
+
+    private static void setVersionName(Context context) {
+        VERSION_NAME = "";
+        try {
+            PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            VERSION_NAME = pInfo.versionName;
+        } catch (NameNotFoundException nnfe) {
+            Log.e(TAG, "Error finding version code: " + nnfe);
+        }
     }
 
     public static String getDeviceLanguage() {
@@ -186,11 +196,20 @@ public class AppUtil {
 
     public static void downloadData(Application application) {
         new InstrumentRepository(application).download();
-        new QuestionRepository(application).download();
-        new DisplayRepository(application).download();
-        new DisplayInstructionRepository(application).download();
+        new OptionRepository(application).download();
+        new OptionSetRepository(application).download();
         new InstructionRepository(application).download();
+        new DisplayRepository(application).download();
+        new QuestionRepository(application).download();
         new SectionRepository(application).download();
+        new DisplayInstructionRepository(application).download();
+        new OptionSetOptionRepository(application).download();
+        new ConditionSkipRepository(application).download();
+        new DeviceUserRepository(application).download();
+        new CriticalResponseRepository(application).download();
+        new LoopQuestionRepository(application).download();
+        new FollowUpQuestionRepository(application).download();
+        new MultipleSkipRepository(application).download();
     }
 
     public static String getAccessToken() {
@@ -270,7 +289,8 @@ public class AppUtil {
                 LAST_SYNC_TIME = mSettings.getLastSyncTime();
                 DOMAIN_NAME = mSettings.getApiUrl();
                 API_VERSION = mSettings.getApiVersion();
-                if (mSettings.getProjectId() != null) PROJECT_ID = Long.valueOf(mSettings.getProjectId());
+                if (mSettings.getProjectId() != null)
+                    PROJECT_ID = Long.valueOf(mSettings.getProjectId());
                 checkDatabaseVersionChange(application);
                 setCrashLogs(application);
                 setDeviceLanguage();

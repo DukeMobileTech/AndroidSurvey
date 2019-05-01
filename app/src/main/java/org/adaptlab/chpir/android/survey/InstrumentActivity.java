@@ -74,7 +74,9 @@ public class InstrumentActivity extends AppCompatActivity {
                 } else {
                     if (TextUtils.isEmpty(settings.getApiUrl()) || TextUtils.isEmpty(settings.getApiVersion()) ||
                             TextUtils.isEmpty(settings.getProjectId()) || TextUtils.isEmpty(settings.getApiKey())) {
-                        startActivity(new Intent(InstrumentActivity.this, SettingsActivity.class));
+                        Intent intent = new Intent(InstrumentActivity.this, SettingsActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
                     }
                 }
             }
