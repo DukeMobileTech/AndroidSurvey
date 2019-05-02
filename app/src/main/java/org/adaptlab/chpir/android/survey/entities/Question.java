@@ -5,14 +5,12 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
-import android.arch.persistence.room.TypeConverters;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringDef;
 
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
-import org.adaptlab.chpir.android.survey.converters.Converters;
 import org.adaptlab.chpir.android.survey.daos.BaseDao;
 
 import java.lang.annotation.Retention;
@@ -28,6 +26,36 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         indices = {@Index(name = "questions_remote_id_index", value = {"RemoteId"}, unique = true),
                 @Index(name = "questions_identifier_index", value = {"QuestionIdentifier"}, unique = true)})
 public class Question implements Entity {
+    public static final String SELECT_ONE = "SELECT_ONE";
+    public static final String SELECT_MULTIPLE = "SELECT_MULTIPLE";
+    public static final String SELECT_ONE_WRITE_OTHER = "SELECT_ONE_WRITE_OTHER";
+    public static final String SELECT_MULTIPLE_WRITE_OTHER = "SELECT_MULTIPLE_WRITE_OTHER";
+    public static final String FREE_RESPONSE = "FREE_RESPONSE";
+    public static final String SLIDER = "SLIDER";
+    public static final String FRONT_PICTURE = "FRONT_PICTURE";
+    public static final String REAR_PICTURE = "REAR_PICTURE";
+    public static final String DATE = "DATE";
+    public static final String RATING = "RATING";
+    public static final String TIME = "TIME";
+    public static final String LIST_OF_TEXT_BOXES = "LIST_OF_TEXT_BOXES";
+    public static final String INTEGER = "INTEGER";
+    public static final String EMAIL_ADDRESS = "EMAIL_ADDRESS";
+    public static final String DECIMAL_NUMBER = "DECIMAL_NUMBER";
+    public static final String INSTRUCTIONS = "INSTRUCTIONS";
+    public static final String MONTH_AND_YEAR = "MONTH_AND_YEAR";
+    public static final String YEAR = "YEAR";
+    public static final String PHONE_NUMBER = "PHONE_NUMBER";
+    public static final String ADDRESS = "ADDRESS";
+    public static final String SELECT_ONE_IMAGE = "SELECT_ONE_IMAGE";
+    public static final String SELECT_MULTIPLE_IMAGE = "SELECT_MULTIPLE_IMAGE";
+    public static final String LIST_OF_INTEGER_BOXES = "LIST_OF_INTEGER_BOXES";
+    public static final String LABELED_SLIDER = "LABELED_SLIDER";
+    public static final String GEO_LOCATION = "GEO_LOCATION";
+    public static final String DROP_DOWN = "DROP_DOWN";
+    public static final String RANGE = "RANGE";
+    public static final String SUM_OF_PARTS = "SUM_OF_PARTS";
+    public static final String SIGNATURE = "SIGNATURE";
+
     @PrimaryKey
     @NonNull
     @SerializedName("id")
@@ -36,10 +64,10 @@ public class Question implements Entity {
     @SerializedName("text")
     @ColumnInfo(name = "Text")
     private String mText;
-    @TypeConverters(Converters.class)
-    // The @SerializedName("question_type") is excluded here because it is handled by QuestionDeserializer class
+    @SerializedName("question_type")
     @ColumnInfo(name = "QuestionType")
-    private QuestionType mQuestionType;
+    private @QuestionType
+    String mQuestionType;
     @SerializedName("question_identifier")
     @ColumnInfo(name = "QuestionIdentifier")
     private String mQuestionIdentifier;
@@ -104,6 +132,25 @@ public class Question implements Entity {
     @SerializedName("question_translations")
     private List<QuestionTranslation> mQuestionTranslations;
 
+    public static Question copyAttributes(Question destination, Question source) {
+        destination.mText = source.mText;
+        destination.mQuestionType = source.mQuestionType;
+        destination.mOptionCount = source.mOptionCount;
+        destination.mInstrumentVersion = source.mInstrumentVersion;
+        destination.mIdentifiesSurvey = source.mIdentifiesSurvey;
+        destination.mQuestionVersion = source.mQuestionVersion;
+        destination.mDeleted = source.mDeleted;
+        destination.mInstrumentRemoteId = source.mInstrumentRemoteId;
+        destination.mRemoteOptionSetId = source.mRemoteOptionSetId;
+        destination.mRemoteSpecialOptionSetId = source.mRemoteSpecialOptionSetId;
+        destination.mTableIdentifier = source.mTableIdentifier;
+        destination.mValidationId = source.mValidationId;
+        destination.mRankResponses = source.mRankResponses;
+        destination.mLoopQuestionCount = source.mLoopQuestionCount;
+        destination.mQuestionId = source.mQuestionId;
+        return destination;
+    }
+
     @NonNull
     public Long getRemoteId() {
         return mRemoteId;
@@ -121,11 +168,12 @@ public class Question implements Entity {
         this.mText = text;
     }
 
-    public QuestionType getQuestionType() {
+    @QuestionType
+    public String getQuestionType() {
         return mQuestionType;
     }
 
-    public void setQuestionType(QuestionType questionType) {
+    public void setQuestionType(@QuestionType String questionType) {
         this.mQuestionType = questionType;
     }
 
@@ -322,48 +370,21 @@ public class Question implements Entity {
         dao.insertAll(list);
     }
 
-    public static class QuestionType {
-        public static final String SELECT_ONE = "SELECT_ONE";
-        public static final String SELECT_MULTIPLE = "SELECT_MULTIPLE";
-        public static final String SELECT_ONE_WRITE_OTHER = "SELECT_ONE_WRITE_OTHER";
-        public static final String SELECT_MULTIPLE_WRITE_OTHER = "SELECT_MULTIPLE_WRITE_OTHER";
-        public static final String FREE_RESPONSE = "FREE_RESPONSE";
-        public static final String SLIDER = "SLIDER";
-        public static final String FRONT_PICTURE = "FRONT_PICTURE";
-        public static final String REAR_PICTURE = "REAR_PICTURE";
-        public static final String DATE = "DATE";
-        public static final String RATING = "RATING";
-        public static final String TIME = "TIME";
-        public static final String LIST_OF_TEXT_BOXES = "LIST_OF_TEXT_BOXES";
-        public static final String INTEGER = "INTEGER";
-        public static final String EMAIL_ADDRESS = "EMAIL_ADDRESS";
-        public static final String DECIMAL_NUMBER = "DECIMAL_NUMBER";
-        public static final String INSTRUCTIONS = "INSTRUCTIONS";
-        public static final String MONTH_AND_YEAR = "MONTH_AND_YEAR";
-        public static final String YEAR = "YEAR";
-        public static final String PHONE_NUMBER = "PHONE_NUMBER";
-        public static final String ADDRESS = "ADDRESS";
-        public static final String SELECT_ONE_IMAGE = "SELECT_ONE_IMAGE";
-        public static final String SELECT_MULTIPLE_IMAGE = "SELECT_MULTIPLE_IMAGE";
-        public static final String LIST_OF_INTEGER_BOXES = "LIST_OF_INTEGER_BOXES";
-        public static final String LABELED_SLIDER = "LABELED_SLIDER";
-        public static final String GEO_LOCATION = "GEO_LOCATION";
-        public static final String DROP_DOWN = "DROP_DOWN";
-        public static final String RANGE = "RANGE";
-        public static final String SUM_OF_PARTS = "SUM_OF_PARTS";
-        public static final String SIGNATURE = "SIGNATURE";
-        public final String questionType;
-        public QuestionType(@QuestionTypeDef String type) {
-            this.questionType = type;
-        }
+    public boolean isOtherQuestionType() {
+        return (mQuestionType.equals(SELECT_ONE_WRITE_OTHER) || mQuestionType.equals(SELECT_MULTIPLE_WRITE_OTHER));
+    }
 
-        @Retention(RetentionPolicy.SOURCE)
-        @StringDef({SELECT_ONE, SELECT_MULTIPLE, SELECT_ONE_WRITE_OTHER, SELECT_MULTIPLE_WRITE_OTHER,
-                FREE_RESPONSE, SLIDER, FRONT_PICTURE, REAR_PICTURE, DATE, RATING, TIME, LIST_OF_TEXT_BOXES,
-                INTEGER, EMAIL_ADDRESS, DECIMAL_NUMBER, INSTRUCTIONS, MONTH_AND_YEAR, YEAR, PHONE_NUMBER,
-                ADDRESS, SELECT_ONE_IMAGE, SELECT_MULTIPLE_IMAGE, LIST_OF_INTEGER_BOXES, LABELED_SLIDER,
-                GEO_LOCATION, DROP_DOWN, RANGE, SUM_OF_PARTS, SIGNATURE})
-        public @interface QuestionTypeDef {
-        }
+    public boolean isMultipleResponseLoop() {
+        return (mQuestionType.equals(SELECT_MULTIPLE) || mQuestionType.equals(SELECT_MULTIPLE_WRITE_OTHER) ||
+                mQuestionType.equals(LIST_OF_INTEGER_BOXES) || mQuestionType.equals(LIST_OF_TEXT_BOXES));
+    }
+
+    @Retention(RetentionPolicy.SOURCE)
+    @StringDef({SELECT_ONE, SELECT_MULTIPLE, SELECT_ONE_WRITE_OTHER, SELECT_MULTIPLE_WRITE_OTHER,
+            FREE_RESPONSE, SLIDER, FRONT_PICTURE, REAR_PICTURE, DATE, RATING, TIME, LIST_OF_TEXT_BOXES,
+            INTEGER, EMAIL_ADDRESS, DECIMAL_NUMBER, INSTRUCTIONS, MONTH_AND_YEAR, YEAR, PHONE_NUMBER,
+            ADDRESS, SELECT_ONE_IMAGE, SELECT_MULTIPLE_IMAGE, LIST_OF_INTEGER_BOXES, LABELED_SLIDER,
+            GEO_LOCATION, DROP_DOWN, RANGE, SUM_OF_PARTS, SIGNATURE})
+    public @interface QuestionType {
     }
 }

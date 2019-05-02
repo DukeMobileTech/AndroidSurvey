@@ -3,11 +3,13 @@ package org.adaptlab.chpir.android.survey.repositories;
 import android.app.Application;
 
 import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
+import org.adaptlab.chpir.android.survey.daos.BaseDao;
 import org.adaptlab.chpir.android.survey.daos.LoopQuestionDao;
+import org.adaptlab.chpir.android.survey.entities.Entity;
 import org.adaptlab.chpir.android.survey.entities.LoopQuestion;
 import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 
-public class LoopQuestionRepository implements Downloadable {
+public class LoopQuestionRepository extends Repository {
     private LoopQuestionDao mLoopQuestionDao;
 
     public LoopQuestionRepository(Application application) {
@@ -17,11 +19,21 @@ public class LoopQuestionRepository implements Downloadable {
 
     @Override
     public void download() {
-        new EntityDownloadTask(mLoopQuestionDao, getRemoteTableName(), LoopQuestion.class).execute();
+        new EntityDownloadTask(this).execute();
     }
 
     @Override
     public String getRemoteTableName() {
         return "loop_questions";
+    }
+
+    @Override
+    public BaseDao getDao() {
+        return mLoopQuestionDao;
+    }
+
+    @Override
+    public Entity getEntity() {
+        return new LoopQuestion();
     }
 }

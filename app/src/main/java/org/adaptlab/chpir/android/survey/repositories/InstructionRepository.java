@@ -3,13 +3,15 @@ package org.adaptlab.chpir.android.survey.repositories;
 import android.app.Application;
 
 import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
+import org.adaptlab.chpir.android.survey.daos.BaseDao;
 import org.adaptlab.chpir.android.survey.daos.InstructionDao;
 import org.adaptlab.chpir.android.survey.daos.InstructionTranslationDao;
+import org.adaptlab.chpir.android.survey.entities.Entity;
 import org.adaptlab.chpir.android.survey.entities.Instruction;
 import org.adaptlab.chpir.android.survey.entities.InstructionTranslation;
-import org.adaptlab.chpir.android.survey.tasks.TranslatableEntityDownloadTask;
+import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 
-public class InstructionRepository implements Downloadable {
+public class InstructionRepository extends Repository {
     private InstructionDao mInstructionDao;
     private InstructionTranslationDao mInstructionTranslationDao;
 
@@ -21,12 +23,31 @@ public class InstructionRepository implements Downloadable {
 
     @Override
     public void download() {
-        new TranslatableEntityDownloadTask(mInstructionDao, mInstructionTranslationDao, getRemoteTableName(),
-                Instruction.class, InstructionTranslation.class).execute();
+        new EntityDownloadTask(this).execute();
     }
 
     @Override
     public String getRemoteTableName() {
         return "instructions";
+    }
+
+    @Override
+    public BaseDao getDao() {
+        return mInstructionDao;
+    }
+
+    @Override
+    public BaseDao getTranslationDao() {
+        return mInstructionTranslationDao;
+    }
+
+    @Override
+    public Entity getEntity() {
+        return new Instruction();
+    }
+
+    @Override
+    public Entity getTranslationEntity() {
+        return new InstructionTranslation();
     }
 }

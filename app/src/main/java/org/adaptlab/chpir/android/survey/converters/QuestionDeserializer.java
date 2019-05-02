@@ -1,5 +1,7 @@
 package org.adaptlab.chpir.android.survey.converters;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -15,8 +17,9 @@ public class QuestionDeserializer implements JsonDeserializer<Question> {
     public Question deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         Question question = new Gson().fromJson(json.getAsJsonObject(), Question.class);
         // QuestionType is saved as a String in the database, but it is passed through a converter first
-        Question.QuestionType questionType = new Question.QuestionType(json.getAsJsonObject().get("question_type").getAsString());
-        question.setQuestionType(questionType);
+//        Question.QuestionType questionType = new Question.QuestionType(json.getAsJsonObject().get("question_type").getAsString());
+//        Log.i("QuestionDeserializer", "Type: " + questionType);
+//        question.setQuestionType(questionType);
         return question;
     }
 }

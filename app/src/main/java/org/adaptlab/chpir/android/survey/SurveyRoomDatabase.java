@@ -4,13 +4,11 @@ import android.arch.persistence.db.SupportSQLiteDatabase;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
-import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.NonNull;
 
-import org.adaptlab.chpir.android.survey.converters.Converters;
 import org.adaptlab.chpir.android.survey.daos.ConditionSkipDao;
 import org.adaptlab.chpir.android.survey.daos.CriticalResponseDao;
 import org.adaptlab.chpir.android.survey.daos.DeviceUserDao;
@@ -69,7 +67,6 @@ import java.util.UUID;
         OptionSetTranslation.class, OptionTranslation.class, ConditionSkip.class, DeviceUser.class,
         FollowUpQuestion.class, MultipleSkip.class, NextQuestion.class},
         version = 1)
-@TypeConverters({Converters.class})
 public abstract class SurveyRoomDatabase extends RoomDatabase {
     private static volatile SurveyRoomDatabase INSTANCE;
     private static RoomDatabase.Callback sRoomDatabaseCallback =

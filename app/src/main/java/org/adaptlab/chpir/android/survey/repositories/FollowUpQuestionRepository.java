@@ -3,11 +3,13 @@ package org.adaptlab.chpir.android.survey.repositories;
 import android.app.Application;
 
 import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
+import org.adaptlab.chpir.android.survey.daos.BaseDao;
 import org.adaptlab.chpir.android.survey.daos.FollowUpQuestionDao;
+import org.adaptlab.chpir.android.survey.entities.Entity;
 import org.adaptlab.chpir.android.survey.entities.FollowUpQuestion;
 import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 
-public class FollowUpQuestionRepository implements Downloadable {
+public class FollowUpQuestionRepository extends Repository {
     private FollowUpQuestionDao dao;
 
     public FollowUpQuestionRepository(Application application) {
@@ -17,11 +19,21 @@ public class FollowUpQuestionRepository implements Downloadable {
 
     @Override
     public void download() {
-        new EntityDownloadTask(dao, getRemoteTableName(), FollowUpQuestion.class).execute();
+        new EntityDownloadTask(this).execute();
     }
 
     @Override
     public String getRemoteTableName() {
         return "follow_up_questions";
+    }
+
+    @Override
+    public BaseDao getDao() {
+        return dao;
+    }
+
+    @Override
+    public Entity getEntity() {
+        return new FollowUpQuestion();
     }
 }

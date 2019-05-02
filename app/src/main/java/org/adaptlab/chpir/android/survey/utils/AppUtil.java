@@ -36,6 +36,7 @@ import org.adaptlab.chpir.android.survey.repositories.QuestionRepository;
 import org.adaptlab.chpir.android.survey.repositories.SectionRepository;
 import org.adaptlab.chpir.android.survey.repositories.SettingsRepository;
 import org.adaptlab.chpir.android.survey.tasks.GetSettingsTask;
+import org.adaptlab.chpir.android.survey.tasks.SetLoopsTask;
 
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -47,8 +48,8 @@ public class AppUtil {
     public final static boolean PRODUCTION = !BuildConfig.DEBUG;
     private final static String TAG = "AppUtil";
     private final static boolean REQUIRE_SECURITY_CHECKS = PRODUCTION;
+    private final static int REMOTE_TABLE_COUNT = 15;
     private static volatile int REMOTE_DOWNLOAD_COUNT = 0;
-
     private static String ACCESS_TOKEN;
     private static String LAST_SYNC_TIME;
     private static String DOMAIN_NAME;
@@ -210,6 +211,34 @@ public class AppUtil {
         new LoopQuestionRepository(application).download();
         new FollowUpQuestionRepository(application).download();
         new MultipleSkipRepository(application).download();
+    }
+
+    public static void incrementRemoteDownloadCount() {
+        synchronized (AppUtil.class) {
+            REMOTE_DOWNLOAD_COUNT++;
+        }
+    }
+
+    public static void resetRemoteDownloadCount() {
+        synchronized (AppUtil.class) {
+            REMOTE_DOWNLOAD_COUNT = 0;
+        }
+    }
+
+    private static int getRemoteDownloadCount() {
+        synchronized (AppUtil.class) {
+            return REMOTE_DOWNLOAD_COUNT;
+        }
+    }
+
+    private static int getRemoteTableCount() {
+        return REMOTE_TABLE_COUNT;
+    }
+
+    public static void setLoopsTask() {
+        if (AppUtil.getRemoteDownloadCount() == AppUtil.getRemoteTableCount()) {
+            new SetLoopsTask().execute();
+        }
     }
 
     public static String getAccessToken() {

@@ -9,9 +9,11 @@ import com.google.gson.Gson;
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.daos.BaseDao;
 import org.adaptlab.chpir.android.survey.entities.Entity;
+import org.adaptlab.chpir.android.survey.repositories.Repository;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.Call;
@@ -20,14 +22,20 @@ import okhttp3.Request;
 
 public class EntityDownloadTask extends AsyncTask<Void, Void, Void> {
     private static final String TAG = "EntityDownloadTask";
-    private BaseDao<? extends Entity> mBaseDao;
+    private BaseDao mBaseDao;
+    private BaseDao mTranslationDao;
+    private Entity mEntity;
+    private Entity mTranslationEntity;
     private String mTableName;
-    private Class<? extends Entity> mEntity;
+    private Gson mGson;
 
-    public EntityDownloadTask(BaseDao<? extends Entity> dao, String tableName, Class<? extends Entity> entity) {
-        mBaseDao = dao;
-        mTableName = tableName;
-        mEntity = entity;
+    public EntityDownloadTask(Repository repository) {
+        mBaseDao = repository.getDao();
+        mTranslationDao = repository.getTranslationDao();
+        mEntity = repository.getEntity();
+        mTranslationEntity = repository.getTranslationEntity();
+        mTableName = repository.getRemoteTableName();
+        mGson = repository.getGson();
     }
 
     @Override
@@ -49,11 +57,18 @@ public class EntityDownloadTask extends AsyncTask<Void, Void, Void> {
                     try {
                         String responseString = response.body().string();
                         if (BuildConfig.DEBUG) Log.i(TAG, mBaseDao + ": " + responseString);
-                        Gson gson = new Gson();
-                        Entity entity = mEntity.newInstance();
-                        List<? extends Entity> entities = gson.fromJson(responseString, entity.getType());
-                        entity.save(mBaseDao, entities);
-                    } catch (IOException | IllegalAccessException | InstantiationException e) {
+                        List<? extends Entity> entities = mGson.fromJson(responseString, mEntity.getType());
+                        mEntity.save(mBaseDao, entities);
+                        if (mTranslationDao != null && mTranslationEntity != null) {
+                            List<Entity> translations = new ArrayList<>();
+                            for (Entity entity : entities) {
+                                translations.addAll(entity.getTranslations());
+                            }
+                            mTranslationEntity.save(mTranslationDao, translations);
+                        }
+                        AppUtil.incrementRemoteDownloadCount();
+                        AppUtil.setLoopsTask();
+                    } catch (IOException e) {
                         if (BuildConfig.DEBUG) Log.e(TAG, "Exception: ", e);
                     }
                     response.close();
@@ -65,4 +80,5 @@ public class EntityDownloadTask extends AsyncTask<Void, Void, Void> {
         });
         return null;
     }
+
 }

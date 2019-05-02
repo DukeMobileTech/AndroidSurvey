@@ -4,15 +4,17 @@ import android.app.Application;
 import android.arch.lifecycle.LiveData;
 
 import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
+import org.adaptlab.chpir.android.survey.daos.BaseDao;
 import org.adaptlab.chpir.android.survey.daos.InstrumentDao;
 import org.adaptlab.chpir.android.survey.daos.InstrumentTranslationDao;
+import org.adaptlab.chpir.android.survey.entities.Entity;
 import org.adaptlab.chpir.android.survey.entities.Instrument;
 import org.adaptlab.chpir.android.survey.entities.InstrumentTranslation;
-import org.adaptlab.chpir.android.survey.tasks.TranslatableEntityDownloadTask;
+import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 
 import java.util.List;
 
-public class InstrumentRepository implements Downloadable {
+public class InstrumentRepository extends Repository {
     private InstrumentDao mInstrumentDao;
     private InstrumentTranslationDao mInstrumentTranslationDao;
     private LiveData<List<Instrument>> mAllInstruments;
@@ -40,12 +42,31 @@ public class InstrumentRepository implements Downloadable {
 
     @Override
     public void download() {
-        new TranslatableEntityDownloadTask(mInstrumentDao, mInstrumentTranslationDao, getRemoteTableName(),
-                Instrument.class, InstrumentTranslation.class).execute();
+        new EntityDownloadTask(this).execute();
     }
 
     @Override
     public String getRemoteTableName() {
         return "instruments";
+    }
+
+    @Override
+    public BaseDao getDao() {
+        return mInstrumentDao;
+    }
+
+    @Override
+    public BaseDao getTranslationDao() {
+        return mInstrumentTranslationDao;
+    }
+
+    @Override
+    public Entity getEntity() {
+        return new Instrument();
+    }
+
+    @Override
+    public Entity getTranslationEntity() {
+        return new InstrumentTranslation();
     }
 }

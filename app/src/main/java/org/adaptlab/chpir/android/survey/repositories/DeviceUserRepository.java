@@ -3,11 +3,13 @@ package org.adaptlab.chpir.android.survey.repositories;
 import android.app.Application;
 
 import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
+import org.adaptlab.chpir.android.survey.daos.BaseDao;
 import org.adaptlab.chpir.android.survey.daos.DeviceUserDao;
 import org.adaptlab.chpir.android.survey.entities.DeviceUser;
+import org.adaptlab.chpir.android.survey.entities.Entity;
 import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 
-public class DeviceUserRepository implements Downloadable {
+public class DeviceUserRepository extends Repository {
     private DeviceUserDao deviceUserDao;
 
     public DeviceUserRepository(Application application) {
@@ -17,11 +19,21 @@ public class DeviceUserRepository implements Downloadable {
 
     @Override
     public void download() {
-        new EntityDownloadTask(deviceUserDao, getRemoteTableName(), DeviceUser.class).execute();
+        new EntityDownloadTask(this).execute();
     }
 
     @Override
     public String getRemoteTableName() {
         return "device_users";
+    }
+
+    @Override
+    public BaseDao getDao() {
+        return deviceUserDao;
+    }
+
+    @Override
+    public Entity getEntity() {
+        return new DeviceUser();
     }
 }
