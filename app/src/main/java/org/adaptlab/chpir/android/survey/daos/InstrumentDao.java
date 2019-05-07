@@ -12,6 +12,12 @@ import java.util.List;
 
 @Dao
 public abstract class InstrumentDao extends BaseDao<Instrument> {
+    @Query("SELECT * FROM Instruments WHERE RemoteId=:id LIMIT 1")
+    public abstract LiveData<Instrument> findById(Long id);
+
+    @Query("SELECT * FROM Instruments WHERE RemoteId=:id LIMIT 1")
+    public abstract Instrument findByIdSync(Long id);
+
     @Query("SELECT * FROM Instruments WHERE ProjectId=:projectId AND Published=1 ORDER BY Title ASC")
     public abstract List<Instrument> projectInstrumentsSync(Long projectId);
 

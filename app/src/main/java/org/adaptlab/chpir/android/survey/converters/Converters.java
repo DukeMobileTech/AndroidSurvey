@@ -4,14 +4,18 @@ import android.arch.persistence.room.TypeConverter;
 
 import org.adaptlab.chpir.android.survey.entities.Question;
 
-//public class Converters {
-//    @TypeConverter
-//    public static Question.QuestionType fromString(String string) {
-//        return string == null ? null : new Question.QuestionType(string);
-//    }
-//
-//    @TypeConverter
-//    public static String toString(Question.QuestionType questionType) {
-//        return questionType == null ? null : questionType.toString();
-//    }
-//}
+import java.util.Date;
+
+public class Converters {
+
+    @TypeConverter
+    public static Date fromTimestamp(Long value) {
+        return value == null ? null : new Date(value);
+    }
+
+    @TypeConverter
+    public static Long dateToTimestamp(Date date) {
+        return date == null ? null : date.getTime();
+    }
+
+}

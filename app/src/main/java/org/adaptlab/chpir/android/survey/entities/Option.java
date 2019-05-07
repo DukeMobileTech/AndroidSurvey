@@ -17,7 +17,7 @@ import java.util.List;
 
 @android.arch.persistence.room.Entity(tableName = "Options", indices = {@Index(name = "options_id_index", value = {"RemoteId"}, unique = true),
         @Index(name = "options_identifier_index", value = {"Identifier"}, unique = true)})
-public class Option implements Entity {
+public class Option implements SurveyEntity {
     @PrimaryKey
     @NonNull
     @SerializedName("id")

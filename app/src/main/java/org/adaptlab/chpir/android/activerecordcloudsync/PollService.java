@@ -29,20 +29,17 @@ public class PollService extends IntentService {
         Intent i = new Intent(context, PollService.class);
         PendingIntent pi = PendingIntent.getService(context, 0, i, 0);
 
-        AlarmManager alarmManager = (AlarmManager) context
-                .getSystemService(Context.ALARM_SERVICE);
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         if (isOn) {
             int DEFAULT_POLL_INTERVAL = 1000 * 24 * 60 * 60;
-            alarmManager.setRepeating(AlarmManager.RTC,
-                    System.currentTimeMillis(), DEFAULT_POLL_INTERVAL, pi);
+            alarmManager.setRepeating(AlarmManager.RTC, System.currentTimeMillis(), DEFAULT_POLL_INTERVAL, pi);
         } else {
             alarmManager.cancel(pi);
             pi.cancel();
         }
 
-        PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(
-                PollService.PREF_IS_ALARM_ON, isOn).apply();
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PollService.PREF_IS_ALARM_ON, isOn).apply();
     }
 
 }

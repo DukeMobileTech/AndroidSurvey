@@ -25,7 +25,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
         parentColumns = "RemoteId", childColumns = "InstrumentRemoteId", onDelete = CASCADE),
         indices = {@Index(name = "questions_remote_id_index", value = {"RemoteId"}, unique = true),
                 @Index(name = "questions_identifier_index", value = {"QuestionIdentifier"}, unique = true)})
-public class Question implements Entity {
+public class Question implements SurveyEntity {
     public static final String SELECT_ONE = "SELECT_ONE";
     public static final String SELECT_MULTIPLE = "SELECT_MULTIPLE";
     public static final String SELECT_ONE_WRITE_OTHER = "SELECT_ONE_WRITE_OTHER";

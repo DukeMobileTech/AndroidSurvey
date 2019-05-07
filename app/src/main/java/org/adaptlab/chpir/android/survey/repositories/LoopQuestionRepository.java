@@ -5,7 +5,7 @@ import android.app.Application;
 import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
 import org.adaptlab.chpir.android.survey.daos.BaseDao;
 import org.adaptlab.chpir.android.survey.daos.LoopQuestionDao;
-import org.adaptlab.chpir.android.survey.entities.Entity;
+import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.entities.LoopQuestion;
 import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 
@@ -33,7 +33,7 @@ public class LoopQuestionRepository extends Repository {
     }
 
     @Override
-    public Entity getEntity() {
+    public SurveyEntity getEntity() {
         return new LoopQuestion();
     }
 }

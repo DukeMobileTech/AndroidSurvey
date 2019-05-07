@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "a00f9f2af66627f6dfa600a39f3ae334",
+    "identityHash": "a8bd060b7a06eee3b16cf804601969ce",
     "entities": [
       {
         "tableName": "Instruments",
@@ -1899,11 +1899,313 @@
             ]
           }
         ]
+      },
+      {
+        "tableName": "Surveys",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`UUID` TEXT NOT NULL, `SentToRemote` INTEGER NOT NULL, `Complete` INTEGER NOT NULL, `Latitude` TEXT, `Longitude` TEXT, `LastUpdated` INTEGER, `Metadata` TEXT, `ProjectId` INTEGER, `InstrumentRemoteId` INTEGER, `RosterUUID` TEXT, `Language` TEXT, `SkippedQuestions` TEXT, `SkipMaps` TEXT, `Identifier` TEXT, `CompletedResponseCount` INTEGER NOT NULL, `Queued` INTEGER NOT NULL, `Instrument_RemoteId` INTEGER, `Instrument_Title` TEXT, `Instrument_Language` TEXT, `Instrument_Alignment` TEXT, `Instrument_VersionNumber` INTEGER, `Instrument_QuestionCount` INTEGER, `Instrument_ProjectId` INTEGER, `Instrument_Published` INTEGER, `Instrument_Deleted` INTEGER, `Instrument_Loaded` INTEGER, PRIMARY KEY(`UUID`))",
+        "fields": [
+          {
+            "fieldPath": "mUUID",
+            "columnName": "UUID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mSent",
+            "columnName": "SentToRemote",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mComplete",
+            "columnName": "Complete",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mLatitude",
+            "columnName": "Latitude",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mLongitude",
+            "columnName": "Longitude",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mLastUpdated",
+            "columnName": "LastUpdated",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mMetadata",
+            "columnName": "Metadata",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mProjectId",
+            "columnName": "ProjectId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mInstrumentRemoteId",
+            "columnName": "InstrumentRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mRosterUUID",
+            "columnName": "RosterUUID",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mLanguage",
+            "columnName": "Language",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mSkippedQuestions",
+            "columnName": "SkippedQuestions",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mSkipMaps",
+            "columnName": "SkipMaps",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mIdentifier",
+            "columnName": "Identifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mCompletedResponseCount",
+            "columnName": "CompletedResponseCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mQueued",
+            "columnName": "Queued",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mInstrument.mRemoteId",
+            "columnName": "Instrument_RemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mInstrument.mTitle",
+            "columnName": "Instrument_Title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mInstrument.mLanguage",
+            "columnName": "Instrument_Language",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mInstrument.mAlignment",
+            "columnName": "Instrument_Alignment",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mInstrument.mVersionNumber",
+            "columnName": "Instrument_VersionNumber",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mInstrument.mQuestionCount",
+            "columnName": "Instrument_QuestionCount",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mInstrument.mProjectId",
+            "columnName": "Instrument_ProjectId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mInstrument.mPublished",
+            "columnName": "Instrument_Published",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mInstrument.mDeleted",
+            "columnName": "Instrument_Deleted",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mInstrument.mLoaded",
+            "columnName": "Instrument_Loaded",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "UUID"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "surveys_uuid_index",
+            "unique": true,
+            "columnNames": [
+              "UUID"
+            ],
+            "createSql": "CREATE UNIQUE INDEX `surveys_uuid_index` ON `${TABLE_NAME}` (`UUID`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Responses",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`UUID` TEXT NOT NULL, `SurveyUUID` TEXT, `QuestionRemoteId` INTEGER, `QuestionIdentifier` TEXT, `Text` TEXT, `Other_Response` TEXT, `SpecialResponse` TEXT, `SentToRemote` INTEGER NOT NULL, `TimeStarted` INTEGER, `TimeEnded` INTEGER, `DeviceUserId` INTEGER, `QuestionVersion` INTEGER NOT NULL, `RandomizedData` TEXT, `RankOrder` TEXT, PRIMARY KEY(`UUID`))",
+        "fields": [
+          {
+            "fieldPath": "mUUID",
+            "columnName": "UUID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mSurveyUUID",
+            "columnName": "SurveyUUID",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mQuestionRemoteId",
+            "columnName": "QuestionRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mQuestionIdentifier",
+            "columnName": "QuestionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mText",
+            "columnName": "Text",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mOtherResponse",
+            "columnName": "Other_Response",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mSpecialResponse",
+            "columnName": "SpecialResponse",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mSent",
+            "columnName": "SentToRemote",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mTimeStarted",
+            "columnName": "TimeStarted",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mTimeEnded",
+            "columnName": "TimeEnded",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDeviceUserId",
+            "columnName": "DeviceUserId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mQuestionVersion",
+            "columnName": "QuestionVersion",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mRandomizedData",
+            "columnName": "RandomizedData",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mRankOrder",
+            "columnName": "RankOrder",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "UUID"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_Responses_SurveyUUID",
+            "unique": false,
+            "columnNames": [
+              "SurveyUUID"
+            ],
+            "createSql": "CREATE  INDEX `index_Responses_SurveyUUID` ON `${TABLE_NAME}` (`SurveyUUID`)"
+          },
+          {
+            "name": "index_Responses_QuestionRemoteId",
+            "unique": false,
+            "columnNames": [
+              "QuestionRemoteId"
+            ],
+            "createSql": "CREATE  INDEX `index_Responses_QuestionRemoteId` ON `${TABLE_NAME}` (`QuestionRemoteId`)"
+          },
+          {
+            "name": "index_Responses_QuestionIdentifier",
+            "unique": false,
+            "columnNames": [
+              "QuestionIdentifier"
+            ],
+            "createSql": "CREATE  INDEX `index_Responses_QuestionIdentifier` ON `${TABLE_NAME}` (`QuestionIdentifier`)"
+          }
+        ],
+        "foreignKeys": []
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"a00f9f2af66627f6dfa600a39f3ae334\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"a8bd060b7a06eee3b16cf804601969ce\")"
     ]
   }
 }

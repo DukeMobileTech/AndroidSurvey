@@ -19,7 +19,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.adaptlab.chpir.android.survey.Display2Fragment;
 import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.Survey2Activity;
 import org.adaptlab.chpir.android.survey.SurveyActivity;
 import org.adaptlab.chpir.android.survey.SurveyFragment;
 import org.adaptlab.chpir.android.survey.entities.Instrument;
@@ -138,8 +140,8 @@ public class InstrumentAdapter extends RecyclerView.Adapter<InstrumentAdapter.In
                     if (mInstrument == null || !mInstrument.isLoaded()) {
                         Toast.makeText(mContext, R.string.instrument_not_loaded, Toast.LENGTH_LONG).show();
                     } else {
-                        Intent i = new Intent(mContext, SurveyActivity.class);
-                        i.putExtra(SurveyFragment.EXTRA_INSTRUMENT_ID, mInstrument.getRemoteId());
+                        Intent i = new Intent(mContext, Survey2Activity.class);
+                        i.putExtra(Display2Fragment.EXTRA_INSTRUMENT_ID, mInstrument.getRemoteId());
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                             mContext.startActivity(i, ActivityOptions.makeSceneTransitionAnimation((Activity) mContext).toBundle());
                         } else {

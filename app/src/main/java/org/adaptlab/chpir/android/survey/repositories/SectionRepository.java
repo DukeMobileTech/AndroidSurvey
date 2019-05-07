@@ -6,7 +6,7 @@ import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
 import org.adaptlab.chpir.android.survey.daos.BaseDao;
 import org.adaptlab.chpir.android.survey.daos.SectionDao;
 import org.adaptlab.chpir.android.survey.daos.SectionTranslationDao;
-import org.adaptlab.chpir.android.survey.entities.Entity;
+import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.entities.Section;
 import org.adaptlab.chpir.android.survey.entities.SectionTranslation;
 import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
@@ -42,12 +42,12 @@ public class SectionRepository extends Repository {
     }
 
     @Override
-    public Entity getEntity() {
+    public SurveyEntity getEntity() {
         return new Section();
     }
 
     @Override
-    public Entity getTranslationEntity() {
+    public SurveyEntity getTranslationEntity() {
         return new SectionTranslation();
     }
 }

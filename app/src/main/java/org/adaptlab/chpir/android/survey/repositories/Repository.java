@@ -3,7 +3,7 @@ package org.adaptlab.chpir.android.survey.repositories;
 import com.google.gson.Gson;
 
 import org.adaptlab.chpir.android.survey.daos.BaseDao;
-import org.adaptlab.chpir.android.survey.entities.Entity;
+import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 
 public abstract class Repository {
     public abstract void download();
@@ -12,7 +12,7 @@ public abstract class Repository {
 
     public abstract BaseDao getDao();
 
-    public abstract Entity getEntity();
+    public abstract SurveyEntity getEntity();
 
     public Gson getGson() {
         return new Gson();
@@ -22,7 +22,7 @@ public abstract class Repository {
         return null;
     }
 
-    public Entity getTranslationEntity() {
+    public SurveyEntity getTranslationEntity() {
         return null;
     }
 

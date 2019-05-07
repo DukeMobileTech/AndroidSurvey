@@ -8,7 +8,7 @@ import com.google.gson.Gson;
 
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.daos.BaseDao;
-import org.adaptlab.chpir.android.survey.entities.Entity;
+import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.repositories.Repository;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 
@@ -24,8 +24,8 @@ public class EntityDownloadTask extends AsyncTask<Void, Void, Void> {
     private static final String TAG = "EntityDownloadTask";
     private BaseDao mBaseDao;
     private BaseDao mTranslationDao;
-    private Entity mEntity;
-    private Entity mTranslationEntity;
+    private SurveyEntity mEntity;
+    private SurveyEntity mTranslationEntity;
     private String mTableName;
     private Gson mGson;
 
@@ -57,11 +57,11 @@ public class EntityDownloadTask extends AsyncTask<Void, Void, Void> {
                     try {
                         String responseString = response.body().string();
                         if (BuildConfig.DEBUG) Log.i(TAG, mBaseDao + ": " + responseString);
-                        List<? extends Entity> entities = mGson.fromJson(responseString, mEntity.getType());
+                        List<? extends SurveyEntity> entities = mGson.fromJson(responseString, mEntity.getType());
                         mEntity.save(mBaseDao, entities);
                         if (mTranslationDao != null && mTranslationEntity != null) {
-                            List<Entity> translations = new ArrayList<>();
-                            for (Entity entity : entities) {
+                            List<SurveyEntity> translations = new ArrayList<>();
+                            for (SurveyEntity entity : entities) {
                                 translations.addAll(entity.getTranslations());
                             }
                             mTranslationEntity.save(mTranslationDao, translations);

@@ -19,7 +19,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 @android.arch.persistence.room.Entity(tableName = "LoopQuestions",
         foreignKeys = @ForeignKey(entity = Question.class,
                 parentColumns = "RemoteId", childColumns = "QuestionRemoteId", onDelete = CASCADE))
-public class LoopQuestion implements Entity {
+public class LoopQuestion implements SurveyEntity {
     @PrimaryKey
     @NonNull
     @SerializedName("id")
@@ -118,7 +118,7 @@ public class LoopQuestion implements Entity {
     }
 
     @Override
-    public List<? extends Entity> getTranslations() {
+    public List<? extends SurveyEntity> getTranslations() {
         return null;
     }
 

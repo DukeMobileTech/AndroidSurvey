@@ -19,7 +19,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 @android.arch.persistence.room.Entity(tableName = "OptionTranslations",
         foreignKeys = @ForeignKey(entity = Option.class,
                 parentColumns = "RemoteId", childColumns = "OptionRemoteId", onDelete = CASCADE))
-public class OptionTranslation implements Entity {
+public class OptionTranslation implements SurveyEntity {
     @PrimaryKey
     @NonNull
     @SerializedName("id")
@@ -75,7 +75,7 @@ public class OptionTranslation implements Entity {
     }
 
     @Override
-    public List<? extends Entity> getTranslations() {
+    public List<? extends SurveyEntity> getTranslations() {
         return null;
     }
 

@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @android.arch.persistence.room.Entity(tableName = "DeviceUser")
-public class DeviceUser implements Entity {
+public class DeviceUser implements SurveyEntity {
     @PrimaryKey
     @NonNull
     @SerializedName("id")
@@ -89,7 +89,7 @@ public class DeviceUser implements Entity {
     }
 
     @Override
-    public List<? extends Entity> getTranslations() {
+    public List<? extends SurveyEntity> getTranslations() {
         return null;
     }
 

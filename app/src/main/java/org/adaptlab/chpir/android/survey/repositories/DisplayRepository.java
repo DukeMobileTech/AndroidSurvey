@@ -8,7 +8,7 @@ import org.adaptlab.chpir.android.survey.daos.DisplayDao;
 import org.adaptlab.chpir.android.survey.daos.DisplayTranslationDao;
 import org.adaptlab.chpir.android.survey.entities.Display;
 import org.adaptlab.chpir.android.survey.entities.DisplayTranslation;
-import org.adaptlab.chpir.android.survey.entities.Entity;
+import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 
 public class DisplayRepository extends Repository {
@@ -42,12 +42,12 @@ public class DisplayRepository extends Repository {
     }
 
     @Override
-    public Entity getEntity() {
+    public SurveyEntity getEntity() {
         return new Display();
     }
 
     @Override
-    public Entity getTranslationEntity() {
+    public SurveyEntity getTranslationEntity() {
         return new DisplayTranslation();
     }
 

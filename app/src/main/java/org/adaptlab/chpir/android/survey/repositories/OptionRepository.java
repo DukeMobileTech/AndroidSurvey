@@ -6,7 +6,7 @@ import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
 import org.adaptlab.chpir.android.survey.daos.BaseDao;
 import org.adaptlab.chpir.android.survey.daos.OptionDao;
 import org.adaptlab.chpir.android.survey.daos.OptionTranslationDao;
-import org.adaptlab.chpir.android.survey.entities.Entity;
+import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.entities.Option;
 import org.adaptlab.chpir.android.survey.entities.OptionTranslation;
 import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
@@ -42,12 +42,12 @@ public class OptionRepository extends Repository {
     }
 
     @Override
-    public Entity getEntity() {
+    public SurveyEntity getEntity() {
         return new Option();
     }
 
     @Override
-    public Entity getTranslationEntity() {
+    public SurveyEntity getTranslationEntity() {
         return new OptionTranslation();
     }
 

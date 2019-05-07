@@ -21,7 +21,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 @android.arch.persistence.room.Entity(tableName = "Sections", indices = {@Index(name = "sections_index", value = {"RemoteId"}, unique = true)},
         foreignKeys = @ForeignKey(entity = Instrument.class, parentColumns = "RemoteId",
                 childColumns = "InstrumentRemoteId", onDelete = CASCADE))
-public class Section implements Entity {
+public class Section implements SurveyEntity {
     @PrimaryKey
     @NonNull
     @SerializedName("id")

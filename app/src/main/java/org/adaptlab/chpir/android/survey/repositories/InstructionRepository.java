@@ -6,7 +6,7 @@ import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
 import org.adaptlab.chpir.android.survey.daos.BaseDao;
 import org.adaptlab.chpir.android.survey.daos.InstructionDao;
 import org.adaptlab.chpir.android.survey.daos.InstructionTranslationDao;
-import org.adaptlab.chpir.android.survey.entities.Entity;
+import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.entities.Instruction;
 import org.adaptlab.chpir.android.survey.entities.InstructionTranslation;
 import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
@@ -42,12 +42,12 @@ public class InstructionRepository extends Repository {
     }
 
     @Override
-    public Entity getEntity() {
+    public SurveyEntity getEntity() {
         return new Instruction();
     }
 
     @Override
-    public Entity getTranslationEntity() {
+    public SurveyEntity getTranslationEntity() {
         return new InstructionTranslation();
     }
 }

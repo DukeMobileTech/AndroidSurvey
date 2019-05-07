@@ -6,7 +6,7 @@ import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
 import org.adaptlab.chpir.android.survey.daos.BaseDao;
 import org.adaptlab.chpir.android.survey.daos.DisplayInstructionDao;
 import org.adaptlab.chpir.android.survey.entities.DisplayInstruction;
-import org.adaptlab.chpir.android.survey.entities.Entity;
+import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 
 public class DisplayInstructionRepository extends Repository {
@@ -33,7 +33,7 @@ public class DisplayInstructionRepository extends Repository {
     }
 
     @Override
-    public Entity getEntity() {
+    public SurveyEntity getEntity() {
         return new DisplayInstruction();
     }
 }

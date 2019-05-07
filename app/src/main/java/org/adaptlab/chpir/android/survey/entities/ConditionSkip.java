@@ -19,7 +19,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 @android.arch.persistence.room.Entity(tableName = "ConditionSkips",
         foreignKeys = @ForeignKey(entity = Question.class,
                 parentColumns = "QuestionIdentifier", childColumns = "QuestionIdentifier", onDelete = CASCADE))
-public class ConditionSkip implements Entity {
+public class ConditionSkip implements SurveyEntity {
     @PrimaryKey
     @NonNull
     @SerializedName("id")
@@ -141,7 +141,7 @@ public class ConditionSkip implements Entity {
     }
 
     @Override
-    public List<? extends Entity> getTranslations() {
+    public List<? extends SurveyEntity> getTranslations() {
         return null;
     }
 

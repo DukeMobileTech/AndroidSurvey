@@ -4,11 +4,13 @@ import android.arch.persistence.db.SupportSQLiteDatabase;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
+import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.NonNull;
 
+import org.adaptlab.chpir.android.survey.converters.Converters;
 import org.adaptlab.chpir.android.survey.daos.ConditionSkipDao;
 import org.adaptlab.chpir.android.survey.daos.CriticalResponseDao;
 import org.adaptlab.chpir.android.survey.daos.DeviceUserDao;
@@ -30,9 +32,12 @@ import org.adaptlab.chpir.android.survey.daos.OptionSetTranslationDao;
 import org.adaptlab.chpir.android.survey.daos.OptionTranslationDao;
 import org.adaptlab.chpir.android.survey.daos.QuestionDao;
 import org.adaptlab.chpir.android.survey.daos.QuestionTranslationDao;
+import org.adaptlab.chpir.android.survey.daos.ResponseDao;
 import org.adaptlab.chpir.android.survey.daos.SectionDao;
 import org.adaptlab.chpir.android.survey.daos.SectionTranslationDao;
 import org.adaptlab.chpir.android.survey.daos.SettingsDao;
+import org.adaptlab.chpir.android.survey.daos.SurveyDao;
+import org.adaptlab.chpir.android.survey.daos.relations.SurveyResponseDao;
 import org.adaptlab.chpir.android.survey.entities.ConditionSkip;
 import org.adaptlab.chpir.android.survey.entities.CriticalResponse;
 import org.adaptlab.chpir.android.survey.entities.DeviceUser;
@@ -54,9 +59,11 @@ import org.adaptlab.chpir.android.survey.entities.OptionSetTranslation;
 import org.adaptlab.chpir.android.survey.entities.OptionTranslation;
 import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.QuestionTranslation;
+import org.adaptlab.chpir.android.survey.entities.Response;
 import org.adaptlab.chpir.android.survey.entities.Section;
 import org.adaptlab.chpir.android.survey.entities.SectionTranslation;
 import org.adaptlab.chpir.android.survey.entities.Settings;
+import org.adaptlab.chpir.android.survey.entities.Survey;
 
 import java.util.UUID;
 
@@ -65,8 +72,9 @@ import java.util.UUID;
         DisplayTranslation.class, DisplayInstruction.class, Instruction.class, InstructionTranslation.class,
         Section.class, SectionTranslation.class, Option.class, OptionSet.class, OptionSetOption.class,
         OptionSetTranslation.class, OptionTranslation.class, ConditionSkip.class, DeviceUser.class,
-        FollowUpQuestion.class, MultipleSkip.class, NextQuestion.class},
+        FollowUpQuestion.class, MultipleSkip.class, NextQuestion.class, Survey.class, Response.class},
         version = 1)
+@TypeConverters({Converters.class})
 public abstract class SurveyRoomDatabase extends RoomDatabase {
     private static volatile SurveyRoomDatabase INSTANCE;
     private static RoomDatabase.Callback sRoomDatabaseCallback =
@@ -139,6 +147,12 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
     public abstract MultipleSkipDao multipleSkipDao();
 
     public abstract NextQuestionDao nextQuestionDao();
+
+    public abstract SurveyDao surveyDao();
+
+    public abstract ResponseDao responseDao();
+
+    public abstract SurveyResponseDao surveyResponseDao();
 
     private static class CreateSettingsInstanceTask extends AsyncTask<Void, Void, Void> {
         private SettingsDao mSettingsDao;

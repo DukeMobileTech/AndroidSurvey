@@ -5,7 +5,7 @@ import org.adaptlab.chpir.android.survey.daos.BaseDao;
 import java.lang.reflect.Type;
 import java.util.List;
 
-public interface Entity<T> {
+public interface SurveyEntity<T> {
     Type getType();
 
     List<T> getTranslations();
