@@ -14,7 +14,7 @@ android {
     defaultConfig {
         applicationId "org.adaptlab.chpir.android.survey"
         vectorDrawables.useSupportLibrary = true
-        minSdkVersion 14
+        minSdkVersion 16
         targetSdkVersion 28
         multiDexEnabled true
 

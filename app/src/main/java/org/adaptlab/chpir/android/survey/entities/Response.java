@@ -27,11 +27,9 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
 
 @Entity(tableName = "Responses")
 public class Response implements SurveyEntity {
-    private static final String TAG = "Response";
-
     @PrimaryKey
     @NonNull
-    @ColumnInfo(name = "UUID")
+    @ColumnInfo(name = "UUID", index = true)
     private String mUUID;
     @ColumnInfo(name = "SurveyUUID", index = true)
     private String mSurveyUUID;
@@ -41,7 +39,7 @@ public class Response implements SurveyEntity {
     private String mQuestionIdentifier;
     @ColumnInfo(name = "Text")
     private String mText;
-    @ColumnInfo(name = "Other_Response")
+    @ColumnInfo(name = "OtherResponse")
     private String mOtherResponse;
     @ColumnInfo(name = "SpecialResponse")
     private String mSpecialResponse;
@@ -65,7 +63,7 @@ public class Response implements SurveyEntity {
         mText = "";
         mSpecialResponse = "";
         mUUID = UUID.randomUUID().toString();
-        setDeviceUserId(AuthUtils.getCurrentUser().getRemoteId());
+//        setDeviceUserId(AuthUtils.getCurrentUser().getRemoteId());
     }
 
     @NonNull

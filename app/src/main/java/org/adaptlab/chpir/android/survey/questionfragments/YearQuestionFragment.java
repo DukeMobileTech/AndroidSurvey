@@ -12,7 +12,7 @@ import org.adaptlab.chpir.android.survey.R;
 import java.util.Calendar;
 
 public class YearQuestionFragment extends DateQuestionFragment {
-    private static final String TAG = "YearQuestionFragment";
+    private static final String TAG = "YearViewHolder";
 
     private DatePicker mDatePicker;
 

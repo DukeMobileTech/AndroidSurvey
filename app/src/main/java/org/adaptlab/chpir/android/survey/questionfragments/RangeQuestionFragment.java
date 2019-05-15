@@ -13,7 +13,7 @@ import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.utils.FormatUtils;
 
 public class RangeQuestionFragment extends SingleQuestionFragment {
-    private static final String TAG = "RangeQuestionFragment";
+    private static final String TAG = "RangeViewHolder";
     private String mTextStart = "";
     private String mTextEnd = "";
     private EditText mStart;

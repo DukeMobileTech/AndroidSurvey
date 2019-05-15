@@ -14,7 +14,7 @@ import org.adaptlab.chpir.android.survey.utils.FormatUtils;
 import org.adaptlab.chpir.android.survey.verhoeff.ParticipantIdValidator;
 
 public class FreeResponseQuestionFragment extends SingleQuestionFragment {
-    private static final String TAG = "FreeResponseQuestionFragment";
+    private static final String TAG = "FreeResponseViewHolder";
     private String mText = "";
     private EditText mFreeText;
     private TextWatcher mTextWatcher = new TextWatcher() {

@@ -27,7 +27,7 @@ import android.widget.TextView;
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.activerecordcloudsync.HttpUtil;
 import org.adaptlab.chpir.android.activerecordcloudsync.NotificationUtils;
-import org.adaptlab.chpir.android.survey.adapters.FragmentPagerAdapter;
+import org.adaptlab.chpir.android.survey.adapters.InstrumentSurveyPagerAdapter;
 import org.adaptlab.chpir.android.survey.models.AdminSettings;
 import org.adaptlab.chpir.android.survey.models.Image;
 import org.adaptlab.chpir.android.survey.models.Instrument;
@@ -43,21 +43,14 @@ import java.util.List;
 import static org.adaptlab.chpir.android.survey.utils.AppUtil.getProjectId;
 
 public class InstrumentActivity extends AppCompatActivity {
-    public final static String EXTRA_AUTHORIZE_SURVEY =
-            "org.adaptlab.chpir.android.survey.authorize_survey_bool";
     private final static String TAG = "InstrumentActivity";
     private ProgressDialog mProgressDialog;
-    private FragmentPagerAdapter mFragmentPagerAdapter;
-    private boolean mAuthorizeSurvey;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AppUtil.appInit(getApplication());
-        setContentView(R.layout.activity_instrument2);
-        if (getIntent() != null) {
-            mAuthorizeSurvey = getIntent().getBooleanExtra(EXTRA_AUTHORIZE_SURVEY, false);
-        }
+        setContentView(R.layout.activity_instrument);
         setSettings();
         requestNeededPermissions();
         setupViewPager();
@@ -93,9 +86,9 @@ public class InstrumentActivity extends AppCompatActivity {
     }
 
     private void setupViewPager() {
-        mFragmentPagerAdapter = new FragmentPagerAdapter(getSupportFragmentManager(), this);
+        InstrumentSurveyPagerAdapter instrumentSurveyPagerAdapter = new InstrumentSurveyPagerAdapter(getSupportFragmentManager(), this);
         ViewPager viewPager = findViewById(R.id.viewPager);
-        viewPager.setAdapter(mFragmentPagerAdapter);
+        viewPager.setAdapter(instrumentSurveyPagerAdapter);
         TabLayout tabLayout = findViewById(R.id.slidingTabs);
         tabLayout.setupWithViewPager(viewPager);
     }
@@ -113,7 +106,7 @@ public class InstrumentActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        setupViewPager();
+//        setupViewPager();
         displayProjectName();
     }
 
@@ -167,10 +160,6 @@ public class InstrumentActivity extends AppCompatActivity {
         }
     }
 
-    public boolean isAuthorizeSurvey() {
-        return mAuthorizeSurvey;
-    }
-
     private void downloadInstruments() {
         showProgressDialog();
         RefreshInstrumentsTask asyncTask = new RefreshInstrumentsTask();
@@ -219,9 +208,9 @@ public class InstrumentActivity extends AppCompatActivity {
     }
 
 //    private void refreshInstrumentsView() {
-//        if (mFragmentPagerAdapter != null &&
-//                mFragmentPagerAdapter.getInstrumentViewPagerFragment() != null) {
-//            mFragmentPagerAdapter.getInstrumentViewPagerFragment().refreshRecyclerView();
+//        if (fragmentPagerAdapter != null &&
+//                fragmentPagerAdapter.getInstrumentViewPagerFragment() != null) {
+//            fragmentPagerAdapter.getInstrumentViewPagerFragment().refreshRecyclerView();
 //        } else {
 //            startActivity(new Intent(this, InstrumentActivity.class));
 //            finish();

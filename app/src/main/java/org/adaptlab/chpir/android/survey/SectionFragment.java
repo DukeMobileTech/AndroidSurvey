@@ -162,8 +162,8 @@ public class SectionFragment extends Fragment {
 //                } else {
 //                    response = mSurvey.getResponseByQuestion(question);
 //                }
-//                response.setQuestion(question);
-//                response.setSurvey(mSurvey);
+//                response.setQuestionData(question);
+//                response.setData(mSurvey);
 //                response.setSpecialResponse(params[0]);
 //                response.setTimeStarted(new Date());
 //                response.setTimeEnded(new Date());

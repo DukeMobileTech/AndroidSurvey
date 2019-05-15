@@ -13,7 +13,7 @@ import org.adaptlab.chpir.android.survey.R;
 import java.util.Calendar;
 
 public class MonthAndYearQuestionFragment extends DateQuestionFragment {
-    private static final String TAG = "MonthAndYearQuestionFragment";
+    private static final String TAG = "MonthAndYearViewHolder";
 
     @Override
     protected DatePicker beforeAddViewHook(ViewGroup component) {

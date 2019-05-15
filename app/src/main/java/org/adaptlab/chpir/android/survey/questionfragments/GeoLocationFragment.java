@@ -17,7 +17,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class GeoLocationFragment extends SingleQuestionFragment {
-    private static final String TAG = "GeoLocationFragment";
+    private static final String TAG = "GeoLocationViewHolder";
     private TextView mLatitude;
     private TextView mLongitude;
     private TextView mAltitude;

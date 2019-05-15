@@ -16,13 +16,11 @@ import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 public class SurveyRepository extends Repository {
     private SurveyDao mSurveyDao;
     private SurveyResponseDao mSurveyResponseDao;
-    private InstrumentDao mInstrumentDao;
 
     public SurveyRepository(Application application) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);
         mSurveyDao = db.surveyDao();
         mSurveyResponseDao = db.surveyResponseDao();
-        mInstrumentDao = db.instrumentDao();
     }
 
     public SurveyDao getSurveyDao() {
@@ -33,14 +31,14 @@ public class SurveyRepository extends Repository {
         return mSurveyResponseDao;
     }
 
-    public String initializeSurvey(Long projectId, Long instrumentId) {
+    public Survey initializeSurvey(Long projectId, Long instrumentId) {
         Survey survey = new Survey();
         survey.setProjectId(projectId);
         survey.setInstrumentRemoteId(instrumentId);
 
-        new InsertSurveyTask(mSurveyDao, mInstrumentDao).execute(survey);
+        new InsertSurveyTask(mSurveyDao).execute(survey);
 
-        return survey.getUUID();
+        return survey;
     }
 
     public void update(Survey survey) {
@@ -85,19 +83,14 @@ public class SurveyRepository extends Repository {
 
     private static class InsertSurveyTask extends AsyncTask<Survey, Void, Void> {
         private SurveyDao mSurveyDao;
-        private InstrumentDao mInstrumentDao;
 
-        InsertSurveyTask(SurveyDao surveyDao, InstrumentDao instrumentDao) {
+        InsertSurveyTask(SurveyDao surveyDao) {
             mSurveyDao = surveyDao;
-            mInstrumentDao = instrumentDao;
         }
 
         @Override
         protected Void doInBackground(Survey... params) {
-            Survey survey = params[0];
-            Instrument instrument = mInstrumentDao.findByIdSync(survey.getInstrumentRemoteId());
-            survey.setInstrument(instrument);
-            mSurveyDao.insert(survey);
+            mSurveyDao.insert(params[0]);
             return null;
         }
     }

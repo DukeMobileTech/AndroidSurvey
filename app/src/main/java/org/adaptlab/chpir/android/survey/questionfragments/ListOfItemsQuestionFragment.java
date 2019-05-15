@@ -25,7 +25,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public abstract class ListOfItemsQuestionFragment extends SingleQuestionFragment {
-    private static final String TAG = "ListOfItemsQuestionFragment";
+    private static final String TAG = "ListOfItemsViewHolder";
     public ArrayList<EditText> mResponses;
 
     protected abstract EditText createEditText();

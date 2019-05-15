@@ -221,7 +221,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         if (getQuestion().rankResponses() && getSelectedOptions().size() > 1) {
             mRankLayout = view.findViewById(R.id.responseRankingLayout);
             mRankLayout.setVisibility(View.VISIBLE);
-            RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
+            RecyclerView recyclerView = view.findViewById(R.id.instrumentRecyclerView);
             mOptionsAdapter = new OptionsAdapter(getSelectedOptions());
             recyclerView.setAdapter(mOptionsAdapter);
             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));

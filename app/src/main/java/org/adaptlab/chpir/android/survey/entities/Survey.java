@@ -24,13 +24,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-@Entity(tableName = "Surveys", indices = {@Index(name = "surveys_uuid_index", value = {"UUID"}, unique = true)})
+@Entity(tableName = "Surveys")
 public class Survey implements SurveyEntity {
     private static final String TAG = "Survey";
 
     @PrimaryKey
     @NonNull
-    @ColumnInfo(name = "UUID")
+    @ColumnInfo(name = "UUID", index = true)
     private String mUUID;
     @ColumnInfo(name = "SentToRemote")
     private boolean mSent;
@@ -46,7 +46,7 @@ public class Survey implements SurveyEntity {
     private String mMetadata;
     @ColumnInfo(name = "ProjectId")
     private Long mProjectId;
-    @ColumnInfo(name = "InstrumentRemoteId")
+    @ColumnInfo(name = "InstrumentRemoteId", index = true)
     private Long mInstrumentRemoteId;
     @ColumnInfo(name = "RosterUUID")
     private String mRosterUUID;
@@ -62,10 +62,6 @@ public class Survey implements SurveyEntity {
     private int mCompletedResponseCount;
     @ColumnInfo(name = "Queued")
     private boolean mQueued;
-    @SuppressWarnings({RoomWarnings.INDEX_FROM_EMBEDDED_ENTITY_IS_DROPPED,
-            RoomWarnings.PRIMARY_KEY_FROM_EMBEDDED_IS_DROPPED})
-    @Embedded(prefix = "Instrument_")
-    private Instrument mInstrument;
 
     public Survey() {
         mSent = false;
@@ -201,14 +197,6 @@ public class Survey implements SurveyEntity {
 
     public void setQueued(boolean mQueued) {
         this.mQueued = mQueued;
-    }
-
-    public Instrument getInstrument() {
-        return mInstrument;
-    }
-
-    public void setInstrument(Instrument mInstrument) {
-        this.mInstrument = mInstrument;
     }
 
     /*

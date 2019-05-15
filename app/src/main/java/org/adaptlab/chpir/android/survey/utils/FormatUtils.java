@@ -32,7 +32,7 @@ public class FormatUtils {
         return ((month + 1) + "-" + year);
     }
     
-    public static GregorianCalendar unformatDate(String date) {
+    public static GregorianCalendar unFormatDate(String date) {
         if (date.equals("")) return null;
         String[] dateComponents = date.split("-");
         int month, day, year;

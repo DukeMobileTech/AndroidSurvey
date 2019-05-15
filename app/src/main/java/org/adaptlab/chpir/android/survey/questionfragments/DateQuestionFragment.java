@@ -1,13 +1,10 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
 import android.graphics.Typeface;
-import android.os.Build;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
-import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
-import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.DatePicker.OnDateChangedListener;
@@ -15,13 +12,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.utils.FormatUtils;
 import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
 import org.adaptlab.chpir.android.survey.views.ScrollableDatePicker;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 public class DateQuestionFragment extends SingleQuestionFragment {
@@ -91,7 +86,7 @@ public class DateQuestionFragment extends SingleQuestionFragment {
 
     @Override
     protected void deserialize(String responseText) {
-        GregorianCalendar dateComponents = FormatUtils.unformatDate(responseText);
+        GregorianCalendar dateComponents = FormatUtils.unFormatDate(responseText);
         if (dateComponents != null) {
             mDay = dateComponents.get(GregorianCalendar.DAY_OF_MONTH);
             mMonth = dateComponents.get(GregorianCalendar.MONTH);

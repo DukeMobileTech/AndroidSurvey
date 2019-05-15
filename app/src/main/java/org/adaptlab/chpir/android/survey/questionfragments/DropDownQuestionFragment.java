@@ -16,7 +16,7 @@ import org.adaptlab.chpir.android.survey.models.Response;
 import java.util.ArrayList;
 
 public class DropDownQuestionFragment extends SingleQuestionFragment {
-    private static final String TAG = "DropDownQuestionFragment";
+    private static final String TAG = "DropDownViewHolder";
     private int mResponseIndex;
     private Spinner mSpinner;
     private ArrayAdapter<String> mAdapter;

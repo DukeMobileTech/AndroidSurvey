@@ -6,21 +6,22 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 
 import org.adaptlab.chpir.android.survey.InstrumentActivity;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.entities.Settings;
 import org.adaptlab.chpir.android.survey.viewmodels.SettingsViewModel;
-import org.adaptlab.chpir.android.survey.viewpagerfragments.InstrumentViewPagerFragment;
-import org.adaptlab.chpir.android.survey.viewpagerfragments.SurveyViewPagerFragment;
+import org.adaptlab.chpir.android.survey.viewpagerfragments.InstrumentPagerFragment;
+import org.adaptlab.chpir.android.survey.viewpagerfragments.SurveyPagerFragment;
 
 import java.util.ArrayList;
 
-public class FragmentPagerAdapter extends android.support.v4.app.FragmentPagerAdapter {
+public class InstrumentSurveyPagerAdapter extends FragmentPagerAdapter {
     private Context mContext;
     private ArrayList<String> mTabs;
 
-    public FragmentPagerAdapter(FragmentManager fm, Context context) {
+    public InstrumentSurveyPagerAdapter(FragmentManager fm, Context context) {
         super(fm);
         mContext = context;
         setTabs();
@@ -50,9 +51,9 @@ public class FragmentPagerAdapter extends android.support.v4.app.FragmentPagerAd
 
     private Fragment createPagerFragment(String name) {
         if (name.equals(mContext.getString(R.string.instruments))) {
-            return new InstrumentViewPagerFragment();
+            return new InstrumentPagerFragment();
         } else if (name.equals(mContext.getString(R.string.surveys))) {
-            return new SurveyViewPagerFragment();
+            return new SurveyPagerFragment();
         }
         return null;
     }
