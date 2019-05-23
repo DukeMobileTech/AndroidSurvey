@@ -1,15 +1,11 @@
 package org.adaptlab.chpir.android.survey.viewholders;
 
 import android.content.Context;
-import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.adaptlab.chpir.android.survey.entities.Instruction;
-import org.adaptlab.chpir.android.survey.entities.Option;
 import org.adaptlab.chpir.android.survey.entities.Question;
-
-import java.util.List;
+import org.adaptlab.chpir.android.survey.entities.relations.QuestionRelation;
 
 public class MultipleSelectMultipleViewHolder extends MultipleQuestionsViewHolder {
 
@@ -30,7 +26,10 @@ public class MultipleSelectMultipleViewHolder extends MultipleQuestionsViewHolde
 
     @Override
     protected void deserializeSpecialResponse() {
+    }
 
+    @Override
+    protected void deserializeOtherResponse(String otherResponse) {
     }
 
     @Override
@@ -44,11 +43,11 @@ public class MultipleSelectMultipleViewHolder extends MultipleQuestionsViewHolde
 //
 //    @Override
 //    protected void saveResponse(Question question, int checkedId, boolean isChecked) {
-//        Response response = getSurvey().getResponseByQuestion(question);
+//        Response response = getSurveyRelation().getResponseByQuestion(question);
 //        if (response == null) {
 //            response = new Response();
-//            response.setQuestionData(question);
-//            response.setData(getSurvey());
+//            response.setQuestionRelation(question);
+//            response.setData(getSurveyRelation());
 //        }
 //        StringBuilder serialized = new StringBuilder();
 //        if (!response.getText().equals("")) {
@@ -91,9 +90,7 @@ public class MultipleSelectMultipleViewHolder extends MultipleQuestionsViewHolde
     }
 
     @Override
-    public void setQuestionData(Question displayQuestion, Instruction qInstruction,
-                                SparseArray<List<Instruction>> displayInstructions,
-                                Instruction osInstruction, List<Option> options, List<Option> specialOptions) {
+    public void setQuestionRelation(QuestionRelation questionRelation) {
 
     }
 
@@ -185,7 +182,7 @@ public class MultipleSelectMultipleViewHolder extends MultipleQuestionsViewHolde
 //        }
 //
 //        private void deserialize(int position) {
-//            Response response = getSurvey().getResponseByQuestion(questionList.get(position));
+//            Response response = getSurveyRelation().getResponseByQuestion(questionList.get(position));
 //            if (response != null) {
 //                String responseText = response.getText();
 //                List<CheckBox> checkBoxes = mCheckBoxes.get(position);

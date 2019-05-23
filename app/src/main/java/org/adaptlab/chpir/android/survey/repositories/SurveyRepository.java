@@ -6,10 +6,8 @@ import android.os.AsyncTask;
 
 import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
 import org.adaptlab.chpir.android.survey.daos.BaseDao;
-import org.adaptlab.chpir.android.survey.daos.InstrumentDao;
 import org.adaptlab.chpir.android.survey.daos.SurveyDao;
 import org.adaptlab.chpir.android.survey.daos.relations.SurveyResponseDao;
-import org.adaptlab.chpir.android.survey.entities.Instrument;
 import org.adaptlab.chpir.android.survey.entities.Survey;
 import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 

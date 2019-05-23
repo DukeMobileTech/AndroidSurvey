@@ -21,6 +21,7 @@ public class SelectMultipleImageViewHolder extends SingleQuestionViewHolder {
     private List<Integer> mSelectedViews;
     private GridView mGridView;
     private ArrayList<Image> mImages;
+
     SelectMultipleImageViewHolder(View itemView, Context context) {
         super(itemView, context);
     }

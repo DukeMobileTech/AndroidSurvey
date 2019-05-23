@@ -5,7 +5,7 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Transaction;
 
-import org.adaptlab.chpir.android.survey.entities.relations.SurveyResponse;
+import org.adaptlab.chpir.android.survey.entities.relations.SurveyRelation;
 
 import java.util.List;
 
@@ -13,10 +13,10 @@ import java.util.List;
 public abstract class SurveyResponseDao {
     @Transaction
     @Query("SELECT * FROM Surveys WHERE UUID=:uuid LIMIT 1")
-    public abstract LiveData<SurveyResponse> findByUUID(String uuid);
+    public abstract LiveData<SurveyRelation> findByUUID(String uuid);
 
     @Transaction
     @Query("SELECT * FROM Surveys WHERE ProjectId=:projectId")
-    public abstract LiveData<List<SurveyResponse>> projectSurveys(Long projectId);
+    public abstract LiveData<List<SurveyRelation>> projectSurveys(Long projectId);
 
 }

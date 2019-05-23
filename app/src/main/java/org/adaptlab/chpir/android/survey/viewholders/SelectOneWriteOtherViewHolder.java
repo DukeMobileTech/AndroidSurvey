@@ -12,6 +12,7 @@ import org.adaptlab.chpir.android.survey.R;
 
 public class SelectOneWriteOtherViewHolder extends SelectOneViewHolder {
     private EditText otherText = null;
+    private RadioButton radioButton;
 
     SelectOneWriteOtherViewHolder(View itemView, Context context) {
         super(itemView, context);
@@ -19,11 +20,10 @@ public class SelectOneWriteOtherViewHolder extends SelectOneViewHolder {
 
     @Override
     protected void beforeAddViewHook(ViewGroup questionComponent) {
-        RadioButton radioButton = new RadioButton(getContext());
+        radioButton = new RadioButton(getContext());
         otherText = new EditText(getContext());
         radioButton.setTextColor(getContext().getResources().getColorStateList(R.color.states));
         radioButton.setText(R.string.other_specify);
-//        radioButton.setTypeface(getInstrument().getTypeFace(mContext.getApplicationContext()));
         final int otherId = getOptions().size();
         radioButton.setId(otherId);
         radioButton.setLayoutParams(new RadioGroup.LayoutParams(
@@ -32,49 +32,36 @@ public class SelectOneWriteOtherViewHolder extends SelectOneViewHolder {
         radioButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                if (mSpecialResponses != null) {
-//                    mSpecialResponses.clearCheck();
-//                }
-            }
-        });
-        getRadioGroup().setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId != -1) {
-                    if (checkedId == otherId) {
+                int id = v.getId();
+                if (id != -1) {
+                    if (id == otherId) {
                         otherText.setEnabled(true);
                     } else {
                         otherText.setEnabled(false);
                         otherText.getText().clear();
                     }
-//                    setResponseIndex(checkedId);
+                    setResponseIndex(id);
                 }
+
             }
         });
-        for (int i = 0; i < getRadioGroup().getChildCount(); i++) {
-            getRadioGroup().getChildAt(i).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-//                    if (mSpecialResponses != null) {
-//                        mSpecialResponses.clearCheck();
-//                    }
-                }
-            });
-        }
         getRadioGroup().addView(radioButton, otherId);
         addOtherResponseView(otherText);
         questionComponent.addView(otherText);
     }
 
-//    @Override
-//    protected void unSetResponse() {
-//        if (getRadioGroup() != null) {
-//            getRadioGroup().clearCheck();
-//        }
-//        if (otherText.getText().length() > 0) {
-//            otherText.setText(Response.BLANK);
-//            otherText.setEnabled(false);
-//        }
-//        setResponseTextBlank();
-//    }
+    @Override
+    protected void deserialize(String responseText) {
+        super.deserialize(responseText);
+        int checked = getRadioGroup().getCheckedRadioButtonId();
+        if (checked == radioButton.getId()) {
+            otherText.setFocusable(true);
+        }
+    }
+
+    @Override
+    protected void deserializeOtherResponse(String otherResponse) {
+        otherText.setText(getResponse().getOtherResponse());
+    }
 
 }

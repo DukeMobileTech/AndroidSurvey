@@ -17,6 +17,7 @@ public class SignatureViewHolder extends SingleQuestionViewHolder {
     private Button mSaveButton;
     private ResponsePhoto mResponsePhoto;
     private Bitmap mSignatureBitmap;
+
     SignatureViewHolder(View itemView, Context context) {
         super(itemView, context);
     }

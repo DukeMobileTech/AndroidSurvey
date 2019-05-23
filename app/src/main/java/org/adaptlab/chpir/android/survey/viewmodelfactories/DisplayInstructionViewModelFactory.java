@@ -5,9 +5,7 @@ import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.NonNull;
 
-import org.adaptlab.chpir.android.survey.entities.DisplayInstruction;
 import org.adaptlab.chpir.android.survey.viewmodels.DisplayInstructionViewModel;
-import org.adaptlab.chpir.android.survey.viewmodels.DisplayQuestionViewModel;
 
 public class DisplayInstructionViewModelFactory implements ViewModelProvider.Factory {
     private long mInstrumentId;

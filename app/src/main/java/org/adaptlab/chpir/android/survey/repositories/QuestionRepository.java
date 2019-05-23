@@ -6,9 +6,9 @@ import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
 import org.adaptlab.chpir.android.survey.daos.BaseDao;
 import org.adaptlab.chpir.android.survey.daos.QuestionDao;
 import org.adaptlab.chpir.android.survey.daos.QuestionTranslationDao;
-import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.QuestionTranslation;
+import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 
 public class QuestionRepository extends Repository {

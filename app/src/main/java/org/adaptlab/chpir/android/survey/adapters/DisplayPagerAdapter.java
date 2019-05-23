@@ -12,13 +12,11 @@ import org.adaptlab.chpir.android.survey.viewpagerfragments.DisplayPagerFragment
 import java.util.List;
 
 public class DisplayPagerAdapter extends FragmentStatePagerAdapter {
-    private int mDisplayPosition;
     private Survey mSurvey;
     private List<Display> mDisplays;
 
-    public DisplayPagerAdapter(FragmentManager fm, int position) {
+    public DisplayPagerAdapter(FragmentManager fm) {
         super(fm);
-        mDisplayPosition = position;
     }
 
     public void setDisplays(List<Display> displays) {
@@ -33,12 +31,8 @@ public class DisplayPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int i) {
-        if (mDisplays != null && mDisplays.get(i) != null) {
-            mDisplayPosition = mDisplays.get(i).getPosition();
-        }
         DisplayPagerFragment fragment = new DisplayPagerFragment();
         Bundle bundle = new Bundle();
-        bundle.putInt(DisplayPagerFragment.EXTRA_DISPLAY_POSITION, mDisplayPosition);
         bundle.putLong(DisplayPagerFragment.EXTRA_INSTRUMENT_ID, mDisplays.get(i).getInstrumentRemoteId());
         bundle.putLong(DisplayPagerFragment.EXTRA_DISPLAY_ID, mDisplays.get(i).getRemoteId());
         if (mSurvey != null)

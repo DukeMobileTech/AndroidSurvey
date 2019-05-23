@@ -5,8 +5,8 @@ import android.app.Application;
 import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
 import org.adaptlab.chpir.android.survey.daos.BaseDao;
 import org.adaptlab.chpir.android.survey.daos.FollowUpQuestionDao;
-import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.entities.FollowUpQuestion;
+import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 
 public class FollowUpQuestionRepository extends Repository {

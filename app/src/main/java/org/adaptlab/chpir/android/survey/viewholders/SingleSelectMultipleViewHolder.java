@@ -1,15 +1,11 @@
 package org.adaptlab.chpir.android.survey.viewholders;
 
 import android.content.Context;
-import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.adaptlab.chpir.android.survey.entities.Instruction;
-import org.adaptlab.chpir.android.survey.entities.Option;
 import org.adaptlab.chpir.android.survey.entities.Question;
-
-import java.util.List;
+import org.adaptlab.chpir.android.survey.entities.relations.QuestionRelation;
 
 public class SingleSelectMultipleViewHolder extends MultipleQuestionsViewHolder {
 //    private static final String TAG = "SSMQF";
@@ -55,20 +51,20 @@ public class SingleSelectMultipleViewHolder extends MultipleQuestionsViewHolder 
     }
 
     @Override
-    public void setQuestionData(Question displayQuestion, Instruction qInstruction,
-                                SparseArray<List<Instruction>> displayInstructions,
-                                Instruction osInstruction, List<Option> options, List<Option> specialOptions) {
+    public void setQuestionRelation(QuestionRelation questionRelation) {
 
     }
 
     @Override
     protected void deserialize(String responseText) {
-
     }
 
     @Override
     protected void deserializeSpecialResponse() {
+    }
 
+    @Override
+    protected void deserializeOtherResponse(String otherResponse) {
     }
 
     @Override
@@ -161,7 +157,7 @@ public class SingleSelectMultipleViewHolder extends MultipleQuestionsViewHolder 
 //        }
 //
 //        private void deserialize(int position) {
-//            Response response = getSurvey().getResponseByQuestion(mQuestionList.get(position));
+//            Response response = getSurveyRelation().getResponseByQuestion(mQuestionList.get(position));
 //            if (response != null) {
 //                String responseText = response.getText();
 //                if (responseText.equals("")) {

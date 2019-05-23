@@ -24,7 +24,7 @@ import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.adapters.ProjectSurveyAdapter;
 import org.adaptlab.chpir.android.survey.entities.Instrument;
 import org.adaptlab.chpir.android.survey.entities.Settings;
-import org.adaptlab.chpir.android.survey.entities.relations.SurveyResponse;
+import org.adaptlab.chpir.android.survey.entities.relations.SurveyRelation;
 import org.adaptlab.chpir.android.survey.tasks.SubmitSurveyTask;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.utils.looper.ItemTouchHelperExtension;
@@ -48,9 +48,9 @@ public class SurveyPagerFragment extends Fragment {
     private ProjectSurveyAdapter completedSurveysAdapter;
     private ProjectSurveyAdapter submittedSurveysAdapter;
 
-    private List<SurveyResponse> inProgressSurveys;
-    private List<SurveyResponse> completedSurveys;
-    private List<SurveyResponse> submittedSurveys;
+    private List<SurveyRelation> inProgressSurveys;
+    private List<SurveyRelation> completedSurveys;
+    private List<SurveyRelation> submittedSurveys;
 
     private Button mSubmitAll;
 
@@ -81,21 +81,21 @@ public class SurveyPagerFragment extends Fragment {
     private void setViewModels(long projectId) {
         ProjectSurveyResponseViewModelFactory factory = new ProjectSurveyResponseViewModelFactory(getActivity().getApplication(), projectId);
         ProjectSurveyResponseViewModel viewModel = ViewModelProviders.of(getActivity(), factory).get(ProjectSurveyResponseViewModel.class);
-        viewModel.getSurveyResponses().observe(this, new Observer<List<SurveyResponse>>() {
+        viewModel.getSurveyResponses().observe(this, new Observer<List<SurveyRelation>>() {
             @Override
-            public void onChanged(@Nullable List<SurveyResponse> surveys) {
+            public void onChanged(@Nullable List<SurveyRelation> surveys) {
                 submittedSurveys.clear();
                 completedSurveys.clear();
                 inProgressSurveys.clear();
-                for (SurveyResponse surveyResponse : surveys) {
-                    if (surveyResponse.survey.isSent() || surveyResponse.survey.isQueued()) {
-                        submittedSurveys.add(surveyResponse);
+                for (SurveyRelation surveyRelation : surveys) {
+                    if (surveyRelation.survey.isSent() || surveyRelation.survey.isQueued()) {
+                        submittedSurveys.add(surveyRelation);
                         submittedSurveysAdapter.setSurveys(submittedSurveys);
-                    } else if (surveyResponse.survey.isComplete()) {
-                        completedSurveys.add(surveyResponse);
+                    } else if (surveyRelation.survey.isComplete()) {
+                        completedSurveys.add(surveyRelation);
                         completedSurveysAdapter.setSurveys(completedSurveys);
                     } else {
-                        inProgressSurveys.add(surveyResponse);
+                        inProgressSurveys.add(surveyRelation);
                         inProgressSurveysAdapter.setSurveys(inProgressSurveys);
                     }
                 }
@@ -173,7 +173,7 @@ public class SurveyPagerFragment extends Fragment {
                         .setPositiveButton(R.string.submit,
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
-                                        for (SurveyResponse survey : completedSurveys) {
+                                        for (SurveyRelation survey : completedSurveys) {
                                             completedSurveysAdapter.prepareForSubmission(survey);
                                         }
                                         new SubmitSurveyTask(getActivity()).execute();

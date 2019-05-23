@@ -5,8 +5,8 @@ import android.app.Application;
 import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
 import org.adaptlab.chpir.android.survey.daos.BaseDao;
 import org.adaptlab.chpir.android.survey.daos.OptionSetOptionDao;
-import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.entities.OptionSetOption;
+import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 
 public class OptionSetOptionRepository extends Repository {

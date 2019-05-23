@@ -4,7 +4,6 @@ import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Query;
 
-import org.adaptlab.chpir.android.survey.entities.OptionSet;
 import org.adaptlab.chpir.android.survey.entities.OptionSetOption;
 
 import java.util.List;

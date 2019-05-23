@@ -7,9 +7,7 @@ import android.support.annotation.NonNull;
 
 import org.adaptlab.chpir.android.survey.daos.DisplayInstructionDao;
 import org.adaptlab.chpir.android.survey.entities.DisplayInstruction;
-import org.adaptlab.chpir.android.survey.entities.relations.DisplayQuestion;
 import org.adaptlab.chpir.android.survey.repositories.DisplayInstructionRepository;
-import org.adaptlab.chpir.android.survey.repositories.DisplayRepository;
 
 import java.util.List;
 

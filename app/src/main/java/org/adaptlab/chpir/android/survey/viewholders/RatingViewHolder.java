@@ -9,6 +9,7 @@ public class RatingViewHolder extends SingleQuestionViewHolder {
     private final static int NUM_STARS = 5;
     private float mRating;
     private RatingBar mRatingBar;
+
     RatingViewHolder(View itemView, Context context) {
         super(itemView, context);
     }

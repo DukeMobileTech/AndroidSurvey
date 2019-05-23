@@ -7,9 +7,9 @@ import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
 import org.adaptlab.chpir.android.survey.daos.BaseDao;
 import org.adaptlab.chpir.android.survey.daos.InstrumentDao;
 import org.adaptlab.chpir.android.survey.daos.InstrumentTranslationDao;
-import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.entities.Instrument;
 import org.adaptlab.chpir.android.survey.entities.InstrumentTranslation;
+import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 
 import java.util.List;

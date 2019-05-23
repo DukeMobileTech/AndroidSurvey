@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "168b6b50f90da21d95017463422d1f10",
+    "identityHash": "1cfc26558215ff548a25b009d88d11af",
     "entities": [
       {
         "tableName": "Instruments",
@@ -2124,6 +2124,16 @@
         },
         "indices": [
           {
+            "name": "survey_uuid_question_identifier_uuid_index",
+            "unique": true,
+            "columnNames": [
+              "SurveyUUID",
+              "QuestionIdentifier",
+              "UUID"
+            ],
+            "createSql": "CREATE UNIQUE INDEX `survey_uuid_question_identifier_uuid_index` ON `${TABLE_NAME}` (`SurveyUUID`, `QuestionIdentifier`, `UUID`)"
+          },
+          {
             "name": "index_Responses_UUID",
             "unique": false,
             "columnNames": [
@@ -2161,7 +2171,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"168b6b50f90da21d95017463422d1f10\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"1cfc26558215ff548a25b009d88d11af\")"
     ]
   }
 }

@@ -162,7 +162,7 @@ public class SectionFragment extends Fragment {
 //                } else {
 //                    response = mSurvey.getResponseByQuestion(question);
 //                }
-//                response.setQuestionData(question);
+//                response.setQuestionRelation(question);
 //                response.setData(mSurvey);
 //                response.setSpecialResponse(params[0]);
 //                response.setTimeStarted(new Date());

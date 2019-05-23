@@ -14,6 +14,7 @@ public class GeoLocationViewHolder extends SingleQuestionViewHolder {
     private TextView mLatitude;
     private TextView mLongitude;
     private TextView mAltitude;
+
     GeoLocationViewHolder(View itemView, Context context) {
         super(itemView, context);
     }

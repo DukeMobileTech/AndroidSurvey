@@ -8,7 +8,7 @@ import org.adaptlab.chpir.android.survey.entities.Survey;
 
 import java.util.List;
 
-public class SurveyResponse {
+public class SurveyRelation {
     @Embedded
     public Survey survey;
     @Relation(parentColumn = "UUID", entityColumn = "SurveyUUID", entity = Response.class)

@@ -3,6 +3,7 @@ package org.adaptlab.chpir.android.survey.entities;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -24,8 +25,10 @@ import java.util.List;
 import java.util.UUID;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
+import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.BLANK;
 
-@Entity(tableName = "Responses")
+@Entity(tableName = "Responses", indices = {@Index(name = "survey_uuid_question_identifier_uuid_index",
+        value = {"SurveyUUID", "QuestionIdentifier", "UUID"}, unique = true)})
 public class Response implements SurveyEntity {
     @PrimaryKey
     @NonNull
@@ -60,10 +63,10 @@ public class Response implements SurveyEntity {
 
     public Response() {
         mSent = false;
-        mText = "";
-        mSpecialResponse = "";
+        mText = BLANK;
+        mOtherResponse = BLANK;
+        mSpecialResponse = BLANK;
         mUUID = UUID.randomUUID().toString();
-//        setDeviceUserId(AuthUtils.getCurrentUser().getRemoteId());
     }
 
     @NonNull

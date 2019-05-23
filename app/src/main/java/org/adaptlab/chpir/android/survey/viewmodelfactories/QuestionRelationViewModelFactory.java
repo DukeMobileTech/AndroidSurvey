@@ -5,26 +5,26 @@ import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.NonNull;
 
-import org.adaptlab.chpir.android.survey.viewmodels.DisplayResponseViewModel;
+import org.adaptlab.chpir.android.survey.viewmodels.QuestionRelationViewModel;
 
-public class DisplayResponseViewModelFactory implements ViewModelProvider.Factory {
+public class QuestionRelationViewModelFactory implements ViewModelProvider.Factory {
+    private Long mInstrumentId;
+    private Long mDisplayId;
     private String mSurveyUUID;
-    private long mInstrumentId;
-    private long mDisplayId;
     private Application mApplication;
 
-    public DisplayResponseViewModelFactory(@NonNull Application application, String uuid, long instrumentId, long displayId) {
+    public QuestionRelationViewModelFactory(@NonNull Application application, Long instrumentId, Long displayId, String uuid) {
         this.mApplication = application;
-        this.mSurveyUUID = uuid;
         this.mInstrumentId = instrumentId;
         this.mDisplayId = displayId;
+        this.mSurveyUUID = uuid;
     }
 
     @NonNull
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-        if (modelClass.isAssignableFrom(DisplayResponseViewModel.class)) {
-            return (T) new DisplayResponseViewModel(mApplication, mSurveyUUID, mInstrumentId, mDisplayId);
+        if (modelClass.isAssignableFrom(QuestionRelationViewModel.class)) {
+            return (T) new QuestionRelationViewModel(mApplication, mInstrumentId, mDisplayId, mSurveyUUID);
         } else {
             return null;
         }

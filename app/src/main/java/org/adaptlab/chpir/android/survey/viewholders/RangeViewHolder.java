@@ -13,6 +13,7 @@ public class RangeViewHolder extends SingleQuestionViewHolder {
     private String mTextEnd = "";
     private EditText mStart;
     private EditText mEnd;
+
     RangeViewHolder(View itemView, Context context) {
         super(itemView, context);
     }

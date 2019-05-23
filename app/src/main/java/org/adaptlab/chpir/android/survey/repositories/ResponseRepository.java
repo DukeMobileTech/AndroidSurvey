@@ -17,6 +17,10 @@ public class ResponseRepository {
         mResponseDao = db.responseDao();
     }
 
+    public ResponseDao getResponseDao() {
+        return mResponseDao;
+    }
+
     public void insert(Response response) {
         new InsertResponseTask(mResponseDao).execute(response);
     }

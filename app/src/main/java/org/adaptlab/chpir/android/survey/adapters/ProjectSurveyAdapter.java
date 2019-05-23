@@ -24,7 +24,7 @@ import org.adaptlab.chpir.android.survey.Survey2Activity;
 import org.adaptlab.chpir.android.survey.entities.Instrument;
 import org.adaptlab.chpir.android.survey.entities.Response;
 import org.adaptlab.chpir.android.survey.entities.Survey;
-import org.adaptlab.chpir.android.survey.entities.relations.SurveyResponse;
+import org.adaptlab.chpir.android.survey.entities.relations.SurveyRelation;
 import org.adaptlab.chpir.android.survey.tasks.SetInstrumentLabelTask;
 import org.adaptlab.chpir.android.survey.tasks.SubmitSurveyTask;
 import org.adaptlab.chpir.android.survey.utils.InstrumentListLabel;
@@ -35,7 +35,7 @@ import java.util.List;
 public class ProjectSurveyAdapter extends RecyclerView.Adapter<ProjectSurveyAdapter.SurveyViewHolder> {
 
     private final LayoutInflater mInflater;
-    private List<SurveyResponse> mSurveyResponses;
+    private List<SurveyRelation> mSurveyRespons;
     private List<Instrument> mInstruments;
     private Context mContext;
 
@@ -44,8 +44,8 @@ public class ProjectSurveyAdapter extends RecyclerView.Adapter<ProjectSurveyAdap
         mContext = context;
     }
 
-    public void setSurveys(List<SurveyResponse> list) {
-        mSurveyResponses = list;
+    public void setSurveys(List<SurveyRelation> list) {
+        mSurveyRespons = list;
         notifyDataSetChanged();
     }
 
@@ -63,20 +63,20 @@ public class ProjectSurveyAdapter extends RecyclerView.Adapter<ProjectSurveyAdap
 
     @Override
     public void onBindViewHolder(@NonNull final SurveyViewHolder viewHolder, int position) {
-        SurveyResponse surveyResponse = mSurveyResponses.get(position);
-        Instrument instrument = getSurveyInstrument(surveyResponse);
-        if (surveyResponse != null && instrument != null) {
-            viewHolder.setData(surveyResponse, instrument);
+        SurveyRelation surveyRelation = mSurveyRespons.get(position);
+        Instrument instrument = getSurveyInstrument(surveyRelation);
+        if (surveyRelation != null && instrument != null) {
+            viewHolder.setData(surveyRelation, instrument);
             setSurveyDeleteAction(viewHolder);
             setSurveyLaunchAction(viewHolder, instrument);
             setSurveySubmitAction(viewHolder);
         }
     }
 
-    private Instrument getSurveyInstrument(SurveyResponse surveyResponse) {
+    private Instrument getSurveyInstrument(SurveyRelation surveyRelation) {
         if (mInstruments == null) return null;
         for (Instrument instrument : mInstruments) {
-            if (instrument.getRemoteId().equals(surveyResponse.survey.getInstrumentRemoteId())) {
+            if (instrument.getRemoteId().equals(surveyRelation.survey.getInstrumentRemoteId())) {
                 return instrument;
             }
         }
@@ -111,8 +111,8 @@ public class ProjectSurveyAdapter extends RecyclerView.Adapter<ProjectSurveyAdap
         viewHolder.mViewContent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SurveyResponse surveyResponse = mSurveyResponses.get(viewHolder.getAdapterPosition());
-                Survey survey = surveyResponse.survey;
+                SurveyRelation surveyRelation = mSurveyRespons.get(viewHolder.getAdapterPosition());
+                Survey survey = surveyRelation.survey;
                 if (survey == null) return;
                 if (survey.isQueued() || survey.isSent()) {
                     Toast.makeText(mContext, R.string.survey_submitted, Toast.LENGTH_LONG).show();
@@ -142,7 +142,7 @@ public class ProjectSurveyAdapter extends RecyclerView.Adapter<ProjectSurveyAdap
                         .setPositiveButton(R.string.submit,
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
-                                        SurveyResponse survey = mSurveyResponses.get(viewHolder.getAdapterPosition());
+                                        SurveyRelation survey = mSurveyRespons.get(viewHolder.getAdapterPosition());
                                         prepareForSubmission(survey);
                                         new SubmitSurveyTask(mContext).execute();
                                         notifyItemChanged(viewHolder.getAdapterPosition());
@@ -160,10 +160,10 @@ public class ProjectSurveyAdapter extends RecyclerView.Adapter<ProjectSurveyAdap
     }
 
     public void remove(int position) {
-        if (position > -1 && position < mSurveyResponses.size()) {
-            SurveyResponse survey = mSurveyResponses.get(position);
+        if (position > -1 && position < mSurveyRespons.size()) {
+            SurveyRelation survey = mSurveyRespons.get(position);
             if (survey != null) {
-                mSurveyResponses.remove(position);
+                mSurveyRespons.remove(position);
 //                survey.delete();
                 notifyItemRemoved(position);
             }
@@ -172,12 +172,12 @@ public class ProjectSurveyAdapter extends RecyclerView.Adapter<ProjectSurveyAdap
 
     @Override
     public int getItemCount() {
-        return mSurveyResponses == null ? 0 : mSurveyResponses.size();
+        return mSurveyRespons == null ? 0 : mSurveyRespons.size();
     }
 
-    public void prepareForSubmission(SurveyResponse surveyResponse) {
-        Survey survey = surveyResponse.survey;
-        List<Response> responses = surveyResponse.responses;
+    public void prepareForSubmission(SurveyRelation surveyRelation) {
+        Survey survey = surveyRelation.survey;
+        List<Response> responses = surveyRelation.responses;
         if (survey.getCompletedResponseCount() == 0 && responses.size() > 0) {
             survey.setCompletedResponseCount(responses.size());
         }
@@ -191,7 +191,7 @@ public class ProjectSurveyAdapter extends RecyclerView.Adapter<ProjectSurveyAdap
         TextView mSubmitAction;
         TextView surveyTextView;
         TextView progressTextView;
-        SurveyResponse mSurvey;
+        SurveyRelation mSurvey;
 
         SurveyViewHolder(final View itemView) {
             super(itemView);
@@ -203,10 +203,10 @@ public class ProjectSurveyAdapter extends RecyclerView.Adapter<ProjectSurveyAdap
             mSubmitAction = itemView.findViewById(R.id.list_item_survey_action_submit);
         }
 
-        public void setData(SurveyResponse surveyResponse, Instrument instrument) {
-            this.mSurvey = surveyResponse;
-            Survey survey = surveyResponse.survey;
-            List<Response> responses = surveyResponse.responses;
+        public void setData(SurveyRelation surveyRelation, Instrument instrument) {
+            this.mSurvey = surveyRelation;
+            Survey survey = surveyRelation.survey;
+            List<Response> responses = surveyRelation.responses;
             String surveyTitle = survey.identifier(mContext) + "\n";
             String instrumentTitle = instrument.getTitle() + "\n";
             String lastUpdated = DateFormat.getDateTimeInstance().format(
