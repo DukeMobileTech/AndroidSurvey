@@ -15,18 +15,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import org.adaptlab.chpir.android.survey.adapters.DisplayPagerAdapter;
-import org.adaptlab.chpir.android.survey.entities.Display;
 import org.adaptlab.chpir.android.survey.entities.Instrument;
 import org.adaptlab.chpir.android.survey.entities.Survey;
-import org.adaptlab.chpir.android.survey.entities.relations.SurveyRelation;
+import org.adaptlab.chpir.android.survey.entities.relations.InstrumentRelation;
 import org.adaptlab.chpir.android.survey.repositories.SurveyRepository;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
-import org.adaptlab.chpir.android.survey.viewmodelfactories.DisplayViewModelFactory;
-import org.adaptlab.chpir.android.survey.viewmodelfactories.InstrumentViewModelFactory;
-import org.adaptlab.chpir.android.survey.viewmodelfactories.SurveyViewModelFactory;
-import org.adaptlab.chpir.android.survey.viewmodels.DisplayViewModel;
-import org.adaptlab.chpir.android.survey.viewmodels.InstrumentViewModel;
-import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
+import org.adaptlab.chpir.android.survey.viewmodelfactories.InstrumentRelationViewModelFactory;
+import org.adaptlab.chpir.android.survey.viewmodels.InstrumentRelationViewModel;
 
 import java.util.List;
 
@@ -39,7 +34,6 @@ public class Survey2Activity extends AppCompatActivity {
     private DisplayPagerAdapter mDisplayPagerAdapter;
 
     private Instrument mInstrument;
-    private Survey mSurvey;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,26 +44,26 @@ public class Survey2Activity extends AppCompatActivity {
         String surveyUUID = getIntent().getStringExtra(EXTRA_SURVEY_UUID);
         if (TextUtils.isEmpty(surveyUUID)) {
             SurveyRepository surveyRepository = new SurveyRepository(getApplication());
-            mSurvey = surveyRepository.initializeSurvey(AppUtil.getProjectId(), instrumentId);
-            surveyUUID = mSurvey.getUUID();
+            Survey survey = surveyRepository.initializeSurvey(AppUtil.getProjectId(), instrumentId);
+            surveyUUID = survey.getUUID();
         }
 
-        mDisplayPagerAdapter = new DisplayPagerAdapter(getSupportFragmentManager());
+        mDisplayPagerAdapter = new DisplayPagerAdapter(getSupportFragmentManager(), surveyUUID);
         setDisplayViewPagers();
-
-        setInstrumentViewModel(instrumentId);
-        setSurveyViewModel(surveyUUID);
-        setDisplayViewModels(instrumentId);
+        setViewModel(instrumentId);
     }
 
-    private void setInstrumentViewModel(long instrumentId) {
-        InstrumentViewModelFactory factory = new InstrumentViewModelFactory(getApplication(), instrumentId);
-        InstrumentViewModel viewModel = ViewModelProviders.of(this, factory).get(InstrumentViewModel.class);
-        viewModel.getInstrument().observe(this, new Observer<Instrument>() {
+    private void setViewModel(Long instrumentId) {
+        InstrumentRelationViewModelFactory factory = new InstrumentRelationViewModelFactory(getApplication(), instrumentId);
+        InstrumentRelationViewModel viewModel = ViewModelProviders.of(this, factory).get(InstrumentRelationViewModel.class);
+        viewModel.getInstrumentRelation().observe(this, new Observer<InstrumentRelation>() {
             @Override
-            public void onChanged(@Nullable Instrument instrument) {
-                mInstrument = instrument;
-                updateActionBarTitle(mInstrument.getTitle());
+            public void onChanged(@Nullable InstrumentRelation relation) {
+                if (relation != null) {
+                    mInstrument = relation.instrument;
+                    updateActionBarTitle(mInstrument.getTitle());
+                    mDisplayPagerAdapter.setDisplays(relation.displays);
+                }
             }
         });
     }
@@ -80,29 +74,6 @@ public class Survey2Activity extends AppCompatActivity {
         TabLayout tabLayout = findViewById(R.id.displayTabs);
         tabLayout.setMinimumWidth(getWindow().getDecorView().getWidth());
         tabLayout.setupWithViewPager(viewPager);
-    }
-
-    private void setSurveyViewModel(String surveyUUID) {
-        SurveyViewModelFactory factory = new SurveyViewModelFactory(getApplication(), surveyUUID);
-        SurveyViewModel surveyViewModel = ViewModelProviders.of(this, factory).get(SurveyViewModel.class);
-        surveyViewModel.getSurveyRelation().observe(this, new Observer<SurveyRelation>() {
-            @Override
-            public void onChanged(@Nullable SurveyRelation surveyRelation) {
-                if (surveyRelation != null) mSurvey = surveyRelation.survey;
-                mDisplayPagerAdapter.setSurvey(mSurvey);
-            }
-        });
-    }
-
-    private void setDisplayViewModels(long instrumentId) {
-        DisplayViewModelFactory factory = new DisplayViewModelFactory(getApplication(), instrumentId);
-        DisplayViewModel displayViewModel = ViewModelProviders.of(this, factory).get(DisplayViewModel.class);
-        displayViewModel.getDisplays().observe(this, new Observer<List<Display>>() {
-            @Override
-            public void onChanged(@Nullable List<Display> displays) {
-                mDisplayPagerAdapter.setDisplays(displays);
-            }
-        });
     }
 
     private void updateActionBarTitle(String title) {

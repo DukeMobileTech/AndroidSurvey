@@ -5,11 +5,8 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 
-import org.adaptlab.chpir.android.survey.daos.InstructionDao;
 import org.adaptlab.chpir.android.survey.daos.OptionSetDao;
-import org.adaptlab.chpir.android.survey.entities.Instruction;
 import org.adaptlab.chpir.android.survey.entities.OptionSet;
-import org.adaptlab.chpir.android.survey.repositories.InstructionRepository;
 import org.adaptlab.chpir.android.survey.repositories.OptionSetRepository;
 
 import java.util.List;

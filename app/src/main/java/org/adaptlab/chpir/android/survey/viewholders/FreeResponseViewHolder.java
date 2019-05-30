@@ -47,20 +47,22 @@ public class FreeResponseViewHolder extends SingleQuestionViewHolder {
                 mFreeText.addTextChangedListener(this);
             }
             timer = new Timer();
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    // Run on UI Thread
-                    if (getContext() != null) {
-                        ((Activity) getContext()).runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                saveResponse();
-                            }
-                        });
+            if (!isDeserialization()) {
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        // Run on UI Thread
+                        if (getContext() != null) {
+                            ((Activity) getContext()).runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    saveResponse();
+                                }
+                            });
+                        }
                     }
-                }
-            }, EDIT_TEXT_DELAY); // delay before saving to db
+                }, EDIT_TEXT_DELAY); // delay before saving to db
+            }
         }
     };
 

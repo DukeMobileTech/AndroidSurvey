@@ -24,7 +24,6 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.SurveyApp;
 import org.adaptlab.chpir.android.survey.entities.Instruction;
 import org.adaptlab.chpir.android.survey.entities.Option;
 import org.adaptlab.chpir.android.survey.entities.Question;
@@ -35,6 +34,7 @@ import org.adaptlab.chpir.android.survey.entities.relations.DisplayRelation;
 import org.adaptlab.chpir.android.survey.entities.relations.OptionSetOptionRelation;
 import org.adaptlab.chpir.android.survey.entities.relations.OptionSetRelation;
 import org.adaptlab.chpir.android.survey.entities.relations.QuestionRelation;
+import org.adaptlab.chpir.android.survey.entities.relations.ResponseRelation;
 import org.adaptlab.chpir.android.survey.repositories.ResponseRepository;
 import org.adaptlab.chpir.android.survey.repositories.SurveyRepository;
 
@@ -65,6 +65,8 @@ public abstract class SingleQuestionViewHolder extends QuestionViewHolder {
     private TextView mOptionSetInstructionTextView;
     private ViewGroup mQuestionComponent;
     private Button mClearButton;
+    private boolean mDeserialization = false;
+
 
     public SingleQuestionViewHolder(View itemView, Context context) {
         super(itemView, context);
@@ -85,6 +87,10 @@ public abstract class SingleQuestionViewHolder extends QuestionViewHolder {
 
     public List<Option> getOptions() {
         return mOptions;
+    }
+
+    boolean isDeserialization() {
+        return mDeserialization;
     }
 
     protected abstract void createQuestionComponent(ViewGroup questionComponent);
@@ -109,23 +115,24 @@ public abstract class SingleQuestionViewHolder extends QuestionViewHolder {
 
             public void afterTextChanged(final Editable s) {
                 timer = new Timer();
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        // Run on UI Thread
-                        if (getContext() != null) {
-                            ((Activity) getContext()).runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    setOtherResponse(s.toString());
-                                }
-                            });
+                if (!mDeserialization) {
+                    timer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            // Run on UI Thread
+                            if (getContext() != null) {
+                                ((Activity) getContext()).runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        setOtherResponse(s.toString());
+                                    }
+                                });
+                            }
                         }
-                    }
-                }, EDIT_TEXT_DELAY); // delay before saving to db
+                    }, EDIT_TEXT_DELAY); // delay before saving to db
+                }
             }
         });
-
     }
 
     private void setOtherResponse(String response) {
@@ -134,10 +141,10 @@ public abstract class SingleQuestionViewHolder extends QuestionViewHolder {
     }
 
     @Override
-    public void setQuestionRelation(QuestionRelation questionRelation) {
+    public void setQuestionRelation(ResponseRelation responseRelation, QuestionRelation questionRelation) {
         mQuestion = questionRelation.question;
-        mSurvey = questionRelation.question.getSurvey();
-        mResponse = questionRelation.question.getResponse();
+        mSurvey = responseRelation.surveys.get(0);
+        mResponse = responseRelation.response;
         setQuestionInstruction(questionRelation);
         setOptionSetItems(questionRelation);
         setSpecialOptions(questionRelation);
@@ -149,8 +156,9 @@ public abstract class SingleQuestionViewHolder extends QuestionViewHolder {
         // Overridden by subclasses to place their graphical elements on the fragment.
         createQuestionComponent(mQuestionComponent);
         setSpecialResponseView();
-
+        mDeserialization = true;
         deserializeResponse();
+        mDeserialization = false;
     }
 
     private void setQuestionInstruction(QuestionRelation questionRelation) {
@@ -219,13 +227,12 @@ public abstract class SingleQuestionViewHolder extends QuestionViewHolder {
     private void updateResponse() {
         mResponse.setTimeEnded(new Date());
         mResponseRepository.update(mResponse);
-//        mQuestion.setResponse(mResponse);
         mSurvey.setLastUpdated(new Date());
         mSurveyRepository.update(mSurvey);
-        Log.i(TAG, "updateResponse");
+//        Log.i(TAG, "updateResponse");
     }
 
-    void saveSpecialResponse(String specialResponse) {
+    private void saveSpecialResponse(String specialResponse) {
         mResponse.setSpecialResponse(specialResponse);
         mResponse.setText(BLANK);
         mResponse.setOtherResponse(BLANK);

@@ -2,21 +2,13 @@ package org.adaptlab.chpir.android.survey.entities;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
-import android.content.Context;
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
-import android.util.Log;
 
 import com.google.gson.reflect.TypeToken;
 
-import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.daos.BaseDao;
-import org.adaptlab.chpir.android.survey.utils.AuthUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -24,21 +16,22 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import static android.arch.persistence.room.ForeignKey.CASCADE;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.BLANK;
 
-@Entity(tableName = "Responses", indices = {@Index(name = "survey_uuid_question_identifier_uuid_index",
-        value = {"SurveyUUID", "QuestionIdentifier", "UUID"}, unique = true)})
+@Entity(tableName = "Responses", indices = {@Index(value = {"SurveyUUID", "QuestionIdentifier", "UUID"}, unique = true)})
 public class Response implements SurveyEntity {
     @PrimaryKey
     @NonNull
     @ColumnInfo(name = "UUID", index = true)
     private String mUUID;
     @ColumnInfo(name = "SurveyUUID", index = true)
+    @NonNull
     private String mSurveyUUID;
     @ColumnInfo(name = "QuestionRemoteId", index = true)
+    @NonNull
     private Long mQuestionRemoteId;
     @ColumnInfo(name = "QuestionIdentifier", index = true)
+    @NonNull
     private String mQuestionIdentifier;
     @ColumnInfo(name = "Text")
     private String mText;

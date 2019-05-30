@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.relations.QuestionRelation;
+import org.adaptlab.chpir.android.survey.entities.relations.ResponseRelation;
 
 public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     public final String TAG = this.getClass().getName();
@@ -25,7 +26,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
     protected abstract void createQuestionComponent(ViewGroup questionComponent);
 
-    public abstract void setQuestionRelation(QuestionRelation questionRelation);
+    public abstract void setQuestionRelation(ResponseRelation responseRelation, QuestionRelation questionRelation);
 
     protected abstract void deserialize(String responseText);
 

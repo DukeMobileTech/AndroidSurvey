@@ -7,10 +7,7 @@ import android.support.annotation.NonNull;
 
 import org.adaptlab.chpir.android.survey.daos.InstructionDao;
 import org.adaptlab.chpir.android.survey.entities.Instruction;
-import org.adaptlab.chpir.android.survey.entities.Instrument;
-import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.repositories.InstructionRepository;
-import org.adaptlab.chpir.android.survey.repositories.InstrumentRepository;
 
 import java.util.List;
 

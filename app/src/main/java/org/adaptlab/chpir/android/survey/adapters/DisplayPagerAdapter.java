@@ -1,31 +1,31 @@
 package org.adaptlab.chpir.android.survey.adapters;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v7.util.DiffUtil;
+import android.util.Log;
 
 import org.adaptlab.chpir.android.survey.entities.Display;
 import org.adaptlab.chpir.android.survey.entities.Survey;
 import org.adaptlab.chpir.android.survey.viewpagerfragments.DisplayPagerFragment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DisplayPagerAdapter extends FragmentStatePagerAdapter {
-    private Survey mSurvey;
+    private String mSurveyUUUID;
     private List<Display> mDisplays;
 
-    public DisplayPagerAdapter(FragmentManager fm) {
+    public DisplayPagerAdapter(FragmentManager fm, String uuid) {
         super(fm);
+        mSurveyUUUID = uuid;
     }
 
     public void setDisplays(List<Display> displays) {
-        this.mDisplays = displays;
-        notifyDataSetChanged();
-    }
-
-    public void setSurvey(Survey survey) {
-        mSurvey = survey;
+        mDisplays = displays;
         notifyDataSetChanged();
     }
 
@@ -35,8 +35,7 @@ public class DisplayPagerAdapter extends FragmentStatePagerAdapter {
         Bundle bundle = new Bundle();
         bundle.putLong(DisplayPagerFragment.EXTRA_INSTRUMENT_ID, mDisplays.get(i).getInstrumentRemoteId());
         bundle.putLong(DisplayPagerFragment.EXTRA_DISPLAY_ID, mDisplays.get(i).getRemoteId());
-        if (mSurvey != null)
-            bundle.putString(DisplayPagerFragment.EXTRA_SURVEY_UUID, mSurvey.getUUID());
+        bundle.putString(DisplayPagerFragment.EXTRA_SURVEY_UUID, mSurveyUUUID);
         fragment.setArguments(bundle);
         return fragment;
     }

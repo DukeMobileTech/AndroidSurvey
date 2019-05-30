@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 
 import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.relations.QuestionRelation;
+import org.adaptlab.chpir.android.survey.entities.relations.ResponseRelation;
 
 public class MultipleSelectMultipleViewHolder extends MultipleQuestionsViewHolder {
 
@@ -90,8 +91,7 @@ public class MultipleSelectMultipleViewHolder extends MultipleQuestionsViewHolde
     }
 
     @Override
-    public void setQuestionRelation(QuestionRelation questionRelation) {
-
+    public void setQuestionRelation(ResponseRelation responseRelation, QuestionRelation questionRelation) {
     }
 
 //    @Override

@@ -37,9 +37,6 @@ import org.adaptlab.chpir.android.survey.daos.SectionDao;
 import org.adaptlab.chpir.android.survey.daos.SectionTranslationDao;
 import org.adaptlab.chpir.android.survey.daos.SettingsDao;
 import org.adaptlab.chpir.android.survey.daos.SurveyDao;
-import org.adaptlab.chpir.android.survey.daos.relations.DisplayQuestionDao;
-import org.adaptlab.chpir.android.survey.daos.relations.DisplayResponseDao;
-import org.adaptlab.chpir.android.survey.daos.relations.SurveyResponseDao;
 import org.adaptlab.chpir.android.survey.entities.ConditionSkip;
 import org.adaptlab.chpir.android.survey.entities.CriticalResponse;
 import org.adaptlab.chpir.android.survey.entities.DeviceUser;
@@ -153,12 +150,6 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
     public abstract SurveyDao surveyDao();
 
     public abstract ResponseDao responseDao();
-
-    public abstract SurveyResponseDao surveyResponseDao();
-
-    public abstract DisplayQuestionDao displayQuestionDao();
-
-    public abstract DisplayResponseDao displayResponseDao();
 
     private static class CreateSettingsInstanceTask extends AsyncTask<Void, Void, Void> {
         private SettingsDao mSettingsDao;

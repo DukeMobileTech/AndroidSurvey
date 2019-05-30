@@ -6,10 +6,7 @@ import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 
 import org.adaptlab.chpir.android.survey.entities.Display;
-import org.adaptlab.chpir.android.survey.entities.Instrument;
-import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.repositories.DisplayRepository;
-import org.adaptlab.chpir.android.survey.repositories.InstrumentRepository;
 
 import java.util.List;
 

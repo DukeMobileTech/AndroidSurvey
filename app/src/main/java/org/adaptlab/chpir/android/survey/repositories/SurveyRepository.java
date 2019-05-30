@@ -7,26 +7,19 @@ import android.os.AsyncTask;
 import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
 import org.adaptlab.chpir.android.survey.daos.BaseDao;
 import org.adaptlab.chpir.android.survey.daos.SurveyDao;
-import org.adaptlab.chpir.android.survey.daos.relations.SurveyResponseDao;
 import org.adaptlab.chpir.android.survey.entities.Survey;
 import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 
 public class SurveyRepository extends Repository {
     private SurveyDao mSurveyDao;
-    private SurveyResponseDao mSurveyResponseDao;
 
     public SurveyRepository(Application application) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);
         mSurveyDao = db.surveyDao();
-        mSurveyResponseDao = db.surveyResponseDao();
     }
 
     public SurveyDao getSurveyDao() {
         return mSurveyDao;
-    }
-
-    public SurveyResponseDao getSurveyResponseDao() {
-        return mSurveyResponseDao;
     }
 
     public Survey initializeSurvey(Long projectId, Long instrumentId) {

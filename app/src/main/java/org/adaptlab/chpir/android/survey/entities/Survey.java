@@ -1,11 +1,8 @@
 package org.adaptlab.chpir.android.survey.entities;
 
 import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
-import android.arch.persistence.room.RoomWarnings;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;

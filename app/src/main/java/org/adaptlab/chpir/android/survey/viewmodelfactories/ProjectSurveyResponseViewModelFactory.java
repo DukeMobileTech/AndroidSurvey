@@ -6,7 +6,6 @@ import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.NonNull;
 
 import org.adaptlab.chpir.android.survey.viewmodels.ProjectSurveyResponseViewModel;
-import org.adaptlab.chpir.android.survey.viewmodels.SurveyResponseViewModel;
 
 public class ProjectSurveyResponseViewModelFactory implements ViewModelProvider.Factory {
     private Application mApplication;

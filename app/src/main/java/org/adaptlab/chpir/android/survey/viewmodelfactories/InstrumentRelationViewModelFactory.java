@@ -5,13 +5,13 @@ import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.NonNull;
 
-import org.adaptlab.chpir.android.survey.viewmodels.InstrumentViewModel;
+import org.adaptlab.chpir.android.survey.viewmodels.InstrumentRelationViewModel;
 
-public class InstrumentViewModelFactory implements ViewModelProvider.Factory {
-    private long mInstrumentId;
+public class InstrumentRelationViewModelFactory implements ViewModelProvider.Factory {
     private Application mApplication;
+    private Long mInstrumentId;
 
-    public InstrumentViewModelFactory(@NonNull Application application, long id) {
+    public InstrumentRelationViewModelFactory(@NonNull Application application, Long id) {
         this.mApplication = application;
         this.mInstrumentId = id;
     }
@@ -19,8 +19,8 @@ public class InstrumentViewModelFactory implements ViewModelProvider.Factory {
     @NonNull
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-        if (modelClass.isAssignableFrom(InstrumentViewModel.class)) {
-            return (T) new InstrumentViewModel(mApplication, mInstrumentId);
+        if (modelClass.isAssignableFrom(InstrumentRelationViewModel.class)) {
+            return (T) new InstrumentRelationViewModel(mApplication, mInstrumentId);
         } else {
             return null;
         }

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "1cfc26558215ff548a25b009d88d11af",
+    "identityHash": "a41a38f4e3739d2c858963d8b8a65fe1",
     "entities": [
       {
         "tableName": "Instruments",
@@ -2029,7 +2029,7 @@
       },
       {
         "tableName": "Responses",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`UUID` TEXT NOT NULL, `SurveyUUID` TEXT, `QuestionRemoteId` INTEGER, `QuestionIdentifier` TEXT, `Text` TEXT, `OtherResponse` TEXT, `SpecialResponse` TEXT, `SentToRemote` INTEGER NOT NULL, `TimeStarted` INTEGER, `TimeEnded` INTEGER, `DeviceUserId` INTEGER, `QuestionVersion` INTEGER NOT NULL, `RandomizedData` TEXT, `RankOrder` TEXT, PRIMARY KEY(`UUID`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`UUID` TEXT NOT NULL, `SurveyUUID` TEXT NOT NULL, `QuestionRemoteId` INTEGER NOT NULL, `QuestionIdentifier` TEXT NOT NULL, `Text` TEXT, `OtherResponse` TEXT, `SpecialResponse` TEXT, `SentToRemote` INTEGER NOT NULL, `TimeStarted` INTEGER, `TimeEnded` INTEGER, `DeviceUserId` INTEGER, `QuestionVersion` INTEGER NOT NULL, `RandomizedData` TEXT, `RankOrder` TEXT, PRIMARY KEY(`UUID`))",
         "fields": [
           {
             "fieldPath": "mUUID",
@@ -2041,19 +2041,19 @@
             "fieldPath": "mSurveyUUID",
             "columnName": "SurveyUUID",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "mQuestionRemoteId",
             "columnName": "QuestionRemoteId",
             "affinity": "INTEGER",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "mQuestionIdentifier",
             "columnName": "QuestionIdentifier",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "mText",
@@ -2124,14 +2124,14 @@
         },
         "indices": [
           {
-            "name": "survey_uuid_question_identifier_uuid_index",
+            "name": "index_Responses_SurveyUUID_QuestionIdentifier_UUID",
             "unique": true,
             "columnNames": [
               "SurveyUUID",
               "QuestionIdentifier",
               "UUID"
             ],
-            "createSql": "CREATE UNIQUE INDEX `survey_uuid_question_identifier_uuid_index` ON `${TABLE_NAME}` (`SurveyUUID`, `QuestionIdentifier`, `UUID`)"
+            "createSql": "CREATE UNIQUE INDEX `index_Responses_SurveyUUID_QuestionIdentifier_UUID` ON `${TABLE_NAME}` (`SurveyUUID`, `QuestionIdentifier`, `UUID`)"
           },
           {
             "name": "index_Responses_UUID",
@@ -2171,7 +2171,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"1cfc26558215ff548a25b009d88d11af\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"a41a38f4e3739d2c858963d8b8a65fe1\")"
     ]
   }
 }

@@ -16,7 +16,7 @@ public class ProjectSurveyResponseViewModel extends AndroidViewModel {
     public ProjectSurveyResponseViewModel(@NonNull Application application, long projectId) {
         super(application);
         SurveyRepository surveyRepository = new SurveyRepository(application);
-        mSurveyResponses = surveyRepository.getSurveyResponseDao().projectSurveys(projectId);
+        mSurveyResponses = surveyRepository.getSurveyDao().projectSurveys(projectId);
     }
 
     public LiveData<List<SurveyRelation>> getSurveyResponses() {

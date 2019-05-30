@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 
 import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.relations.QuestionRelation;
+import org.adaptlab.chpir.android.survey.entities.relations.ResponseRelation;
 
 public class SingleSelectMultipleViewHolder extends MultipleQuestionsViewHolder {
 //    private static final String TAG = "SSMQF";
@@ -51,7 +52,7 @@ public class SingleSelectMultipleViewHolder extends MultipleQuestionsViewHolder 
     }
 
     @Override
-    public void setQuestionRelation(QuestionRelation questionRelation) {
+    public void setQuestionRelation(ResponseRelation responseRelation, QuestionRelation questionRelation) {
 
     }
 

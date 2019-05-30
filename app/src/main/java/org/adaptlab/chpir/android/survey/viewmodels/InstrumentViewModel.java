@@ -8,8 +8,6 @@ import android.support.annotation.NonNull;
 import org.adaptlab.chpir.android.survey.entities.Instrument;
 import org.adaptlab.chpir.android.survey.repositories.InstrumentRepository;
 
-import java.util.List;
-
 public class InstrumentViewModel extends AndroidViewModel {
     private InstrumentRepository mRepository;
     private LiveData<Instrument> mInstrument;
