@@ -131,6 +131,8 @@ public class Question implements SurveyEntity {
     @Ignore
     @SerializedName("question_translations")
     private List<QuestionTranslation> mQuestionTranslations;
+    @Ignore
+    private boolean mSkipped = false;
 
     public static Question copyAttributes(Question destination, Question source) {
         destination.mText = source.mText;
@@ -377,6 +379,15 @@ public class Question implements SurveyEntity {
     public boolean isMultipleResponseLoop() {
         return (mQuestionType.equals(SELECT_MULTIPLE) || mQuestionType.equals(SELECT_MULTIPLE_WRITE_OTHER) ||
                 mQuestionType.equals(LIST_OF_INTEGER_BOXES) || mQuestionType.equals(LIST_OF_TEXT_BOXES));
+    }
+
+    public boolean isSingleResponse() {
+        return (mQuestionType.equals(SELECT_ONE) || mQuestionType.equals(SELECT_ONE_WRITE_OTHER) ||
+                mQuestionType.equals(DROP_DOWN));
+    }
+
+    public boolean isMultipleResponse() {
+        return mQuestionType.equals(SELECT_MULTIPLE) || mQuestionType.equals(SELECT_MULTIPLE_WRITE_OTHER);
     }
 
     @Retention(RetentionPolicy.SOURCE)

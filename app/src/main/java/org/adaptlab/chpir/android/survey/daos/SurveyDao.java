@@ -12,9 +12,12 @@ import java.util.List;
 
 @Dao
 public abstract class SurveyDao extends BaseDao<Survey> {
+    @Query("SELECT * FROM Surveys WHERE UUID=:uuid")
+    public abstract LiveData<Survey> findByUUID(String uuid);
+
     @Transaction
-    @Query("SELECT * FROM Surveys WHERE UUID=:uuid LIMIT 1")
-    public abstract LiveData<SurveyRelation> findByUUID(String uuid);
+    @Query("SELECT * FROM Surveys WHERE UUID=:uuid")
+    public abstract LiveData<SurveyRelation> findSurveyRelationByUUID(String uuid);
 
     @Transaction
     @Query("SELECT * FROM Surveys WHERE ProjectId=:projectId")

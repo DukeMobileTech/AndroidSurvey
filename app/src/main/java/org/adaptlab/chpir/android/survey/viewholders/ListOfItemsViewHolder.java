@@ -23,8 +23,8 @@ import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 public abstract class ListOfItemsViewHolder extends SingleQuestionViewHolder {
     private ArrayList<EditText> mResponses;
 
-    ListOfItemsViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    ListOfItemsViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
 
     protected abstract EditText createEditText();

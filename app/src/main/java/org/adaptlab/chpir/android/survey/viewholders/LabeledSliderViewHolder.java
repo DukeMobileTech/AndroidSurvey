@@ -6,8 +6,8 @@ import android.view.ViewGroup;
 
 public class LabeledSliderViewHolder extends SliderViewHolder {
 
-    LabeledSliderViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    LabeledSliderViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
 
     @Override

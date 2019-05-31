@@ -14,8 +14,8 @@ public class SelectOneWriteOtherViewHolder extends SelectOneViewHolder {
     private EditText otherText = null;
     private RadioButton radioButton;
 
-    SelectOneWriteOtherViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    SelectOneWriteOtherViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
 
     @Override

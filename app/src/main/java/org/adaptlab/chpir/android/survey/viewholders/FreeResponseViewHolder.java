@@ -30,6 +30,7 @@ public class FreeResponseViewHolder extends SingleQuestionViewHolder {
         }
 
         public void onTextChanged(CharSequence s, int start, int before, int count) {
+            getSpecialResponses().clearCheck();
             if (!FormatUtils.isEmpty(s.toString())) {
                 backspacing = before > count;
                 mText = s.toString();
@@ -66,8 +67,8 @@ public class FreeResponseViewHolder extends SingleQuestionViewHolder {
         }
     };
 
-    FreeResponseViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    FreeResponseViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
 
     @Override

@@ -5,8 +5,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 public class FrontPictureViewHolder extends PictureViewHolder {
-    FrontPictureViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    FrontPictureViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
 //    private static final String TAG = "FrontPictureFragment";
 //    private ResponsePhoto mPhoto;

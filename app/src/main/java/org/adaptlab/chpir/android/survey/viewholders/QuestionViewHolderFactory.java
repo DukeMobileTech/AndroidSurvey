@@ -13,68 +13,68 @@ public class QuestionViewHolderFactory {
             ONE_IMAGE = 21, ONE = 22, ONE_WRITE_OTHER = 23, SIGNATURE = 24, SLIDER = 25, SUM = 26,
             TIME = 27, YEAR = 28;
 
-    public static QuestionViewHolder createViewHolder(View view, Context context, int viewType) {
+    public static QuestionViewHolder createViewHolder(View view, Context context, int viewType, QuestionViewHolder.OnResponseSelectedListener listener) {
         switch (viewType) {
             case ADDRESS:
-                return new AddressViewHolder(view, context);
+                return new AddressViewHolder(view, context, listener);
             case DATE:
-                return new DateViewHolder(view, context);
+                return new DateViewHolder(view, context, listener);
             case DECIMAL:
-                return new DecimalViewHolder(view, context);
+                return new DecimalViewHolder(view, context, listener);
             case DROP_DOWN:
-                return new DropDownViewHolder(view, context);
+                return new DropDownViewHolder(view, context, listener);
             case EMAIL:
-                return new EmailViewHolder(view, context);
+                return new EmailViewHolder(view, context, listener);
             case FREE_RESPONSE:
-                return new FreeResponseViewHolder(view, context);
+                return new FreeResponseViewHolder(view, context, listener);
             case FRONT_PICTURE:
-                return new FrontPictureViewHolder(view, context);
+                return new FrontPictureViewHolder(view, context, listener);
             case GEO_LOCATION:
-                return new GeoLocationViewHolder(view, context);
+                return new GeoLocationViewHolder(view, context, listener);
             case INSTRUCTIONS:
-                return new InstructionsViewHolder(view, context);
+                return new InstructionsViewHolder(view, context, listener);
             case INTEGER:
-                return new IntegerViewHolder(view, context);
+                return new IntegerViewHolder(view, context, listener);
             case LABELED_SLIDER:
-                return new LabeledSliderViewHolder(view, context);
+                return new LabeledSliderViewHolder(view, context, listener);
             case INTEGER_BOX:
-                return new IntegerBoxesViewHolder(view, context);
+                return new IntegerBoxesViewHolder(view, context, listener);
             case TEXT_BOX:
-                return new TextBoxesViewHolder(view, context);
+                return new TextBoxesViewHolder(view, context, listener);
             case MONTH_AND_YEAR:
-                return new MonthAndYearViewHolder(view, context);
+                return new MonthAndYearViewHolder(view, context, listener);
             case PHONE_NUMBER:
-                return new PhoneNumberViewHolder(view, context);
+                return new PhoneNumberViewHolder(view, context, listener);
             case RANGE:
-                return new RangeViewHolder(view, context);
+                return new RangeViewHolder(view, context, listener);
             case RATING:
-                return new RatingViewHolder(view, context);
+                return new RatingViewHolder(view, context, listener);
             case REAR_PICTURE:
-                return new RearPictureViewHolder(view, context);
+                return new RearPictureViewHolder(view, context, listener);
             case MULTIPLE:
-                return new SelectMultipleViewHolder(view, context);
+                return new SelectMultipleViewHolder(view, context, listener);
             case MULTIPLE_IMAGE:
-                return new SelectMultipleImageViewHolder(view, context);
+                return new SelectMultipleImageViewHolder(view, context, listener);
             case MULTIPLE_WRITE_OTHER:
-                return new SelectMultipleWriteOtherViewHolder(view, context);
+                return new SelectMultipleWriteOtherViewHolder(view, context, listener);
             case ONE:
-                return new SelectOneViewHolder(view, context);
+                return new SelectOneViewHolder(view, context, listener);
             case ONE_IMAGE:
-                return new SelectOneImageViewHolder(view, context);
+                return new SelectOneImageViewHolder(view, context, listener);
             case ONE_WRITE_OTHER:
-                return new SelectOneWriteOtherViewHolder(view, context);
+                return new SelectOneWriteOtherViewHolder(view, context, listener);
             case SIGNATURE:
-                return new SignatureViewHolder(view, context);
+                return new SignatureViewHolder(view, context, listener);
             case SLIDER:
-                return new SliderViewHolder(view, context);
+                return new SliderViewHolder(view, context, listener);
             case SUM:
-                return new SumOfPartsViewHolder(view, context);
+                return new SumOfPartsViewHolder(view, context, listener);
             case TIME:
-                return new TimeViewHolder(view, context);
+                return new TimeViewHolder(view, context, listener);
             case YEAR:
-                return new YearViewHolder(view, context);
+                return new YearViewHolder(view, context, listener);
             default:
-                return new FreeResponseViewHolder(view, context);
+                return new FreeResponseViewHolder(view, context, listener);
         }
     }
 

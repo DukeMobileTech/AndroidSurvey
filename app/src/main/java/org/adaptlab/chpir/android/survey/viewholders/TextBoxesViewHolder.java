@@ -6,8 +6,8 @@ import android.widget.EditText;
 
 public class TextBoxesViewHolder extends ListOfItemsViewHolder {
 
-    TextBoxesViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    TextBoxesViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
 
     @Override

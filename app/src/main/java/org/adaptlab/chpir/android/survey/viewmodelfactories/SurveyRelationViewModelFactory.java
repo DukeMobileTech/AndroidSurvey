@@ -1,0 +1,29 @@
+package org.adaptlab.chpir.android.survey.viewmodelfactories;
+
+import android.app.Application;
+import android.arch.lifecycle.ViewModel;
+import android.arch.lifecycle.ViewModelProvider;
+import android.support.annotation.NonNull;
+
+import org.adaptlab.chpir.android.survey.viewmodels.SurveyRelationViewModel;
+
+public class SurveyRelationViewModelFactory implements ViewModelProvider.Factory {
+    private String mUUID;
+    private Application mApplication;
+
+    public SurveyRelationViewModelFactory(@NonNull Application application, String uuid) {
+        this.mApplication = application;
+        this.mUUID = uuid;
+    }
+
+    @NonNull
+    @Override
+    public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+        if (modelClass.isAssignableFrom(SurveyRelationViewModel.class)) {
+            return (T) new SurveyRelationViewModel(mApplication, mUUID);
+        } else {
+            return null;
+        }
+    }
+
+}

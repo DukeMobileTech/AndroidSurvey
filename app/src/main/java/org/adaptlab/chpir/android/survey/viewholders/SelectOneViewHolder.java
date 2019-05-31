@@ -17,8 +17,8 @@ public class SelectOneViewHolder extends SingleQuestionViewHolder {
     private RadioGroup mRadioGroup;
     private int mResponseIndex;
 
-    SelectOneViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    SelectOneViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
 
     // This is used to add additional UI components in subclasses.

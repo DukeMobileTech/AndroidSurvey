@@ -13,8 +13,8 @@ public class TimeViewHolder extends SingleQuestionViewHolder {
     private int mMinute;
     private TimePicker mTimePicker;
 
-    TimeViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    TimeViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
 
     @Override

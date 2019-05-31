@@ -1,7 +1,7 @@
 package org.adaptlab.chpir.android.survey.entities;
 
 import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
@@ -14,16 +14,12 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.arch.persistence.room.ForeignKey.CASCADE;
-
-@android.arch.persistence.room.Entity(tableName = "LoopQuestions",
-        foreignKeys = @ForeignKey(entity = Question.class,
-                parentColumns = "RemoteId", childColumns = "QuestionRemoteId", onDelete = CASCADE))
+@Entity(tableName = "LoopQuestions")
 public class LoopQuestion implements SurveyEntity {
     @PrimaryKey
     @NonNull
     @SerializedName("id")
-    @ColumnInfo(name = "RemoteId")
+    @ColumnInfo(name = "RemoteId", index = true)
     private Long mRemoteId;
     @SerializedName("parent")
     @ColumnInfo(name = "Parent")

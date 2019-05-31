@@ -17,8 +17,8 @@ public class SelectOneImageViewHolder extends SingleQuestionViewHolder {
     private Integer mPreviouslySelectedViewIndex = Integer.MAX_VALUE;
     private GridView mGridView;
 
-    SelectOneImageViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    SelectOneImageViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
 
     @Override

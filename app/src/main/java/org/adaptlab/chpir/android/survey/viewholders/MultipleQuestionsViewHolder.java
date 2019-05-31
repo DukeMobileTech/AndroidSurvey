@@ -6,10 +6,9 @@ import android.view.ViewGroup;
 
 public abstract class MultipleQuestionsViewHolder extends QuestionViewHolder {
 
-    MultipleQuestionsViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    MultipleQuestionsViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
-
 
     protected abstract void createQuestionComponent(ViewGroup questionComponent);
 

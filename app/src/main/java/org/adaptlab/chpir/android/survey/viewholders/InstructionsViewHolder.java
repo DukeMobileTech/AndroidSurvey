@@ -11,8 +11,8 @@ import android.view.ViewGroup;
  */
 public class InstructionsViewHolder extends SingleQuestionViewHolder {
 
-    InstructionsViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    InstructionsViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
 
     @Override

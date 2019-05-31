@@ -12,8 +12,8 @@ import org.adaptlab.chpir.android.survey.R;
 public class SelectMultipleWriteOtherViewHolder extends SelectMultipleViewHolder {
     private EditText otherText = null;
 
-    SelectMultipleWriteOtherViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    SelectMultipleWriteOtherViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
 
     @Override

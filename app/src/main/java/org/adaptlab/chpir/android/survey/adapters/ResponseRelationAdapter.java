@@ -17,10 +17,13 @@ import org.adaptlab.chpir.android.survey.viewholders.QuestionViewHolderFactory;
 import java.util.HashMap;
 import java.util.List;
 
+import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.SKIPPED;
+
 public class ResponseRelationAdapter extends ListAdapter<ResponseRelation, QuestionViewHolder> {
     public static final String TAG = ResponseRelationAdapter.class.getName();
 
     private HashMap<String, QuestionRelation> mQuestionRelations;
+    private QuestionViewHolder.OnResponseSelectedListener mListener;
 
     private static final DiffUtil.ItemCallback<ResponseRelation> DIFF_CALLBACK = new DiffUtil.ItemCallback<ResponseRelation>() {
         @Override
@@ -35,20 +38,21 @@ public class ResponseRelationAdapter extends ListAdapter<ResponseRelation, Quest
             boolean same = oldResponseRelation.response.getText().equals(newResponseRelation.response.getText()) &&
                     oldResponseRelation.response.getSpecialResponse().equals(newResponseRelation.response.getSpecialResponse()) &&
                     oldResponseRelation.response.getOtherResponse().equals(newResponseRelation.response.getOtherResponse());
-//            Log.i(TAG, "areContentsTheSame: " + same);
+//            Log.i(TAG, newResponseRelation.response.getQuestionIdentifier() + ": " + same);
             return same;
         }
     };
 
-    public ResponseRelationAdapter() {
+    public ResponseRelationAdapter(QuestionViewHolder.OnResponseSelectedListener listener) {
         super(DIFF_CALLBACK);
+        mListener = listener;
     }
 
     @NonNull
     @Override
     public QuestionViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_question, parent, false);
-        return QuestionViewHolderFactory.createViewHolder(view, parent.getContext(), viewType);
+        return QuestionViewHolderFactory.createViewHolder(view, parent.getContext(), viewType, mListener);
     }
 
     @Override

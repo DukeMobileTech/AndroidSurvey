@@ -15,9 +15,7 @@ public class QuestionRelationRepository {
     public final String TAG = this.getClass().getName();
     private LiveData<List<QuestionRelation>> questions;
 
-    public QuestionRelationRepository(Application application, Long instrumentId, Long displayId, final String surveyUUID) {
-        if (BuildConfig.DEBUG)
-            Log.i(TAG, "initialize: " + instrumentId + " " + displayId + " " + surveyUUID);
+    public QuestionRelationRepository(Application application, Long instrumentId, Long displayId) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);
         QuestionDao questionDao = db.questionDao();
         questions = questionDao.displayQuestions(instrumentId, displayId);

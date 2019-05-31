@@ -13,8 +13,8 @@ public class SingleSelectMultipleViewHolder extends MultipleQuestionsViewHolder 
 //    private HashSet<Integer> mViewToHideSet;
 //    private QuestionRecyclerViewAdapter mRecyclerViewAdapter;
 
-    public SingleSelectMultipleViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    public SingleSelectMultipleViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
 
     @Override

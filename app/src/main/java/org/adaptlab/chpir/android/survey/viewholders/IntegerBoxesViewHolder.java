@@ -7,8 +7,8 @@ import android.widget.EditText;
 
 public class IntegerBoxesViewHolder extends ListOfItemsViewHolder {
 
-    IntegerBoxesViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    IntegerBoxesViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
 
     @Override

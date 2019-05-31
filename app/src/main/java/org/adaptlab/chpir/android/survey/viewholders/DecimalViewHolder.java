@@ -7,8 +7,8 @@ import android.widget.EditText;
 
 public class DecimalViewHolder extends FreeResponseViewHolder {
 
-    DecimalViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    DecimalViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
 
     protected void beforeAddViewHook(EditText editText) {

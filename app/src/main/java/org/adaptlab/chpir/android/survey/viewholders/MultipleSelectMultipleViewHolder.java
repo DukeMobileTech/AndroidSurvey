@@ -12,8 +12,8 @@ public class MultipleSelectMultipleViewHolder extends MultipleQuestionsViewHolde
 
 //    private QuestionRecyclerViewAdapter mRecyclerViewAdapter;
 
-    public MultipleSelectMultipleViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    public MultipleSelectMultipleViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
 
     @Override

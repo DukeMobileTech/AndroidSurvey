@@ -10,8 +10,8 @@ public class RatingViewHolder extends SingleQuestionViewHolder {
     private float mRating;
     private RatingBar mRatingBar;
 
-    RatingViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    RatingViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
 
     @Override

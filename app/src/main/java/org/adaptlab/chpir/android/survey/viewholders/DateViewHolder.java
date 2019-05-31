@@ -33,8 +33,8 @@ public class DateViewHolder extends SingleQuestionViewHolder {
         }
     };
 
-    DateViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    DateViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
 
     protected DatePicker beforeAddViewHook(ViewGroup component) {

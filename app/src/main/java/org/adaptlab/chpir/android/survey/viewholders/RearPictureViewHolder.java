@@ -5,9 +5,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 public class RearPictureViewHolder extends PictureViewHolder {
-    RearPictureViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    RearPictureViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
+
 //    private static final String TAG = "RearPictureViewHolder";
 //    private ResponsePhoto mPhoto;
 

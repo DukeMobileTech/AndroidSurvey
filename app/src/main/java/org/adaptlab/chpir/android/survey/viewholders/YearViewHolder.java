@@ -8,8 +8,8 @@ import android.widget.DatePicker;
 public class YearViewHolder extends DateViewHolder {
     private DatePicker mDatePicker;
 
-    YearViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    YearViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
 
     @Override

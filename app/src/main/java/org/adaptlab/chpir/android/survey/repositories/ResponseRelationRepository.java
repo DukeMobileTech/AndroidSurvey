@@ -16,8 +16,6 @@ public class ResponseRelationRepository {
     private LiveData<List<ResponseRelation>> responses;
 
     public ResponseRelationRepository(Application application, Long instrumentId, Long displayId, final String surveyUUID) {
-        if (BuildConfig.DEBUG)
-            Log.i(TAG, "initialize: " + instrumentId + " " + displayId + " " + surveyUUID);
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);
         ResponseDao responseDao = db.responseDao();
         responses = responseDao.displayResponses(instrumentId, displayId, surveyUUID);

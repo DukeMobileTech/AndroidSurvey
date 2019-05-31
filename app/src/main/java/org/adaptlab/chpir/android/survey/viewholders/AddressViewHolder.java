@@ -7,8 +7,8 @@ import android.widget.EditText;
 
 public class AddressViewHolder extends FreeResponseViewHolder {
 
-    AddressViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    AddressViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
 
     protected void beforeAddViewHook(EditText editText) {

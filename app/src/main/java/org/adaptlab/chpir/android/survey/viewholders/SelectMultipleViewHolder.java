@@ -17,8 +17,8 @@ public class SelectMultipleViewHolder extends SingleQuestionViewHolder {
     private ArrayList<Integer> mResponseIndices;
     private ArrayList<CheckBox> mCheckBoxes;
 
-    SelectMultipleViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    SelectMultipleViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
 
     // This is used to add additional UI components in subclasses.

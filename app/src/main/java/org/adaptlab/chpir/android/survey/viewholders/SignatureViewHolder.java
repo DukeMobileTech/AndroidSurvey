@@ -18,8 +18,8 @@ public class SignatureViewHolder extends SingleQuestionViewHolder {
     private ResponsePhoto mResponsePhoto;
     private Bitmap mSignatureBitmap;
 
-    SignatureViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    SignatureViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
 
 //    @Override

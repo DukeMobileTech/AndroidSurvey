@@ -10,8 +10,8 @@ import org.adaptlab.chpir.android.survey.utils.FormatUtils;
 public class MonthAndYearViewHolder extends DateViewHolder {
     private static final String TAG = "MonthAndYearViewHolder";
 
-    MonthAndYearViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    MonthAndYearViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
 
     @Override

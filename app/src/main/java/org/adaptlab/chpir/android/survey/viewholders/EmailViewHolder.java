@@ -7,8 +7,8 @@ import android.widget.EditText;
 
 public class EmailViewHolder extends FreeResponseViewHolder {
 
-    EmailViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    EmailViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
 
     protected void beforeAddViewHook(EditText editText) {

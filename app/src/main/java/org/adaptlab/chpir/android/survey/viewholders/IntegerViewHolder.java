@@ -7,8 +7,8 @@ import android.widget.EditText;
 
 public class IntegerViewHolder extends FreeResponseViewHolder {
 
-    IntegerViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    IntegerViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
 
     protected void beforeAddViewHook(EditText editText) {

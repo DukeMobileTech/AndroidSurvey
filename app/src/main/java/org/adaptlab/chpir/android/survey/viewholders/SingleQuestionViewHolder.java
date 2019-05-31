@@ -14,7 +14,6 @@ import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -45,13 +44,17 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.BLANK;
+import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.EDIT_TEXT_DELAY;
 import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtml;
 
 public abstract class SingleQuestionViewHolder extends QuestionViewHolder {
     protected RadioGroup mSpecialResponses;
+
     private ResponseRepository mResponseRepository;
     private SurveyRepository mSurveyRepository;
+
+    private QuestionRelation mQuestionRelation;
     private Question mQuestion;
     private Survey mSurvey;
     private Response mResponse;
@@ -60,16 +63,17 @@ public abstract class SingleQuestionViewHolder extends QuestionViewHolder {
     private List<Option> mOptions;
     private List<Option> mSpecialOptions;
     private List<DisplayInstructionRelation> mDisplayInstructions;
+
     private TextView mDisplayInstructionTextView;
     private TextView mSpannedTextView;
     private TextView mOptionSetInstructionTextView;
     private ViewGroup mQuestionComponent;
     private Button mClearButton;
+
     private boolean mDeserialization = false;
 
-
-    public SingleQuestionViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    public SingleQuestionViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
         mResponseRepository = new ResponseRepository((Application) context.getApplicationContext());
         mSurveyRepository = new SurveyRepository((Application) context.getApplicationContext());
         mDisplayInstructionTextView = itemView.findViewById(R.id.displayInstructions);
@@ -78,6 +82,28 @@ public abstract class SingleQuestionViewHolder extends QuestionViewHolder {
         mQuestionComponent = itemView.findViewById(R.id.response_component);
         mSpecialResponses = itemView.findViewById(R.id.specialResponseButtons);
         mClearButton = itemView.findViewById(R.id.clearResponsesButton);
+    }
+
+    @Override
+    public void setQuestionRelation(ResponseRelation responseRelation, QuestionRelation questionRelation) {
+        mQuestionRelation = questionRelation;
+        mQuestion = questionRelation.question;
+        mSurvey = responseRelation.surveys.get(0);
+        mResponse = responseRelation.response;
+        setQuestionInstruction(questionRelation);
+        setOptionSetItems(questionRelation);
+        setSpecialOptions(questionRelation);
+        setDisplayInstructions(questionRelation);
+
+        setSpannedText();
+        setDisplayInstructionsText();
+        setOptionSetInstructionsText();
+        // Overridden by subclasses to place their graphical elements on the fragment.
+        createQuestionComponent(mQuestionComponent);
+        setSpecialResponseView();
+        mDeserialization = true;
+        deserializeResponse();
+        mDeserialization = false;
     }
 
     @Override
@@ -91,6 +117,10 @@ public abstract class SingleQuestionViewHolder extends QuestionViewHolder {
 
     boolean isDeserialization() {
         return mDeserialization;
+    }
+
+    RadioGroup getSpecialResponses() {
+        return mSpecialResponses;
     }
 
     protected abstract void createQuestionComponent(ViewGroup questionComponent);
@@ -138,27 +168,6 @@ public abstract class SingleQuestionViewHolder extends QuestionViewHolder {
     private void setOtherResponse(String response) {
         getResponse().setOtherResponse(response);
         saveResponse();
-    }
-
-    @Override
-    public void setQuestionRelation(ResponseRelation responseRelation, QuestionRelation questionRelation) {
-        mQuestion = questionRelation.question;
-        mSurvey = responseRelation.surveys.get(0);
-        mResponse = responseRelation.response;
-        setQuestionInstruction(questionRelation);
-        setOptionSetItems(questionRelation);
-        setSpecialOptions(questionRelation);
-        setDisplayInstructions(questionRelation);
-
-        setSpannedText();
-        setDisplayInstructionsText();
-        setOptionSetInstructionsText();
-        // Overridden by subclasses to place their graphical elements on the fragment.
-        createQuestionComponent(mQuestionComponent);
-        setSpecialResponseView();
-        mDeserialization = true;
-        deserializeResponse();
-        mDeserialization = false;
     }
 
     private void setQuestionInstruction(QuestionRelation questionRelation) {
@@ -225,11 +234,52 @@ public abstract class SingleQuestionViewHolder extends QuestionViewHolder {
     }
 
     private void updateResponse() {
-        mResponse.setTimeEnded(new Date());
-        mResponseRepository.update(mResponse);
+        updateSkipData();
         mSurvey.setLastUpdated(new Date());
         mSurveyRepository.update(mSurvey);
-//        Log.i(TAG, "updateResponse");
+        mResponse.setTimeEnded(new Date());
+        mResponseRepository.update(mResponse);
+    }
+
+    private void updateSkipData() {
+        Option selectedOption = null;
+        String enteredValue = null;
+        List<Option> selectedOptions = new ArrayList<>();
+        if (!TextUtils.isEmpty(mResponse.getText())) {
+            if (mQuestion.isSingleResponse()) {
+                selectedOption = getSelectedOption(mResponse.getText());
+            } else if (mQuestion.getQuestionType().equals(Question.INTEGER)) {
+                enteredValue = mResponse.getText();
+            } else if (mQuestion.isMultipleResponse()) {
+                String[] responses = mResponse.getText().split(COMMA);
+                if (responses.length == 1) {
+                    selectedOption = getSelectedOption(responses[0]);
+                } else {
+                    for (String str : responses) {
+                        Option option = getSelectedOption(str);
+                        if (option != null) selectedOptions.add(option);
+                    }
+                }
+            }
+        }
+        if (!TextUtils.isEmpty(mResponse.getSpecialResponse())) {
+            for (Option option : mSpecialOptions) {
+                if (option.getText().equals(mResponse.getSpecialResponse())) {
+                    selectedOption = option;
+                    break;
+                }
+            }
+        }
+        getListener().onResponseSelected(mQuestionRelation, selectedOption, selectedOptions, enteredValue);
+    }
+
+    private Option getSelectedOption(String responseText) {
+        int responseIndex = Integer.parseInt(responseText);
+        if (responseIndex < mOptions.size()) {
+            return mOptions.get(responseIndex);
+        } else {
+            return null;
+        }
     }
 
     private void saveSpecialResponse(String specialResponse) {
@@ -307,7 +357,7 @@ public abstract class SingleQuestionViewHolder extends QuestionViewHolder {
 //                    if (causeQuestion.isSingleSelect()) {
 //                        int index = Integer.parseInt(responses[question.getLoopNumber()]);
 //                        responseText = mSurveyFragment.getOptions().get(causeQuestion).get(index).getText(mSurveyFragment.getInstrument());
-//                    } else if (causeQuestion.hasMultipleResponses()) {
+//                    } else if (causeQuestion.isMultipleResponse()) {
 //                        if (Arrays.asList(responses).contains(Integer.toString(question.getLoopNumber()))) {
 //                            responseText = mSurveyFragment.getOptions().get(causeQuestion).get(question.getLoopNumber()).getText(mSurveyFragment.getInstrument());
 //                        }
@@ -393,15 +443,10 @@ public abstract class SingleQuestionViewHolder extends QuestionViewHolder {
         mClearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                mSpecialResponses.clearCheck();
-//                unSetResponse();
-//                if (mQuestion.rankResponses()) {
-//                    if (mRankLayout != null && mOptionsAdapter != null) {
-//                        mOptionsAdapter.clear();
-//                        mRankLayout.setVisibility(View.GONE);
-//                    }
-//                }
-//                setResponse(Response.BLANK);
+                mResponse.setText(BLANK);
+                mResponse.setOtherResponse(BLANK);
+                mResponse.setSpecialResponse(BLANK);
+                updateResponse();
             }
         });
     }

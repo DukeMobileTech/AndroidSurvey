@@ -20,8 +20,8 @@ public class DropDownViewHolder extends SingleQuestionViewHolder {
     private ArrayAdapter<String> mAdapter;
     private int mResponseIndex;
 
-    DropDownViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    DropDownViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
 
     //    @Override

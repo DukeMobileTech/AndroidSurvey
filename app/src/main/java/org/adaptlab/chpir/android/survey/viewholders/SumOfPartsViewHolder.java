@@ -7,15 +7,14 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 public class SumOfPartsViewHolder extends ListOfItemsViewHolder {
-    SumOfPartsViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    SumOfPartsViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
 
     @Override
     protected EditText createEditText() {
         EditText editText = new EditText(getContext());
-        editText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED |
-                InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        editText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         return editText;
     }
 

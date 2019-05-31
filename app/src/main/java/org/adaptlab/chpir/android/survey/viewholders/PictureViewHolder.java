@@ -5,9 +5,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 public abstract class PictureViewHolder extends SingleQuestionViewHolder {
-    PictureViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    PictureViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
+
 //    public static final int REAR_CAMERA = 0;
 //    public static final int FRONT_CAMERA = 1;
 //    public static final int REQUEST_PHOTO = 0;

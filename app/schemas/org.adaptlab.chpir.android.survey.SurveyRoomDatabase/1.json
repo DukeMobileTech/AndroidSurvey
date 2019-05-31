@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "a41a38f4e3739d2c858963d8b8a65fe1",
+    "identityHash": "9adf22ce7eae9aeade68b8a5d4c81364",
     "entities": [
       {
         "tableName": "Instruments",
@@ -566,7 +566,7 @@
       },
       {
         "tableName": "LoopQuestions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Parent` TEXT, `Looped` TEXT, `Deleted` INTEGER NOT NULL, `OptionIndices` TEXT, `SameDisplay` INTEGER NOT NULL, `TextToReplace` TEXT, `QuestionRemoteId` INTEGER, PRIMARY KEY(`RemoteId`), FOREIGN KEY(`QuestionRemoteId`) REFERENCES `Questions`(`RemoteId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Parent` TEXT, `Looped` TEXT, `Deleted` INTEGER NOT NULL, `OptionIndices` TEXT, `SameDisplay` INTEGER NOT NULL, `TextToReplace` TEXT, `QuestionRemoteId` INTEGER, PRIMARY KEY(`RemoteId`))",
         "fields": [
           {
             "fieldPath": "mRemoteId",
@@ -625,6 +625,14 @@
         },
         "indices": [
           {
+            "name": "index_LoopQuestions_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE  INDEX `index_LoopQuestions_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          },
+          {
             "name": "index_LoopQuestions_QuestionRemoteId",
             "unique": false,
             "columnNames": [
@@ -633,19 +641,7 @@
             "createSql": "CREATE  INDEX `index_LoopQuestions_QuestionRemoteId` ON `${TABLE_NAME}` (`QuestionRemoteId`)"
           }
         ],
-        "foreignKeys": [
-          {
-            "table": "Questions",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "QuestionRemoteId"
-            ],
-            "referencedColumns": [
-              "RemoteId"
-            ]
-          }
-        ]
+        "foreignKeys": []
       },
       {
         "tableName": "CriticalResponses",
@@ -1730,7 +1726,7 @@
       },
       {
         "tableName": "MultipleSkips",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `QuestionIdentifier` TEXT, `OptionIdentifier` TEXT, `SkipQuestionIdentifier` TEXT, `QuestionId` INTEGER, `InstrumentRemoteId` INTEGER, `Deleted` INTEGER NOT NULL, `Value` TEXT, PRIMARY KEY(`RemoteId`), FOREIGN KEY(`QuestionIdentifier`) REFERENCES `Questions`(`QuestionIdentifier`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `QuestionIdentifier` TEXT, `OptionIdentifier` TEXT, `SkipQuestionIdentifier` TEXT, `QuestionId` INTEGER, `InstrumentRemoteId` INTEGER, `Deleted` INTEGER NOT NULL, `Value` TEXT, PRIMARY KEY(`RemoteId`))",
         "fields": [
           {
             "fieldPath": "mRemoteId",
@@ -1789,31 +1785,43 @@
         },
         "indices": [
           {
+            "name": "index_MultipleSkips_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE  INDEX `index_MultipleSkips_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          },
+          {
             "name": "index_MultipleSkips_QuestionIdentifier",
             "unique": false,
             "columnNames": [
               "QuestionIdentifier"
             ],
             "createSql": "CREATE  INDEX `index_MultipleSkips_QuestionIdentifier` ON `${TABLE_NAME}` (`QuestionIdentifier`)"
+          },
+          {
+            "name": "index_MultipleSkips_OptionIdentifier",
+            "unique": false,
+            "columnNames": [
+              "OptionIdentifier"
+            ],
+            "createSql": "CREATE  INDEX `index_MultipleSkips_OptionIdentifier` ON `${TABLE_NAME}` (`OptionIdentifier`)"
+          },
+          {
+            "name": "index_MultipleSkips_SkipQuestionIdentifier",
+            "unique": false,
+            "columnNames": [
+              "SkipQuestionIdentifier"
+            ],
+            "createSql": "CREATE  INDEX `index_MultipleSkips_SkipQuestionIdentifier` ON `${TABLE_NAME}` (`SkipQuestionIdentifier`)"
           }
         ],
-        "foreignKeys": [
-          {
-            "table": "Questions",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "QuestionIdentifier"
-            ],
-            "referencedColumns": [
-              "QuestionIdentifier"
-            ]
-          }
-        ]
+        "foreignKeys": []
       },
       {
         "tableName": "NextQuestions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `QuestionIdentifier` TEXT, `OptionIdentifier` TEXT, `NextQuestionIdentifier` TEXT, `QuestionId` INTEGER, `InstrumentRemoteId` INTEGER, `Deleted` INTEGER NOT NULL, `CompleteSurvey` INTEGER NOT NULL, `Value` TEXT, PRIMARY KEY(`RemoteId`), FOREIGN KEY(`QuestionIdentifier`) REFERENCES `Questions`(`QuestionIdentifier`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `QuestionIdentifier` TEXT, `OptionIdentifier` TEXT, `NextQuestionIdentifier` TEXT, `QuestionId` INTEGER, `InstrumentRemoteId` INTEGER, `Deleted` INTEGER NOT NULL, `CompleteSurvey` INTEGER NOT NULL, `Value` TEXT, PRIMARY KEY(`RemoteId`))",
         "fields": [
           {
             "fieldPath": "mRemoteId",
@@ -1878,27 +1886,39 @@
         },
         "indices": [
           {
+            "name": "index_NextQuestions_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE  INDEX `index_NextQuestions_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          },
+          {
             "name": "index_NextQuestions_QuestionIdentifier",
             "unique": false,
             "columnNames": [
               "QuestionIdentifier"
             ],
             "createSql": "CREATE  INDEX `index_NextQuestions_QuestionIdentifier` ON `${TABLE_NAME}` (`QuestionIdentifier`)"
+          },
+          {
+            "name": "index_NextQuestions_OptionIdentifier",
+            "unique": false,
+            "columnNames": [
+              "OptionIdentifier"
+            ],
+            "createSql": "CREATE  INDEX `index_NextQuestions_OptionIdentifier` ON `${TABLE_NAME}` (`OptionIdentifier`)"
+          },
+          {
+            "name": "index_NextQuestions_NextQuestionIdentifier",
+            "unique": false,
+            "columnNames": [
+              "NextQuestionIdentifier"
+            ],
+            "createSql": "CREATE  INDEX `index_NextQuestions_NextQuestionIdentifier` ON `${TABLE_NAME}` (`NextQuestionIdentifier`)"
           }
         ],
-        "foreignKeys": [
-          {
-            "table": "Questions",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "QuestionIdentifier"
-            ],
-            "referencedColumns": [
-              "QuestionIdentifier"
-            ]
-          }
-        ]
+        "foreignKeys": []
       },
       {
         "tableName": "Surveys",
@@ -2171,7 +2191,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"a41a38f4e3739d2c858963d8b8a65fe1\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"9adf22ce7eae9aeade68b8a5d4c81364\")"
     ]
   }
 }

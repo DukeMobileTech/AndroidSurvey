@@ -1,7 +1,7 @@
 package org.adaptlab.chpir.android.survey.entities;
 
 import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
@@ -14,25 +14,21 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.arch.persistence.room.ForeignKey.CASCADE;
-
-@android.arch.persistence.room.Entity(tableName = "MultipleSkips",
-        foreignKeys = @ForeignKey(entity = Question.class,
-                parentColumns = "QuestionIdentifier", childColumns = "QuestionIdentifier", onDelete = CASCADE))
+@Entity(tableName = "MultipleSkips")
 public class MultipleSkip implements SurveyEntity {
     @PrimaryKey
     @NonNull
     @SerializedName("id")
-    @ColumnInfo(name = "RemoteId")
+    @ColumnInfo(name = "RemoteId", index = true)
     private Long mRemoteId;
     @SerializedName("question_identifier")
     @ColumnInfo(name = "QuestionIdentifier", index = true)
     private String mQuestionIdentifier;
     @SerializedName("option_identifier")
-    @ColumnInfo(name = "OptionIdentifier")
+    @ColumnInfo(name = "OptionIdentifier", index = true)
     private String mOptionIdentifier;
     @SerializedName("skip_question_identifier")
-    @ColumnInfo(name = "SkipQuestionIdentifier")
+    @ColumnInfo(name = "SkipQuestionIdentifier", index = true)
     private String mSkipQuestionIdentifier;
     @SerializedName("question_id")
     @ColumnInfo(name = "QuestionId")

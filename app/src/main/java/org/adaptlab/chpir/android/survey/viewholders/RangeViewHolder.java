@@ -14,8 +14,8 @@ public class RangeViewHolder extends SingleQuestionViewHolder {
     private EditText mStart;
     private EditText mEnd;
 
-    RangeViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    RangeViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
 
 //    @Override

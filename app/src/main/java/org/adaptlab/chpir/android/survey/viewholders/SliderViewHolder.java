@@ -9,8 +9,8 @@ public class SliderViewHolder extends SingleQuestionViewHolder {
     private int mProgress;
     private SeekBar mSlider;
 
-    SliderViewHolder(View itemView, Context context) {
-        super(itemView, context);
+    SliderViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
+        super(itemView, context, listener);
     }
 
     protected void beforeAddViewHook(ViewGroup questionComponent) {
