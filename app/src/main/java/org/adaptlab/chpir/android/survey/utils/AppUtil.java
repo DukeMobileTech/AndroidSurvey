@@ -29,6 +29,7 @@ import org.adaptlab.chpir.android.survey.repositories.InstructionRepository;
 import org.adaptlab.chpir.android.survey.repositories.InstrumentRepository;
 import org.adaptlab.chpir.android.survey.repositories.LoopQuestionRepository;
 import org.adaptlab.chpir.android.survey.repositories.MultipleSkipRepository;
+import org.adaptlab.chpir.android.survey.repositories.NextQuestionRepository;
 import org.adaptlab.chpir.android.survey.repositories.OptionRepository;
 import org.adaptlab.chpir.android.survey.repositories.OptionSetOptionRepository;
 import org.adaptlab.chpir.android.survey.repositories.OptionSetRepository;
@@ -211,6 +212,7 @@ public class AppUtil {
         new LoopQuestionRepository(application).download();
         new FollowUpQuestionRepository(application).download();
         new MultipleSkipRepository(application).download();
+        new NextQuestionRepository(application).download();
     }
 
     public static void incrementRemoteDownloadCount() {

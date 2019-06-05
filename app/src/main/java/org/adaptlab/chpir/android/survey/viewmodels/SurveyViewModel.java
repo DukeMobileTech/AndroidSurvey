@@ -8,6 +8,8 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import org.adaptlab.chpir.android.survey.BuildConfig;
+import org.adaptlab.chpir.android.survey.entities.Display;
+import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.Survey;
 import org.adaptlab.chpir.android.survey.repositories.SurveyRepository;
 import org.json.JSONException;
@@ -28,6 +30,10 @@ public class SurveyViewModel extends AndroidViewModel {
     private HashSet<String> mQuestionsToSkipSet;
     private HashMap<String, List<String>> mQuestionsToSkipMap;
     private Survey mSurvey;
+    private int mDisplayPosition = 0;
+    private List<Question> mQuestions;
+    private List<Display> mDisplays;
+    private List<Integer> mPreviousDisplays;
 
     public SurveyViewModel(@NonNull Application application, String uuid) {
         super(application);
@@ -50,6 +56,46 @@ public class SurveyViewModel extends AndroidViewModel {
 
     public HashSet<String> getQuestionsToSkipSet() {
         return mQuestionsToSkipSet;
+    }
+
+    public void setDisplayPosition(int position) {
+        mDisplayPosition = position;
+    }
+
+    public int getDisplayPosition() {
+        return mDisplayPosition;
+    }
+
+    public void decrementDisplayPosition() {
+        mDisplayPosition -=1;
+    }
+
+    public void incrementDisplayPosition() {
+        mDisplayPosition +=1;
+    }
+
+    public List<Question> getQuestions() {
+        return mQuestions;
+    }
+
+    public void setQuestions(List<Question> mQuestions) {
+        this.mQuestions = mQuestions;
+    }
+
+    public List<Display> getDisplays() {
+        return mDisplays;
+    }
+
+    public void setDisplays(List<Display> mDisplays) {
+        this.mDisplays = mDisplays;
+    }
+
+    public List<Integer> getPreviousDisplays() {
+        return mPreviousDisplays;
+    }
+
+    public void setPreviousDisplays(List<Integer> mPreviousDisplays) {
+        this.mPreviousDisplays = mPreviousDisplays;
     }
 
     public void setSkipData() {

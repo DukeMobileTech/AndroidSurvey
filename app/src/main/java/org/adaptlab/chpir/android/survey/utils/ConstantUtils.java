@@ -4,5 +4,6 @@ public class ConstantUtils {
     public static final String BLANK = "";
     public static final String COMMA = ",";
     public static final String SKIPPED = "SKIPPED";
+    public static final String COMPLETE_SURVEY = "COMPLETE_SURVEY";
     public static final int EDIT_TEXT_DELAY = 2000;
 }

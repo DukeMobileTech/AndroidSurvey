@@ -14,6 +14,7 @@ import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -24,6 +25,7 @@ import android.widget.TextView;
 
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.entities.Instruction;
+import org.adaptlab.chpir.android.survey.entities.NextQuestion;
 import org.adaptlab.chpir.android.survey.entities.Option;
 import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.Response;
@@ -39,6 +41,7 @@ import org.adaptlab.chpir.android.survey.repositories.SurveyRepository;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -270,7 +273,80 @@ public abstract class SingleQuestionViewHolder extends QuestionViewHolder {
                 }
             }
         }
-        getListener().onResponseSelected(mQuestionRelation, selectedOption, selectedOptions, enteredValue);
+        String nextQuestion = null;
+        if (selectedOptions.isEmpty()) {
+            if (selectedOption != null && enteredValue == null) {
+                nextQuestion = getNextQuestionIdentifier(selectedOption);
+            } else if (selectedOption == null && enteredValue != null) {
+                nextQuestion = getNextQuestionIdentifier(enteredValue);
+            }
+        } else {
+            nextQuestion = getNextQuestionIdentifier(selectedOptions);
+        }
+
+        getListener().onResponseSelected(mQuestionRelation, selectedOption, selectedOptions, enteredValue, nextQuestion);
+    }
+
+    private String getNextQuestionIdentifier(Option option) {
+        if (!TextUtils.isEmpty(mResponse.getText())) {
+            NextQuestion nextQuestion = getNextQuestionForOption(option);
+            if (nextQuestion != null) {
+                return nextQuestion.getNextQuestionString();
+            }
+        }
+        if (!TextUtils.isEmpty(mResponse.getSpecialResponse())) {
+            NextQuestion nextQuestion = getNextQuestionForOption(option);
+            if (nextQuestion != null) {
+                return nextQuestion.getNextQuestionString();
+            }
+        }
+        return null;
+    }
+
+    private String getNextQuestionIdentifier(String value) {
+        if (TextUtils.isEmpty(value)) return null;
+        NextQuestion nextQuestion = getNextQuestionForValue(value);
+        if (nextQuestion != null) {
+            return nextQuestion.getNextQuestionString();
+        }
+        return null;
+    }
+
+    private String getNextQuestionIdentifier(List<Option> options) {
+        HashSet<String> nextQuestions = new HashSet<>();
+        for (Option option : options) {
+            NextQuestion nextQuestion = getNextQuestionForOption(option);
+            if (nextQuestion != null && !TextUtils.isEmpty(nextQuestion.getNextQuestionIdentifier())) {
+                nextQuestions.add(nextQuestion.getNextQuestionIdentifier());
+            }
+        }
+        if (nextQuestions.size() == 1) {
+            return nextQuestions.iterator().next();
+        } else {
+            return null;
+        }
+    }
+
+    private NextQuestion getNextQuestionForOption(Option option) {
+        List<NextQuestion> nextQuestions = mQuestionRelation.nextQuestions;
+        if (nextQuestions == null) return null;
+        for (NextQuestion nextQuestion : nextQuestions) {
+            if (nextQuestion.getOptionIdentifier().equals(option.getIdentifier())) {
+                return nextQuestion;
+            }
+        }
+        return null;
+    }
+
+    private NextQuestion getNextQuestionForValue(String value) {
+        List<NextQuestion> nextQuestions = mQuestionRelation.nextQuestions;
+        if (nextQuestions == null) return null;
+        for (NextQuestion nextQuestion : nextQuestions) {
+            if (nextQuestion.getValue().equals(value)) {
+                return nextQuestion;
+            }
+        }
+        return null;
     }
 
     private Option getSelectedOption(String responseText) {

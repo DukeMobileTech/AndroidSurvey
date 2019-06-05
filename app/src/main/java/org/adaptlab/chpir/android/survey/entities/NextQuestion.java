@@ -14,6 +14,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMPLETE_SURVEY;
+
 @Entity(tableName = "NextQuestions")
 public class NextQuestion implements SurveyEntity {
     @PrimaryKey
@@ -119,9 +121,17 @@ public class NextQuestion implements SurveyEntity {
         this.mValue = mValue;
     }
 
+    public String getNextQuestionString() {
+        if (isCompleteSurvey()) {
+            return COMPLETE_SURVEY;
+        } else {
+            return getNextQuestionIdentifier();
+        }
+    }
+
     @Override
     public Type getType() {
-        return new TypeToken<ArrayList<FollowUpQuestion>>() {
+        return new TypeToken<ArrayList<NextQuestion>>() {
         }.getType();
     }
 

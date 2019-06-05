@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.LongSparseArray;
 import android.view.LayoutInflater;
@@ -17,7 +18,9 @@ import android.view.ViewGroup;
 
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.adapters.ResponseRelationAdapter;
+import org.adaptlab.chpir.android.survey.entities.ConditionSkip;
 import org.adaptlab.chpir.android.survey.entities.MultipleSkip;
+import org.adaptlab.chpir.android.survey.entities.NextQuestion;
 import org.adaptlab.chpir.android.survey.entities.Option;
 import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.Response;
@@ -37,6 +40,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+
+import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMPLETE_SURVEY;
 
 public class DisplayPagerFragment extends Fragment {
     public final static String EXTRA_INSTRUMENT_ID = "org.adaptlab.chpir.android.survey.EXTRA_INSTRUMENT_ID";
@@ -70,11 +75,44 @@ public class DisplayPagerFragment extends Fragment {
     private void setOnResponseSelectedListener() {
         mListener = new QuestionViewHolder.OnResponseSelectedListener() {
             @Override
-            public void onResponseSelected(QuestionRelation qr, Option selectedOption, List<Option> selectedOptions, String enteredValue) {
-                Log.i(TAG, "qid: " + qr.question.getQuestionIdentifier());
-                if (selectedOption != null) Log.i(TAG, "Res: " + selectedOption.getText());
+            public void onResponseSelected(QuestionRelation qr, Option selectedOption, List<Option> selectedOptions, String enteredValue, String nextQuestion) {
+//                Log.i(TAG, "qid: " + qr.question.getQuestionIdentifier());
+//                if (selectedOption != null) Log.i(TAG, "Res: " + selectedOption.getText());
+//                if (nextQuestion != null) Log.i(TAG, "NQ: " + nextQuestion);
 
-                if (qr.multipleSkips != null) {
+                if (qr.nextQuestions != null && !qr.nextQuestions.isEmpty()) {
+                    List<String> skipList = new ArrayList<>();
+                    if (nextQuestion != null) {
+                        if (nextQuestion.equals(COMPLETE_SURVEY)) {
+                            List<String> questions = new ArrayList<>();
+                            for (Question q : mSurveyViewModel.getQuestions()) {
+                                questions.add(q.getQuestionIdentifier());
+                            }
+                            skipList = new ArrayList<>(questions.subList(questions.indexOf(qr.question.getQuestionIdentifier()) + 1, questions.size()));
+                        } else {
+                            boolean toBeSkipped = false;
+                            for (Question curQuestion : mSurveyViewModel.getQuestions()) {
+                                if (curQuestion.getQuestionIdentifier().equals(nextQuestion)) {
+                                    break;
+                                }
+                                if (toBeSkipped) {
+                                    skipList.add(curQuestion.getQuestionIdentifier());
+                                    Log.i(TAG, "To skip: " + curQuestion.getQuestionIdentifier());
+                                    // Skip loop children questions
+//                                for (Question question : loopChildren(curQuestion.getQuestionIdentifier())) {
+//                                    skipList.add(question.getQuestionIdentifier());
+//                                }
+                                }
+                                if (curQuestion.getQuestionIdentifier().equals(qr.question.getQuestionIdentifier()))
+                                    toBeSkipped = true;
+                            }
+                        }
+                    }
+                    mSurveyViewModel.updateQuestionsToSkipMap(qr.question.getQuestionIdentifier() + "/skipTo", skipList);
+                    mSurveyViewModel.updateQuestionsToSkipSet();
+                }
+
+                if (qr.multipleSkips != null && !qr.multipleSkips.isEmpty()) {
                     List<String> skipList = new ArrayList<>();
                     if (selectedOption != null) {
                         for (MultipleSkip multipleSkip : qr.multipleSkips) {
