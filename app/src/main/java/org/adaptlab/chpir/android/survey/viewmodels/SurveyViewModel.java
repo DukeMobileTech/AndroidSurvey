@@ -6,10 +6,12 @@ import android.arch.lifecycle.LiveData;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.util.LongSparseArray;
 
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.entities.Display;
 import org.adaptlab.chpir.android.survey.entities.Question;
+import org.adaptlab.chpir.android.survey.entities.Section;
 import org.adaptlab.chpir.android.survey.entities.Survey;
 import org.adaptlab.chpir.android.survey.repositories.SurveyRepository;
 import org.json.JSONException;
@@ -19,6 +21,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
@@ -34,6 +37,9 @@ public class SurveyViewModel extends AndroidViewModel {
     private List<Question> mQuestions;
     private List<Display> mDisplays;
     private List<Integer> mPreviousDisplays;
+    private LongSparseArray<Section> mSections;
+    private LinkedHashMap<String, List<String>> mExpandableListData;
+    private List<String> mExpandableListTitle;
 
     public SurveyViewModel(@NonNull Application application, String uuid) {
         super(application);
@@ -94,8 +100,32 @@ public class SurveyViewModel extends AndroidViewModel {
         return mPreviousDisplays;
     }
 
-    public void setPreviousDisplays(List<Integer> mPreviousDisplays) {
-        this.mPreviousDisplays = mPreviousDisplays;
+    public void setPreviousDisplays(List<Integer> previousDisplays) {
+        mPreviousDisplays = previousDisplays;
+    }
+
+    public void setSections(LongSparseArray<Section> sections) {
+        mSections = sections;
+    }
+
+    public LongSparseArray<Section> getSections() {
+        return mSections;
+    }
+
+    public LinkedHashMap<String, List<String>> getExpandableListData() {
+        return mExpandableListData;
+    }
+
+    public void setExpandableListData(LinkedHashMap<String, List<String>> listData) {
+        mExpandableListData = listData;
+    }
+
+    public List<String> getExpandableListTitle() {
+        return mExpandableListTitle;
+    }
+
+    public void setExpandableListTitle(List<String> listTitle) {
+        mExpandableListTitle = listTitle;
     }
 
     public void setSkipData() {

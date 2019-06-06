@@ -12,7 +12,7 @@ public class InstrumentViewModel extends AndroidViewModel {
     private InstrumentRepository mRepository;
     private LiveData<Instrument> mInstrument;
 
-    public InstrumentViewModel(@NonNull Application application, long instrumentId) {
+    public InstrumentViewModel(@NonNull Application application, Long instrumentId) {
         super(application);
         mRepository = new InstrumentRepository(application);
         mInstrument = mRepository.getInstrumentDao().findById(instrumentId);
