@@ -2,7 +2,11 @@ package org.adaptlab.chpir.android.survey.repositories;
 
 import android.app.Application;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
+import org.adaptlab.chpir.android.survey.converters.SurveyEntityDeserializer;
 import org.adaptlab.chpir.android.survey.daos.BaseDao;
 import org.adaptlab.chpir.android.survey.daos.OptionDao;
 import org.adaptlab.chpir.android.survey.daos.OptionTranslationDao;
@@ -51,4 +55,10 @@ public class OptionRepository extends Repository {
         return new OptionTranslation();
     }
 
+    @Override
+    public Gson getGson() {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(Option.class, new SurveyEntityDeserializer<>(Option.class));
+        return gsonBuilder.create();
+    }
 }

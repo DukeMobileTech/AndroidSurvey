@@ -2,12 +2,10 @@ package org.adaptlab.chpir.android.survey.repositories;
 
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
-import android.util.Log;
 
-import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
 import org.adaptlab.chpir.android.survey.daos.ResponseDao;
-import org.adaptlab.chpir.android.survey.entities.relations.ResponseRelation;
+import org.adaptlab.chpir.android.survey.relations.ResponseRelation;
 
 import java.util.List;
 

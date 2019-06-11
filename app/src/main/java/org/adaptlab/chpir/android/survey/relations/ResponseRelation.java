@@ -1,4 +1,4 @@
-package org.adaptlab.chpir.android.survey.entities.relations;
+package org.adaptlab.chpir.android.survey.relations;
 
 import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Relation;
@@ -8,10 +8,9 @@ import org.adaptlab.chpir.android.survey.entities.Survey;
 
 import java.util.List;
 
-public class SurveyRelation {
+public class ResponseRelation {
     @Embedded
-    public Survey survey;
-    @Relation(parentColumn = "UUID", entityColumn = "SurveyUUID", entity = Response.class)
-    public List<Response> responses;
-
+    public Response response;
+    @Relation(parentColumn = "SurveyUUID", entityColumn = "UUID", entity = Survey.class)
+    public List<Survey> surveys;
 }

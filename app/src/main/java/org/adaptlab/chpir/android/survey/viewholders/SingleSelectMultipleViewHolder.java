@@ -5,8 +5,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import org.adaptlab.chpir.android.survey.entities.Question;
-import org.adaptlab.chpir.android.survey.entities.relations.QuestionRelation;
-import org.adaptlab.chpir.android.survey.entities.relations.ResponseRelation;
+import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
+import org.adaptlab.chpir.android.survey.relations.ResponseRelation;
 
 public class SingleSelectMultipleViewHolder extends MultipleQuestionsViewHolder {
 //    private static final String TAG = "SSMQF";

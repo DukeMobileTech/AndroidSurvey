@@ -16,13 +16,7 @@ import java.util.List;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
-@android.arch.persistence.room.Entity(tableName = "OptionSetTranslations",
-        foreignKeys = {@ForeignKey(entity = OptionSet.class, parentColumns = "RemoteId",
-                childColumns = "OptionSetRemoteId", onDelete = CASCADE),
-                @ForeignKey(entity = Option.class, parentColumns = "RemoteId",
-                        childColumns = "OptionRemoteId", onDelete = CASCADE),
-                @ForeignKey(entity = OptionTranslation.class, parentColumns = "RemoteId",
-                        childColumns = "OptionTranslationRemoteId", onDelete = CASCADE)})
+@android.arch.persistence.room.Entity(tableName = "OptionSetTranslations")
 public class OptionSetTranslation implements SurveyEntity {
     @PrimaryKey
     @NonNull
@@ -98,5 +92,10 @@ public class OptionSetTranslation implements SurveyEntity {
     public void save(BaseDao dao, List list) {
         dao.updateAll(list);
         dao.insertAll(list);
+    }
+
+    @Override
+    public void setDeleted(boolean deleted) {
+
     }
 }

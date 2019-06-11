@@ -12,6 +12,7 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
 import org.adaptlab.chpir.android.survey.daos.BaseDao;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -390,6 +391,10 @@ public class Question implements SurveyEntity {
         return mQuestionType.equals(SELECT_MULTIPLE) || mQuestionType.equals(SELECT_MULTIPLE_WRITE_OTHER);
     }
 
+    public boolean isListResponse() {
+        return mQuestionType.equals(LIST_OF_INTEGER_BOXES) || mQuestionType.equals(LIST_OF_TEXT_BOXES);
+    }
+
     @Retention(RetentionPolicy.SOURCE)
     @StringDef({SELECT_ONE, SELECT_MULTIPLE, SELECT_ONE_WRITE_OTHER, SELECT_MULTIPLE_WRITE_OTHER,
             FREE_RESPONSE, SLIDER, FRONT_PICTURE, REAR_PICTURE, DATE, RATING, TIME, LIST_OF_TEXT_BOXES,
@@ -398,4 +403,18 @@ public class Question implements SurveyEntity {
             GEO_LOCATION, DROP_DOWN, RANGE, SUM_OF_PARTS, SIGNATURE})
     public @interface QuestionType {
     }
+
+    @NonNull
+    public String toString() {
+        return new ToStringBuilder(this).
+                append("RemoteId", mRemoteId).
+                append("NumberInInstrument", mNumberInInstrument).
+                append("Text", mText).
+                append("QuestionIdentifier", mQuestionIdentifier).
+                append("DisplayId", mDisplayId).
+                append("InstrumentRemoteId", mInstrumentRemoteId).
+                append("QuestionType", mQuestionType).
+                toString();
+    }
+
 }

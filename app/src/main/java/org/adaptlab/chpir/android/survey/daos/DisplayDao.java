@@ -16,10 +16,9 @@ public abstract class DisplayDao extends BaseDao<Display> {
     @Query("SELECT * FROM Displays WHERE InstrumentRemoteId=:instrumentId AND Deleted=0 ORDER BY Position ASC")
     public abstract LiveData<List<Display>> instrumentDisplays(Long instrumentId);
 
-    @Query("SELECT * FROM Displays WHERE RemoteId=:id LIMIT 1")
+    @Query("SELECT * FROM Displays WHERE RemoteId=:id")
     public abstract Display findByIdSync(Long id);
 
-    @Query("SELECT * FROM Displays WHERE Title=:title AND InstrumentRemoteId=:instrumentId LIMIT 1")
+    @Query("SELECT * FROM Displays WHERE Title=:title AND InstrumentRemoteId=:instrumentId")
     public abstract Display findByTitleAndInstrumentIdSync(String title, Long instrumentId);
-
 }

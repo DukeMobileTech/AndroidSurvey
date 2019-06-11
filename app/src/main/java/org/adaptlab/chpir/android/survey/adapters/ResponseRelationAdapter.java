@@ -3,21 +3,18 @@ package org.adaptlab.chpir.android.survey.adapters;
 import android.support.annotation.NonNull;
 import android.support.v7.recyclerview.extensions.ListAdapter;
 import android.support.v7.util.DiffUtil;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.entities.relations.QuestionRelation;
-import org.adaptlab.chpir.android.survey.entities.relations.ResponseRelation;
+import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
+import org.adaptlab.chpir.android.survey.relations.ResponseRelation;
 import org.adaptlab.chpir.android.survey.viewholders.QuestionViewHolder;
 import org.adaptlab.chpir.android.survey.viewholders.QuestionViewHolderFactory;
 
 import java.util.HashMap;
 import java.util.List;
-
-import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.SKIPPED;
 
 public class ResponseRelationAdapter extends ListAdapter<ResponseRelation, QuestionViewHolder> {
     public static final String TAG = ResponseRelationAdapter.class.getName();
@@ -28,18 +25,14 @@ public class ResponseRelationAdapter extends ListAdapter<ResponseRelation, Quest
     private static final DiffUtil.ItemCallback<ResponseRelation> DIFF_CALLBACK = new DiffUtil.ItemCallback<ResponseRelation>() {
         @Override
         public boolean areItemsTheSame(@NonNull ResponseRelation oldResponseRelation, @NonNull ResponseRelation newResponseRelation) {
-            boolean same = oldResponseRelation.response.getUUID().equals(newResponseRelation.response.getUUID());
-//            Log.i(TAG, "areItemsTheSame: " + same);
-            return same;
+            return oldResponseRelation.response.getUUID().equals(newResponseRelation.response.getUUID());
         }
 
         @Override
         public boolean areContentsTheSame(@NonNull ResponseRelation oldResponseRelation, @NonNull ResponseRelation newResponseRelation) {
-            boolean same = oldResponseRelation.response.getText().equals(newResponseRelation.response.getText()) &&
+            return oldResponseRelation.response.getText().equals(newResponseRelation.response.getText()) &&
                     oldResponseRelation.response.getSpecialResponse().equals(newResponseRelation.response.getSpecialResponse()) &&
                     oldResponseRelation.response.getOtherResponse().equals(newResponseRelation.response.getOtherResponse());
-//            Log.i(TAG, newResponseRelation.response.getQuestionIdentifier() + ": " + same);
-            return same;
         }
     };
 
@@ -79,6 +72,7 @@ public class ResponseRelationAdapter extends ListAdapter<ResponseRelation, Quest
         for (QuestionRelation questionRelation : questionRelations) {
             mQuestionRelations.put(questionRelation.question.getQuestionIdentifier(), questionRelation);
         }
+        notifyDataSetChanged();
     }
 
 }

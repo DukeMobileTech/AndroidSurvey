@@ -8,21 +8,15 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.google.gson.reflect.TypeToken;
-
 import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.daos.BaseDao;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 @Entity(tableName = "Surveys")
-public class Survey implements SurveyEntity {
+public class Survey {
     private static final String TAG = "Survey";
 
     @PrimaryKey
@@ -59,6 +53,8 @@ public class Survey implements SurveyEntity {
     private int mCompletedResponseCount;
     @ColumnInfo(name = "Queued")
     private boolean mQueued;
+    @ColumnInfo(name = "LastDisplayPosition")
+    private int mLastDisplayPosition;
 
     public Survey() {
         mSent = false;
@@ -196,6 +192,14 @@ public class Survey implements SurveyEntity {
         this.mQueued = mQueued;
     }
 
+    public int getLastDisplayPosition() {
+        return mLastDisplayPosition;
+    }
+
+    public void setLastDisplayPosition(int position) {
+        this.mLastDisplayPosition = position;
+    }
+
     /*
      * The identifier to display to the user to identify a Survey.
      * Return Unidentified Survey string if no response for identifier questions.
@@ -238,23 +242,6 @@ public class Survey implements SurveyEntity {
         }
 
         return "";
-    }
-
-    @Override
-    public Type getType() {
-        return new TypeToken<ArrayList<Survey>>() {
-        }.getType();
-    }
-
-    @Override
-    public List getTranslations() {
-        return null;
-    }
-
-    @Override
-    public void save(BaseDao dao, List list) {
-        dao.updateAll(list);
-        dao.insertAll(list);
     }
 
 }

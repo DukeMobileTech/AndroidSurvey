@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "9adf22ce7eae9aeade68b8a5d4c81364",
+    "identityHash": "1cbae7e013f2696db8696bf6f5f57373",
     "entities": [
       {
         "tableName": "Instruments",
@@ -763,12 +763,28 @@
         },
         "indices": [
           {
-            "name": "displays_id_index",
-            "unique": true,
+            "name": "index_Displays_Title",
+            "unique": false,
             "columnNames": [
-              "RemoteId"
+              "Title"
             ],
-            "createSql": "CREATE UNIQUE INDEX `displays_id_index` ON `${TABLE_NAME}` (`RemoteId`)"
+            "createSql": "CREATE  INDEX `index_Displays_Title` ON `${TABLE_NAME}` (`Title`)"
+          },
+          {
+            "name": "index_Displays_Position",
+            "unique": false,
+            "columnNames": [
+              "Position"
+            ],
+            "createSql": "CREATE  INDEX `index_Displays_Position` ON `${TABLE_NAME}` (`Position`)"
+          },
+          {
+            "name": "index_Displays_InstrumentRemoteId",
+            "unique": false,
+            "columnNames": [
+              "InstrumentRemoteId"
+            ],
+            "createSql": "CREATE  INDEX `index_Displays_InstrumentRemoteId` ON `${TABLE_NAME}` (`InstrumentRemoteId`)"
           }
         ],
         "foreignKeys": []
@@ -1348,7 +1364,7 @@
       },
       {
         "tableName": "OptionSetTranslations",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Language` TEXT, `OptionSetRemoteId` INTEGER, `OptionRemoteId` INTEGER, `OptionTranslationRemoteId` INTEGER, PRIMARY KEY(`RemoteId`), FOREIGN KEY(`OptionSetRemoteId`) REFERENCES `OptionSets`(`RemoteId`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`OptionRemoteId`) REFERENCES `Options`(`RemoteId`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`OptionTranslationRemoteId`) REFERENCES `OptionTranslations`(`RemoteId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Language` TEXT, `OptionSetRemoteId` INTEGER, `OptionRemoteId` INTEGER, `OptionTranslationRemoteId` INTEGER, PRIMARY KEY(`RemoteId`))",
         "fields": [
           {
             "fieldPath": "mRemoteId",
@@ -1413,41 +1429,7 @@
             "createSql": "CREATE  INDEX `index_OptionSetTranslations_OptionTranslationRemoteId` ON `${TABLE_NAME}` (`OptionTranslationRemoteId`)"
           }
         ],
-        "foreignKeys": [
-          {
-            "table": "OptionSets",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "OptionSetRemoteId"
-            ],
-            "referencedColumns": [
-              "RemoteId"
-            ]
-          },
-          {
-            "table": "Options",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "OptionRemoteId"
-            ],
-            "referencedColumns": [
-              "RemoteId"
-            ]
-          },
-          {
-            "table": "OptionTranslations",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "OptionTranslationRemoteId"
-            ],
-            "referencedColumns": [
-              "RemoteId"
-            ]
-          }
-        ]
+        "foreignKeys": []
       },
       {
         "tableName": "OptionTranslations",
@@ -1922,7 +1904,7 @@
       },
       {
         "tableName": "Surveys",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`UUID` TEXT NOT NULL, `SentToRemote` INTEGER NOT NULL, `Complete` INTEGER NOT NULL, `Latitude` TEXT, `Longitude` TEXT, `LastUpdated` INTEGER, `Metadata` TEXT, `ProjectId` INTEGER, `InstrumentRemoteId` INTEGER, `RosterUUID` TEXT, `Language` TEXT, `SkippedQuestions` TEXT, `SkipMaps` TEXT, `Identifier` TEXT, `CompletedResponseCount` INTEGER NOT NULL, `Queued` INTEGER NOT NULL, PRIMARY KEY(`UUID`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`UUID` TEXT NOT NULL, `SentToRemote` INTEGER NOT NULL, `Complete` INTEGER NOT NULL, `Latitude` TEXT, `Longitude` TEXT, `LastUpdated` INTEGER, `Metadata` TEXT, `ProjectId` INTEGER, `InstrumentRemoteId` INTEGER, `RosterUUID` TEXT, `Language` TEXT, `SkippedQuestions` TEXT, `SkipMaps` TEXT, `Identifier` TEXT, `CompletedResponseCount` INTEGER NOT NULL, `Queued` INTEGER NOT NULL, `LastDisplayPosition` INTEGER NOT NULL, PRIMARY KEY(`UUID`))",
         "fields": [
           {
             "fieldPath": "mUUID",
@@ -2017,6 +1999,12 @@
           {
             "fieldPath": "mQueued",
             "columnName": "Queued",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mLastDisplayPosition",
+            "columnName": "LastDisplayPosition",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -2191,7 +2179,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"9adf22ce7eae9aeade68b8a5d4c81364\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"1cbae7e013f2696db8696bf6f5f57373\")"
     ]
   }
 }

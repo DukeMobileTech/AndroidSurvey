@@ -5,7 +5,7 @@ import android.arch.lifecycle.LiveData;
 
 import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
 import org.adaptlab.chpir.android.survey.daos.InstrumentDao;
-import org.adaptlab.chpir.android.survey.entities.relations.InstrumentRelation;
+import org.adaptlab.chpir.android.survey.relations.InstrumentRelation;
 
 public class InstrumentRelationRepository {
     public final String TAG = this.getClass().getName();

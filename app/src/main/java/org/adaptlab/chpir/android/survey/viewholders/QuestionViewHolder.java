@@ -7,9 +7,8 @@ import android.view.ViewGroup;
 
 import org.adaptlab.chpir.android.survey.entities.Option;
 import org.adaptlab.chpir.android.survey.entities.Question;
-import org.adaptlab.chpir.android.survey.entities.Response;
-import org.adaptlab.chpir.android.survey.entities.relations.QuestionRelation;
-import org.adaptlab.chpir.android.survey.entities.relations.ResponseRelation;
+import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
+import org.adaptlab.chpir.android.survey.relations.ResponseRelation;
 
 import java.util.List;
 
@@ -48,7 +47,8 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
     public interface OnResponseSelectedListener {
         void onResponseSelected(QuestionRelation questionRelation, Option selectedOption,
-                                List<Option> selectedOptions, String enteredValue, String nextQuestion);
+                                List<Option> selectedOptions, String enteredValue,
+                                String nextQuestion, String response);
     }
 
 }

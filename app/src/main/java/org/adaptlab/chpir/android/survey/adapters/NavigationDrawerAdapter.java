@@ -1,7 +1,6 @@
 package org.adaptlab.chpir.android.survey.adapters;
 
 import android.content.Context;
-import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,17 +14,15 @@ import java.util.Map;
 
 public class NavigationDrawerAdapter extends BaseExpandableListAdapter {
 
-    private Context mContext;
     private List<String> mExpandableListTitle;
     private Map<String, List<String>> mExpandableListDetail;
     private LayoutInflater mLayoutInflater;
 
     public NavigationDrawerAdapter(Context context, List<String> expandableListTitle,
                                    Map<String, List<String>> expandableListDetail) {
-        mContext = context;
         mExpandableListTitle = expandableListTitle;
         mExpandableListDetail = expandableListDetail;
-        mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
@@ -69,7 +66,7 @@ public class NavigationDrawerAdapter extends BaseExpandableListAdapter {
         if (convertView == null) {
             convertView = mLayoutInflater.inflate(R.layout.list_group, null);
         }
-        TextView listTitleTextView = (TextView) convertView.findViewById(R.id.listTitle);
+        TextView listTitleTextView = convertView.findViewById(R.id.listTitle);
 //        listTitleTextView.setTypeface(mInstrument.getTypeFace(mContext), Typeface.BOLD);
         listTitleTextView.setText(listTitle);
         return convertView;
@@ -82,7 +79,7 @@ public class NavigationDrawerAdapter extends BaseExpandableListAdapter {
         if (convertView == null) {
             convertView = mLayoutInflater.inflate(R.layout.list_item_text_view, null);
         }
-        TextView expandedListTextView = (TextView) convertView.findViewById(R.id.expandedListItem);
+        TextView expandedListTextView = convertView.findViewById(R.id.expandedListItem);
         expandedListTextView.setText(expandedListText);
         return convertView;
     }

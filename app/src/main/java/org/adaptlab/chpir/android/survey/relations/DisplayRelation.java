@@ -1,4 +1,4 @@
-package org.adaptlab.chpir.android.survey.entities.relations;
+package org.adaptlab.chpir.android.survey.relations;
 
 import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Relation;

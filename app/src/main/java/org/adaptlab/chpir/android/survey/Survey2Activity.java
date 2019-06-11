@@ -4,7 +4,6 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -13,6 +12,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.LongSparseArray;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,9 +26,10 @@ import org.adaptlab.chpir.android.survey.adapters.DisplayPagerAdapter;
 import org.adaptlab.chpir.android.survey.adapters.NavigationDrawerAdapter;
 import org.adaptlab.chpir.android.survey.entities.Display;
 import org.adaptlab.chpir.android.survey.entities.Instrument;
+import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.Section;
 import org.adaptlab.chpir.android.survey.entities.Survey;
-import org.adaptlab.chpir.android.survey.entities.relations.InstrumentRelation;
+import org.adaptlab.chpir.android.survey.relations.InstrumentRelation;
 import org.adaptlab.chpir.android.survey.repositories.SurveyRepository;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.viewmodelfactories.InstrumentRelationViewModelFactory;
@@ -39,6 +40,8 @@ import org.adaptlab.chpir.android.survey.viewmodels.SectionViewModel;
 import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -61,12 +64,7 @@ public class Survey2Activity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_survey);
-        mActionBar = getSupportActionBar();
-        if (mActionBar != null) {
-            mActionBar.setDisplayHomeAsUpEnabled(true);
-            mActionBar.setHomeButtonEnabled(true);
-        }
-
+        setActionBar();
         long instrumentId = getIntent().getLongExtra(EXTRA_INSTRUMENT_ID, -1);
         if (instrumentId == -1) return;
         String surveyUUID = getIntent().getStringExtra(EXTRA_SURVEY_UUID);
@@ -84,28 +82,26 @@ public class Survey2Activity extends AppCompatActivity {
         setSectionViewModel(instrumentId);
     }
 
+    private void setActionBar() {
+        mActionBar = getSupportActionBar();
+        if (mActionBar != null) {
+            mActionBar.setDisplayHomeAsUpEnabled(true);
+            mActionBar.setHomeButtonEnabled(true);
+        }
+    }
+
     private void setDisplayViewPagers() {
         mViewPager = findViewById(R.id.displayPager);
+//        mViewPager.setOffscreenPageLimit(3);
         mViewPager.setAdapter(mDisplayPagerAdapter);
-        TabLayout tabLayout = findViewById(R.id.displayTabs);
-        tabLayout.setMinimumWidth(getWindow().getDecorView().getWidth());
-        tabLayout.setupWithViewPager(mViewPager);
     }
 
     private void addOnPageChangeListener() {
-        mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+        mViewPager.addOnPageChangeListener( new ViewPager.SimpleOnPageChangeListener() {
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                mSurveyViewModel.setDisplayPosition(position);
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                mSurveyViewModel.setDisplayPosition(position);
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
+            public void onPageSelected (int position) {
+                Display display = mSurveyViewModel.getDisplays().get(position);
+                mActionBar.setTitle(display.getPosition() + ": " + display.getTitle());
             }
         });
     }
@@ -119,14 +115,34 @@ public class Survey2Activity extends AppCompatActivity {
                 if (relation != null) {
                     mInstrument = relation.instrument;
                     mActionBar.setTitle(mInstrument.getTitle());
-                    mSurveyViewModel.setDisplays(relation.displays);
-                    mDisplayPagerAdapter.setDisplays(relation.displays);
-                    mSurveyViewModel.setQuestions(relation.questions);
+                    List<Display> displays = relation.displays;
+                    Collections.sort(displays, new Comparator<Display>() {
+                        @Override
+                        public int compare(Display o1, Display o2) {
+                            if (o1.getPosition() < o2.getPosition()) return -1;
+                            if (o1.getPosition() > o2.getPosition()) return 1;
+                            return 0;
+                        }
+                    });
+                    mSurveyViewModel.setDisplays(displays);
+                    mDisplayPagerAdapter.setDisplays(displays);
+                    List<Question> questions = relation.questions;
+                    Collections.sort(questions, new Comparator<Question>() {
+                        @Override
+                        public int compare(Question o1, Question o2) {
+                            if (o1.getNumberInInstrument() < o2.getNumberInInstrument()) return -1;
+                            if (o1.getNumberInInstrument() > o2.getNumberInInstrument()) return 1;
+                            return 0;
+                        }
+                    });
+                    mSurveyViewModel.setQuestions(questions);
+
                     if (mSurveyViewModel.getPreviousDisplays() == null) {
                         mSurveyViewModel.setPreviousDisplays(new ArrayList<Integer>());
                     }
                     setNavigationListData();
                     invalidateOptionsMenu();
+                    setViewPagerPosition();
                 }
             }
         });
@@ -139,9 +155,10 @@ public class Survey2Activity extends AppCompatActivity {
             @Override
             public void onChanged(@Nullable Survey survey) {
                 mSurvey = survey;
-                if (mSurveyViewModel.getSurvey() == null) {
+                if (survey != null && mSurveyViewModel.getSurvey() == null) {
                     mSurveyViewModel.setSurvey(mSurvey);
                     mSurveyViewModel.setSkipData();
+                    mSurveyViewModel.setDisplayPosition(mSurvey.getLastDisplayPosition());
                 }
             }
         });
@@ -168,10 +185,11 @@ public class Survey2Activity extends AppCompatActivity {
             return;
         LinkedHashMap<String, List<String>> listData = new LinkedHashMap<>();
         for (int i = 0; i < mSurveyViewModel.getDisplays().size(); i++) {
-            Section section = mSurveyViewModel.getSections().get(mSurveyViewModel.getDisplays().get(i).getSectionId());
+            Display display = mSurveyViewModel.getDisplays().get(i);
+            Section section = mSurveyViewModel.getSections().get(display.getSectionId());
             List<String> displayTitles = listData.get(section.getTitle());
             if (displayTitles == null) displayTitles = new ArrayList<>();
-            displayTitles.add(mSurveyViewModel.getDisplays().get(i).getTitle());
+            displayTitles.add(display.getPosition() + " " + display.getTitle());
             listData.put(section.getTitle(), displayTitles);
         }
         mSurveyViewModel.setExpandableListData(listData);
@@ -184,6 +202,8 @@ public class Survey2Activity extends AppCompatActivity {
         super.onPause();
         mSurveyViewModel.persistSkipMaps();
         mSurveyViewModel.persistSkippedQuestions();
+        mSurveyViewModel.setSurveyLastUpdatedTime();
+        mSurveyViewModel.setSurveyLastDisplayPosition();
         mSurveyViewModel.update();
     }
 
@@ -207,7 +227,6 @@ public class Survey2Activity extends AppCompatActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         int position = mViewPager.getCurrentItem();
-        mSurveyViewModel.setDisplayPosition(position);
         menu.findItem(R.id.menu_item_previous).setVisible(position != 0 && !mSurveyViewModel.getPreviousDisplays().isEmpty()).setEnabled(true);
         if (mSurveyViewModel.getDisplays() != null) {
             menu.findItem(R.id.menu_item_next).setVisible(position != mSurveyViewModel.getDisplays().size() - 1).setEnabled(true);
@@ -269,7 +288,7 @@ public class Survey2Activity extends AppCompatActivity {
                 String selectedItem = ((List) (mSurveyViewModel.getExpandableListData().get(mSurveyViewModel.getExpandableListTitle().get(groupPosition)))).get(childPosition).toString();
                 int index = 0;
                 for (Display display : mSurveyViewModel.getDisplays()) {
-                    if (display.getTitle().equals(selectedItem)) {
+                    if ((display.getPosition() + " " + display.getTitle()).equals(selectedItem)) {
                         moveToDisplay(index);
                         break;
                     }
@@ -305,14 +324,18 @@ public class Survey2Activity extends AppCompatActivity {
         } else {
             mSurveyViewModel.decrementDisplayPosition();
         }
-        mViewPager.setCurrentItem(mSurveyViewModel.getDisplayPosition());
+        setViewPagerPosition();
         invalidateOptionsMenu();
+    }
+
+    private void setViewPagerPosition() {
+        mViewPager.setCurrentItem(mSurveyViewModel.getDisplayPosition());
     }
 
     private void moveToNextDisplay() {
         mSurveyViewModel.getPreviousDisplays().add(mSurveyViewModel.getDisplayPosition());
         mSurveyViewModel.incrementDisplayPosition();
-        mViewPager.setCurrentItem(mSurveyViewModel.getDisplayPosition());
+        setViewPagerPosition();
         invalidateOptionsMenu();
     }
 
@@ -321,7 +344,7 @@ public class Survey2Activity extends AppCompatActivity {
         if (position < displayPosition) {
             mSurveyViewModel.getPreviousDisplays().add(displayPosition);
             mSurveyViewModel.setDisplayPosition(position);
-            mViewPager.setCurrentItem(mSurveyViewModel.getDisplayPosition());
+            setViewPagerPosition();
         } else if (position > displayPosition) {
             mSurveyViewModel.setDisplayPosition(position - 1);
             moveToNextDisplay();

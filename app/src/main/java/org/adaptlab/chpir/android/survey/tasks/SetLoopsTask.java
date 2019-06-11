@@ -3,11 +3,13 @@ package org.adaptlab.chpir.android.survey.tasks;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.LongSparseArray;
 
 import org.adaptlab.chpir.android.survey.SurveyApp;
 import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
 import org.adaptlab.chpir.android.survey.daos.DisplayDao;
 import org.adaptlab.chpir.android.survey.daos.InstrumentDao;
+import org.adaptlab.chpir.android.survey.daos.LoopQuestionDao;
 import org.adaptlab.chpir.android.survey.daos.MultipleSkipDao;
 import org.adaptlab.chpir.android.survey.daos.NextQuestionDao;
 import org.adaptlab.chpir.android.survey.daos.QuestionDao;
@@ -18,138 +20,157 @@ import org.adaptlab.chpir.android.survey.entities.MultipleSkip;
 import org.adaptlab.chpir.android.survey.entities.NextQuestion;
 import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.Settings;
+import org.adaptlab.chpir.android.survey.relations.InstrumentRelation;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.apache.commons.lang3.RandomUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
+import static org.adaptlab.chpir.android.survey.models.Instrument.LOOP_MAX;
+import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
+
 public class SetLoopsTask extends AsyncTask<Void, Void, Void> {
     private static final String TAG = "SetLoopsTask";
-    private static final int LOOP_MAX = 12;
-    private static final String LIST_DELIMITER = ",";
     private static final int LOWER_BOUND = 100000;
     private static final int UPPER_BOUND = 1000000;
+    private DisplayDao mDisplayDao;
+    private InstrumentDao mInstrumentDao;
+    private QuestionDao mQuestionDao;
+    private LoopQuestionDao mLoopQuestionDao;
+    private NextQuestionDao mNextQuestionDao;
+    private MultipleSkipDao mMultipleSkipDao;
+    private List<Display> mDisplays;
+    private LongSparseArray<Display> mDisplayLongSparseArray;
 
     @Override
     protected Void doInBackground(Void... voids) {
         SurveyRoomDatabase database = SurveyRoomDatabase.getDatabase(SurveyApp.getInstance());
         Settings settings = database.settingsDao().getInstanceSync();
-        List<Instrument> instruments = database.instrumentDao().projectInstrumentsSync(Long.valueOf(settings.getProjectId()));
+        mDisplayDao = database.displayDao();
+        mInstrumentDao = database.instrumentDao();
+        mQuestionDao = database.questionDao();
+        mLoopQuestionDao = database.loopQuestionDao();
+        mNextQuestionDao = database.nextQuestionDao();
+        mMultipleSkipDao = database.multipleSkipDao();
+
+        List<Instrument> instruments = mInstrumentDao.projectInstrumentsSync(Long.valueOf(settings.getProjectId()));
         for (Instrument instrument : instruments) {
-            List<Display> displays = database.displayDao().instrumentDisplaysSync(instrument.getRemoteId());
-            List<Question> questions = database.questionDao().instrumentQuestionsSync(instrument.getRemoteId());
+            mDisplays = mDisplayDao.instrumentDisplaysSync(instrument.getRemoteId());
+            mDisplayLongSparseArray = new LongSparseArray<>();
+            for (Display display : mDisplays) {
+                mDisplayLongSparseArray.put(display.getRemoteId(), display);
+            }
+            List<Question> questions = mQuestionDao.instrumentQuestionsSync(instrument.getRemoteId());
             for (Question question : questions) {
-                if (question.getLoopQuestionCount() > 0 && question.getLoopSource() == null && question.getDisplayId() != null) {
-                    List<LoopQuestion> loopQuestions = database.loopQuestionDao().allLoopQuestionsSync(question.getRemoteId());
+                if (question.getLoopQuestionCount() > 0 && question.getLoopSource() == null) {
+                    List<LoopQuestion> loopQuestions = mLoopQuestionDao.allLoopQuestionsSync(question.getRemoteId());
                     if (loopQuestions.size() > 0) {
                         if (question.getQuestionType().equals(Question.INTEGER)) {
                             for (LoopQuestion loopQuestion : loopQuestions) {
-                                Display display = getDisplay(question, loopQuestion, loopQuestions, database);
+                                Display display = getDisplay(question, loopQuestion, loopQuestions);
                                 for (int k = 1; k <= LOOP_MAX; k++) {
-                                    createLoopQuestion(question, loopQuestion, k, display, database);
+                                    createLoopQuestion(question, loopQuestion, k, display);
                                 }
-                                displays = updateDisplays(displays, display, question, false, database);
                             }
                         } else if (question.isMultipleResponseLoop()) {
                             for (LoopQuestion loopQuestion : loopQuestions) {
-                                Display display = getDisplay(question, loopQuestion, loopQuestions, database);
+                                Display display = getDisplay(question, loopQuestion, loopQuestions);
                                 if (TextUtils.isEmpty(loopQuestion.getOptionIndices())) {
                                     for (int k = 0; k < question.getOptionCount(); k++) {
-                                        createLoopQuestion(question, loopQuestion, k, display, database);
+                                        createLoopQuestion(question, loopQuestion, k, display);
                                     }
                                     if (question.isOtherQuestionType()) {
-                                        createLoopQuestion(question, loopQuestion, question.getOptionCount(), display, database);
+                                        createLoopQuestion(question, loopQuestion, question.getOptionCount(), display);
                                     }
                                 } else {
                                     // Loop only for particular options
-                                    String[] indices = loopQuestion.getOptionIndices().split(LIST_DELIMITER);
+                                    String[] indices = loopQuestion.getOptionIndices().split(COMMA);
                                     for (String index : indices) {
                                         int ind = Integer.parseInt(index);
-                                        createLoopQuestion(question, loopQuestion, ind, display, database);
+                                        createLoopQuestion(question, loopQuestion, ind, display);
                                     }
                                 }
-                                displays = updateDisplays(displays, display, question, loopQuestion.isSameDisplay(), database);
                             }
                         }
-                        sanitizeDisplays(displays, getDisplayQuestions(questions), database);
                     }
                 }
             }
-            setInstrumentLoaded(database, instrument);
+            orderDisplays();
+            setInstrumentLoaded(instrument);
         }
         return null;
     }
 
-    private void setInstrumentLoaded(SurveyRoomDatabase db, Instrument instrument) {
-        DisplayDao dao = db.displayDao();
-        InstrumentDao instrumentDao = db.instrumentDao();
-        List<Question> questions = db.questionDao().instrumentQuestionsSync(instrument.getRemoteId());
-        HashMap<Long, List<Question>> dQuestions = getDisplayQuestions(questions);
-        for (Display display : dao.instrumentDisplaysSync(instrument.getRemoteId())) {
-            if (dQuestions.get(display.getRemoteId()) == null ||
-                    display.getQuestionCount() != dQuestions.get(display.getRemoteId()).size()) {
+    private Display getDisplay(Question q, LoopQuestion lq, List<LoopQuestion> lqs) {
+        Display display;
+        Display parent = mDisplayLongSparseArray.get(q.getDisplayId());
+        if (lq.isSameDisplay()) {
+            parent.setQuestionCount(parent.getQuestionCount() + getDisplayQuestionCount(q, lq, lqs));
+            display = parent;
+        } else {
+            display = mDisplayDao.findByTitleAndInstrumentIdSync(parent.getTitle() + " p2", q.getInstrumentRemoteId());
+            if (display == null) {
+                display = new Display();
+                display.setTitle(parent.getTitle() + " p2");
+                display.setInstrumentRemoteId(parent.getInstrumentRemoteId());
+                display.setSectionId(parent.getSectionId());
+                display.setRemoteId(getDisplayId());
+                display.setDeleted(parent.isDeleted());
+                mDisplayDao.insert(display);
+                mDisplayLongSparseArray.put(display.getRemoteId(), display);
+                int parentIndex = mDisplays.indexOf(parent);
+                mDisplays.add(parentIndex + 1, display);
+            }
+            int questionCount = getDisplayQuestionCount(q, lq, lqs);
+            if (display.getQuestionCount() != questionCount) {
+                display.setQuestionCount(questionCount);
+                mDisplayDao.update(display);
+            }
+        }
+        return display;
+    }
+
+    private void setInstrumentLoaded(Instrument instrument) {
+        InstrumentRelation instrumentRelation = mInstrumentDao.findInstrumentRelationByIdSync(instrument.getRemoteId());
+        LongSparseArray<List<Question>> displayQuestions = getDisplayQuestions(instrumentRelation.questions);
+        for (Display display : instrumentRelation.displays) {
+            if (display.getQuestionCount() != displayQuestions.get(display.getRemoteId()).size()) {
                 instrument.setLoaded(false);
-                instrumentDao.update(instrument);
+                mInstrumentDao.update(instrument);
                 return;
             }
         }
         instrument.setLoaded(true);
-        instrumentDao.update(instrument);
+        mInstrumentDao.update(instrument);
     }
 
-    private void sanitizeDisplays(List<Display> displays, HashMap<Long, List<Question>> displayQuestions, SurveyRoomDatabase db) {
-        DisplayDao dao = db.displayDao();
-        for (Iterator<Display> iterator = displays.iterator(); iterator.hasNext(); ) {
-            Display display = iterator.next();
-            if (displayQuestions.get(display.getRemoteId()) == null) {
-                // Display has no questions, so delete it
-                dao.delete(display);
-                iterator.remove();
-            }
-        }
-        // Ensure they are numbered consecutively
-        for (int k = 0; k < displays.size(); k++) {
-            Display display = displays.get(k);
+    /**
+     * Number displays consecutively
+     */
+    private void orderDisplays() {
+        for (int k = 0; k < mDisplays.size(); k++) {
+            Display display = mDisplays.get(k);
             if (display.getPosition() != k + 1) {
                 display.setPosition(k + 1);
-                dao.update(display);
             }
         }
+        mDisplayDao.updateAll(mDisplays);
     }
 
-    private List<Display> updateDisplays(List<Display> displays, Display display, Question question,
-                                         boolean isSameDisplay, SurveyRoomDatabase db) {
-        DisplayDao dao = db.displayDao();
-        Display questionDisplay = dao.findByIdSync(question.getDisplayId());
-        if (displays.contains(display)) {
-            int index = displays.indexOf(display);
-            if (!isSameDisplay && index != questionDisplay.getPosition()) {
-                displays.remove(display);
-                displays.add(questionDisplay.getPosition(), display);
-            }
-        } else {
-            displays.add(questionDisplay.getPosition(), display);
-        }
-        return displays;
-    }
-
-    private void createLoopQuestion(Question question, LoopQuestion lq, int index, Display display, SurveyRoomDatabase db) {
-        QuestionDao dao = db.questionDao();
-        Question source = dao.findByQuestionIdentifierSync(lq.getLooped());
+    private void createLoopQuestion(Question question, LoopQuestion lq, int index, Display display) {
+        Question source = mQuestionDao.findByQuestionIdentifierSync(lq.getLooped());
         if (source == null) return;
         String identifier = question.getQuestionIdentifier() + "_" + source.getQuestionIdentifier() + "_" + index;
-        Question loopedQuestion = dao.findByQuestionIdentifierSync(identifier);
+        Question loopedQuestion = mQuestionDao.findByQuestionIdentifierSync(identifier);
         if (loopedQuestion == null) {
             loopedQuestion = new Question();
-            loopedQuestion.setRemoteId(getQuestionId(dao));
+            loopedQuestion.setRemoteId(getQuestionId());
             loopedQuestion.setDisplayId(display.getRemoteId());
             loopedQuestion.setLoopNumber(index);
             loopedQuestion.setQuestionIdentifier(identifier);
-            dao.insert(loopedQuestion);
+            mQuestionDao.insert(loopedQuestion);
         }
         loopedQuestion.setLoopSource(source.getQuestionIdentifier());
         loopedQuestion = Question.copyAttributes(loopedQuestion, source);
@@ -161,24 +182,24 @@ public class SetLoopsTask extends AsyncTask<Void, Void, Void> {
         loopedQuestion.setTextToReplace(lq.getTextToReplace());
         if (lq.isDeleted()) {
             loopedQuestion.setDeleted(true);
-            source.setLoopQuestionCount(db.loopQuestionDao().loopQuestionsSync(source.getRemoteId()).size());
-            dao.update(source);
+            source.setLoopQuestionCount(mLoopQuestionDao.loopQuestionsSync(source.getRemoteId()).size());
+            mQuestionDao.update(source);
         }
-        dao.update(loopedQuestion);
-        setLoopedQuestionNextQuestions(question, source, loopedQuestion, index, db);
-        setLoopedQuestionMultipleSkips(question, source, loopedQuestion, index, db);
-        setSkipsLoopedQuestion(source, loopedQuestion, db);
+        mQuestionDao.update(loopedQuestion);
+
+        setLoopedQuestionNextQuestions(question, source, loopedQuestion, index);
+        setLoopedQuestionMultipleSkips(question, source, loopedQuestion, index);
+        setSkipsLoopedQuestion(source, loopedQuestion);
     }
 
-    private void setLoopedQuestionNextQuestions(Question question, Question source, Question loopedQuestion, int index, SurveyRoomDatabase db) {
-        NextQuestionDao dao = db.nextQuestionDao();
-        List<NextQuestion> nextQuestions = dao.questionNextQuestionsSync(source.getQuestionIdentifier(), source.getInstrumentRemoteId());
+    private void setLoopedQuestionNextQuestions(Question question, Question source, Question loopedQuestion, int index) {
+        List<NextQuestion> nextQuestions = mNextQuestionDao.questionNextQuestionsSync(source.getQuestionIdentifier(), source.getInstrumentRemoteId());
         String qi = loopedQuestion.getQuestionIdentifier();
         for (NextQuestion nextQuestion : nextQuestions) {
             String oi = nextQuestion.getOptionIdentifier();
             String nqi = question.getQuestionIdentifier() + "_" + nextQuestion.getNextQuestionIdentifier() + "_" + index;
             String value = nextQuestion.getValue();
-            NextQuestion nq = dao.findByAttributesSync(qi, oi, nqi, value);
+            NextQuestion nq = mNextQuestionDao.findByAttributesSync(qi, oi, nqi, value);
             if (nq == null) {
                 nq = new NextQuestion();
                 nq.setQuestionIdentifier(qi);
@@ -187,37 +208,35 @@ public class SetLoopsTask extends AsyncTask<Void, Void, Void> {
                 nq.setDeleted(nextQuestion.isDeleted());
                 nq.setInstrumentRemoteId(nextQuestion.getInstrumentRemoteId());
                 nq.setValue(value);
-                dao.insert(nq);
+                mNextQuestionDao.insert(nq);
             }
         }
     }
 
-    private void setLoopedQuestionMultipleSkips(Question question, Question source, Question loopedQuestion, int index, SurveyRoomDatabase db) {
-        MultipleSkipDao dao = db.multipleSkipDao();
-        List<MultipleSkip> multipleSkips = dao.questionMultipleSkipsSync(source.getQuestionIdentifier(), source.getInstrumentRemoteId());
+    private void setLoopedQuestionMultipleSkips(Question question, Question source, Question loopedQuestion, int index) {
+        List<MultipleSkip> multipleSkips = mMultipleSkipDao.questionMultipleSkipsSync(source.getQuestionIdentifier(), source.getInstrumentRemoteId());
         String qi = loopedQuestion.getQuestionIdentifier();
         for (MultipleSkip multipleSkip : multipleSkips) {
             String oi = multipleSkip.getOptionIdentifier();
             String val = multipleSkip.getValue();
             String sqi = question.getQuestionIdentifier() + "_" + multipleSkip.getSkipQuestionIdentifier() + "_" + index;
-            createMultipleSkip(dao, sqi, multipleSkip, qi, oi, val);
+            createMultipleSkip(sqi, multipleSkip, qi, oi, val);
         }
     }
 
-    private void setSkipsLoopedQuestion(Question source, Question loopedQuestion, SurveyRoomDatabase db) {
-        MultipleSkipDao dao = db.multipleSkipDao();
-        List<MultipleSkip> skipsQuestion = dao.skipsQuestionMultipleSkipsSync(source.getQuestionIdentifier(), source.getInstrumentRemoteId());
+    private void setSkipsLoopedQuestion(Question source, Question loopedQuestion) {
+        List<MultipleSkip> skipsQuestion = mMultipleSkipDao.skipsQuestionMultipleSkipsSync(source.getQuestionIdentifier(), source.getInstrumentRemoteId());
         String sqi = loopedQuestion.getQuestionIdentifier();
         for (MultipleSkip multipleSkip : skipsQuestion) {
             String qi = multipleSkip.getQuestionIdentifier();
             String oi = multipleSkip.getOptionIdentifier();
             String val = multipleSkip.getValue();
-            createMultipleSkip(dao, sqi, multipleSkip, qi, oi, val);
+            createMultipleSkip(sqi, multipleSkip, qi, oi, val);
         }
     }
 
-    private void createMultipleSkip(MultipleSkipDao dao, String sqi, MultipleSkip multipleSkip, String qi, String oi, String val) {
-        MultipleSkip ms = dao.findByAttributesSync(sqi, oi, sqi, val);
+    private void createMultipleSkip(String sqi, MultipleSkip multipleSkip, String qi, String oi, String val) {
+        MultipleSkip ms = mMultipleSkipDao.findByAttributesSync(sqi, oi, sqi, val);
         if (ms == null) {
             ms = new MultipleSkip();
             ms.setQuestionIdentifier(qi);
@@ -226,30 +245,8 @@ public class SetLoopsTask extends AsyncTask<Void, Void, Void> {
             ms.setSkipQuestionIdentifier(sqi);
             ms.setDeleted(multipleSkip.isDeleted());
             ms.setInstrumentRemoteId(multipleSkip.getInstrumentRemoteId());
-            dao.insert(ms);
+            mMultipleSkipDao.insert(ms);
         }
-    }
-
-    private Display getDisplay(Question q, LoopQuestion lq, List<LoopQuestion> lqs, SurveyRoomDatabase db) {
-        DisplayDao dao = db.displayDao();
-        Display parent = dao.findByIdSync(q.getDisplayId());
-        if (lq.isSameDisplay()) {
-            parent.setQuestionCount(parent.getQuestionCount() + getDisplayQuestionCount(q, lq, lqs));
-            dao.update(parent);
-            return parent;
-        }
-        Display display = dao.findByTitleAndInstrumentIdSync(parent.getTitle() + " p2", q.getInstrumentRemoteId());
-        if (display == null) {
-            display = new Display();
-            display.setTitle(parent.getTitle() + " p2");
-            display.setInstrumentRemoteId(q.getInstrumentRemoteId());
-            display.setSectionId(parent.getSectionId());
-            display.setRemoteId(getDisplayId(dao));
-            display.setDeleted(parent.isDeleted());
-        }
-        display.setQuestionCount(getDisplayQuestionCount(q, lq, lqs));
-        dao.update(display);
-        return display;
     }
 
     private int getDisplayQuestionCount(Question q, LoopQuestion lq, List<LoopQuestion> list) {
@@ -269,26 +266,27 @@ public class SetLoopsTask extends AsyncTask<Void, Void, Void> {
                     return q.getOptionCount() * count;
                 }
             } else {
-                String[] indices = lq.getOptionIndices().split(LIST_DELIMITER);
+                String[] indices = lq.getOptionIndices().split(COMMA);
                 return indices.length * count;
             }
         }
     }
 
-    private long getDisplayId(DisplayDao dao) {
+    private long getDisplayId() {
         long remoteId = getId();
-        Display display = dao.findByIdSync(remoteId);
-        if (display != null) {
-            getDisplayId(dao);
+        Display display = mDisplayDao.findByIdSync(remoteId);
+        while (display != null) {
+            remoteId = getId();
+            display = mDisplayDao.findByIdSync(remoteId);
         }
         return remoteId;
     }
 
-    private long getQuestionId(QuestionDao dao) {
+    private long getQuestionId() {
         long remoteId = getId();
-        Question question = dao.findByIdSync(remoteId);
+        Question question = mQuestionDao.findByIdSync(remoteId);
         if (question != null) {
-            getQuestionId(dao);
+            return getQuestionId();
         }
         return remoteId;
     }
@@ -302,9 +300,10 @@ public class SetLoopsTask extends AsyncTask<Void, Void, Void> {
     }
 
     @NonNull
-    private HashMap<Long, List<Question>> getDisplayQuestions(List<Question> questions) {
-        HashMap<Long, List<Question>> dQuestions = new HashMap<>();
+    private LongSparseArray<List<Question>> getDisplayQuestions(List<Question> questions) {
+        LongSparseArray<List<Question>> dQuestions = new LongSparseArray<>();
         for (Question question : questions) {
+            if (question.isDeleted()) continue;
             List<Question> displayQuestions = dQuestions.get(question.getDisplayId());
             if (displayQuestions == null) {
                 displayQuestions = new ArrayList<>();

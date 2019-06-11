@@ -2,8 +2,6 @@ package org.adaptlab.chpir.android.survey.converters;
 
 import android.arch.persistence.room.TypeConverter;
 
-import org.adaptlab.chpir.android.survey.entities.Question;
-
 import java.util.Date;
 
 public class Converters {

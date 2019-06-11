@@ -6,7 +6,7 @@ import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Transaction;
 
 import org.adaptlab.chpir.android.survey.entities.Response;
-import org.adaptlab.chpir.android.survey.entities.relations.ResponseRelation;
+import org.adaptlab.chpir.android.survey.relations.ResponseRelation;
 
 import java.util.List;
 

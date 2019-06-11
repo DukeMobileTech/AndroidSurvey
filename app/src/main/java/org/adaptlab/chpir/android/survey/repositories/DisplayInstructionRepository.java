@@ -2,7 +2,11 @@ package org.adaptlab.chpir.android.survey.repositories;
 
 import android.app.Application;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
+import org.adaptlab.chpir.android.survey.converters.SurveyEntityDeserializer;
 import org.adaptlab.chpir.android.survey.daos.BaseDao;
 import org.adaptlab.chpir.android.survey.daos.DisplayInstructionDao;
 import org.adaptlab.chpir.android.survey.entities.DisplayInstruction;
@@ -35,5 +39,12 @@ public class DisplayInstructionRepository extends Repository {
     @Override
     public SurveyEntity getEntity() {
         return new DisplayInstruction();
+    }
+
+    @Override
+    public Gson getGson() {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(DisplayInstruction.class, new SurveyEntityDeserializer<>(DisplayInstruction.class));
+        return gsonBuilder.create();
     }
 }

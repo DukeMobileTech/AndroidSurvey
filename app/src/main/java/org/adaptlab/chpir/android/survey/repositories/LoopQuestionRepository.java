@@ -2,7 +2,11 @@ package org.adaptlab.chpir.android.survey.repositories;
 
 import android.app.Application;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
+import org.adaptlab.chpir.android.survey.converters.SurveyEntityDeserializer;
 import org.adaptlab.chpir.android.survey.daos.BaseDao;
 import org.adaptlab.chpir.android.survey.daos.LoopQuestionDao;
 import org.adaptlab.chpir.android.survey.entities.LoopQuestion;
@@ -35,5 +39,12 @@ public class LoopQuestionRepository extends Repository {
     @Override
     public SurveyEntity getEntity() {
         return new LoopQuestion();
+    }
+
+    @Override
+    public Gson getGson() {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(LoopQuestion.class, new SurveyEntityDeserializer<>(LoopQuestion.class));
+        return gsonBuilder.create();
     }
 }

@@ -12,4 +12,5 @@ public interface SurveyEntity<T> {
 
     void save(BaseDao<T> dao, List<T> list);
 
+    void setDeleted(boolean deleted);
 }

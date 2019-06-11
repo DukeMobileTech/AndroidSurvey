@@ -5,12 +5,10 @@ import android.app.Application;
 import android.os.AsyncTask;
 
 import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
-import org.adaptlab.chpir.android.survey.daos.BaseDao;
 import org.adaptlab.chpir.android.survey.daos.SurveyDao;
 import org.adaptlab.chpir.android.survey.entities.Survey;
-import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 
-public class SurveyRepository extends Repository {
+public class SurveyRepository {
     private SurveyDao mSurveyDao;
 
     public SurveyRepository(Application application) {
@@ -35,27 +33,6 @@ public class SurveyRepository extends Repository {
     public void update(Survey survey) {
         new UpdateSurveyTask(mSurveyDao).execute(survey);
     }
-
-    @Override
-    public void download() {
-        // Do not implement
-    }
-
-    @Override
-    public String getRemoteTableName() {
-        return "surveys";
-    }
-
-    @Override
-    public BaseDao getDao() {
-        return mSurveyDao;
-    }
-
-    @Override
-    public SurveyEntity getEntity() {
-        return new Survey();
-    }
-
 
     private static class UpdateSurveyTask extends AsyncTask<Survey, Void, Void> {
 

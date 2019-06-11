@@ -18,6 +18,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -33,7 +34,7 @@ public class SurveyViewModel extends AndroidViewModel {
     private HashSet<String> mQuestionsToSkipSet;
     private HashMap<String, List<String>> mQuestionsToSkipMap;
     private Survey mSurvey;
-    private int mDisplayPosition = 0;
+    private int mDisplayPosition;
     private List<Question> mQuestions;
     private List<Display> mDisplays;
     private List<Integer> mPreviousDisplays;
@@ -61,6 +62,7 @@ public class SurveyViewModel extends AndroidViewModel {
     }
 
     public HashSet<String> getQuestionsToSkipSet() {
+        if (mQuestionsToSkipSet == null) return new HashSet<>();
         return mQuestionsToSkipSet;
     }
 
@@ -208,4 +210,11 @@ public class SurveyViewModel extends AndroidViewModel {
         }
     }
 
+    public void setSurveyLastDisplayPosition() {
+        mSurvey.setLastDisplayPosition(mDisplayPosition);
+    }
+
+    public void setSurveyLastUpdatedTime() {
+        mSurvey.setLastUpdated(new Date());
+    }
 }

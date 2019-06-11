@@ -106,7 +106,6 @@ public class InstrumentActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-//        setupViewPager();
         displayProjectName();
     }
 
@@ -152,7 +151,6 @@ public class InstrumentActivity extends AppCompatActivity {
                 }
                 return true;
             case R.id.menu_item_refresh:
-//                downloadInstruments();
                 AppUtil.downloadData(this.getApplication());
                 return true;
             default:

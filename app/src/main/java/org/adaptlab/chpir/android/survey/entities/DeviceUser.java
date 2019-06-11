@@ -98,4 +98,8 @@ public class DeviceUser implements SurveyEntity {
         dao.updateAll(list);
         dao.insertAll(list);
     }
+
+    @Override
+    public void setDeleted(boolean deleted) {
+    }
 }

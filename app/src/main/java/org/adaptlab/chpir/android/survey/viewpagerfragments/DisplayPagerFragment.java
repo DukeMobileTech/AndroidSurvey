@@ -2,6 +2,7 @@ package org.adaptlab.chpir.android.survey.viewpagerfragments;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,15 +19,14 @@ import android.view.ViewGroup;
 
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.adapters.ResponseRelationAdapter;
-import org.adaptlab.chpir.android.survey.entities.ConditionSkip;
+import org.adaptlab.chpir.android.survey.entities.LoopQuestion;
 import org.adaptlab.chpir.android.survey.entities.MultipleSkip;
-import org.adaptlab.chpir.android.survey.entities.NextQuestion;
 import org.adaptlab.chpir.android.survey.entities.Option;
 import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.Response;
 import org.adaptlab.chpir.android.survey.entities.Survey;
-import org.adaptlab.chpir.android.survey.entities.relations.QuestionRelation;
-import org.adaptlab.chpir.android.survey.entities.relations.ResponseRelation;
+import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
+import org.adaptlab.chpir.android.survey.relations.ResponseRelation;
 import org.adaptlab.chpir.android.survey.repositories.ResponseRepository;
 import org.adaptlab.chpir.android.survey.viewholders.QuestionViewHolder;
 import org.adaptlab.chpir.android.survey.viewmodelfactories.QuestionRelationViewModelFactory;
@@ -37,10 +37,15 @@ import org.adaptlab.chpir.android.survey.viewmodels.ResponseRelationViewModel;
 import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
+import static org.adaptlab.chpir.android.survey.models.Instrument.LOOP_MAX;
+import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMPLETE_SURVEY;
 
 public class DisplayPagerFragment extends Fragment {
@@ -75,43 +80,62 @@ public class DisplayPagerFragment extends Fragment {
     private void setOnResponseSelectedListener() {
         mListener = new QuestionViewHolder.OnResponseSelectedListener() {
             @Override
-            public void onResponseSelected(QuestionRelation qr, Option selectedOption, List<Option> selectedOptions, String enteredValue, String nextQuestion) {
-//                Log.i(TAG, "qid: " + qr.question.getQuestionIdentifier());
-//                if (selectedOption != null) Log.i(TAG, "Res: " + selectedOption.getText());
-//                if (nextQuestion != null) Log.i(TAG, "NQ: " + nextQuestion);
+            public void onResponseSelected(QuestionRelation qr, Option selectedOption, List<Option> selectedOptions, String enteredValue, String nextQuestion, String text) {
+                setNextQuestions(qr, nextQuestion);
+                setMultipleSkips(qr, selectedOption, selectedOptions, enteredValue);
+                setQuestionLoops(qr, text);
+                mSurveyViewModel.updateQuestionsToSkipSet();
+            }
 
-                if (qr.nextQuestions != null && !qr.nextQuestions.isEmpty()) {
-                    List<String> skipList = new ArrayList<>();
-                    if (nextQuestion != null) {
-                        if (nextQuestion.equals(COMPLETE_SURVEY)) {
-                            List<String> questions = new ArrayList<>();
-                            for (Question q : mSurveyViewModel.getQuestions()) {
-                                questions.add(q.getQuestionIdentifier());
-                            }
-                            skipList = new ArrayList<>(questions.subList(questions.indexOf(qr.question.getQuestionIdentifier()) + 1, questions.size()));
-                        } else {
-                            boolean toBeSkipped = false;
-                            for (Question curQuestion : mSurveyViewModel.getQuestions()) {
-                                if (curQuestion.getQuestionIdentifier().equals(nextQuestion)) {
-                                    break;
-                                }
-                                if (toBeSkipped) {
-                                    skipList.add(curQuestion.getQuestionIdentifier());
-                                    Log.i(TAG, "To skip: " + curQuestion.getQuestionIdentifier());
-                                    // Skip loop children questions
-//                                for (Question question : loopChildren(curQuestion.getQuestionIdentifier())) {
-//                                    skipList.add(question.getQuestionIdentifier());
-//                                }
-                                }
-                                if (curQuestion.getQuestionIdentifier().equals(qr.question.getQuestionIdentifier()))
-                                    toBeSkipped = true;
+            private void setQuestionLoops(QuestionRelation qr, String text) {
+                if (qr.loopQuestions != null && !qr.loopQuestions.isEmpty()) {
+                    if (qr.question.getQuestionType().equals(Question.INTEGER)) {
+                        List<String> questionsToHide = new ArrayList<>();
+                        int start = 0;
+                        if (!TextUtils.isEmpty(text)) {
+                            start = Integer.parseInt(text);
+                        }
+                        for (int k = start + 1; k <= LOOP_MAX; k++) {
+                            for (LoopQuestion lq : qr.loopQuestions) {
+                                String id = qr.question.getQuestionIdentifier() + "_" + lq.getLooped() + "_" + k;
+                                questionsToHide.add(id);
                             }
                         }
+                        mSurveyViewModel.updateQuestionsToSkipMap(qr.question.getQuestionIdentifier() + "/intLoop", questionsToHide);
+                    } else if (qr.question.isMultipleResponseLoop()) {
+                        List<String> responses;
+                        if (qr.question.isListResponse()) {
+                            responses = Arrays.asList(text.split(COMMA, -1)); // Keep empty values
+                        } else {
+                            responses = Arrays.asList(text.split(COMMA)); // Ignore empty values
+                        }
+                        List<String> questionsToHide = new ArrayList<>();
+                        int optionsSize = qr.optionSets.get(0).optionSetOptions.size() - 1;
+                        if (qr.question.isOtherQuestionType()) {
+                            optionsSize += 1;
+                        }
+                        for (int k = 0; k <= optionsSize; k++) {
+                            for (LoopQuestion lq : qr.loopQuestions) {
+                                if (!TextUtils.isEmpty(lq.getLooped())) {
+                                    String id = qr.question.getQuestionIdentifier() + "_" + lq.getLooped() + "_" + k;
+                                    if (qr.question.isMultipleResponse()) {
+                                        if (!responses.contains(String.valueOf(k))) {
+                                            questionsToHide.add(id);
+                                        }
+                                    } else if (qr.question.isListResponse()) {
+                                        if (TextUtils.isEmpty(text) || TextUtils.isEmpty(responses.get(k))) {
+                                            questionsToHide.add(id);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        mSurveyViewModel.updateQuestionsToSkipMap(qr.question.getQuestionIdentifier() + "/multiLoop", questionsToHide);
                     }
-                    mSurveyViewModel.updateQuestionsToSkipMap(qr.question.getQuestionIdentifier() + "/skipTo", skipList);
-                    mSurveyViewModel.updateQuestionsToSkipSet();
                 }
+            }
 
+            private void setMultipleSkips(QuestionRelation qr, Option selectedOption, List<Option> selectedOptions, String enteredValue) {
                 if (qr.multipleSkips != null && !qr.multipleSkips.isEmpty()) {
                     List<String> skipList = new ArrayList<>();
                     if (selectedOption != null) {
@@ -140,7 +164,35 @@ public class DisplayPagerFragment extends Fragment {
                         }
                         mSurveyViewModel.updateQuestionsToSkipMap(qr.question.getQuestionIdentifier() + "/multi", new ArrayList<>(skipSet));
                     }
-                    mSurveyViewModel.updateQuestionsToSkipSet();
+                }
+            }
+
+            private void setNextQuestions(QuestionRelation qr, String nextQuestion) {
+                if (qr.nextQuestions != null && !qr.nextQuestions.isEmpty()) {
+                    List<String> skipList = new ArrayList<>();
+                    if (nextQuestion != null) {
+                        if (nextQuestion.equals(COMPLETE_SURVEY)) {
+                            List<String> questions = new ArrayList<>();
+                            for (Question q : mSurveyViewModel.getQuestions()) {
+                                questions.add(q.getQuestionIdentifier());
+                            }
+                            skipList = new ArrayList<>(questions.subList(questions.indexOf(qr.question.getQuestionIdentifier()) + 1, questions.size()));
+                        } else {
+                            boolean toBeSkipped = false;
+                            for (Question curQuestion : mSurveyViewModel.getQuestions()) {
+                                if (curQuestion.getQuestionIdentifier().equals(nextQuestion)) {
+                                    break;
+                                }
+                                if (toBeSkipped) {
+                                    skipList.add(curQuestion.getQuestionIdentifier());
+                                    Log.i(TAG, "To skip: " + curQuestion.getQuestionIdentifier());
+                                }
+                                if (curQuestion.getQuestionIdentifier().equals(qr.question.getQuestionIdentifier()))
+                                    toBeSkipped = true;
+                            }
+                        }
+                    }
+                    mSurveyViewModel.updateQuestionsToSkipMap(qr.question.getQuestionIdentifier() + "/skipTo", skipList);
                 }
             }
         };
@@ -176,10 +228,32 @@ public class DisplayPagerFragment extends Fragment {
                 mQuestions = new ArrayList<>();
                 for (QuestionRelation questionRelation : questionRelations) {
                     mQuestions.add(questionRelation.question);
+                    hideLoopedQuestions(questionRelation);
                 }
+
+                Collections.sort(mQuestions, new Comparator<Question>() {
+                    @Override
+                    public int compare(Question o1, Question o2) {
+                        if (o1.getNumberInInstrument() < o2.getNumberInInstrument()) return -1;
+                        if (o1.getNumberInInstrument() > o2.getNumberInInstrument()) return 1;
+                        return 0;
+                    }
+                });
+
                 initializeResponses();
             }
         });
+    }
+
+    private void hideLoopedQuestions(QuestionRelation questionRelation) {
+        if (questionRelation.loopedQuestions.size() > 0) {
+            List<String> questionsToHide = new ArrayList<>();
+            for (LoopQuestion lq : questionRelation.loopedQuestions) {
+                questionsToHide.add(lq.getLooped());
+            }
+            mSurveyViewModel.updateQuestionsToSkipMap(questionRelation.question.getQuestionIdentifier() + "/looped", questionsToHide);
+            hideQuestions();
+        }
     }
 
     private void setResponses() {
@@ -210,7 +284,7 @@ public class DisplayPagerFragment extends Fragment {
         mSurveyViewModel.getLiveDataSurvey().observe(getViewLifecycleOwner(), new Observer<Survey>() {
             @Override
             public void onChanged(@Nullable Survey survey) {
-                if (mSurveyViewModel.getSurvey() == null) {
+                if (survey != null && mSurveyViewModel.getSurvey() == null) {
                     mSurveyViewModel.setSurvey(survey);
                     mSurveyViewModel.setSkipData();
                 }

@@ -2,7 +2,11 @@ package org.adaptlab.chpir.android.survey.repositories;
 
 import android.app.Application;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
+import org.adaptlab.chpir.android.survey.converters.SurveyEntityDeserializer;
 import org.adaptlab.chpir.android.survey.daos.BaseDao;
 import org.adaptlab.chpir.android.survey.daos.CriticalResponseDao;
 import org.adaptlab.chpir.android.survey.entities.CriticalResponse;
@@ -35,5 +39,12 @@ public class CriticalResponseRepository extends Repository {
     @Override
     public SurveyEntity getEntity() {
         return new CriticalResponse();
+    }
+
+    @Override
+    public Gson getGson() {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(CriticalResponse.class, new SurveyEntityDeserializer<>(CriticalResponse.class));
+        return gsonBuilder.create();
     }
 }

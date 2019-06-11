@@ -3,7 +3,11 @@ package org.adaptlab.chpir.android.survey.repositories;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
+import org.adaptlab.chpir.android.survey.converters.SurveyEntityDeserializer;
 import org.adaptlab.chpir.android.survey.daos.BaseDao;
 import org.adaptlab.chpir.android.survey.daos.InstrumentDao;
 import org.adaptlab.chpir.android.survey.daos.InstrumentTranslationDao;
@@ -17,19 +21,13 @@ import java.util.List;
 public class InstrumentRepository extends Repository {
     private InstrumentDao mInstrumentDao;
     private InstrumentTranslationDao mInstrumentTranslationDao;
-    private LiveData<List<Instrument>> mAllInstruments;
     private LiveData<List<InstrumentTranslation>> mAllInstrumentTranslations;
 
     public InstrumentRepository(Application application) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);
         mInstrumentDao = db.instrumentDao();
         mInstrumentTranslationDao = db.instrumentTranslationDao();
-        mAllInstruments = mInstrumentDao.getAllInstruments();
         mAllInstrumentTranslations = mInstrumentTranslationDao.getAllInstrumentTranslations();
-    }
-
-    public LiveData<List<Instrument>> getAllInstruments() {
-        return mAllInstruments;
     }
 
     public LiveData<List<InstrumentTranslation>> getAllInstrumentTranslations() {
@@ -68,5 +66,12 @@ public class InstrumentRepository extends Repository {
     @Override
     public SurveyEntity getTranslationEntity() {
         return new InstrumentTranslation();
+    }
+
+    @Override
+    public Gson getGson() {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(Instrument.class, new SurveyEntityDeserializer<>(Instrument.class));
+        return gsonBuilder.create();
     }
 }

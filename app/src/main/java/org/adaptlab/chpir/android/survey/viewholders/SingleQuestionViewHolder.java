@@ -14,7 +14,6 @@ import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -30,14 +29,13 @@ import org.adaptlab.chpir.android.survey.entities.Option;
 import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.Response;
 import org.adaptlab.chpir.android.survey.entities.Survey;
-import org.adaptlab.chpir.android.survey.entities.relations.DisplayInstructionRelation;
-import org.adaptlab.chpir.android.survey.entities.relations.DisplayRelation;
-import org.adaptlab.chpir.android.survey.entities.relations.OptionSetOptionRelation;
-import org.adaptlab.chpir.android.survey.entities.relations.OptionSetRelation;
-import org.adaptlab.chpir.android.survey.entities.relations.QuestionRelation;
-import org.adaptlab.chpir.android.survey.entities.relations.ResponseRelation;
+import org.adaptlab.chpir.android.survey.relations.DisplayInstructionRelation;
+import org.adaptlab.chpir.android.survey.relations.DisplayRelation;
+import org.adaptlab.chpir.android.survey.relations.OptionSetOptionRelation;
+import org.adaptlab.chpir.android.survey.relations.OptionSetRelation;
+import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
+import org.adaptlab.chpir.android.survey.relations.ResponseRelation;
 import org.adaptlab.chpir.android.survey.repositories.ResponseRepository;
-import org.adaptlab.chpir.android.survey.repositories.SurveyRepository;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -55,7 +53,6 @@ public abstract class SingleQuestionViewHolder extends QuestionViewHolder {
     protected RadioGroup mSpecialResponses;
 
     private ResponseRepository mResponseRepository;
-    private SurveyRepository mSurveyRepository;
 
     private QuestionRelation mQuestionRelation;
     private Question mQuestion;
@@ -78,7 +75,6 @@ public abstract class SingleQuestionViewHolder extends QuestionViewHolder {
     public SingleQuestionViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
         super(itemView, context, listener);
         mResponseRepository = new ResponseRepository((Application) context.getApplicationContext());
-        mSurveyRepository = new SurveyRepository((Application) context.getApplicationContext());
         mDisplayInstructionTextView = itemView.findViewById(R.id.displayInstructions);
         mSpannedTextView = itemView.findViewById(R.id.spannedTextView);
         mOptionSetInstructionTextView = itemView.findViewById(R.id.optionSetInstructions);
@@ -238,8 +234,6 @@ public abstract class SingleQuestionViewHolder extends QuestionViewHolder {
 
     private void updateResponse() {
         updateSkipData();
-        mSurvey.setLastUpdated(new Date());
-        mSurveyRepository.update(mSurvey);
         mResponse.setTimeEnded(new Date());
         mResponseRepository.update(mResponse);
     }
@@ -284,7 +278,7 @@ public abstract class SingleQuestionViewHolder extends QuestionViewHolder {
             nextQuestion = getNextQuestionIdentifier(selectedOptions);
         }
 
-        getListener().onResponseSelected(mQuestionRelation, selectedOption, selectedOptions, enteredValue, nextQuestion);
+        getListener().onResponseSelected(mQuestionRelation, selectedOption, selectedOptions, enteredValue, nextQuestion, mResponse.getText());
     }
 
     private String getNextQuestionIdentifier(Option option) {

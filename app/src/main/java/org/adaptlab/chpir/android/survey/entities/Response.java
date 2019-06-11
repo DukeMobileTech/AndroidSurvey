@@ -6,20 +6,13 @@ import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
-import com.google.gson.reflect.TypeToken;
-
-import org.adaptlab.chpir.android.survey.daos.BaseDao;
-
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.BLANK;
 
 @Entity(tableName = "Responses", indices = {@Index(value = {"SurveyUUID", "QuestionIdentifier", "UUID"}, unique = true)})
-public class Response implements SurveyEntity {
+public class Response {
     @PrimaryKey
     @NonNull
     @ColumnInfo(name = "UUID", index = true)
@@ -175,20 +168,4 @@ public class Response implements SurveyEntity {
         this.mRankOrder = mRankOrder;
     }
 
-    @Override
-    public Type getType() {
-        return new TypeToken<ArrayList<Response>>() {
-        }.getType();
-    }
-
-    @Override
-    public List getTranslations() {
-        return null;
-    }
-
-    @Override
-    public void save(BaseDao dao, List list) {
-        dao.updateAll(list);
-        dao.insertAll(list);
-    }
 }
