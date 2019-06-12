@@ -2,7 +2,6 @@ package org.adaptlab.chpir.android.survey.viewpagerfragments;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -185,7 +184,6 @@ public class DisplayPagerFragment extends Fragment {
                                 }
                                 if (toBeSkipped) {
                                     skipList.add(curQuestion.getQuestionIdentifier());
-                                    Log.i(TAG, "To skip: " + curQuestion.getQuestionIdentifier());
                                 }
                                 if (curQuestion.getQuestionIdentifier().equals(qr.question.getQuestionIdentifier()))
                                     toBeSkipped = true;
@@ -206,7 +204,9 @@ public class DisplayPagerFragment extends Fragment {
             displayQuestionIds.add(rr.response.getQuestionIdentifier());
         }
         for (String questionToSkip : mSurveyViewModel.getQuestionsToSkipSet()) {
-            if (displayQuestionIds.contains(questionToSkip)) hideSet.add(questionToSkip);
+            if (displayQuestionIds.contains(questionToSkip)){
+                hideSet.add(questionToSkip);
+            }
         }
         List<ResponseRelation> visibleQuestions = new ArrayList<>();
         for (ResponseRelation rr : mResponseRelations) {
@@ -290,6 +290,7 @@ public class DisplayPagerFragment extends Fragment {
                 }
             }
         });
+        mResponseRelationAdapter.setSurveyViewModel(mSurveyViewModel);
     }
 
     private void initializeResponses() {

@@ -12,6 +12,7 @@ import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
 import org.adaptlab.chpir.android.survey.relations.ResponseRelation;
 import org.adaptlab.chpir.android.survey.viewholders.QuestionViewHolder;
 import org.adaptlab.chpir.android.survey.viewholders.QuestionViewHolderFactory;
+import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +22,7 @@ public class ResponseRelationAdapter extends ListAdapter<ResponseRelation, Quest
 
     private HashMap<String, QuestionRelation> mQuestionRelations;
     private QuestionViewHolder.OnResponseSelectedListener mListener;
+    private SurveyViewModel mSurveyViewModel;
 
     private static final DiffUtil.ItemCallback<ResponseRelation> DIFF_CALLBACK = new DiffUtil.ItemCallback<ResponseRelation>() {
         @Override
@@ -50,6 +52,7 @@ public class ResponseRelationAdapter extends ListAdapter<ResponseRelation, Quest
 
     @Override
     public void onBindViewHolder(@NonNull QuestionViewHolder viewHolder, int position) {
+        if (mSurveyViewModel != null) viewHolder.setSurveyViewModel(mSurveyViewModel);
         if (mQuestionRelations == null) return;
         ResponseRelation responseRelation = getItem(position);
         QuestionRelation questionRelation = mQuestionRelations.get(responseRelation.response.getQuestionIdentifier());
@@ -72,6 +75,11 @@ public class ResponseRelationAdapter extends ListAdapter<ResponseRelation, Quest
         for (QuestionRelation questionRelation : questionRelations) {
             mQuestionRelations.put(questionRelation.question.getQuestionIdentifier(), questionRelation);
         }
+        notifyDataSetChanged();
+    }
+
+    public void setSurveyViewModel(SurveyViewModel viewModel) {
+        mSurveyViewModel = viewModel;
         notifyDataSetChanged();
     }
 

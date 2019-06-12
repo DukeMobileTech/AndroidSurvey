@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.NonNull;
 
-import org.adaptlab.chpir.android.survey.viewmodels.InstrumentViewModel;
 import org.adaptlab.chpir.android.survey.viewmodels.SectionViewModel;
 
 public class SectionViewModelFactory implements ViewModelProvider.Factory {

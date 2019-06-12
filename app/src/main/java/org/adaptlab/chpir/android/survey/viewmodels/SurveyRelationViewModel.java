@@ -14,7 +14,6 @@ public class SurveyRelationViewModel extends AndroidViewModel {
     public SurveyRelationViewModel(@NonNull Application application, String uuid) {
         super(application);
         SurveyRepository surveyRepository = new SurveyRepository(application);
-        if (uuid == null) return;
         mSurveyRelation = surveyRepository.getSurveyDao().findSurveyRelationByUUID(uuid);
     }
 

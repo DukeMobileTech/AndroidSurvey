@@ -38,6 +38,7 @@ import org.adaptlab.chpir.android.survey.relations.ResponseRelation;
 import org.adaptlab.chpir.android.survey.repositories.ResponseRepository;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -407,56 +408,38 @@ public abstract class SingleQuestionViewHolder extends QuestionViewHolder {
 
     private Spanned getQuestionText() {
         String text = mQuestion.getText();
-
-//            if (question.isFollowUpQuestion()) {
-//                String followUpText = question.getFollowingUpText(mSurveyFragment.getResponses(), getActivity());
-//                if (followUpText != null) {
-//                    text = followUpText;
-//                }
-//            } else if (question.hasRandomizedFactors()) {
-//                text = question.getRandomizedText(mSurveyFragment.getResponses().get(question.getQuestionIdentifier()));
-//            } else if (!TextUtils.isEmpty(question.getLoopSource())) {
-//                String causeId = question.getQuestionIdentifier().split("_")[0];
-//                Response response = mSurveyFragment.getResponses().get(causeId);
-//                if (response == null || TextUtils.isEmpty(response.getText())) {
-//                    text = question.getText();
-//                } else {
-//                    String responseText = "";
-//                    String[] responses = response.getText().split(Response.LIST_DELIMITER, -1);
-//                    Question causeQuestion = mSurveyFragment.getQuestions().get(causeId);
-//                    if (causeQuestion.isSingleSelect()) {
-//                        int index = Integer.parseInt(responses[question.getLoopNumber()]);
-//                        responseText = mSurveyFragment.getOptions().get(causeQuestion).get(index).getText(mSurveyFragment.getInstrument());
-//                    } else if (causeQuestion.isMultipleResponse()) {
-//                        if (Arrays.asList(responses).contains(Integer.toString(question.getLoopNumber()))) {
-//                            responseText = mSurveyFragment.getOptions().get(causeQuestion).get(question.getLoopNumber()).getText(mSurveyFragment.getInstrument());
-//                        }
-//                    } else {
-//                        if (question.getLoopNumber() < responses.length) {
-//                            responseText = responses[question.getLoopNumber()]; //Keep empty values
-//                        }
-//                    }
-//                    if (TextUtils.isEmpty(responseText)) {
-//                        text = question.getText();
-//                    } else {
-//                        text = question.getText();
-//                        int begin = text.indexOf("[");
-//                        int last = text.indexOf("]");
-//                        if (begin != -1 && last != -1 && begin < last) {
-//                            text = text.replace(text.substring(begin, last + 1), responseText);
-//                        } else {
-//                            if (question.getTextToReplace() == null) {
-//                                text = question.getText();
-//                            } else {
-//                                text = question.getText().replace(question.getTextToReplace(), responseText);
-//                            }
-//                        }
-//                    }
-//                }
-//            } else {
-//                text = question.getText();
-//            }
-
+        if (!TextUtils.isEmpty(mQuestion.getLoopSource())) {
+            String causeId = mQuestion.getQuestionIdentifier().split("_")[0];
+            Response response = getSurveyViewModel().getResponses().get(causeId);
+            if (response != null && !TextUtils.isEmpty(response.getText())) {
+                String responseText = "";
+                String[] responses = response.getText().split(COMMA, -1);
+                Question causeQuestion = getSurveyViewModel().getQuestionsMap().get(causeId);
+                if (causeQuestion.isSingleResponse()) {
+                    int index = Integer.parseInt(responses[mQuestion.getLoopNumber()]);
+                    responseText = mOptions.get(index).getText();
+                } else if (causeQuestion.isMultipleResponse()) {
+                    if (Arrays.asList(responses).contains(Integer.toString(mQuestion.getLoopNumber()))) {
+                        responseText = mOptions.get(mQuestion.getLoopNumber()).getText();
+                    }
+                } else {
+                    if (mQuestion.getLoopNumber() < responses.length) {
+                        responseText = responses[mQuestion.getLoopNumber()]; //Keep empty values
+                    }
+                }
+                if (!TextUtils.isEmpty(responseText)) {
+                    int begin = text.indexOf("[");
+                    int last = text.indexOf("]");
+                    if (begin != -1 && last != -1 && begin < last) {
+                        text = text.replace(text.substring(begin, last + 1), responseText);
+                    } else {
+                        if (!TextUtils.isEmpty(mQuestion.getTextToReplace())) {
+                            text = mQuestion.getText().replace(mQuestion.getTextToReplace(), responseText);
+                        }
+                    }
+                }
+            }
+        }
         return styleTextWithHtml(text);
     }
 

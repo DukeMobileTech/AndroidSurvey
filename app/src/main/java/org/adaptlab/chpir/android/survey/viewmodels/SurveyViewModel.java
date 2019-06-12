@@ -11,13 +11,17 @@ import android.util.LongSparseArray;
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.entities.Display;
 import org.adaptlab.chpir.android.survey.entities.Question;
+import org.adaptlab.chpir.android.survey.entities.Response;
 import org.adaptlab.chpir.android.survey.entities.Section;
 import org.adaptlab.chpir.android.survey.entities.Survey;
 import org.adaptlab.chpir.android.survey.repositories.SurveyRepository;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,12 +39,14 @@ public class SurveyViewModel extends AndroidViewModel {
     private HashMap<String, List<String>> mQuestionsToSkipMap;
     private Survey mSurvey;
     private int mDisplayPosition;
-    private List<Question> mQuestions;
     private List<Display> mDisplays;
     private List<Integer> mPreviousDisplays;
     private LongSparseArray<Section> mSections;
     private LinkedHashMap<String, List<String>> mExpandableListData;
     private List<String> mExpandableListTitle;
+    private HashMap<String, Question> mQuestionsMap;
+    private HashMap<String, Response> mResponses;
+    private List<Question> mQuestions;
 
     public SurveyViewModel(@NonNull Application application, String uuid) {
         super(application);
@@ -66,28 +72,36 @@ public class SurveyViewModel extends AndroidViewModel {
         return mQuestionsToSkipSet;
     }
 
-    public void setDisplayPosition(int position) {
-        mDisplayPosition = position;
-    }
-
     public int getDisplayPosition() {
         return mDisplayPosition;
     }
 
+    public void setDisplayPosition(int position) {
+        mDisplayPosition = position;
+    }
+
     public void decrementDisplayPosition() {
-        mDisplayPosition -=1;
+        mDisplayPosition -= 1;
     }
 
     public void incrementDisplayPosition() {
-        mDisplayPosition +=1;
+        mDisplayPosition += 1;
+    }
+
+    public HashMap<String, Question> getQuestionsMap() {
+        return mQuestionsMap;
     }
 
     public List<Question> getQuestions() {
         return mQuestions;
     }
 
-    public void setQuestions(List<Question> mQuestions) {
-        this.mQuestions = mQuestions;
+    public void setQuestions(List<Question> questions) {
+        mQuestions = questions;
+        mQuestionsMap = new HashMap<>();
+        for (Question question : questions) {
+            mQuestionsMap.put(question.getQuestionIdentifier(), question);
+        }
     }
 
     public List<Display> getDisplays() {
@@ -106,12 +120,12 @@ public class SurveyViewModel extends AndroidViewModel {
         mPreviousDisplays = previousDisplays;
     }
 
-    public void setSections(LongSparseArray<Section> sections) {
-        mSections = sections;
-    }
-
     public LongSparseArray<Section> getSections() {
         return mSections;
+    }
+
+    public void setSections(LongSparseArray<Section> sections) {
+        mSections = sections;
     }
 
     public LinkedHashMap<String, List<String>> getExpandableListData() {
@@ -154,6 +168,7 @@ public class SurveyViewModel extends AndroidViewModel {
     }
 
     public void persistSkipMaps() {
+        if (mQuestionsToSkipMap == null) return;
         try {
             JSONObject jsonObject = new JSONObject();
             for (HashMap.Entry<String, List<String>> pair : mQuestionsToSkipMap.entrySet()) {
@@ -216,5 +231,13 @@ public class SurveyViewModel extends AndroidViewModel {
 
     public void setSurveyLastUpdatedTime() {
         mSurvey.setLastUpdated(new Date());
+    }
+
+    public HashMap<String, Response> getResponses() {
+        return mResponses;
+    }
+
+    public void setResponses(HashMap<String, Response> map) {
+        mResponses = map;
     }
 }

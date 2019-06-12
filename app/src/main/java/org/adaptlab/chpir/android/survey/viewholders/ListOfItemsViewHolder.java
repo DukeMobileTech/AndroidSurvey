@@ -1,14 +1,20 @@
 package org.adaptlab.chpir.android.survey.viewholders;
 
+import android.app.Activity;
 import android.content.Context;
 import android.support.multidex.BuildConfig;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.opencsv.CSVReader;
 
+import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.entities.Option;
 import org.apache.commons.codec.Charsets;
 import org.apache.commons.lang3.StringEscapeUtils;
 
@@ -17,8 +23,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
+import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.EDIT_TEXT_DELAY;
 
 public abstract class ListOfItemsViewHolder extends SingleQuestionViewHolder {
     private ArrayList<EditText> mResponses;
@@ -30,32 +39,49 @@ public abstract class ListOfItemsViewHolder extends SingleQuestionViewHolder {
     protected abstract EditText createEditText();
 
     protected void createQuestionComponent(ViewGroup questionComponent) {
-//        mResponses = new ArrayList<>();
-//        for (Option option : getOptions()) {
-//            final TextView optionText = new TextView(getActivity());
-//            optionText.setText(getOptionText(option));
-//            questionComponent.addView(optionText);
-//            EditText editText = createEditText();
-//            editText.setHint(R.string.free_response_edittext);
+        questionComponent.removeAllViews();
+        mResponses = new ArrayList<>();
+        for (Option option : getOptions()) {
+            final TextView optionText = new TextView(getContext());
+            optionText.setText(option.getText());
+            questionComponent.addView(optionText);
+            EditText editText = createEditText();
+            editText.setHint(R.string.free_response_edittext);
 //            editText.setTypeface(getInstrument().getTypeFace(getActivity().getApplicationContext()));
-//            questionComponent.addView(editText);
-//            mResponses.add(editText);
-//            editText.addTextChangedListener(new TextWatcher() {
-//                public void onTextChanged(CharSequence s, int start, int before, int count) {
-//                    setResponse(null);
-//                }
-//
-//                // Required by interface
-//                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//                }
-//
-//                public void afterTextChanged(Editable s) {
-//                    if (mSpecialResponses != null && s.length() > 0) {
-//                        mSpecialResponses.clearCheck();
-//                    }
-//                }
-//            });
-//        }
+            questionComponent.addView(editText);
+            mResponses.add(editText);
+            editText.addTextChangedListener(new TextWatcher() {
+                private Timer timer;
+
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if (timer != null) timer.cancel();
+                }
+
+                // Required by interface
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                public void afterTextChanged(Editable s) {
+                    timer = new Timer();
+                    if (!isDeserialization()) {
+                        timer.schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                // Run on UI Thread
+                                if (getContext() != null) {
+                                    ((Activity) getContext()).runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            saveResponse();
+                                        }
+                                    });
+                                }
+                            }
+                        }, EDIT_TEXT_DELAY); // delay before saving to db
+                    }
+                }
+            });
+        }
     }
 
     @Override
@@ -85,13 +111,5 @@ public abstract class ListOfItemsViewHolder extends SingleQuestionViewHolder {
             if (BuildConfig.DEBUG) Log.e(TAG, "IOException " + e.getMessage());
         }
     }
-
-//    @Override
-//    protected void unSetResponse() {
-//        for (EditText oneEditText : mResponses) {
-//            oneEditText.setText(Response.BLANK);
-//        }
-//        setResponseTextBlank();
-//    }
 
 }

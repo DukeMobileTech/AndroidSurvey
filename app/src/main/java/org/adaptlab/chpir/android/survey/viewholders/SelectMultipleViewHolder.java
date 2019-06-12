@@ -27,6 +27,7 @@ public class SelectMultipleViewHolder extends SingleQuestionViewHolder {
 
     @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
+        questionComponent.removeAllViews();
         mCheckBoxes = new ArrayList<>();
         mResponseIndices = new ArrayList<>();
         for (Option option : getOptions()) {
@@ -44,7 +45,7 @@ public class SelectMultipleViewHolder extends SingleQuestionViewHolder {
 //                        mSpecialResponses.clearCheck();
 //                    }
 //                    checkOptionExclusivity(v);
-//                    toggleResponseIndex(v.getId());
+                    toggleResponseIndex(v.getId());
 //                    if (getQuestion().rankResponses()) {
 //                        optionToggled(v.getId());
 //                    }
@@ -107,30 +108,17 @@ public class SelectMultipleViewHolder extends SingleQuestionViewHolder {
         }
     }
 
-//    protected void toggleResponseIndex(int index) {
-//        if (mResponseIndices.contains(index)) {
-//            mResponseIndices.remove((Integer) index);
-//        } else {
-//            mResponseIndices.add(index);
-//        }
-//        setResponse(null);
-//    }
+    private void toggleResponseIndex(int index) {
+        if (mResponseIndices.contains(index)) {
+            mResponseIndices.remove((Integer) index);
+        } else {
+            mResponseIndices.add(index);
+        }
+        saveResponse();
+    }
 
     void addCheckBox(CheckBox checkbox) {
         mCheckBoxes.add(checkbox);
     }
-
-//    @Override
-//    protected void unSetResponse() {
-//        for (CheckBox box : mCheckBoxes) {
-//            if (box.isChecked()) {
-//                box.setChecked(false);
-//            }
-//        }
-//        setResponseTextBlank();
-//        if (getQuestion().rankResponses()) {
-//            getResponse().setRankOrder(Response.BLANK);
-//        }
-//    }
 
 }

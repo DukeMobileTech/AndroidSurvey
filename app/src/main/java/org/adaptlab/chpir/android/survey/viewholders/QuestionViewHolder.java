@@ -9,6 +9,7 @@ import org.adaptlab.chpir.android.survey.entities.Option;
 import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
 import org.adaptlab.chpir.android.survey.relations.ResponseRelation;
+import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
 
 import java.util.List;
 
@@ -16,6 +17,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     public final String TAG = this.getClass().getName();
     private Context mContext;
     private OnResponseSelectedListener mListener;
+    private SurveyViewModel mSurveyViewModel;
 
     QuestionViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
         super(itemView);
@@ -25,6 +27,14 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
     public Context getContext() {
         return mContext;
+    }
+
+    SurveyViewModel getSurveyViewModel() {
+        return mSurveyViewModel;
+    }
+
+    public void setSurveyViewModel(SurveyViewModel model) {
+        mSurveyViewModel = model;
     }
 
     protected abstract Question getQuestion();
