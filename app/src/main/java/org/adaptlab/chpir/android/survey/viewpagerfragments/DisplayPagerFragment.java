@@ -10,7 +10,6 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.LongSparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -137,9 +136,10 @@ public class DisplayPagerFragment extends Fragment {
             private void setMultipleSkips(QuestionRelation qr, Option selectedOption, List<Option> selectedOptions, String enteredValue) {
                 if (qr.multipleSkips != null && !qr.multipleSkips.isEmpty()) {
                     List<String> skipList = new ArrayList<>();
-                    if (selectedOption != null) {
+                    if (selectedOption != null && selectedOption.getIdentifier() != null) {
                         for (MultipleSkip multipleSkip : qr.multipleSkips) {
-                            if (multipleSkip.getOptionIdentifier().equals(selectedOption.getIdentifier())) {
+                            if (multipleSkip.getOptionIdentifier() != null &&
+                                    multipleSkip.getOptionIdentifier().equals(selectedOption.getIdentifier())) {
                                 skipList.add(multipleSkip.getSkipQuestionIdentifier());
                             }
                         }
@@ -204,7 +204,7 @@ public class DisplayPagerFragment extends Fragment {
             displayQuestionIds.add(rr.response.getQuestionIdentifier());
         }
         for (String questionToSkip : mSurveyViewModel.getQuestionsToSkipSet()) {
-            if (displayQuestionIds.contains(questionToSkip)){
+            if (displayQuestionIds.contains(questionToSkip)) {
                 hideSet.add(questionToSkip);
             }
         }

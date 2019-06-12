@@ -6,6 +6,7 @@ import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Transaction;
 
 import org.adaptlab.chpir.android.survey.entities.Survey;
+import org.adaptlab.chpir.android.survey.relations.ProjectSurveyRelation;
 import org.adaptlab.chpir.android.survey.relations.SurveyRelation;
 
 import java.util.List;
@@ -21,5 +22,5 @@ public abstract class SurveyDao extends BaseDao<Survey> {
 
     @Transaction
     @Query("SELECT * FROM Surveys WHERE ProjectId=:projectId")
-    public abstract LiveData<List<SurveyRelation>> projectSurveys(Long projectId);
+    public abstract LiveData<List<ProjectSurveyRelation>> projectSurveys(Long projectId);
 }

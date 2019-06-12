@@ -1,18 +1,13 @@
 package org.adaptlab.chpir.android.survey.adapters;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v7.util.DiffUtil;
-import android.util.Log;
 
 import org.adaptlab.chpir.android.survey.entities.Display;
-import org.adaptlab.chpir.android.survey.entities.Survey;
 import org.adaptlab.chpir.android.survey.viewpagerfragments.DisplayPagerFragment;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class DisplayPagerAdapter extends FragmentStatePagerAdapter {

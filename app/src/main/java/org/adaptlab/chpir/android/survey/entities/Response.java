@@ -46,6 +46,8 @@ public class Response {
     private String mRandomizedData;
     @ColumnInfo(name = "RankOrder")
     private String mRankOrder;
+    @ColumnInfo(name = "IdentifiesSurvey")
+    private boolean mIdentifiesSurvey;
 
     public Response() {
         mSent = false;
@@ -166,6 +168,14 @@ public class Response {
 
     public void setRankOrder(String mRankOrder) {
         this.mRankOrder = mRankOrder;
+    }
+
+    public boolean isIdentifiesSurvey() {
+        return mIdentifiesSurvey;
+    }
+
+    public void setIdentifiesSurvey(boolean identifiesSurvey) {
+        mIdentifiesSurvey = identifiesSurvey;
     }
 
 }

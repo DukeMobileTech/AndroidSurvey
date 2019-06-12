@@ -15,6 +15,7 @@ import org.adaptlab.chpir.android.survey.entities.Response;
 import org.adaptlab.chpir.android.survey.entities.Section;
 import org.adaptlab.chpir.android.survey.entities.Survey;
 import org.adaptlab.chpir.android.survey.repositories.SurveyRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -204,6 +205,10 @@ public class SurveyViewModel extends AndroidViewModel {
             }
             mSurvey.setSkippedQuestions(serialized.toString());
         }
+    }
+
+    public void persistPreviousDisplays() {
+        mSurvey.setPreviousDisplays(StringUtils.join(mPreviousDisplays, COMMA));
     }
 
     public void update() {

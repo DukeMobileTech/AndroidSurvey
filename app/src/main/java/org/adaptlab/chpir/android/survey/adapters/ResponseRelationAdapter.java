@@ -19,11 +19,6 @@ import java.util.List;
 
 public class ResponseRelationAdapter extends ListAdapter<ResponseRelation, QuestionViewHolder> {
     public static final String TAG = ResponseRelationAdapter.class.getName();
-
-    private HashMap<String, QuestionRelation> mQuestionRelations;
-    private QuestionViewHolder.OnResponseSelectedListener mListener;
-    private SurveyViewModel mSurveyViewModel;
-
     private static final DiffUtil.ItemCallback<ResponseRelation> DIFF_CALLBACK = new DiffUtil.ItemCallback<ResponseRelation>() {
         @Override
         public boolean areItemsTheSame(@NonNull ResponseRelation oldResponseRelation, @NonNull ResponseRelation newResponseRelation) {
@@ -37,6 +32,9 @@ public class ResponseRelationAdapter extends ListAdapter<ResponseRelation, Quest
                     oldResponseRelation.response.getOtherResponse().equals(newResponseRelation.response.getOtherResponse());
         }
     };
+    private HashMap<String, QuestionRelation> mQuestionRelations;
+    private QuestionViewHolder.OnResponseSelectedListener mListener;
+    private SurveyViewModel mSurveyViewModel;
 
     public ResponseRelationAdapter(QuestionViewHolder.OnResponseSelectedListener listener) {
         super(DIFF_CALLBACK);

@@ -49,6 +49,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
+
 public class Survey2Activity extends AppCompatActivity {
     public final static String EXTRA_INSTRUMENT_ID = "org.adaptlab.chpir.android.survey.EXTRA_INSTRUMENT_ID";
     public final static String EXTRA_SURVEY_UUID = "org.adaptlab.chpir.android.survey.EXTRA_SURVEY_UUID";
@@ -143,9 +145,6 @@ public class Survey2Activity extends AppCompatActivity {
                     });
                     mSurveyViewModel.setQuestions(questions);
 
-                    if (mSurveyViewModel.getPreviousDisplays() == null) {
-                        mSurveyViewModel.setPreviousDisplays(new ArrayList<Integer>());
-                    }
                     setNavigationListData();
                     setViewPagerPosition();
                     invalidateOptionsMenu();
@@ -165,6 +164,13 @@ public class Survey2Activity extends AppCompatActivity {
                     mSurveyViewModel.setSurvey(mSurvey);
                     mSurveyViewModel.setSkipData();
                     mSurveyViewModel.setDisplayPosition(mSurvey.getLastDisplayPosition());
+                    ArrayList<Integer> previousDisplays = new ArrayList<>();
+                    if (mSurvey.getPreviousDisplays() != null) {
+                        for (String str : mSurvey.getPreviousDisplays().split(COMMA)) {
+                            if (!TextUtils.isEmpty(str)) previousDisplays.add(Integer.valueOf(str));
+                        }
+                    }
+                    mSurveyViewModel.setPreviousDisplays(previousDisplays);
                 }
             }
         });
@@ -219,10 +225,11 @@ public class Survey2Activity extends AppCompatActivity {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onStop() {
+        super.onStop();
         mSurveyViewModel.persistSkipMaps();
         mSurveyViewModel.persistSkippedQuestions();
+        mSurveyViewModel.persistPreviousDisplays();
         mSurveyViewModel.setSurveyLastUpdatedTime();
         mSurveyViewModel.setSurveyLastDisplayPosition();
         mSurveyViewModel.update();
@@ -346,30 +353,26 @@ public class Survey2Activity extends AppCompatActivity {
             mSurveyViewModel.decrementDisplayPosition();
         }
         setViewPagerPosition();
-        invalidateOptionsMenu();
     }
 
     private void setViewPagerPosition() {
         mViewPager.setCurrentItem(mSurveyViewModel.getDisplayPosition());
+        invalidateOptionsMenu();
     }
 
     private void moveToNextDisplay() {
         mSurveyViewModel.getPreviousDisplays().add(mSurveyViewModel.getDisplayPosition());
         mSurveyViewModel.incrementDisplayPosition();
         setViewPagerPosition();
-        invalidateOptionsMenu();
     }
 
     private void moveToDisplay(int position) {
         int displayPosition = mSurveyViewModel.getDisplayPosition();
-        if (position < displayPosition) {
+        if (position > displayPosition) {
             mSurveyViewModel.getPreviousDisplays().add(displayPosition);
-            mSurveyViewModel.setDisplayPosition(position);
-            setViewPagerPosition();
-        } else if (position > displayPosition) {
-            mSurveyViewModel.setDisplayPosition(position - 1);
-            moveToNextDisplay();
         }
+        mSurveyViewModel.setDisplayPosition(position);
+        setViewPagerPosition();
         mDrawerLayout.closeDrawer(mExpandableListView);
     }
 

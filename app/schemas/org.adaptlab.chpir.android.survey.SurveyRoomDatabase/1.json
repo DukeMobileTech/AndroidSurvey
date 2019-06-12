@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "1cbae7e013f2696db8696bf6f5f57373",
+    "identityHash": "34a725997c4cbaa7dfb4406b78473bec",
     "entities": [
       {
         "tableName": "Instruments",
@@ -1904,7 +1904,7 @@
       },
       {
         "tableName": "Surveys",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`UUID` TEXT NOT NULL, `SentToRemote` INTEGER NOT NULL, `Complete` INTEGER NOT NULL, `Latitude` TEXT, `Longitude` TEXT, `LastUpdated` INTEGER, `Metadata` TEXT, `ProjectId` INTEGER, `InstrumentRemoteId` INTEGER, `RosterUUID` TEXT, `Language` TEXT, `SkippedQuestions` TEXT, `SkipMaps` TEXT, `Identifier` TEXT, `CompletedResponseCount` INTEGER NOT NULL, `Queued` INTEGER NOT NULL, `LastDisplayPosition` INTEGER NOT NULL, PRIMARY KEY(`UUID`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`UUID` TEXT NOT NULL, `SentToRemote` INTEGER NOT NULL, `Complete` INTEGER NOT NULL, `Latitude` TEXT, `Longitude` TEXT, `LastUpdated` INTEGER, `Metadata` TEXT, `ProjectId` INTEGER, `InstrumentRemoteId` INTEGER, `RosterUUID` TEXT, `Language` TEXT, `SkippedQuestions` TEXT, `SkipMaps` TEXT, `Identifier` TEXT, `CompletedResponseCount` INTEGER NOT NULL, `Queued` INTEGER NOT NULL, `LastDisplayPosition` INTEGER NOT NULL, `PreviousDisplays` TEXT, PRIMARY KEY(`UUID`))",
         "fields": [
           {
             "fieldPath": "mUUID",
@@ -2007,6 +2007,12 @@
             "columnName": "LastDisplayPosition",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "mPreviousDisplays",
+            "columnName": "PreviousDisplays",
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -2037,7 +2043,7 @@
       },
       {
         "tableName": "Responses",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`UUID` TEXT NOT NULL, `SurveyUUID` TEXT NOT NULL, `QuestionRemoteId` INTEGER NOT NULL, `QuestionIdentifier` TEXT NOT NULL, `Text` TEXT, `OtherResponse` TEXT, `SpecialResponse` TEXT, `SentToRemote` INTEGER NOT NULL, `TimeStarted` INTEGER, `TimeEnded` INTEGER, `DeviceUserId` INTEGER, `QuestionVersion` INTEGER NOT NULL, `RandomizedData` TEXT, `RankOrder` TEXT, PRIMARY KEY(`UUID`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`UUID` TEXT NOT NULL, `SurveyUUID` TEXT NOT NULL, `QuestionRemoteId` INTEGER NOT NULL, `QuestionIdentifier` TEXT NOT NULL, `Text` TEXT, `OtherResponse` TEXT, `SpecialResponse` TEXT, `SentToRemote` INTEGER NOT NULL, `TimeStarted` INTEGER, `TimeEnded` INTEGER, `DeviceUserId` INTEGER, `QuestionVersion` INTEGER NOT NULL, `RandomizedData` TEXT, `RankOrder` TEXT, `IdentifiesSurvey` INTEGER NOT NULL, PRIMARY KEY(`UUID`))",
         "fields": [
           {
             "fieldPath": "mUUID",
@@ -2122,6 +2128,12 @@
             "columnName": "RankOrder",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "mIdentifiesSurvey",
+            "columnName": "IdentifiesSurvey",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -2179,7 +2191,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"1cbae7e013f2696db8696bf6f5f57373\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"34a725997c4cbaa7dfb4406b78473bec\")"
     ]
   }
 }

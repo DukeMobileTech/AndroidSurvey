@@ -8,11 +8,14 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
+import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.R;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Entity(tableName = "Surveys")
@@ -55,6 +58,8 @@ public class Survey {
     private boolean mQueued;
     @ColumnInfo(name = "LastDisplayPosition")
     private int mLastDisplayPosition;
+    @ColumnInfo(name = "PreviousDisplays")
+    private String mPreviousDisplays;
 
     public Survey() {
         mSent = false;
@@ -204,7 +209,7 @@ public class Survey {
      * The identifier to display to the user to identify a Survey.
      * Return Unidentified Survey string if no response for identifier questions.
      */
-    public String identifier(Context context) {
+    public String identifier(Context context, List<Response> responses) {
         if (isSent() && !TextUtils.isEmpty(getIdentifier())) {
             return getIdentifier();
         }
@@ -219,11 +224,11 @@ public class Survey {
             return surveyLabel;
         }
 
-//        for (Response response : responses()) {
-//            if (response.getQuestion().identifiesSurvey()) {
-//                identifier.append(response.getText()).append(" ");
-//            }
-//        }
+        for (Response response : responses) {
+            if (response.isIdentifiesSurvey()) {
+                identifier.append(response.getText()).append(" ");
+            }
+        }
 
         if (identifier.toString().trim().isEmpty())
             return context.getResources().getString(R.string.unidentified_survey) + " " + getUUID();
@@ -238,10 +243,18 @@ public class Survey {
                 return metadata.getString("survey_label");
             }
         } catch (JSONException er) {
-            Log.e(TAG, er.getMessage());
+            if (BuildConfig.DEBUG) Log.e(TAG, er.getMessage());
         }
 
         return "";
+    }
+
+    public void setPreviousDisplays(String previousDisplays) {
+        mPreviousDisplays = previousDisplays;
+    }
+
+    public String getPreviousDisplays() {
+        return mPreviousDisplays;
     }
 
 }

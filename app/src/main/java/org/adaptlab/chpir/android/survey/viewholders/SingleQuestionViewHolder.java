@@ -14,6 +14,7 @@ import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -236,6 +237,7 @@ public abstract class SingleQuestionViewHolder extends QuestionViewHolder {
     private void updateResponse() {
         updateSkipData();
         mResponse.setTimeEnded(new Date());
+        mResponse.setIdentifiesSurvey(mQuestion.isIdentifiesSurvey());
         mResponseRepository.update(mResponse);
     }
 

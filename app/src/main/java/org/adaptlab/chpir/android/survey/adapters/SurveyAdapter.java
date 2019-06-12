@@ -24,7 +24,7 @@ import org.adaptlab.chpir.android.survey.Survey2Activity;
 import org.adaptlab.chpir.android.survey.entities.Instrument;
 import org.adaptlab.chpir.android.survey.entities.Response;
 import org.adaptlab.chpir.android.survey.entities.Survey;
-import org.adaptlab.chpir.android.survey.relations.SurveyRelation;
+import org.adaptlab.chpir.android.survey.relations.ProjectSurveyRelation;
 import org.adaptlab.chpir.android.survey.tasks.SetInstrumentLabelTask;
 import org.adaptlab.chpir.android.survey.tasks.SubmitSurveyTask;
 import org.adaptlab.chpir.android.survey.utils.InstrumentListLabel;
@@ -32,25 +32,19 @@ import org.adaptlab.chpir.android.survey.utils.InstrumentListLabel;
 import java.text.DateFormat;
 import java.util.List;
 
-public class ProjectSurveyAdapter extends RecyclerView.Adapter<ProjectSurveyAdapter.SurveyViewHolder> {
+public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyViewHolder> {
 
     private final LayoutInflater mInflater;
-    private List<SurveyRelation> mSurveyRespons;
-    private List<Instrument> mInstruments;
+    private List<ProjectSurveyRelation> mProjectSurveyRelations;
     private Context mContext;
 
-    public ProjectSurveyAdapter(Context context) {
+    public SurveyAdapter(Context context) {
         mInflater = LayoutInflater.from(context);
         mContext = context;
     }
 
-    public void setSurveys(List<SurveyRelation> list) {
-        mSurveyRespons = list;
-        notifyDataSetChanged();
-    }
-
-    public void setInstruments(List<Instrument> instruments) {
-        mInstruments = instruments;
+    public void setSurveys(List<ProjectSurveyRelation> list) {
+        mProjectSurveyRelations = list;
         notifyDataSetChanged();
     }
 
@@ -63,24 +57,12 @@ public class ProjectSurveyAdapter extends RecyclerView.Adapter<ProjectSurveyAdap
 
     @Override
     public void onBindViewHolder(@NonNull final SurveyViewHolder viewHolder, int position) {
-        SurveyRelation surveyRelation = mSurveyRespons.get(position);
-        Instrument instrument = getSurveyInstrument(surveyRelation);
-        if (surveyRelation != null && instrument != null) {
-            viewHolder.setData(surveyRelation, instrument);
-            setSurveyDeleteAction(viewHolder);
-            setSurveyLaunchAction(viewHolder, instrument);
-            setSurveySubmitAction(viewHolder);
-        }
-    }
-
-    private Instrument getSurveyInstrument(SurveyRelation surveyRelation) {
-        if (mInstruments == null) return null;
-        for (Instrument instrument : mInstruments) {
-            if (instrument.getRemoteId().equals(surveyRelation.survey.getInstrumentRemoteId())) {
-                return instrument;
-            }
-        }
-        return null;
+        ProjectSurveyRelation surveyRelation = mProjectSurveyRelations.get(position);
+        if (surveyRelation == null) return;
+        viewHolder.setData(surveyRelation);
+        setSurveyDeleteAction(viewHolder);
+        setSurveyLaunchAction(viewHolder);
+        setSurveySubmitAction(viewHolder);
     }
 
     private void setSurveyDeleteAction(@NonNull final SurveyViewHolder viewHolder) {
@@ -107,13 +89,13 @@ public class ProjectSurveyAdapter extends RecyclerView.Adapter<ProjectSurveyAdap
         });
     }
 
-    private void setSurveyLaunchAction(@NonNull final SurveyViewHolder viewHolder, final Instrument instrument) {
+    private void setSurveyLaunchAction(@NonNull final SurveyViewHolder viewHolder) {
         viewHolder.mViewContent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SurveyRelation surveyRelation = mSurveyRespons.get(viewHolder.getAdapterPosition());
+                ProjectSurveyRelation surveyRelation = mProjectSurveyRelations.get(viewHolder.getAdapterPosition());
                 Survey survey = surveyRelation.survey;
-                if (survey == null) return;
+                Instrument instrument = surveyRelation.instruments.get(0);
                 if (survey.isQueued() || survey.isSent()) {
                     Toast.makeText(mContext, R.string.survey_submitted, Toast.LENGTH_LONG).show();
                 } else if (!instrument.isLoaded()) {
@@ -142,7 +124,7 @@ public class ProjectSurveyAdapter extends RecyclerView.Adapter<ProjectSurveyAdap
                         .setPositiveButton(R.string.submit,
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
-                                        SurveyRelation survey = mSurveyRespons.get(viewHolder.getAdapterPosition());
+                                        ProjectSurveyRelation survey = mProjectSurveyRelations.get(viewHolder.getAdapterPosition());
                                         prepareForSubmission(survey);
                                         new SubmitSurveyTask(mContext).execute();
                                         notifyItemChanged(viewHolder.getAdapterPosition());
@@ -160,10 +142,10 @@ public class ProjectSurveyAdapter extends RecyclerView.Adapter<ProjectSurveyAdap
     }
 
     public void remove(int position) {
-        if (position > -1 && position < mSurveyRespons.size()) {
-            SurveyRelation survey = mSurveyRespons.get(position);
+        if (position > -1 && position < mProjectSurveyRelations.size()) {
+            ProjectSurveyRelation survey = mProjectSurveyRelations.get(position);
             if (survey != null) {
-                mSurveyRespons.remove(position);
+                mProjectSurveyRelations.remove(position);
 //                survey.delete();
                 notifyItemRemoved(position);
             }
@@ -172,10 +154,10 @@ public class ProjectSurveyAdapter extends RecyclerView.Adapter<ProjectSurveyAdap
 
     @Override
     public int getItemCount() {
-        return mSurveyRespons == null ? 0 : mSurveyRespons.size();
+        return mProjectSurveyRelations == null ? 0 : mProjectSurveyRelations.size();
     }
 
-    public void prepareForSubmission(SurveyRelation surveyRelation) {
+    private void prepareForSubmission(ProjectSurveyRelation surveyRelation) {
         Survey survey = surveyRelation.survey;
         List<Response> responses = surveyRelation.responses;
         if (survey.getCompletedResponseCount() == 0 && responses.size() > 0) {
@@ -191,7 +173,7 @@ public class ProjectSurveyAdapter extends RecyclerView.Adapter<ProjectSurveyAdap
         TextView mSubmitAction;
         TextView surveyTextView;
         TextView progressTextView;
-        SurveyRelation mSurvey;
+        ProjectSurveyRelation mProjectSurveyRelation;
 
         SurveyViewHolder(final View itemView) {
             super(itemView);
@@ -203,16 +185,15 @@ public class ProjectSurveyAdapter extends RecyclerView.Adapter<ProjectSurveyAdap
             mSubmitAction = itemView.findViewById(R.id.list_item_survey_action_submit);
         }
 
-        public void setData(SurveyRelation surveyRelation, Instrument instrument) {
-            this.mSurvey = surveyRelation;
+        void setData(ProjectSurveyRelation surveyRelation) {
+            this.mProjectSurveyRelation = surveyRelation;
             Survey survey = surveyRelation.survey;
+            Instrument instrument = surveyRelation.instruments.get(0);
             List<Response> responses = surveyRelation.responses;
-            String surveyTitle = survey.identifier(mContext) + "\n";
+            String surveyTitle = survey.identifier(mContext, surveyRelation.responses) + "\n";
             String instrumentTitle = instrument.getTitle() + "\n";
-            String lastUpdated = DateFormat.getDateTimeInstance().format(
-                    survey.getLastUpdated()) + "  ";
-            SpannableString spannableString = new SpannableString(surveyTitle +
-                    instrumentTitle + lastUpdated);
+            String lastUpdated = DateFormat.getDateTimeInstance().format(survey.getLastUpdated()) + "  ";
+            SpannableString spannableString = new SpannableString(surveyTitle + instrumentTitle + lastUpdated);
             // survey title
             spannableString.setSpan(new RelativeSizeSpan(1.2f), 0, surveyTitle.length(),
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
