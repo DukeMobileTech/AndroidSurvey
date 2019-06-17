@@ -841,7 +841,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         @Override
         public OptionsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View optionView = LayoutInflater.from(parent.getContext()).inflate(
-                    R.layout.list_item_option_view, parent, false);
+                    R.layout.list_item_option, parent, false);
             return new OptionsViewHolder(optionView);
         }
 

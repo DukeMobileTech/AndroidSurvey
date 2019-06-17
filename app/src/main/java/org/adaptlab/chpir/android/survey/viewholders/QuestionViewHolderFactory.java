@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.View;
 
 import org.adaptlab.chpir.android.survey.entities.Question;
+import org.adaptlab.chpir.android.survey.utils.ConstantUtils;
 
 public class QuestionViewHolderFactory {
     private static final int ADDRESS = 0, DATE = 1, DECIMAL = 2, DROP_DOWN = 3, EMAIL = 4, FREE_RESPONSE = 5,
@@ -11,7 +12,7 @@ public class QuestionViewHolderFactory {
             INTEGER_BOX = 11, TEXT_BOX = 12, MONTH_AND_YEAR = 13, MULTIPLE = 14, PHONE_NUMBER = 15,
             RANGE = 16, RATING = 17, REAR_PICTURE = 18, MULTIPLE_IMAGE = 19, MULTIPLE_WRITE_OTHER = 20,
             ONE_IMAGE = 21, ONE = 22, ONE_WRITE_OTHER = 23, SIGNATURE = 24, SLIDER = 25, SUM = 26,
-            TIME = 27, YEAR = 28;
+            TIME = 27, YEAR = 28, SELECT_ONE_TABLE = 29, SELECT_MULTIPLE_TABLE = 30, TABLE_HEADER = 31;
 
     public static QuestionViewHolder createViewHolder(View view, Context context, int viewType, QuestionViewHolder.OnResponseSelectedListener listener) {
         switch (viewType) {
@@ -73,6 +74,12 @@ public class QuestionViewHolderFactory {
                 return new TimeViewHolder(view, context, listener);
             case YEAR:
                 return new YearViewHolder(view, context, listener);
+            case SELECT_ONE_TABLE:
+                return new SelectOneTableViewHolder(view, context, listener);
+            case SELECT_MULTIPLE_TABLE:
+                return new SelectMultipleTableViewHolder(view, context, listener);
+            case TABLE_HEADER:
+                return new TableHeaderViewHolder(view, context);
             default:
                 return new FreeResponseViewHolder(view, context, listener);
         }
@@ -138,6 +145,12 @@ public class QuestionViewHolderFactory {
                 return TIME;
             case Question.YEAR:
                 return YEAR;
+            case ConstantUtils.SELECT_ONE_TABLE:
+                return SELECT_ONE_TABLE;
+            case ConstantUtils.SELECT_MULTIPLE_TABLE:
+                return SELECT_MULTIPLE_TABLE;
+            case ConstantUtils.TABLE_HEADER:
+                return TABLE_HEADER;
             default:
                 return FREE_RESPONSE;
         }

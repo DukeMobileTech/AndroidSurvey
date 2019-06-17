@@ -28,13 +28,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static org.adaptlab.chpir.android.survey.models.Instrument.LOOP_MAX;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
+import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.LOOP_MAX;
+import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.LOWER_BOUND;
+import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.UPPER_BOUND;
 
 public class SetLoopsTask extends AsyncTask<Void, Void, Void> {
     private static final String TAG = "SetLoopsTask";
-    private static final int LOWER_BOUND = 100000;
-    private static final int UPPER_BOUND = 1000000;
     private DisplayDao mDisplayDao;
     private InstrumentDao mInstrumentDao;
     private QuestionDao mQuestionDao;

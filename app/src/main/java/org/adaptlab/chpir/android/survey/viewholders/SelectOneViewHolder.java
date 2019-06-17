@@ -13,7 +13,7 @@ import org.adaptlab.chpir.android.survey.entities.Option;
 
 import static org.adaptlab.chpir.android.survey.utils.FormatUtils.removeNonNumericCharacters;
 
-public class SelectOneViewHolder extends SingleQuestionViewHolder {
+public class SelectOneViewHolder extends QuestionViewHolder {
     private RadioGroup mRadioGroup;
     private int mResponseIndex;
 

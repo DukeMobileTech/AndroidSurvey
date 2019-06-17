@@ -7,7 +7,7 @@ import android.widget.TimePicker;
 
 import org.adaptlab.chpir.android.survey.utils.FormatUtils;
 
-public class TimeViewHolder extends SingleQuestionViewHolder {
+public class TimeViewHolder extends QuestionViewHolder {
 
     private int mHour;
     private int mMinute;

@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
-    android:id="@+id/question_card_view"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/question_card_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     card_view:cardBackgroundColor="@color/transparent"
@@ -21,13 +20,13 @@
             android:gravity="start"
             android:textColor="@color/primary_text"
             android:textSize="20sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/question_response"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="start"/>
+            android:gravity="start" />
 
     </LinearLayout>
 

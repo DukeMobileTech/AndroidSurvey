@@ -5,7 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SeekBar;
 
-public class SliderViewHolder extends SingleQuestionViewHolder {
+public class SliderViewHolder extends QuestionViewHolder {
     private int mProgress;
     private SeekBar mSlider;
 

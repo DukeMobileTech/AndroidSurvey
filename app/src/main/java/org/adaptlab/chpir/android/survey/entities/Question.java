@@ -132,8 +132,6 @@ public class Question implements SurveyEntity {
     @Ignore
     @SerializedName("question_translations")
     private List<QuestionTranslation> mQuestionTranslations;
-    @Ignore
-    private boolean mSkipped = false;
 
     public static Question copyAttributes(Question destination, Question source) {
         destination.mText = source.mText;

@@ -5,7 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RatingBar;
 
-public class RatingViewHolder extends SingleQuestionViewHolder {
+public class RatingViewHolder extends QuestionViewHolder {
     private final static int NUM_STARS = 5;
     private float mRating;
     private RatingBar mRatingBar;

@@ -15,7 +15,7 @@ import java.util.List;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 
-public class SelectMultipleImageViewHolder extends SingleQuestionViewHolder {
+public class SelectMultipleImageViewHolder extends QuestionViewHolder {
     private final int SELECTED = Color.GREEN;
     private final int UNSELECTED = Color.TRANSPARENT;
     private List<Integer> mSelectedViews;

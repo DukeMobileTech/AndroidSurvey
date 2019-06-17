@@ -27,10 +27,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:gravity="end"
         android:layout_weight="1"
         android:contentDescription="@string/drag_left"
         android:foregroundGravity="center"
+        android:gravity="end"
         app:srcCompat="@drawable/ic_chevron_left_black_24dp" />
 
 </LinearLayout>

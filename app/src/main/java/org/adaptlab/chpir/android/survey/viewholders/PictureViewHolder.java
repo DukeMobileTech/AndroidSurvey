@@ -4,7 +4,7 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 
-public abstract class PictureViewHolder extends SingleQuestionViewHolder {
+public abstract class PictureViewHolder extends QuestionViewHolder {
     PictureViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
         super(itemView, context, listener);
     }

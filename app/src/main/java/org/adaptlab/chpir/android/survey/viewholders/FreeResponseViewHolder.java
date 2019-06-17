@@ -17,7 +17,7 @@ import java.util.TimerTask;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.EDIT_TEXT_DELAY;
 
-public class FreeResponseViewHolder extends SingleQuestionViewHolder {
+public class FreeResponseViewHolder extends QuestionViewHolder {
     private EditText mFreeText;
     private String mText = "";
     private TextWatcher mTextWatcher = new TextWatcher() {

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 
-public class SelectMultipleViewHolder extends SingleQuestionViewHolder {
+public class SelectMultipleViewHolder extends QuestionViewHolder {
     private ArrayList<Integer> mResponseIndices;
     private ArrayList<CheckBox> mCheckBoxes;
 
@@ -34,21 +34,12 @@ public class SelectMultipleViewHolder extends SingleQuestionViewHolder {
             final int optionId = getOptions().indexOf(option);
             CheckBox checkbox = new CheckBox(getContext());
             checkbox.setText(option.getText());
-//            checkbox.setTypeface(getInstrument().getTypeFace(
-//                    getActivity().getApplicationContext()));
             checkbox.setTextColor(getContext().getResources().getColorStateList(R.color.states));
             checkbox.setId(optionId);
             checkbox.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    if (mSpecialResponses != null) {
-//                        mSpecialResponses.clearCheck();
-//                    }
-//                    checkOptionExclusivity(v);
                     toggleResponseIndex(v.getId());
-//                    if (getQuestion().rankResponses()) {
-//                        optionToggled(v.getId());
-//                    }
                 }
             });
             mCheckBoxes.add(checkbox);
@@ -56,32 +47,6 @@ public class SelectMultipleViewHolder extends SingleQuestionViewHolder {
         }
         beforeAddViewHook(questionComponent);
     }
-
-//    protected void checkOptionExclusivity(View v) {
-//        if (getQuestion().hasExclusiveOption() && (int) v.getId() < getOptions().size()) {
-//            Option selectedOption = getOptions().get(v.getId());
-//            CheckBox selectedCheckbox = (CheckBox) v;
-//            if (selectedCheckbox.isChecked() && selectedOption.isExclusive(getQuestion())) {
-//                for (CheckBox checkBox : mCheckBoxes) {
-//                    if (checkBox != selectedCheckbox && checkBox.isChecked()) {
-//                        checkBox.setChecked(false);
-//                    }
-//                }
-//                mResponseIndices.clear();
-//            } else {
-//                for (CheckBox checkBox : mCheckBoxes) {
-//                    int index = checkBox.getId();
-//                    if (checkBox.isChecked() && index < getOptions().size() &&
-//                            getOptions().get(index).isExclusive(getQuestion())) {
-//                        checkBox.setChecked(false);
-//                        if (mResponseIndices.contains(index)) {
-//                            mResponseIndices.remove((Integer) index);
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
 
     @Override
     protected String serialize() {

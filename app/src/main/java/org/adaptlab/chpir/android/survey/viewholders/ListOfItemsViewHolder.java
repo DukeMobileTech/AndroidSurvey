@@ -29,7 +29,7 @@ import java.util.TimerTask;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.EDIT_TEXT_DELAY;
 
-public abstract class ListOfItemsViewHolder extends SingleQuestionViewHolder {
+public abstract class ListOfItemsViewHolder extends QuestionViewHolder {
     private ArrayList<EditText> mResponses;
 
     ListOfItemsViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {

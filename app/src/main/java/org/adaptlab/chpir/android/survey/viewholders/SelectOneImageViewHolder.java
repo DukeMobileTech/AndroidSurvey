@@ -10,7 +10,7 @@ import org.adaptlab.chpir.android.survey.models.Image;
 
 import java.util.ArrayList;
 
-public class SelectOneImageViewHolder extends SingleQuestionViewHolder {
+public class SelectOneImageViewHolder extends QuestionViewHolder {
     private final int SELECTED = Color.GREEN;
     private int mResponseIndex;
     private ArrayList<Image> mImages;

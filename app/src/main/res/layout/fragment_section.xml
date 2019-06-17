@@ -16,21 +16,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/continue_to_section"
-        android:textStyle="italic"/>
+        android:textStyle="italic" />
 
     <TextView
         android:id="@+id/auto_fill_section_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/auto_fill_section"
-        android:textStyle="italic"/>
+        android:textStyle="italic" />
 
     <TextView
         android:id="@+id/section_navigation_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/section_navigation"
-        android:textStyle="italic"/>
+        android:textStyle="italic" />
 
     <RadioGroup
         android:id="@+id/default_responses_radio_group"

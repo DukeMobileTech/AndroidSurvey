@@ -8,7 +8,7 @@ import android.widget.EditText;
 
 import org.adaptlab.chpir.android.survey.utils.FormatUtils;
 
-public class RangeViewHolder extends SingleQuestionViewHolder {
+public class RangeViewHolder extends QuestionViewHolder {
     private String mTextStart = "";
     private String mTextEnd = "";
     private EditText mStart;

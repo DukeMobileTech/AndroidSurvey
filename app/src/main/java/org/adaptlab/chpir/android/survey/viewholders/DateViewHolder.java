@@ -13,7 +13,7 @@ import org.adaptlab.chpir.android.survey.views.ScrollableDatePicker;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-public class DateViewHolder extends SingleQuestionViewHolder {
+public class DateViewHolder extends QuestionViewHolder {
     protected int mDay;
     protected int mMonth;
     protected int mYear;

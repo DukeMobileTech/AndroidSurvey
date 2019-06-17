@@ -9,7 +9,7 @@ import android.view.ViewGroup;
  *
  * It does not save a response, only displays the text.
  */
-public class InstructionsViewHolder extends SingleQuestionViewHolder {
+public class InstructionsViewHolder extends QuestionViewHolder {
 
     InstructionsViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
         super(itemView, context, listener);

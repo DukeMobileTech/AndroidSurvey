@@ -11,7 +11,7 @@ import com.github.gcacace.signaturepad.views.SignaturePad;
 
 import org.adaptlab.chpir.android.survey.models.ResponsePhoto;
 
-public class SignatureViewHolder extends SingleQuestionViewHolder {
+public class SignatureViewHolder extends QuestionViewHolder {
     private SignaturePad mSignaturePad;
     private Button mClearButton;
     private Button mSaveButton;

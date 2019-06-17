@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
-
-<TextView
-    android:id="@+id/expandedListItem"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingBottom="@dimen/layout_padding_default"
-    android:paddingTop="@dimen/layout_padding_default"
-    android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft"
-    android:paddingRight="?android:attr/expandableListPreferredChildPaddingLeft"
-    android:textColor="@color/secondary_text"/>
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/expandedListItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft"
+        android:paddingTop="@dimen/layout_padding_default"
+        android:paddingRight="?android:attr/expandableListPreferredChildPaddingLeft"
+        android:paddingBottom="@dimen/layout_padding_default"
+        android:textColor="@color/secondary_text" />
 </LinearLayout>

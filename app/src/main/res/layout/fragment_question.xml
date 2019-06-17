@@ -147,8 +147,8 @@
     <View
         android:layout_width="fill_parent"
         android:layout_height="2dp"
-        android:background="@color/primary_text"
         android:layout_margin="@dimen/layout_margin_default"
+        android:background="@color/primary_text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

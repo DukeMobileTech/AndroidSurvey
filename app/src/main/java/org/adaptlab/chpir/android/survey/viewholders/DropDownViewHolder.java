@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.BLANK;
 
-public class DropDownViewHolder extends SingleQuestionViewHolder {
+public class DropDownViewHolder extends QuestionViewHolder {
     private Spinner mSpinner;
     private ArrayAdapter<String> mAdapter;
     private int mResponseIndex;

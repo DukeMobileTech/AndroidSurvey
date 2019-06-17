@@ -10,7 +10,7 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class GeoLocationViewHolder extends SingleQuestionViewHolder {
+public class GeoLocationViewHolder extends QuestionViewHolder {
     private TextView mLatitude;
     private TextView mLongitude;
     private TextView mAltitude;
