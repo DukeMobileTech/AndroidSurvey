@@ -354,6 +354,14 @@ public class Question implements SurveyEntity {
         this.mQuestionTranslations = translations;
     }
 
+    public String getTranslatedText(String language, List<QuestionTranslation> translations) {
+        if (translations == null || translations.size() == 0) return mText;
+        for (QuestionTranslation translation : translations) {
+            if (translation.getLanguage().equals(language)) return translation.getText();
+        }
+        return mText;
+    }
+
     @Override
     public Type getType() {
         return new TypeToken<ArrayList<Question>>() {

@@ -16,14 +16,12 @@ import java.util.List;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
-@android.arch.persistence.room.Entity(tableName = "QuestionTranslations",
-        foreignKeys = @ForeignKey(entity = Question.class,
-                parentColumns = "RemoteId", childColumns = "QuestionRemoteId", onDelete = CASCADE))
+@android.arch.persistence.room.Entity(tableName = "QuestionTranslations")
 public class QuestionTranslation implements SurveyEntity {
     @PrimaryKey
     @NonNull
     @SerializedName("id")
-    @ColumnInfo(name = "RemoteId")
+    @ColumnInfo(name = "RemoteId", index = true)
     private Long mRemoteId;
     @SerializedName("text")
     @ColumnInfo(name = "Text")

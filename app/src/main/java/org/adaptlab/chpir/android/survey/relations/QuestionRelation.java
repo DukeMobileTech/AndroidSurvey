@@ -10,6 +10,7 @@ import org.adaptlab.chpir.android.survey.entities.MultipleSkip;
 import org.adaptlab.chpir.android.survey.entities.NextQuestion;
 import org.adaptlab.chpir.android.survey.entities.OptionSet;
 import org.adaptlab.chpir.android.survey.entities.Question;
+import org.adaptlab.chpir.android.survey.entities.QuestionTranslation;
 
 import java.util.List;
 
@@ -32,4 +33,6 @@ public class QuestionRelation {
     public List<LoopQuestion> loopQuestions;
     @Relation(parentColumn = "QuestionIdentifier", entityColumn = "Looped", entity = LoopQuestion.class)
     public List<LoopQuestion> loopedQuestions;
+    @Relation(parentColumn = "RemoteId", entityColumn = "QuestionRemoteId", entity = QuestionTranslation.class)
+    public List<QuestionTranslation> translations;
 }

@@ -422,7 +422,8 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     }
 
     Spanned getQuestionText() {
-        String text = mQuestion.getText();
+//        String text = mQuestion.getText();
+        String text = mQuestion.getTranslatedText(mSurveyViewModel.getLanguage(), mQuestionRelation.translations);
         if (!TextUtils.isEmpty(mQuestion.getLoopSource())) {
             String causeId = mQuestion.getQuestionIdentifier().split("_")[0];
             Response response = getSurveyViewModel().getResponses().get(causeId);

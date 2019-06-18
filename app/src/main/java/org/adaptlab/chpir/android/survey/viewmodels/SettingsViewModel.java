@@ -14,21 +14,21 @@ import java.util.List;
 public class SettingsViewModel extends AndroidViewModel {
     private SettingsRepository mSettingsRepository;
     private LiveData<Settings> mSettings;
-    private LiveData<List<InstrumentTranslation>> allLanguages;
+    private LiveData<List<String>> mLanguages;
 
     public SettingsViewModel(@NonNull Application application) {
         super(application);
         mSettingsRepository = new SettingsRepository(application);
         mSettings = mSettingsRepository.getSettings();
-        allLanguages = mSettingsRepository.allLanguages();
+        mLanguages = mSettingsRepository.languages();
     }
 
     public LiveData<Settings> getSettings() {
         return mSettings;
     }
 
-    public LiveData<List<InstrumentTranslation>> getAllLanguages() {
-        return allLanguages;
+    public LiveData<List<String>> getLanguages() {
+        return mLanguages;
     }
 
     public void updateSettings(Settings settings) {

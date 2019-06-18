@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -70,6 +71,7 @@ public class SettingsFragment extends Fragment {
     private Spinner mSpinner;
     private Settings mSettings;
     private SettingsViewModel mSettingsViewModel;
+    private List<String> mLanguages;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -95,13 +97,15 @@ public class SettingsFragment extends Fragment {
                 mCustomLocaleEditText.setText(mSettings.getCustomLocaleCode());
                 mLastUpdateTextView.setText(String.format(Locale.getDefault(), "%s%s%s",
                         getString(R.string.last_update), " ", getLastUpdateTime()));
+                if (mLanguages != null) setSpinnerAdapter();
             }
         });
 
-        mSettingsViewModel.getAllLanguages().observe(this, new Observer<List<InstrumentTranslation>>() {
+        mSettingsViewModel.getLanguages().observe(this, new Observer<List<String>>() {
             @Override
-            public void onChanged(@Nullable List<InstrumentTranslation> instrumentTranslations) {
-                setSpinnerAdapter(instrumentTranslations);
+            public void onChanged(@Nullable List<String> languages) {
+                mLanguages = languages;
+                if (mSettings != null) setSpinnerAdapter();
             }
         });
     }
@@ -111,29 +115,17 @@ public class SettingsFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_settings, parent, false);
 
         mApiDomainNameEditText = v.findViewById(R.id.api_endpoint_text);
-//        mApiDomainNameEditText.setText(mSettings.getApiUrl());
         mApiVersionEditText = v.findViewById(R.id.api_version_text);
-//        mApiVersionEditText.setText(mSettings.getApiVersion());
         mProjectIdEditText = v.findViewById(R.id.project_id_text);
-//        mProjectIdEditText.setText(mSettings.getProjectId());
         mApiKeyEditText = v.findViewById(R.id.api_key_text);
-//        mApiKeyEditText.setText(mSettings.getApiKey());
         mRequiredFields = new ArrayList<>(Arrays.asList(mApiDomainNameEditText, mApiVersionEditText, mProjectIdEditText, mApiKeyEditText));
         mShowSurveysCheckBox = v.findViewById(R.id.show_surveys_checkbox);
-//        mShowSurveysCheckBox.setChecked(mSettings.isShowSurveys());
         mRequirePasswordCheckBox = v.findViewById(R.id.require_password);
-//        mRequirePasswordCheckBox.setChecked(mSettings.isRequirePassword());
         mRecordSurveyLocationCheckBox = v.findViewById(R.id.record_survey_location_checkbox);
-//        mRecordSurveyLocationCheckBox.setChecked(mSettings.isRecordSurveyLocation());
         mDeviceIdentifierEditText = v.findViewById(R.id.device_identifier_edit_text);
-//        mDeviceIdentifierEditText.setText(mSettings.getDeviceIdentifier());
-//        mDeviceIdentifierEditText.setSelection(mDeviceIdentifierEditText.getText().length());
         mDeviceLabelEditText = v.findViewById(R.id.device_label_edit_text);
-//        mDeviceLabelEditText.setText(mSettings.getDeviceLabel());
         mCustomLocaleEditText = v.findViewById(R.id.custom_locale_edit_text);
-//        mCustomLocaleEditText.setText(mSettings.getCustomLocaleCode());
         mSpinner = v.findViewById(R.id.device_language_spinner);
-//        setSpinnerAdapter();
 
         // Disable edits if using default settings
         if (getResources().getBoolean(R.bool.default_admin_settings)) {
@@ -279,27 +271,26 @@ public class SettingsFragment extends Fragment {
         }
     }
 
-    private void setSpinnerAdapter(List<InstrumentTranslation> instrumentTranslations) {
+    private void setSpinnerAdapter() {
         if (getActivity() == null) return;
         final List<String> languageCodes = new ArrayList<>();
-        languageCodes.add("en");
-        for(InstrumentTranslation instrumentTranslation : instrumentTranslations) {
-            languageCodes.add(instrumentTranslation.getLanguage());
-        }
+        languageCodes.add(getString(R.string.english_iso_code));
+        languageCodes.addAll(mLanguages);
         ArrayList<String> displayLanguages = new ArrayList<>();
         for (String languageCode : languageCodes) {
             displayLanguages.add(new Locale(languageCode).getDisplayLanguage());
         }
-        final ArrayAdapter<String> mAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, displayLanguages);
-        mAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mSpinner.setAdapter(mAdapter);
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, displayLanguages);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSpinner.setAdapter(adapter);
         mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (mSettings != null && position != languageCodes.indexOf(mSettings.getLanguage())) {
+                if (position != languageCodes.indexOf(mSettings.getLanguage())) {
                     mSettings.setLanguage(languageCodes.get(position));
                     LocaleManager.setNewLocale(getActivity(), languageCodes.get(position));
                     mSettingsViewModel.updateSettings(mSettings);
+                    getActivity().recreate();
                 }
             }
 
@@ -307,9 +298,7 @@ public class SettingsFragment extends Fragment {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
-        if (mSettings != null) {
-            mSpinner.setSelection(languageCodes.indexOf(mSettings.getLanguage()));
-        }
+        mSpinner.setSelection(languageCodes.indexOf(mSettings.getLanguage()));
     }
 
     public String getLastUpdateTime() {

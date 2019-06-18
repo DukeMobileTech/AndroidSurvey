@@ -65,7 +65,6 @@ import org.adaptlab.chpir.android.survey.models.NextQuestion;
 import org.adaptlab.chpir.android.survey.models.Option;
 import org.adaptlab.chpir.android.survey.models.OptionSet;
 import org.adaptlab.chpir.android.survey.models.OptionSetTranslation;
-import org.adaptlab.chpir.android.survey.models.OptionTranslation;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Score;
@@ -185,7 +184,7 @@ public class SurveyFragment extends Fragment {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         switch (requestCode) {
             case ACCESS_FINE_LOCATION_CODE: {
@@ -302,7 +301,7 @@ public class SurveyFragment extends Fragment {
             setupNavigationDrawer();
         }
         setLanguageSelection(menu);
-        mProgressView = menu.findItem(R.id.menu_item_progress);
+//        mProgressView = menu.findItem(R.id.menu_item_progress);
     }
 
     @Override
@@ -314,7 +313,7 @@ public class SurveyFragment extends Fragment {
                 .setEnabled(true);
         menu.findItem(R.id.menu_item_finish).setVisible(mDisplayNumber == mDisplays.size() - 1)
                 .setEnabled(true);
-        menu.findItem(R.id.menu_item_progress).setVisible(showProgressBar);
+//        menu.findItem(R.id.menu_item_progress).setVisible(showProgressBar);
     }
 
     @Override
@@ -1356,7 +1355,7 @@ public class SurveyFragment extends Fragment {
             if (convertView == null) {
                 convertView = mLayoutInflater.inflate(R.layout.list_group, null);
             }
-            TextView listTitleTextView = (TextView) convertView.findViewById(R.id.listTitle);
+            TextView listTitleTextView = convertView.findViewById(R.id.listTitle);
             listTitleTextView.setTypeface(mInstrument.getTypeFace(mContext), Typeface.BOLD);
             listTitleTextView.setText(listTitle);
             return convertView;
@@ -1369,7 +1368,7 @@ public class SurveyFragment extends Fragment {
             if (convertView == null) {
                 convertView = mLayoutInflater.inflate(R.layout.list_item_text_view, null);
             }
-            TextView expandedListTextView = (TextView) convertView.findViewById(R.id.expandedListItem);
+            TextView expandedListTextView = convertView.findViewById(R.id.expandedListItem);
             expandedListTextView.setText(expandedListText);
             return convertView;
         }

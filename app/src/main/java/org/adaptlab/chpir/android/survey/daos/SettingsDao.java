@@ -18,10 +18,6 @@ public abstract class SettingsDao extends BaseDao<Settings> {
     @Query("SELECT * from Settings ORDER BY Id ASC LIMIT 1")
     public abstract Settings getInstanceSync();
 
-    @Query("SELECT * FROM InstrumentTranslations WHERE InstrumentRemoteId=:instrumentId ORDER BY Language ASC")
-    public abstract LiveData<List<InstrumentTranslation>> projectInstrumentTranslations(Long instrumentId);
-
-    @Query("SELECT * FROM InstrumentTranslations ORDER BY Language ASC")
-    public abstract LiveData<List<InstrumentTranslation>> allInstrumentTranslations();
-
+    @Query("SELECT DISTINCT language FROM QuestionTranslations")
+    public abstract LiveData<List<String>> languages();
 }

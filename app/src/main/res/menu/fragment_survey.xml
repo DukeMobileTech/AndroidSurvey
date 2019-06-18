@@ -2,11 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/menu_item_progress"
-        android:visible="false"
-        app:actionLayout="@layout/action_view_progress"
-        app:showAsAction="always" />
-    <item
         android:id="@+id/language_spinner"
         android:title="@string/language"
         app:actionViewClass="android.widget.Spinner"

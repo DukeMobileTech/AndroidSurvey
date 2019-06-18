@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "d2d4553ea20c787d2eebd6f09794247f",
+    "identityHash": "03f4a2d84924eabb3a7d470131bf98db",
     "entities": [
       {
         "tableName": "Instruments",
@@ -507,7 +507,7 @@
       },
       {
         "tableName": "QuestionTranslations",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Text` TEXT, `Language` TEXT, `QuestionRemoteId` INTEGER, PRIMARY KEY(`RemoteId`), FOREIGN KEY(`QuestionRemoteId`) REFERENCES `Questions`(`RemoteId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Text` TEXT, `Language` TEXT, `QuestionRemoteId` INTEGER, PRIMARY KEY(`RemoteId`))",
         "fields": [
           {
             "fieldPath": "mRemoteId",
@@ -542,6 +542,14 @@
         },
         "indices": [
           {
+            "name": "index_QuestionTranslations_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE  INDEX `index_QuestionTranslations_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          },
+          {
             "name": "index_QuestionTranslations_QuestionRemoteId",
             "unique": false,
             "columnNames": [
@@ -550,19 +558,7 @@
             "createSql": "CREATE  INDEX `index_QuestionTranslations_QuestionRemoteId` ON `${TABLE_NAME}` (`QuestionRemoteId`)"
           }
         ],
-        "foreignKeys": [
-          {
-            "table": "Questions",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "QuestionRemoteId"
-            ],
-            "referencedColumns": [
-              "RemoteId"
-            ]
-          }
-        ]
+        "foreignKeys": []
       },
       {
         "tableName": "LoopQuestions",
@@ -2191,7 +2187,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"d2d4553ea20c787d2eebd6f09794247f\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"03f4a2d84924eabb3a7d470131bf98db\")"
     ]
   }
 }

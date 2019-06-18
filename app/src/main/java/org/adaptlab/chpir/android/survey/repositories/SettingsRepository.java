@@ -14,11 +14,13 @@ import java.util.List;
 public class SettingsRepository {
     private SettingsDao mSettingsDao;
     private LiveData<Settings> mSettings;
+    private LiveData<List<String>> mLanguages;
 
     public SettingsRepository(Application application) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);
         mSettingsDao = db.settingsDao();
         mSettings = mSettingsDao.getInstance();
+        mLanguages = mSettingsDao.languages();
     }
 
     public SettingsDao getSettingsDao() {
@@ -29,8 +31,8 @@ public class SettingsRepository {
         return mSettings;
     }
 
-    public LiveData<List<InstrumentTranslation>> allLanguages() {
-        return mSettingsDao.allInstrumentTranslations();
+    public LiveData<List<String>> languages() {
+        return mLanguages;
     }
 
     public void update(Settings settings) {

@@ -12,20 +12,25 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.LongSparseArray;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.Spinner;
 
 import org.adaptlab.chpir.android.survey.adapters.DisplayPagerAdapter;
 import org.adaptlab.chpir.android.survey.adapters.NavigationDrawerAdapter;
 import org.adaptlab.chpir.android.survey.entities.Display;
 import org.adaptlab.chpir.android.survey.entities.Instrument;
 import org.adaptlab.chpir.android.survey.entities.Question;
+import org.adaptlab.chpir.android.survey.entities.QuestionTranslation;
 import org.adaptlab.chpir.android.survey.entities.Response;
 import org.adaptlab.chpir.android.survey.entities.Section;
 import org.adaptlab.chpir.android.survey.entities.Survey;
@@ -33,12 +38,14 @@ import org.adaptlab.chpir.android.survey.relations.InstrumentRelation;
 import org.adaptlab.chpir.android.survey.relations.SurveyRelation;
 import org.adaptlab.chpir.android.survey.repositories.SurveyRepository;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
+import org.adaptlab.chpir.android.survey.utils.LocaleManager;
 import org.adaptlab.chpir.android.survey.viewmodelfactories.InstrumentRelationViewModelFactory;
 import org.adaptlab.chpir.android.survey.viewmodelfactories.SectionViewModelFactory;
 import org.adaptlab.chpir.android.survey.viewmodelfactories.SurveyRelationViewModelFactory;
 import org.adaptlab.chpir.android.survey.viewmodelfactories.SurveyViewModelFactory;
 import org.adaptlab.chpir.android.survey.viewmodels.InstrumentRelationViewModel;
 import org.adaptlab.chpir.android.survey.viewmodels.SectionViewModel;
+import org.adaptlab.chpir.android.survey.viewmodels.SettingsViewModel;
 import org.adaptlab.chpir.android.survey.viewmodels.SurveyRelationViewModel;
 import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
 
@@ -46,8 +53,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 
@@ -64,7 +74,9 @@ public class Survey2Activity extends AppCompatActivity {
     private ActionBarDrawerToggle mDrawerToggle;
     private ExpandableListView mExpandableListView;
     private ActionBar mActionBar;
+    private Spinner mSpinner;
     private int mLastPosition = -1;
+    private List<String> mLanguageCodes;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -87,6 +99,7 @@ public class Survey2Activity extends AppCompatActivity {
         setSurveyViewModel(surveyUUID);
         setSectionViewModel(instrumentId);
         setSurveyRelationViewModel(surveyUUID);
+        setLanguage();
     }
 
     private void setActionBar() {
@@ -149,6 +162,18 @@ public class Survey2Activity extends AppCompatActivity {
                     setViewPagerPosition();
                     invalidateOptionsMenu();
                 }
+            }
+        });
+    }
+
+    private void setLanguage() {
+        SettingsViewModel viewModel = ViewModelProviders.of(this).get(SettingsViewModel.class);
+        viewModel.getLanguages().observe(this, new Observer<List<String>>() {
+            @Override
+            public void onChanged(@Nullable List<String> languages) {
+                initializeLanguages();
+                mLanguageCodes.addAll(languages);
+                invalidateOptionsMenu();
             }
         });
     }
@@ -224,6 +249,32 @@ public class Survey2Activity extends AppCompatActivity {
         setNavigationDrawer();
     }
 
+    private void setLanguageSelection( ) {
+        ArrayList<String> displayLanguages = new ArrayList<>();
+        for (String languageCode : mLanguageCodes) {
+            displayLanguages.add(new Locale(languageCode).getDisplayLanguage());
+        }
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, displayLanguages);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSpinner.setAdapter(adapter);
+        mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position != mLanguageCodes.indexOf(AppUtil.getSettings().getLanguage())) {
+                    AppUtil.getSettings().setLanguage(mLanguageCodes.get(position));
+                    mSurveyViewModel.setLanguage(mLanguageCodes.get(position));
+                    LocaleManager.setNewLocale(Survey2Activity.this, mLanguageCodes.get(position));
+                    recreate();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+        mSpinner.setSelection(mLanguageCodes.indexOf(AppUtil.getSettings().getLanguage()));
+    }
+
     @Override
     public void onStop() {
         super.onStop();
@@ -248,7 +299,18 @@ public class Survey2Activity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.fragment_survey, menu);
+        MenuItem item = menu.findItem(R.id.language_spinner);
+        mSpinner = (Spinner) item.getActionView();
+        initializeLanguages();
+        setLanguageSelection();
         return true;
+    }
+
+    private void initializeLanguages() {
+        if (mLanguageCodes == null) {
+            mLanguageCodes = new ArrayList<>();
+            mLanguageCodes.add(getString(R.string.english_iso_code));
+        }
     }
 
     @Override

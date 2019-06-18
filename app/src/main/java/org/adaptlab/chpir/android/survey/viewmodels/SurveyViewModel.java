@@ -48,6 +48,7 @@ public class SurveyViewModel extends AndroidViewModel {
     private HashMap<String, Question> mQuestionsMap;
     private HashMap<String, Response> mResponses;
     private List<Question> mQuestions;
+    private String mLanguage;
 
     public SurveyViewModel(@NonNull Application application, String uuid) {
         super(application);
@@ -245,4 +246,13 @@ public class SurveyViewModel extends AndroidViewModel {
     public void setResponses(HashMap<String, Response> map) {
         mResponses = map;
     }
+
+    public void setLanguage(String language) {
+        mLanguage = language;
+    }
+
+    public String getLanguage() {
+        return mLanguage;
+    }
+
 }

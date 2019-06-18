@@ -9,6 +9,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import org.adaptlab.chpir.android.survey.converters.Converters;
 import org.adaptlab.chpir.android.survey.daos.ConditionSkipDao;
@@ -64,6 +65,7 @@ import org.adaptlab.chpir.android.survey.entities.SectionTranslation;
 import org.adaptlab.chpir.android.survey.entities.Settings;
 import org.adaptlab.chpir.android.survey.entities.Survey;
 
+import java.util.Locale;
 import java.util.UUID;
 
 @Database(entities = {Instrument.class, InstrumentTranslation.class, Question.class, Settings.class,
@@ -75,6 +77,7 @@ import java.util.UUID;
         version = 1)
 @TypeConverters({Converters.class})
 public abstract class SurveyRoomDatabase extends RoomDatabase {
+    private static final String TAG = SurveyRoomDatabase.class.getName();
     private static volatile SurveyRoomDatabase INSTANCE;
     private static RoomDatabase.Callback sRoomDatabaseCallback =
             new RoomDatabase.Callback() {
@@ -165,7 +168,9 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
                 settings = new Settings();
                 settings.setDeviceIdentifier(UUID.randomUUID().toString());
                 settings.setDeviceLabel(Build.MODEL);
+                settings.setLanguage(Locale.getDefault().getLanguage());
                 mSettingsDao.insert(settings);
+                if (BuildConfig.DEBUG) Log.i(TAG, "Language: " + settings.getLanguage());
             }
             return null;
         }

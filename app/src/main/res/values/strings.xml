@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">iSEE</string>
     <string name="start_survey">Start Survey</string>
     <string name="survey_title_label">Choose instrument</string>
@@ -186,4 +185,5 @@
     <string name="uploading_surveys">Survey Upload</string>
     <string name="survey_upload">surveys will be uploaded</string>
     <string name="survey_submitted">This survey has been marked for submission or is already submitted.</string>
+    <string name="english_iso_code">en</string>
 </resources>
