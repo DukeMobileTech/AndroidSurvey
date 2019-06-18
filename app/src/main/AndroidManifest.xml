@@ -47,13 +47,6 @@
             android:screenOrientation="sensorLandscape"
             android:uiOptions="splitActionBarWhenNarrow" />
         <activity
-            android:name=".SettingsActivity"
-            android:screenOrientation="sensorLandscape" />
-        <activity
-            android:name=".LoginActivity"
-            android:noHistory="true"
-            android:screenOrientation="sensorLandscape" />
-        <activity
             android:name=".ReviewPageActivity"
             android:screenOrientation="sensorLandscape" />
         <activity
@@ -78,6 +71,10 @@
             android:name=".ScoreUnitActivity"
             android:screenOrientation="sensorLandscape" />
         <activity android:name=".Survey2Activity" />
+        <activity android:name=".SettingsActivity" />
+        <activity
+            android:name=".LoginActivity"
+            android:noHistory="true" />
 
         <provider
             android:name="com.activeandroid.content.ContentProvider"

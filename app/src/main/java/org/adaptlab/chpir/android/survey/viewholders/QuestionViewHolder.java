@@ -16,6 +16,7 @@ import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -66,7 +67,6 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     private Question mQuestion;
     private Survey mSurvey;
     private Response mResponse;
-    private Instruction mQuestionInstruction;
     private Instruction mOptionSetInstruction;
     private List<Option> mOptions;
     private List<Option> mSpecialOptions;
@@ -105,7 +105,6 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         mQuestion = questionRelation.question;
         mSurvey = responseRelation.surveys.get(0);
         mResponse = responseRelation.response;
-        setQuestionInstruction(questionRelation);
         setOptionSetItems(questionRelation);
         setSpecialOptions(questionRelation);
         setDisplayInstructions(questionRelation);
@@ -127,10 +126,6 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
     public void setAdapter(ResponseRelationAdapter adapter) {
         mAdapter = adapter;
-    }
-
-    QuestionRelation getQuestionRelation() {
-        return mQuestionRelation;
     }
 
     void setQuestionRelation(QuestionRelation relation) {
@@ -202,12 +197,6 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     private void setOtherResponse(String response) {
         getResponse().setOtherResponse(response);
         saveResponse();
-    }
-
-    void setQuestionInstruction(QuestionRelation questionRelation) {
-        if (questionRelation.instructions != null) {
-            mQuestionInstruction = questionRelation.instructions.get(0);
-        }
     }
 
     void setOptionSetItems(QuestionRelation questionRelation) {
@@ -428,11 +417,8 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
     String getQuestionInstructions() {
         String instructions = "";
-        if (mQuestionInstruction != null) instructions = mQuestionInstruction.getText();
-        if (!TextUtils.isEmpty(instructions) && !instructions.equals("null")) {
-            instructions = styleTextWithHtml(instructions).toString();
-        }
-        return instructions;
+        if (mQuestionRelation.instructions != null) instructions = mQuestionRelation.instructions.get(0).getText();
+        return styleTextWithHtml(instructions).toString();
     }
 
     Spanned getQuestionText() {

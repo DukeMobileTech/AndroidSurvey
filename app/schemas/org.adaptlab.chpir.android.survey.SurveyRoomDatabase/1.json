@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "34a725997c4cbaa7dfb4406b78473bec",
+    "identityHash": "d2d4553ea20c787d2eebd6f09794247f",
     "entities": [
       {
         "tableName": "Instruments",
@@ -963,12 +963,12 @@
         },
         "indices": [
           {
-            "name": "instructions_index",
-            "unique": true,
+            "name": "index_Instructions_RemoteId",
+            "unique": false,
             "columnNames": [
               "RemoteId"
             ],
-            "createSql": "CREATE UNIQUE INDEX `instructions_index` ON `${TABLE_NAME}` (`RemoteId`)"
+            "createSql": "CREATE  INDEX `index_Instructions_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
           }
         ],
         "foreignKeys": []
@@ -2191,7 +2191,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"34a725997c4cbaa7dfb4406b78473bec\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"d2d4553ea20c787d2eebd6f09794247f\")"
     ]
   }
 }

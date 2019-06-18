@@ -43,6 +43,7 @@ public class DisplayAdapter extends RecyclerView.Adapter<DisplayAdapter.DisplayV
 
     public void setResponseRelationAdapters(List<ResponseRelationAdapter> adapters) {
         mResponseRelationAdapters = adapters;
+        notifyDataSetChanged();
     }
 
     public void setSurveyViewModel(SurveyViewModel viewModel) {
@@ -65,7 +66,9 @@ public class DisplayAdapter extends RecyclerView.Adapter<DisplayAdapter.DisplayV
         List<QuestionRelation> questionRelations = mQuestionRelationGroups.get(position);
         List<ResponseRelation> responseRelations = mResponseRelationGroups.get(position);
 
-        viewHolder.recyclerView.setAdapter(adapter);
+        if (viewHolder.recyclerView.getAdapter() == null) {
+            viewHolder.recyclerView.setAdapter(adapter);
+        }
 
         adapter.setQuestionRelations(questionRelations);
         adapter.setSurveyViewModel(mSurveyViewModel);
@@ -98,6 +101,5 @@ public class DisplayAdapter extends RecyclerView.Adapter<DisplayAdapter.DisplayV
             dividerItemDecoration.setDrawable(mContext.getResources().getDrawable(R.drawable.border));
             recyclerView.addItemDecoration(dividerItemDecoration);
         }
-
     }
 }

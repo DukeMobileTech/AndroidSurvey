@@ -15,12 +15,12 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-@android.arch.persistence.room.Entity(tableName = "Instructions", indices = {@Index(name = "instructions_index", value = {"RemoteId"}, unique = true)})
+@android.arch.persistence.room.Entity(tableName = "Instructions")
 public class Instruction implements SurveyEntity {
     @PrimaryKey
     @NonNull
     @SerializedName("id")
-    @ColumnInfo(name = "RemoteId")
+    @ColumnInfo(name = "RemoteId", index = true)
     private Long mRemoteId;
     @SerializedName("text")
     @ColumnInfo(name = "Text")

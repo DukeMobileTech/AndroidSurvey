@@ -68,6 +68,7 @@ public class DisplayPagerFragment extends Fragment {
     private QuestionViewHolder.OnResponseSelectedListener mListener;
     private DisplayAdapter mDisplayAdapter;
     private List<List<QuestionRelation>> mQuestionRelationGroups;
+    private List<ResponseRelationAdapter> mResponseRelationAdapters;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -262,6 +263,7 @@ public class DisplayPagerFragment extends Fragment {
 
                 initializeResponses();
                 groupQuestionRelations(questionRelations);
+                setAdapters();
             }
         });
     }
@@ -284,26 +286,29 @@ public class DisplayPagerFragment extends Fragment {
                 mQuestionRelationGroups.add(new ArrayList<>(group));
             }
         }
-
-        List<ResponseRelationAdapter> responseRelationAdapters = new ArrayList<>();
-        for (List<QuestionRelation> list : mQuestionRelationGroups) {
-            if (TextUtils.isEmpty(list.get(0).question.getTableIdentifier())) {
-                responseRelationAdapters.add(new ResponseRelationAdapter(mListener));
-            } else {
-                responseRelationAdapters.add(new ResponseRelationTableAdapter(mListener));
-                // Add header
-                QuestionRelation fakeCopy = new QuestionRelation();
-                fakeCopy.question = list.get(0).question;
-                fakeCopy.instructions = list.get(0).instructions;
-                fakeCopy.optionSets = list.get(0).optionSets;
-                fakeCopy.specialOptionSets = list.get(0).specialOptionSets;
-                fakeCopy.displays = list.get(0).displays;
-                list.add(0, fakeCopy);
-            }
-        }
-
-        mDisplayAdapter.setResponseRelationAdapters(responseRelationAdapters);
         mDisplayAdapter.setQuestionRelationGroups(mQuestionRelationGroups);
+    }
+
+    private void setAdapters() {
+        if (mResponseRelationAdapters == null || mResponseRelationAdapters.size() != mQuestionRelationGroups.size()) {
+            mResponseRelationAdapters = new ArrayList<>();
+            for (List<QuestionRelation> list : mQuestionRelationGroups) {
+                if (TextUtils.isEmpty(list.get(0).question.getTableIdentifier())) {
+                    mResponseRelationAdapters.add(new ResponseRelationAdapter(mListener));
+                } else {
+                    mResponseRelationAdapters.add(new ResponseRelationTableAdapter(mListener));
+                    // Add header
+                    QuestionRelation fakeCopy = new QuestionRelation();
+                    fakeCopy.question = list.get(0).question;
+                    fakeCopy.instructions = list.get(0).instructions;
+                    fakeCopy.optionSets = list.get(0).optionSets;
+                    fakeCopy.specialOptionSets = list.get(0).specialOptionSets;
+                    fakeCopy.displays = list.get(0).displays;
+                    list.add(0, fakeCopy);
+                }
+            }
+            mDisplayAdapter.setResponseRelationAdapters(mResponseRelationAdapters);
+        }
     }
 
     private void hideLoopedQuestions(QuestionRelation questionRelation) {
