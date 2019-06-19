@@ -25,14 +25,30 @@ public class ResponseRelationTableAdapter extends ResponseRelationAdapter {
     @NonNull
     @Override
     public QuestionViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_question_table, parent, false);
+        View view;
+        if (viewType == QuestionViewHolderFactory.TABLE_HEADER) {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_question_table_header, parent, false);
+        } else {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_question_table, parent, false);
+        }
         return QuestionViewHolderFactory.createViewHolder(view, parent.getContext(), viewType, getListener());
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull QuestionViewHolder viewHolder, int position) {
+        viewHolder.setAdapter(this);
+        if (getSurveyViewModel() != null) viewHolder.setSurveyViewModel(getSurveyViewModel());
+        if (getQuestionRelations() == null) return;
+        ResponseRelation responseRelation = getResponseRelation(position);
+        QuestionRelation questionRelation = getQuestionRelations().get(responseRelation.response.getQuestionIdentifier());
+        if (questionRelation == null) return;
+        viewHolder.setRelations(responseRelation, questionRelation);
     }
 
     @Override
     public int getItemViewType(int position) {
         if (getQuestionRelations() == null) return -1;
-        ResponseRelation responseRelation = getItem(position);
+        ResponseRelation responseRelation = getResponseRelation(position);
         QuestionRelation questionRelation = getQuestionRelations().get(responseRelation.response.getQuestionIdentifier());
         if (questionRelation == null) return -1;
         String type = questionRelation.question.getQuestionType();
@@ -44,6 +60,21 @@ public class ResponseRelationTableAdapter extends ResponseRelationAdapter {
             type = SELECT_MULTIPLE_TABLE;
         }
         return QuestionViewHolderFactory.getQuestionViewType(type);
+    }
+
+    private ResponseRelation getResponseRelation(int position) {
+        ResponseRelation responseRelation;
+        if (position == 0) {
+            responseRelation = getItem(position);
+        } else {
+            responseRelation = getItem(position - 1);
+        }
+        return responseRelation;
+    }
+
+    @Override
+    public int getItemCount() {
+        return super.getItemCount() + 1;
     }
 
 }

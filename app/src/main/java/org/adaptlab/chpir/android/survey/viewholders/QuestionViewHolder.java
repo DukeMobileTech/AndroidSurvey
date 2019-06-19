@@ -16,6 +16,7 @@ import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -101,7 +102,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         mResponseRepository = new ResponseRepository((Application) context.getApplicationContext());
     }
 
-    public void setQuestionRelation(ResponseRelation responseRelation, QuestionRelation questionRelation) {
+    public void setRelations(ResponseRelation responseRelation, QuestionRelation questionRelation) {
         mQuestionRelation = questionRelation;
         mQuestion = questionRelation.question;
         mSurvey = responseRelation.surveys.get(0);
@@ -254,7 +255,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         mResponseRepository.update(mResponse);
     }
 
-    private void updateSkipData() {
+    void updateSkipData() {
         Option selectedOption = null;
         String enteredValue = null;
         List<Option> selectedOptions = new ArrayList<>();
@@ -369,6 +370,9 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     }
 
     void saveSpecialResponse(String specialResponse) {
+        if (mQuestion.getNumberInInstrument() == 150) {
+            Log.i(TAG, "saveSpecialResponse: " + specialResponse);
+        }
         mResponse.setSpecialResponse(specialResponse);
         mResponse.setText(BLANK);
         mResponse.setOtherResponse(BLANK);

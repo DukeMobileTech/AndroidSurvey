@@ -214,24 +214,14 @@ public class DisplayPagerFragment extends Fragment {
             }
         }
         List<List<ResponseRelation>> visibleRelations = new ArrayList<>();
-        int index = 0;
         for (List<ResponseRelation> relationList : mResponseRelationGroups) {
             List<ResponseRelation> responseRelations = new ArrayList<>();
-            if (mQuestionRelationGroups != null &&
-                    !TextUtils.isEmpty(mQuestionRelationGroups.get(index).get(0).question.getTableIdentifier())) {
-                ResponseRelation fakeCopy = new ResponseRelation();
-                fakeCopy.response = relationList.get(0).response;
-                fakeCopy.questions = relationList.get(0).questions;
-                fakeCopy.surveys = relationList.get(0).surveys;
-                responseRelations.add(fakeCopy);
-            }
             for (ResponseRelation rr : relationList) {
                 if (!hideSet.contains(rr.response.getQuestionIdentifier())) {
                     responseRelations.add(rr);
                 }
             }
             visibleRelations.add(responseRelations);
-            index++;
         }
 
         mDisplayAdapter.setResponseRelationGroups(visibleRelations);
@@ -295,14 +285,6 @@ public class DisplayPagerFragment extends Fragment {
                     mResponseRelationAdapters.add(new ResponseRelationAdapter(mListener));
                 } else {
                     mResponseRelationAdapters.add(new ResponseRelationTableAdapter(mListener));
-                    // Add header
-                    QuestionRelation fakeCopy = new QuestionRelation();
-                    fakeCopy.question = list.get(0).question;
-                    fakeCopy.instructions = list.get(0).instructions;
-                    fakeCopy.optionSets = list.get(0).optionSets;
-                    fakeCopy.specialOptionSets = list.get(0).specialOptionSets;
-                    fakeCopy.displays = list.get(0).displays;
-                    list.add(0, fakeCopy);
                 }
             }
             mDisplayAdapter.setResponseRelationAdapters(mResponseRelationAdapters);

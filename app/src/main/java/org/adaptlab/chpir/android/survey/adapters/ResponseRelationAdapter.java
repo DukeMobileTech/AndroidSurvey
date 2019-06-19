@@ -56,7 +56,7 @@ public class ResponseRelationAdapter extends ListAdapter<ResponseRelation, Quest
         ResponseRelation responseRelation = getItem(position);
         QuestionRelation questionRelation = mQuestionRelations.get(responseRelation.response.getQuestionIdentifier());
         if (questionRelation == null) return;
-        viewHolder.setQuestionRelation(responseRelation, questionRelation);
+        viewHolder.setRelations(responseRelation, questionRelation);
     }
 
     @Override
@@ -67,6 +67,10 @@ public class ResponseRelationAdapter extends ListAdapter<ResponseRelation, Quest
         if (questionRelation == null) return -1;
         String type = questionRelation.question.getQuestionType();
         return QuestionViewHolderFactory.getQuestionViewType(type);
+    }
+
+    SurveyViewModel getSurveyViewModel() {
+        return mSurveyViewModel;
     }
 
     void setSurveyViewModel(SurveyViewModel viewModel) {
@@ -89,4 +93,5 @@ public class ResponseRelationAdapter extends ListAdapter<ResponseRelation, Quest
         }
         notifyDataSetChanged();
     }
+
 }

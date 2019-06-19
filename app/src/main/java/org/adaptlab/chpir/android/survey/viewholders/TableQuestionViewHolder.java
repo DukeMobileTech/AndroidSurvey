@@ -43,7 +43,10 @@ public abstract class TableQuestionViewHolder extends QuestionViewHolder {
     }
 
     @Override
-    public void setQuestionRelation(ResponseRelation responseRelation, QuestionRelation questionRelation) {
+    public void setRelations(ResponseRelation responseRelation, QuestionRelation questionRelation) {
+        if (questionRelation.question.getNumberInInstrument() == 150) {
+            Log.i(TAG, "setRelations: " + responseRelation.response.getText() + " : " + responseRelation.response.getSpecialResponse());
+        }
         setQuestionRelation(questionRelation);
         setOptionSetItems(questionRelation);
         setSpecialOptions(questionRelation);
@@ -84,17 +87,6 @@ public abstract class TableQuestionViewHolder extends QuestionViewHolder {
         mQuestionTextView.setText(spannableText);
     }
 
-    void setTableInstructions() {
-        int number = getQuestion().getNumberInInstrument();
-        String range = number + " - " + (number + (getAdapter().getItemCount() - 2)) + "\n";
-        SpannableString spannableText = new SpannableString(range + getQuestionInstructions());
-        spannableText.setSpan(new ForegroundColorSpan(getContext().getResources().getColor(R.color.secondary_text)),
-                0, spannableText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        spannableText.setSpan(new StyleSpan(Typeface.BOLD), 0, range.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        spannableText.setSpan(new StyleSpan(Typeface.ITALIC), range.length(), spannableText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        mQuestionTextView.setText(spannableText);
-    }
-
     void setSpecialResponseView() {
         mSpecialResponseRadioGroup.removeAllViews();
         List<String> responses = new ArrayList<>();
@@ -113,6 +105,8 @@ public abstract class TableQuestionViewHolder extends QuestionViewHolder {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if (getQuestion().getNumberInInstrument() == 150)
+                        Log.i(TAG, "onClick: " + v.getId());
                     saveSpecialResponse(finalResponses.get(v.getId()));
                 }
             });
@@ -130,10 +124,14 @@ public abstract class TableQuestionViewHolder extends QuestionViewHolder {
 
     @Override
     protected void deserializeSpecialResponse() {
+        if (getQuestion().getNumberInInstrument() == 150)
+            Log.i(TAG, "deserializeSpecialResponse: " + getResponse().getSpecialResponse());
         if (getResponse() == null || TextUtils.isEmpty(getResponse().getSpecialResponse())) return;
         for (int i = 0; i < mSpecialResponseRadioGroup.getChildCount(); i++) {
             if (((RadioButton) mSpecialResponseRadioGroup.getChildAt(i)).getText().equals(getResponse().getSpecialResponse())) {
                 mSpecialResponseRadioGroup.check(i);
+                if (getQuestion().getNumberInInstrument() == 150)
+                    Log.i(TAG, "checked: " + i);
             }
         }
     }
@@ -142,12 +140,7 @@ public abstract class TableQuestionViewHolder extends QuestionViewHolder {
         return mQuestionComponent;
     }
 
-    RadioGroup getSpecialResponseRadioGroup() {
-        return mSpecialResponseRadioGroup;
+    TextView getQuestionTextView() {
+        return mQuestionTextView;
     }
-
-    Button getClearButton() {
-        return mClearButton;
-    }
-
 }

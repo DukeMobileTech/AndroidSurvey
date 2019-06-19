@@ -98,4 +98,5 @@ public class DisplayAdapter extends RecyclerView.Adapter<DisplayAdapter.DisplayV
             recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
         }
     }
+
 }

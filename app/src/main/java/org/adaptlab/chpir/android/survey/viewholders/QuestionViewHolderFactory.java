@@ -7,12 +7,38 @@ import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.utils.ConstantUtils;
 
 public class QuestionViewHolderFactory {
-    private static final int ADDRESS = 0, DATE = 1, DECIMAL = 2, DROP_DOWN = 3, EMAIL = 4, FREE_RESPONSE = 5,
-            FRONT_PICTURE = 6, GEO_LOCATION = 7, INSTRUCTIONS = 8, INTEGER = 9, LABELED_SLIDER = 10,
-            INTEGER_BOX = 11, TEXT_BOX = 12, MONTH_AND_YEAR = 13, MULTIPLE = 14, PHONE_NUMBER = 15,
-            RANGE = 16, RATING = 17, REAR_PICTURE = 18, MULTIPLE_IMAGE = 19, MULTIPLE_WRITE_OTHER = 20,
-            ONE_IMAGE = 21, ONE = 22, ONE_WRITE_OTHER = 23, SIGNATURE = 24, SLIDER = 25, SUM = 26,
-            TIME = 27, YEAR = 28, SELECT_ONE_TABLE = 29, SELECT_MULTIPLE_TABLE = 30, TABLE_HEADER = 31;
+    private static final int ADDRESS = 0;
+    private static final int DATE = 1;
+    private static final int DECIMAL = 2;
+    private static final int DROP_DOWN = 3;
+    private static final int EMAIL = 4;
+    private static final int FREE_RESPONSE = 5;
+    private static final int FRONT_PICTURE = 6;
+    private static final int GEO_LOCATION = 7;
+    private static final int INSTRUCTIONS = 8;
+    private static final int INTEGER = 9;
+    private static final int LABELED_SLIDER = 10;
+    private static final int INTEGER_BOX = 11;
+    private static final int TEXT_BOX = 12;
+    private static final int MONTH_AND_YEAR = 13;
+    private static final int MULTIPLE = 14;
+    private static final int PHONE_NUMBER = 15;
+    private static final int RANGE = 16;
+    private static final int RATING = 17;
+    private static final int REAR_PICTURE = 18;
+    private static final int MULTIPLE_IMAGE = 19;
+    private static final int MULTIPLE_WRITE_OTHER = 20;
+    private static final int ONE_IMAGE = 21;
+    private static final int ONE = 22;
+    private static final int ONE_WRITE_OTHER = 23;
+    private static final int SIGNATURE = 24;
+    private static final int SLIDER = 25;
+    private static final int SUM = 26;
+    private static final int TIME = 27;
+    private static final int YEAR = 28;
+    private static final int SELECT_ONE_TABLE = 29;
+    private static final int SELECT_MULTIPLE_TABLE = 30;
+    public static final int TABLE_HEADER = 31;
 
     public static QuestionViewHolder createViewHolder(View view, Context context, int viewType, QuestionViewHolder.OnResponseSelectedListener listener) {
         switch (viewType) {
