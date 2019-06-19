@@ -8,8 +8,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.adaptlab.chpir.android.survey.relations.OptionRelation;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
 import org.adaptlab.chpir.android.survey.relations.ResponseRelation;
+import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
 
 public class TableHeaderViewHolder extends TableQuestionViewHolder {
 
@@ -29,9 +31,10 @@ public class TableHeaderViewHolder extends TableQuestionViewHolder {
 
     @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
-        for (int k = 0; k < getOptions().size(); k++) {
+        for (int k = 0; k < getOptionRelations().size(); k++) {
             TextView textView = new TextView(getContext());
-            textView.setText(getOptions().get(k).getText());
+            OptionRelation optionRelation = getOptionRelations().get(k);
+            textView.setText(TranslationUtil.getText(optionRelation.option, optionRelation.translations, getSurveyViewModel()));
             textView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
             textView.setGravity(Gravity.CENTER | Gravity.CENTER_VERTICAL);
             textView.setWidth(getOptionWidth());

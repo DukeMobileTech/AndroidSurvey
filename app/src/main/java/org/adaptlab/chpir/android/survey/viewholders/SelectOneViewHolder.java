@@ -9,7 +9,8 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.entities.Option;
+import org.adaptlab.chpir.android.survey.relations.OptionRelation;
+import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
 
 import static org.adaptlab.chpir.android.survey.utils.FormatUtils.removeNonNumericCharacters;
 
@@ -33,13 +34,13 @@ public class SelectOneViewHolder extends QuestionViewHolder {
     protected void createQuestionComponent(ViewGroup questionComponent) {
         questionComponent.removeAllViews();
         mRadioGroup = new RadioGroup(getContext());
-        for (Option option : getOptions()) {
-            int optionId = getOptions().indexOf(option);
+        for (OptionRelation optionRelation : getOptionRelations()) {
+            int optionId = getOptionRelations().indexOf(optionRelation);
             RadioButton radioButton = new RadioButton(getContext());
             radioButton.setLayoutParams(new RadioGroup.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT));
-            radioButton.setText(option.getText());
+            radioButton.setText(TranslationUtil.getText(optionRelation.option, optionRelation.translations, getSurveyViewModel()));
             radioButton.setId(optionId);
             radioButton.setTextColor(getContext().getResources().getColorStateList(R.color.states));
             radioButton.setOnClickListener(new View.OnClickListener() {

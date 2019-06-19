@@ -26,7 +26,7 @@ public class SelectMultipleTableViewHolder extends TableQuestionViewHolder {
     protected void createQuestionComponent(ViewGroup questionComponent) {
         questionComponent.removeAllViews();
         mCheckBoxes = new ArrayList<>();
-        for (int k = 0; k < getOptions().size(); k++) {
+        for (int k = 0; k < getOptionRelations().size(); k++) {
             CheckBox checkBox = new CheckBox(getContext());
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(getOptionWidth() / 2,
                     ViewGroup.LayoutParams.WRAP_CONTENT);

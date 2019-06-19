@@ -9,7 +9,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.entities.Option;
+import org.adaptlab.chpir.android.survey.relations.OptionRelation;
+import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
 
 import java.util.ArrayList;
 
@@ -24,13 +25,6 @@ public class DropDownViewHolder extends QuestionViewHolder {
         super(itemView, context, listener);
     }
 
-    //    @Override
-//    protected void unSetResponse() {
-//        clearAdapter();
-//        setSpinnerAdapter();
-//        setResponseTextBlank();
-//    }
-//
     @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -70,8 +64,8 @@ public class DropDownViewHolder extends QuestionViewHolder {
 
     private void setSpinnerAdapter() {
         ArrayList<String> optionsArray = new ArrayList<>();
-        for (Option option : getOptions()) {
-            optionsArray.add(option.getText());
+        for (OptionRelation optionRelation : getOptionRelations()) {
+            optionsArray.add(TranslationUtil.getText(optionRelation.option, optionRelation.translations, getSurveyViewModel()));
         }
         optionsArray.add(""); // Adds empty selection
         mAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, optionsArray);
@@ -88,6 +82,6 @@ public class DropDownViewHolder extends QuestionViewHolder {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
-        mSpinner.setSelection(getOptions().size()); // Selects empty selection
+        mSpinner.setSelection(getOptionRelations().size()); // Selects empty selection
     }
 }

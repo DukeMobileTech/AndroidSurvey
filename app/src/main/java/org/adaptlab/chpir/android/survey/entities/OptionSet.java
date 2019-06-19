@@ -2,7 +2,6 @@ package org.adaptlab.chpir.android.survey.entities;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
@@ -15,12 +14,12 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-@android.arch.persistence.room.Entity(tableName = "OptionSets", indices = {@Index(name = "option_sets_index", value = {"RemoteId"}, unique = true)})
+@android.arch.persistence.room.Entity(tableName = "OptionSets")
 public class OptionSet implements SurveyEntity {
     @PrimaryKey
     @NonNull
     @SerializedName("id")
-    @ColumnInfo(name = "RemoteId")
+    @ColumnInfo(name = "RemoteId", index = true)
     private Long mRemoteId;
     @SerializedName("title")
     @ColumnInfo(name = "Title")
@@ -29,7 +28,7 @@ public class OptionSet implements SurveyEntity {
     @ColumnInfo(name = "Deleted")
     private boolean mDeleted;
     @SerializedName("instruction_id")
-    @ColumnInfo(name = "InstructionRemoteId")
+    @ColumnInfo(name = "InstructionRemoteId", index = true)
     private Long mInstructionRemoteId;
     @SerializedName("special")
     @ColumnInfo(name = "Special")

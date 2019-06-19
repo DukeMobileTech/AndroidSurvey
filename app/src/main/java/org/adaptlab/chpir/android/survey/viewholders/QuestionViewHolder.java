@@ -16,7 +16,6 @@ import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -35,11 +34,13 @@ import org.adaptlab.chpir.android.survey.entities.Response;
 import org.adaptlab.chpir.android.survey.entities.Survey;
 import org.adaptlab.chpir.android.survey.relations.DisplayInstructionRelation;
 import org.adaptlab.chpir.android.survey.relations.DisplayRelation;
+import org.adaptlab.chpir.android.survey.relations.OptionRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionSetOptionRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionSetRelation;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
 import org.adaptlab.chpir.android.survey.relations.ResponseRelation;
 import org.adaptlab.chpir.android.survey.repositories.ResponseRepository;
+import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
 import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
 
 import java.util.ArrayList;
@@ -68,8 +69,8 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     private Survey mSurvey;
     private Response mResponse;
     private Instruction mOptionSetInstruction;
-    private List<Option> mOptions;
-    private List<Option> mSpecialOptions;
+    private List<OptionRelation> mOptionRelations;
+    private List<OptionRelation> mSpecialOptionRelations;
     private List<DisplayInstructionRelation> mDisplayInstructions;
     private ResponseRelationAdapter mAdapter;
 
@@ -132,7 +133,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         mQuestionRelation = relation;
     }
 
-    public Question getQuestion() {
+    Question getQuestion() {
         return mQuestion;
     }
 
@@ -140,8 +141,12 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         this.mQuestion = mQuestion;
     }
 
-    public List<Option> getOptions() {
-        return mOptions;
+    List<OptionRelation> getOptionRelations() {
+        return mOptionRelations;
+    }
+
+    List<OptionRelation> getSpecialOptionRelations() {
+        return mSpecialOptionRelations;
     }
 
     boolean isDeserialization() {
@@ -201,7 +206,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
     void setOptionSetItems(QuestionRelation questionRelation) {
         if (questionRelation.optionSets != null) {
-            mOptions = new ArrayList<>();
+            mOptionRelations = new ArrayList<>();
             OptionSetRelation optionSetRelation = questionRelation.optionSets.get(0);
             if (optionSetRelation != null) {
                 if (optionSetRelation.instructions != null) {
@@ -210,7 +215,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                 if (optionSetRelation.optionSetOptions != null) {
                     for (OptionSetOptionRelation relation : optionSetRelation.optionSetOptions) {
                         if (relation.options != null) {
-                            mOptions.add(relation.options.get(0));
+                            mOptionRelations.add(relation.options.get(0));
                         }
                     }
                 }
@@ -271,9 +276,9 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
             }
         }
         if (!TextUtils.isEmpty(mResponse.getSpecialResponse())) {
-            for (Option option : mSpecialOptions) {
-                if (option.getText().equals(mResponse.getSpecialResponse())) {
-                    selectedOption = option;
+            for (OptionRelation optionRelation : mSpecialOptionRelations) {
+                if (optionRelation.option.getText().equals(mResponse.getSpecialResponse())) {
+                    selectedOption = optionRelation.option;
                     break;
                 }
             }
@@ -356,8 +361,8 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
     private Option getSelectedOption(String responseText) {
         int responseIndex = Integer.parseInt(responseText);
-        if (responseIndex < mOptions.size()) {
-            return mOptions.get(responseIndex);
+        if (responseIndex < mOptionRelations.size()) {
+            return mOptionRelations.get(responseIndex).option;
         } else {
             return null;
         }
@@ -417,13 +422,13 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
     String getQuestionInstructions() {
         String instructions = "";
-        if (mQuestionRelation.instructions != null) instructions = mQuestionRelation.instructions.get(0).getText();
+        if (mQuestionRelation.instructions != null)
+            instructions = mQuestionRelation.instructions.get(0).getText();
         return styleTextWithHtml(instructions).toString();
     }
 
     Spanned getQuestionText() {
-//        String text = mQuestion.getText();
-        String text = mQuestion.getTranslatedText(mSurveyViewModel.getLanguage(), mQuestionRelation.translations);
+        String text = TranslationUtil.getText(mQuestion, mQuestionRelation.translations, mSurveyViewModel);
         if (!TextUtils.isEmpty(mQuestion.getLoopSource())) {
             String causeId = mQuestion.getQuestionIdentifier().split("_")[0];
             Response response = getSurveyViewModel().getResponses().get(causeId);
@@ -433,10 +438,10 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                 Question causeQuestion = getSurveyViewModel().getQuestionsMap().get(causeId);
                 if (causeQuestion.isSingleResponse()) {
                     int index = Integer.parseInt(responses[mQuestion.getLoopNumber()]);
-                    responseText = mOptions.get(index).getText();
+                    responseText = mOptionRelations.get(index).option.getText();
                 } else if (causeQuestion.isMultipleResponse()) {
                     if (Arrays.asList(responses).contains(Integer.toString(mQuestion.getLoopNumber()))) {
-                        responseText = mOptions.get(mQuestion.getLoopNumber()).getText();
+                        responseText = mOptionRelations.get(mQuestion.getLoopNumber()).option.getText();
                     }
                 } else {
                     if (mQuestion.getLoopNumber() < responses.length) {
@@ -488,8 +493,8 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     private void setSpecialResponseView() {
         mSpecialResponses.removeAllViews();
         List<String> responses = new ArrayList<>();
-        for (Option option : mSpecialOptions) {
-            responses.add(option.getText());
+        for (OptionRelation optionRelation : mSpecialOptionRelations) {
+            responses.add(optionRelation.option.getText());
         }
 
         for (String response : responses) {
@@ -537,7 +542,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         return mContext;
     }
 
-    private SurveyViewModel getSurveyViewModel() {
+    SurveyViewModel getSurveyViewModel() {
         return mSurveyViewModel;
     }
 
@@ -560,18 +565,14 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         mListener = listener;
     }
 
-    List<Option> getSpecialOptions() {
-        return mSpecialOptions;
-    }
-
     void setSpecialOptions(QuestionRelation questionRelation) {
         if (questionRelation.specialOptionSets != null) {
-            mSpecialOptions = new ArrayList<>();
+            mSpecialOptionRelations = new ArrayList<>();
             OptionSetRelation optionSetRelation = questionRelation.specialOptionSets.get(0);
             if (optionSetRelation != null && optionSetRelation.optionSetOptions != null) {
                 for (OptionSetOptionRelation relation : optionSetRelation.optionSetOptions) {
                     if (relation.options != null) {
-                        mSpecialOptions.add(relation.options.get(0));
+                        mSpecialOptionRelations.add(relation.options.get(0));
                     }
                 }
             }

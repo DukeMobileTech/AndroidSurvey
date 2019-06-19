@@ -6,8 +6,9 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 
 import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.entities.Option;
+import org.adaptlab.chpir.android.survey.relations.OptionRelation;
 import org.adaptlab.chpir.android.survey.utils.FormatUtils;
+import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
 
 import java.util.ArrayList;
 
@@ -30,10 +31,10 @@ public class SelectMultipleViewHolder extends QuestionViewHolder {
         questionComponent.removeAllViews();
         mCheckBoxes = new ArrayList<>();
         mResponseIndices = new ArrayList<>();
-        for (Option option : getOptions()) {
-            final int optionId = getOptions().indexOf(option);
+        for (OptionRelation optionRelation : getOptionRelations()) {
+            final int optionId = getOptionRelations().indexOf(optionRelation);
             CheckBox checkbox = new CheckBox(getContext());
-            checkbox.setText(option.getText());
+            checkbox.setText(TranslationUtil.getText(optionRelation.option, optionRelation.translations, getSurveyViewModel()));
             checkbox.setTextColor(getContext().getResources().getColorStateList(R.color.states));
             checkbox.setId(optionId);
             checkbox.setOnClickListener(new View.OnClickListener() {

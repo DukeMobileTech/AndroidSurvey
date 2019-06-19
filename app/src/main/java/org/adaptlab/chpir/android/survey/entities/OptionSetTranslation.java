@@ -1,7 +1,6 @@
 package org.adaptlab.chpir.android.survey.entities;
 
 import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
@@ -13,8 +12,6 @@ import org.adaptlab.chpir.android.survey.daos.BaseDao;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-
-import static android.arch.persistence.room.ForeignKey.CASCADE;
 
 @android.arch.persistence.room.Entity(tableName = "OptionSetTranslations")
 public class OptionSetTranslation implements SurveyEntity {

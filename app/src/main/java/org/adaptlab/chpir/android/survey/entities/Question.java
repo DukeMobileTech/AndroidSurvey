@@ -1,9 +1,7 @@
 package org.adaptlab.chpir.android.survey.entities;
 
 import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringDef;
@@ -20,13 +18,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.arch.persistence.room.ForeignKey.CASCADE;
-
-@android.arch.persistence.room.Entity(tableName = "Questions", foreignKeys = @ForeignKey(entity = Instrument.class,
-        parentColumns = "RemoteId", childColumns = "InstrumentRemoteId", onDelete = CASCADE),
-        indices = {@Index(name = "questions_remote_id_index", value = {"RemoteId"}, unique = true),
-                @Index(name = "questions_identifier_index", value = {"QuestionIdentifier"}, unique = true)})
-public class Question implements SurveyEntity {
+@android.arch.persistence.room.Entity(tableName = "Questions")
+public class Question implements SurveyEntity, Translatable {
     public static final String SELECT_ONE = "SELECT_ONE";
     public static final String SELECT_MULTIPLE = "SELECT_MULTIPLE";
     public static final String SELECT_ONE_WRITE_OTHER = "SELECT_ONE_WRITE_OTHER";
@@ -60,7 +53,7 @@ public class Question implements SurveyEntity {
     @PrimaryKey
     @NonNull
     @SerializedName("id")
-    @ColumnInfo(name = "RemoteId")
+    @ColumnInfo(name = "RemoteId", index = true)
     private Long mRemoteId;
     @SerializedName("text")
     @ColumnInfo(name = "Text")
@@ -70,10 +63,10 @@ public class Question implements SurveyEntity {
     private @QuestionType
     String mQuestionType;
     @SerializedName("question_identifier")
-    @ColumnInfo(name = "QuestionIdentifier")
+    @ColumnInfo(name = "QuestionIdentifier", index = true)
     private String mQuestionIdentifier;
     @SerializedName("question_id")
-    @ColumnInfo(name = "QuestionId")
+    @ColumnInfo(name = "QuestionId", index = true)
     private Long mQuestionId;
     @SerializedName("option_count")
     @ColumnInfo(name = "OptionCount")
@@ -82,7 +75,7 @@ public class Question implements SurveyEntity {
     @ColumnInfo(name = "InstrumentVersion")
     private int mInstrumentVersion;
     @SerializedName("number_in_instrument")
-    @ColumnInfo(name = "NumberInInstrument")
+    @ColumnInfo(name = "NumberInInstrument", index = true)
     private int mNumberInInstrument;
     @SerializedName("identifies_survey")
     @ColumnInfo(name = "IdentifiesSurvey")
@@ -354,14 +347,6 @@ public class Question implements SurveyEntity {
         this.mQuestionTranslations = translations;
     }
 
-    public String getTranslatedText(String language, List<QuestionTranslation> translations) {
-        if (translations == null || translations.size() == 0) return mText;
-        for (QuestionTranslation translation : translations) {
-            if (translation.getLanguage().equals(language)) return translation.getText();
-        }
-        return mText;
-    }
-
     @Override
     public Type getType() {
         return new TypeToken<ArrayList<Question>>() {
@@ -401,15 +386,6 @@ public class Question implements SurveyEntity {
         return mQuestionType.equals(LIST_OF_INTEGER_BOXES) || mQuestionType.equals(LIST_OF_TEXT_BOXES);
     }
 
-    @Retention(RetentionPolicy.SOURCE)
-    @StringDef({SELECT_ONE, SELECT_MULTIPLE, SELECT_ONE_WRITE_OTHER, SELECT_MULTIPLE_WRITE_OTHER,
-            FREE_RESPONSE, SLIDER, FRONT_PICTURE, REAR_PICTURE, DATE, RATING, TIME, LIST_OF_TEXT_BOXES,
-            INTEGER, EMAIL_ADDRESS, DECIMAL_NUMBER, INSTRUCTIONS, MONTH_AND_YEAR, YEAR, PHONE_NUMBER,
-            ADDRESS, SELECT_ONE_IMAGE, SELECT_MULTIPLE_IMAGE, LIST_OF_INTEGER_BOXES, LABELED_SLIDER,
-            GEO_LOCATION, DROP_DOWN, RANGE, SUM_OF_PARTS, SIGNATURE})
-    public @interface QuestionType {
-    }
-
     @NonNull
     public String toString() {
         return new ToStringBuilder(this).
@@ -421,6 +397,15 @@ public class Question implements SurveyEntity {
                 append("InstrumentRemoteId", mInstrumentRemoteId).
                 append("QuestionType", mQuestionType).
                 toString();
+    }
+
+    @Retention(RetentionPolicy.SOURCE)
+    @StringDef({SELECT_ONE, SELECT_MULTIPLE, SELECT_ONE_WRITE_OTHER, SELECT_MULTIPLE_WRITE_OTHER,
+            FREE_RESPONSE, SLIDER, FRONT_PICTURE, REAR_PICTURE, DATE, RATING, TIME, LIST_OF_TEXT_BOXES,
+            INTEGER, EMAIL_ADDRESS, DECIMAL_NUMBER, INSTRUCTIONS, MONTH_AND_YEAR, YEAR, PHONE_NUMBER,
+            ADDRESS, SELECT_ONE_IMAGE, SELECT_MULTIPLE_IMAGE, LIST_OF_INTEGER_BOXES, LABELED_SLIDER,
+            GEO_LOCATION, DROP_DOWN, RANGE, SUM_OF_PARTS, SIGNATURE})
+    public @interface QuestionType {
     }
 
 }

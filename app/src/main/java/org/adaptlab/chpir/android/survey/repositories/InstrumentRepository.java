@@ -1,7 +1,6 @@
 package org.adaptlab.chpir.android.survey.repositories;
 
 import android.app.Application;
-import android.arch.lifecycle.LiveData;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -16,22 +15,14 @@ import org.adaptlab.chpir.android.survey.entities.InstrumentTranslation;
 import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 
-import java.util.List;
-
 public class InstrumentRepository extends Repository {
     private InstrumentDao mInstrumentDao;
     private InstrumentTranslationDao mInstrumentTranslationDao;
-    private LiveData<List<InstrumentTranslation>> mAllInstrumentTranslations;
 
     public InstrumentRepository(Application application) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);
         mInstrumentDao = db.instrumentDao();
         mInstrumentTranslationDao = db.instrumentTranslationDao();
-        mAllInstrumentTranslations = mInstrumentTranslationDao.getAllInstrumentTranslations();
-    }
-
-    public LiveData<List<InstrumentTranslation>> getAllInstrumentTranslations() {
-        return mAllInstrumentTranslations;
     }
 
     public InstrumentDao getInstrumentDao() {

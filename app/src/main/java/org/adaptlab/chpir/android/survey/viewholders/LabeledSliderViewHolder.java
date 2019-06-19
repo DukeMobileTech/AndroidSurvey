@@ -12,12 +12,12 @@ public class LabeledSliderViewHolder extends SliderViewHolder {
 
     @Override
     public void beforeAddViewHook(ViewGroup questionComponent) {
-//        if (getOptions() != null) {
+//        if (getOptionRelations() != null) {
 //            TableLayout tableLayout = new TableLayout(getActivity());
 //            TableRow tableRow = new TableRow(getActivity());
 //            tableLayout.setStretchAllColumns(true);
 //
-//            for (Option option : getOptions()) {
+//            for (Option option : getOptionRelations()) {
 //                TextView optionText = new TextView(getActivity());
 //                optionText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
 //                optionText.setGravity(getGravityByPosition(option));
@@ -31,7 +31,7 @@ public class LabeledSliderViewHolder extends SliderViewHolder {
     }
 
 //    private int getGravityByPosition(Option option) {
-//        List<Option> options = getOptions();
+//        List<Option> options = getOptionRelations();
 //        if (options.isEmpty()) return Gravity.START;
 //
 //        if (options.get(0).equals(option)) {

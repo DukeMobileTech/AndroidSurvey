@@ -1,7 +1,6 @@
 package org.adaptlab.chpir.android.survey.entities;
 
 import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
@@ -14,16 +13,12 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.arch.persistence.room.ForeignKey.CASCADE;
-
-@android.arch.persistence.room.Entity(tableName = "OptionSetOptions", foreignKeys = {
-        @ForeignKey(entity = OptionSet.class, parentColumns = "RemoteId", childColumns = "OptionSetRemoteId", onDelete = CASCADE),
-        @ForeignKey(entity = Option.class, parentColumns = "RemoteId", childColumns = "OptionRemoteId", onDelete = CASCADE)})
+@android.arch.persistence.room.Entity(tableName = "OptionSetOptions")
 public class OptionSetOption implements SurveyEntity {
     @PrimaryKey
     @NonNull
     @SerializedName("id")
-    @ColumnInfo(name = "RemoteId")
+    @ColumnInfo(name = "RemoteId", index = true)
     private Long mRemoteId;
     @SerializedName("number_in_question")
     @ColumnInfo(name = "Position")

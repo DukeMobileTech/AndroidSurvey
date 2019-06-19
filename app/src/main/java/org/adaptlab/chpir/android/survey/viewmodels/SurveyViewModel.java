@@ -19,10 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,7 +45,8 @@ public class SurveyViewModel extends AndroidViewModel {
     private HashMap<String, Question> mQuestionsMap;
     private HashMap<String, Response> mResponses;
     private List<Question> mQuestions;
-    private String mLanguage;
+    private String mDeviceLanguage;
+    private String mInstrumentLanguage;
 
     public SurveyViewModel(@NonNull Application application, String uuid) {
         super(application);
@@ -247,12 +245,19 @@ public class SurveyViewModel extends AndroidViewModel {
         mResponses = map;
     }
 
-    public void setLanguage(String language) {
-        mLanguage = language;
+    public void setDeviceLanguage(String language) {
+        mDeviceLanguage = language;
     }
 
-    public String getLanguage() {
-        return mLanguage;
+    public String getDeviceLanguage() {
+        return mDeviceLanguage;
     }
 
+    public String getInstrumentLanguage() {
+        return mInstrumentLanguage;
+    }
+
+    public void setInstrumentLanguage(String language) {
+        mInstrumentLanguage = language;
+    }
 }

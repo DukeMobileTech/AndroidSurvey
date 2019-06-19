@@ -1,7 +1,6 @@
 package org.adaptlab.chpir.android.survey.entities;
 
 import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
@@ -14,28 +13,24 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.arch.persistence.room.ForeignKey.CASCADE;
-
-@android.arch.persistence.room.Entity(tableName = "FollowUpQuestions",
-        foreignKeys = @ForeignKey(entity = Question.class,
-                parentColumns = "QuestionIdentifier", childColumns = "QuestionIdentifier", onDelete = CASCADE))
+@android.arch.persistence.room.Entity(tableName = "FollowUpQuestions")
 public class FollowUpQuestion implements SurveyEntity {
     @PrimaryKey
     @NonNull
     @SerializedName("id")
-    @ColumnInfo(name = "RemoteId")
+    @ColumnInfo(name = "RemoteId", index = true)
     private Long mRemoteId;
     @SerializedName("question_identifier")
     @ColumnInfo(name = "QuestionIdentifier", index = true)
     private String mQuestionIdentifier;
     @SerializedName("following_up_question_identifier")
-    @ColumnInfo(name = "FollowingUpQuestionIdentifier")
+    @ColumnInfo(name = "FollowingUpQuestionIdentifier", index = true)
     private String mFollowingUpQuestionIdentifier;
     @SerializedName("question_id")
-    @ColumnInfo(name = "QuestionId")
+    @ColumnInfo(name = "QuestionId", index = true)
     private Long mQuestionId;
     @SerializedName("instrument_id")
-    @ColumnInfo(name = "InstrumentRemoteId")
+    @ColumnInfo(name = "InstrumentRemoteId", index = true)
     private Long mInstrumentRemoteId;
     @SerializedName("deleted_at")
     @ColumnInfo(name = "Deleted")

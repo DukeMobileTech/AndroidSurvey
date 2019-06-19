@@ -12,7 +12,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.LongSparseArray;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,7 +29,6 @@ import org.adaptlab.chpir.android.survey.adapters.NavigationDrawerAdapter;
 import org.adaptlab.chpir.android.survey.entities.Display;
 import org.adaptlab.chpir.android.survey.entities.Instrument;
 import org.adaptlab.chpir.android.survey.entities.Question;
-import org.adaptlab.chpir.android.survey.entities.QuestionTranslation;
 import org.adaptlab.chpir.android.survey.entities.Response;
 import org.adaptlab.chpir.android.survey.entities.Section;
 import org.adaptlab.chpir.android.survey.entities.Survey;
@@ -53,11 +51,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 
@@ -134,6 +130,7 @@ public class Survey2Activity extends AppCompatActivity {
                 if (relation != null) {
                     mInstrument = relation.instrument;
                     mActionBar.setTitle(mInstrument.getTitle());
+                    mSurveyViewModel.setInstrumentLanguage(mInstrument.getLanguage());
 
                     List<Display> displays = relation.displays;
                     Collections.sort(displays, new Comparator<Display>() {
@@ -262,7 +259,7 @@ public class Survey2Activity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position != mLanguageCodes.indexOf(AppUtil.getSettings().getLanguage())) {
                     AppUtil.getSettings().setLanguage(mLanguageCodes.get(position));
-                    mSurveyViewModel.setLanguage(mLanguageCodes.get(position));
+                    mSurveyViewModel.setDeviceLanguage(mLanguageCodes.get(position));
                     LocaleManager.setNewLocale(Survey2Activity.this, mLanguageCodes.get(position));
                     recreate();
                 }

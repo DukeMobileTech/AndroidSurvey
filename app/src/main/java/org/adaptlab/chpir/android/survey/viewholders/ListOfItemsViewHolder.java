@@ -14,7 +14,8 @@ import android.widget.TextView;
 import com.opencsv.CSVReader;
 
 import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.entities.Option;
+import org.adaptlab.chpir.android.survey.relations.OptionRelation;
+import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
 import org.apache.commons.codec.Charsets;
 import org.apache.commons.lang3.StringEscapeUtils;
 
@@ -41,9 +42,9 @@ public abstract class ListOfItemsViewHolder extends QuestionViewHolder {
     protected void createQuestionComponent(ViewGroup questionComponent) {
         questionComponent.removeAllViews();
         mResponses = new ArrayList<>();
-        for (Option option : getOptions()) {
+        for (OptionRelation optionRelation : getOptionRelations()) {
             final TextView optionText = new TextView(getContext());
-            optionText.setText(option.getText());
+            optionText.setText(TranslationUtil.getText(optionRelation.option, optionRelation.translations, getSurveyViewModel()));
             questionComponent.addView(optionText);
             EditText editText = createEditText();
             editText.setHint(R.string.free_response_edittext);

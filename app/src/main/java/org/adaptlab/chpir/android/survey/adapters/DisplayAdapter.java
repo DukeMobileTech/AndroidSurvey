@@ -2,7 +2,6 @@ package org.adaptlab.chpir.android.survey.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -97,9 +96,6 @@ public class DisplayAdapter extends RecyclerView.Adapter<DisplayAdapter.DisplayV
             super(itemView);
             recyclerView = itemView.findViewById(R.id.questionsRecyclerView);
             recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-            DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL);
-            dividerItemDecoration.setDrawable(mContext.getResources().getDrawable(R.drawable.border));
-            recyclerView.addItemDecoration(dividerItemDecoration);
         }
     }
 }

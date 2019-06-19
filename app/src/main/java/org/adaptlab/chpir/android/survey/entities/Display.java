@@ -20,7 +20,7 @@ public class Display implements SurveyEntity {
     @PrimaryKey
     @NonNull
     @SerializedName("id")
-    @ColumnInfo(name = "RemoteId")
+    @ColumnInfo(name = "RemoteId", index = true)
     private Long mRemoteId;
     @SerializedName("title")
     @ColumnInfo(name = "Title", index = true)

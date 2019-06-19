@@ -11,6 +11,7 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -19,9 +20,10 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.entities.Option;
+import org.adaptlab.chpir.android.survey.relations.OptionRelation;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
 import org.adaptlab.chpir.android.survey.relations.ResponseRelation;
+import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +60,7 @@ public abstract class TableQuestionViewHolder extends QuestionViewHolder {
         DisplayMetrics displayMetrics = getContext().getResources().getDisplayMetrics();
         float margin = getContext().getResources().getDimension(R.dimen.activity_horizontal_margin);
         float totalWidth = (displayMetrics.widthPixels - (margin * 2)) / 2;
-        return (int) totalWidth / getOptions().size();
+        return (int) totalWidth / getOptionRelations().size();
     }
 
     private void setQuestionText() {
@@ -96,8 +98,8 @@ public abstract class TableQuestionViewHolder extends QuestionViewHolder {
     void setSpecialResponseView() {
         mSpecialResponseRadioGroup.removeAllViews();
         List<String> responses = new ArrayList<>();
-        for (Option option : getSpecialOptions()) {
-            responses.add(option.getText());
+        for (OptionRelation optionRelation : getSpecialOptionRelations()) {
+            responses.add(TranslationUtil.getText(optionRelation.option, optionRelation.translations, getSurveyViewModel()));
         }
         final List<String> finalResponses = responses;
 

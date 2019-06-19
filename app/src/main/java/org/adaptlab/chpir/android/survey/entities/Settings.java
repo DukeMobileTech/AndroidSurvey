@@ -9,7 +9,7 @@ import android.text.TextUtils;
 @Entity(tableName = "Settings")
 public class Settings {
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "Id")
+    @ColumnInfo(name = "Id", index = true)
     private Long mId;
     @ColumnInfo(name = "DeviceIdentifier")
     private String mDeviceIdentifier;

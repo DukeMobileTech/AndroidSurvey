@@ -22,16 +22,17 @@ public class LoopQuestion implements SurveyEntity {
     @ColumnInfo(name = "RemoteId", index = true)
     private Long mRemoteId;
     @SerializedName("parent")
-    @ColumnInfo(name = "Parent") // Question identifier that triggers loop
+    @ColumnInfo(name = "Parent", index = true) // Question identifier that triggers loop
     private String mParent;
     @SerializedName("looped")
-    @ColumnInfo(name = "Looped") // Question identifier that is looped
+    @ColumnInfo(name = "Looped", index = true) // Question identifier that is looped
     private String mLooped;
     @SerializedName("deleted_at")
     @ColumnInfo(name = "Deleted")
     private boolean mDeleted;
     @SerializedName("option_indices")
-    @ColumnInfo(name = "OptionIndices") // Determines how many times this question (Looped) is looped
+    @ColumnInfo(name = "OptionIndices")
+    // Determines how many times this question (Looped) is looped
     private String mOptionIndices;
     @SerializedName("same_display")
     @ColumnInfo(name = "SameDisplay")

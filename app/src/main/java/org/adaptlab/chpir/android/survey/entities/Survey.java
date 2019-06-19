@@ -10,7 +10,6 @@ import android.util.Log;
 
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.R;
-import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -249,12 +248,12 @@ public class Survey {
         return "";
     }
 
-    public void setPreviousDisplays(String previousDisplays) {
-        mPreviousDisplays = previousDisplays;
-    }
-
     public String getPreviousDisplays() {
         return mPreviousDisplays;
+    }
+
+    public void setPreviousDisplays(String previousDisplays) {
+        mPreviousDisplays = previousDisplays;
     }
 
 }

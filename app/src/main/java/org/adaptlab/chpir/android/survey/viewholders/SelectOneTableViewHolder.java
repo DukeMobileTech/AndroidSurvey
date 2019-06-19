@@ -21,9 +21,10 @@ public class SelectOneTableViewHolder extends TableQuestionViewHolder {
 
     @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
+        questionComponent.removeAllViews();
         mRadioGroup = new RadioGroup(getContext());
         mRadioGroup.setOrientation(LinearLayout.HORIZONTAL);
-        for (int k = 0; k < getOptions().size(); k++) {
+        for (int k = 0; k < getOptionRelations().size(); k++) {
             RadioButton radioButton = new RadioButton(getContext());
             RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(getOptionWidth() / 2,
                     ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -33,10 +34,7 @@ public class SelectOneTableViewHolder extends TableQuestionViewHolder {
             radioButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    int id = view.getId();
-                    if (id != -1) {
-                        setResponseIndex(id);
-                    }
+                    setResponseIndex(view.getId());
                 }
             });
             mRadioGroup.addView(radioButton);

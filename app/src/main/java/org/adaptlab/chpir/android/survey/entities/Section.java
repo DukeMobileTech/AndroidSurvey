@@ -1,9 +1,7 @@
 package org.adaptlab.chpir.android.survey.entities;
 
 import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
@@ -16,16 +14,12 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.arch.persistence.room.ForeignKey.CASCADE;
-
-@android.arch.persistence.room.Entity(tableName = "Sections", indices = {@Index(name = "sections_index", value = {"RemoteId"}, unique = true)},
-        foreignKeys = @ForeignKey(entity = Instrument.class, parentColumns = "RemoteId",
-                childColumns = "InstrumentRemoteId", onDelete = CASCADE))
+@android.arch.persistence.room.Entity(tableName = "Sections")
 public class Section implements SurveyEntity {
     @PrimaryKey
     @NonNull
     @SerializedName("id")
-    @ColumnInfo(name = "RemoteId")
+    @ColumnInfo(name = "RemoteId", index = true)
     private Long mRemoteId;
     @SerializedName("title")
     @ColumnInfo(name = "Title")

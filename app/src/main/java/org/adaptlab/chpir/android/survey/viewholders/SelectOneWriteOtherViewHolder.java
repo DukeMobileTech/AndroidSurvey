@@ -24,7 +24,7 @@ public class SelectOneWriteOtherViewHolder extends SelectOneViewHolder {
         otherText = new EditText(getContext());
         radioButton.setTextColor(getContext().getResources().getColorStateList(R.color.states));
         radioButton.setText(R.string.other_specify);
-        final int otherId = getOptions().size();
+        final int otherId = getOptionRelations().size();
         radioButton.setId(otherId);
         radioButton.setLayoutParams(new RadioGroup.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,

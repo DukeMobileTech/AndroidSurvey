@@ -36,7 +36,7 @@ public class NextQuestion implements SurveyEntity {
     @ColumnInfo(name = "QuestionId")
     private Long mQuestionId;
     @SerializedName("instrument_id")
-    @ColumnInfo(name = "InstrumentRemoteId")
+    @ColumnInfo(name = "InstrumentRemoteId", index = true)
     private Long mInstrumentRemoteId;
     @SerializedName("deleted_at")
     @ColumnInfo(name = "Deleted")
