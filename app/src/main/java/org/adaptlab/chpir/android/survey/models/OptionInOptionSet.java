@@ -30,6 +30,10 @@ public class OptionInOptionSet extends ReceiveModel {
     @Column(name = "IsExclusive")
     private boolean mIsExclusive;
 
+    public static OptionInOptionSet findByRemoteId(Long id) {
+        return new Select().from(OptionInOptionSet.class).where("RemoteId = ?", id).executeSingle();
+    }
+
     @Override
     public void createObjectFromJSON(JSONObject jsonObject) {
         try {
@@ -56,28 +60,24 @@ public class OptionInOptionSet extends ReceiveModel {
         }
     }
 
-    public static OptionInOptionSet findByRemoteId(Long id) {
-        return new Select().from(OptionInOptionSet.class).where("RemoteId = ?", id).executeSingle();
-    }
-
     public Long getRemoteOptionSetId() {
         return mRemoteOptionSetId;
-    }
-
-    public Long getRemoteOptionId() {
-        return mRemoteOptionId;
     }
 
     private void setRemoteOptionSetId(Long id) {
         mRemoteOptionSetId = id;
     }
 
-    private void setRemoteId(Long id) {
-        mRemoteId = id;
+    public Long getRemoteOptionId() {
+        return mRemoteOptionId;
     }
 
     private void setRemoteOptionId(Long id) {
         mRemoteOptionId = id;
+    }
+
+    private void setRemoteId(Long id) {
+        mRemoteId = id;
     }
 
     private void setNumberInQuestion(int number) {

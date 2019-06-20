@@ -2,13 +2,15 @@ package org.adaptlab.chpir.android.survey.roster;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentManager;
+
+import com.google.android.material.navigation.NavigationView;
 
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.Question;
@@ -23,9 +25,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import static org.adaptlab.chpir.android.survey.utils.FormatUtils.stripHtml;
 import static org.adaptlab.chpir.android.survey.roster.RosterActivity.EXTRA_QUESTION_ID;
 import static org.adaptlab.chpir.android.survey.roster.RosterActivity.EXTRA_SURVEY_IDENTIFIER;
+import static org.adaptlab.chpir.android.survey.utils.FormatUtils.stripHtml;
 
 public class ResponseEditorActivity extends AppCompatActivity {
     public final static String EXTRA_QUESTION_NUMBER =

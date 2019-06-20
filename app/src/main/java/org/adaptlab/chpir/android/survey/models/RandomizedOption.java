@@ -31,6 +31,10 @@ public class RandomizedOption extends ReceiveModel {
         super();
     }
 
+    public static RandomizedOption findByRemoteId(Long id) {
+        return new Select().from(RandomizedOption.class).where("RemoteId = ?", id).executeSingle();
+    }
+
     @Override
     public void createObjectFromJSON(JSONObject jsonObject) {
         try {
@@ -71,20 +75,12 @@ public class RandomizedOption extends ReceiveModel {
         }
     }
 
-    public static RandomizedOption findByRemoteId(Long id) {
-        return new Select().from(RandomizedOption.class).where("RemoteId = ?", id).executeSingle();
-    }
-
     public RandomizedFactor getRandomizedFactor() {
         return mRandomizedFactor;
     }
 
     private void setRandomizedFactor(RandomizedFactor randomizedFactor) {
         mRandomizedFactor = randomizedFactor;
-    }
-
-    private void setText(String text) {
-        mText = text;
     }
 
     public Long getRemoteId() {
@@ -106,6 +102,10 @@ public class RandomizedOption extends ReceiveModel {
             }
         }
         return mText;
+    }
+
+    private void setText(String text) {
+        mText = text;
     }
 
     private Instrument getInstrument() {

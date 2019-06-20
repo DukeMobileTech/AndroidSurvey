@@ -7,7 +7,7 @@ import com.activeandroid.query.Select;
 
 @Table(name = "DisplayTranslations")
 public class DisplayTranslation extends Model {
-	@Column(name = "Display")
+    @Column(name = "Display")
     private Display mDisplay;
     @Column(name = "Language")
     private String mLanguage;
@@ -19,7 +19,7 @@ public class DisplayTranslation extends Model {
     public DisplayTranslation() {
         super();
     }
-    
+
     public static DisplayTranslation findByLanguage(String language) {
         return new Select().from(DisplayTranslation.class).where("Language = ?", language).executeSingle();
     }
@@ -27,27 +27,27 @@ public class DisplayTranslation extends Model {
     public static DisplayTranslation findByRemoteId(Long id) {
         return new Select().from(DisplayTranslation.class).where("RemoteId = ?", id).executeSingle();
     }
-    
+
     public Display getDisplay() {
         return mDisplay;
     }
-    
+
     public void setDisplay(Display display) {
         mDisplay = display;
     }
-    
+
     public String getLanguage() {
         return mLanguage;
     }
-    
+
     public void setLanguage(String language) {
         mLanguage = language;
     }
-    
+
     public String getText() {
         return mText;
     }
-    
+
     public void setText(String text) {
         mText = text;
     }

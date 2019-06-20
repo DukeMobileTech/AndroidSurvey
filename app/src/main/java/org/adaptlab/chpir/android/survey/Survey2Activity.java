@@ -1,16 +1,6 @@
 package org.adaptlab.chpir.android.survey;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.LongSparseArray;
 import android.view.Menu;
@@ -23,6 +13,17 @@ import android.widget.ArrayAdapter;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.Spinner;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.viewpager.widget.ViewPager;
 
 import org.adaptlab.chpir.android.survey.adapters.DisplayPagerAdapter;
 import org.adaptlab.chpir.android.survey.adapters.NavigationDrawerAdapter;
@@ -246,7 +247,7 @@ public class Survey2Activity extends AppCompatActivity {
         setNavigationDrawer();
     }
 
-    private void setLanguageSelection( ) {
+    private void setLanguageSelection() {
         ArrayList<String> displayLanguages = new ArrayList<>();
         for (String languageCode : mLanguageCodes) {
             displayLanguages.add(new Locale(languageCode).getDisplayLanguage());

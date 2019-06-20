@@ -6,7 +6,6 @@ import android.util.Log;
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.SurveyApp;
 import org.adaptlab.chpir.android.survey.models.Image;
-import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.apache.commons.codec.CharEncoding;
 
 import java.io.ByteArrayOutputStream;

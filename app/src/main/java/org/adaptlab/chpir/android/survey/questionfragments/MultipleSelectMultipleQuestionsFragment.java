@@ -1,9 +1,6 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
 import android.content.Context;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +8,10 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.adaptlab.chpir.android.survey.MultipleQuestionsFragment;
 import org.adaptlab.chpir.android.survey.R;
@@ -93,7 +94,8 @@ public class MultipleSelectMultipleQuestionsFragment extends MultipleQuestionsFr
     }
 
     @Override
-    protected void unSetResponse() {}
+    protected void unSetResponse() {
+    }
 
     @Override
     protected void clearRegularResponseUI(int pos) {
@@ -144,9 +146,9 @@ public class MultipleSelectMultipleQuestionsFragment extends MultipleQuestionsFr
                 List<CheckBox> checkBoxes = new ArrayList<>();
                 for (int k = 0; k < options.length; k++) {
                     CheckBox checkBox = new CheckBox(getActivity());
-                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(getOptionWidth()/2,
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(getOptionWidth() / 2,
                             ViewGroup.LayoutParams.MATCH_PARENT);
-                    params.leftMargin = getOptionWidth()/2;
+                    params.leftMargin = getOptionWidth() / 2;
                     checkBox.setLayoutParams(params);
                     checkBox.setId(k);
                     checkBoxes.add(checkBox);
@@ -202,7 +204,8 @@ public class MultipleSelectMultipleQuestionsFragment extends MultipleQuestionsFr
             }
         }
 
-        private void updateLayout() { }
+        private void updateLayout() {
+        }
 
         @Override
         public int getItemCount() {

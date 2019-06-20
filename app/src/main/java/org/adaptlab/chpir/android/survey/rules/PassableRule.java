@@ -9,13 +9,13 @@ import org.adaptlab.chpir.android.survey.models.Rule;
  */
 public abstract class PassableRule {
     private Rule mInstrumentRule;
-    
+
     // Return true if passes defined rule, false otherwise.
     public abstract boolean passesRule();
-    
+
     // The failure message to return if the rule does not pass.
     public abstract String getFailureMessage();
-        
+
     /*
      * Cache the mInstrumentRule if it is found.
      */

@@ -15,6 +15,7 @@ import java.util.List;
 
 @Table(name = "ScoreSchemes")
 public class ScoreScheme extends ReceiveModel {
+    private static final String TAG = "ScoreScheme";
     @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
     private Long mRemoteId;
     @Column(name = "Title")
@@ -24,8 +25,10 @@ public class ScoreScheme extends ReceiveModel {
     @Column(name = "Deleted")
     private boolean mDeleted;
 
-    private static final String TAG = "ScoreScheme";
-    
+    public static ScoreScheme findByRemoteId(Long remoteId) {
+        return new Select().from(ScoreScheme.class).where("RemoteId = ?", remoteId).executeSingle();
+    }
+
     @Override
     public void createObjectFromJSON(JSONObject jsonObject) {
         try {
@@ -48,20 +51,8 @@ public class ScoreScheme extends ReceiveModel {
         }
     }
 
-    public static ScoreScheme findByRemoteId(Long remoteId) {
-        return new Select().from(ScoreScheme.class).where("RemoteId = ?", remoteId).executeSingle();
-    }
-
-    private void setRemoteId(Long remoteId) {
-        mRemoteId = remoteId;
-    }
-
     private void setInstrumentRemoteId(long instrumentRemoteId) {
         mInstrumentRemoteId = instrumentRemoteId;
-    }
-
-    private void setTitle(String title) {
-        mTitle = title;
     }
 
     private void setDeleted(boolean deleted) {
@@ -70,6 +61,10 @@ public class ScoreScheme extends ReceiveModel {
 
     public String getTitle() {
         return mTitle;
+    }
+
+    private void setTitle(String title) {
+        mTitle = title;
     }
 
     public List<ScoreUnit> scoreUnits() {
@@ -81,6 +76,10 @@ public class ScoreScheme extends ReceiveModel {
 
     public Long getRemoteId() {
         return mRemoteId;
+    }
+
+    private void setRemoteId(Long remoteId) {
+        mRemoteId = remoteId;
     }
 
     public Instrument getInstrument() {

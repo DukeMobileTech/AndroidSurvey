@@ -12,11 +12,11 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
+import org.adaptlab.chpir.android.survey.models.Image;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.utils.PictureUtils;
-import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
-import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.models.Image;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,6 +89,11 @@ public class SelectMultipleImageQuestionFragment extends SingleQuestionFragment 
         }
     }
 
+    @Override
+    protected void unSetResponse() {
+
+    }
+
     private class ImageAdapter extends ArrayAdapter<Image> {
 
         public ImageAdapter(ArrayList<Image> images) {
@@ -112,11 +117,6 @@ public class SelectMultipleImageQuestionFragment extends SingleQuestionFragment 
             }
             return view;
         }
-    }
-
-    @Override
-    protected void unSetResponse() {
-
     }
 
 }

@@ -28,6 +28,10 @@ public class GridLabel extends ReceiveModel {
     @Column(name = "Position")
     private int mPosition;
 
+    public static GridLabel findByRemoteId(Long remoteId) {
+        return new Select().from(GridLabel.class).where("RemoteId = ?", remoteId).executeSingle();
+    }
+
     @Override
     public void createObjectFromJSON(JSONObject jsonObject) {
         try {
@@ -65,10 +69,6 @@ public class GridLabel extends ReceiveModel {
         } catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);
         }
-    }
-
-    public static GridLabel findByRemoteId(Long remoteId) {
-        return new Select().from(GridLabel.class).where("RemoteId = ?", remoteId).executeSingle();
     }
 
     private void setLabel(String label) {

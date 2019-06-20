@@ -17,6 +17,7 @@ import java.util.List;
 
 public abstract class Scorer {
     public String TAG = this.getClass().getName();
+
     public abstract double score(ScoreUnit unit, Survey survey);
 
     List<Option> getSortedSelectedOptions(Response response) {

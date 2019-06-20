@@ -2244,9 +2244,10 @@
         "foreignKeys": []
       }
     ],
+    "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"2c4ef9804662a3f5f5f1dd78236a8721\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2c4ef9804662a3f5f5f1dd78236a8721')"
     ]
   }
 }

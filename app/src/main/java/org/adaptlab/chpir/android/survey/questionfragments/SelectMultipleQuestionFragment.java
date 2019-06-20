@@ -14,8 +14,8 @@ import java.util.ArrayList;
 
 public class SelectMultipleQuestionFragment extends SingleQuestionFragment {
     private final static String TAG = "SelectMultipleFragment";
-    private ArrayList<Integer> mResponseIndices;
     protected ArrayList<CheckBox> mCheckBoxes;
+    private ArrayList<Integer> mResponseIndices;
 
     // This is used to add additional UI components in subclasses.
     protected void beforeAddViewHook(ViewGroup questionComponent) {

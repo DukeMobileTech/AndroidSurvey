@@ -89,14 +89,14 @@ public class RemoteAuthenticationTask extends AsyncTask<String, Void, String> {
         return apiKey;
     }
 
-    public interface AsyncTaskListener {
-        void onAsyncTaskFinished(String param);
-    }
-
     @Override
     protected void onPostExecute(String param) {
         super.onPostExecute(param);
         mListener.onAsyncTaskFinished(param);
+    }
+
+    public interface AsyncTaskListener {
+        void onAsyncTaskFinished(String param);
     }
 
 }

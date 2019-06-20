@@ -29,6 +29,10 @@ public class DisplayInstruction extends ReceiveModel {
         super();
     }
 
+    public static DisplayInstruction findByRemoteId(Long id) {
+        return new Select().from(DisplayInstruction.class).where("RemoteId = ?", id).executeSingle();
+    }
+
     @Override
     public void createObjectFromJSON(JSONObject jsonObject) {
         if (BuildConfig.DEBUG) Log.i(TAG, "Creating DisplayInstruction: " + jsonObject);
@@ -51,10 +55,6 @@ public class DisplayInstruction extends ReceiveModel {
         } catch (JSONException je) {
             if (BuildConfig.DEBUG) Log.e(TAG, "Error parsing object json", je);
         }
-    }
-
-    public static DisplayInstruction findByRemoteId(Long id) {
-        return new Select().from(DisplayInstruction.class).where("RemoteId = ?", id).executeSingle();
     }
 
     private void setDisplayId(Long id) {

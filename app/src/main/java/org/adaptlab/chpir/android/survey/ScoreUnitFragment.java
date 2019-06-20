@@ -1,11 +1,12 @@
 package org.adaptlab.chpir.android.survey;
 
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+
+import androidx.fragment.app.ListFragment;
 
 import com.activeandroid.Model;
 

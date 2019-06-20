@@ -75,6 +75,42 @@ public class Survey extends SendModel {
         mLastUpdated = new Date();
     }
 
+    public static List<Survey> getAllProjectSurveys(Long projectId) {
+        return new Select("Surveys.*")
+                .from(Survey.class)
+                .innerJoin(Instrument.class)
+                .on("Surveys.InstrumentRemoteId=Instruments.RemoteId AND Instruments.Published=" + 1)
+                .where("Surveys.ProjectId = ? AND RosterUUID IS null", projectId)
+                .orderBy("Surveys.LastUpdated DESC")
+                .execute();
+    }
+
+    public static List<Survey> getAll() {
+        return new Select().from(Survey.class).execute();
+    }
+
+    public static Cursor getProjectSurveysCursor(Long projectId) {
+        From query = new Select("Surveys.*")
+                .from(Survey.class)
+                .where("ProjectId = ? AND RosterUUID IS null", projectId)
+                .orderBy("LastUpdated DESC");
+        return Cache.openDatabase().rawQuery(query.toSql(), query.getArguments());
+    }
+
+    public static List<Survey> getCompleted() {
+        return new Select().from(Survey.class).where("Complete = ? AND ProjectID = ?", 1,
+                AppUtil.getProjectId()).execute();
+    }
+
+    static List<Survey> getIncomplete() {
+        return new Select().from(Survey.class).where("Complete = ? AND ProjectID = ?", 0,
+                AppUtil.getProjectId()).execute();
+    }
+
+    public static Survey findByUUID(String uuid) {
+        return new Select().from(Survey.class).where("UUID = ?", uuid).executeSingle();
+    }
+
     @Override
     public JSONObject toJSON() {
         JSONObject json = new JSONObject();
@@ -160,42 +196,6 @@ public class Survey extends SendModel {
                 question.getId(), getUUID()).executeSingle();
     }
 
-    public static List<Survey> getAllProjectSurveys(Long projectId) {
-        return new Select("Surveys.*")
-                .from(Survey.class)
-                .innerJoin(Instrument.class)
-                .on("Surveys.InstrumentRemoteId=Instruments.RemoteId AND Instruments.Published=" + 1)
-                .where("Surveys.ProjectId = ? AND RosterUUID IS null", projectId)
-                .orderBy("Surveys.LastUpdated DESC")
-                .execute();
-    }
-
-    public static List<Survey> getAll() {
-        return new Select().from(Survey.class).execute();
-    }
-
-    public static Cursor getProjectSurveysCursor(Long projectId) {
-        From query = new Select("Surveys.*")
-                .from(Survey.class)
-                .where("ProjectId = ? AND RosterUUID IS null", projectId)
-                .orderBy("LastUpdated DESC");
-        return Cache.openDatabase().rawQuery(query.toSql(), query.getArguments());
-    }
-
-    public static List<Survey> getCompleted() {
-        return new Select().from(Survey.class).where("Complete = ? AND ProjectID = ?", 1,
-                AppUtil.getProjectId()).execute();
-    }
-
-    static List<Survey> getIncomplete() {
-        return new Select().from(Survey.class).where("Complete = ? AND ProjectID = ?", 0,
-                AppUtil.getProjectId()).execute();
-    }
-
-    public static Survey findByUUID(String uuid) {
-        return new Select().from(Survey.class).where("UUID = ?", uuid).executeSingle();
-    }
-
     /*
      * Relationships
      */
@@ -239,10 +239,6 @@ public class Survey extends SendModel {
 
     public Instrument getInstrument() {
         return Instrument.findByRemoteId(getInstrumentRemoteId());
-    }
-
-    public void setInstrumentRemoteId(Long instrumentId) {
-        mInstrumentRemoteId = instrumentId;
     }
 
     public String getUUID() {
@@ -303,12 +299,12 @@ public class Survey extends SendModel {
         this.delete();
     }
 
-    public void setMetadata(String metadata) {
-        mMetadata = metadata;
-    }
-
     public String getMetadata() {
         return mMetadata;
+    }
+
+    public void setMetadata(String metadata) {
+        mMetadata = metadata;
     }
 
     public void setProjectId(Long id) {
@@ -330,6 +326,10 @@ public class Survey extends SendModel {
 
     private Long getInstrumentRemoteId() {
         return mInstrumentRemoteId;
+    }
+
+    public void setInstrumentRemoteId(Long instrumentId) {
+        mInstrumentRemoteId = instrumentId;
     }
 
     public void setRosterUUID(String uuid) {

@@ -3,14 +3,15 @@ package org.adaptlab.chpir.android.activerecordcloudsync;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
-import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
+import androidx.core.app.NotificationCompat;
+
 import org.adaptlab.chpir.android.survey.BuildConfig;
+import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.DeviceSyncEntry;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
-import org.adaptlab.chpir.android.survey.R;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -50,6 +51,10 @@ public class ActiveRecordCloudSync {
         mSendTables.put(tableName, sendTable);
     }
 
+    public static String getEndPoint() {
+        return mEndPoint;
+    }
+
     public static void setEndPoint(String endPoint) {
         if (BuildConfig.DEBUG) Log.i(TAG, "Api End point is: " + endPoint);
 
@@ -57,10 +62,6 @@ public class ActiveRecordCloudSync {
         if (lastChar != '/') endPoint = endPoint + "/";
 
         mEndPoint = endPoint;
-    }
-
-    public static String getEndPoint() {
-        return mEndPoint;
     }
 
     static String getProjectsEndPoint() {
@@ -110,16 +111,12 @@ public class ActiveRecordCloudSync {
         return responseCode != 426;  // Http Status Code 426 = upgrade required     
     }
 
-    public static void setAccessToken(String token) {
-        mAccessToken = token;
-    }
-
     public static String getAccessToken() {
         return mAccessToken;
     }
 
-    public static void setVersionCode(int code) {
-        mVersionCode = code;
+    public static void setAccessToken(String token) {
+        mAccessToken = token;
     }
 
     /*
@@ -127,6 +124,10 @@ public class ActiveRecordCloudSync {
      */
     public static int getVersionCode() {
         return mVersionCode;
+    }
+
+    public static void setVersionCode(int code) {
+        mVersionCode = code;
     }
 
     /*

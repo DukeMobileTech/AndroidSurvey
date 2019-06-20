@@ -7,7 +7,6 @@ import android.widget.LinearLayout;
 import android.widget.RatingBar;
 
 import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
-import org.adaptlab.chpir.android.survey.models.Response;
 
 public class RatingQuestionFragment extends SingleQuestionFragment {
     private final static int NUM_STARS = 5;

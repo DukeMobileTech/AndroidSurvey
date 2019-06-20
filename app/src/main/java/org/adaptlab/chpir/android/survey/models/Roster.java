@@ -6,8 +6,9 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.provider.BaseColumns;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+
+import androidx.core.app.NotificationCompat;
 
 import com.activeandroid.Cache;
 import com.activeandroid.annotation.Column;
@@ -26,6 +27,7 @@ import java.util.UUID;
 
 @Table(name = "Rosters", id = BaseColumns._ID)
 public class Roster extends SendModel {
+    private final String TAG = "Roster";
     @Column(name = "UUID")
     private String mUUID;
     @Column(name = "SentToRemote")
@@ -36,8 +38,6 @@ public class Roster extends SendModel {
     private String mIdentifier;
     @Column(name = "InstrumentRemoteId")
     private Long mInstrumentRemoteId;
-
-    private final String TAG = "Roster";
 
     public Roster() {
         super();
@@ -51,24 +51,32 @@ public class Roster extends SendModel {
         return Cache.openDatabase().rawQuery(query.toSql(), query.getArguments());
     }
 
-    public void setInstrument(Instrument instrument) {
-        mInstrumentRemoteId = instrument.getRemoteId();
+    public static Roster findByIdentifier(String identifier) {
+        return new Select().from(Roster.class).where("Identifier = ?", identifier).executeSingle();
+    }
+
+    public static Roster findByUUID(String uuid) {
+        return new Select().from(Roster.class).where("UUID = ?", uuid).executeSingle();
     }
 
     public Instrument getInstrument() {
         return Instrument.findByRemoteId(mInstrumentRemoteId);
     }
 
+    public void setInstrument(Instrument instrument) {
+        mInstrumentRemoteId = instrument.getRemoteId();
+    }
+
     public String getIdentifier() {
         return mIdentifier;
     }
 
-    public String getUUID() {
-        return mUUID;
-    }
-
     public void setIdentifier(String identifier) {
         mIdentifier = identifier;
+    }
+
+    public String getUUID() {
+        return mUUID;
     }
 
     public void setComplete(boolean status) {
@@ -84,14 +92,6 @@ public class Roster extends SendModel {
 
     public List<Survey> surveys() {
         return new Select().from(Survey.class).where("RosterUUID = ?", mUUID).execute();
-    }
-
-    public static Roster findByIdentifier(String identifier) {
-        return new Select().from(Roster.class).where("Identifier = ?", identifier).executeSingle();
-    }
-
-    public static Roster findByUUID(String uuid) {
-        return new Select().from(Roster.class).where("UUID = ?", uuid).executeSingle();
     }
 
     public List<RosterLog> rosterLogs() {

@@ -1,7 +1,7 @@
 package org.adaptlab.chpir.android.survey.relations;
 
-import android.arch.persistence.room.Embedded;
-import android.arch.persistence.room.Relation;
+import androidx.room.Embedded;
+import androidx.room.Relation;
 
 import org.adaptlab.chpir.android.survey.entities.DisplayInstruction;
 import org.adaptlab.chpir.android.survey.entities.Instruction;

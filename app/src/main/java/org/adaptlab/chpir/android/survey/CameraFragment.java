@@ -8,10 +8,6 @@ import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Surface;
@@ -21,6 +17,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
 import org.adaptlab.chpir.android.survey.models.ResponsePhoto;
 
 import java.io.FileOutputStream;
@@ -29,37 +30,18 @@ import java.util.List;
 import java.util.UUID;
 
 public class CameraFragment extends Fragment {
-    private static final String TAG = "CameraFragment";
     public static final String EXTRA_PHOTO_FILENAME = "CameraFragment.filename";
     public static final String EXTRA_RESPONSE_PHOTO = "CameraFragment.photo";
     public static final String EXTRA_CAMERA = "CameraFragment.camera_index";
+    private static final String TAG = "CameraFragment";
     public static int CAMERA;
     private View mProgressIndicator;
     private Camera mCamera;
-
-    public static CameraFragment newCameraFragmentInstance(ResponsePhoto picture, int
-            camera_index) {
-        CAMERA = camera_index;
-        Bundle args = new Bundle();
-        args.putSerializable(EXTRA_RESPONSE_PHOTO, picture);
-        args.putSerializable(EXTRA_CAMERA, CAMERA);
-        CameraFragment fragment = new CameraFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt(EXTRA_CAMERA, CAMERA);
-    }
-
     private Camera.ShutterCallback mShutterCallback = new Camera.ShutterCallback() {
         public void onShutter() {
             mProgressIndicator.setVisibility(View.VISIBLE);
         }
     };
-
     private Camera.PictureCallback mJPEGCallBack = new Camera.PictureCallback() {
         public void onPictureTaken(byte[] data, Camera camera) {
             String filename = UUID.randomUUID().toString() + ".jpg";
@@ -95,6 +77,53 @@ public class CameraFragment extends Fragment {
         }
 
     };
+
+    public static CameraFragment newCameraFragmentInstance(ResponsePhoto picture, int
+            camera_index) {
+        CAMERA = camera_index;
+        Bundle args = new Bundle();
+        args.putSerializable(EXTRA_RESPONSE_PHOTO, picture);
+        args.putSerializable(EXTRA_CAMERA, CAMERA);
+        CameraFragment fragment = new CameraFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static void setCameraDisplayOrientation(Activity activity, int cameraId, android
+            .hardware.Camera camera) {
+        android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
+        android.hardware.Camera.getCameraInfo(cameraId, info);
+        int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+        int degrees = 0;
+        switch (rotation) {
+            case Surface.ROTATION_0:
+                degrees = 0;
+                break;
+            case Surface.ROTATION_90:
+                degrees = 90;
+                break;
+            case Surface.ROTATION_180:
+                degrees = 180;
+                break;
+            case Surface.ROTATION_270:
+                degrees = 270;
+                break;
+        }
+        int result;
+        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            result = (info.orientation + degrees) % 360;
+            result = (360 - result) % 360;  // compensate the mirror
+        } else {  // back-facing
+            result = (info.orientation - degrees + 360) % 360;
+        }
+        camera.setDisplayOrientation(result);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(EXTRA_CAMERA, CAMERA);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
@@ -152,36 +181,6 @@ public class CameraFragment extends Fragment {
         });
 
         return v;
-    }
-
-    public static void setCameraDisplayOrientation(Activity activity, int cameraId, android
-            .hardware.Camera camera) {
-        android.hardware.Camera.CameraInfo info = new android.hardware.Camera.CameraInfo();
-        android.hardware.Camera.getCameraInfo(cameraId, info);
-        int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
-        int degrees = 0;
-        switch (rotation) {
-            case Surface.ROTATION_0:
-                degrees = 0;
-                break;
-            case Surface.ROTATION_90:
-                degrees = 90;
-                break;
-            case Surface.ROTATION_180:
-                degrees = 180;
-                break;
-            case Surface.ROTATION_270:
-                degrees = 270;
-                break;
-        }
-        int result;
-        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-            result = (info.orientation + degrees) % 360;
-            result = (360 - result) % 360;  // compensate the mirror
-        } else {  // back-facing
-            result = (info.orientation - degrees + 360) % 360;
-        }
-        camera.setDisplayOrientation(result);
     }
 
     private Size getBestSupportedSize(List<Size> sizes, int width, int height) {

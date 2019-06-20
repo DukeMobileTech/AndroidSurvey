@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:app="http://schemas.android.com/apk/res-auto"
-      xmlns:tools="http://schemas.android.com/tools"
-      tools:context=".roster.RosterActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".roster.RosterActivity">
 
     <item
         android:id="@+id/add_participant"
-        android:title="@string/new_participant"
         android:icon="@drawable/ic_person_add_black_24dp"
+        android:title="@string/new_participant"
         app:showAsAction="ifRoom|withText" />
 
 </menu>

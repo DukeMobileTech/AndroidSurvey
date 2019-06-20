@@ -8,7 +8,6 @@ import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
 import org.adaptlab.chpir.android.survey.BuildConfig;
-import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,6 +39,10 @@ public class Validation extends ReceiveModel {
 
     public Validation() {
         super();
+    }
+
+    public static Validation findByRemoteId(Long id) {
+        return new Select().from(Validation.class).where("RemoteId = ?", id).executeSingle();
     }
 
     @Override
@@ -83,10 +86,6 @@ public class Validation extends ReceiveModel {
         }
     }
 
-    public static Validation findByRemoteId(Long id) {
-        return new Select().from(Validation.class).where("RemoteId = ?", id).executeSingle();
-    }
-
     public Long getRemoteId() {
         return mRemoteId;
     }
@@ -107,12 +106,12 @@ public class Validation extends ReceiveModel {
         return mValidationText;
     }
 
-    private List<ValidationTranslation> translations() {
-        return getMany(ValidationTranslation.class, "Validation");
-    }
-
     private void setValidationText(String validationText) {
         mValidationText = validationText;
+    }
+
+    private List<ValidationTranslation> translations() {
+        return getMany(ValidationTranslation.class, "Validation");
     }
 
     public String getValidationMessage(Instrument instrument) {

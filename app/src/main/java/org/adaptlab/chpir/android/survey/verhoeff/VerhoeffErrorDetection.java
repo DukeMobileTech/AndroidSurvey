@@ -27,6 +27,14 @@ public class VerhoeffErrorDetection {
         }
     }
 
+    private static boolean doCheck(int[] a) {
+        int check = 0;
+        for (int i = 0; i < a.length; i++)
+            check = op[check][F[i % 8][a[i]]];
+        if (check != 0) return false;
+        else return true;
+    }
+
     /*
      * Format: $ - ### - %% - @
      *
@@ -41,14 +49,6 @@ public class VerhoeffErrorDetection {
         }
 
         return doCheck(generateCheckArray(checkString));
-    }
-
-    private static boolean doCheck(int[] a) {
-        int check = 0;
-        for (int i = 0; i < a.length; i++)
-            check = op[check][F[i % 8][a[i]]];
-        if (check != 0) return false;
-        else return true;
     }
 
     private int[] generateCheckArray(String checkString) {

@@ -12,56 +12,56 @@ import org.json.JSONObject;
 
 @Table(name = "Skips")
 public class Skip extends ReceiveModel {
-	private static final String TAG = "Skip";
-	@Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    private static final String TAG = "Skip";
+    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
     private Long mRemoteId;
-	@Column(name = "Option", onUpdate = Column.ForeignKeyAction.CASCADE, onDelete = Column.ForeignKeyAction.CASCADE)
-	private Option mOption;
-	@Column(name = "Question", onUpdate = Column.ForeignKeyAction.CASCADE, onDelete = Column.ForeignKeyAction.CASCADE)
-	private Question mQuestion;
-	@Column(name = "Deleted")
-	private boolean mDeleted;
-	
-	@Override
-	public void createObjectFromJSON(JSONObject jsonObject) {
-		try {
+    @Column(name = "Option", onUpdate = Column.ForeignKeyAction.CASCADE, onDelete = Column.ForeignKeyAction.CASCADE)
+    private Option mOption;
+    @Column(name = "Question", onUpdate = Column.ForeignKeyAction.CASCADE, onDelete = Column.ForeignKeyAction.CASCADE)
+    private Question mQuestion;
+    @Column(name = "Deleted")
+    private boolean mDeleted;
+
+    public static Skip findByRemoteId(Long remoteId) {
+        return new Select().from(Skip.class).where("RemoteId = ?", remoteId).executeSingle();
+    }
+
+    @Override
+    public void createObjectFromJSON(JSONObject jsonObject) {
+        try {
             Long remoteId = jsonObject.getLong("id");
             Skip skip = Skip.findByRemoteId(remoteId);
             if (skip == null) {
-            	skip = this;
+                skip = this;
             }
             skip.setRemoteId(remoteId);
             skip.setOption(Option.findByRemoteId(jsonObject.getLong("option_id")));
             skip.setQuestion(Question.findByQuestionIdentifier(jsonObject.getString("question_identifier")));
             if (jsonObject.isNull("deleted_at")) {
-            	skip.setDeleted(false);
+                skip.setDeleted(false);
             } else {
-            	skip.setDeleted(true);
+                skip.setDeleted(true);
             }
-			skip.save();
-		} catch (JSONException je) {
+            skip.save();
+        } catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);
-        }  
-	}
+        }
+    }
 
-	private void setQuestion(Question question) {
-		mQuestion = question;
-	}
+    private void setQuestion(Question question) {
+        mQuestion = question;
+    }
 
-	private void setOption(Option option) {
-		mOption = option;
-	}
+    private void setOption(Option option) {
+        mOption = option;
+    }
 
-	private void setRemoteId(Long remoteId) {
-		mRemoteId = remoteId;
-	}
+    private void setRemoteId(Long remoteId) {
+        mRemoteId = remoteId;
+    }
 
-	private void setDeleted(boolean deleted) {
-		mDeleted = deleted;
-	}
-
-	public static Skip findByRemoteId(Long remoteId) {
-		return new Select().from(Skip.class).where("RemoteId = ?", remoteId).executeSingle();
-	}
+    private void setDeleted(boolean deleted) {
+        mDeleted = deleted;
+    }
 
 }

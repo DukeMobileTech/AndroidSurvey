@@ -1,6 +1,6 @@
 package org.adaptlab.chpir.android.survey.daos;
 
-import android.arch.persistence.room.Dao;
+import androidx.room.Dao;
 
 import org.adaptlab.chpir.android.survey.entities.CriticalResponse;
 

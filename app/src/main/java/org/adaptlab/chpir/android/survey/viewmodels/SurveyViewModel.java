@@ -1,12 +1,13 @@
 package org.adaptlab.chpir.android.survey.viewmodels;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.LongSparseArray;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.entities.Display;
@@ -245,12 +246,12 @@ public class SurveyViewModel extends AndroidViewModel {
         mResponses = map;
     }
 
-    public void setDeviceLanguage(String language) {
-        mDeviceLanguage = language;
-    }
-
     public String getDeviceLanguage() {
         return mDeviceLanguage;
+    }
+
+    public void setDeviceLanguage(String language) {
+        mDeviceLanguage = language;
     }
 
     public String getInstrumentLanguage() {

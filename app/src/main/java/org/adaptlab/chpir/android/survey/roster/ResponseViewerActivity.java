@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,6 +12,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.Question;
@@ -26,9 +27,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import static org.adaptlab.chpir.android.survey.utils.FormatUtils.stripHtml;
 import static org.adaptlab.chpir.android.survey.roster.RosterActivity.EXTRA_QUESTION_ID;
 import static org.adaptlab.chpir.android.survey.roster.RosterActivity.EXTRA_SURVEY_IDENTIFIER;
+import static org.adaptlab.chpir.android.survey.utils.FormatUtils.stripHtml;
 
 public class ResponseViewerActivity extends AppCompatActivity {
     private static final String TAG = "ResponseViewerActivity";

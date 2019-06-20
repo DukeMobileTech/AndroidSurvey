@@ -18,7 +18,7 @@ import java.util.List;
  * instrument for a given time period.  This keeps track of the timestamps
  * of each created survey and stores them in the stored params for the
  * rule.
- * 
+ *
  */
 public class InstrumentSurveyLimitPerMinuteRule extends PassableRule {
     private static final String TAG = "InstrumentSurveyLimitPerMinuteRule";
@@ -30,7 +30,7 @@ public class InstrumentSurveyLimitPerMinuteRule extends PassableRule {
     private String mFailureMessage;
 
     public InstrumentSurveyLimitPerMinuteRule(Instrument instrument,
-            String failureMessage) {
+                                              String failureMessage) {
         mInstrument = instrument;
         mFailureMessage = failureMessage;
         mDateFormatter = new SimpleDateFormat("EEE MMM dd kk:mm:ss z yyyy"); // The format to use to store timestamps
@@ -47,7 +47,7 @@ public class InstrumentSurveyLimitPerMinuteRule extends PassableRule {
             int numberOfSurveys = instrumentRule.getParamJSON().getInt(Rule.NUM_SURVEYS_KEY);
             int minuteInterval = instrumentRule.getParamJSON().getInt(Rule.MINUTE_INTERVAL_KEY);
 
-            List<Date> surveyTimestamps = parseTimestamps(instrumentRule.<String> getStoredValue(Rule.SURVEY_TIMESTAMPS_KEY));
+            List<Date> surveyTimestamps = parseTimestamps(instrumentRule.<String>getStoredValue(Rule.SURVEY_TIMESTAMPS_KEY));
 
             Date now = new Date();
 
@@ -105,9 +105,9 @@ public class InstrumentSurveyLimitPerMinuteRule extends PassableRule {
 
     /*
      * Remove all timestamps outside of a given minute interval for a list of dates.
-     * 
+     *
      * This will remove all timestamps outside of the range referenceTime - minuteInterval.
-     * 
+     *
      * E.G. if the referenceTime is the current time, and the minute interval is 5, then it will remove
      * all timestamps from the list that are older than 5 minutes.
      */

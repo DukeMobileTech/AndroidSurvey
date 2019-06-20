@@ -22,7 +22,7 @@
     <string name="network_unavailable">Hakuna mtandao inayopatikana kwenye kifaa.</string>
     <string name="api_unavailable">Seva haijibu.</string>
     <string name="surveys">utafiti zinazoendelea</string>
-    <string name="questions">maswali</string>  
+    <string name="questions">maswali</string>
     <string name="question">swali</string>
     <string name="encryption_required_title">Usimbaji fiche inahitajika</string>
     <string name="encryption_required_text">Programu hii inahitaji kifaa kisimbwe. Tafadhali simba kifaa chako ili uweze kuendelea.</string>

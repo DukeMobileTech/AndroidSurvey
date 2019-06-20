@@ -49,7 +49,7 @@ public class SearchScorer extends Scorer {
 
     private boolean areLabelsSimilar(ScoreUnit unit) {
         for (int k = 1; k < unit.optionScores().size(); k++) {
-            if (!unit.optionScores().get(k).getLabel().equals(unit.optionScores().get(k-1).getLabel())) {
+            if (!unit.optionScores().get(k).getLabel().equals(unit.optionScores().get(k - 1).getLabel())) {
                 return false;
             }
         }

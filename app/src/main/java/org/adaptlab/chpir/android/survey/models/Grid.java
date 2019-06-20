@@ -31,6 +31,10 @@ public class Grid extends ReceiveModel {
     @Column(name = "Instructions")
     private String mInstructions;
 
+    public static Grid findByRemoteId(Long remoteId) {
+        return new Select().from(Grid.class).where("RemoteId = ?", remoteId).executeSingle();
+    }
+
     @Override
     public void createObjectFromJSON(JSONObject jsonObject) {
         try {
@@ -73,10 +77,6 @@ public class Grid extends ReceiveModel {
         } catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);
         }
-    }
-
-    public static Grid findByRemoteId(Long remoteId) {
-        return new Select().from(Grid.class).where("RemoteId = ?", remoteId).executeSingle();
     }
 
     private void setQuestionType(String questionType) {

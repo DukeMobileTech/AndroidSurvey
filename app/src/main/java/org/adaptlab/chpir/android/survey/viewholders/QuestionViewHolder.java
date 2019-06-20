@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.graphics.Typeface;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.Spannable;
@@ -23,6 +21,9 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.adapters.ResponseRelationAdapter;
@@ -212,16 +213,16 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     }
 
     void setOptionSetItems(QuestionRelation questionRelation) {
-        if (questionRelation.optionSets != null) {
+        if (questionRelation.optionSets.size() > 0) {
             mOptionRelations = new ArrayList<>();
             OptionSetRelation optionSetRelation = questionRelation.optionSets.get(0);
             if (optionSetRelation != null) {
-                if (optionSetRelation.instructions != null) {
+                if (optionSetRelation.instructions.size() > 0) {
                     mOptionSetInstruction = optionSetRelation.instructions.get(0);
                 }
                 if (optionSetRelation.optionSetOptions != null) {
                     for (OptionSetOptionRelation relation : optionSetRelation.optionSetOptions) {
-                        if (relation.options != null) {
+                        if (relation.options.size() > 0) {
                             mOptionRelations.add(relation.options.get(0));
                         }
                     }
@@ -429,7 +430,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
     String getQuestionInstructions() {
         String instructions = "";
-        if (mQuestionRelation.instructions != null)
+        if (mQuestionRelation.instructions.size() > 0)
             instructions = mQuestionRelation.instructions.get(0).getText();
         return styleTextWithHtml(instructions).toString();
     }

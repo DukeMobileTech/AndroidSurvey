@@ -8,9 +8,11 @@ import java.util.List;
 
 public class TranslationUtil {
     public static String getText(Translatable translatable, List<? extends Translation> translations, SurveyViewModel viewModel) {
-        if (viewModel.getInstrumentLanguage().equals(viewModel.getDeviceLanguage()) || translations == null || translations.isEmpty()) return translatable.getText();
+        if (viewModel.getInstrumentLanguage().equals(viewModel.getDeviceLanguage()) || translations == null || translations.isEmpty())
+            return translatable.getText();
         for (Translation translation : translations) {
-            if (translation.getLanguage().equals(viewModel.getDeviceLanguage())) return translation.getText();
+            if (translation.getLanguage().equals(viewModel.getDeviceLanguage()))
+                return translation.getText();
         }
         return translatable.getText();
     }

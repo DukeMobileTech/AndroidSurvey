@@ -1,30 +1,16 @@
 package org.adaptlab.chpir.android.survey;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.text.TextUtils;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
+
+import androidx.fragment.app.Fragment;
 
 import com.activeandroid.Model;
 
-import org.adaptlab.chpir.android.survey.models.Question;
-import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Section;
 import org.adaptlab.chpir.android.survey.models.Survey;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 public class SectionFragment extends Fragment {
     private static final String TAG = "SectionFragment";

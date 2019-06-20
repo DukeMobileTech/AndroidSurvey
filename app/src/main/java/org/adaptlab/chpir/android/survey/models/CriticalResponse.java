@@ -30,20 +30,12 @@ public class CriticalResponse extends Model {
         return new Select().from(CriticalResponse.class).where("RemoteId = ?", id).executeSingle();
     }
 
+    public static List<CriticalResponse> getAll() {
+        return new Select().from(CriticalResponse.class).where("Deleted = 0").execute();
+    }
+
     public void setRemoteId(Long id) {
         mRemoteId = id;
-    }
-
-    public void setInstructionId(Long id) {
-        mInstructionId = id;
-    }
-
-    public void setQuestionIdentifier(String identifier) {
-        mQuestionIdentifier = identifier;
-    }
-
-    public void setOptionIdentifier(String identifier) {
-        mOptionIdentifier = identifier;
     }
 
     public boolean getDeleted() {
@@ -54,19 +46,27 @@ public class CriticalResponse extends Model {
         mDeleted = deleted;
     }
 
-    public static List<CriticalResponse> getAll() {
-        return new Select().from(CriticalResponse.class).where("Deleted = 0").execute();
-    }
-
     public String getQuestionIdentifier() {
         return mQuestionIdentifier;
+    }
+
+    public void setQuestionIdentifier(String identifier) {
+        mQuestionIdentifier = identifier;
     }
 
     public String getOptionIdentifier() {
         return mOptionIdentifier;
     }
 
+    public void setOptionIdentifier(String identifier) {
+        mOptionIdentifier = identifier;
+    }
+
     public Long getInstructionId() {
         return mInstructionId;
+    }
+
+    public void setInstructionId(Long id) {
+        mInstructionId = id;
     }
 }

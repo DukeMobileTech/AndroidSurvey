@@ -1,7 +1,8 @@
 package org.adaptlab.chpir.android.survey;
 
-import android.support.v4.app.Fragment;
 import android.util.Log;
+
+import androidx.fragment.app.Fragment;
 
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.questionfragments.AddressQuestionFragment;

@@ -24,61 +24,61 @@ public class EncryptUtil {
 
     private static int iterationCount = 1000;
     private static int keyLength = 256;
-    private static SecretKey theKey = null;
     static int saltLength = keyLength / 8;
+    private static SecretKey theKey = null;
 
-       public static String encrypt(String value, String password) throws NoSuchAlgorithmException, InvalidKeySpecException,
-               NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException,
-               BadPaddingException, UnsupportedEncodingException {
+    public static String encrypt(String value, String password) throws NoSuchAlgorithmException, InvalidKeySpecException,
+            NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException,
+            BadPaddingException, UnsupportedEncodingException {
 
-           SecureRandom random = new SecureRandom();
-           byte[] salt = new byte[saltLength];
-           random.nextBytes(salt);
+        SecureRandom random = new SecureRandom();
+        byte[] salt = new byte[saltLength];
+        random.nextBytes(salt);
 
-           SecretKey key = getKey(password, salt);
+        SecretKey key = getKey(password, salt);
 
-           Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-           byte[] iv = new byte[cipher.getBlockSize()];
-           random.nextBytes(iv);
-           IvParameterSpec ivParams = new IvParameterSpec(iv);
-           cipher.init(Cipher.ENCRYPT_MODE, key, ivParams);
-           byte[] cipherText = cipher.doFinal(value.getBytes("UTF-8"));
-           
-           return salt + "::" + iv + "::" + new String(cipherText, "UTF-8");
-       }
-       
-       public static String decrypt(String ciphertext, String password) throws NoSuchAlgorithmException, InvalidKeySpecException,
-               NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException,
-               BadPaddingException, UnsupportedEncodingException {
-           
-           String[] fields = ciphertext.split("::");
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        byte[] iv = new byte[cipher.getBlockSize()];
+        random.nextBytes(iv);
+        IvParameterSpec ivParams = new IvParameterSpec(iv);
+        cipher.init(Cipher.ENCRYPT_MODE, key, ivParams);
+        byte[] cipherText = cipher.doFinal(value.getBytes("UTF-8"));
 
-           byte[] salt = Base64.decodeBase64(fields[0]);
-           byte[] iv = Base64.decodeBase64(fields[1]);
-           byte[] cipherBytes = Base64.decodeBase64(fields[2]);
-           
-           SecretKey key = getKey(password, salt);
+        return salt + "::" + iv + "::" + new String(cipherText, "UTF-8");
+    }
 
-           Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-           IvParameterSpec ivParams = new IvParameterSpec(iv);
-           cipher.init(Cipher.DECRYPT_MODE, key, ivParams);
-           byte[] plaintext = cipher.doFinal(cipherBytes);
-           
-           return new String(plaintext , "UTF-8");
-       }
+    public static String decrypt(String ciphertext, String password) throws NoSuchAlgorithmException, InvalidKeySpecException,
+            NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException,
+            BadPaddingException, UnsupportedEncodingException {
 
-       private static SecretKey getKey(String password, byte[] salt) throws NoSuchAlgorithmException, InvalidKeySpecException {
-           if (theKey != null) return theKey;
+        String[] fields = ciphertext.split("::");
 
-           KeySpec keySpec = new PBEKeySpec(password.toCharArray(), salt,
-                               iterationCount, keyLength);
-           SecretKeyFactory keyFactory = SecretKeyFactory
-                               .getInstance("PBKDF2WithHmacSHA1");
-           byte[] keyBytes = keyFactory.generateSecret(keySpec).getEncoded();
-           SecretKey key = new SecretKeySpec(keyBytes, "AES");
-           theKey = key;
-           
-           return theKey;
-       }
+        byte[] salt = Base64.decodeBase64(fields[0]);
+        byte[] iv = Base64.decodeBase64(fields[1]);
+        byte[] cipherBytes = Base64.decodeBase64(fields[2]);
+
+        SecretKey key = getKey(password, salt);
+
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        IvParameterSpec ivParams = new IvParameterSpec(iv);
+        cipher.init(Cipher.DECRYPT_MODE, key, ivParams);
+        byte[] plaintext = cipher.doFinal(cipherBytes);
+
+        return new String(plaintext, "UTF-8");
+    }
+
+    private static SecretKey getKey(String password, byte[] salt) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        if (theKey != null) return theKey;
+
+        KeySpec keySpec = new PBEKeySpec(password.toCharArray(), salt,
+                iterationCount, keyLength);
+        SecretKeyFactory keyFactory = SecretKeyFactory
+                .getInstance("PBKDF2WithHmacSHA1");
+        byte[] keyBytes = keyFactory.generateSecret(keySpec).getEncoded();
+        SecretKey key = new SecretKeySpec(keyBytes, "AES");
+        theKey = key;
+
+        return theKey;
+    }
 
 }

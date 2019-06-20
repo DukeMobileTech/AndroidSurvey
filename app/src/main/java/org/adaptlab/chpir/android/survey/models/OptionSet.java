@@ -87,10 +87,6 @@ public class OptionSet extends ReceiveModel {
         mRemoteId = id;
     }
 
-    private void setTitle(String title) {
-        mTitle = title;
-    }
-
     private void setDeleted(boolean deleted) {
         mDeleted = deleted;
     }
@@ -109,5 +105,9 @@ public class OptionSet extends ReceiveModel {
 
     public String getTitle() {
         return mTitle;
+    }
+
+    private void setTitle(String title) {
+        mTitle = title;
     }
 }

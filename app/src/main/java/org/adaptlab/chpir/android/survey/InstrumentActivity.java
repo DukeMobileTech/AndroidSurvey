@@ -3,20 +3,12 @@ package org.adaptlab.chpir.android.survey;
 import android.Manifest;
 import android.app.ActivityOptions;
 import android.app.ProgressDialog;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,19 +16,29 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.viewpager.widget.ViewPager;
+
+import com.google.android.material.tabs.TabLayout;
+
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.activerecordcloudsync.HttpUtil;
 import org.adaptlab.chpir.android.activerecordcloudsync.NotificationUtils;
 import org.adaptlab.chpir.android.survey.adapters.InstrumentSurveyPagerAdapter;
+import org.adaptlab.chpir.android.survey.entities.Settings;
 import org.adaptlab.chpir.android.survey.models.AdminSettings;
 import org.adaptlab.chpir.android.survey.models.Image;
 import org.adaptlab.chpir.android.survey.models.Instrument;
 import org.adaptlab.chpir.android.survey.models.Project;
-import org.adaptlab.chpir.android.survey.entities.Settings;
-import org.adaptlab.chpir.android.survey.viewmodels.SettingsViewModel;
 import org.adaptlab.chpir.android.survey.tasks.SetScoreUnitOrderingQuestionTask;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.utils.LocaleManager;
+import org.adaptlab.chpir.android.survey.viewmodels.SettingsViewModel;
 
 import java.util.List;
 
@@ -235,10 +237,6 @@ public class InstrumentActivity extends AppCompatActivity {
     private static class RefreshInstrumentsTask extends AsyncTask<Void, Void, Integer> {
         private AsyncTaskListener mListener;
 
-        public interface AsyncTaskListener {
-            void onAsyncTaskFinished();
-        }
-
         void setListener(AsyncTaskListener listener) {
             this.mListener = listener;
         }
@@ -265,16 +263,16 @@ public class InstrumentActivity extends AppCompatActivity {
             super.onPostExecute(code);
             mListener.onAsyncTaskFinished();
         }
+
+        public interface AsyncTaskListener {
+            void onAsyncTaskFinished();
+        }
     }
 
     private static class RefreshImagesTask extends AsyncTask<Void, Void, Void> {
         private final static String TAG = "ImageDownloader";
 
         private AsyncTaskListener mListener;
-
-        public interface AsyncTaskListener {
-            void onAsyncTaskFinished();
-        }
 
         void setListener(AsyncTaskListener listener) {
             this.mListener = listener;
@@ -302,14 +300,14 @@ public class InstrumentActivity extends AppCompatActivity {
             super.onPostExecute(param);
             mListener.onAsyncTaskFinished();
         }
+
+        public interface AsyncTaskListener {
+            void onAsyncTaskFinished();
+        }
     }
 
     private static class InstrumentSanitizerTask extends AsyncTask<Object, Void, Boolean> {
         private AsyncTaskListener mListener;
-
-        public interface AsyncTaskListener {
-            void onAsyncTaskFinished(Boolean last);
-        }
 
         void setListener(AsyncTaskListener listener) {
             this.mListener = listener;
@@ -326,6 +324,10 @@ public class InstrumentActivity extends AppCompatActivity {
         protected void onPostExecute(Boolean last) {
             super.onPostExecute(last);
             mListener.onAsyncTaskFinished(last);
+        }
+
+        public interface AsyncTaskListener {
+            void onAsyncTaskFinished(Boolean last);
         }
     }
 

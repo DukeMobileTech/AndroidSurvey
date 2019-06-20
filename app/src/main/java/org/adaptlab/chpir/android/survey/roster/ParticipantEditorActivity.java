@@ -3,17 +3,18 @@ package org.adaptlab.chpir.android.survey.roster;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import org.adaptlab.chpir.android.survey.SurveyApp;
-import org.adaptlab.chpir.android.survey.utils.AppUtil;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentManager;
+
+import com.google.android.material.navigation.NavigationView;
+
 import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.SurveyApp;
 import org.adaptlab.chpir.android.survey.models.Question;
 import org.adaptlab.chpir.android.survey.models.Response;
 import org.adaptlab.chpir.android.survey.models.Roster;
@@ -224,7 +225,7 @@ public class ParticipantEditorActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause () {
+    protected void onPause() {
         if (mSurveyIdentifierQuestion != null) {
             Response idResponse = mQuestionResponseList.get(mSurveyIdentifierQuestion);
             if (idResponse == null) {
@@ -244,6 +245,15 @@ public class ParticipantEditorActivity extends AppCompatActivity {
 
     public List<Question> getQuestions() {
         return mQuestions;
+    }
+
+    private void setIdentifierQuestion() {
+        for (Question question : mQuestions) {
+            if (question.identifiesSurvey()) {
+                mSurveyIdentifierQuestion = question;
+                break;
+            }
+        }
     }
 
     private class QuestionLoaderTask extends AsyncTask<Survey, Void,
@@ -282,15 +292,6 @@ public class ParticipantEditorActivity extends AppCompatActivity {
             }
         }
 
-    }
-
-    private void setIdentifierQuestion() {
-         for (Question question : mQuestions) {
-                if (question.identifiesSurvey()) {
-                    mSurveyIdentifierQuestion = question;
-                    break;
-                }
-         }
     }
 
 }

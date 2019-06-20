@@ -1,8 +1,9 @@
 package org.adaptlab.chpir.android.survey.models;
 
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
@@ -40,6 +41,15 @@ public class ConditionSkip extends ReceiveModel {
     @Column(name = "Deleted")
     private boolean mDeleted;
 
+    public static List<ConditionSkip> getAll(Long instrumentId) {
+        return new Select().from(ConditionSkip.class).where(
+                "RemoteInstrumentId = ? AND Deleted != ?", instrumentId, 1).execute();
+    }
+
+    public static ConditionSkip findByRemoteId(Long id) {
+        return new Select().from(ConditionSkip.class).where("RemoteId = ?", id).executeSingle();
+    }
+
     @Override
     public void createObjectFromJSON(JSONObject jsonObject) {
         try {
@@ -68,37 +78,32 @@ public class ConditionSkip extends ReceiveModel {
         }
     }
 
-    public static List<ConditionSkip> getAll(Long instrumentId) {
-        return new Select().from(ConditionSkip.class).where(
-                "RemoteInstrumentId = ? AND Deleted != ?", instrumentId, 1).execute();
-    }
-
     public String getQuestionIdentifier() {
         return mQuestionIdentifier;
-    }
-
-    public String getOptionIdentifier() {
-        return mOptionIdentifier;
-    }
-
-    public boolean getDeleted() {
-        return mDeleted;
-    }
-
-    public static ConditionSkip findByRemoteId(Long id) {
-        return new Select().from(ConditionSkip.class).where("RemoteId = ?", id).executeSingle();
-    }
-
-    private void setRemoteId(Long id) {
-        mRemoteId = id;
     }
 
     private void setQuestionIdentifier(String id) {
         mQuestionIdentifier = id;
     }
 
+    public String getOptionIdentifier() {
+        return mOptionIdentifier;
+    }
+
     private void setOptionIdentifier(String id) {
         mOptionIdentifier = id;
+    }
+
+    public boolean getDeleted() {
+        return mDeleted;
+    }
+
+    private void setDeleted(boolean deleted) {
+        mDeleted = deleted;
+    }
+
+    private void setRemoteId(Long id) {
+        mRemoteId = id;
     }
 
     private void setNextQuestionIdentifier(String id) {
@@ -123,10 +128,6 @@ public class ConditionSkip extends ReceiveModel {
 
     private void setCondition(String condition) {
         mCondition = condition;
-    }
-
-    private void setDeleted(boolean deleted) {
-        mDeleted = deleted;
     }
 
     private Question getConditionQuestion() {
@@ -165,7 +166,7 @@ public class ConditionSkip extends ReceiveModel {
             if (getConditionQuestion().hasMultipleResponses()) {
                 if (getResponseStrings(conditionResponse).length == 1 && getConditionOptionIndex()
                         == Integer.parseInt(conditionResponse.getText())) {
-                        return mNextQuestionIdentifier;
+                    return mNextQuestionIdentifier;
                 }
             }
         } else if (mCondition.equals(Condition.ONLY_AND.toString())) {
@@ -187,7 +188,7 @@ public class ConditionSkip extends ReceiveModel {
         if (mCondition.equals(Condition.ONLY.toString())) {
             if (getConditionQuestion().hasMultipleResponses()) {
                 if ((getResponseStrings(conditionResponse).length == 1) &&
-                getConditionOptionIndex() == Integer.parseInt(conditionResponse.getText())) {
+                        getConditionOptionIndex() == Integer.parseInt(conditionResponse.getText())) {
                     return mNextQuestionIdentifier;
                 }
             }
@@ -204,7 +205,7 @@ public class ConditionSkip extends ReceiveModel {
             if (getConditionQuestion().hasMultipleResponses()) {
                 if (getResponseStrings(conditionResponse).length == 1 && getConditionOptionIndex()
                         == Integer.parseInt(conditionResponse.getText())) {
-                        return mNextQuestionIdentifier;
+                    return mNextQuestionIdentifier;
                 }
             }
         }
@@ -217,7 +218,7 @@ public class ConditionSkip extends ReceiveModel {
     }
 
     private Response getConditionResponse(Response response) {
-       return response.getSurvey().getResponseByQuestion(getConditionQuestion());
+        return response.getSurvey().getResponseByQuestion(getConditionQuestion());
     }
 
     public enum Condition {

@@ -37,7 +37,7 @@ public class BankScorer extends Scorer {
             }
             for (Map.Entry<Double, String> entry : scoreOptionsMap(unit).entrySet()) {
                 if (entry.getValue().equals(value) && entry.getKey() > scoreVal) {
-                        scoreVal = entry.getKey();
+                    scoreVal = entry.getKey();
                 }
             }
         }

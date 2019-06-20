@@ -1,9 +1,6 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
 import android.content.Context;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +9,10 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.adaptlab.chpir.android.survey.MultipleQuestionsFragment;
 import org.adaptlab.chpir.android.survey.R;
@@ -49,7 +50,8 @@ public class SingleSelectMultipleQuestionsFragment extends MultipleQuestionsFrag
     }
 
     @Override
-    protected void unSetResponse() { }
+    protected void unSetResponse() {
+    }
 
     @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
@@ -59,7 +61,7 @@ public class SingleSelectMultipleQuestionsFragment extends MultipleQuestionsFrag
         recyclerView.setLayoutManager(recyclerLayoutManager);
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
-                        recyclerLayoutManager.getOrientation());
+                recyclerLayoutManager.getOrientation());
         recyclerView.addItemDecoration(dividerItemDecoration);
 
         mRecyclerViewAdapter = new QuestionRecyclerViewAdapter(getQuestions(), getTableHeaders(), getActivity());
@@ -113,9 +115,9 @@ public class SingleSelectMultipleQuestionsFragment extends MultipleQuestionsFrag
                 final Button specialResponseButton = new Button(context);
                 for (int k = 0; k < options.length; k++) {
                     RadioButton radioButton = new RadioButton(context);
-                    RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(getOptionWidth()/2,
+                    RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(getOptionWidth() / 2,
                             ViewGroup.LayoutParams.MATCH_PARENT);
-                    params.leftMargin = getOptionWidth()/2;
+                    params.leftMargin = getOptionWidth() / 2;
                     radioButton.setLayoutParams(params);
                     radioButton.setId(k);
                     holder.radioGroup.addView(radioButton);

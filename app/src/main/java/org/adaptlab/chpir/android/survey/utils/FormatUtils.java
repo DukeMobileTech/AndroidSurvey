@@ -1,7 +1,6 @@
 package org.adaptlab.chpir.android.survey.utils;
 
 import android.content.Context;
-import android.os.Build;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -23,15 +22,15 @@ public class FormatUtils {
             return plural;
         }
     }
-       
+
     public static String formatDate(int month, int day, int year) {
         return ((month + 1) + "-" + day + "-" + year);
     }
-    
+
     public static String formatDate(int month, int year) {
         return ((month + 1) + "-" + year);
     }
-    
+
     public static GregorianCalendar unFormatDate(String date) {
         if (date.equals("")) return null;
         String[] dateComponents = date.split("-");
@@ -44,17 +43,17 @@ public class FormatUtils {
         } else {
             // Just year and month
             month = Integer.parseInt(dateComponents[0]) - 1;
-            year = Integer.parseInt(dateComponents[1]); 
+            year = Integer.parseInt(dateComponents[1]);
             day = 1; // not used           
         }
-        return new GregorianCalendar(year, month, day);        
+        return new GregorianCalendar(year, month, day);
     }
-       
+
     // Format: HH:MM, 24 hour format
     public static String formatTime(int hour, int minute) {
         return hour + ":" + formatMinute(minute);
     }
-        
+
     public static int[] unformatTime(String time) {
         if (time.equals("")) return null;
         String[] timeComponents = time.split(":");
@@ -71,13 +70,14 @@ public class FormatUtils {
             return String.valueOf(minute);
         }
     }
-    
+
     public static String unformatMultipleResponses(List<Option> options, String responseText, Context context, Instrument instrument) {
         String[] responses = responseText.split(",");
         String multipleText = "";
         for (int i = 0; i < responses.length; i++) {
             multipleText += options.get(Integer.parseInt(responses[i])).getText(instrument);
-            if (i < responses.length - 2) multipleText += context.getString(R.string.comma) + context.getString(R.string.space);
+            if (i < responses.length - 2)
+                multipleText += context.getString(R.string.comma) + context.getString(R.string.space);
             else if (i == responses.length - 2) multipleText += context.getString(R.string.space)
                     + context.getString(R.string.and) + context.getString(R.string.space);
         }

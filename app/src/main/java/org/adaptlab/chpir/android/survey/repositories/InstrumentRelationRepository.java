@@ -1,7 +1,8 @@
 package org.adaptlab.chpir.android.survey.repositories;
 
 import android.app.Application;
-import android.arch.lifecycle.LiveData;
+
+import androidx.lifecycle.LiveData;
 
 import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
 import org.adaptlab.chpir.android.survey.daos.InstrumentDao;

@@ -11,10 +11,10 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
-import org.adaptlab.chpir.android.survey.utils.PictureUtils;
-import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
 import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
 import org.adaptlab.chpir.android.survey.models.Image;
+import org.adaptlab.chpir.android.survey.utils.PictureUtils;
 
 import java.util.ArrayList;
 
@@ -51,28 +51,6 @@ public class SelectOneImageQuestionFragment extends SingleQuestionFragment {
         }
     }
 
-    private class ImageAdapter extends ArrayAdapter<Image> {
-        public ImageAdapter(ArrayList<Image> images) {
-            super(getActivity(), 0, images);
-        }
-
-        public View getView(int position, View view, ViewGroup parent) {
-            if (view == null) {
-                view = getActivity().getLayoutInflater().inflate(R.layout.image_item, parent,
-                        false);
-            }
-            Image img = getItem(position);
-            ImageView imageView = (ImageView) view.findViewById(R.id.image_item_view);
-            String path = getActivity().getFileStreamPath(img.getBitmapPath()).getAbsolutePath();
-            BitmapDrawable bitmap = PictureUtils.getScaledDrawable(getActivity(), path);
-            imageView.setImageDrawable(bitmap);
-            if (mPreviouslySelectedViewIndex == position) {
-                imageView.setBackgroundColor(SELECTED);
-            }
-            return view;
-        }
-    }
-
     private void setBackgroundColor(ImageView view) {
         view.setBackgroundColor(SELECTED);
     }
@@ -103,6 +81,28 @@ public class SelectOneImageQuestionFragment extends SingleQuestionFragment {
     @Override
     protected void unSetResponse() {
 
+    }
+
+    private class ImageAdapter extends ArrayAdapter<Image> {
+        public ImageAdapter(ArrayList<Image> images) {
+            super(getActivity(), 0, images);
+        }
+
+        public View getView(int position, View view, ViewGroup parent) {
+            if (view == null) {
+                view = getActivity().getLayoutInflater().inflate(R.layout.image_item, parent,
+                        false);
+            }
+            Image img = getItem(position);
+            ImageView imageView = (ImageView) view.findViewById(R.id.image_item_view);
+            String path = getActivity().getFileStreamPath(img.getBitmapPath()).getAbsolutePath();
+            BitmapDrawable bitmap = PictureUtils.getScaledDrawable(getActivity(), path);
+            imageView.setImageDrawable(bitmap);
+            if (mPreviouslySelectedViewIndex == position) {
+                imageView.setBackgroundColor(SELECTED);
+            }
+            return view;
+        }
     }
 
 }

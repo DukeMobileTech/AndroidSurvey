@@ -8,7 +8,6 @@ import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
 import org.adaptlab.chpir.android.survey.BuildConfig;
-import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -27,6 +26,10 @@ public class QuestionRandomizedFactor extends ReceiveModel {
 
     public QuestionRandomizedFactor() {
         super();
+    }
+
+    public static QuestionRandomizedFactor findByRemoteId(Long id) {
+        return new Select().from(QuestionRandomizedFactor.class).where("RemoteId = ?", id).executeSingle();
     }
 
     @Override
@@ -51,12 +54,12 @@ public class QuestionRandomizedFactor extends ReceiveModel {
         }
     }
 
-    public static QuestionRandomizedFactor findByRemoteId(Long id) {
-        return new Select().from(QuestionRandomizedFactor.class).where("RemoteId = ?", id).executeSingle();
-    }
-
     public RandomizedFactor getRandomizedFactor() {
         return mRandomizedFactor;
+    }
+
+    private void setRandomizedFactor(RandomizedFactor randomizedFactor) {
+        mRandomizedFactor = randomizedFactor;
     }
 
     private void setPosition(int position) {
@@ -69,9 +72,5 @@ public class QuestionRandomizedFactor extends ReceiveModel {
 
     private void setRemoteId(Long remoteId) {
         mRemoteId = remoteId;
-    }
-
-    private void setRandomizedFactor(RandomizedFactor randomizedFactor) {
-        mRandomizedFactor = randomizedFactor;
     }
 }

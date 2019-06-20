@@ -1,8 +1,9 @@
 package org.adaptlab.chpir.android.survey.entities;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.PrimaryKey;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
@@ -13,7 +14,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-@android.arch.persistence.room.Entity(tableName = "InstructionTranslations")
+@Entity(tableName = "InstructionTranslations")
 public class InstructionTranslation implements SurveyEntity {
     @PrimaryKey
     @NonNull

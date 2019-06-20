@@ -29,6 +29,15 @@ public class FollowUpQuestion extends ReceiveModel {
     @Column(name = "Position")
     private Long mPosition;
 
+    public static FollowUpQuestion findByRemoteId(Long id) {
+        return new Select().from(FollowUpQuestion.class).where("RemoteId = ?", id).executeSingle();
+    }
+
+    public static List<FollowUpQuestion> getAll(Long instrumentId) {
+        return new Select().from(FollowUpQuestion.class).where(
+                "RemoteInstrumentId = ?", instrumentId).execute();
+    }
+
     @Override
     public void createObjectFromJSON(JSONObject jsonObject) {
         try {
@@ -49,37 +58,28 @@ public class FollowUpQuestion extends ReceiveModel {
         }
     }
 
-    public static FollowUpQuestion findByRemoteId(Long id) {
-        return new Select().from(FollowUpQuestion.class).where("RemoteId = ?", id).executeSingle();
-    }
-
     public Question getFollowingUpOnQuestion() {
         return new Select().from(Question.class).where("QuestionIdentifier = ? AND InstrumentRemoteId = ? AND Deleted != 1", mFollowingUpQuestionIdentifier, mRemoteInstrumentId).executeSingle();
-    }
-
-    public static List<FollowUpQuestion> getAll(Long instrumentId) {
-        return new Select().from(FollowUpQuestion.class).where(
-                "RemoteInstrumentId = ?", instrumentId).execute();
     }
 
     public String getQuestionIdentifier() {
         return mQuestionIdentifier;
     }
 
-    public String getFollowingUpQuestionIdentifier() {
-        return mFollowingUpQuestionIdentifier;
-    }
-
-    private void setRemoteId(Long id) {
-        mRemoteId = id;
-    }
-
     private void setQuestionIdentifier(String id) {
         mQuestionIdentifier = id;
     }
 
+    public String getFollowingUpQuestionIdentifier() {
+        return mFollowingUpQuestionIdentifier;
+    }
+
     private void setFollowingUpQuestionIdentifier(String id) {
         mFollowingUpQuestionIdentifier = id;
+    }
+
+    private void setRemoteId(Long id) {
+        mRemoteId = id;
     }
 
     private void setRemoteQuestionId(Long id) {

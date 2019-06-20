@@ -21,6 +21,10 @@ public class Project extends ReceiveModel {
     @Column(name = "Description")
     private String mDescription;
 
+    public static Project findByRemoteId(Long id) {
+        return new Select().from(Project.class).where("RemoteId = ?", id).executeSingle();
+    }
+
     @Override
     public void createObjectFromJSON(JSONObject jsonObject) {
         try {
@@ -36,10 +40,6 @@ public class Project extends ReceiveModel {
         } catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);
         }
-    }
-
-    public static Project findByRemoteId(Long id) {
-        return new Select().from(Project.class).where("RemoteId = ?", id).executeSingle();
     }
 
     public String getName() {

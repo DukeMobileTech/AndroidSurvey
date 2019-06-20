@@ -7,7 +7,6 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
 import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
-import org.adaptlab.chpir.android.survey.models.Response;
 
 public class SliderQuestionFragment extends SingleQuestionFragment {
     private int mProgress;

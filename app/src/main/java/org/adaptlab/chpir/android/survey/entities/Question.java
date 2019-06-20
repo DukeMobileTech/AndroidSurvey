@@ -1,10 +1,11 @@
 package org.adaptlab.chpir.android.survey.entities;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.PrimaryKey;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringDef;
+import androidx.annotation.NonNull;
+import androidx.annotation.StringDef;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
@@ -18,7 +19,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-@android.arch.persistence.room.Entity(tableName = "Questions")
+@Entity(tableName = "Questions")
 public class Question implements SurveyEntity, Translatable {
     public static final String SELECT_ONE = "SELECT_ONE";
     public static final String SELECT_MULTIPLE = "SELECT_MULTIPLE";

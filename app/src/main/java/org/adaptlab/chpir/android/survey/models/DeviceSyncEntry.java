@@ -5,13 +5,13 @@ import android.util.Log;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.activerecordcloudsync.SendModel;
-import org.adaptlab.chpir.android.survey.SurveyApp;
-import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.BuildConfig;
+import org.adaptlab.chpir.android.survey.SurveyApp;
+import org.adaptlab.chpir.android.survey.location.LocationManager;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.apache.commons.codec.CharEncoding;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.adaptlab.chpir.android.survey.location.LocationManager;
 
 import java.io.IOException;
 import java.io.OutputStream;

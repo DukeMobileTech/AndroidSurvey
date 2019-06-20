@@ -34,6 +34,11 @@ public class RawScore extends SendModel {
         mUUID = UUID.randomUUID().toString();
     }
 
+    public static RawScore findByScoreUnitAndScore(ScoreUnit scoreUnit, Score score) {
+        return new Select().from(RawScore.class).where("ScoreUnit = ? AND ScoreUUID = ?",
+                scoreUnit.getId(), score.getUUID()).executeSingle();
+    }
+
     @Override
     public JSONObject toJSON() {
         JSONObject json = new JSONObject();
@@ -74,25 +79,12 @@ public class RawScore extends SendModel {
         return true;
     }
 
-    public static RawScore findByScoreUnitAndScore(ScoreUnit scoreUnit, Score score) {
-        return new Select().from(RawScore.class).where("ScoreUnit = ? AND ScoreUUID = ?",
-                scoreUnit.getId(), score.getUUID()).executeSingle();
-    }
-
-    public void setScore(Score score) {
-        mScoreUUID = score.getUUID();
-    }
-
-    public void setScoreUnit(ScoreUnit scoreUnit) {
-        mScoreUnit = scoreUnit;
+    public double getValue() {
+        return mValue;
     }
 
     public void setValue(double value) {
         mValue = value;
-    }
-
-    public double getValue() {
-        return mValue;
     }
 
     public Score getScore() {
@@ -100,8 +92,16 @@ public class RawScore extends SendModel {
         return new Select().from(Score.class).where("UUID = ?", mScoreUUID).executeSingle();
     }
 
+    public void setScore(Score score) {
+        mScoreUUID = score.getUUID();
+    }
+
     public ScoreUnit getScoreUnit() {
         return mScoreUnit;
+    }
+
+    public void setScoreUnit(ScoreUnit scoreUnit) {
+        mScoreUnit = scoreUnit;
     }
 
     public double getWeightedScore() {

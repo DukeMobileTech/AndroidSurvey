@@ -17,35 +17,43 @@ import java.util.List;
 @Table(name = "Sections")
 public class Section extends ReceiveModel {
 
-	private static final String TAG = "Section";
-	
-	@Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    private static final String TAG = "Section";
+
+    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
     private Long mRemoteId;
-	@Column(name = "Title")
+    @Column(name = "Title")
     private String mTitle;
-	@Column(name = "InstrumentRemoteId")
+    @Column(name = "InstrumentRemoteId")
     private Long mInstrumentRemoteId;
     @Column(name = "Deleted")
     private boolean mDeleted;
 
-	@Override
-	public void createObjectFromJSON(JSONObject jsonObject) {
-		try {
+    public static Section findByRemoteId(Long remoteId) {
+        return new Select().from(Section.class).where("RemoteId = ?", remoteId).executeSingle();
+    }
+
+    public static List<Section> getAll() {
+        return new Select().from(Section.class).orderBy("Id ASC").execute();
+    }
+
+    @Override
+    public void createObjectFromJSON(JSONObject jsonObject) {
+        try {
             Long remoteId = jsonObject.getLong("id");
             Section section = Section.findByRemoteId(remoteId);
             if (section == null) {
-            	section = this;
+                section = this;
             }
             section.setRemoteId(remoteId);
             section.setInstrumentRemoteId(jsonObject.getLong("instrument_id"));
             section.setTitle(jsonObject.getString("title"));
-			if (jsonObject.isNull("deleted_at")) {
+            if (jsonObject.isNull("deleted_at")) {
                 section.setDeleted(false);
             } else {
                 section.setDeleted(true);
             }
             section.save();
-            
+
             //Generate translations
             JSONArray translationsArray = jsonObject.optJSONArray("section_translations");
             if (translationsArray != null) {
@@ -63,10 +71,10 @@ public class Section extends ReceiveModel {
                     translation.save();
                 }
             }
-		} catch (JSONException je) {
+        } catch (JSONException je) {
             Log.e(TAG, "Error parsing object json", je);
-        }  
-	}
+        }
+    }
 
     private void setDeleted(boolean deleted) {
         mDeleted = deleted;
@@ -77,80 +85,72 @@ public class Section extends ReceiveModel {
      * if a translation does not yet exist.
      */
     public SectionTranslation getTranslationByLanguage(String language) {
-        for(SectionTranslation translation : translations()) {
+        for (SectionTranslation translation : translations()) {
             if (translation.getLanguage().equals(language)) {
                 return translation;
             }
         }
-        
+
         SectionTranslation translation = new SectionTranslation();
         translation.setLanguage(language);
         return translation;
     }
-    
+
     public List<SectionTranslation> translations() {
-    	return getMany(SectionTranslation.class, "Section");
+        return getMany(SectionTranslation.class, "Section");
     }
 
-	public void setInstrumentRemoteId(Long instrumentId) {
-		mInstrumentRemoteId = instrumentId;
-	}
-	
-	public Instrument getInstrument() {
-		return Instrument.findByRemoteId(getInstrumentRemoteId());
-	}
-
-	public void setRemoteId(Long remoteId) {
-		mRemoteId = remoteId;
-	}
+    public Instrument getInstrument() {
+        return Instrument.findByRemoteId(getInstrumentRemoteId());
+    }
 
     public Long getRemoteId() {
         return mRemoteId;
     }
-	
-	public void setTitle(String title) {
-		mTitle = title;
-	}
+
+    public void setRemoteId(Long remoteId) {
+        mRemoteId = remoteId;
+    }
 
     private Long getInstrumentRemoteId() {
         return mInstrumentRemoteId;
     }
 
-	/*
+    public void setInstrumentRemoteId(Long instrumentId) {
+        mInstrumentRemoteId = instrumentId;
+    }
+
+    /*
      * If the language of the instrument is the same as the language setting on the
      * device (or through the Admin settings), then return the section title.
-     * 
+     *
      * If another language is requested, iterate through section translations to
      * find translated title.
-     * 
+     *
      * If the language requested is not available as a translation, return the non-translated
      * text for the section.
      */
-	public String getTitle() {
-		if (getInstrument().getLanguage().equals(AppUtil.getDeviceLanguage())) return mTitle;
+    public String getTitle() {
+        if (getInstrument().getLanguage().equals(AppUtil.getDeviceLanguage())) return mTitle;
         if (activeTranslation() != null) return activeTranslation().getText();
         for (SectionTranslation translation : translations()) {
             if (translation.getLanguage().equals(AppUtil.getDeviceLanguage())) {
                 return translation.getText();
             }
         }
-		//Default
-		return mTitle;
-	}
+        //Default
+        return mTitle;
+    }
+
+    public void setTitle(String title) {
+        mTitle = title;
+    }
 
     private SectionTranslation activeTranslation() {
         if (getInstrument().activeTranslation() == null) return null;
         return new Select().from(SectionTranslation.class)
                 .where("InstrumentTranslation = ? AND Section = ?",
-                getInstrument().activeTranslation().getId(), getId()).executeSingle();
+                        getInstrument().activeTranslation().getId(), getId()).executeSingle();
     }
-
-	public static Section findByRemoteId(Long remoteId) {
-		return new Select().from(Section.class).where("RemoteId = ?", remoteId).executeSingle();
-	}
-	
-	public static List<Section> getAll() {
-		return new Select().from(Section.class).orderBy("Id ASC").execute();
-	}
 
 }

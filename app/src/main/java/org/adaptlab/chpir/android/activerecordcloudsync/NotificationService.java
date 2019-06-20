@@ -17,13 +17,6 @@ public class NotificationService extends IntentService {
         super(TAG);
     }
 
-    @Override
-    protected void onHandleIntent(Intent intent) {
-        NotificationManager manager = (NotificationManager) getApplicationContext()
-                .getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.cancel(intent.getIntExtra(EXTRA_ID, 0));
-    }
-
     @TargetApi(Build.VERSION_CODES.KITKAT)
     public static void setServiceAlarm(Context context, int id) {
         Intent i = new Intent(context, NotificationService.class);
@@ -32,6 +25,13 @@ public class NotificationService extends IntentService {
 
         AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         manager.setExact(AlarmManager.RTC, System.currentTimeMillis() + 15000, pi);
+    }
+
+    @Override
+    protected void onHandleIntent(Intent intent) {
+        NotificationManager manager = (NotificationManager) getApplicationContext()
+                .getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.cancel(intent.getIntExtra(EXTRA_ID, 0));
     }
 
 }

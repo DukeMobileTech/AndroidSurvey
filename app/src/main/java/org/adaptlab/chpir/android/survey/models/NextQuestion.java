@@ -40,6 +40,15 @@ public class NextQuestion extends ReceiveModel {
         super();
     }
 
+    public static List<NextQuestion> getAll(Long instrumentId) {
+        return new Select().from(NextQuestion.class).where(
+                "RemoteInstrumentId = ? AND Deleted != ?", instrumentId, 1).execute();
+    }
+
+    public static NextQuestion findByRemoteId(Long id) {
+        return new Select().from(NextQuestion.class).where("RemoteId = ?", id).executeSingle();
+    }
+
     @Override
     public void createObjectFromJSON(JSONObject jsonObject) {
         try {
@@ -67,17 +76,12 @@ public class NextQuestion extends ReceiveModel {
         }
     }
 
-    public static List<NextQuestion> getAll(Long instrumentId) {
-        return new Select().from(NextQuestion.class).where(
-                "RemoteInstrumentId = ? AND Deleted != ?", instrumentId, 1).execute();
-    }
-
-    public static NextQuestion findByRemoteId(Long id) {
-        return new Select().from(NextQuestion.class).where("RemoteId = ?", id).executeSingle();
-    }
-
     public String getNextQuestionIdentifier() {
         return mNextQuestionIdentifier;
+    }
+
+    void setNextQuestionIdentifier(String id) {
+        mNextQuestionIdentifier = id;
     }
 
     private boolean completeSurvey() {
@@ -88,48 +92,40 @@ public class NextQuestion extends ReceiveModel {
         mRemoteId = id;
     }
 
-    void setQuestionIdentifier(String id) {
-        mQuestionIdentifier = id;
+    public String getOptionIdentifier() {
+        return mOptionIdentifier;
     }
 
     void setOptionIdentifier(String id) {
         mOptionIdentifier = id;
     }
 
-    public String getOptionIdentifier() {
-        return mOptionIdentifier;
-    }
-
-    void setNextQuestionIdentifier(String id) {
-        mNextQuestionIdentifier = id;
-    }
-
     private void setRemoteQuestionId(Long id) {
         mRemoteQuestionId = id;
-    }
-
-    void setRemoteInstrumentId(Long id) {
-        mRemoteInstrumentId = id;
     }
 
     Long getRemoteInstrumentId() {
         return mRemoteInstrumentId;
     }
 
-    void setDeleted(boolean deleted) {
-        mDeleted = deleted;
+    void setRemoteInstrumentId(Long id) {
+        mRemoteInstrumentId = id;
     }
 
     boolean getDeleted() {
         return mDeleted;
     }
 
-    private void setValue(String value) {
-        mValue = value;
+    void setDeleted(boolean deleted) {
+        mDeleted = deleted;
     }
 
     public String getValue() {
         return mValue;
+    }
+
+    private void setValue(String value) {
+        mValue = value;
     }
 
     private void setCompleteSurvey(boolean completeSurvey) {
@@ -138,6 +134,10 @@ public class NextQuestion extends ReceiveModel {
 
     public String getQuestionIdentifier() {
         return mQuestionIdentifier;
+    }
+
+    void setQuestionIdentifier(String id) {
+        mQuestionIdentifier = id;
     }
 
     public String getNextQuestionString() {

@@ -7,8 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 
-import org.adaptlab.chpir.android.survey.utils.FormatUtils;
 import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.utils.FormatUtils;
 
 import java.util.Calendar;
 

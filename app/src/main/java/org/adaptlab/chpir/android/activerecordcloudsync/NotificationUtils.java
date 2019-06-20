@@ -4,11 +4,11 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
-import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.os.Build;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+
+import androidx.core.app.NotificationCompat;
 
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.R;
@@ -49,9 +49,9 @@ public class NotificationUtils {
 
     /*
      * Check for various network errors and display error message in notification tray.
-     * 
+     *
      * Return false if network errors, return true if okay to proceed.
-     * 
+     *
      * This WILL throw an exception if executed on UI thread since it pings a URL.
      */
     public static boolean checkForNetworkErrors(Context context) {

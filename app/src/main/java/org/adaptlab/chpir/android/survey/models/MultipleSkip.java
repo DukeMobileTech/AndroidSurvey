@@ -8,7 +8,6 @@ import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
 import org.adaptlab.chpir.android.survey.BuildConfig;
-import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -39,6 +38,15 @@ public class MultipleSkip extends ReceiveModel {
         super();
     }
 
+    public static MultipleSkip findByRemoteId(Long id) {
+        return new Select().from(MultipleSkip.class).where("RemoteId = ?", id).executeSingle();
+    }
+
+    public static List<MultipleSkip> getAll(Long instrumentId) {
+        return new Select().from(MultipleSkip.class).where(
+                "RemoteInstrumentId = ? AND Deleted != ?", instrumentId, 1).execute();
+    }
+
     @Override
     public void createObjectFromJSON(JSONObject jsonObject) {
         try {
@@ -66,57 +74,44 @@ public class MultipleSkip extends ReceiveModel {
         }
     }
 
-    public static MultipleSkip findByRemoteId(Long id) {
-        return new Select().from(MultipleSkip.class).where("RemoteId = ?", id).executeSingle();
-    }
-
-    public static List<MultipleSkip> getAll(Long instrumentId) {
-        return new Select().from(MultipleSkip.class).where(
-                "RemoteInstrumentId = ? AND Deleted != ?", instrumentId, 1).execute();
-    }
-
     private void setRemoteId(Long id) {
         mRemoteId = id;
-    }
-
-    void setQuestionIdentifier(String id) {
-        mQuestionIdentifier = id;
-    }
-
-    void setOptionIdentifier(String id) {
-        mOptionIdentifier = id;
     }
 
     public String getOptionIdentifier() {
         return mOptionIdentifier;
     }
 
-    void setSkipQuestionIdentifier(String id) {
-        mSkipQuestionIdentifier = id;
+    void setOptionIdentifier(String id) {
+        mOptionIdentifier = id;
     }
 
     public String getSkipQuestionIdentifier() {
         return mSkipQuestionIdentifier;
     }
 
-    private void setRemoteQuestionId(Long id) {
-        mRemoteQuestionId = id;
+    void setSkipQuestionIdentifier(String id) {
+        mSkipQuestionIdentifier = id;
     }
 
-    void setRemoteInstrumentId(Long id) {
-        mRemoteInstrumentId = id;
+    private void setRemoteQuestionId(Long id) {
+        mRemoteQuestionId = id;
     }
 
     Long getRemoteInstrumentId() {
         return mRemoteInstrumentId;
     }
 
-    void setDeleted(boolean deleted) {
-        mDeleted = deleted;
+    void setRemoteInstrumentId(Long id) {
+        mRemoteInstrumentId = id;
     }
 
     boolean getDeleted() {
         return mDeleted;
+    }
+
+    void setDeleted(boolean deleted) {
+        mDeleted = deleted;
     }
 
     public String getValue() {
@@ -129,5 +124,9 @@ public class MultipleSkip extends ReceiveModel {
 
     public String getQuestionIdentifier() {
         return mQuestionIdentifier;
+    }
+
+    void setQuestionIdentifier(String id) {
+        mQuestionIdentifier = id;
     }
 }

@@ -1,6 +1,6 @@
 package org.adaptlab.chpir.android.survey.converters;
 
-import android.arch.persistence.room.TypeConverter;
+import androidx.room.TypeConverter;
 
 import java.util.Date;
 

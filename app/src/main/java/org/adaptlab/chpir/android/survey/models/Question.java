@@ -393,12 +393,12 @@ public class Question extends ReceiveModel {
         mImageCount = count;
     }
 
-    private void setOptionCount(int num) {
-        mOptionCount = num;
-    }
-
     public int getOptionCount() {
         return mOptionCount;
+    }
+
+    private void setOptionCount(int num) {
+        mOptionCount = num;
     }
 
     @Override

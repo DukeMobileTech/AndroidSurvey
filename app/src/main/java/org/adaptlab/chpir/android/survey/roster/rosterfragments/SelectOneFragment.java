@@ -16,7 +16,7 @@ public class SelectOneFragment extends RosterFragment {
             RadioButton radioButton = new RadioButton(getActivity());
             radioButton.setText(option);
             radioButton.setId(i);
-            if (getResponse().getText() != null && getResponse().getText().equals(i+"")) {
+            if (getResponse().getText() != null && getResponse().getText().equals(i + "")) {
                 radioButton.setChecked(true);
             }
             radioButton.setLayoutParams(new RadioGroup.LayoutParams(
@@ -27,7 +27,7 @@ public class SelectOneFragment extends RosterFragment {
 
         mRadioGroup.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                getResponse().setResponse(checkedId+"");
+                getResponse().setResponse(checkedId + "");
             }
         });
         responseComponent.addView(mRadioGroup);

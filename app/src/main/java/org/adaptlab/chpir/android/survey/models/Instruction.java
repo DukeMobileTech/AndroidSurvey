@@ -29,6 +29,14 @@ public class Instruction extends ReceiveModel {
         super();
     }
 
+    public static Instruction findByRemoteId(Long id) {
+        return new Select().from(Instruction.class).where("RemoteId = ?", id).executeSingle();
+    }
+
+    public static List<Instruction> getAll() {
+        return new Select().from(Instruction.class).where("Deleted = 0").execute();
+    }
+
     @Override
     public void createObjectFromJSON(JSONObject jsonObject) {
         if (BuildConfig.DEBUG) Log.i(TAG, "Creating Instruction: " + jsonObject);
@@ -68,20 +76,12 @@ public class Instruction extends ReceiveModel {
         }
     }
 
-    public static Instruction findByRemoteId(Long id) {
-        return new Select().from(Instruction.class).where("RemoteId = ?", id).executeSingle();
-    }
-
-    public static List<Instruction> getAll() {
-        return new Select().from(Instruction.class).where("Deleted = 0").execute();
-    }
-
     public Long getRemoteId() {
         return mRemoteId;
     }
 
     void setRemoteId(Long id) {
-       mRemoteId = id;
+        mRemoteId = id;
     }
 
     void setDeleted(boolean status) {

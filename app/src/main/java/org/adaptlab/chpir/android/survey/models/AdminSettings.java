@@ -286,6 +286,11 @@ public class AdminSettings extends Model {
         return mShowDK;
     }
 
+    public void setShowDK(boolean showDK) {
+        mShowDK = showDK;
+        save();
+    }
+
     /*
      * Show NOT APPLICABLE special response for each question if true
      */
@@ -305,6 +310,11 @@ public class AdminSettings extends Model {
         return mShowRF;
     }
 
+    public void setShowRF(boolean showRF) {
+        mShowRF = showRF;
+        save();
+    }
+
     /*
      * Show SKIP special response for each question if true
      */
@@ -314,16 +324,6 @@ public class AdminSettings extends Model {
 
     public void setShowSkip(boolean showSkip) {
         mShowSkip = showSkip;
-        save();
-    }
-
-    public void setShowRF(boolean showRF) {
-        mShowRF = showRF;
-        save();
-    }
-
-    public void setShowDK(boolean showDK) {
-        mShowDK = showDK;
         save();
     }
 

@@ -8,14 +8,13 @@ import com.activeandroid.query.Select;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
 import org.adaptlab.chpir.android.survey.BuildConfig;
-import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
 
 @Table(name = "RandomizedFactors")
-public class RandomizedFactor extends ReceiveModel{
+public class RandomizedFactor extends ReceiveModel {
     private static final String TAG = "RandomizedFactor";
     @Column(name = "InstrumentRemoteId")
     private Long mInstrumentRemoteId;
@@ -27,6 +26,10 @@ public class RandomizedFactor extends ReceiveModel{
 
     public RandomizedFactor() {
         super();
+    }
+
+    public static RandomizedFactor findByRemoteId(Long id) {
+        return new Select().from(RandomizedFactor.class).where("RemoteId = ?", id).executeSingle();
     }
 
     @Override
@@ -50,20 +53,8 @@ public class RandomizedFactor extends ReceiveModel{
         }
     }
 
-    public static RandomizedFactor findByRemoteId(Long id) {
-        return new Select().from(RandomizedFactor.class).where("RemoteId = ?", id).executeSingle();
-    }
-
     public List<RandomizedOption> randomizedOptions() {
         return new Select().from(RandomizedOption.class).where("RandomizedFactor = ?", getId()).execute();
-    }
-
-    private void setTitle(String title) {
-        mTitle = title;
-    }
-
-    private void setInstrument(Long instrumentId) {
-        mInstrumentRemoteId = instrumentId;
     }
 
     private void setRemoteId(Long remoteId) {
@@ -74,7 +65,15 @@ public class RandomizedFactor extends ReceiveModel{
         return mTitle;
     }
 
+    private void setTitle(String title) {
+        mTitle = title;
+    }
+
     public Instrument getInstrument() {
         return Instrument.findByRemoteId(mInstrumentRemoteId);
+    }
+
+    private void setInstrument(Long instrumentId) {
+        mInstrumentRemoteId = instrumentId;
     }
 }

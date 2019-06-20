@@ -23,9 +23,9 @@ public abstract class PictureQuestionFragment extends SingleQuestionFragment {
     public static final int REAR_CAMERA = 0;
     public static final int FRONT_CAMERA = 1;
     public static final int REQUEST_PHOTO = 0;
-    private static final String TAG = "PictureViewHolder";
     public static final String DEFAULT = "org.adaptlab.chpir.android" +
             ".survey:drawable/ic_action_picture";
+    private static final String TAG = "PictureViewHolder";
     protected CameraFragment mCameraFragment;
     protected ImageView mPhotoView;
     private ResponsePhoto mPhoto;

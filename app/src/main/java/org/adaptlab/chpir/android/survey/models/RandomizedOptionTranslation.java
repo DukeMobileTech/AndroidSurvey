@@ -30,16 +30,8 @@ public class RandomizedOptionTranslation extends Model {
         mRemoteId = remoteId;
     }
 
-    public void setLanguage(String language) {
-        mLanguage = language;
-    }
-
     void setRandomizedOption(RandomizedOption randomizedOption) {
         mRandomizedOption = randomizedOption;
-    }
-
-    public void setText(String text) {
-        mText = text;
     }
 
     public void setInstrumentTranslation(InstrumentTranslation instrumentTranslation) {
@@ -50,7 +42,15 @@ public class RandomizedOptionTranslation extends Model {
         return mText;
     }
 
+    public void setText(String text) {
+        mText = text;
+    }
+
     public String getLanguage() {
         return mLanguage;
+    }
+
+    public void setLanguage(String language) {
+        mLanguage = language;
     }
 }

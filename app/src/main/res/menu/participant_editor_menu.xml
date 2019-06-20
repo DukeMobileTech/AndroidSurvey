@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/un_submit_participant"
         android:icon="@drawable/ic_undo_black_24dp"
         android:title="@string/un_submit"
-        app:showAsAction="ifRoom|withText"/>
+        app:showAsAction="ifRoom|withText" />
     <item
         android:id="@+id/submit_participant"
         android:icon="@drawable/ic_send_black_24dp"
         android:title="@string/submit"
-        app:showAsAction="ifRoom|withText"/>
+        app:showAsAction="ifRoom|withText" />
     <item
         android:id="@+id/menu_item_previous"
         android:icon="@drawable/ic_chevron_left_black_24dp"
         android:title="@string/previous_button"
-        app:showAsAction="ifRoom|withText"/>
+        app:showAsAction="ifRoom|withText" />
     <item
         android:id="@+id/menu_item_next"
         android:icon="@drawable/ic_chevron_right_black_24dp"
         android:title="@string/next_button"
-        app:showAsAction="ifRoom|withText"/>
+        app:showAsAction="ifRoom|withText" />
 </menu>

@@ -1,14 +1,10 @@
 package org.adaptlab.chpir.android.survey.questionfragments;
 
-import android.annotation.TargetApi;
-import android.os.Build;
-import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.TimePicker;
 
-import org.adaptlab.chpir.android.survey.models.Response;
-import org.adaptlab.chpir.android.survey.utils.FormatUtils;
 import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
+import org.adaptlab.chpir.android.survey.utils.FormatUtils;
 
 public class TimeQuestionFragment extends SingleQuestionFragment {
     private int mHour;

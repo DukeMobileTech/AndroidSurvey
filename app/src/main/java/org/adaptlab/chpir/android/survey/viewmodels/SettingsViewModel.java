@@ -1,11 +1,11 @@
 package org.adaptlab.chpir.android.survey.viewmodels;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
-import android.support.annotation.NonNull;
 
-import org.adaptlab.chpir.android.survey.entities.InstrumentTranslation;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+
 import org.adaptlab.chpir.android.survey.entities.Settings;
 import org.adaptlab.chpir.android.survey.repositories.SettingsRepository;
 

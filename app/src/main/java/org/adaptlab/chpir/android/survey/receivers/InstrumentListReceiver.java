@@ -22,18 +22,18 @@ public class InstrumentListReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.i(TAG, "Received broadcast to send list of available instruments");
-        
+
         Long currentProjectId;
-        
+
         try {
             currentProjectId = Long.valueOf(AdminSettings.getInstance().getProjectId());
         } catch (NumberFormatException nfe) {
             Log.e(TAG, "Project ID is not a number: " + nfe);
             return;
         }
-        
+
         int instrumentListSize = Instrument.getAllProjectInstruments(currentProjectId).size();
-        
+
         String[] instrumentTitleList = new String[instrumentListSize];
         long[] instrumentIdList = new long[instrumentListSize];
         String[] instrumentParticipantTypes = new String[instrumentListSize];
@@ -55,7 +55,7 @@ public class InstrumentListReceiver extends BroadcastReceiver {
                 instrumentParticipantAges[i] = participantAgeRule.getParamJSON().toString();
             }
         }
-        
+
         Intent i = new Intent();
         i.setAction(INSTRUMENT_LIST);
         i.putExtra(INSTRUMENT_TITLE_LIST, instrumentTitleList);

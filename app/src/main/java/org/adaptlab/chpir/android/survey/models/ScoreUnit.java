@@ -18,6 +18,7 @@ import static org.adaptlab.chpir.android.survey.models.Question.validQuestionTyp
 
 @Table(name = "ScoreUnits")
 public class ScoreUnit extends ReceiveModel {
+    private final static String TAG = "ScoreUnit";
     @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
     private Long mRemoteId;
     @Column(name = "ScoreScheme")
@@ -37,7 +38,22 @@ public class ScoreUnit extends ReceiveModel {
     @Column(name = "QuestionNumberInInstrument")
     private int mQuestionNumberInInstrument;
 
-    private final static String TAG = "ScoreUnit";
+    public static ScoreUnit findByRemoteId(Long remoteId) {
+        return new Select().from(ScoreUnit.class).where("RemoteId = ?", remoteId).executeSingle();
+    }
+
+    public static List<ScoreUnit> getAll() {
+        return new Select().from(ScoreUnit.class).execute();
+    }
+
+    public static boolean validScoreType(String scoreType) {
+        for (ScoreType type : ScoreType.values()) {
+            if (type.name().equals(scoreType)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     @Override
     public void createObjectFromJSON(JSONObject jsonObject) {
@@ -63,10 +79,6 @@ public class ScoreUnit extends ReceiveModel {
         } catch (JSONException je) {
             if (BuildConfig.DEBUG) Log.e(TAG, "Error parsing object json", je);
         }
-    }
-
-    public static ScoreUnit findByRemoteId(Long remoteId) {
-        return new Select().from(ScoreUnit.class).where("RemoteId = ?", remoteId).executeSingle();
     }
 
     public List<ScoreUnitQuestion> scoreUnitQuestions() {
@@ -112,10 +124,6 @@ public class ScoreUnit extends ReceiveModel {
                 getId(), value).orderBy("Option").execute();
     }
 
-    public static List<ScoreUnit> getAll() {
-        return new Select().from(ScoreUnit.class).execute();
-    }
-
     public String questionIdentifiers() {
         StringBuilder idsBuilder = new StringBuilder();
         List<ScoreUnitQuestion> suq = scoreUnitQuestions();
@@ -126,10 +134,6 @@ public class ScoreUnit extends ReceiveModel {
             }
         }
         return idsBuilder.toString().trim();
-    }
-
-    private void setRemoteId(Long remoteId) {
-        mRemoteId = remoteId;
     }
 
     private void setScoreScheme(ScoreScheme scoreScheme) {
@@ -144,6 +148,10 @@ public class ScoreUnit extends ReceiveModel {
         }
     }
 
+    public ScoreType getScoreType() {
+        return mScoreType;
+    }
+
     private void setScoreType(String scoreType) {
         if (validScoreType(scoreType)) {
             mScoreType = ScoreType.valueOf(scoreType);
@@ -152,57 +160,48 @@ public class ScoreUnit extends ReceiveModel {
         }
     }
 
-    public static boolean validScoreType(String scoreType) {
-        for (ScoreType type : ScoreType.values()) {
-            if (type.name().equals(scoreType)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public ScoreType getScoreType() {
-        return mScoreType;
-    }
-
     private void setDeleted(boolean deleted) {
         mDeleted = deleted;
-    }
-
-    private void setWeight(double weight) {
-        mWeight = weight;
-    }
-
-    private void setMin(double min) {
-        mMin = min;
-    }
-
-    private void setMax(double max) {
-        mMax = max;
     }
 
     public double getMin() {
         return mMin;
     }
 
+    private void setMin(double min) {
+        mMin = min;
+    }
+
     public double getMax() {
         return mMax;
+    }
+
+    private void setMax(double max) {
+        mMax = max;
     }
 
     public double getWeight() {
         return mWeight;
     }
 
-    public void setQuestionNumberInInstrument(int pos) {
-        mQuestionNumberInInstrument = pos;
+    private void setWeight(double weight) {
+        mWeight = weight;
     }
 
     public int getQuestionNumberInInstrument() {
         return mQuestionNumberInInstrument;
     }
 
+    public void setQuestionNumberInInstrument(int pos) {
+        mQuestionNumberInInstrument = pos;
+    }
+
     public Long getRemoteId() {
         return mRemoteId;
+    }
+
+    private void setRemoteId(Long remoteId) {
+        mRemoteId = remoteId;
     }
 
     public enum ScoreType {

@@ -13,6 +13,7 @@ import org.json.JSONObject;
 
 @Table(name = "OptionScores")
 public class OptionScore extends ReceiveModel {
+    private final static String TAG = "OptionScore";
     @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
     private Long mRemoteId;
     @Column(name = "ScoreUnit")
@@ -30,7 +31,9 @@ public class OptionScore extends ReceiveModel {
     @Column(name = "Deleted")
     private boolean mDeleted;
 
-    private final static String TAG = "OptionScore";
+    private static OptionScore findByRemoteId(Long remoteId) {
+        return new Select().from(OptionScore.class).where("RemoteId = ?", remoteId).executeSingle();
+    }
 
     @Override
     public void createObjectFromJSON(JSONObject jsonObject) {
@@ -64,28 +67,40 @@ public class OptionScore extends ReceiveModel {
         return mValue;
     }
 
+    private void setValue(double value) {
+        mValue = value;
+    }
+
     public Option getOption() {
         return mOption;
+    }
+
+    private void setOption(Option option) {
+        mOption = option;
     }
 
     public Long getRemoteId() {
         return mRemoteId;
     }
 
+    private void setRemoteId(Long remoteId) {
+        mRemoteId = remoteId;
+    }
+
     public String getLabel() {
         return mLabel;
+    }
+
+    private void setLabel(String label) {
+        mLabel = label;
     }
 
     public boolean getExists() {
         return mPresent;
     }
 
-    private static OptionScore findByRemoteId(Long remoteId) {
-        return new Select().from(OptionScore.class).where("RemoteId = ?", remoteId).executeSingle();
-    }
-
-    private void setRemoteId(Long remoteId) {
-        mRemoteId = remoteId;
+    private void setExists(boolean exists) {
+        mPresent = exists;
     }
 
     private void setScoreUnit(ScoreUnit scoreUnit) {
@@ -96,24 +111,8 @@ public class OptionScore extends ReceiveModel {
         mDeleted = deleted;
     }
 
-    private void setValue(double value) {
-        mValue = value;
-    }
-
-    private void setOption(Option option) {
-        mOption = option;
-    }
-
-    private void setLabel(String label) {
-        mLabel = label;
-    }
-
     private void setNextQuestion(boolean nextQuestion) {
         mNextQuestion = nextQuestion;
-    }
-
-    private void setExists(boolean exists) {
-        mPresent = exists;
     }
 
 }

@@ -7,7 +7,7 @@ import com.activeandroid.query.Select;
 
 @Table(name = "InstructionTranslations")
 public class InstructionTranslation extends Model {
-	@Column(name = "Instruction")
+    @Column(name = "Instruction")
     private Instruction mInstruction;
     @Column(name = "Language")
     private String mLanguage;
@@ -19,7 +19,7 @@ public class InstructionTranslation extends Model {
     public InstructionTranslation() {
         super();
     }
-    
+
     public static InstructionTranslation findByLanguage(String language) {
         return new Select().from(InstructionTranslation.class).where("Language = ?", language).executeSingle();
     }
@@ -31,19 +31,19 @@ public class InstructionTranslation extends Model {
     public void setInstruction(Instruction instruction) {
         mInstruction = instruction;
     }
-    
+
     public String getLanguage() {
         return mLanguage;
     }
-    
+
     public void setLanguage(String language) {
         mLanguage = language;
     }
-    
+
     public String getText() {
         return mText;
     }
-    
+
     public void setText(String text) {
         mText = text;
     }

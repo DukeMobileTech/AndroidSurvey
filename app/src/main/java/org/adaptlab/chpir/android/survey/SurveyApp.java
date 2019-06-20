@@ -2,7 +2,8 @@ package org.adaptlab.chpir.android.survey;
 
 import android.content.Context;
 import android.content.res.Configuration;
-import android.support.v7.app.AppCompatDelegate;
+
+import androidx.appcompat.app.AppCompatDelegate;
 
 import com.newrelic.agent.android.NewRelic;
 

@@ -10,18 +10,11 @@ import android.preference.PreferenceManager;
 import org.adaptlab.chpir.android.survey.tasks.SubmitSurveyTask;
 
 public class PollService extends IntentService {
-    private static final String TAG = "PollService";
     public static final String PREF_IS_ALARM_ON = "isAlarmOn";
+    private static final String TAG = "PollService";
 
     public PollService() {
         super(TAG);
-    }
-
-    @Override
-    protected void onHandleIntent(Intent intent) {
-        if (NotificationUtils.checkForNetworkErrors(getApplicationContext())) {
-            new SubmitSurveyTask(getApplicationContext()).execute();
-        }
     }
 
     // Control polling of api, set isOn to true to enable polling
@@ -40,6 +33,13 @@ public class PollService extends IntentService {
         }
 
         PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PollService.PREF_IS_ALARM_ON, isOn).apply();
+    }
+
+    @Override
+    protected void onHandleIntent(Intent intent) {
+        if (NotificationUtils.checkForNetworkErrors(getApplicationContext())) {
+            new SubmitSurveyTask(getApplicationContext()).execute();
+        }
     }
 
 }

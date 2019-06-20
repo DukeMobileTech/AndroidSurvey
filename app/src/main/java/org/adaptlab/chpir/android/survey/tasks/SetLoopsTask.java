@@ -1,9 +1,10 @@
 package org.adaptlab.chpir.android.survey.tasks;
 
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.LongSparseArray;
+
+import androidx.annotation.NonNull;
 
 import org.adaptlab.chpir.android.survey.SurveyApp;
 import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;

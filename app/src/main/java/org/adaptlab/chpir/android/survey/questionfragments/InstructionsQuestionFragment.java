@@ -7,7 +7,7 @@ import org.adaptlab.chpir.android.survey.SingleQuestionFragment;
 
 /*
  * This question type exist only to add text to a screen.
- * 
+ *
  * It does not save a response, only displays the text.
  */
 public class InstructionsQuestionFragment extends SingleQuestionFragment {

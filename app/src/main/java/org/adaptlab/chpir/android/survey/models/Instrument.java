@@ -3,11 +3,12 @@ package org.adaptlab.chpir.android.survey.models;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.provider.BaseColumns;
-import android.support.annotation.NonNull;
-import android.support.v4.util.LongSparseArray;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
+
+import androidx.annotation.NonNull;
+import androidx.collection.LongSparseArray;
 
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;

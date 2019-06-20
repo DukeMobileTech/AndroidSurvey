@@ -13,6 +13,7 @@ import org.json.JSONObject;
 
 @Table(name = "ScoreUnitQuestions")
 public class ScoreUnitQuestion extends ReceiveModel {
+    private final static String TAG = "ScoreUnitQuestion";
     @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
     private Long mRemoteId;
     @Column(name = "ScoreUnit")
@@ -22,7 +23,9 @@ public class ScoreUnitQuestion extends ReceiveModel {
     @Column(name = "Deleted")
     private boolean mDeleted;
 
-    private final static String TAG = "ScoreUnitQuestion";
+    private static ScoreUnitQuestion findByRemoteId(Long remoteId) {
+        return new Select().from(ScoreUnitQuestion.class).where("RemoteId = ?", remoteId).executeSingle();
+    }
 
     @Override
     public void createObjectFromJSON(JSONObject jsonObject) {
@@ -46,10 +49,6 @@ public class ScoreUnitQuestion extends ReceiveModel {
         }
     }
 
-    private static ScoreUnitQuestion findByRemoteId(Long remoteId) {
-        return new Select().from(ScoreUnitQuestion.class).where("RemoteId = ?", remoteId).executeSingle();
-    }
-
     private void setScoreUnit(ScoreUnit scoreUnit) {
         mScoreUnit = scoreUnit;
     }
@@ -58,16 +57,16 @@ public class ScoreUnitQuestion extends ReceiveModel {
         mRemoteId = remoteId;
     }
 
-    private void setQuestion(Question question) {
-        mQuestion = question;
-    }
-
     private void setDeleted(boolean deleted) {
         mDeleted = deleted;
     }
 
     public Question getQuestion() {
         return mQuestion;
+    }
+
+    private void setQuestion(Question question) {
+        mQuestion = question;
     }
 
 }

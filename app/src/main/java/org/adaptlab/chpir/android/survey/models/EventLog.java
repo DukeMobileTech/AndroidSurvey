@@ -15,11 +15,6 @@ import java.util.List;
 public class EventLog extends Model {
     private final static String TAG = "EVENT";
     private Context mContext;
-    
-    public enum EventType {
-        SENT_SURVEY, SENT_ROSTER, SENT_SCORE
-    }
-    
     @Column(name = "EventType")
     private EventType mEventType;
     @Column(name = "SurveyIdentifier")
@@ -28,49 +23,53 @@ public class EventLog extends Model {
     private Date mTimestamp;
     @Column(name = "InstrumentRemoteId")
     private Long mInstrumentRemoteId;
-    
+
     public EventLog(EventType eventType, Context context) {
         super();
         mEventType = eventType;
         mTimestamp = new Date();
         mContext = context;
     }
-    
+
     public static List<EventLog> getAll() {
         return new Select().from(EventLog.class).orderBy("Id ASC").execute();
-    }
-    
-    public void setInstrumentRemoteId(Long instrumentId) {
-        mInstrumentRemoteId = instrumentId;
     }
 
     private Long getInstrumentRemoteId() {
         return mInstrumentRemoteId;
     }
-    
-    public void setSurveyIdentifier(String identifier) {
-        mSurveyIdentifier = identifier;
+
+    public void setInstrumentRemoteId(Long instrumentId) {
+        mInstrumentRemoteId = instrumentId;
     }
-    
+
     public Instrument getInstrument() {
         return Instrument.findByRemoteId(getInstrumentRemoteId());
     }
-    
+
     public String getSurveyIdentifier() {
         return mSurveyIdentifier;
     }
-    
+
+    public void setSurveyIdentifier(String identifier) {
+        mSurveyIdentifier = identifier;
+    }
+
     public Date getTimestamp() {
         return mTimestamp;
     }
-    
+
     public String getLogMessage(Context context) {
         Resources r = context.getResources();
-        
+
         if (mEventType == EventType.SENT_SURVEY) {
             return r.getString(R.string.event_log_sent_survey, getInstrument().getTitle(), mSurveyIdentifier);
         }
-        
+
         return "";
+    }
+
+    public enum EventType {
+        SENT_SURVEY, SENT_ROSTER, SENT_SCORE
     }
 }

@@ -3,7 +3,6 @@
 
     <group
         android:id="@+id/drawer_menu_group"
-        android:checkableBehavior="single">
-    </group>
+        android:checkableBehavior="single"></group>
 
 </menu>
