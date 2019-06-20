@@ -11,7 +11,6 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -22,7 +21,6 @@ import android.widget.TextView;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.relations.OptionRelation;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
-import org.adaptlab.chpir.android.survey.relations.ResponseRelation;
 import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
 
 import java.util.ArrayList;
@@ -43,16 +41,12 @@ public abstract class TableQuestionViewHolder extends QuestionViewHolder {
     }
 
     @Override
-    public void setRelations(ResponseRelation responseRelation, QuestionRelation questionRelation) {
-        if (questionRelation.question.getNumberInInstrument() == 150) {
-            Log.i(TAG, "setRelations: " + responseRelation.response.getText() + " : " + responseRelation.response.getSpecialResponse());
-        }
+    public void setRelations(QuestionRelation questionRelation) {
         setQuestionRelation(questionRelation);
         setOptionSetItems(questionRelation);
         setSpecialOptions(questionRelation);
         setQuestion(questionRelation.question);
-        setSurvey(responseRelation.surveys.get(0));
-        setResponse(responseRelation.response);
+        setResponse(questionRelation.response);
 
         setQuestionText();
         createQuestionComponent(getQuestionComponent());
@@ -105,8 +99,6 @@ public abstract class TableQuestionViewHolder extends QuestionViewHolder {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (getQuestion().getNumberInInstrument() == 150)
-                        Log.i(TAG, "onClick: " + v.getId());
                     saveSpecialResponse(finalResponses.get(v.getId()));
                 }
             });
@@ -124,14 +116,10 @@ public abstract class TableQuestionViewHolder extends QuestionViewHolder {
 
     @Override
     protected void deserializeSpecialResponse() {
-        if (getQuestion().getNumberInInstrument() == 150)
-            Log.i(TAG, "deserializeSpecialResponse: " + getResponse().getSpecialResponse());
         if (getResponse() == null || TextUtils.isEmpty(getResponse().getSpecialResponse())) return;
         for (int i = 0; i < mSpecialResponseRadioGroup.getChildCount(); i++) {
             if (((RadioButton) mSpecialResponseRadioGroup.getChildAt(i)).getText().equals(getResponse().getSpecialResponse())) {
                 mSpecialResponseRadioGroup.check(i);
-                if (getQuestion().getNumberInInstrument() == 150)
-                    Log.i(TAG, "checked: " + i);
             }
         }
     }

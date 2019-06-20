@@ -9,30 +9,25 @@ import android.view.ViewGroup;
 
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
-import org.adaptlab.chpir.android.survey.relations.ResponseRelation;
 import org.adaptlab.chpir.android.survey.viewholders.QuestionViewHolder;
 import org.adaptlab.chpir.android.survey.viewholders.QuestionViewHolderFactory;
 import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
 
-import java.util.HashMap;
-import java.util.List;
-
-public class ResponseRelationAdapter extends ListAdapter<ResponseRelation, QuestionViewHolder> {
+public class ResponseRelationAdapter extends ListAdapter<QuestionRelation, QuestionViewHolder> {
     public static final String TAG = ResponseRelationAdapter.class.getName();
-    private static final DiffUtil.ItemCallback<ResponseRelation> DIFF_CALLBACK = new DiffUtil.ItemCallback<ResponseRelation>() {
+    private static final DiffUtil.ItemCallback<QuestionRelation> DIFF_CALLBACK = new DiffUtil.ItemCallback<QuestionRelation>() {
         @Override
-        public boolean areItemsTheSame(@NonNull ResponseRelation oldResponseRelation, @NonNull ResponseRelation newResponseRelation) {
-            return oldResponseRelation.response.getUUID().equals(newResponseRelation.response.getUUID());
+        public boolean areItemsTheSame(@NonNull QuestionRelation oldQuestionRelation, @NonNull QuestionRelation newQuestionRelation) {
+            return oldQuestionRelation.response.getUUID().equals(newQuestionRelation.responses.get(0).getUUID());
         }
 
         @Override
-        public boolean areContentsTheSame(@NonNull ResponseRelation oldResponseRelation, @NonNull ResponseRelation newResponseRelation) {
-            return oldResponseRelation.response.getText().equals(newResponseRelation.response.getText()) &&
-                    oldResponseRelation.response.getSpecialResponse().equals(newResponseRelation.response.getSpecialResponse()) &&
-                    oldResponseRelation.response.getOtherResponse().equals(newResponseRelation.response.getOtherResponse());
+        public boolean areContentsTheSame(@NonNull QuestionRelation oldQuestionRelation, @NonNull QuestionRelation newQuestionRelation) {
+            return oldQuestionRelation.response.getText().equals(newQuestionRelation.response.getText()) &&
+                    oldQuestionRelation.response.getSpecialResponse().equals(newQuestionRelation.response.getSpecialResponse()) &&
+                    oldQuestionRelation.response.getOtherResponse().equals(newQuestionRelation.response.getOtherResponse());
         }
     };
-    private HashMap<String, QuestionRelation> mQuestionRelations;
     private QuestionViewHolder.OnResponseSelectedListener mListener;
     private SurveyViewModel mSurveyViewModel;
 
@@ -52,18 +47,14 @@ public class ResponseRelationAdapter extends ListAdapter<ResponseRelation, Quest
     public void onBindViewHolder(@NonNull QuestionViewHolder viewHolder, int position) {
         viewHolder.setAdapter(this);
         if (mSurveyViewModel != null) viewHolder.setSurveyViewModel(mSurveyViewModel);
-        if (mQuestionRelations == null) return;
-        ResponseRelation responseRelation = getItem(position);
-        QuestionRelation questionRelation = mQuestionRelations.get(responseRelation.response.getQuestionIdentifier());
+        QuestionRelation questionRelation = getItem(position);
         if (questionRelation == null) return;
-        viewHolder.setRelations(responseRelation, questionRelation);
+        viewHolder.setRelations(questionRelation);
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (mQuestionRelations == null) return -1;
-        ResponseRelation responseRelation = getItem(position);
-        QuestionRelation questionRelation = mQuestionRelations.get(responseRelation.response.getQuestionIdentifier());
+        QuestionRelation questionRelation = getItem(position);
         if (questionRelation == null) return -1;
         String type = questionRelation.question.getQuestionType();
         return QuestionViewHolderFactory.getQuestionViewType(type);
@@ -75,23 +66,10 @@ public class ResponseRelationAdapter extends ListAdapter<ResponseRelation, Quest
 
     void setSurveyViewModel(SurveyViewModel viewModel) {
         mSurveyViewModel = viewModel;
-        notifyDataSetChanged();
     }
 
     protected QuestionViewHolder.OnResponseSelectedListener getListener() {
         return mListener;
-    }
-
-    HashMap<String, QuestionRelation> getQuestionRelations() {
-        return mQuestionRelations;
-    }
-
-    void setQuestionRelations(List<QuestionRelation> questionRelations) {
-        mQuestionRelations = new HashMap<>();
-        for (QuestionRelation questionRelation : questionRelations) {
-            mQuestionRelations.put(questionRelation.question.getQuestionIdentifier(), questionRelation);
-        }
-        notifyDataSetChanged();
     }
 
 }

@@ -15,7 +15,6 @@ import android.widget.TextView;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.relations.OptionRelation;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
-import org.adaptlab.chpir.android.survey.relations.ResponseRelation;
 import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
 
 public class TableHeaderViewHolder extends TableQuestionViewHolder {
@@ -25,7 +24,7 @@ public class TableHeaderViewHolder extends TableQuestionViewHolder {
     }
 
     @Override
-    public void setRelations(ResponseRelation responseRelation, QuestionRelation questionRelation) {
+    public void setRelations(QuestionRelation questionRelation) {
         setQuestion(questionRelation.question);
         setQuestionRelation(questionRelation);
         setOptionSetItems(questionRelation);
@@ -35,6 +34,7 @@ public class TableHeaderViewHolder extends TableQuestionViewHolder {
 
     @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
+        questionComponent.removeAllViews();
         for (int k = 0; k < getOptionRelations().size(); k++) {
             TextView textView = new TextView(getContext());
             OptionRelation optionRelation = getOptionRelations().get(k);
@@ -42,7 +42,6 @@ public class TableHeaderViewHolder extends TableQuestionViewHolder {
             textView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
             textView.setGravity(Gravity.CENTER | Gravity.CENTER_VERTICAL);
             textView.setWidth(getOptionWidth());
-            textView.setPadding(1, 1, 1, 1);
             questionComponent.addView(textView);
         }
     }

@@ -16,7 +16,6 @@ import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -39,7 +38,6 @@ import org.adaptlab.chpir.android.survey.relations.OptionRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionSetOptionRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionSetRelation;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
-import org.adaptlab.chpir.android.survey.relations.ResponseRelation;
 import org.adaptlab.chpir.android.survey.repositories.ResponseRepository;
 import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
 import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
@@ -102,11 +100,10 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         mResponseRepository = new ResponseRepository((Application) context.getApplicationContext());
     }
 
-    public void setRelations(ResponseRelation responseRelation, QuestionRelation questionRelation) {
+    public void setRelations(QuestionRelation questionRelation) {
         mQuestionRelation = questionRelation;
         mQuestion = questionRelation.question;
-        mSurvey = responseRelation.surveys.get(0);
-        mResponse = responseRelation.response;
+        mResponse = questionRelation.response;
         setOptionSetItems(questionRelation);
         setSpecialOptions(questionRelation);
         setDisplayInstructions(questionRelation);
@@ -120,6 +117,15 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         mDeserialization = true;
         deserializeResponse();
         mDeserialization = false;
+    }
+
+    SurveyViewModel getSurveyViewModel() {
+        return mSurveyViewModel;
+    }
+
+    public void setSurveyViewModel(SurveyViewModel model) {
+        mSurveyViewModel = model;
+        mSurvey = mSurveyViewModel.getSurvey();
     }
 
     ResponseRelationAdapter getAdapter() {
@@ -370,9 +376,6 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     }
 
     void saveSpecialResponse(String specialResponse) {
-        if (mQuestion.getNumberInInstrument() == 150) {
-            Log.i(TAG, "saveSpecialResponse: " + specialResponse);
-        }
         mResponse.setSpecialResponse(specialResponse);
         mResponse.setText(BLANK);
         mResponse.setOtherResponse(BLANK);
@@ -544,14 +547,6 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
     public Context getContext() {
         return mContext;
-    }
-
-    SurveyViewModel getSurveyViewModel() {
-        return mSurveyViewModel;
-    }
-
-    public void setSurveyViewModel(SurveyViewModel model) {
-        mSurveyViewModel = model;
     }
 
     protected abstract void deserialize(String responseText);

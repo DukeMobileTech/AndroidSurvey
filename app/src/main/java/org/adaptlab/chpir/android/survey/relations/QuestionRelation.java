@@ -1,6 +1,7 @@
 package org.adaptlab.chpir.android.survey.relations;
 
 import android.arch.persistence.room.Embedded;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.Relation;
 
 import org.adaptlab.chpir.android.survey.entities.Display;
@@ -11,6 +12,7 @@ import org.adaptlab.chpir.android.survey.entities.NextQuestion;
 import org.adaptlab.chpir.android.survey.entities.OptionSet;
 import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.QuestionTranslation;
+import org.adaptlab.chpir.android.survey.entities.Response;
 
 import java.util.List;
 
@@ -35,4 +37,8 @@ public class QuestionRelation {
     public List<LoopQuestion> loopedQuestions;
     @Relation(parentColumn = "RemoteId", entityColumn = "QuestionRemoteId", entity = QuestionTranslation.class)
     public List<QuestionTranslation> translations;
+    @Relation(parentColumn = "QuestionIdentifier", entityColumn = "QuestionIdentifier", entity = Response.class)
+    public List<Response> responses;
+    @Ignore
+    public Response response = null;
 }

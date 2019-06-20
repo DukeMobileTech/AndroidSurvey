@@ -7,6 +7,7 @@ import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.utils.ConstantUtils;
 
 public class QuestionViewHolderFactory {
+    public static final int TABLE_HEADER = 31;
     private static final int ADDRESS = 0;
     private static final int DATE = 1;
     private static final int DECIMAL = 2;
@@ -38,7 +39,6 @@ public class QuestionViewHolderFactory {
     private static final int YEAR = 28;
     private static final int SELECT_ONE_TABLE = 29;
     private static final int SELECT_MULTIPLE_TABLE = 30;
-    public static final int TABLE_HEADER = 31;
 
     public static QuestionViewHolder createViewHolder(View view, Context context, int viewType, QuestionViewHolder.OnResponseSelectedListener listener) {
         switch (viewType) {

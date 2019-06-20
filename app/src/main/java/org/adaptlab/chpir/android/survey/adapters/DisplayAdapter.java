@@ -2,6 +2,8 @@ package org.adaptlab.chpir.android.survey.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v7.recyclerview.extensions.ListAdapter;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -11,43 +13,58 @@ import android.view.ViewGroup;
 
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
-import org.adaptlab.chpir.android.survey.relations.ResponseRelation;
 import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
 
 import java.util.List;
 
-public class DisplayAdapter extends RecyclerView.Adapter<DisplayAdapter.DisplayViewHolder> {
+public class DisplayAdapter extends ListAdapter<List<QuestionRelation>, DisplayAdapter.DisplayViewHolder> {
+    private static final DiffUtil.ItemCallback<List<QuestionRelation>> DIFF_CALLBACK = new DiffUtil.ItemCallback<List<QuestionRelation>>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull List<QuestionRelation> oldQuestionRelations, @NonNull List<QuestionRelation> newQuestionRelations) {
+            if (oldQuestionRelations.size() != newQuestionRelations.size()) return false;
+            boolean same = true;
+            for (int k = 0; k < oldQuestionRelations.size(); k++) {
+                QuestionRelation oldQuestionRelation = oldQuestionRelations.get(k);
+                QuestionRelation newQuestionRelation = newQuestionRelations.get(k);
+                same = oldQuestionRelation.response.getUUID().equals(newQuestionRelation.response.getUUID());
+                if (!same) break;
+            }
+            return same;
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull List<QuestionRelation> oldQuestionRelations, @NonNull List<QuestionRelation> newQuestionRelations) {
+            if (oldQuestionRelations.size() != newQuestionRelations.size()) return false;
+            boolean same = true;
+            for (int k = 0; k < oldQuestionRelations.size(); k++) {
+                QuestionRelation oldQuestionRelation = oldQuestionRelations.get(k);
+                QuestionRelation newQuestionRelation = newQuestionRelations.get(k);
+                same = oldQuestionRelation.response.getText().equals(newQuestionRelation.response.getText()) &&
+                        oldQuestionRelation.response.getSpecialResponse().equals(newQuestionRelation.response.getSpecialResponse()) &&
+                        oldQuestionRelation.response.getOtherResponse().equals(newQuestionRelation.response.getOtherResponse());
+                if (!same) break;
+            }
+            return same;
+        }
+    };
     private static final int DEFAULT = 0;
     private static final int TABLE = 1;
 
-    private List<List<QuestionRelation>> mQuestionRelationGroups;
-    private List<List<ResponseRelation>> mResponseRelationGroups;
     private List<ResponseRelationAdapter> mResponseRelationAdapters;
     private SurveyViewModel mSurveyViewModel;
     private Context mContext;
 
     public DisplayAdapter(Context context) {
+        super(DIFF_CALLBACK);
         mContext = context;
-    }
-
-    public void setQuestionRelationGroups(List<List<QuestionRelation>> groups) {
-        mQuestionRelationGroups = groups;
-        notifyDataSetChanged();
-    }
-
-    public void setResponseRelationGroups(List<List<ResponseRelation>> groups) {
-        mResponseRelationGroups = groups;
-        notifyDataSetChanged();
     }
 
     public void setResponseRelationAdapters(List<ResponseRelationAdapter> adapters) {
         mResponseRelationAdapters = adapters;
-        notifyDataSetChanged();
     }
 
     public void setSurveyViewModel(SurveyViewModel viewModel) {
         mSurveyViewModel = viewModel;
-        notifyDataSetChanged();
     }
 
     @NonNull
@@ -59,34 +76,23 @@ public class DisplayAdapter extends RecyclerView.Adapter<DisplayAdapter.DisplayV
 
     @Override
     public void onBindViewHolder(@NonNull DisplayViewHolder viewHolder, int position) {
-        if (mResponseRelationAdapters == null || mQuestionRelationGroups == null || mResponseRelationGroups == null)
-            return;
         ResponseRelationAdapter adapter = mResponseRelationAdapters.get(position);
-        List<QuestionRelation> questionRelations = mQuestionRelationGroups.get(position);
-        List<ResponseRelation> responseRelations = mResponseRelationGroups.get(position);
-
+        List<QuestionRelation> questionRelations = getItem(position);
         if (viewHolder.recyclerView.getAdapter() == null) {
             viewHolder.recyclerView.setAdapter(adapter);
         }
-
-        adapter.setQuestionRelations(questionRelations);
         adapter.setSurveyViewModel(mSurveyViewModel);
-        adapter.submitList(responseRelations);
+        adapter.submitList(questionRelations);
     }
 
     @Override
     public int getItemViewType(int position) {
-        List<QuestionRelation> group = mQuestionRelationGroups.get(position);
+        List<QuestionRelation> group = getItem(position);
         if (TextUtils.isEmpty(group.get(0).question.getTableIdentifier())) {
             return DEFAULT;
         } else {
             return TABLE;
         }
-    }
-
-    @Override
-    public int getItemCount() {
-        return mQuestionRelationGroups == null ? 0 : mQuestionRelationGroups.size();
     }
 
     class DisplayViewHolder extends RecyclerView.ViewHolder {

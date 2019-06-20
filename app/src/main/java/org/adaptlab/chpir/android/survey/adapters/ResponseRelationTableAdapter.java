@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
-import org.adaptlab.chpir.android.survey.relations.ResponseRelation;
 import org.adaptlab.chpir.android.survey.viewholders.QuestionViewHolder;
 import org.adaptlab.chpir.android.survey.viewholders.QuestionViewHolderFactory;
 
@@ -38,18 +37,14 @@ public class ResponseRelationTableAdapter extends ResponseRelationAdapter {
     public void onBindViewHolder(@NonNull QuestionViewHolder viewHolder, int position) {
         viewHolder.setAdapter(this);
         if (getSurveyViewModel() != null) viewHolder.setSurveyViewModel(getSurveyViewModel());
-        if (getQuestionRelations() == null) return;
-        ResponseRelation responseRelation = getResponseRelation(position);
-        QuestionRelation questionRelation = getQuestionRelations().get(responseRelation.response.getQuestionIdentifier());
+        QuestionRelation questionRelation = getQuestionRelation(position);
         if (questionRelation == null) return;
-        viewHolder.setRelations(responseRelation, questionRelation);
+        viewHolder.setRelations(questionRelation);
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (getQuestionRelations() == null) return -1;
-        ResponseRelation responseRelation = getResponseRelation(position);
-        QuestionRelation questionRelation = getQuestionRelations().get(responseRelation.response.getQuestionIdentifier());
+        QuestionRelation questionRelation = getQuestionRelation(position);
         if (questionRelation == null) return -1;
         String type = questionRelation.question.getQuestionType();
         if (position == 0 && (type.equals(Question.SELECT_ONE) || type.equals(Question.SELECT_MULTIPLE))) {
@@ -62,14 +57,12 @@ public class ResponseRelationTableAdapter extends ResponseRelationAdapter {
         return QuestionViewHolderFactory.getQuestionViewType(type);
     }
 
-    private ResponseRelation getResponseRelation(int position) {
-        ResponseRelation responseRelation;
+    private QuestionRelation getQuestionRelation(int position) {
         if (position == 0) {
-            responseRelation = getItem(position);
+            return getItem(position);
         } else {
-            responseRelation = getItem(position - 1);
+            return getItem(position - 1);
         }
-        return responseRelation;
     }
 
     @Override
