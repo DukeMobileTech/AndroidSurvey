@@ -32,20 +32,24 @@ import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 
 public class SurveyViewModel extends AndroidViewModel {
     public final String TAG = this.getClass().getName();
+
     private LiveData<Survey> mLiveDataSurvey;
     private SurveyRepository mSurveyRepository;
+
     private HashSet<String> mQuestionsToSkipSet;
     private HashMap<String, List<String>> mQuestionsToSkipMap;
-    private Survey mSurvey;
-    private int mDisplayPosition;
-    private List<Display> mDisplays;
-    private List<Integer> mPreviousDisplays;
-    private LongSparseArray<Section> mSections;
-    private LinkedHashMap<String, List<String>> mExpandableListData;
-    private List<String> mExpandableListTitle;
     private HashMap<String, Question> mQuestionsMap;
     private HashMap<String, Response> mResponses;
+    private LongSparseArray<Section> mSections;
+    private LinkedHashMap<String, List<String>> mExpandableListData;
     private List<Question> mQuestions;
+    private List<String> mExpandableListTitle;
+    private List<Display> mDisplays;
+    private List<Integer> mPreviousDisplays;
+
+    private Survey mSurvey;
+
+    private int mDisplayPosition;
     private String mDeviceLanguage;
     private String mInstrumentLanguage;
 
@@ -261,4 +265,5 @@ public class SurveyViewModel extends AndroidViewModel {
     public void setInstrumentLanguage(String language) {
         mInstrumentLanguage = language;
     }
+
 }

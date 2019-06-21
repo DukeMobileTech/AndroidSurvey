@@ -2,6 +2,7 @@ package org.adaptlab.chpir.android.survey.viewpagerfragments;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.adapters.DisplayAdapter;
 import org.adaptlab.chpir.android.survey.adapters.ResponseRelationAdapter;
@@ -64,11 +66,30 @@ public class DisplayPagerFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() == null) return;
-        mInstrumentId = getArguments().getLong(EXTRA_INSTRUMENT_ID);
-        mDisplayId = getArguments().getLong(EXTRA_DISPLAY_ID);
-        mSurveyUUID = getArguments().getString(EXTRA_SURVEY_UUID);
+        if (getArguments() != null) {
+            mInstrumentId = getArguments().getLong(EXTRA_INSTRUMENT_ID);
+            mDisplayId = getArguments().getLong(EXTRA_DISPLAY_ID);
+            mSurveyUUID = getArguments().getString(EXTRA_SURVEY_UUID);
+        }
         setOnResponseSelectedListener();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong(EXTRA_DISPLAY_ID, mDisplayId);
+        outState.putLong(EXTRA_INSTRUMENT_ID, mInstrumentId);
+        outState.putString(EXTRA_SURVEY_UUID, mSurveyUUID);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null) {
+            mInstrumentId = savedInstanceState.getLong(EXTRA_INSTRUMENT_ID);
+            mDisplayId = savedInstanceState.getLong(EXTRA_DISPLAY_ID);
+            mSurveyUUID = savedInstanceState.getString(EXTRA_SURVEY_UUID);
+        }
     }
 
     private void setOnResponseSelectedListener() {
@@ -305,9 +326,9 @@ public class DisplayPagerFragment extends Fragment {
             mResponseRelationAdapters = new ArrayList<>();
             for (List<QuestionRelation> list : mQuestionRelationGroups) {
                 if (TextUtils.isEmpty(list.get(0).question.getTableIdentifier())) {
-                    mResponseRelationAdapters.add(new ResponseRelationAdapter(mListener));
+                    mResponseRelationAdapters.add(new ResponseRelationAdapter(mListener, mSurveyViewModel));
                 } else {
-                    mResponseRelationAdapters.add(new ResponseRelationTableAdapter(mListener));
+                    mResponseRelationAdapters.add(new ResponseRelationTableAdapter(mListener, mSurveyViewModel));
                 }
             }
             mDisplayAdapter.setResponseRelationAdapters(mResponseRelationAdapters);
@@ -337,7 +358,6 @@ public class DisplayPagerFragment extends Fragment {
                 }
             }
         });
-        mDisplayAdapter.setSurveyViewModel(mSurveyViewModel);
     }
 
     @Override

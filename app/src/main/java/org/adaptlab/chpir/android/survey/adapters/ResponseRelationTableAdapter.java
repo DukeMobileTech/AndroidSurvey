@@ -11,6 +11,7 @@ import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
 import org.adaptlab.chpir.android.survey.viewholders.QuestionViewHolder;
 import org.adaptlab.chpir.android.survey.viewholders.QuestionViewHolderFactory;
+import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.SELECT_MULTIPLE_TABLE;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.SELECT_ONE_TABLE;
@@ -18,8 +19,8 @@ import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.TABLE_HEADER
 
 public class ResponseRelationTableAdapter extends ResponseRelationAdapter {
 
-    public ResponseRelationTableAdapter(QuestionViewHolder.OnResponseSelectedListener listener) {
-        super(listener);
+    public ResponseRelationTableAdapter(QuestionViewHolder.OnResponseSelectedListener listener, SurveyViewModel viewModel) {
+        super(listener, viewModel);
     }
 
     @NonNull
@@ -37,16 +38,14 @@ public class ResponseRelationTableAdapter extends ResponseRelationAdapter {
     @Override
     public void onBindViewHolder(@NonNull QuestionViewHolder viewHolder, int position) {
         viewHolder.setAdapter(this);
-        if (getSurveyViewModel() != null) viewHolder.setSurveyViewModel(getSurveyViewModel());
+        viewHolder.setSurveyViewModel(getSurveyViewModel());
         QuestionRelation questionRelation = getQuestionRelation(position);
-        if (questionRelation == null) return;
         viewHolder.setRelations(questionRelation);
     }
 
     @Override
     public int getItemViewType(int position) {
         QuestionRelation questionRelation = getQuestionRelation(position);
-        if (questionRelation == null) return -1;
         String type = questionRelation.question.getQuestionType();
         if (position == 0 && (type.equals(Question.SELECT_ONE) || type.equals(Question.SELECT_MULTIPLE))) {
             type = TABLE_HEADER;

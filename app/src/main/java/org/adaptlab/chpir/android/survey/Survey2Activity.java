@@ -2,6 +2,7 @@ package org.adaptlab.chpir.android.survey;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.LongSparseArray;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,6 +15,7 @@ import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.Spinner;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -74,29 +76,41 @@ public class Survey2Activity extends AppCompatActivity {
     private Spinner mSpinner;
     private int mLastPosition = -1;
     private List<String> mLanguageCodes;
+    private Long mInstrumentId;
+    private String mSurveyUUID;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_survey);
-        setActionBar();
-        long instrumentId = getIntent().getLongExtra(EXTRA_INSTRUMENT_ID, -1);
-        if (instrumentId == -1) return;
-        String surveyUUID = getIntent().getStringExtra(EXTRA_SURVEY_UUID);
-        if (TextUtils.isEmpty(surveyUUID)) {
+        if (getIntent() != null) {
+            mInstrumentId = getIntent().getLongExtra(EXTRA_INSTRUMENT_ID, -1);
+            if (mInstrumentId == -1) return;
+            mSurveyUUID = getIntent().getStringExtra(EXTRA_SURVEY_UUID);
+        }
+        if (TextUtils.isEmpty(mSurveyUUID)) {
             SurveyRepository surveyRepository = new SurveyRepository(getApplication());
-            Survey survey = surveyRepository.initializeSurvey(AppUtil.getProjectId(), instrumentId);
-            surveyUUID = survey.getUUID();
+            Survey survey = surveyRepository.initializeSurvey(AppUtil.getProjectId(), mInstrumentId);
+            mSurveyUUID = survey.getUUID();
         }
 
-        mDisplayPagerAdapter = new DisplayPagerAdapter(getSupportFragmentManager(), surveyUUID);
+        setActionBar();
+        mDisplayPagerAdapter = new DisplayPagerAdapter(getSupportFragmentManager(), mSurveyUUID);
         setDisplayViewPagers();
         addOnPageChangeListener();
-        setInstrumentViewModel(instrumentId);
-        setSurveyViewModel(surveyUUID);
-        setSectionViewModel(instrumentId);
-        setSurveyRelationViewModel(surveyUUID);
+        setInstrumentViewModel(mInstrumentId);
+        setSurveyViewModel(mSurveyUUID);
+        setSectionViewModel(mInstrumentId);
+        setSurveyRelationViewModel(mSurveyUUID);
         setLanguage();
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            mInstrumentId = savedInstanceState.getLong(EXTRA_INSTRUMENT_ID);
+            mSurveyUUID = savedInstanceState.getString(EXTRA_SURVEY_UUID);
+        }
     }
 
     private void setActionBar() {
@@ -271,6 +285,13 @@ public class Survey2Activity extends AppCompatActivity {
             }
         });
         mSpinner.setSelection(mLanguageCodes.indexOf(AppUtil.getSettings().getLanguage()));
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong(EXTRA_INSTRUMENT_ID, mInstrumentId);
+        outState.putString(EXTRA_SURVEY_UUID, mSurveyUUID);
     }
 
     @Override

@@ -32,9 +32,10 @@ public class ResponseRelationAdapter extends ListAdapter<QuestionRelation, Quest
     private QuestionViewHolder.OnResponseSelectedListener mListener;
     private SurveyViewModel mSurveyViewModel;
 
-    public ResponseRelationAdapter(QuestionViewHolder.OnResponseSelectedListener listener) {
+    public ResponseRelationAdapter(QuestionViewHolder.OnResponseSelectedListener listener, SurveyViewModel viewModel) {
         super(DIFF_CALLBACK);
         mListener = listener;
+        mSurveyViewModel = viewModel;
     }
 
     @NonNull
@@ -47,26 +48,20 @@ public class ResponseRelationAdapter extends ListAdapter<QuestionRelation, Quest
     @Override
     public void onBindViewHolder(@NonNull QuestionViewHolder viewHolder, int position) {
         viewHolder.setAdapter(this);
-        if (mSurveyViewModel != null) viewHolder.setSurveyViewModel(mSurveyViewModel);
+        viewHolder.setSurveyViewModel(mSurveyViewModel);
         QuestionRelation questionRelation = getItem(position);
-        if (questionRelation == null) return;
         viewHolder.setRelations(questionRelation);
     }
 
     @Override
     public int getItemViewType(int position) {
         QuestionRelation questionRelation = getItem(position);
-        if (questionRelation == null) return -1;
         String type = questionRelation.question.getQuestionType();
         return QuestionViewHolderFactory.getQuestionViewType(type);
     }
 
     SurveyViewModel getSurveyViewModel() {
         return mSurveyViewModel;
-    }
-
-    void setSurveyViewModel(SurveyViewModel viewModel) {
-        mSurveyViewModel = viewModel;
     }
 
     protected QuestionViewHolder.OnResponseSelectedListener getListener() {
