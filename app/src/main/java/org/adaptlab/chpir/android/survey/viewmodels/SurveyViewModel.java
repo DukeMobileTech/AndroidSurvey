@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 
@@ -40,6 +41,7 @@ public class SurveyViewModel extends AndroidViewModel {
     private HashMap<String, List<String>> mQuestionsToSkipMap;
     private HashMap<String, Question> mQuestionsMap;
     private HashMap<String, Response> mResponses;
+    private HashMap<String, Question> mQuestionsWithoutResponses;
     private LongSparseArray<Section> mSections;
     private LinkedHashMap<String, List<String>> mExpandableListData;
     private List<Question> mQuestions;
@@ -242,6 +244,10 @@ public class SurveyViewModel extends AndroidViewModel {
         mSurvey.setLastUpdated(new Date());
     }
 
+    public void setSurveyComplete() {
+        mSurvey.setComplete(true);
+    }
+
     public HashMap<String, Response> getResponses() {
         return mResponses;
     }
@@ -264,6 +270,22 @@ public class SurveyViewModel extends AndroidViewModel {
 
     public void setInstrumentLanguage(String language) {
         mInstrumentLanguage = language;
+    }
+
+    public void setQuestionsWithoutResponses() {
+        mQuestionsWithoutResponses = new HashMap<>(getQuestionsMap());
+        for (String identifier : getQuestionsToSkipSet()) {
+            mQuestionsWithoutResponses.remove(identifier);
+        }
+        for (Map.Entry<String, Response> entry : getResponses().entrySet()) {
+            if (!entry.getValue().isEmptyResponse()) {
+                mQuestionsWithoutResponses.remove(entry.getKey());
+            }
+        }
+    }
+
+    public HashMap<String, Question> getQuestionsWithoutResponses() {
+        return mQuestionsWithoutResponses;
     }
 
 }

@@ -26,18 +26,18 @@
     <uses-feature android:name="android.hardware.camera" />
 
     <application
-        android:name="org.adaptlab.chpir.android.survey.SurveyApp"
+        android:name=".SurveyApp"
         android:allowBackup="false"
         android:icon="@drawable/ic_assignment_black_24dp"
         android:label="@string/app_name"
         android:theme="@style/Theme.Survey"
         tools:ignore="GoogleAppIndexingWarning">
-
         <activity
             android:name=".InstrumentActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -45,9 +45,7 @@
             android:name=".SurveyActivity"
             android:screenOrientation="sensorLandscape"
             android:uiOptions="splitActionBarWhenNarrow" />
-        <activity
-            android:name=".ReviewPageActivity"
-            android:screenOrientation="sensorLandscape" />
+        <activity android:name=".SurveyReviewActivity" />
         <activity
             android:name=".SectionActivity"
             android:screenOrientation="sensorLandscape" />
@@ -69,7 +67,7 @@
         <activity
             android:name=".ScoreUnitActivity"
             android:screenOrientation="sensorLandscape" />
-        <activity android:name=".Survey2Activity"/>
+        <activity android:name=".Survey2Activity" />
         <activity android:name=".SettingsActivity" />
         <activity
             android:name=".LoginActivity"
@@ -115,7 +113,6 @@
         <meta-data
             android:name="SEED_DB"
             android:value="false" />
-
         <meta-data
             android:name="AA_MODELS"
             android:value="org.adaptlab.chpir.android.survey.models.AdminSettings, org.adaptlab.chpir.android.survey.models.DeviceSyncEntry, org.adaptlab.chpir.android.survey.models.Project, org.adaptlab.chpir.android.survey.models.Instrument, org.adaptlab.chpir.android.survey.models.Section, org.adaptlab.chpir.android.survey.models.Grid, org.adaptlab.chpir.android.survey.models.Question, org.adaptlab.chpir.android.survey.models.Option, org.adaptlab.chpir.android.survey.models.RandomizedFactor, org.adaptlab.chpir.android.survey.models.RandomizedOption, org.adaptlab.chpir.android.survey.models.QuestionRandomizedFactor, org.adaptlab.chpir.android.survey.models.GridLabel, org.adaptlab.chpir.android.survey.models.Image, org.adaptlab.chpir.android.survey.models.DeviceUser, org.adaptlab.chpir.android.survey.models.Skip, org.adaptlab.chpir.android.survey.models.Rule, org.adaptlab.chpir.android.survey.models.ScoreScheme, org.adaptlab.chpir.android.survey.models.ScoreUnit, org.adaptlab.chpir.android.survey.models.OptionScore, org.adaptlab.chpir.android.survey.models.ScoreUnitQuestion, org.adaptlab.chpir.android.survey.models.Survey, org.adaptlab.chpir.android.survey.models.Response, org.adaptlab.chpir.android.survey.models.ResponsePhoto, org.adaptlab.chpir.android.survey.models.Roster, org.adaptlab.chpir.android.survey.models.Score, org.adaptlab.chpir.android.survey.models.RawScore, org.adaptlab.chpir.android.survey.models.GridLabelTranslation, org.adaptlab.chpir.android.survey.models.InstrumentTranslation, org.adaptlab.chpir.android.survey.models.OptionTranslation, org.adaptlab.chpir.android.survey.models.QuestionTranslation, org.adaptlab.chpir.android.survey.models.LoopQuestion, org.adaptlab.chpir.android.survey.models.SectionTranslation, org.adaptlab.chpir.android.survey.models.DefaultAdminSettings, org.adaptlab.chpir.android.survey.models.EventLog, org.adaptlab.chpir.android.survey.models.GridTranslation, org.adaptlab.chpir.android.survey.models.RosterLog, org.adaptlab.chpir.android.survey.models.RandomizedOptionTranslation, org.adaptlab.chpir.android.survey.models.Display, org.adaptlab.chpir.android.survey.models.DisplayTranslation, org.adaptlab.chpir.android.survey.models.NextQuestion, org.adaptlab.chpir.android.survey.models.MultipleSkip, org.adaptlab.chpir.android.survey.models.FollowUpQuestion, org.adaptlab.chpir.android.survey.models.OptionInOptionSet, org.adaptlab.chpir.android.survey.models.OptionSet, org.adaptlab.chpir.android.survey.models.Instruction, org.adaptlab.chpir.android.survey.models.InstructionTranslation, org.adaptlab.chpir.android.survey.models.DisplayInstruction, org.adaptlab.chpir.android.survey.models.Validation, org.adaptlab.chpir.android.survey.models.ValidationTranslation, org.adaptlab.chpir.android.survey.models.ConditionSkip, org.adaptlab.chpir.android.survey.models.CriticalResponse, org.adaptlab.chpir.android.survey.models.OptionSetTranslation" />

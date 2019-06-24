@@ -11,6 +11,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,7 +35,7 @@ import java.text.DateFormat;
 import java.util.List;
 
 public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyViewHolder> {
-
+    private final String TAG = SurveyAdapter.class.getName();
     private final LayoutInflater mInflater;
     private List<ProjectSurveyRelation> mProjectSurveyRelations;
     private Context mContext;
@@ -194,6 +195,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
             String surveyTitle = survey.identifier(mContext, surveyRelation.responses) + "\n";
             String instrumentTitle = instrument.getTitle() + "\n";
             String lastUpdated = DateFormat.getDateTimeInstance().format(survey.getLastUpdated()) + "  ";
+
             SpannableString spannableString = new SpannableString(surveyTitle + instrumentTitle + lastUpdated);
             // survey title
             spannableString.setSpan(new RelativeSizeSpan(1.2f), 0, surveyTitle.length(),
@@ -221,6 +223,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
             spannableString.setSpan(new ForegroundColorSpan(mContext.getResources().getColor(R.color
                     .secondary_text)), end, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             surveyTextView.setText(spannableString);
+
             if (!survey.isQueued()) {
                 SetInstrumentLabelTask setInstrumentLabelTask = new SetInstrumentLabelTask();
                 setInstrumentLabelTask.setListener(new SetInstrumentLabelTask.AsyncTaskListener() {
@@ -252,20 +255,20 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
             }
             SpannableString progressString = new SpannableString(progress);
             if (survey.isSent() || survey.isQueued()) {
+                Log.i(TAG, "isSent || isQueued");
                 if (responses.size() > 0) {
                     mSubmitAction.setVisibility(View.VISIBLE);
                 } else {
                     mSubmitAction.setVisibility(View.GONE);
                 }
-                progressString.setSpan(new ForegroundColorSpan(mContext.getResources().getColor(R.color
-                        .blue)), 0, progress.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                progressString.setSpan(new ForegroundColorSpan(mContext.getResources().getColor(R.color.blue)), 0, progress.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             } else if (survey.isComplete()) {
-                progressString.setSpan(new ForegroundColorSpan(mContext.getResources().getColor(R.color
-                        .green)), 0, progress.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                Log.i(TAG, "isComplete");
+                progressString.setSpan(new ForegroundColorSpan(mContext.getResources().getColor(R.color.green)), 0, progress.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 mSubmitAction.setVisibility(View.VISIBLE);
             } else {
-                progressString.setSpan(new ForegroundColorSpan(mContext.getResources().getColor(R.color
-                        .red)), 0, progress.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                Log.i(TAG, "inProgress");
+                progressString.setSpan(new ForegroundColorSpan(mContext.getResources().getColor(R.color.red)), 0, progress.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 mSubmitAction.setVisibility(View.GONE);
             }
 

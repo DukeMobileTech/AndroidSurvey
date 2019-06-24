@@ -1121,9 +1121,9 @@ public class SurveyFragment extends Fragment {
     }
 
     private void goToReviewPage() {
-        Intent i = new Intent(getActivity(), ReviewPageActivity.class);
+        Intent i = new Intent(getActivity(), SurveyReviewActivity.class);
         Bundle b = new Bundle();
-        b.putLong(ReviewPageFragment.EXTRA_REVIEW_SURVEY_ID, mSurvey.getId());
+        b.putLong(SurveyReviewFragment.EXTRA_SURVEY_UUID, mSurvey.getId());
         i.putExtras(b);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             startActivityForResult(i, REVIEW_CODE, ActivityOptions.makeSceneTransitionAnimation

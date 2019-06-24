@@ -15,5 +15,5 @@ public class InstrumentRelation {
     @Relation(parentColumn = "RemoteId", entityColumn = "InstrumentRemoteId", entity = Display.class)
     public List<Display> displays;
     @Relation(parentColumn = "RemoteId", entityColumn = "InstrumentRemoteId", entity = Question.class)
-    public List<Question> questions;
+    public List<QuestionTranslationRelation> questions;
 }

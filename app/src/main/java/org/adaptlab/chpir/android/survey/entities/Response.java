@@ -178,4 +178,8 @@ public class Response {
         mIdentifiesSurvey = identifiesSurvey;
     }
 
+    public boolean isEmptyResponse() {
+        return mText.isEmpty() && mOtherResponse.isEmpty() && mSpecialResponse.isEmpty();
+    }
+
 }

@@ -1,5 +1,9 @@
 package org.adaptlab.chpir.android.survey;
 
+import android.app.Activity;
+import android.app.ActivityOptions;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -36,6 +40,7 @@ import org.adaptlab.chpir.android.survey.entities.Response;
 import org.adaptlab.chpir.android.survey.entities.Section;
 import org.adaptlab.chpir.android.survey.entities.Survey;
 import org.adaptlab.chpir.android.survey.relations.InstrumentRelation;
+import org.adaptlab.chpir.android.survey.relations.QuestionTranslationRelation;
 import org.adaptlab.chpir.android.survey.relations.SurveyRelation;
 import org.adaptlab.chpir.android.survey.repositories.SurveyRepository;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
@@ -63,6 +68,8 @@ import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 public class Survey2Activity extends AppCompatActivity {
     public final static String EXTRA_INSTRUMENT_ID = "org.adaptlab.chpir.android.survey.EXTRA_INSTRUMENT_ID";
     public final static String EXTRA_SURVEY_UUID = "org.adaptlab.chpir.android.survey.EXTRA_SURVEY_UUID";
+    public final static String EXTRA_DISPLAY_ID = "org.adaptlab.chpir.android.survey.EXTRA_DISPLAY_ID";
+    private static final int REVIEW_CODE = 100;
     private final String TAG = this.getClass().getName();
     private DisplayPagerAdapter mDisplayPagerAdapter;
     private ViewPager mViewPager;
@@ -159,7 +166,11 @@ public class Survey2Activity extends AppCompatActivity {
                     mSurveyViewModel.setDisplays(displays);
                     mDisplayPagerAdapter.setDisplays(displays);
 
-                    List<Question> questions = relation.questions;
+                    List<Question> questions = new ArrayList<>();
+                    for (QuestionTranslationRelation questionTranslationRelation : relation.questions) {
+                        questions.add(questionTranslationRelation.question);
+                    }
+
                     Collections.sort(questions, new Comparator<Question>() {
                         @Override
                         public int compare(Question o1, Question o2) {
@@ -284,6 +295,7 @@ public class Survey2Activity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
+        mSurveyViewModel.setDeviceLanguage(AppUtil.getSettings().getLanguage());
         mSpinner.setSelection(mLanguageCodes.indexOf(AppUtil.getSettings().getLanguage()));
     }
 
@@ -297,6 +309,10 @@ public class Survey2Activity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
+        saveData();
+    }
+
+    private void saveData() {
         mSurveyViewModel.persistSkipMaps();
         mSurveyViewModel.persistSkippedQuestions();
         mSurveyViewModel.persistPreviousDisplays();
@@ -357,7 +373,7 @@ public class Survey2Activity extends AppCompatActivity {
                 moveToNextDisplay();
                 return true;
             case R.id.menu_item_finish:
-                finishSurvey();
+                beginSurveyCompletion();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -457,8 +473,52 @@ public class Survey2Activity extends AppCompatActivity {
         mDrawerLayout.closeDrawer(mExpandableListView);
     }
 
-    public void finishSurvey() {
+    public void beginSurveyCompletion() {
+        saveData();
+        mSurveyViewModel.setQuestionsWithoutResponses();
+        if (mSurveyViewModel.getQuestionsWithoutResponses().size() > 0) {
+            Intent i = new Intent(this, SurveyReviewActivity.class);
+            Bundle b = new Bundle();
+            b.putString(SurveyReviewFragment.EXTRA_SURVEY_UUID, mSurveyUUID);
+            b.putLong(SurveyReviewFragment.EXTRA_INSTRUMENT_ID, mInstrumentId);
+            b.putString(SurveyReviewFragment.EXTRA_DEVICE_LANGUAGE, mSurveyViewModel.getDeviceLanguage());
+            i.putExtras(b);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                startActivityForResult(i, REVIEW_CODE, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+            } else {
+                startActivityForResult(i, REVIEW_CODE);
+            }
+        } else {
+            finishSurvey();
+        }
+    }
+
+    private void finishSurvey() {
+        mSurveyViewModel.setSurveyComplete();
+        mSurveyViewModel.update();
         finish();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK && requestCode == REVIEW_CODE) {
+            Long displayId = 0L;
+            if (data.getExtras() != null) {
+                displayId = data.getExtras().getLong(EXTRA_DISPLAY_ID);
+            }
+            if (displayId.equals(-1L)) {
+                finishSurvey();
+            } else {
+                int position = 0;
+                for (Display display : mSurveyViewModel.getDisplays()) {
+                    if (display.getRemoteId().equals(displayId)) {
+                        mSurveyViewModel.setDisplayPosition(position);
+                        setViewPagerPosition();
+                    }
+                    position++;
+                }
+            }
+        }
     }
 
 }

@@ -71,7 +71,7 @@ public class SectionFragment extends Fragment {
 //    private void displayNextQuestion(int num) {
 //        Intent i = new Intent(getActivity(), SurveyActivity.class);
 //        i.putExtra(SurveyFragment.EXTRA_INSTRUMENT_ID, mSection.getInstrument().getRemoteId());
-//        i.putExtra(SurveyFragment.EXTRA_QUESTION_NUMBER, num);
+//        i.putExtra(SurveyFragment.EXTRA_DISPLAY_ID, num);
 //        i.putExtra(SurveyFragment.EXTRA_SURVEY_UUID, mSurvey.getId());
 //        i.putIntegerArrayListExtra(SurveyFragment.EXTRA_PREVIOUS_QUESTION_IDS, mQuestionsToAddToPreviousList);
 //        getActivity().setResult(Activity.RESULT_OK, i);
