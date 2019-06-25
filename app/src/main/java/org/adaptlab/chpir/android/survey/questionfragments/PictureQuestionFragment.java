@@ -62,12 +62,8 @@ public abstract class PictureQuestionFragment extends SingleQuestionFragment {
 
     protected boolean isCameraAvailable() {
         PackageManager manager = getActivity().getPackageManager();
-        if (!manager.hasSystemFeature(PackageManager.FEATURE_CAMERA) &&
-                !manager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT)) {
-            return false;
-        } else {
-            return true;
-        }
+        return manager.hasSystemFeature(PackageManager.FEATURE_CAMERA) ||
+                manager.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT);
     }
 
     protected boolean showPhoto() {

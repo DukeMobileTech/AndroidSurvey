@@ -89,7 +89,7 @@ public abstract class RosterFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        TextView itemText = (TextView) getActivity().findViewById(R.id.roster_item_text);
+        TextView itemText = getActivity().findViewById(R.id.roster_item_text);
         itemText.setText(styleTextWithHtml(mQuestion.getText()));
     }
 

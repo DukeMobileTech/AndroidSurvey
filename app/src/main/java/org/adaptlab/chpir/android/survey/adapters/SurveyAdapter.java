@@ -27,8 +27,8 @@ import org.adaptlab.chpir.android.survey.entities.Instrument;
 import org.adaptlab.chpir.android.survey.entities.Response;
 import org.adaptlab.chpir.android.survey.entities.Survey;
 import org.adaptlab.chpir.android.survey.relations.ProjectSurveyRelation;
+import org.adaptlab.chpir.android.survey.repositories.SurveyRepository;
 import org.adaptlab.chpir.android.survey.tasks.SetInstrumentLabelTask;
-import org.adaptlab.chpir.android.survey.tasks.SubmitSurveyTask;
 import org.adaptlab.chpir.android.survey.utils.InstrumentListLabel;
 
 import java.text.DateFormat;
@@ -39,10 +39,12 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
     private final LayoutInflater mInflater;
     private List<ProjectSurveyRelation> mProjectSurveyRelations;
     private Context mContext;
+    private SurveyRepository mSurveyRepository;
 
-    public SurveyAdapter(Context context) {
+    public SurveyAdapter(Context context, SurveyRepository repository) {
         mInflater = LayoutInflater.from(context);
         mContext = context;
+        mSurveyRepository = repository;
     }
 
     public void setSurveys(List<ProjectSurveyRelation> list) {
@@ -50,10 +52,14 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
         notifyDataSetChanged();
     }
 
+    public List<ProjectSurveyRelation> getSurveyRelations() {
+        return mProjectSurveyRelations;
+    }
+
     @NonNull
     @Override
     public SurveyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View surveyView = mInflater.inflate(R.layout.list_item_survey_background, parent, false);
+        View surveyView = mInflater.inflate(R.layout.list_item_survey, parent, false);
         return new SurveyViewHolder(surveyView);
     }
 
@@ -62,33 +68,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
         ProjectSurveyRelation surveyRelation = mProjectSurveyRelations.get(position);
         if (surveyRelation == null) return;
         viewHolder.setData(surveyRelation);
-        setSurveyDeleteAction(viewHolder);
         setSurveyLaunchAction(viewHolder);
-        setSurveySubmitAction(viewHolder);
-    }
-
-    private void setSurveyDeleteAction(@NonNull final SurveyViewHolder viewHolder) {
-        viewHolder.mDeleteAction.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new AlertDialog.Builder(mContext)
-                        .setTitle(R.string.delete_survey_title)
-                        .setMessage(R.string.delete_survey_message)
-                        .setPositiveButton(R.string.delete, new DialogInterface
-                                .OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                remove(viewHolder.getAdapterPosition());
-                            }
-                        })
-                        .setNegativeButton(R.string.cancel, new DialogInterface
-                                .OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                notifyItemChanged(viewHolder.getAdapterPosition());
-                            }
-                        })
-                        .show();
-            }
-        });
     }
 
     private void setSurveyLaunchAction(@NonNull final SurveyViewHolder viewHolder) {
@@ -116,63 +96,65 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
         });
     }
 
-    private void setSurveySubmitAction(final SurveyViewHolder viewHolder) {
-        viewHolder.mSubmitAction.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new AlertDialog.Builder(mContext)
-                        .setTitle(R.string.submit_survey)
-                        .setMessage(R.string.submit_survey_message)
-                        .setPositiveButton(R.string.submit,
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        ProjectSurveyRelation survey = mProjectSurveyRelations.get(viewHolder.getAdapterPosition());
-                                        prepareForSubmission(survey);
-                                        new SubmitSurveyTask(mContext).execute();
-                                        notifyItemChanged(viewHolder.getAdapterPosition());
-                                    }
-                                })
-                        .setNegativeButton(R.string.cancel,
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int id) {
-                                        notifyItemChanged(viewHolder.getAdapterPosition());
-                                    }
-                                })
-                        .show();
-            }
-        });
-    }
-
-    public void remove(int position) {
-        if (position > -1 && position < mProjectSurveyRelations.size()) {
-            ProjectSurveyRelation survey = mProjectSurveyRelations.get(position);
-            if (survey != null) {
-                mProjectSurveyRelations.remove(position);
-//                survey.delete();
-                notifyItemRemoved(position);
-            }
-        }
-    }
-
     @Override
     public int getItemCount() {
         return mProjectSurveyRelations == null ? 0 : mProjectSurveyRelations.size();
     }
 
-    private void prepareForSubmission(ProjectSurveyRelation surveyRelation) {
+    public void prepareForSubmission(ProjectSurveyRelation surveyRelation) {
         Survey survey = surveyRelation.survey;
         List<Response> responses = surveyRelation.responses;
         if (survey.getCompletedResponseCount() == 0 && responses.size() > 0) {
             survey.setCompletedResponseCount(responses.size());
         }
         survey.setQueued(true);
+        mSurveyRepository.update(survey);
     }
 
-    public class SurveyViewHolder extends RecyclerView.ViewHolder {
-        public View mViewContent;
-        public View mActionContainer;
-        TextView mDeleteAction;
-        TextView mSubmitAction;
+    public void deleteItem(final int position) {
+        new AlertDialog.Builder(mContext)
+                .setTitle(R.string.delete_survey_title)
+                .setMessage(R.string.delete_survey_message)
+                .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        ProjectSurveyRelation survey = mProjectSurveyRelations.get(position);
+                        mProjectSurveyRelations.remove(position);
+//                        survey.delete();
+                        notifyItemRemoved(position);
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        notifyItemChanged(position);
+                    }
+                })
+                .show();
+    }
+
+    public void uploadItem(final int position) {
+        new AlertDialog.Builder(mContext)
+                .setTitle(R.string.submit_survey)
+                .setMessage(R.string.submit_survey_message)
+                .setPositiveButton(R.string.submit,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                ProjectSurveyRelation survey = mProjectSurveyRelations.get(position);
+                                prepareForSubmission(survey);
+//                                new SubmitSurveyTask(mContext).execute();
+                                notifyItemChanged(position);
+                            }
+                        })
+                .setNegativeButton(R.string.cancel,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                notifyItemChanged(position);
+                            }
+                        })
+                .show();
+    }
+
+    class SurveyViewHolder extends RecyclerView.ViewHolder {
+        View mViewContent;
         TextView surveyTextView;
         TextView progressTextView;
         ProjectSurveyRelation mProjectSurveyRelation;
@@ -181,10 +163,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
             super(itemView);
             surveyTextView = itemView.findViewById(R.id.surveyProperties);
             progressTextView = itemView.findViewById(R.id.surveyProgress);
-            mViewContent = itemView.findViewById(R.id.list_item_survey_main_content);
-            mActionContainer = itemView.findViewById(R.id.list_item_survey_action_container);
-            mDeleteAction = itemView.findViewById(R.id.list_item_survey_action_delete);
-            mSubmitAction = itemView.findViewById(R.id.list_item_survey_action_submit);
+            mViewContent = itemView.findViewById(R.id.list_item_survey_content);
         }
 
         void setData(ProjectSurveyRelation surveyRelation) {
@@ -256,20 +235,13 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
             SpannableString progressString = new SpannableString(progress);
             if (survey.isSent() || survey.isQueued()) {
                 Log.i(TAG, "isSent || isQueued");
-                if (responses.size() > 0) {
-                    mSubmitAction.setVisibility(View.VISIBLE);
-                } else {
-                    mSubmitAction.setVisibility(View.GONE);
-                }
                 progressString.setSpan(new ForegroundColorSpan(mContext.getResources().getColor(R.color.blue)), 0, progress.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             } else if (survey.isComplete()) {
                 Log.i(TAG, "isComplete");
                 progressString.setSpan(new ForegroundColorSpan(mContext.getResources().getColor(R.color.green)), 0, progress.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                mSubmitAction.setVisibility(View.VISIBLE);
             } else {
                 Log.i(TAG, "inProgress");
                 progressString.setSpan(new ForegroundColorSpan(mContext.getResources().getColor(R.color.red)), 0, progress.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                mSubmitAction.setVisibility(View.GONE);
             }
 
             progressTextView.setText(progressString);

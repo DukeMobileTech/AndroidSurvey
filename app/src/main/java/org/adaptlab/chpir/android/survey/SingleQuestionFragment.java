@@ -29,7 +29,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -51,7 +50,6 @@ import org.adaptlab.chpir.android.survey.models.Survey;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.utils.AuthUtils;
 import org.adaptlab.chpir.android.survey.utils.FormatUtils;
-import org.adaptlab.chpir.android.survey.utils.looper.ItemTouchHelperExtension;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -229,9 +227,9 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
             DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(
                     recyclerView.getContext(), DividerItemDecoration.VERTICAL);
             recyclerView.addItemDecoration(dividerItemDecoration);
-            ItemTouchHelperExtension.Callback callback = new ItemTouchHelperCallback();
-            ItemTouchHelperExtension itemTouchHelper = new ItemTouchHelperExtension(callback);
-            itemTouchHelper.attachToRecyclerView(recyclerView);
+//            ItemTouchHelperExtension.Callback callback = new ItemTouchHelperCallback();
+//            ItemTouchHelperExtension itemTouchHelper = new ItemTouchHelperExtension(callback);
+//            itemTouchHelper.attachToRecyclerView(recyclerView);
         }
     }
 
@@ -766,26 +764,26 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         checkForCriticalResponses(mQuestion, mResponse);
     }
 
-    private class ItemTouchHelperCallback extends ItemTouchHelperExtension.Callback {
-
-        @Override
-        public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-            return makeMovementFlags(ItemTouchHelper.UP | ItemTouchHelper.DOWN,
-                    ItemTouchHelper.END);
-        }
-
-        @Override
-        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
-                              RecyclerView.ViewHolder target) {
-            return mOptionsAdapter.onItemMove(viewHolder.getAdapterPosition(),
-                    target.getAdapterPosition());
-        }
-
-        @Override
-        public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-
-        }
-    }
+//    private class ItemTouchHelperCallback extends ItemTouchHelperExtension.Callback {
+//
+//        @Override
+//        public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+//            return makeMovementFlags(ItemTouchHelper.UP | ItemTouchHelper.DOWN,
+//                    ItemTouchHelper.END);
+//        }
+//
+//        @Override
+//        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
+//                              RecyclerView.ViewHolder target) {
+//            return mOptionsAdapter.onItemMove(viewHolder.getAdapterPosition(),
+//                    target.getAdapterPosition());
+//        }
+//
+//        @Override
+//        public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+//
+//        }
+//    }
 
     private class OptionsAdapter extends RecyclerView.Adapter<OptionsViewHolder> {
         private List<Option> mOptions;

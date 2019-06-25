@@ -130,7 +130,7 @@ public class CameraFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_camera, parent, false);
         mProgressIndicator = v.findViewById(R.id.camera_progressIndicator);
         mProgressIndicator.setVisibility(View.INVISIBLE);
-        Button takePictureButton = (Button) v.findViewById(R.id.camera_takePictureButton);
+        Button takePictureButton = v.findViewById(R.id.camera_takePictureButton);
         takePictureButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -140,7 +140,7 @@ public class CameraFragment extends Fragment {
             }
         });
 
-        SurfaceView mSurfaceView = (SurfaceView) v.findViewById(R.id.camera_surfaceView);
+        SurfaceView mSurfaceView = v.findViewById(R.id.camera_surfaceView);
         SurfaceHolder holder = mSurfaceView.getHolder();
         holder.addCallback(new SurfaceHolder.Callback() {
             public void surfaceCreated(SurfaceHolder holder) {

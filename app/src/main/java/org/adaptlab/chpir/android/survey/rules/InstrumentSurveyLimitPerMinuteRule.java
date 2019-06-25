@@ -89,8 +89,8 @@ public class InstrumentSurveyLimitPerMinuteRule extends PassableRule {
     private List<Date> parseTimestamps(String timestamps) throws ParseException {
         List<Date> timestampArray = new ArrayList<Date>();
         if (timestamps != null) {
-            for (String dateString : Arrays.asList(timestamps.substring(1,
-                    timestamps.length() - 1).split(", "))) {
+            for (String dateString : timestamps.substring(1,
+                    timestamps.length() - 1).split(", ")) {
                 timestampArray.add(mDateFormatter.parse(dateString));
             }
         }

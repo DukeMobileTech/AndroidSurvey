@@ -54,8 +54,8 @@ public class ParticipantEditorActivity extends AppCompatActivity {
             getSupportActionBar().setHomeButtonEnabled(true);
         }
 
-        mDrawer = (DrawerLayout) findViewById(R.id.roster_drawer_layout);
-        navigationView = (NavigationView) findViewById(R.id.roster_drawer_view);
+        mDrawer = findViewById(R.id.roster_drawer_layout);
+        navigationView = findViewById(R.id.roster_drawer_view);
 
         Long rosterId = getIntent().getLongExtra(RosterActivity.EXTRA_ROSTER_ID, -1);
         if (rosterId != -1) {

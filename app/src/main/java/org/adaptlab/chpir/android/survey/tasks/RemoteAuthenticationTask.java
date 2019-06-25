@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 public class RemoteAuthenticationTask extends AsyncTask<String, Void, String> {
     private final String TAG = "RemoteAuthTask";
@@ -59,7 +60,7 @@ public class RemoteAuthenticationTask extends AsyncTask<String, Void, String> {
             urlConnection.setReadTimeout(30000);
             urlConnection.setDoOutput(true);
 
-            byte[] outputInBytes = json.toString().getBytes(CharEncoding.UTF_8);
+            byte[] outputInBytes = json.toString().getBytes(StandardCharsets.UTF_8);
             OutputStream outputStream = urlConnection.getOutputStream();
             outputStream.write(outputInBytes);
             outputStream.close();

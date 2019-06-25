@@ -108,10 +108,10 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
         mSurveys = new ArrayList<>();
         new QuestionLoaderTask().execute(instrument);
 
-        dataLayout = (TableLayout) findViewById(R.id.content_table);
-        identifierLayout = (TableLayout) findViewById(R.id.participant_id);
-        headerScrollView = (OHScrollView) findViewById(R.id.header_scroll);
-        contentScrollView = (OHScrollView) findViewById(R.id.content_scroll);
+        dataLayout = findViewById(R.id.content_table);
+        identifierLayout = findViewById(R.id.participant_id);
+        headerScrollView = findViewById(R.id.header_scroll);
+        contentScrollView = findViewById(R.id.content_scroll);
         headerScrollView.setScrollViewListener(this);
         contentScrollView.setScrollViewListener(this);
     }
@@ -129,7 +129,7 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
             if (question == surveyIdentifier) {
                 setTextViewAttributes(headerView, ContextCompat.getColor(this,
                         R.color.primary_light), Typeface.BOLD);
-                LinearLayout participantIDLayout = (LinearLayout) findViewById(R.id.header_1);
+                LinearLayout participantIDLayout = findViewById(R.id.header_1);
                 if (participantIDLayout != null) {
                     participantIDLayout.addView(headerView);
                 }
@@ -140,7 +140,7 @@ public class RosterActivity extends AppCompatActivity implements ScrollViewListe
                 row.addView(headerView);
             }
         }
-        TableLayout rosterHeaders = (TableLayout) findViewById(R.id.header_2);
+        TableLayout rosterHeaders = findViewById(R.id.header_2);
         if (rosterHeaders != null) {
             rosterHeaders.addView(row);
         }

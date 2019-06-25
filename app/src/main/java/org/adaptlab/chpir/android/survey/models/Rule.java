@@ -27,7 +27,6 @@ public class Rule extends ReceiveModel {
     public static final String SURVEY_TIMESTAMPS_KEY = "survey_timestamps";
     private static final String TAG = "RuleModel";
 
-    ;
     @Column(name = "RuleType")
     private RuleType mRuleType;
     @Column(name = "Params")

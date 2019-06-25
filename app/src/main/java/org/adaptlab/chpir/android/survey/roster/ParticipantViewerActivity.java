@@ -39,7 +39,7 @@ public class ParticipantViewerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_participant_viewer);
-        mRecyclerView = (RecyclerView) findViewById(R.id.participant_recycler_view);
+        mRecyclerView = findViewById(R.id.participant_recycler_view);
         Long surveyId = getIntent().getLongExtra(RosterActivity.EXTRA_SURVEY_ID, -1);
         if (surveyId != -1) {
             mSurvey = Survey.load(Survey.class, surveyId);
@@ -149,9 +149,9 @@ public class ParticipantViewerActivity extends AppCompatActivity {
 
             QuestionViewHolder(View itemView) {
                 super(itemView);
-                cardView = (CardView) itemView.findViewById(R.id.question_card_view);
-                questionText = (TextView) itemView.findViewById(R.id.question_text);
-                questionResponse = (TextView) itemView.findViewById(R.id.question_response);
+                cardView = itemView.findViewById(R.id.question_card_view);
+                questionText = itemView.findViewById(R.id.question_text);
+                questionResponse = itemView.findViewById(R.id.question_response);
             }
         }
 

@@ -48,29 +48,29 @@ public class ScoreUnitFragment extends ListFragment {
 
             ScoreUnit scoreUnit = getItem(position);
             if (scoreUnit != null) {
-                TextView scoreType = (TextView) convertView.findViewById(R.id.score_type_value);
+                TextView scoreType = convertView.findViewById(R.id.score_type_value);
                 scoreType.setText(scoreUnit.getScoreType().toString());
 
-                TextView questionIds = (TextView) convertView.findViewById(R.id
+                TextView questionIds = convertView.findViewById(R.id
                         .question_identifiers_value);
                 questionIds.setText(scoreUnit.questionIdentifiers());
 
-                TextView minScore = (TextView) convertView.findViewById(R.id.minimum_score_value);
+                TextView minScore = convertView.findViewById(R.id.minimum_score_value);
                 minScore.setText(String.valueOf(scoreUnit.getMin()));
 
-                TextView maxScore = (TextView) convertView.findViewById(R.id.maximum_score_value);
+                TextView maxScore = convertView.findViewById(R.id.maximum_score_value);
                 maxScore.setText(String.valueOf(scoreUnit.getMax()));
 
-                TextView scoreWeight = (TextView) convertView.findViewById(R.id.score_weight_value);
+                TextView scoreWeight = convertView.findViewById(R.id.score_weight_value);
                 scoreWeight.setText(String.valueOf(scoreUnit.getWeight()));
             }
 
             RawScore rawScore = mScore.findRawScoreByScoreUnit(scoreUnit);
             if (rawScore != null) {
-                TextView unitRawScore = (TextView) convertView.findViewById(R.id.unit_score_value);
+                TextView unitRawScore = convertView.findViewById(R.id.unit_score_value);
                 unitRawScore.setText(String.valueOf(rawScore.getValue()));
 
-                TextView weightedScore = (TextView) convertView.findViewById(R.id.weighted_score_value);
+                TextView weightedScore = convertView.findViewById(R.id.weighted_score_value);
                 weightedScore.setText(String.valueOf(rawScore.getWeightedScore()));
             }
             return convertView;

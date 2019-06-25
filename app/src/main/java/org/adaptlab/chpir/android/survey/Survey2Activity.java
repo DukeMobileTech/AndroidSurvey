@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.LongSparseArray;
 import android.view.Menu;
 import android.view.MenuInflater;

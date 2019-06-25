@@ -34,7 +34,7 @@ public class SelectMultipleImageQuestionFragment extends SingleQuestionFragment 
         View v = inflater.inflate(R.layout.fragment_image, questionComponent, false);
         mImages = (ArrayList<Image>) getQuestion().images();
         mSelectedViews = new ArrayList<Integer>();
-        mGridView = (GridView) v.findViewById(R.id.imageGridView);
+        mGridView = v.findViewById(R.id.imageGridView);
         setUpAdapter();
         mGridView.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
@@ -106,7 +106,7 @@ public class SelectMultipleImageQuestionFragment extends SingleQuestionFragment 
                         false);
             }
             Image img = getItem(position);
-            ImageView imageView = (ImageView) view.findViewById(R.id.image_item_view);
+            ImageView imageView = view.findViewById(R.id.image_item_view);
             String path = getActivity().getFileStreamPath(img.getBitmapPath()).getAbsolutePath();
             BitmapDrawable bitmap = PictureUtils.getScaledDrawable(getActivity(), path);
             imageView.setImageDrawable(bitmap);

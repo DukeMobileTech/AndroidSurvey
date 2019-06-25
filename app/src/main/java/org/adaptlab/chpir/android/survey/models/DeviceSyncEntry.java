@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -111,7 +112,7 @@ public class DeviceSyncEntry extends SendModel {
             connection.setDoOutput(true);
 
             JSONObject json = toJSON();
-            byte[] outputInBytes = json.toString().getBytes(CharEncoding.UTF_8);
+            byte[] outputInBytes = json.toString().getBytes(StandardCharsets.UTF_8);
             OutputStream outputStream = connection.getOutputStream();
             outputStream.write(outputInBytes);
             outputStream.close();

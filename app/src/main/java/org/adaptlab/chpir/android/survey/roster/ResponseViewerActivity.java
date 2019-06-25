@@ -90,7 +90,7 @@ public class ResponseViewerActivity extends AppCompatActivity {
 
     private void setListView() {
         ResponseViewerAdapter adapter = new ResponseViewerAdapter(mResponses, this);
-        ListView lView = (ListView) findViewById(R.id.responseListView);
+        ListView lView = findViewById(R.id.responseListView);
         if (lView != null) {
             lView.setAdapter(adapter);
         }
@@ -144,9 +144,9 @@ public class ResponseViewerActivity extends AppCompatActivity {
 
             Response id = responseIdentifiers.get(position);
             Response response = responseMap.get(id);
-            TextView surveyIdView = (TextView) view.findViewById(R.id.survey_response);
+            TextView surveyIdView = view.findViewById(R.id.survey_response);
             if (id != null) surveyIdView.setText(id.getText());
-            TextView responseView = (TextView) view.findViewById(R.id.question_response);
+            TextView responseView = view.findViewById(R.id.question_response);
             if (response != null) responseView.setText(response.getText());
             return view;
         }

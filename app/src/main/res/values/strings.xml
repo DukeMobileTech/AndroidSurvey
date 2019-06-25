@@ -104,7 +104,7 @@
     <string name="reset">Reset</string>
     <string name="reset_header">Reset Last Sync Time</string>
     <string name="critical_message_title">Critical Responses In Survey</string>
-    <string name="submit">Submit</string>
+    <string name="submit">Submit All</string>
     <string name="review">Review</string>
     <string name="data_settings">Data Settings</string>
     <string name="delete_confirmation">Are you sure? All un-synced surveys will be lost</string>

@@ -11,4 +11,9 @@
         android:icon="@drawable/ic_refresh_black_24dp"
         android:title="@string/refresh"
         app:showAsAction="ifRoom|withText" />
+    <item
+        android:id="@+id/menu_item_submit_all"
+        android:icon="@drawable/ic_cloud_upload_black_24dp"
+        android:title="@string/submit"
+        app:showAsAction="ifRoom|withText" />
 </menu>

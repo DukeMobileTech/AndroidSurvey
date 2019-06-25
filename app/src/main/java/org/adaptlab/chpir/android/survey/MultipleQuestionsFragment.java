@@ -98,7 +98,7 @@ public abstract class MultipleQuestionsFragment extends QuestionFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_question, parent, false);
-        mDisplayInstructionsText = (TextView) v.findViewById(R.id.displayInstructions);
+        mDisplayInstructionsText = v.findViewById(R.id.displayInstructions);
         setDisplayInstructions();
         setOptionWidth();
         String questionRange = getQuestionRange() + "\n";

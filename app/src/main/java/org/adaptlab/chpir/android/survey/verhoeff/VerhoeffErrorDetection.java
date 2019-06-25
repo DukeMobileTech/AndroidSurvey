@@ -31,8 +31,7 @@ public class VerhoeffErrorDetection {
         int check = 0;
         for (int i = 0; i < a.length; i++)
             check = op[check][F[i % 8][a[i]]];
-        if (check != 0) return false;
-        else return true;
+        return check == 0;
     }
 
     /*

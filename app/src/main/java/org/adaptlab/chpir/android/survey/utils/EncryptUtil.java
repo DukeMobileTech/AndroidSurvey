@@ -3,6 +3,7 @@ package org.adaptlab.chpir.android.survey.utils;
 import org.apache.commons.codec.binary.Base64;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -42,9 +43,9 @@ public class EncryptUtil {
         random.nextBytes(iv);
         IvParameterSpec ivParams = new IvParameterSpec(iv);
         cipher.init(Cipher.ENCRYPT_MODE, key, ivParams);
-        byte[] cipherText = cipher.doFinal(value.getBytes("UTF-8"));
+        byte[] cipherText = cipher.doFinal(value.getBytes(StandardCharsets.UTF_8));
 
-        return salt + "::" + iv + "::" + new String(cipherText, "UTF-8");
+        return salt + "::" + iv + "::" + new String(cipherText, StandardCharsets.UTF_8);
     }
 
     public static String decrypt(String ciphertext, String password) throws NoSuchAlgorithmException, InvalidKeySpecException,
@@ -64,7 +65,7 @@ public class EncryptUtil {
         cipher.init(Cipher.DECRYPT_MODE, key, ivParams);
         byte[] plaintext = cipher.doFinal(cipherBytes);
 
-        return new String(plaintext, "UTF-8");
+        return new String(plaintext, StandardCharsets.UTF_8);
     }
 
     private static SecretKey getKey(String password, byte[] salt) throws NoSuchAlgorithmException, InvalidKeySpecException {

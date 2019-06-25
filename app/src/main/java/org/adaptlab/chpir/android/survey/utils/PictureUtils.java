@@ -29,9 +29,9 @@ public class PictureUtils {
         int inSampleSize = 1;
         if (srcHeight > destHeight || srcWidth > destWidth) {
             if (srcWidth > srcHeight) {
-                inSampleSize = Math.round((float) srcHeight / (float) destHeight);
+                inSampleSize = Math.round(srcHeight / destHeight);
             } else {
-                inSampleSize = Math.round((float) srcWidth / (float) destWidth);
+                inSampleSize = Math.round(srcWidth / destWidth);
             }
         }
 

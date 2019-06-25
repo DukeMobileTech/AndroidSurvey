@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 public class HttpUtil {
@@ -35,7 +36,7 @@ public class HttpUtil {
                 connection.setReadTimeout(TIMEOUT);
                 connection.setDoOutput(true);
 
-                byte[] outputInBytes = element.toJSON().toString().getBytes(CharEncoding.UTF_8);
+                byte[] outputInBytes = element.toJSON().toString().getBytes(StandardCharsets.UTF_8);
                 OutputStream outputStream = connection.getOutputStream();
                 outputStream.write(outputInBytes);
                 outputStream.close();

@@ -53,7 +53,7 @@ public class SelectMultipleQuestionFragment extends SingleQuestionFragment {
     }
 
     protected void checkOptionExclusivity(View v) {
-        if (getQuestion().hasExclusiveOption() && (int) v.getId() < getOptions().size()) {
+        if (getQuestion().hasExclusiveOption() && v.getId() < getOptions().size()) {
             Option selectedOption = getOptions().get(v.getId());
             CheckBox selectedCheckbox = (CheckBox) v;
             if (selectedCheckbox.isChecked() && selectedOption.isExclusive(getQuestion())) {

@@ -135,6 +135,7 @@ public class InstrumentActivity extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
+        menu.findItem(R.id.menu_item_submit_all).setEnabled(false).setVisible(false);
         if (getResources().getBoolean(R.bool.default_hide_admin_button)) {
             menu.findItem(R.id.menu_item_settings).setEnabled(false).setVisible(false);
         }
