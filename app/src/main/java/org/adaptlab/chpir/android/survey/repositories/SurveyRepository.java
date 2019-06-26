@@ -7,6 +7,9 @@ import android.os.AsyncTask;
 import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
 import org.adaptlab.chpir.android.survey.daos.SurveyDao;
 import org.adaptlab.chpir.android.survey.entities.Survey;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
+
+import java.util.List;
 
 public class SurveyRepository {
     private SurveyDao mSurveyDao;
@@ -20,10 +23,19 @@ public class SurveyRepository {
         return mSurveyDao;
     }
 
+    public List<Survey> getCompleted() {
+        return mSurveyDao.projectCompletedSurveys(AppUtil.getProjectId());
+    }
+
+    public List<Survey> getIncomplete() {
+        return mSurveyDao.projectIncompleteSurveys(AppUtil.getProjectId());
+    }
+
     public Survey initializeSurvey(Long projectId, Long instrumentId) {
         Survey survey = new Survey();
         survey.setProjectId(projectId);
         survey.setInstrumentRemoteId(instrumentId);
+        survey.setLanguage(AppUtil.getDeviceLanguage());
 
         new InsertSurveyTask(mSurveyDao).execute(survey);
 
@@ -32,6 +44,10 @@ public class SurveyRepository {
 
     public void update(Survey survey) {
         new UpdateSurveyTask(mSurveyDao).execute(survey);
+    }
+
+    public void delete(Survey survey) {
+        new DeleteSurveyTask(mSurveyDao).execute(survey);
     }
 
     private static class UpdateSurveyTask extends AsyncTask<Survey, Void, Void> {
@@ -59,6 +75,20 @@ public class SurveyRepository {
         @Override
         protected Void doInBackground(Survey... params) {
             mSurveyDao.insert(params[0]);
+            return null;
+        }
+    }
+
+    private static class DeleteSurveyTask extends AsyncTask<Survey, Void, Void> {
+        private SurveyDao surveyDao;
+
+        DeleteSurveyTask(SurveyDao dao) {
+            surveyDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(Survey... params) {
+            surveyDao.delete(params[0]);
             return null;
         }
     }

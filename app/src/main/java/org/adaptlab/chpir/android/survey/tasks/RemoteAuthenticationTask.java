@@ -4,7 +4,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import org.adaptlab.chpir.android.survey.BuildConfig;
-import org.apache.commons.codec.CharEncoding;
 import org.json.JSONException;
 import org.json.JSONObject;
 

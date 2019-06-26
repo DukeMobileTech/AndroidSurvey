@@ -36,7 +36,7 @@ public class InstrumentPagerFragment extends Fragment {
 
         mInstrumentAdapter = new InstrumentAdapter(this.getContext());
 
-        if (AppUtil.getProjectId() == 0) {
+        if (AppUtil.getProjectId() == null) {
             SettingsViewModel settingsViewModel = ViewModelProviders.of(getActivity()).get(SettingsViewModel.class);
             settingsViewModel.getSettings().observe(this, new Observer<Settings>() {
                 @Override

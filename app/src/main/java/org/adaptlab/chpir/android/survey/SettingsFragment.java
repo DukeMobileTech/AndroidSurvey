@@ -358,7 +358,7 @@ public class SettingsFragment extends Fragment {
                         mSettings.setApiVersion(version);
                         AppUtil.setApiVersion(version);
                         mSettings.setProjectId(project);
-                        AppUtil.setProjectId(Integer.parseInt(project));
+                        AppUtil.setProjectId(Long.valueOf(project));
                         mSettings.setShowSurveys(surveysCheckBox.isChecked());
                         mSettings.setRecordSurveyLocation(recordSurveyLocation.isChecked());
                         mSettingsViewModel.updateSettings(mSettings);
@@ -398,6 +398,7 @@ public class SettingsFragment extends Fragment {
                                 Toast.makeText(getActivity(), R.string.invalid_user_credentials, Toast.LENGTH_LONG).show();
                             } else {
                                 mSettings.setApiKey(param);
+                                mSettings.setDeviceUserName(username.getText().toString());
                                 AppUtil.setAccessToken(param);
                                 mApiKeyEditText.setText(param);
                                 if (mDialog != null) mDialog.dismiss();

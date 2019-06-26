@@ -9,8 +9,11 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.google.gson.JsonObject;
+
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -19,7 +22,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity(tableName = "Surveys")
-public class Survey {
+public class Survey implements Uploadable {
     private static final String TAG = "Survey";
 
     @PrimaryKey
@@ -38,7 +41,7 @@ public class Survey {
     private Date mLastUpdated;
     @ColumnInfo(name = "Metadata")
     private String mMetadata;
-    @ColumnInfo(name = "ProjectId")
+    @ColumnInfo(name = "ProjectId", index = true)
     private Long mProjectId;
     @ColumnInfo(name = "InstrumentRemoteId", index = true)
     private Long mInstrumentRemoteId;
@@ -60,6 +63,10 @@ public class Survey {
     private int mLastDisplayPosition;
     @ColumnInfo(name = "PreviousDisplays")
     private String mPreviousDisplays;
+    @ColumnInfo(name = "InstrumentTitle")
+    private String mInstrumentTitle;
+    @ColumnInfo(name = "InstrumentVersionNumber")
+    private String mInstrumentVersionNumber;
 
     public Survey() {
         mSent = false;
@@ -257,4 +264,41 @@ public class Survey {
         mPreviousDisplays = previousDisplays;
     }
 
+    public String getInstrumentTitle() {
+        return mInstrumentTitle;
+    }
+
+    public void setInstrumentTitle(String mInstrumentTitle) {
+        this.mInstrumentTitle = mInstrumentTitle;
+    }
+
+    public String getInstrumentVersionNumber() {
+        return mInstrumentVersionNumber;
+    }
+
+    public void setInstrumentVersionNumber(String mInstrumentVersionNumber) {
+        this.mInstrumentVersionNumber = mInstrumentVersionNumber;
+    }
+
+    @Override
+    public String toJSON() {
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("instrument_id", mInstrumentRemoteId);
+        jsonObject.addProperty("instrument_version_number", mInstrumentVersionNumber);
+        jsonObject.addProperty("device_uuid", AppUtil.getSettings().getDeviceIdentifier());
+        jsonObject.addProperty("device_label", AppUtil.getSettings().getDeviceLabel());
+        jsonObject.addProperty("uuid", mUUID);
+        jsonObject.addProperty("instrument_title", mInstrumentTitle);
+        jsonObject.addProperty("latitude", mLatitude);
+        jsonObject.addProperty("longitude", mLongitude);
+        jsonObject.addProperty("metadata", mMetadata);
+        jsonObject.addProperty("skipped_questions", mSkippedQuestions);
+        jsonObject.addProperty("roster_uuid", mRosterUUID);
+        jsonObject.addProperty("language", mLanguage);
+        jsonObject.addProperty("completed_responses_count", mCompletedResponseCount);
+
+        JsonObject json = new JsonObject();
+        json.add("survey", jsonObject);
+        return json.toString();
+    }
 }

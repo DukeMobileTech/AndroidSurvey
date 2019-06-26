@@ -152,6 +152,13 @@ public class Survey2Activity extends AppCompatActivity {
                     mInstrument = relation.instrument;
                     mActionBar.setTitle(mInstrument.getTitle());
                     mSurveyViewModel.setInstrumentLanguage(mInstrument.getLanguage());
+                    if (mSurveyViewModel.getSurvey().getInstrumentTitle() == null) {
+                        mSurveyViewModel.getSurvey().setInstrumentTitle(mInstrument.getTitle());
+                    }
+                    if (mSurveyViewModel.getSurvey().getInstrumentVersionNumber() == null) {
+                        mSurveyViewModel.getSurvey().setInstrumentVersionNumber(String.valueOf(mInstrument.getVersionNumber()));
+                    }
+                    mSurveyViewModel.update();
 
                     List<Display> displays = relation.displays;
                     Collections.sort(displays, new Comparator<Display>() {
@@ -218,6 +225,7 @@ public class Survey2Activity extends AppCompatActivity {
                         }
                     }
                     mSurveyViewModel.setPreviousDisplays(previousDisplays);
+                    mSurveyViewModel.setSurveyLanguage();
                 }
             }
         });
@@ -285,6 +293,8 @@ public class Survey2Activity extends AppCompatActivity {
                 if (position != mLanguageCodes.indexOf(AppUtil.getSettings().getLanguage())) {
                     AppUtil.getSettings().setLanguage(mLanguageCodes.get(position));
                     mSurveyViewModel.setDeviceLanguage(mLanguageCodes.get(position));
+                    mSurveyViewModel.setSurveyLanguage();
+                    mSurveyViewModel.update();
                     LocaleManager.setNewLocale(Survey2Activity.this, mLanguageCodes.get(position));
                     recreate();
                 }

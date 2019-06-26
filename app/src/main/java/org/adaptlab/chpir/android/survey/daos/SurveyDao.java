@@ -21,6 +21,17 @@ public abstract class SurveyDao extends BaseDao<Survey> {
     public abstract LiveData<SurveyRelation> findSurveyRelationByUUID(String uuid);
 
     @Transaction
-    @Query("SELECT * FROM Surveys WHERE ProjectId=:projectId")
+    @Query("SELECT * FROM Surveys WHERE ProjectId=:projectId ORDER BY LastUpdated DESC")
     public abstract LiveData<List<ProjectSurveyRelation>> projectSurveys(Long projectId);
+
+    @Transaction
+    @Query("SELECT * FROM Surveys WHERE ProjectId=:projectId")
+    public abstract List<ProjectSurveyRelation> projectSurveysSync(Long projectId);
+
+    @Query("SELECT * FROM Surveys WHERE ProjectId=:projectId AND Complete=1")
+    public abstract List<Survey> projectCompletedSurveys(Long projectId);
+
+    @Query("SELECT * FROM Surveys WHERE ProjectId=:projectId AND Complete=0")
+    public abstract List<Survey> projectIncompleteSurveys(Long projectId);
+
 }

@@ -11,7 +11,6 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +28,7 @@ import org.adaptlab.chpir.android.survey.entities.Survey;
 import org.adaptlab.chpir.android.survey.relations.ProjectSurveyRelation;
 import org.adaptlab.chpir.android.survey.repositories.SurveyRepository;
 import org.adaptlab.chpir.android.survey.tasks.SetInstrumentLabelTask;
+import org.adaptlab.chpir.android.survey.tasks.SubmitSurveyTask;
 import org.adaptlab.chpir.android.survey.utils.InstrumentListLabel;
 
 import java.text.DateFormat;
@@ -117,9 +117,9 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
                 .setMessage(R.string.delete_survey_message)
                 .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        ProjectSurveyRelation survey = mProjectSurveyRelations.get(position);
+                        ProjectSurveyRelation projectSurveyRelation = mProjectSurveyRelations.get(position);
+                        mSurveyRepository.delete(projectSurveyRelation.survey);
                         mProjectSurveyRelations.remove(position);
-//                        survey.delete();
                         notifyItemRemoved(position);
                     }
                 })
@@ -140,7 +140,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
                             public void onClick(DialogInterface dialog, int id) {
                                 ProjectSurveyRelation survey = mProjectSurveyRelations.get(position);
                                 prepareForSubmission(survey);
-//                                new SubmitSurveyTask(mContext).execute();
+                                new SubmitSurveyTask().execute();
                                 notifyItemChanged(position);
                             }
                         })
@@ -234,13 +234,10 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
             }
             SpannableString progressString = new SpannableString(progress);
             if (survey.isSent() || survey.isQueued()) {
-                Log.i(TAG, "isSent || isQueued");
                 progressString.setSpan(new ForegroundColorSpan(mContext.getResources().getColor(R.color.blue)), 0, progress.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             } else if (survey.isComplete()) {
-                Log.i(TAG, "isComplete");
                 progressString.setSpan(new ForegroundColorSpan(mContext.getResources().getColor(R.color.green)), 0, progress.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             } else {
-                Log.i(TAG, "inProgress");
                 progressString.setSpan(new ForegroundColorSpan(mContext.getResources().getColor(R.color.red)), 0, progress.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
 

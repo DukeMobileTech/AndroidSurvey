@@ -40,7 +40,13 @@ public class EntityDownloadTask extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... voids) {
-        String url = AppUtil.getFullApiUrl() + mTableName + AppUtil.getParams();
+        String url;
+        if (mTableName.equals("projects")) {
+            url = AppUtil.getProjectsEndPoint() + AppUtil.getParams();
+        } else {
+            url = AppUtil.getFullApiUrl() + mTableName + AppUtil.getParams();
+        }
+        if (BuildConfig.DEBUG) Log.i(TAG, "url: " + url);
         final Request request = new Request.Builder().url(url).build();
 
         AppUtil.getOkHttpClient().newCall(request).enqueue(new Callback() {

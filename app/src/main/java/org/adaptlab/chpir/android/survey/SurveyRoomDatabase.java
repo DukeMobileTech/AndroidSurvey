@@ -32,6 +32,7 @@ import org.adaptlab.chpir.android.survey.daos.OptionSetDao;
 import org.adaptlab.chpir.android.survey.daos.OptionSetOptionDao;
 import org.adaptlab.chpir.android.survey.daos.OptionSetTranslationDao;
 import org.adaptlab.chpir.android.survey.daos.OptionTranslationDao;
+import org.adaptlab.chpir.android.survey.daos.ProjectDao;
 import org.adaptlab.chpir.android.survey.daos.QuestionDao;
 import org.adaptlab.chpir.android.survey.daos.QuestionTranslationDao;
 import org.adaptlab.chpir.android.survey.daos.ResponseDao;
@@ -58,6 +59,7 @@ import org.adaptlab.chpir.android.survey.entities.OptionSet;
 import org.adaptlab.chpir.android.survey.entities.OptionSetOption;
 import org.adaptlab.chpir.android.survey.entities.OptionSetTranslation;
 import org.adaptlab.chpir.android.survey.entities.OptionTranslation;
+import org.adaptlab.chpir.android.survey.entities.Project;
 import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.QuestionTranslation;
 import org.adaptlab.chpir.android.survey.entities.Response;
@@ -70,7 +72,7 @@ import java.util.Locale;
 import java.util.UUID;
 
 @Database(entities = {Instrument.class, InstrumentTranslation.class, Question.class, Settings.class,
-        QuestionTranslation.class, LoopQuestion.class, CriticalResponse.class, Display.class,
+        QuestionTranslation.class, LoopQuestion.class, CriticalResponse.class, Display.class, Project.class,
         DisplayTranslation.class, DisplayInstruction.class, Instruction.class, InstructionTranslation.class,
         Section.class, SectionTranslation.class, Option.class, OptionSet.class, OptionSetOption.class,
         OptionSetTranslation.class, OptionTranslation.class, ConditionSkip.class, DeviceUser.class,
@@ -154,6 +156,8 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
     public abstract SurveyDao surveyDao();
 
     public abstract ResponseDao responseDao();
+
+    public abstract ProjectDao projectDao();
 
     private static class CreateSettingsInstanceTask extends AsyncTask<Void, Void, Void> {
         private SettingsDao mSettingsDao;

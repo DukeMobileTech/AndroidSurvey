@@ -58,6 +58,8 @@ public class Settings {
     private String mLanguage;
     @ColumnInfo(name = "DatabaseVersion")
     private int mDatabaseVersion;
+    @ColumnInfo(name = "DeviceUserName")
+    private String mDeviceUserName;
 
     @NonNull
     public Long getId() {
@@ -250,6 +252,14 @@ public class Settings {
 
     public void setApiUrl(String apiUrl) {
         this.mApiUrl = apiUrl;
+    }
+
+    public String getDeviceUserName() {
+        return mDeviceUserName;
+    }
+
+    public void setDeviceUserName(String name) {
+        mDeviceUserName = name;
     }
 
     public String getFullApiUrl() {

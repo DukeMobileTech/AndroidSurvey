@@ -272,6 +272,10 @@ public class SurveyViewModel extends AndroidViewModel {
         mInstrumentLanguage = language;
     }
 
+    public void setSurveyLanguage() {
+        mSurvey.setLanguage(mDeviceLanguage);
+    }
+
     public void setQuestionsWithoutResponses() {
         mQuestionsWithoutResponses = new HashMap<>(getQuestionsMap());
         for (String identifier : getQuestionsToSkipSet()) {

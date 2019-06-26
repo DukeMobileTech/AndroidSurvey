@@ -12,6 +12,7 @@ import androidx.core.app.NotificationCompat;
 
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
 
 public class NotificationUtils {
     private static final String TAG = "NetworkNotificationUtil";
@@ -24,12 +25,8 @@ public class NotificationUtils {
                                         int defaults, int priority, int importance) {
         if (context == null) return;
         int CHANNEL_ID = 100;
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL)
-                .setSmallIcon(iconId)
-                .setContentTitle(context.getString(titleId))
-                .setContentText(message)
-                .setDefaults(defaults)
-                .setPriority(priority);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL).setSmallIcon(iconId)
+                .setContentTitle(context.getString(titleId)).setContentText(message).setDefaults(defaults).setPriority(priority);
 
         NotificationManager notificationManager;
 
@@ -60,12 +57,12 @@ public class NotificationUtils {
             showNotification(context, android.R.drawable.ic_dialog_alert, R.string.app_name,
                     context.getString(R.string.network_unavailable), Notification.BADGE_ICON_SMALL,
                     NotificationCompat.PRIORITY_DEFAULT, NotificationManager.IMPORTANCE_DEFAULT);
-        } else if (!ActiveRecordCloudSync.isApiAvailable()) {
+        } else if (!AppUtil.isApiAvailable()) {
             if (BuildConfig.DEBUG) Log.i(TAG, "Api endpoint is not available");
             showNotification(context, android.R.drawable.ic_dialog_alert, R.string.app_name,
                     context.getString(R.string.api_unavailable), Notification.BADGE_ICON_SMALL,
                     NotificationCompat.PRIORITY_DEFAULT, NotificationManager.IMPORTANCE_DEFAULT);
-        } else if (!ActiveRecordCloudSync.isVersionAcceptable()) {
+        } else if (!AppUtil.isVersionAcceptable()) {
             if (BuildConfig.DEBUG) Log.i(TAG, "Android version code is not acceptable");
             showNotification(context, android.R.drawable.ic_dialog_alert, R.string.app_name,
                     context.getString(R.string.unacceptable_version_code), Notification.BADGE_ICON_SMALL,

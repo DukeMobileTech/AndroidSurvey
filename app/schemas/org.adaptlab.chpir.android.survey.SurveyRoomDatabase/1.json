@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "2c4ef9804662a3f5f5f1dd78236a8721",
+    "identityHash": "5d37e33b7cbe38ffdfbdd7bd00b9e560",
     "entities": [
       {
         "tableName": "Instruments",
@@ -83,6 +83,14 @@
               "RemoteId"
             ],
             "createSql": "CREATE  INDEX `index_Instruments_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          },
+          {
+            "name": "index_Instruments_ProjectId",
+            "unique": false,
+            "columnNames": [
+              "ProjectId"
+            ],
+            "createSql": "CREATE  INDEX `index_Instruments_ProjectId` ON `${TABLE_NAME}` (`ProjectId`)"
           }
         ],
         "foreignKeys": []
@@ -349,7 +357,7 @@
       },
       {
         "tableName": "Settings",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`Id` INTEGER PRIMARY KEY AUTOINCREMENT, `DeviceIdentifier` TEXT, `DeviceLabel` TEXT, `ApiUrl` TEXT, `CustomLocaleCode` TEXT, `ShowSurveys` INTEGER NOT NULL, `ShowSkip` INTEGER NOT NULL, `ShowNA` INTEGER NOT NULL, `ShowRF` INTEGER NOT NULL, `ShowDK` INTEGER NOT NULL, `ApiVersion` TEXT, `ProjectId` TEXT, `ApiKey` TEXT, `RequirePassword` INTEGER NOT NULL, `RecordSurveyLocation` INTEGER NOT NULL, `LastSyncTimes` TEXT, `SecondEndpoint` INTEGER NOT NULL, `Api2Url` TEXT, `Api2Version` TEXT, `Api2Key` TEXT, `ShowRosters` INTEGER NOT NULL, `ShowScores` INTEGER NOT NULL, `Language` TEXT, `DatabaseVersion` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`Id` INTEGER PRIMARY KEY AUTOINCREMENT, `DeviceIdentifier` TEXT, `DeviceLabel` TEXT, `ApiUrl` TEXT, `CustomLocaleCode` TEXT, `ShowSurveys` INTEGER NOT NULL, `ShowSkip` INTEGER NOT NULL, `ShowNA` INTEGER NOT NULL, `ShowRF` INTEGER NOT NULL, `ShowDK` INTEGER NOT NULL, `ApiVersion` TEXT, `ProjectId` TEXT, `ApiKey` TEXT, `RequirePassword` INTEGER NOT NULL, `RecordSurveyLocation` INTEGER NOT NULL, `LastSyncTimes` TEXT, `SecondEndpoint` INTEGER NOT NULL, `Api2Url` TEXT, `Api2Version` TEXT, `Api2Key` TEXT, `ShowRosters` INTEGER NOT NULL, `ShowScores` INTEGER NOT NULL, `Language` TEXT, `DatabaseVersion` INTEGER NOT NULL, `DeviceUserName` TEXT)",
         "fields": [
           {
             "fieldPath": "mId",
@@ -494,6 +502,12 @@
             "columnName": "DatabaseVersion",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "mDeviceUserName",
+            "columnName": "DeviceUserName",
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -826,6 +840,47 @@
               "InstrumentRemoteId"
             ],
             "createSql": "CREATE  INDEX `index_Displays_InstrumentRemoteId` ON `${TABLE_NAME}` (`InstrumentRemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Projects",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Name` TEXT, `Description` TEXT, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mName",
+            "columnName": "Name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDescription",
+            "columnName": "Description",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_Projects_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE  INDEX `index_Projects_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
           }
         ],
         "foreignKeys": []
@@ -1613,7 +1668,7 @@
         "foreignKeys": []
       },
       {
-        "tableName": "DeviceUser",
+        "tableName": "DeviceUsers",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Active` INTEGER NOT NULL, `Name` TEXT, `UserName` TEXT, `PasswordDigest` TEXT, PRIMARY KEY(`RemoteId`))",
         "fields": [
           {
@@ -1653,7 +1708,24 @@
           ],
           "autoGenerate": false
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_DeviceUsers_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE  INDEX `index_DeviceUsers_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          },
+          {
+            "name": "index_DeviceUsers_UserName",
+            "unique": false,
+            "columnNames": [
+              "UserName"
+            ],
+            "createSql": "CREATE  INDEX `index_DeviceUsers_UserName` ON `${TABLE_NAME}` (`UserName`)"
+          }
+        ],
         "foreignKeys": []
       },
       {
@@ -1959,7 +2031,7 @@
       },
       {
         "tableName": "Surveys",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`UUID` TEXT NOT NULL, `SentToRemote` INTEGER NOT NULL, `Complete` INTEGER NOT NULL, `Latitude` TEXT, `Longitude` TEXT, `LastUpdated` INTEGER, `Metadata` TEXT, `ProjectId` INTEGER, `InstrumentRemoteId` INTEGER, `RosterUUID` TEXT, `Language` TEXT, `SkippedQuestions` TEXT, `SkipMaps` TEXT, `Identifier` TEXT, `CompletedResponseCount` INTEGER NOT NULL, `Queued` INTEGER NOT NULL, `LastDisplayPosition` INTEGER NOT NULL, `PreviousDisplays` TEXT, PRIMARY KEY(`UUID`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`UUID` TEXT NOT NULL, `SentToRemote` INTEGER NOT NULL, `Complete` INTEGER NOT NULL, `Latitude` TEXT, `Longitude` TEXT, `LastUpdated` INTEGER, `Metadata` TEXT, `ProjectId` INTEGER, `InstrumentRemoteId` INTEGER, `RosterUUID` TEXT, `Language` TEXT, `SkippedQuestions` TEXT, `SkipMaps` TEXT, `Identifier` TEXT, `CompletedResponseCount` INTEGER NOT NULL, `Queued` INTEGER NOT NULL, `LastDisplayPosition` INTEGER NOT NULL, `PreviousDisplays` TEXT, `InstrumentTitle` TEXT, `InstrumentVersionNumber` TEXT, PRIMARY KEY(`UUID`))",
         "fields": [
           {
             "fieldPath": "mUUID",
@@ -2068,6 +2140,18 @@
             "columnName": "PreviousDisplays",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "mInstrumentTitle",
+            "columnName": "InstrumentTitle",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mInstrumentVersionNumber",
+            "columnName": "InstrumentVersionNumber",
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -2084,6 +2168,14 @@
               "UUID"
             ],
             "createSql": "CREATE  INDEX `index_Surveys_UUID` ON `${TABLE_NAME}` (`UUID`)"
+          },
+          {
+            "name": "index_Surveys_ProjectId",
+            "unique": false,
+            "columnNames": [
+              "ProjectId"
+            ],
+            "createSql": "CREATE  INDEX `index_Surveys_ProjectId` ON `${TABLE_NAME}` (`ProjectId`)"
           },
           {
             "name": "index_Surveys_InstrumentRemoteId",
@@ -2247,7 +2339,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2c4ef9804662a3f5f5f1dd78236a8721')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5d37e33b7cbe38ffdfbdd7bd00b9e560')"
     ]
   }
 }

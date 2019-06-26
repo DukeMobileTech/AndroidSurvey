@@ -9,7 +9,6 @@ import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.SurveyApp;
 import org.adaptlab.chpir.android.survey.location.LocationManager;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
-import org.apache.commons.codec.CharEncoding;
 import org.json.JSONException;
 import org.json.JSONObject;
 

@@ -9,31 +9,24 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
 import org.adaptlab.chpir.android.survey.daos.BaseDao;
-import org.adaptlab.chpir.android.survey.vendor.BCrypt;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity(tableName = "DeviceUsers")
-public class DeviceUser implements SurveyEntity {
+@Entity(tableName = "Projects")
+public class Project implements SurveyEntity {
     @PrimaryKey
     @NonNull
     @SerializedName("id")
     @ColumnInfo(name = "RemoteId", index = true)
     private Long mRemoteId;
-    @SerializedName("active")
-    @ColumnInfo(name = "Active")
-    private boolean mActive;
     @SerializedName("name")
     @ColumnInfo(name = "Name")
     private String mName;
-    @SerializedName("username")
-    @ColumnInfo(name = "UserName", index = true)
-    private String mUserName;
-    @SerializedName("password_digest")
-    @ColumnInfo(name = "PasswordDigest")
-    private String mPasswordDigest;
+    @SerializedName("description")
+    @ColumnInfo(name = "Description")
+    private String mDescription;
 
     @NonNull
     public Long getRemoteId() {
@@ -44,14 +37,6 @@ public class DeviceUser implements SurveyEntity {
         this.mRemoteId = mRemoteId;
     }
 
-    public boolean isActive() {
-        return mActive;
-    }
-
-    public void setActive(boolean mActive) {
-        this.mActive = mActive;
-    }
-
     public String getName() {
         return mName;
     }
@@ -60,32 +45,17 @@ public class DeviceUser implements SurveyEntity {
         this.mName = mName;
     }
 
-    public String getUserName() {
-        return mUserName;
+    public String getDescription() {
+        return mDescription;
     }
 
-    public void setUserName(String mUserName) {
-        this.mUserName = mUserName;
-    }
-
-    public String getPasswordDigest() {
-        return mPasswordDigest;
-    }
-
-    public void setPasswordDigest(String mPasswordDigest) {
-        this.mPasswordDigest = mPasswordDigest;
-    }
-
-    public boolean checkPassword(String password) {
-        if (!mActive) {
-            return false;
-        }
-        return BCrypt.checkpw(password, mPasswordDigest);
+    public void setDescription(String mDescription) {
+        this.mDescription = mDescription;
     }
 
     @Override
     public Type getType() {
-        return new TypeToken<ArrayList<DeviceUser>>() {
+        return new TypeToken<ArrayList<Project>>() {
         }.getType();
     }
 

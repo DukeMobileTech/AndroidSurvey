@@ -25,6 +25,10 @@ public class ResponseRepository {
         new UpdateResponseTask(mResponseDao).execute(response);
     }
 
+    public void delete(Response response) {
+        new DeleteResponseTask(mResponseDao).execute(response);
+    }
+
     public void insertAll(List<Response> responses) {
         new InsertAllResponsesTask(mResponseDao, responses).execute();
     }
@@ -53,6 +57,20 @@ public class ResponseRepository {
         @Override
         protected Void doInBackground(Response... params) {
             mResponseDao.update(params[0]);
+            return null;
+        }
+    }
+
+    private static class DeleteResponseTask extends AsyncTask<Response, Void, Void> {
+        private ResponseDao mResponseDao;
+
+        DeleteResponseTask(ResponseDao dao) {
+            mResponseDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(Response... params) {
+            mResponseDao.delete(params[0]);
             return null;
         }
     }

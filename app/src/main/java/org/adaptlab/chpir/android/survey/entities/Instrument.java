@@ -38,7 +38,7 @@ public class Instrument implements SurveyEntity {
     @ColumnInfo(name = "QuestionCount")
     private int mQuestionCount;
     @SerializedName("project_id")
-    @ColumnInfo(name = "ProjectId")
+    @ColumnInfo(name = "ProjectId", index = true)
     private Long mProjectId;
     @SerializedName("published")
     @ColumnInfo(name = "Published")

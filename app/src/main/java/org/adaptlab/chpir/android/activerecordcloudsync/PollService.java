@@ -38,7 +38,7 @@ public class PollService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         if (NotificationUtils.checkForNetworkErrors(getApplicationContext())) {
-            new SubmitSurveyTask(getApplicationContext()).execute();
+            new SubmitSurveyTask().execute();
         }
     }
 
