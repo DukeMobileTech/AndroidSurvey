@@ -2,20 +2,18 @@ package org.adaptlab.chpir.android.survey.viewholders;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.github.gcacace.signaturepad.views.SignaturePad;
 
-import org.adaptlab.chpir.android.survey.models.ResponsePhoto;
 
 public class SignatureViewHolder extends QuestionViewHolder {
     private SignaturePad mSignaturePad;
     private Button mClearButton;
     private Button mSaveButton;
-    private ResponsePhoto mResponsePhoto;
+    //    private ResponsePhoto mResponsePhoto;
     private Bitmap mSignatureBitmap;
 
     SignatureViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
@@ -124,14 +122,14 @@ public class SignatureViewHolder extends QuestionViewHolder {
 
     @Override
     protected void deserialize(String responseText) {
-        String filename = mResponsePhoto.getPicturePath();
-        if (filename != null && !filename.isEmpty()) {
-            String path = getContext().getFileStreamPath(filename).getAbsolutePath();
-            mSignatureBitmap = BitmapFactory.decodeFile(path);
-            if (mSignaturePad != null) {
-                mSignaturePad.setSignatureBitmap(mSignatureBitmap);
-            }
-        }
+//        String filename = mResponsePhoto.getPicturePath();
+//        if (filename != null && !filename.isEmpty()) {
+//            String path = getContext().getFileStreamPath(filename).getAbsolutePath();
+//            mSignatureBitmap = BitmapFactory.decodeFile(path);
+//            if (mSignaturePad != null) {
+//                mSignaturePad.setSignatureBitmap(mSignatureBitmap);
+//            }
+//        }
     }
 
     @Override

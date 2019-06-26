@@ -1,2 +1,0 @@
-ALTER TABLE Responses ADD COLUMN RandomizedData STRING;
-ALTER TABLE Options ADD COLUMN CompleteSurvey BOOLEAN;

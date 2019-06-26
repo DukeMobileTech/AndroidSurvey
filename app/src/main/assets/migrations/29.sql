@@ -1,1 +1,0 @@
-ALTER TABLE AdminSettings ADD COLUMN RecordSurveyLocation BOOLEAN;

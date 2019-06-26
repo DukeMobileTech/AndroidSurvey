@@ -40,9 +40,9 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
-import static org.adaptlab.chpir.android.survey.models.Instrument.LOOP_MAX;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMPLETE_SURVEY;
+import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.LOOP_MAX;
 
 public class DisplayPagerFragment extends Fragment {
     public final static String EXTRA_INSTRUMENT_ID = "org.adaptlab.chpir.android.survey.EXTRA_INSTRUMENT_ID";

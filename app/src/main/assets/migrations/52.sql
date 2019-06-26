@@ -1,1 +1,0 @@
-ALTER TABLE Instruments ADD COLUMN Scorable BOOLEAN;

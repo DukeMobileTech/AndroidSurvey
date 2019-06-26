@@ -1,1 +1,0 @@
-ALTER TABLE MultipleSkips ADD COLUMN Value INTEGER;

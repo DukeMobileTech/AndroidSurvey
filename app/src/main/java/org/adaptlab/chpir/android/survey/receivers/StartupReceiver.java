@@ -7,7 +7,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import org.adaptlab.chpir.android.activerecordcloudsync.PollService;
+import org.adaptlab.chpir.android.survey.utils.PollService;
 
 public class StartupReceiver extends BroadcastReceiver {
     private static final String TAG = "StartupReceiver";

@@ -1,3 +1,0 @@
-ALTER TABLE Questions ADD COLUMN LoopQuestionCount INTEGER;
-ALTER TABLE Questions ADD COLUMN LoopSource STRING;
-ALTER TABLE Questions ADD COLUMN LoopNumber INTEGER;

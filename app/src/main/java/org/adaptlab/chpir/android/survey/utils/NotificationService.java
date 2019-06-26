@@ -1,4 +1,4 @@
-package org.adaptlab.chpir.android.activerecordcloudsync;
+package org.adaptlab.chpir.android.survey.utils;
 
 import android.annotation.TargetApi;
 import android.app.AlarmManager;

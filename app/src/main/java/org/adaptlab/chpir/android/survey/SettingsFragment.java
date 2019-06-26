@@ -1,8 +1,6 @@
 package org.adaptlab.chpir.android.survey;
 
 import android.app.AlertDialog;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,15 +23,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
-import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.survey.entities.Settings;
-import org.adaptlab.chpir.android.survey.models.Response;
-import org.adaptlab.chpir.android.survey.models.Survey;
 import org.adaptlab.chpir.android.survey.tasks.ApkUpdateTask;
 import org.adaptlab.chpir.android.survey.tasks.RemoteAuthenticationTask;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
@@ -45,15 +39,10 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 public class SettingsFragment extends Fragment {
-    private final String TAG = "SettingsFragment";
-    private final String CHANNEL = "RESTORATION_CHANNEL";
-    private final int RESTORATION_ID = 12345;
     private EditText mDeviceIdentifierEditText;
     private EditText mDeviceLabelEditText;
     private EditText mApiDomainNameEditText;
@@ -175,99 +164,31 @@ public class SettingsFragment extends Fragment {
             }
         });
 
-        Button restoreData = v.findViewById(R.id.restoreResponsesButton);
-        restoreData.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                restoreDeletedSurveys();
-            }
-        });
-
         return v;
-    }
-
-    private void restoreDeletedSurveys() {
-        if (getActivity() == null) return;
-        Set<String> surveyIds = new HashSet<>();
-        List<Survey> surveys = Survey.getAll();
-        List<Response> responses = Response.getAll();
-        int MAX = surveys.size() + responses.size();
-        NotificationManager notificationManager = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            notificationManager = getActivity().getSystemService(NotificationManager.class);
-        }
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getActivity(), CHANNEL)
-                .setSmallIcon(R.drawable.ic_restore_black_24dp)
-                .setContentTitle("Restoring Data")
-                .setContentText("Please wait a moment as data is restored")
-                .setPriority(NotificationCompat.PRIORITY_HIGH);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            String description = "Restoring previously deleted surveys that still have their data on the device";
-            NotificationChannel channel = new NotificationChannel(CHANNEL, CHANNEL, NotificationManager.IMPORTANCE_HIGH);
-            channel.setDescription(description);
-            if (notificationManager != null) {
-                notificationManager.createNotificationChannel(channel);
-            }
-        }
-        builder.setProgress(MAX, 0, false);
-        if (notificationManager != null) {
-            notificationManager.notify(RESTORATION_ID, builder.build());
-        }
-
-        int counter = 0;
-        for (Survey survey : surveys) {
-            surveyIds.add(survey.getUUID());
-            counter += 1;
-            builder.setProgress(counter, MAX, false);
-        }
-        for (Response response : responses) {
-            counter += 1;
-            builder.setProgress(counter, MAX, false);
-            if (!surveyIds.contains(response.getSurveyUUID())) {
-                Survey survey = new Survey();
-                survey.setUuid(response.getSurveyUUID());
-                survey.setInstrumentRemoteId(response.getQuestion().getInstrument().getRemoteId());
-                survey.setProjectId(response.getQuestion().getInstrument().getProjectId());
-                survey.save();
-                surveyIds.add(response.getSurveyUUID());
-            }
-        }
-        builder.setContentText("Restoration complete").setProgress(0, 0, false);
-        if (notificationManager != null) {
-            notificationManager.notify(RESTORATION_ID, builder.build());
-            notificationManager.cancel(RESTORATION_ID);
-        }
-        getActivity().finish();
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.admin_setting_menu, menu);
+        inflater.inflate(R.menu.fragment_setting, menu);
     }
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         if (getResources().getBoolean(R.bool.default_admin_settings)) {
-            menu.findItem(R.id.save_admin_settings_button).setEnabled(false).setVisible(false);
-            menu.findItem(R.id.delete_data_button).setEnabled(false).setVisible(false);
+            menu.findItem(R.id.save_settings_button).setEnabled(false).setVisible(false);
         }
-        menu.findItem(R.id.delete_data_button).setEnabled(false).setVisible(false);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.save_admin_settings_button:
-                saveSettings();
-                finishActivity();
-                return true;
-            case R.id.delete_data_button:
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.save_settings_button) {
+            saveSettings();
+            finishActivity();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     private void setSpinnerAdapter() {
@@ -300,7 +221,7 @@ public class SettingsFragment extends Fragment {
         mSpinner.setSelection(languageCodes.indexOf(mSettings.getLanguage()));
     }
 
-    public String getLastUpdateTime() {
+    private String getLastUpdateTime() {
         String last = mSettings.getLastSyncTime();
         if (TextUtils.isEmpty(last)) return "";
         Calendar calendar = Calendar.getInstance();
@@ -429,9 +350,6 @@ public class SettingsFragment extends Fragment {
             mSettings.setRecordSurveyLocation(mRecordSurveyLocationCheckBox.isChecked());
 
             mSettingsViewModel.updateSettings(mSettings);
-
-            ActiveRecordCloudSync.setAccessToken(mSettings.getApiKey());
-            ActiveRecordCloudSync.setEndPoint(mSettings.getFullApiUrl());
         }
     }
 

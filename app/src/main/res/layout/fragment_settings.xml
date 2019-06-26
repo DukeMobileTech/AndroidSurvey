@@ -327,23 +327,5 @@
             android:text="@string/check_for_updates"
             android:textColor="@color/primary_text" />
 
-        <TextView
-            android:id="@+id/restoreResponsesLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:text="Use the button below to restore deleted surveys whose responses are still on the device"
-            android:textStyle="bold" />
-
-        <Button
-            android:id="@+id/restoreResponsesButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:background="@color/primary"
-            android:padding="10dp"
-            android:text="Restore Survey Responses"
-            android:textColor="@color/primary_text" />
-
     </LinearLayout>
 </ScrollView>

@@ -1,1 +1,0 @@
-ALTER TABLE Responses ADD COLUMN DeviceUser LONG;

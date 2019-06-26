@@ -1,2 +1,0 @@
-ALTER TABLE Surveys ADD COLUMN LastQuestion LONG;
-ALTER TABLE Surveys ADD COLUMN LastUpdated DATE;

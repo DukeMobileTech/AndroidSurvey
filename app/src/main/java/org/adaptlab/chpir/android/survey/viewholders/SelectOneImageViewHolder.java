@@ -6,14 +6,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 
-import org.adaptlab.chpir.android.survey.models.Image;
-
-import java.util.ArrayList;
 
 public class SelectOneImageViewHolder extends QuestionViewHolder {
     private final int SELECTED = Color.GREEN;
     private int mResponseIndex;
-    private ArrayList<Image> mImages;
+    //    private ArrayList<Image> mImages;
     private Integer mPreviouslySelectedViewIndex = Integer.MAX_VALUE;
     private GridView mGridView;
 

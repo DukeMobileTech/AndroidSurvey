@@ -1,5 +1,6 @@
 package org.adaptlab.chpir.android.survey;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.res.Configuration;
 
@@ -10,7 +11,7 @@ import com.newrelic.agent.android.NewRelic;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.utils.LocaleManager;
 
-public class SurveyApp extends com.activeandroid.app.Application {
+public class SurveyApp extends Application {
     private static SurveyApp mInstance;
 
     public static SurveyApp getInstance() {

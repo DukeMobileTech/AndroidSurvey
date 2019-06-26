@@ -67,7 +67,6 @@ dependencies {
     implementation files('libs/commons-codec-1.8.jar')
     implementation files('libs/commons-lang3-3.4.jar')
     implementation files('libs/opencsv-3.5.jar')
-    implementation files('libs/ActiveAndroid.jar')
 
     // Gson
     implementation 'com.google.code.gson:gson:2.8.5'

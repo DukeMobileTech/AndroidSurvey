@@ -3,7 +3,6 @@ package org.adaptlab.chpir.android.survey.tasks;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import org.adaptlab.chpir.android.activerecordcloudsync.NotificationUtils;
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.SurveyApp;
 import org.adaptlab.chpir.android.survey.entities.DeviceSyncEntry;
@@ -14,6 +13,7 @@ import org.adaptlab.chpir.android.survey.relations.ProjectSurveyRelation;
 import org.adaptlab.chpir.android.survey.repositories.ResponseRepository;
 import org.adaptlab.chpir.android.survey.repositories.SurveyRepository;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
+import org.adaptlab.chpir.android.survey.utils.NotificationUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;

@@ -16,11 +16,10 @@ import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
-import org.adaptlab.chpir.android.activerecordcloudsync.NotificationUtils;
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
+import org.adaptlab.chpir.android.survey.utils.NotificationUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -62,10 +61,7 @@ public class ApkUpdateTask extends AsyncTask<Void, Void, Void> {
     }
 
     private void checkLatestApk() {
-        ActiveRecordCloudSync.setAccessToken(AppUtil.getAccessToken());
-        ActiveRecordCloudSync.setVersionCode(AppUtil.getVersionCode(mContext));
-        String url = AppUtil.getFullApiUrl() + "android_updates" +
-                ActiveRecordCloudSync.getParams();
+        String url = AppUtil.getFullApiUrl() + "android_updates" + AppUtil.getParams();
         try {
             String jsonString = getUrl(url);
             if (BuildConfig.DEBUG) Log.i(TAG, "Got JSON String: " + jsonString);
@@ -170,7 +166,7 @@ public class ApkUpdateTask extends AsyncTask<Void, Void, Void> {
 
         private void downloadLatestApk() {
             String url = AppUtil.getFullApiUrl() + "android_updates/" +
-                    mApkId + "/" + ActiveRecordCloudSync.getParams();
+                    mApkId + "/" + AppUtil.getParams();
             File path = Environment.getExternalStoragePublicDirectory(Environment
                     .DIRECTORY_DOWNLOADS);
             mFile = new File(path, mFileName);

@@ -1,1 +1,0 @@
-ALTER TABLE Options ADD COLUMN InstrumentVersion INTEGER;

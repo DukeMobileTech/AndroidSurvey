@@ -1,2 +1,0 @@
-ALTER TABLE Responses ADD COLUMN TimeStarted DATE;
-ALTER TABLE Responses ADD COLUMN TimeEnded DATE;

@@ -1,9 +1,0 @@
-ALTER TABLE InstrumentTranslations ADD COLUMN Active BOOLEAN;
-ALTER TABLE InstrumentTranslations ADD COLUMN RemoteId LONG;
-ALTER TABLE QuestionTranslations ADD COLUMN InstrumentTranslation INTEGER;
-ALTER TABLE QuestionTranslations ADD COLUMN RemoteId LONG;
-ALTER TABLE QuestionTranslations ADD COLUMN Instructions TEXT;
-ALTER TABLE OptionTranslations ADD COLUMN InstrumentTranslation INTEGER;
-ALTER TABLE OptionTranslations ADD COLUMN RemoteId LONG;
-ALTER TABLE SectionTranslations ADD COLUMN InstrumentTranslation INTEGER;
-ALTER TABLE SectionTranslations ADD COLUMN RemoteId LONG;

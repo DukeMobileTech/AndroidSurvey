@@ -1,4 +1,4 @@
-package org.adaptlab.chpir.android.activerecordcloudsync;
+package org.adaptlab.chpir.android.survey.utils;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -12,7 +12,6 @@ import androidx.core.app.NotificationCompat;
 
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.utils.AppUtil;
 
 public class NotificationUtils {
     private static final String TAG = "NetworkNotificationUtil";

@@ -1,1 +1,0 @@
-ALTER TABLE Surveys ADD COLUMN SkipMaps STRING;

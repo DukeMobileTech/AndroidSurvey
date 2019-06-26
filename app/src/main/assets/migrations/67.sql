@@ -1,2 +1,0 @@
-ALTER TABLE Questions ADD COLUMN TableIdentifier STRING;
-ALTER TABLE Displays ADD COLUMN SectionTitle STRING;

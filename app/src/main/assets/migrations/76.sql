@@ -1,1 +1,0 @@
-ALTER TABLE LoopQuestions ADD COLUMN OptionIndices STRING;

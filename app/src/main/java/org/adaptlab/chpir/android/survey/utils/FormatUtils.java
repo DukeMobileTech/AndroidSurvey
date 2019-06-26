@@ -1,18 +1,13 @@
 package org.adaptlab.chpir.android.survey.utils;
 
-import android.content.Context;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
 
-import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.models.Instrument;
-import org.adaptlab.chpir.android.survey.models.Option;
-import org.adaptlab.chpir.android.survey.models.Response;
-
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
-import java.util.List;
+
+import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 
 public class FormatUtils {
     public static String pluralize(int number, String singular, String plural) {
@@ -63,29 +58,12 @@ public class FormatUtils {
     }
 
     // Add a 0 to minute values less than 10 to look more natural
-    public static String formatMinute(int minute) {
+    private static String formatMinute(int minute) {
         if (minute < 10) {
             return "0" + minute;
         } else {
             return String.valueOf(minute);
         }
-    }
-
-    public static String unformatMultipleResponses(List<Option> options, String responseText, Context context, Instrument instrument) {
-        String[] responses = responseText.split(",");
-        String multipleText = "";
-        for (int i = 0; i < responses.length; i++) {
-            multipleText += options.get(Integer.parseInt(responses[i])).getText(instrument);
-            if (i < responses.length - 2)
-                multipleText += context.getString(R.string.comma) + context.getString(R.string.space);
-            else if (i == responses.length - 2) multipleText += context.getString(R.string.space)
-                    + context.getString(R.string.and) + context.getString(R.string.space);
-        }
-        return multipleText;
-    }
-
-    public static String stripHtml(String withHtml) {
-        return Html.fromHtml(withHtml).toString().trim();
     }
 
     public static Spanned styleTextWithHtml(String text) {
@@ -104,7 +82,7 @@ public class FormatUtils {
         StringBuilder serialized = new StringBuilder();
         for (int i = 0; i < list.size(); i++) {
             serialized.append(list.get(i));
-            if (i < list.size() - 1) serialized.append(Response.LIST_DELIMITER);
+            if (i < list.size() - 1) serialized.append(COMMA);
         }
         return serialized.toString();
     }

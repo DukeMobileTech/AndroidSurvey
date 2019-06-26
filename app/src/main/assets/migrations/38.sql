@@ -1,3 +1,0 @@
-ALTER TABLE Sections ADD COLUMN FirstQuestionNumber INTEGER;
-ALTER TABLE Sections ADD COLUMN SectionNumber INTEGER;
-ALTER TABLE Questions ADD COLUMN Section STRING;

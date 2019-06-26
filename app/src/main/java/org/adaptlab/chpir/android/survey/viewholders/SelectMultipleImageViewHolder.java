@@ -8,9 +8,6 @@ import android.view.ViewGroup;
 import android.widget.GridView;
 import android.widget.ImageView;
 
-import org.adaptlab.chpir.android.survey.models.Image;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
@@ -20,7 +17,7 @@ public class SelectMultipleImageViewHolder extends QuestionViewHolder {
     private final int UNSELECTED = Color.TRANSPARENT;
     private List<Integer> mSelectedViews;
     private GridView mGridView;
-    private ArrayList<Image> mImages;
+//    private ArrayList<Image> mImages;
 
     SelectMultipleImageViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
         super(itemView, context, listener);

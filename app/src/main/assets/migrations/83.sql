@@ -1,2 +1,0 @@
-ALTER TABLE LoopQuestions ADD COLUMN TextToReplace STRING;
-ALTER TABLE Questions ADD COLUMN TextToReplace STRING;
