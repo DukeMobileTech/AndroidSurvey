@@ -45,6 +45,7 @@ import org.adaptlab.chpir.android.survey.tasks.SetLoopsTask;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -56,6 +57,7 @@ public class AppUtil {
     private final static String TAG = "AppUtil";
     private final static boolean REQUIRE_SECURITY_CHECKS = PRODUCTION;
     private final static int REMOTE_TABLE_COUNT = 15;
+    private static final int TIMEOUT = 10000;
     private static volatile int REMOTE_DOWNLOAD_COUNT = 0;
     private static String ACCESS_TOKEN;
     private static String LAST_SYNC_TIME;
@@ -69,6 +71,7 @@ public class AppUtil {
     private static OkHttpClient okHttpClient;
     private static Settings mSettings;
     private static SettingsRepository mSettingsRepository;
+    private static String mCurrentSyncTime;
 
     public static void appInit(Application application) {
         if (AppUtil.REQUIRE_SECURITY_CHECKS) {
@@ -204,6 +207,8 @@ public class AppUtil {
     }
 
     public static void downloadData(Application application) {
+        Date currentTime = new Date();
+        mCurrentSyncTime = Long.toString(currentTime.getTime());
         new ProjectRepository(application).download();
         new InstrumentRepository(application).download();
         new OptionRepository(application).download();
@@ -251,7 +256,7 @@ public class AppUtil {
         }
     }
 
-    public static String getAccessToken() {
+    private static String getAccessToken() {
         return ACCESS_TOKEN;
     }
 
@@ -286,6 +291,8 @@ public class AppUtil {
 
     public static void setLastSyncTime(String lastSyncTime) {
         LAST_SYNC_TIME = lastSyncTime;
+        mSettings.setLastSyncTime(LAST_SYNC_TIME);
+        mSettingsRepository.update(mSettings);
     }
 
     public static String getFullApiUrl() {
@@ -363,14 +370,13 @@ public class AppUtil {
         deviceUserTask.execute((DeviceUserDao) repository.getDao());
     }
 
-    public static boolean isApiAvailable() {
-        if (getPingAddress() == null) return false;
-        int responseCode = ping(getPingAddress(), 10000);
+    static boolean isApiAvailable() {
+        int responseCode = ping(getPingAddress());
         return responseCode == 426 || (200 <= responseCode && responseCode < 300);
     }
 
-    public static boolean isVersionAcceptable() {
-        int responseCode = ping(getPingAddress(), 10000);
+    static boolean isVersionAcceptable() {
+        int responseCode = ping(getPingAddress());
         return responseCode != 426;  // Http Status Code 426 = upgrade required
     }
 
@@ -379,13 +385,13 @@ public class AppUtil {
     }
 
 
-    private static int ping(String url, int timeout) {
+    private static int ping(String url) {
         if (url == null) return -1;
         url = url + getParams();
         try {
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-            connection.setConnectTimeout(timeout);
-            connection.setReadTimeout(timeout);
+            connection.setConnectTimeout(TIMEOUT);
+            connection.setReadTimeout(TIMEOUT);
             connection.setRequestMethod("HEAD");
             int responseCode = connection.getResponseCode();
             if (BuildConfig.DEBUG)
@@ -394,6 +400,14 @@ public class AppUtil {
         } catch (IOException exception) {
             return -1;
         }
+    }
+
+    public static String getCurrentSyncTime() {
+        return mCurrentSyncTime;
+    }
+
+    public static void resetCurrentSyncTime() {
+        mCurrentSyncTime = null;
     }
 
 }

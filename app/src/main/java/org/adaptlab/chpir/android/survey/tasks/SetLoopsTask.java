@@ -148,6 +148,8 @@ public class SetLoopsTask extends AsyncTask<Void, Void, Void> {
                 return;
             }
         }
+        AppUtil.setLastSyncTime(AppUtil.getCurrentSyncTime());
+        AppUtil.resetCurrentSyncTime();
         instrument.setLoaded(true);
         mInstrumentDao.update(instrument);
     }

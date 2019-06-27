@@ -126,14 +126,14 @@ public class SettingsFragment extends Fragment {
         }
 
         mLastUpdateTextView = v.findViewById(R.id.last_update_label);
-//        mLastUpdateTextView.setText(String.format(Locale.getDefault(), "%s%s%s",
-//                getString(R.string.last_update), " ", getLastUpdateTime()));
 
         Button resetLastSyncTime = v.findViewById(R.id.reset_last_sync_time_button);
         resetLastSyncTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mSettings.setLastSyncTime(null);
+                AppUtil.setLastSyncTime(null);
+                mSettingsViewModel.updateSettings(mSettings);
                 mLastUpdateTextView.setText(String.format(Locale.getDefault(), "%s%s%s",
                         getString(R.string.last_update), " ", getLastUpdateTime()));
             }
