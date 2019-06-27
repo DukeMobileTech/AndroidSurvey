@@ -21,7 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.Survey2Activity;
+import org.adaptlab.chpir.android.survey.SurveyActivity;
 import org.adaptlab.chpir.android.survey.entities.Instrument;
 import org.adaptlab.chpir.android.survey.entities.Response;
 import org.adaptlab.chpir.android.survey.entities.Survey;
@@ -83,9 +83,9 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
                 } else if (!instrument.isLoaded()) {
                     Toast.makeText(mContext, R.string.instrument_not_loaded, Toast.LENGTH_LONG).show();
                 } else {
-                    Intent i = new Intent(mContext, Survey2Activity.class);
-                    i.putExtra(Survey2Activity.EXTRA_INSTRUMENT_ID, survey.getInstrumentRemoteId());
-                    i.putExtra(Survey2Activity.EXTRA_SURVEY_UUID, survey.getUUID());
+                    Intent i = new Intent(mContext, SurveyActivity.class);
+                    i.putExtra(SurveyActivity.EXTRA_INSTRUMENT_ID, survey.getInstrumentRemoteId());
+                    i.putExtra(SurveyActivity.EXTRA_SURVEY_UUID, survey.getUUID());
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         mContext.startActivity(i, ActivityOptions.makeSceneTransitionAnimation((Activity) mContext).toBundle());
                     } else {

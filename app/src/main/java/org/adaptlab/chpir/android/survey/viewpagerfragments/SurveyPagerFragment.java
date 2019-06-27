@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,11 +94,18 @@ public class SurveyPagerFragment extends Fragment {
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.fragment_instrument, menu);
+    }
+
+    @Override
     public void onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         menu.findItem(R.id.menu_item_submit_all).setEnabled(true).setVisible(true);
         menu.findItem(R.id.menu_item_settings).setEnabled(false).setVisible(false);
         menu.findItem(R.id.menu_item_refresh).setEnabled(false).setVisible(false);
+        menu.findItem(R.id.menu_item_progress_action).setEnabled(false).setVisible(false);
     }
 
     @Override

@@ -205,7 +205,7 @@ public class SurveyReviewFragment extends ListFragment {
 
     private void setReturnResults(Long displayId) {
         Intent i = new Intent();
-        i.putExtra(Survey2Activity.EXTRA_DISPLAY_ID, displayId);
+        i.putExtra(SurveyActivity.EXTRA_DISPLAY_ID, displayId);
         getActivity().setResult(Activity.RESULT_OK, i);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getActivity().finishAfterTransition();

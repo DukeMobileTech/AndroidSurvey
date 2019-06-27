@@ -1,16 +1,11 @@
 package org.adaptlab.chpir.android.survey;
 
 import android.Manifest;
-import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -108,42 +103,6 @@ public class InstrumentActivity extends AppCompatActivity {
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(LocaleManager.setLocale(base));
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.fragment_instrument, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-        menu.findItem(R.id.menu_item_submit_all).setEnabled(false).setVisible(false);
-        if (getResources().getBoolean(R.bool.default_hide_admin_button)) {
-            menu.findItem(R.id.menu_item_settings).setEnabled(false).setVisible(false);
-        }
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_item_settings:
-                Intent i = new Intent(this, SettingsActivity.class);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    startActivity(i, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
-                } else {
-                    startActivity(i);
-                }
-                return true;
-            case R.id.menu_item_refresh:
-                AppUtil.downloadData(this.getApplication());
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 
 }

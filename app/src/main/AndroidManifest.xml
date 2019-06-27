@@ -42,7 +42,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".SurveyReviewActivity" />
-        <activity android:name=".Survey2Activity" />
+        <activity android:name=".SurveyActivity" />
         <activity android:name=".SettingsActivity" />
 
         <service android:name=".utils.PollService" />

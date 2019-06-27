@@ -64,7 +64,7 @@ import java.util.Locale;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 
-public class Survey2Activity extends AppCompatActivity {
+public class SurveyActivity extends AppCompatActivity {
     public final static String EXTRA_INSTRUMENT_ID = "org.adaptlab.chpir.android.survey.EXTRA_INSTRUMENT_ID";
     public final static String EXTRA_SURVEY_UUID = "org.adaptlab.chpir.android.survey.EXTRA_SURVEY_UUID";
     public final static String EXTRA_DISPLAY_ID = "org.adaptlab.chpir.android.survey.EXTRA_DISPLAY_ID";
@@ -295,7 +295,7 @@ public class Survey2Activity extends AppCompatActivity {
                     mSurveyViewModel.setDeviceLanguage(mLanguageCodes.get(position));
                     mSurveyViewModel.setSurveyLanguage();
                     mSurveyViewModel.update();
-                    LocaleManager.setNewLocale(Survey2Activity.this, mLanguageCodes.get(position));
+                    LocaleManager.setNewLocale(SurveyActivity.this, mLanguageCodes.get(position));
                     recreate();
                 }
             }
