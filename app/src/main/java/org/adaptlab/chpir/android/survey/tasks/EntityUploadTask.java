@@ -5,7 +5,6 @@ import android.util.Log;
 
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.SurveyApp;
-import org.adaptlab.chpir.android.survey.entities.DeviceSyncEntry;
 import org.adaptlab.chpir.android.survey.entities.Response;
 import org.adaptlab.chpir.android.survey.entities.Survey;
 import org.adaptlab.chpir.android.survey.entities.Uploadable;
@@ -13,6 +12,7 @@ import org.adaptlab.chpir.android.survey.relations.ProjectSurveyRelation;
 import org.adaptlab.chpir.android.survey.repositories.ResponseRepository;
 import org.adaptlab.chpir.android.survey.repositories.SurveyRepository;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
+import org.adaptlab.chpir.android.survey.utils.DeviceSyncEntry;
 import org.adaptlab.chpir.android.survey.utils.NotificationUtils;
 
 import java.io.IOException;
@@ -25,8 +25,8 @@ import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
-public class SubmitSurveyTask extends AsyncTask<Void, Integer, Void> {
-    private static final String TAG = SubmitSurveyTask.class.getName();
+public class EntityUploadTask extends AsyncTask<Void, Integer, Void> {
+    private static final String TAG = EntityUploadTask.class.getName();
     private SurveyRepository mSurveyRepository;
     private ResponseRepository mResponseRepository;
 

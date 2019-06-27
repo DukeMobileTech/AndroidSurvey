@@ -60,6 +60,10 @@ public class Settings {
     private int mDatabaseVersion;
     @ColumnInfo(name = "DeviceUserName")
     private String mDeviceUserName;
+    @ColumnInfo(name = "Latitude")
+    private String mLatitude;
+    @ColumnInfo(name = "Longitude")
+    private String mLongitude;
 
     @NonNull
     public Long getId() {
@@ -260,6 +264,22 @@ public class Settings {
 
     public void setDeviceUserName(String name) {
         mDeviceUserName = name;
+    }
+
+    public String getLatitude() {
+        return mLatitude;
+    }
+
+    public void setLatitude(String mLatitude) {
+        this.mLatitude = mLatitude;
+    }
+
+    public String getLongitude() {
+        return mLongitude;
+    }
+
+    public void setLongitude(String mLongitude) {
+        this.mLongitude = mLongitude;
     }
 
     public String getFullApiUrl() {

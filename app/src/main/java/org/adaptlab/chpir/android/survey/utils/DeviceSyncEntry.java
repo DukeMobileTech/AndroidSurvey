@@ -1,13 +1,13 @@
-package org.adaptlab.chpir.android.survey.entities;
+package org.adaptlab.chpir.android.survey.utils;
 
 import com.google.gson.JsonObject;
 
 import org.adaptlab.chpir.android.survey.SurveyApp;
-import org.adaptlab.chpir.android.survey.location.LocationManager;
+import org.adaptlab.chpir.android.survey.entities.Settings;
+import org.adaptlab.chpir.android.survey.entities.Uploadable;
 import org.adaptlab.chpir.android.survey.repositories.InstrumentRepository;
 import org.adaptlab.chpir.android.survey.repositories.SettingsRepository;
 import org.adaptlab.chpir.android.survey.repositories.SurveyRepository;
-import org.adaptlab.chpir.android.survey.utils.AppUtil;
 
 import java.util.Locale;
 import java.util.TimeZone;
@@ -15,14 +15,11 @@ import java.util.TimeZone;
 public class DeviceSyncEntry implements Uploadable {
     private final static String TAG = DeviceSyncEntry.class.getName();
 
-    private LocationManager mLocationManager;
     private Settings mSettings;
     private InstrumentRepository mInstrumentRepository;
     private SurveyRepository mSurveyRepository;
 
     public DeviceSyncEntry() {
-//        mLocationManager = new LocationManager(SurveyApp.getInstance());
-//        mLocationManager.startLocationUpdates();
         mSettings = new SettingsRepository(SurveyApp.getInstance()).getSettingsDao().getInstanceSync();
         mInstrumentRepository = new InstrumentRepository(SurveyApp.getInstance());
         mSurveyRepository = new SurveyRepository(SurveyApp.getInstance());
@@ -31,8 +28,8 @@ public class DeviceSyncEntry implements Uploadable {
     @Override
     public String toJSON() {
         JsonObject jsonObject = new JsonObject();
-//        jsonObject.addProperty("latitude", mLocationManager.getLatitude());
-//        jsonObject.addProperty("longitude", mLocationManager.getLongitude());
+        jsonObject.addProperty("latitude", mSettings.getLatitude());
+        jsonObject.addProperty("longitude", mSettings.getLongitude());
         jsonObject.addProperty("current_version_code", AppUtil.getVersionCode());
         jsonObject.addProperty("current_version_name", AppUtil.getVersionName());
         jsonObject.addProperty("num_complete_surveys", mSurveyRepository.getCompleted().size());

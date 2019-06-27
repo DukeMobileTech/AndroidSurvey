@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -24,12 +25,15 @@ import org.adaptlab.chpir.android.survey.entities.Project;
 import org.adaptlab.chpir.android.survey.entities.Settings;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.utils.LocaleManager;
+import org.adaptlab.chpir.android.survey.utils.LocationManager;
 import org.adaptlab.chpir.android.survey.viewmodelfactories.ProjectViewModelFactory;
 import org.adaptlab.chpir.android.survey.viewmodels.ProjectViewModel;
 import org.adaptlab.chpir.android.survey.viewmodels.SettingsViewModel;
 
 public class InstrumentActivity extends AppCompatActivity {
     private final static String TAG = "InstrumentActivity";
+    private static final int ACCESS_PERMISSION_CODE = 1;
+    private LocationManager mLocationManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -54,8 +58,17 @@ public class InstrumentActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
                 setupViewPager();
+                startLocationUpdates();
             }
         });
+    }
+
+    private void setupViewPager() {
+        InstrumentSurveyPagerAdapter instrumentSurveyPagerAdapter = new InstrumentSurveyPagerAdapter(getSupportFragmentManager(), this);
+        ViewPager viewPager = findViewById(R.id.viewPager);
+        viewPager.setAdapter(instrumentSurveyPagerAdapter);
+        TabLayout tabLayout = findViewById(R.id.slidingTabs);
+        tabLayout.setupWithViewPager(viewPager);
     }
 
     private void setProject(Long projectId) {
@@ -78,16 +91,8 @@ public class InstrumentActivity extends AppCompatActivity {
                 android.Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE
         };
         if (!hasPermission(permissions)) {
-            ActivityCompat.requestPermissions(this, permissions, 1);
+            ActivityCompat.requestPermissions(this, permissions, ACCESS_PERMISSION_CODE);
         }
-    }
-
-    private void setupViewPager() {
-        InstrumentSurveyPagerAdapter instrumentSurveyPagerAdapter = new InstrumentSurveyPagerAdapter(getSupportFragmentManager(), this);
-        ViewPager viewPager = findViewById(R.id.viewPager);
-        viewPager.setAdapter(instrumentSurveyPagerAdapter);
-        TabLayout tabLayout = findViewById(R.id.slidingTabs);
-        tabLayout.setupWithViewPager(viewPager);
     }
 
     private boolean hasPermission(String[] permissions) {
@@ -103,6 +108,28 @@ public class InstrumentActivity extends AppCompatActivity {
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(LocaleManager.setLocale(base));
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mLocationManager != null) mLocationManager.stopLocationUpdates();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        if (requestCode == ACCESS_PERMISSION_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startLocationUpdates();
+            }
+        }
+    }
+
+    private void startLocationUpdates() {
+        if (mLocationManager == null) {
+            mLocationManager = new LocationManager(this);
+            mLocationManager.startLocationUpdates();
+        }
     }
 
 }

@@ -82,7 +82,7 @@ public class DisplayAdapter extends ListAdapter<List<QuestionRelation>, DisplayA
     @Override
     public int getItemViewType(int position) {
         List<QuestionRelation> group = getItem(position);
-        if (TextUtils.isEmpty(group.get(0).question.getTableIdentifier())) {
+        if (group.size() == 0 || TextUtils.isEmpty(group.get(0).question.getTableIdentifier())) {
             return DEFAULT;
         } else {
             return TABLE;

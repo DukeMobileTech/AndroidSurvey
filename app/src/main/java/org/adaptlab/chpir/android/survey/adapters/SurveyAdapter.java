@@ -27,8 +27,8 @@ import org.adaptlab.chpir.android.survey.entities.Response;
 import org.adaptlab.chpir.android.survey.entities.Survey;
 import org.adaptlab.chpir.android.survey.relations.ProjectSurveyRelation;
 import org.adaptlab.chpir.android.survey.repositories.SurveyRepository;
+import org.adaptlab.chpir.android.survey.tasks.EntityUploadTask;
 import org.adaptlab.chpir.android.survey.tasks.SetInstrumentLabelTask;
-import org.adaptlab.chpir.android.survey.tasks.SubmitSurveyTask;
 import org.adaptlab.chpir.android.survey.utils.InstrumentListLabel;
 
 import java.text.DateFormat;
@@ -140,7 +140,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
                             public void onClick(DialogInterface dialog, int id) {
                                 ProjectSurveyRelation survey = mProjectSurveyRelations.get(position);
                                 prepareForSubmission(survey);
-                                new SubmitSurveyTask().execute();
+                                new EntityUploadTask().execute();
                                 notifyItemChanged(position);
                             }
                         })

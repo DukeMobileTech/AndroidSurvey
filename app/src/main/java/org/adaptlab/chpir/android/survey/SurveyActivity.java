@@ -44,6 +44,7 @@ import org.adaptlab.chpir.android.survey.relations.SurveyRelation;
 import org.adaptlab.chpir.android.survey.repositories.SurveyRepository;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.utils.LocaleManager;
+import org.adaptlab.chpir.android.survey.utils.LocationManager;
 import org.adaptlab.chpir.android.survey.viewmodelfactories.InstrumentRelationViewModelFactory;
 import org.adaptlab.chpir.android.survey.viewmodelfactories.SectionViewModelFactory;
 import org.adaptlab.chpir.android.survey.viewmodelfactories.SurveyRelationViewModelFactory;
@@ -84,6 +85,7 @@ public class SurveyActivity extends AppCompatActivity {
     private List<String> mLanguageCodes;
     private Long mInstrumentId;
     private String mSurveyUUID;
+    private LocationManager mLocationManager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -109,6 +111,14 @@ public class SurveyActivity extends AppCompatActivity {
         setSectionViewModel(mInstrumentId);
         setSurveyRelationViewModel(mSurveyUUID);
         setLanguage();
+        startLocationUpdates();
+    }
+
+    private void startLocationUpdates() {
+        if (mLocationManager == null) {
+            mLocationManager = new LocationManager(this);
+            mLocationManager.startLocationUpdates();
+        }
     }
 
     @Override
@@ -226,6 +236,7 @@ public class SurveyActivity extends AppCompatActivity {
                     }
                     mSurveyViewModel.setPreviousDisplays(previousDisplays);
                     mSurveyViewModel.setSurveyLanguage();
+                    mLocationManager.setSurveyViewModel(mSurveyViewModel);
                 }
             }
         });
@@ -319,6 +330,7 @@ public class SurveyActivity extends AppCompatActivity {
     public void onStop() {
         super.onStop();
         saveData();
+        if (mLocationManager != null) mLocationManager.stopLocationUpdates();
     }
 
     private void saveData() {
@@ -328,15 +340,6 @@ public class SurveyActivity extends AppCompatActivity {
         mSurveyViewModel.setSurveyLastUpdatedTime();
         mSurveyViewModel.setSurveyLastDisplayPosition();
         mSurveyViewModel.update();
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        List<Fragment> fragments = getSupportFragmentManager().getFragments();
-        for (Fragment fragment : fragments) {
-            fragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
     }
 
     @Override

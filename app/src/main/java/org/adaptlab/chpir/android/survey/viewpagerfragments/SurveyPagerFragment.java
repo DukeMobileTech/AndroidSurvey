@@ -30,7 +30,7 @@ import org.adaptlab.chpir.android.survey.adapters.SurveyAdapter;
 import org.adaptlab.chpir.android.survey.entities.Settings;
 import org.adaptlab.chpir.android.survey.relations.ProjectSurveyRelation;
 import org.adaptlab.chpir.android.survey.repositories.SurveyRepository;
-import org.adaptlab.chpir.android.survey.tasks.SubmitSurveyTask;
+import org.adaptlab.chpir.android.survey.tasks.EntityUploadTask;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.viewmodelfactories.ProjectSurveyRelationViewModelFactory;
 import org.adaptlab.chpir.android.survey.viewmodels.ProjectSurveyRelationViewModel;
@@ -129,7 +129,7 @@ public class SurveyPagerFragment extends Fragment {
                                         mSurveyAdapter.prepareForSubmission(projectSurveyRelation);
                                     }
                                 }
-                                new SubmitSurveyTask().execute();
+                                new EntityUploadTask().execute();
                             }
                         })
                 .setNegativeButton(R.string.cancel,

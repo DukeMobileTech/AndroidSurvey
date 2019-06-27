@@ -449,7 +449,8 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                     responseText = mOptionRelations.get(index).option.getText();
                 } else if (causeQuestion.isMultipleResponse()) {
                     if (Arrays.asList(responses).contains(Integer.toString(mQuestion.getLoopNumber()))) {
-                        responseText = mOptionRelations.get(mQuestion.getLoopNumber()).option.getText();
+                        if (mQuestion.getLoopNumber() < mOptionRelations.size())
+                            responseText = mOptionRelations.get(mQuestion.getLoopNumber()).option.getText();
                     }
                 } else {
                     if (mQuestion.getLoopNumber() < responses.length) {

@@ -38,6 +38,7 @@ import org.adaptlab.chpir.android.survey.repositories.ProjectRepository;
 import org.adaptlab.chpir.android.survey.repositories.QuestionRepository;
 import org.adaptlab.chpir.android.survey.repositories.SectionRepository;
 import org.adaptlab.chpir.android.survey.repositories.SettingsRepository;
+import org.adaptlab.chpir.android.survey.tasks.EntityUploadTask;
 import org.adaptlab.chpir.android.survey.tasks.GetDeviceUserTask;
 import org.adaptlab.chpir.android.survey.tasks.GetSettingsTask;
 import org.adaptlab.chpir.android.survey.tasks.SetLoopsTask;
@@ -198,7 +199,7 @@ public class AppUtil {
         return okHttpClient;
     }
 
-    public static String getOsBuildNumber() {
+    static String getOsBuildNumber() {
         return Build.DISPLAY;
     }
 
@@ -207,8 +208,10 @@ public class AppUtil {
     }
 
     public static void downloadData(Application application) {
+        // Record the time of the entity downloads
         Date currentTime = new Date();
         mCurrentSyncTime = Long.toString(currentTime.getTime());
+        // Download survey entities
         new ProjectRepository(application).download();
         new InstrumentRepository(application).download();
         new OptionRepository(application).download();
@@ -226,9 +229,11 @@ public class AppUtil {
         new FollowUpQuestionRepository(application).download();
         new MultipleSkipRepository(application).download();
         new NextQuestionRepository(application).download();
+        // Upload queued surveys
+        new EntityUploadTask().execute();
     }
 
-    public static void incrementRemoteDownloadCount() {
+    private static void incrementRemoteDownloadCount() {
         synchronized (AppUtil.class) {
             REMOTE_DOWNLOAD_COUNT++;
         }
@@ -250,10 +255,15 @@ public class AppUtil {
         return REMOTE_TABLE_COUNT;
     }
 
-    public static void setLoopsTask() {
-        if (AppUtil.getRemoteDownloadCount() == AppUtil.getRemoteTableCount()) {
+    private static void setLoopsTask() {
+        if (getRemoteDownloadCount() == getRemoteTableCount()) {
             new SetLoopsTask().execute();
         }
+    }
+
+    public static void updateDownloadProgress() {
+        incrementRemoteDownloadCount();
+        setLoopsTask();
     }
 
     private static String getAccessToken() {
@@ -264,7 +274,7 @@ public class AppUtil {
         ACCESS_TOKEN = accessToken;
     }
 
-    public static int getVersionCode() {
+    static int getVersionCode() {
         return VERSION_CODE;
     }
 
@@ -383,7 +393,6 @@ public class AppUtil {
     private static String getPingAddress() {
         return getProjectsEndPoint();
     }
-
 
     private static int ping(String url) {
         if (url == null) return -1;

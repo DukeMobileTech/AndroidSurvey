@@ -48,6 +48,7 @@ public class SurveyViewModel extends AndroidViewModel {
     private List<String> mExpandableListTitle;
     private List<Display> mDisplays;
     private List<Integer> mPreviousDisplays;
+    private List<String> mLocations;
 
     private Survey mSurvey;
 
@@ -292,4 +293,11 @@ public class SurveyViewModel extends AndroidViewModel {
         return mQuestionsWithoutResponses;
     }
 
+    public List<String> getLocations() {
+        return mLocations;
+    }
+
+    public void setLocations(List<String> mLocations) {
+        this.mLocations = mLocations;
+    }
 }

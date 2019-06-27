@@ -7,7 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.preference.PreferenceManager;
 
-import org.adaptlab.chpir.android.survey.tasks.SubmitSurveyTask;
+import org.adaptlab.chpir.android.survey.tasks.EntityUploadTask;
 
 public class PollService extends IntentService {
     public static final String PREF_IS_ALARM_ON = "isAlarmOn";
@@ -38,7 +38,7 @@ public class PollService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         if (NotificationUtils.checkForNetworkErrors(getApplicationContext())) {
-            new SubmitSurveyTask().execute();
+            new EntityUploadTask().execute();
         }
     }
 
