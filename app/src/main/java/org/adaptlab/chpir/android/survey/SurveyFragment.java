@@ -687,6 +687,7 @@ public class SurveyFragment extends Fragment {
     }
 
     private void moveToNextDisplay() {
+        if (mDisplayFragment == null) return;
         String emptyResponses = mDisplayFragment.checkForEmptyResponses();
         if (emptyResponses.length() > 0) {
             promptForResponses(emptyResponses, false);

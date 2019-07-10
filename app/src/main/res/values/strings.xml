@@ -21,7 +21,7 @@
     <string name="api_version">Api Version</string>
     <string name="project_id">Project Id</string>
     <string name="last_update">Last Update:  </string>
-    <string name="sync_notification_text">Syncing with server...</string>
+    <string name="sync_notification_text">Syncing with server &#8230;</string>
     <string name="sync_notification_complete_text">Syncing with server complete.</string>
     <string name="network_unavailable">No network available on the device.</string>
     <string name="api_unavailable">Remote api is not responsive.</string>
