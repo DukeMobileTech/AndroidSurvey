@@ -35,6 +35,8 @@ public class Display extends ReceiveModel {
     @Column(name = "QuestionCount")
     private int mQuestionCount;
 
+    private double mDisplayPosition;
+
 
     public Display() {
         super();
@@ -177,6 +179,14 @@ public class Display extends ReceiveModel {
 
     public void setQuestionCount(int count) {
         mQuestionCount = count;
+    }
+
+    public double getDisplayPosition() {
+        return mDisplayPosition;
+    }
+
+    public void setDisplayPosition(double mDisplayPosition) {
+        this.mDisplayPosition = mDisplayPosition;
     }
 
     public enum DisplayMode {

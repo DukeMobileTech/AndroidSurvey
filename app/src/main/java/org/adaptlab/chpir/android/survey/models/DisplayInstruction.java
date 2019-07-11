@@ -57,11 +57,11 @@ public class DisplayInstruction extends ReceiveModel {
         return new Select().from(DisplayInstruction.class).where("RemoteId = ?", id).executeSingle();
     }
 
-    private void setDisplayId(Long id) {
+    void setDisplayId(Long id) {
         mRemoteDisplayId = id;
     }
 
-    private void setDeleted(boolean status) {
+    void setDeleted(boolean status) {
         mDeleted = status;
     }
 
@@ -69,7 +69,7 @@ public class DisplayInstruction extends ReceiveModel {
         return mPosition;
     }
 
-    private void setPosition(int position) {
+    public void setPosition(int position) {
         mPosition = position;
     }
 
@@ -77,7 +77,7 @@ public class DisplayInstruction extends ReceiveModel {
         return mRemoteId;
     }
 
-    private void setRemoteId(Long id) {
+    public void setRemoteId(Long id) {
         mRemoteId = id;
     }
 
@@ -85,7 +85,7 @@ public class DisplayInstruction extends ReceiveModel {
         return mInstructionId;
     }
 
-    private void setInstructionId(Long instructionId) {
+    void setInstructionId(Long instructionId) {
         mInstructionId = instructionId;
     }
 

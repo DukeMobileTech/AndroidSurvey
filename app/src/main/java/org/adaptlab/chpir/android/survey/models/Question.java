@@ -81,6 +81,8 @@ public class Question extends ReceiveModel {
     private Long mQuestionId;
     @Column(name = "TextToReplace")
     private String mTextToReplace;
+    @Column(name = "Position")
+    private String mPosition; // Used for display purposes
 
     public Question() {
         super();
@@ -115,6 +117,7 @@ public class Question extends ReceiveModel {
         destination.mRankResponses = source.mRankResponses;
         destination.mLoopQuestionCount = source.mLoopQuestionCount;
         destination.mQuestionId = source.mQuestionId;
+        destination.mInstructionId = source.mInstructionId;
         return destination;
     }
 
@@ -422,6 +425,7 @@ public class Question extends ReceiveModel {
             question.setIdentifiesSurvey(jsonObject.optBoolean("identifies_survey", false));
             if (!jsonObject.isNull("number_in_instrument")) {
                 question.setNumberInInstrument(jsonObject.getInt("number_in_instrument"));
+                question.setPosition(jsonObject.optString("number_in_instrument"));
             }
             question.setInstruction(jsonObject.optLong("instruction_id"));
             question.setQuestionVersion(jsonObject.getInt("question_version"));
@@ -783,6 +787,14 @@ public class Question extends ReceiveModel {
     public List<LoopQuestion> loopQuestionsWithDeleted() {
         return new Select().from(LoopQuestion.class).where("Question = ?",
                 getId()).execute();
+    }
+
+    public String getPosition() {
+        return mPosition;
+    }
+
+    public void setPosition(String mPosition) {
+        this.mPosition = mPosition;
     }
 
     public enum QuestionType {

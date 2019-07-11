@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="org.adaptlab.chpir.android.survey"
-    android:versionCode="136"
-    android:versionName="2.1.51">
+    android:versionCode="137"
+    android:versionName="2.1.52">
 
     <permission
         android:name="org.adaptlab.chpir.android.survey.LAUNCH_SURVEY"
@@ -114,7 +114,7 @@
             android:value="Survey.db" />
         <meta-data
             android:name="AA_DB_VERSION"
-            android:value="86" />
+            android:value="87" />
         <meta-data
             android:name="SEED_DB"
             android:value="false" />

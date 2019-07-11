@@ -2,8 +2,10 @@ package org.adaptlab.chpir.android.survey.models;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v4.util.LongSparseArray;
 import android.text.TextUtils;
 import android.util.Log;
@@ -21,6 +23,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -71,6 +75,8 @@ public class Instrument extends ReceiveModel {
     private boolean mRoster;
     @Column(name = "Scorable")
     private boolean mScorable;
+
+    private List<Display> mDisplays;
 
     public Instrument() {
         super();
@@ -523,55 +529,126 @@ public class Instrument extends ReceiveModel {
     }
 
     public void setLoops() {
-        List<Display> mDisplays = displays();
-        for (Question question : questions()) {
+        mDisplays = displays();
+        List<Question> questions = questions();
+        //Set display position to a double
+        for (int k = 0; k < mDisplays.size(); k++) {
+            Display display = mDisplays.get(k);
+            display.setDisplayPosition(display.getPosition());
+        }
+
+        HashMap<String, Question> questionsMap = new HashMap<>();
+        for (Question question : questions) {
+            questionsMap.put(question.getQuestionIdentifier(), question);
+        }
+        for (Question question : questions) {
             if (question.getLoopQuestionCount() > 0 && question.getLoopSource() == null
                     && question.getDisplayId() != null) {
                 List<LoopQuestion> loopQuestions = question.loopQuestionsWithDeleted();
                 if (loopQuestions.size() > 0) {
+                    List<Question> loopedQuestions = new ArrayList<>();
+                    for (LoopQuestion lq : loopQuestions) {
+                        loopedQuestions.add(questionsMap.get(lq.getLooped()));
+                    }
+                    Collections.sort(loopedQuestions, new Comparator<Question>() {
+                        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                        @Override
+                        public int compare(Question q1, Question q2) {
+                            return Integer.compare(q1.getNumberInInstrument(), q2.getNumberInInstrument());
+                        }
+                    });
+
+                    Display dis = getDisplay(question, loopQuestions.get(0), loopQuestions);
                     if (question.getQuestionType().equals(Question.QuestionType.INTEGER)) {
+                        // Create display instruction
+                        for (int k = 1; k <= LOOP_MAX; k++) {
+                            int index = k - 1;
+                            String text = question.getText() + " : " + index;
+                            createDisplayInstruction(question, loopedQuestions.get(0), loopQuestions.get(0), dis, text, index);
+                        }
+
                         for (LoopQuestion loopQuestion : loopQuestions) {
                             Display display = getDisplay(question, loopQuestion, loopQuestions);
                             for (int k = 1; k <= LOOP_MAX; k++) {
-                                String instruction = question.getText() + " : " + k;
-                                createLoopQuestion(question, loopQuestion, instruction, k, display);
+                                createLoopQuestion(question, loopQuestion, k, display);
                             }
-                            updateDisplays(mDisplays, display, question, false);
                         }
                     } else if (question.isMultipleResponseLoop()) {
+                        // Create Display Instruction
+                        if (TextUtils.isEmpty(loopQuestions.get(0).getOptionIndices())) {
+                            for (int k = 0; k < question.getOptionCount(); k++) {
+                                String text = question.getText() + " : " + question.defaultOptions().get(k).getText(this);
+                                createDisplayInstruction(question, loopedQuestions.get(0), loopQuestions.get(0), dis, text, k);
+                            }
+                            if (question.isOtherQuestionType()) {
+                                String text = question.getText() + " : Other";
+                                createDisplayInstruction(question, loopedQuestions.get(0), loopQuestions.get(0), dis, text, question.getOptionCount());
+                            }
+                        } else {
+                            // Loop only for particular options
+                            String[] indices = loopQuestions.get(0).getOptionIndices().split(Response.LIST_DELIMITER);
+                            for (String index : indices) {
+                                int ind = Integer.parseInt(index);
+                                String text = question.getText() + " : " + question.defaultOptions().get(ind).getText(this);
+                                createDisplayInstruction(question, loopedQuestions.get(0), loopQuestions.get(0), dis, text, ind);
+                            }
+                        }
+
                         for (LoopQuestion loopQuestion : loopQuestions) {
                             Display display = getDisplay(question, loopQuestion, loopQuestions);
                             if (TextUtils.isEmpty(loopQuestion.getOptionIndices())) {
                                 for (int k = 0; k < question.getOptionCount(); k++) {
-                                    String instruction = question.getText() + " : " +
-                                            question.defaultOptions().get(k).getText(this);
-                                    createLoopQuestion(question, loopQuestion, instruction, k, display);
+                                    createLoopQuestion(question, loopQuestion, k, display);
                                 }
                                 if (question.isOtherQuestionType()) {
-                                    String instruction = question.getText() + " : Other";
-                                    createLoopQuestion(question, loopQuestion, instruction,
-                                            question.getOptionCount(), display);
+                                    createLoopQuestion(question, loopQuestion, question.getOptionCount(), display);
                                 }
                             } else {
                                 // Loop only for particular options
                                 String[] indices = loopQuestion.getOptionIndices().split(Response.LIST_DELIMITER);
                                 for (String index : indices) {
                                     int ind = Integer.parseInt(index);
-                                    String instruction = question.getText() + " : " +
-                                            question.defaultOptions().get(ind).getText(this);
-                                    createLoopQuestion(question, loopQuestion, instruction, ind, display);
+                                    createLoopQuestion(question, loopQuestion, ind, display);
                                 }
                             }
-                            updateDisplays(mDisplays, display, question, loopQuestion.isSameDisplay());
                         }
                     }
-                    sanitizeDisplays(mDisplays);
+                    sanitizeDisplays();
                 }
             }
         }
     }
 
-    private void sanitizeDisplays(List<Display> mDisplays) {
+    private void createDisplayInstruction(Question parent, Question looped, LoopQuestion lq, Display display, String text, int index) {
+        Instruction  instruction = Instruction.findByText(text);
+        if (instruction == null) instruction = createLoopInstruction(text);
+        int position;
+        if (lq.isSameDisplay()) {
+            position = looped.getNumberInInstrument();
+        } else {
+            position = looped.getNumberInInstrument() + (index * parent.getLoopQuestionCount());
+        }
+        DisplayInstruction displayInstruction = new Select().from(DisplayInstruction.class).where(
+                "RemoteDisplayId = ? AND InstructionId = ? AND Position = ?",
+                display.getRemoteId(), instruction.getRemoteId(), position).executeSingle();
+        if (displayInstruction == null) {
+            long remoteId = new Random().nextLong();
+            DisplayInstruction di = DisplayInstruction.findByRemoteId(remoteId);
+            while (di != null) {
+                remoteId = new Random().nextLong();
+                di = DisplayInstruction.findByRemoteId(remoteId);
+            }
+            displayInstruction = new DisplayInstruction();
+            displayInstruction.setRemoteId(remoteId);
+            displayInstruction.setDisplayId(display.getRemoteId());
+            displayInstruction.setInstructionId(instruction.getRemoteId());
+            displayInstruction.setPosition(position);
+            displayInstruction.setDeleted(false);
+            displayInstruction.save();
+        }
+    }
+
+    private void sanitizeDisplays() {
         HashMap<Long, List<Question>> displayQuestions = getDisplayQuestions();
         for (Iterator<Display> iterator = mDisplays.iterator(); iterator.hasNext(); ) {
             Display display = iterator.next();
@@ -582,24 +659,18 @@ public class Instrument extends ReceiveModel {
             }
         }
         // Ensure they are numbered consecutively
+        Collections.sort(mDisplays, new Comparator<Display>() {
+            @Override
+            public int compare(Display o1, Display o2) {
+                return Double.compare(o1.getDisplayPosition(), o2.getDisplayPosition());
+            }
+        });
         for (int k = 0; k < mDisplays.size(); k++) {
             Display display = mDisplays.get(k);
             if (display.getPosition() != k + 1) {
                 display.setPosition(k + 1);
                 display.save();
             }
-        }
-    }
-
-    private void updateDisplays(List<Display> mDisplays, Display display, Question question, boolean sameDisplay) {
-        if (mDisplays.contains(display)) {
-            int index = mDisplays.indexOf(display);
-            if (!sameDisplay && index != question.getDisplay().getPosition()) {
-                mDisplays.remove(display);
-                mDisplays.add(question.getDisplay().getPosition(), display);
-            }
-        } else {
-            mDisplays.add(question.getDisplay().getPosition(), display);
         }
     }
 
@@ -620,7 +691,9 @@ public class Instrument extends ReceiveModel {
             display.setSectionId(parent.getSectionId());
             display.setRemoteId(getBoundedDisplayId());
             display.setDeleted(parent.getDeleted());
+            mDisplays.add(display);
         }
+        display.setDisplayPosition(parent.getDisplayPosition() + 0.1);
         display.setQuestionCount(getDisplayQuestionCount(q, lq, lqs));
         display.save();
         return display;
@@ -649,8 +722,7 @@ public class Instrument extends ReceiveModel {
         }
     }
 
-    private void createLoopQuestion(Question question, LoopQuestion lq, String instruction,
-                                    int index, Display display) {
+    private void createLoopQuestion(Question question, LoopQuestion lq, int index, Display display) {
         Question source = lq.loopedQuestion();
         if (source == null) return;
         String identifier = question.getQuestionIdentifier() + "_" + source.getQuestionIdentifier() + "_" + index;
@@ -662,12 +734,6 @@ public class Instrument extends ReceiveModel {
             loopedQuestion.setLoopNumber(index);
             loopedQuestion.setQuestionIdentifier(identifier);
         }
-        if ((TextUtils.isEmpty(source.getTextToReplace()) || source.getInstructionId() == null) &&
-                loopedQuestion.getInstructionId() == null) {
-            loopedQuestion.setInstruction(createLoopInstruction(instruction).getRemoteId());
-        } else {
-            loopedQuestion.setInstruction(null);
-        }
         loopedQuestion.setLoopSource(source.getQuestionIdentifier());
         loopedQuestion = Question.copyAttributes(loopedQuestion, source);
         if (lq.isSameDisplay()) {
@@ -675,6 +741,7 @@ public class Instrument extends ReceiveModel {
         } else {
             loopedQuestion.setNumberInInstrument(source.getNumberInInstrument() + (index * question.getLoopQuestionCount()));
         }
+        loopedQuestion.setPosition(source.getNumberInInstrument() + "_" + index);
         loopedQuestion.setTextToReplace(lq.getTextToReplace());
         if (lq.isDeleted()) {
             loopedQuestion.setDeleted(true);
@@ -792,7 +859,7 @@ public class Instrument extends ReceiveModel {
         }
         Instruction instruction = Instruction.findByRemoteId(remoteId);
         if (instruction != null) {
-            getUnusedRemoteId();
+            return getUnusedRemoteId();
         }
         return remoteId;
     }

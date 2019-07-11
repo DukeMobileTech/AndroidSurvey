@@ -1163,17 +1163,17 @@ public class SurveyFragment extends Fragment {
         if (mDisplay != null && questions.size() > 0) {
             // Screen title
             if (!mDisplay.getMode().equals(Display.DisplayMode.SINGLE.toString())) {
-                updateActionBarTitle(String.format(Locale.getDefault(), "%s %s%d %s %d%s",
-                        mDisplay.getTitle(), "(", questions.get(0).getNumberInInstrument(),
-                        "-", questions.get(questions.size() - 1).getNumberInInstrument(), ")"));
+                updateActionBarTitle(String.format(Locale.getDefault(), "%s %s%s %s %s%s",
+                        mDisplay.getTitle(), "(", questions.get(0).getPosition(),
+                        "-", questions.get(questions.size() - 1).getPosition(), ")"));
             } else {
                 updateActionBarTitle(mDisplay.getTitle());
             }
             // Progress text
-            mDisplayIndexLabel.setText(String.format(Locale.getDefault(), "%s %d %s %d %s%d %s" +
-                            " %d%s", getString(R.string.screen), mDisplayNumber + 1, getString(R.string
-                            .of), mDisplays.size(), "(", questions.get(0).getNumberInInstrument(), "-",
-                    questions.get(questions.size() - 1).getNumberInInstrument(), ")"));
+            mDisplayIndexLabel.setText(String.format(Locale.getDefault(), "%s %d %s %d %s%s %s" +
+                            " %s%s", getString(R.string.screen), mDisplayNumber + 1, getString(R.string
+                            .of), mDisplays.size(), "(", questions.get(0).getPosition(), "-",
+                    questions.get(questions.size() - 1).getPosition(), ")"));
             // Progress bar
             mProgressBar.setProgress((int) (100 * (mDisplayNumber + 1) / (float) mDisplays.size()));
         }

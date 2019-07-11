@@ -97,7 +97,7 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         if (isComponentNull()) return null;
         deserialization = true;
         View v = inflater.inflate(R.layout.fragment_question, parent, false);
-        String number = mQuestion.getNumberInInstrument() + ": ";
+        String number = mQuestion.getPosition() + ": ";
         int numLen = number.length();
         String identifier = mQuestion.getQuestionIdentifier() + "\n";
         int idLen = identifier.length();
