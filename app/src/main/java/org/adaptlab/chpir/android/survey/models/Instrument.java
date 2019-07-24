@@ -175,8 +175,7 @@ public class Instrument extends ReceiveModel {
         mRemoteId = id;
     }
 
-
-    public void sanitize() {
+    private void sanitize() {
         HashMap<Long, List<Question>> mDisplayQuestions = getDisplayQuestions();
         for (Display display : displays()) {
             if (mDisplayQuestions.get(display.getRemoteId()) == null || display.getQuestionCount()
@@ -548,7 +547,8 @@ public class Instrument extends ReceiveModel {
                 if (loopQuestions.size() > 0) {
                     List<Question> loopedQuestions = new ArrayList<>();
                     for (LoopQuestion lq : loopQuestions) {
-                        loopedQuestions.add(questionsMap.get(lq.getLooped()));
+                        Question q = questionsMap.get(lq.getLooped());
+                        if (q != null) loopedQuestions.add(q);
                     }
                     Collections.sort(loopedQuestions, new Comparator<Question>() {
                         @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -613,10 +613,11 @@ public class Instrument extends ReceiveModel {
                             }
                         }
                     }
-                    sanitizeDisplays();
                 }
             }
         }
+        sanitizeDisplays();
+        sanitize();
     }
 
     private void createDisplayInstruction(Question parent, Question looped, LoopQuestion lq, Display display, String text, int index) {
@@ -657,6 +658,24 @@ public class Instrument extends ReceiveModel {
                 display.delete();
                 iterator.remove();
             }
+            // Temp fix
+            List<Question> questions = displayQuestions.get(display.getRemoteId());
+            if (questions != null && display.getQuestionCount() != questions.size()) {
+                boolean getOut = false;
+                for (Question question : questions) {
+                    if (question.getLoopQuestionCount() > 0 ) {
+                        List<LoopQuestion> loopQuestions = question.loopQuestions();
+                        for (LoopQuestion loopQuestion : loopQuestions) {
+                            if (loopQuestion.isSameDisplay()) {
+                                display.setQuestionCount(questions.size());
+                                getOut = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (getOut) break;
+                }
+            }
         }
         // Ensure they are numbered consecutively
         Collections.sort(mDisplays, new Comparator<Display>() {
@@ -677,8 +696,6 @@ public class Instrument extends ReceiveModel {
     private Display getDisplay(Question q, LoopQuestion lq, List<LoopQuestion> lqs) {
         Display parent = q.getDisplay();
         if (lq.isSameDisplay()) {
-            parent.setQuestionCount(parent.getQuestionCount() + getDisplayQuestionCount(q, lq, lqs));
-            parent.save();
             return parent;
         }
         Display display = Display.findByTitleAndInstrument(parent.getTitle() + " p2",
