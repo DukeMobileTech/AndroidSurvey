@@ -1,5 +1,7 @@
 package org.adaptlab.chpir.android.survey.utils;
 
+import android.util.Log;
+
 import com.google.gson.JsonObject;
 
 import org.adaptlab.chpir.android.survey.SurveyApp;
@@ -34,7 +36,11 @@ public class DeviceSyncEntry implements Uploadable {
         jsonObject.addProperty("current_version_name", AppUtil.getVersionName());
         jsonObject.addProperty("num_complete_surveys", mSurveyRepository.getCompleted().size());
         jsonObject.addProperty("num_incomplete_surveys", mSurveyRepository.getIncomplete().size());
-        jsonObject.addProperty("current_language", new Locale(AppUtil.getDeviceLanguage()).getDisplayLanguage());
+        if (AppUtil.getDeviceLanguage() == null) {
+            jsonObject.addProperty("current_language", Locale.getDefault().getDisplayLanguage());
+        } else {
+            jsonObject.addProperty("current_language", new Locale(AppUtil.getDeviceLanguage()).getDisplayLanguage());
+        }
         jsonObject.addProperty("instrument_versions", mInstrumentRepository.instrumentVersions());
         jsonObject.addProperty("device_uuid", mSettings.getDeviceIdentifier());
         jsonObject.addProperty("api_key", mSettings.getApiKey());

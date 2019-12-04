@@ -13,16 +13,13 @@ import java.util.List;
 
 @Dao
 public abstract class InstrumentDao extends BaseDao<Instrument> {
-    @Query("SELECT * FROM Instruments WHERE RemoteId=:id LIMIT 1")
-    public abstract LiveData<Instrument> findById(Long id);
-
-    @Query("SELECT * FROM Instruments WHERE ProjectId=:projectId AND Published=1 ORDER BY Title ASC")
+    @Query("SELECT * FROM Instruments WHERE ProjectId=:projectId AND Published=1 AND Deleted=0 ORDER BY Title ASC")
     public abstract List<Instrument> projectInstrumentsSync(Long projectId);
 
-    @Query("SELECT * FROM Instruments WHERE ProjectId=:projectId AND Published=1 ORDER BY Title ASC")
+    @Query("SELECT * FROM Instruments WHERE ProjectId=:projectId AND Published=1 AND Deleted=0 ORDER BY Title ASC")
     public abstract LiveData<List<Instrument>> projectInstruments(Long projectId);
 
-    @Query("SELECT * FROM Questions WHERE InstrumentRemoteId=:instrumentId")
+    @Query("SELECT * FROM Questions WHERE InstrumentRemoteId=:instrumentId AND Deleted=0")
     public abstract LiveData<List<Question>> questions(Long instrumentId);
 
     @Transaction

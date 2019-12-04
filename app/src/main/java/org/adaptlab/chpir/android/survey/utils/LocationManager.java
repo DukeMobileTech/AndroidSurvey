@@ -70,9 +70,6 @@ public class LocationManager {
         mContext = context;
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(mContext);
         mSettingsClient = LocationServices.getSettingsClient(mContext);
-        createLocationCallback();
-        createLocationRequest();
-        buildLocationSettingsRequest();
         setSettings();
     }
 
@@ -83,6 +80,9 @@ public class LocationManager {
             @Override
             public void onAsyncTaskFinished(Settings settings) {
                 mSettings = settings;
+                createLocationCallback();
+                createLocationRequest();
+                buildLocationSettingsRequest();
             }
         });
         getSettingsTask.execute(mSettingsRepository.getSettingsDao());
@@ -119,10 +119,13 @@ public class LocationManager {
         mSurveyViewModel = viewModel;
         List<String> locations = new ArrayList<>();
         try {
-            JSONObject jsonObject = new JSONObject(mSurveyViewModel.getSurvey().getMetadata());
-            String location = jsonObject.getString("location");
-            if (!TextUtils.isEmpty(location)) {
-               locations = new ArrayList<>(Arrays.asList(location.split(COMMA)));
+            String metadata = mSurveyViewModel.getSurvey().getMetadata();
+            if (metadata != null) {
+                JSONObject jsonObject = new JSONObject(metadata);
+                String location = jsonObject.getString("location");
+                if (!TextUtils.isEmpty(location)) {
+                    locations = new ArrayList<>(Arrays.asList(location.split(COMMA)));
+                }
             }
         } catch (JSONException e) {
             if (BuildConfig.DEBUG) Log.e(TAG, "JSONException: " + e);

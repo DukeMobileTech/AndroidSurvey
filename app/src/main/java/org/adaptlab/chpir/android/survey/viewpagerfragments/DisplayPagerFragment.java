@@ -267,12 +267,14 @@ public class DisplayPagerFragment extends Fragment {
                     }
                 });
 
-                if (questionRelations.get(0).response == null) {
-                    initializeResponses(questionRelations);
-                } else {
-                    groupQuestionRelations(questionRelations);
-                    setAdapters();
-                    hideQuestions();
+                if (questionRelations.size() > 0) {
+                    if (questionRelations.get(0).response == null) {
+                        initializeResponses(questionRelations);
+                    } else {
+                        groupQuestionRelations(questionRelations);
+                        setAdapters();
+                        hideQuestions();
+                    }
                 }
             }
         });

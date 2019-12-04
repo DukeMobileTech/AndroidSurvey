@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -234,9 +235,8 @@ public class SurveyReviewFragment extends ListFragment {
             questionNumberTextView.setTextColor(Color.BLACK);
 
             String text = TranslationUtil.getText(relation.question, relation.translations, mSurveyViewModel);
-
             TextView questionTextView = convertView.findViewById(R.id.review_question_text);
-            questionTextView.setText(Html.fromHtml(text));
+            if (text != null) questionTextView.setText(Html.fromHtml(text));
             questionTextView.setMaxLines(2);
 
             return convertView;

@@ -7,9 +7,8 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.1'
+        classpath 'com.android.tools.build:gradle:3.5.3'
         classpath 'io.fabric.tools:gradle:1.28.0'
-        classpath 'com.newrelic.agent.android:agent-gradle-plugin:5.23.0'
     }
 }
 

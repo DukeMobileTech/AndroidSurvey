@@ -2,6 +2,7 @@ package org.adaptlab.chpir.android.survey.tasks;
 
 import android.os.AsyncTask;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.LongSparseArray;
 
 import androidx.annotation.NonNull;
@@ -142,10 +143,12 @@ public class SetLoopsTask extends AsyncTask<Void, Void, Void> {
         }
         LongSparseArray<List<Question>> displayQuestions = getDisplayQuestions(questions);
         for (Display display : instrumentRelation.displays) {
-            if (display.getQuestionCount() != displayQuestions.get(display.getRemoteId()).size()) {
-                instrument.setLoaded(false);
-                mInstrumentDao.update(instrument);
-                return;
+            if (displayQuestions.get(display.getRemoteId()) != null) {
+                if (display.getQuestionCount() != displayQuestions.get(display.getRemoteId()).size()) {
+                    instrument.setLoaded(false);
+                    mInstrumentDao.update(instrument);
+                    return;
+                }
             }
         }
         AppUtil.setLastSyncTime(AppUtil.getCurrentSyncTime());

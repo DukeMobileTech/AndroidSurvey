@@ -41,6 +41,7 @@ public abstract class ListOfItemsViewHolder extends QuestionViewHolder {
     protected abstract EditText createEditText();
 
     protected void createQuestionComponent(ViewGroup questionComponent) {
+        if (questionComponent == null) return;
         questionComponent.removeAllViews();
         mResponses = new ArrayList<>();
         for (OptionRelation optionRelation : getOptionRelations()) {

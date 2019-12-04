@@ -301,6 +301,7 @@ public class AppUtil {
 
     public static void setLastSyncTime(String lastSyncTime) {
         LAST_SYNC_TIME = lastSyncTime;
+        if (mSettings == null) return;
         mSettings.setLastSyncTime(LAST_SYNC_TIME);
         mSettingsRepository.update(mSettings);
     }
@@ -374,6 +375,7 @@ public class AppUtil {
         deviceUserTask.setListener(new GetDeviceUserTask.AsyncTaskListener() {
             @Override
             public void onAsyncTaskFinished(DeviceUser deviceUser) {
+                if (deviceUser == null) return;
                 DEVICE_USER_ID = deviceUser.getRemoteId();
             }
         });

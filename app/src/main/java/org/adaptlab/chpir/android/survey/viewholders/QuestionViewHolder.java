@@ -14,6 +14,7 @@ import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -102,6 +103,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void setRelations(QuestionRelation questionRelation) {
+        Log.i(TAG, "setRelations: " + questionRelation.question.toString());
         mQuestionRelation = questionRelation;
         mQuestion = questionRelation.question;
         mResponse = questionRelation.response;
@@ -213,8 +215,8 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     }
 
     void setOptionSetItems(QuestionRelation questionRelation) {
+        mOptionRelations = new ArrayList<>();
         if (questionRelation.optionSets.size() > 0) {
-            mOptionRelations = new ArrayList<>();
             OptionSetRelation optionSetRelation = questionRelation.optionSets.get(0);
             if (optionSetRelation != null) {
                 if (optionSetRelation.instructions.size() > 0) {
@@ -232,8 +234,8 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     }
 
     private void setDisplayInstructions(QuestionRelation questionRelation) {
+        mDisplayInstructions = new ArrayList<>();
         if (questionRelation.displays != null) {
-            mDisplayInstructions = new ArrayList<>();
             DisplayRelation displayRelation = questionRelation.displays.get(0);
             if (displayRelation != null && displayRelation.displayInstructions != null) {
                 mDisplayInstructions.addAll(displayRelation.displayInstructions);
@@ -400,6 +402,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     }
 
     private void setSpannedText() {
+        if (mSpannedTextView == null) return;
         String number = mQuestion.getNumberInInstrument() + ": ";
         int numLen = number.length();
         String identifier = mQuestion.getQuestionIdentifier() + "\n";
@@ -502,8 +505,10 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     private void setSpecialResponseView() {
         mSpecialResponses.removeAllViews();
         List<String> responses = new ArrayList<>();
-        for (OptionRelation optionRelation : mSpecialOptionRelations) {
-            responses.add(optionRelation.option.getText());
+        if (mSpecialOptionRelations != null) {
+            for (OptionRelation optionRelation : mSpecialOptionRelations) {
+                responses.add(optionRelation.option.getText());
+            }
         }
 
         for (String response : responses) {
@@ -567,8 +572,8 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     }
 
     void setSpecialOptions(QuestionRelation questionRelation) {
-        if (questionRelation.specialOptionSets != null) {
-            mSpecialOptionRelations = new ArrayList<>();
+        mSpecialOptionRelations = new ArrayList<>();
+        if (questionRelation.specialOptionSets.size() > 0) {
             OptionSetRelation optionSetRelation = questionRelation.specialOptionSets.get(0);
             if (optionSetRelation != null && optionSetRelation.optionSetOptions != null) {
                 for (OptionSetOptionRelation relation : optionSetRelation.optionSetOptions) {

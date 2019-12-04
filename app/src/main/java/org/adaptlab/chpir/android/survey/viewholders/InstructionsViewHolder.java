@@ -17,7 +17,6 @@ public class InstructionsViewHolder extends QuestionViewHolder {
 
     @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
-        ((ViewGroup) questionComponent.getParent()).setVisibility(View.GONE);
     }
 
     @Override
@@ -29,8 +28,4 @@ public class InstructionsViewHolder extends QuestionViewHolder {
     protected void deserialize(String responseText) {
     }
 
-//    @Override
-//    protected void unSetResponse() {
-//
-//    }
 }

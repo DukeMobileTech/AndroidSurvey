@@ -6,9 +6,6 @@ import android.content.res.Configuration;
 
 import androidx.appcompat.app.AppCompatDelegate;
 
-import com.newrelic.agent.android.NewRelic;
-
-import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.utils.LocaleManager;
 
 public class SurveyApp extends Application {
@@ -26,9 +23,6 @@ public class SurveyApp extends Application {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         super.onCreate();
         mInstance = this;
-        if (AppUtil.PRODUCTION) {
-            NewRelic.withApplicationToken(getString(R.string.new_relic_application_token)).start(this);
-        }
     }
 
     @Override

@@ -60,6 +60,7 @@ public class SurveyRepository {
 
         @Override
         protected Void doInBackground(Survey... params) {
+            if (params[0] == null) return null;
             mSurveyDao.update(params[0]);
             return null;
         }
@@ -74,6 +75,7 @@ public class SurveyRepository {
 
         @Override
         protected Void doInBackground(Survey... params) {
+            if (params[0] == null) return null;
             mSurveyDao.insert(params[0]);
             return null;
         }
@@ -88,6 +90,7 @@ public class SurveyRepository {
 
         @Override
         protected Void doInBackground(Survey... params) {
+            if (params[0] == null) return null;
             surveyDao.delete(params[0]);
             return null;
         }

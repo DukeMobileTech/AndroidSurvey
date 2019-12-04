@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.LongSparseArray;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -162,15 +163,22 @@ public class SurveyActivity extends AppCompatActivity {
                     mInstrument = relation.instrument;
                     mActionBar.setTitle(mInstrument.getTitle());
                     mSurveyViewModel.setInstrumentLanguage(mInstrument.getLanguage());
-                    if (mSurveyViewModel.getSurvey().getInstrumentTitle() == null) {
-                        mSurveyViewModel.getSurvey().setInstrumentTitle(mInstrument.getTitle());
-                    }
-                    if (mSurveyViewModel.getSurvey().getInstrumentVersionNumber() == null) {
-                        mSurveyViewModel.getSurvey().setInstrumentVersionNumber(String.valueOf(mInstrument.getVersionNumber()));
+                    if (mSurveyViewModel.getSurvey() != null) {
+                        if (mSurveyViewModel.getSurvey().getInstrumentTitle() == null) {
+                            mSurveyViewModel.getSurvey().setInstrumentTitle(mInstrument.getTitle());
+                        }
+                        if (mSurveyViewModel.getSurvey().getInstrumentVersionNumber() == null) {
+                            mSurveyViewModel.getSurvey().setInstrumentVersionNumber(String.valueOf(mInstrument.getVersionNumber()));
+                        }
                     }
                     mSurveyViewModel.update();
 
-                    List<Display> displays = relation.displays;
+                    List<Display> displays = new ArrayList<>();
+                    for (Display display : relation.displays) {
+                        if (!display.isDeleted()) {
+                            displays.add(display);
+                        }
+                    }
                     Collections.sort(displays, new Comparator<Display>() {
                         @Override
                         public int compare(Display o1, Display o2) {
@@ -315,6 +323,7 @@ public class SurveyActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
+        if (AppUtil.getSettings() == null) return;
         mSurveyViewModel.setDeviceLanguage(AppUtil.getSettings().getLanguage());
         mSpinner.setSelection(mLanguageCodes.indexOf(AppUtil.getSettings().getLanguage()));
     }
