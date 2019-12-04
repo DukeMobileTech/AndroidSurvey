@@ -192,7 +192,14 @@ public abstract class QuestionFragment extends Fragment {
                     responseText = mSurveyFragment.getOptions().get(causeQuestion).get(index).getText(mSurveyFragment.getInstrument());
                 } else if (causeQuestion.hasMultipleResponses()) {
                     if (Arrays.asList(responses).contains(Integer.toString(question.getLoopNumber()))) {
-                        responseText = mSurveyFragment.getOptions().get(causeQuestion).get(question.getLoopNumber()).getText(mSurveyFragment.getInstrument());
+                        List<Option> causeOptions = mSurveyFragment.getOptions().get(causeQuestion);
+                        if (question.getLoopNumber() < causeOptions.size()) {
+                            responseText = mSurveyFragment.getOptions().get(causeQuestion).get(question.getLoopNumber()).getText(mSurveyFragment.getInstrument());
+                        } else {
+                            if (causeQuestion.isOtherQuestionType() && causeOptions.size() == question.getLoopNumber()) {
+                                responseText = response.getOtherResponse();
+                            }
+                        }
                     }
                 } else {
                     if (question.getLoopNumber() < responses.length) {

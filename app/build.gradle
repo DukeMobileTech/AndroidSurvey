@@ -9,13 +9,13 @@ repositories {
 }
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
 
     defaultConfig {
         applicationId "org.adaptlab.chpir.android.survey"
         vectorDrawables.useSupportLibrary = true
         minSdkVersion 14
-        targetSdkVersion 27
+        targetSdkVersion 28
         multiDexEnabled true
     }
 
