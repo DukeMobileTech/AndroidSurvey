@@ -7,6 +7,7 @@ public class ConstantUtils {
     public static final String SELECT_ONE_TABLE = "SELECT_ONE_TABLE";
     public static final String SELECT_MULTIPLE_TABLE = "SELECT_MULTIPLE_TABLE";
     public static final String TABLE_HEADER = "TABLE_HEADER";
+    public static final String INTEGER_BOXES_TABLE = "INTEGER_BOXES_TABLE";
     public static final int EDIT_TEXT_DELAY = 2000;
     public static final int LOOP_MAX = 12;
     public static final int LOWER_BOUND = 100000;

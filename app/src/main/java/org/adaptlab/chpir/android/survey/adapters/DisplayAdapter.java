@@ -18,6 +18,8 @@ import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
 import java.util.List;
 
 public class DisplayAdapter extends ListAdapter<List<QuestionRelation>, DisplayAdapter.DisplayViewHolder> {
+    public final String TAG = this.getClass().getName();
+
     private static final DiffUtil.ItemCallback<List<QuestionRelation>> DIFF_CALLBACK = new DiffUtil.ItemCallback<List<QuestionRelation>>() {
         @Override
         public boolean areItemsTheSame(@NonNull List<QuestionRelation> oldQuestionRelations, @NonNull List<QuestionRelation> newQuestionRelations) {

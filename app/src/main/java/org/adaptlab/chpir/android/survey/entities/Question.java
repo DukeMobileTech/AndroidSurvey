@@ -399,6 +399,7 @@ public class Question implements SurveyEntity, Translatable {
                 append("QuestionType", mQuestionType).
                 append("OptionSetId", mRemoteOptionSetId).
                 append("RemoteOptionSetId", mRemoteSpecialOptionSetId).
+                append("TableIdentifier", mTableIdentifier).
                 toString();
     }
 
