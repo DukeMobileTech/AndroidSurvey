@@ -123,6 +123,12 @@ public class Question implements SurveyEntity, Translatable {
     private int mLoopNumber;
     @ColumnInfo(name = "TextToReplace")
     private String mTextToReplace;
+    @SerializedName("pop_up_instruction")
+    @ColumnInfo(name = "PopUpInstruction")
+    private boolean mPopUpInstruction;
+    @SerializedName("instruction_after_text")
+    @ColumnInfo(name = "InstructionAfterText")
+    private boolean mInstructionAfterText;
     @Ignore
     @SerializedName("question_translations")
     private List<QuestionTranslation> mQuestionTranslations;
@@ -401,6 +407,22 @@ public class Question implements SurveyEntity, Translatable {
                 append("RemoteOptionSetId", mRemoteSpecialOptionSetId).
                 append("TableIdentifier", mTableIdentifier).
                 toString();
+    }
+
+    public boolean isPopUpInstruction() {
+        return mPopUpInstruction;
+    }
+
+    public void setPopUpInstruction(boolean mPopUpInstruction) {
+        this.mPopUpInstruction = mPopUpInstruction;
+    }
+
+    public boolean isInstructionAfterText() {
+        return mInstructionAfterText;
+    }
+
+    public void setInstructionAfterText(boolean mInstructionAfterText) {
+        this.mInstructionAfterText = mInstructionAfterText;
     }
 
     @Retention(RetentionPolicy.SOURCE)

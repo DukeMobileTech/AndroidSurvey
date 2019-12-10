@@ -299,6 +299,7 @@ public class SurveyActivity extends AppCompatActivity {
     }
 
     private void setLanguageSelection() {
+        if (AppUtil.getSettings() == null) return;
         ArrayList<String> displayLanguages = new ArrayList<>();
         for (String languageCode : mLanguageCodes) {
             displayLanguages.add(new Locale(languageCode).getDisplayLanguage());
@@ -323,7 +324,6 @@ public class SurveyActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
-        if (AppUtil.getSettings() == null) return;
         mSurveyViewModel.setDeviceLanguage(AppUtil.getSettings().getLanguage());
         mSpinner.setSelection(mLanguageCodes.indexOf(AppUtil.getSettings().getLanguage()));
     }

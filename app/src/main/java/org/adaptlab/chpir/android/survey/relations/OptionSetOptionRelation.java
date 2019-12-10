@@ -3,6 +3,7 @@ package org.adaptlab.chpir.android.survey.relations;
 import androidx.room.Embedded;
 import androidx.room.Relation;
 
+import org.adaptlab.chpir.android.survey.entities.Instruction;
 import org.adaptlab.chpir.android.survey.entities.Option;
 import org.adaptlab.chpir.android.survey.entities.OptionSetOption;
 
@@ -13,4 +14,6 @@ public class OptionSetOptionRelation {
     public OptionSetOption optionSetOption;
     @Relation(parentColumn = "OptionRemoteId", entityColumn = "RemoteId", entity = Option.class)
     public List<OptionRelation> options;
+    @Relation(parentColumn = "InstructionId", entityColumn = "RemoteId", entity = Instruction.class)
+    public List<Instruction> instructions;
 }

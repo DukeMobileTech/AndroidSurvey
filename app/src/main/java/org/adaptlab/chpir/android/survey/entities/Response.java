@@ -53,6 +53,8 @@ public class Response implements Uploadable {
     private String mRankOrder;
     @ColumnInfo(name = "IdentifiesSurvey")
     private boolean mIdentifiesSurvey;
+    @ColumnInfo(name = "OtherText")
+    private String mOtherText;
 
     public Response() {
         mSent = false;
@@ -204,10 +206,19 @@ public class Response implements Uploadable {
         jsonObject.addProperty("randomized_data", mRandomizedData);
         jsonObject.addProperty("rank_order", mRankOrder);
         jsonObject.addProperty("device_user_id", mDeviceUserId);
+        jsonObject.addProperty("other_text", mOtherText);
 
         JsonObject json = new JsonObject();
         json.add("response", jsonObject);
 
         return json.toString();
+    }
+
+    public String getOtherText() {
+        return mOtherText;
+    }
+
+    public void setOtherText(String mOtherText) {
+        this.mOtherText = mOtherText;
     }
 }

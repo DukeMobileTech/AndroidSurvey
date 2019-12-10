@@ -27,6 +27,7 @@ public class DropDownViewHolder extends QuestionViewHolder {
 
     @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
+        questionComponent.removeAllViews();
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         if (inflater != null) {
             View view = inflater.inflate(R.layout.spinner, null);

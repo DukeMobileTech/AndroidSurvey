@@ -1,8 +1,10 @@
 package org.adaptlab.chpir.android.survey.viewholders;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Typeface;
 import android.text.Editable;
 import android.text.InputType;
@@ -19,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -47,6 +50,7 @@ import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Timer;
@@ -73,6 +77,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     private List<OptionRelation> mOptionRelations;
     private List<OptionRelation> mSpecialOptionRelations;
     private List<DisplayInstructionRelation> mDisplayInstructions;
+    private HashMap<String, Instruction> mOptionInstructions;
     private ResponseRelationAdapter mAdapter;
 
     private TextView mDisplayInstructionTextView;
@@ -80,6 +85,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     private TextView mOptionSetInstructionTextView;
     private ViewGroup mQuestionComponent;
     private Button mClearButton;
+    private ImageButton mPopUpButton;
 
     private boolean mDeserialization = false;
 
@@ -94,6 +100,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         mQuestionComponent = itemView.findViewById(R.id.response_component);
         mSpecialResponses = itemView.findViewById(R.id.specialResponseButtons);
         mClearButton = itemView.findViewById(R.id.clearResponsesButton);
+        mPopUpButton = itemView.findViewById(R.id.popupInstructions);
     }
 
     public QuestionViewHolder(@NonNull View itemView, Context context) {
@@ -103,7 +110,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void setRelations(QuestionRelation questionRelation) {
-        Log.i(TAG, "setRelations: " + questionRelation.question.toString());
+//        Log.i(TAG, "setRelations: " + questionRelation.question.toString());
         mQuestionRelation = questionRelation;
         mQuestion = questionRelation.question;
         mResponse = questionRelation.response;
@@ -216,17 +223,17 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
     void setOptionSetItems(QuestionRelation questionRelation) {
         mOptionRelations = new ArrayList<>();
+        mOptionInstructions = new HashMap<>();
         if (questionRelation.optionSets.size() > 0) {
             OptionSetRelation optionSetRelation = questionRelation.optionSets.get(0);
-            if (optionSetRelation != null) {
-                if (optionSetRelation.instructions.size() > 0) {
-                    mOptionSetInstruction = optionSetRelation.instructions.get(0);
-                }
-                if (optionSetRelation.optionSetOptions != null) {
-                    for (OptionSetOptionRelation relation : optionSetRelation.optionSetOptions) {
-                        if (relation.options.size() > 0) {
-                            mOptionRelations.add(relation.options.get(0));
-                        }
+            if (optionSetRelation.instructions.size() > 0) {
+                mOptionSetInstruction = optionSetRelation.instructions.get(0);
+            }
+            for (OptionSetOptionRelation relation : optionSetRelation.optionSetOptions) {
+                if (relation.options.size() > 0) {
+                    mOptionRelations.add(relation.options.get(0));
+                    if (relation.instructions.size() > 0) {
+                        mOptionInstructions.put(relation.options.get(0).option.getIdentifier(), relation.instructions.get(0));
                     }
                 }
             }
@@ -408,27 +415,64 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         String identifier = mQuestion.getQuestionIdentifier() + "\n";
         int idLen = identifier.length();
         String instructions = getQuestionInstructions();
-        if (instructions.length() != 0) {
-            instructions = instructions + "\n";
-        }
         int insLen = instructions.length();
         Spanned text = getQuestionText();
         int textLen = text.length();
-        SpannableString spannableText = new SpannableString(number + identifier + instructions + text);
-        spannableText.setSpan(new ForegroundColorSpan(getContext().getResources().getColor(R.color.secondary_text)),
-                0, numLen + idLen + insLen, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        spannableText.setSpan(new StyleSpan(Typeface.BOLD), 0, numLen,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        spannableText.setSpan(new StyleSpan(Typeface.ITALIC), numLen + idLen,
-                numLen + idLen + insLen, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        spannableText.setSpan(new ForegroundColorSpan(getContext().getResources().getColor(R.color.blue)),
-                numLen + idLen + insLen, numLen + idLen + insLen + textLen,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        spannableText.setSpan(new RelativeSizeSpan(1.2f),
-                numLen + idLen + insLen, numLen + idLen + insLen + textLen,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
+        SpannableString spannableText;
+        if (mQuestion.isPopUpInstruction()) {
+            spannableText = new SpannableString(number + identifier + text);
+            spannableText.setSpan(new ForegroundColorSpan(getContext().getResources().getColor(R.color.secondary_text)),
+                    0, numLen + idLen, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableText.setSpan(new ForegroundColorSpan(getContext().getResources().getColor(R.color.blue)),
+                    numLen + idLen, numLen + idLen + textLen, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        } else if (mQuestion.isInstructionAfterText()) {
+            spannableText = new SpannableString(number + identifier + text + instructions);
+            spannableText.setSpan(new ForegroundColorSpan(getContext().getResources().getColor(R.color.secondary_text)),
+                    0, numLen + idLen, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableText.setSpan(new ForegroundColorSpan(getContext().getResources().getColor(R.color.secondary_text)),
+                    numLen + idLen + textLen, numLen + idLen + textLen + insLen, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableText.setSpan(new StyleSpan(Typeface.ITALIC), numLen + idLen + textLen,
+                    numLen + idLen + textLen + insLen, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableText.setSpan(new ForegroundColorSpan(getContext().getResources().getColor(R.color.blue)),
+                    numLen + idLen, numLen + idLen + textLen,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        } else {
+            spannableText = new SpannableString(number + identifier + instructions + text);
+            spannableText.setSpan(new ForegroundColorSpan(getContext().getResources().getColor(R.color.secondary_text)),
+                    0, numLen + idLen + insLen, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableText.setSpan(new StyleSpan(Typeface.ITALIC), numLen + idLen,
+                    numLen + idLen + insLen, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableText.setSpan(new ForegroundColorSpan(getContext().getResources().getColor(R.color.blue)),
+                    numLen + idLen + insLen, numLen + idLen + insLen + textLen,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+        spannableText.setSpan(new StyleSpan(Typeface.BOLD), 0, numLen, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        if (mQuestion.isPopUpInstruction()) {
+            spannableText.setSpan(new RelativeSizeSpan(1.2f), numLen + idLen,
+                    numLen + idLen + textLen, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            mPopUpButton.setVisibility(View.VISIBLE);
+            mPopUpButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    showPopUpInstruction();
+                }
+            });
+        } else {
+            spannableText.setSpan(new RelativeSizeSpan(1.2f), numLen + idLen + insLen,
+                    numLen + idLen + insLen + textLen, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
         mSpannedTextView.setText(spannableText);
+    }
+
+    private void showPopUpInstruction() {
+        String instructions = getQuestionInstructions();
+        new AlertDialog.Builder(getContext())
+                .setMessage(instructions)
+                .setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {}
+                })
+                .show();
+
     }
 
     String getQuestionInstructions() {
@@ -481,8 +525,10 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
             StringBuilder stringBuilder = new StringBuilder();
             List<Instruction> instructions = new ArrayList<>();
             for (DisplayInstructionRelation relation : mDisplayInstructions) {
-                if (relation.displayInstruction.getPosition() == mQuestion.getNumberInInstrument()) {
-                    instructions.add(relation.instructions.get(0));
+                if (relation.instructions.size() > 0) {
+                    if (relation.displayInstruction.getPosition() == mQuestion.getNumberInInstrument()) {
+                        instructions.add(relation.instructions.get(0));
+                    }
                 }
             }
             for (Instruction instruction : instructions) {

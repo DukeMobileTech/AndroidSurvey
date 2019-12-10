@@ -78,7 +78,7 @@ import java.util.UUID;
         Section.class, SectionTranslation.class, Option.class, OptionSet.class, OptionSetOption.class,
         OptionSetTranslation.class, OptionTranslation.class, ConditionSkip.class, DeviceUser.class,
         FollowUpQuestion.class, MultipleSkip.class, NextQuestion.class, Survey.class, Response.class},
-        version = 2)
+        version = 3)
 @TypeConverters({Converters.class})
 public abstract class SurveyRoomDatabase extends RoomDatabase {
     private static final String TAG = SurveyRoomDatabase.class.getName();
@@ -87,6 +87,16 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
         public void migrate(SupportSQLiteDatabase database) {
             database.execSQL("ALTER TABLE Settings ADD COLUMN Latitude TEXT");
             database.execSQL("ALTER TABLE Settings ADD COLUMN Longitude TEXT");
+        }
+    };
+    private static final Migration MIGRATION_2_3 = new Migration(2, 3) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE OptionSetOptions ADD COLUMN InstructionId INTEGER");
+            database.execSQL("ALTER TABLE OptionSetOptions ADD COLUMN AllowTextEntry INTEGER DEFAULT 0 NOT NULL");
+            database.execSQL("ALTER TABLE Responses ADD COLUMN OtherText TEXT");
+            database.execSQL("ALTER TABLE Questions ADD COLUMN PopUpInstruction INTEGER DEFAULT 0 NOT NULL");
+            database.execSQL("ALTER TABLE Questions ADD COLUMN InstructionAfterText INTEGER DEFAULT 0 NOT NULL");
         }
     };
     private static volatile SurveyRoomDatabase INSTANCE;
@@ -106,7 +116,7 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             SurveyRoomDatabase.class, "SurveyDatabase")
                             .addCallback(sRoomDatabaseCallback)
-                            .addMigrations(MIGRATION_1_2)
+                            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                             .build();
                 }
             }

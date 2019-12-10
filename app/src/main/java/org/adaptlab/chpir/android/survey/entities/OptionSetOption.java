@@ -39,7 +39,13 @@ public class OptionSetOption implements SurveyEntity {
     @SerializedName("is_exclusive")
     @ColumnInfo(name = "Exclusive")
     private boolean mExclusive;
-
+    @SerializedName("instruction_id")
+    @ColumnInfo(name = "InstructionId")
+    private Long mInstructionId;
+    @SerializedName("allow_text_entry")
+    @ColumnInfo(name = "AllowTextEntry")
+    private boolean mAllowTextEntry;
+    
     @NonNull
     public Long getRemoteId() {
         return mRemoteId;
@@ -112,5 +118,21 @@ public class OptionSetOption implements SurveyEntity {
     public void save(BaseDao dao, List list) {
         dao.updateAll(list);
         dao.insertAll(list);
+    }
+
+    public Long getInstructionId() {
+        return mInstructionId;
+    }
+
+    public void setInstructionId(Long mInstructionId) {
+        this.mInstructionId = mInstructionId;
+    }
+
+    public boolean isAllowTextEntry() {
+        return mAllowTextEntry;
+    }
+
+    public void setAllowTextEntry(boolean mAllowTextEntry) {
+        this.mAllowTextEntry = mAllowTextEntry;
     }
 }
