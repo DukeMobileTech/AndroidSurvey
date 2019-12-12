@@ -148,7 +148,7 @@ public class SurveyActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position) {
                 Display display = mSurveyViewModel.getDisplays().get(position);
-                mActionBar.setTitle(display.getPosition() + ": " + display.getTitle());
+                mActionBar.setTitle(display.getTitle());
             }
         });
     }
@@ -290,7 +290,7 @@ public class SurveyActivity extends AppCompatActivity {
             Section section = mSurveyViewModel.getSections().get(display.getSectionId());
             List<String> displayTitles = listData.get(section.getTitle());
             if (displayTitles == null) displayTitles = new ArrayList<>();
-            displayTitles.add(display.getPosition() + " " + display.getTitle());
+            displayTitles.add(display.getTitle());
             listData.put(section.getTitle(), displayTitles);
         }
         mSurveyViewModel.setExpandableListData(listData);
@@ -434,7 +434,7 @@ public class SurveyActivity extends AppCompatActivity {
                 String selectedItem = ((List) (mSurveyViewModel.getExpandableListData().get(mSurveyViewModel.getExpandableListTitle().get(groupPosition)))).get(childPosition).toString();
                 int index = 0;
                 for (Display display : mSurveyViewModel.getDisplays()) {
-                    if ((display.getPosition() + " " + display.getTitle()).equals(selectedItem)) {
+                    if (display.getTitle().equals(selectedItem)) {
                         moveToDisplay(index);
                         break;
                     }

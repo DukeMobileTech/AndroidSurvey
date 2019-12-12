@@ -35,8 +35,9 @@ public class SelectMultipleViewHolder extends QuestionViewHolder {
             final int optionId = getOptionRelations().indexOf(optionRelation);
             CheckBox checkbox = new CheckBox(getContext());
             checkbox.setText(TranslationUtil.getText(optionRelation.option, optionRelation.translations, getSurveyViewModel()));
-            checkbox.setTextColor(getContext().getResources().getColorStateList(R.color.states));
+            setOptionTextColor(checkbox);
             checkbox.setId(optionId);
+            toggleCarryForward(checkbox, optionId);
             checkbox.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

@@ -45,11 +45,14 @@ public abstract class ListOfItemsViewHolder extends QuestionViewHolder {
         questionComponent.removeAllViews();
         mResponses = new ArrayList<>();
         for (OptionRelation optionRelation : getOptionRelations()) {
+            int optionId = getOptionRelations().indexOf(optionRelation);
             final TextView optionText = new TextView(getContext());
             optionText.setText(TranslationUtil.getText(optionRelation.option, optionRelation.translations, getSurveyViewModel()));
+            toggleCarryForward(optionText, optionId);
             questionComponent.addView(optionText);
             EditText editText = createEditText();
             editText.setHint(R.string.free_response_edittext);
+            toggleCarryForward(editText, optionId);
             questionComponent.addView(editText);
             mResponses.add(editText);
             editText.addTextChangedListener(new TextWatcher() {

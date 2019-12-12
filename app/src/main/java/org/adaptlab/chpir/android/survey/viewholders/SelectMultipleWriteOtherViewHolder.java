@@ -21,11 +21,10 @@ public class SelectMultipleWriteOtherViewHolder extends SelectMultipleViewHolder
         CheckBox checkbox = new CheckBox(getContext());
         otherText = new EditText(getContext());
         checkbox.setText(R.string.other_specify);
-//        checkbox.setTypeface(getInstrument().getTypeFace(
-//                getActivity().getApplicationContext()));
-        checkbox.setTextColor(getContext().getResources().getColorStateList(R.color.states));
         final int otherId = getOptionRelations().size();
         checkbox.setId(otherId);
+        setOptionTextColor(checkbox);
+        toggleCarryForward(checkbox, otherId);
         checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {

@@ -25,6 +25,8 @@ public class QuestionRelation {
     public List<OptionSetRelation> optionSets;
     @Relation(parentColumn = "RemoteSpecialOptionSetId", entityColumn = "RemoteId", entity = OptionSet.class)
     public List<OptionSetRelation> specialOptionSets;
+    @Relation(parentColumn = "CarryForwardOptionSetId", entityColumn = "RemoteId", entity = OptionSet.class)
+    public List<OptionSetRelation> carryForwardOptionSets;
     @Relation(parentColumn = "DisplayId", entityColumn = "RemoteId", entity = Display.class)
     public List<DisplayRelation> displays;
     @Relation(parentColumn = "QuestionIdentifier", entityColumn = "QuestionIdentifier", entity = NextQuestion.class)

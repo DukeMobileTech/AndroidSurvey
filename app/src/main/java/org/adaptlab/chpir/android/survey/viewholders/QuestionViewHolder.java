@@ -6,6 +6,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.Spannable;
@@ -20,6 +21,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
@@ -76,6 +78,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     private Instruction mOptionSetInstruction;
     private List<OptionRelation> mOptionRelations;
     private List<OptionRelation> mSpecialOptionRelations;
+    private List<OptionRelation> mCarryForwardOptionRelations;
     private List<DisplayInstructionRelation> mDisplayInstructions;
     private HashMap<String, Instruction> mOptionInstructions;
     private ResponseRelationAdapter mAdapter;
@@ -116,6 +119,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         mResponse = questionRelation.response;
         setOptionSetItems(questionRelation);
         setSpecialOptions(questionRelation);
+        setCarryForwardOptions(questionRelation);
         setDisplayInstructions(questionRelation);
 
         setSpannedText();
@@ -159,11 +163,46 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     }
 
     List<OptionRelation> getOptionRelations() {
-        return mOptionRelations;
+        if (mQuestion.isCarryForward()) {
+            return mCarryForwardOptionRelations;
+        } else {
+            return mOptionRelations;
+        }
     }
 
     List<OptionRelation> getSpecialOptionRelations() {
         return mSpecialOptionRelations;
+    }
+
+    private Response getCarryForwardResponse() {
+        return getSurveyViewModel().getResponses().get(mQuestion.getCarryForwardIdentifier());
+    }
+
+    void toggleCarryForward(View view, int optionId) {
+        if (getQuestion().isCarryForward()) {
+            ArrayList<Integer> responseIndices = new ArrayList<>();
+            String[] listOfIndices = getCarryForwardResponse().getText().split(COMMA);
+            for (String index : listOfIndices) {
+                if (!index.equals("")) {
+                    responseIndices.add(Integer.parseInt(index));
+                }
+            }
+            if (!responseIndices.contains(optionId)) {
+                view.setEnabled(false);
+                if (view instanceof EditText) {
+                    ((EditText) view).setHint(null);
+                }
+                if (view instanceof TextView) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        ((TextView) view).setTextColor(getContext().getColor(R.color.secondary_text));
+                    }
+                }
+            }
+        }
+    }
+
+    void setOptionTextColor(CompoundButton button) {
+        button.setTextColor(getContext().getResources().getColorStateList(R.color.states));
     }
 
     boolean isDeserialization() {
@@ -574,13 +613,17 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
             });
         }
 
-        mClearButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                clearResponse();
-                updateResponse();
-            }
-        });
+        if (mQuestion.getQuestionType().equals(Question.INSTRUCTIONS)) {
+            mClearButton.setVisibility(View.GONE);
+        } else {
+            mClearButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    clearResponse();
+                    updateResponse();
+                }
+            });
+        }
     }
 
     void clearResponse() {
@@ -625,6 +668,20 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                 for (OptionSetOptionRelation relation : optionSetRelation.optionSetOptions) {
                     if (relation.options != null) {
                         mSpecialOptionRelations.add(relation.options.get(0));
+                    }
+                }
+            }
+        }
+    }
+
+    void setCarryForwardOptions(QuestionRelation questionRelation) {
+        mCarryForwardOptionRelations = new ArrayList<>();
+        if (questionRelation.carryForwardOptionSets.size() > 0) {
+            OptionSetRelation optionSetRelation = questionRelation.carryForwardOptionSets.get(0);
+            if (optionSetRelation != null && optionSetRelation.optionSetOptions != null) {
+                for (OptionSetOptionRelation relation : optionSetRelation.optionSetOptions) {
+                    if (relation.options.size() > 0) {
+                        mCarryForwardOptionRelations.add(relation.options.get(0));
                     }
                 }
             }

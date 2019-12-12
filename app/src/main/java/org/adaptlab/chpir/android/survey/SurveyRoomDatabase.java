@@ -68,6 +68,7 @@ import org.adaptlab.chpir.android.survey.entities.Section;
 import org.adaptlab.chpir.android.survey.entities.SectionTranslation;
 import org.adaptlab.chpir.android.survey.entities.Settings;
 import org.adaptlab.chpir.android.survey.entities.Survey;
+import org.adaptlab.chpir.android.survey.entities.SurveyNote;
 
 import java.util.Locale;
 import java.util.UUID;
@@ -77,8 +78,9 @@ import java.util.UUID;
         DisplayTranslation.class, DisplayInstruction.class, Instruction.class, InstructionTranslation.class,
         Section.class, SectionTranslation.class, Option.class, OptionSet.class, OptionSetOption.class,
         OptionSetTranslation.class, OptionTranslation.class, ConditionSkip.class, DeviceUser.class,
-        FollowUpQuestion.class, MultipleSkip.class, NextQuestion.class, Survey.class, Response.class},
-        version = 3)
+        FollowUpQuestion.class, MultipleSkip.class, NextQuestion.class, Survey.class, Response.class,
+        SurveyNote.class},
+        version = 4, exportSchema = true)
 @TypeConverters({Converters.class})
 public abstract class SurveyRoomDatabase extends RoomDatabase {
     private static final String TAG = SurveyRoomDatabase.class.getName();
@@ -99,6 +101,18 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
             database.execSQL("ALTER TABLE Questions ADD COLUMN InstructionAfterText INTEGER DEFAULT 0 NOT NULL");
         }
     };
+    private static final Migration MIGRATION_3_4 = new Migration(3, 4) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE Questions ADD COLUMN CarryForwardIdentifier TEXT");
+            database.execSQL("ALTER TABLE Questions ADD COLUMN DefaultResponse TEXT");
+            database.execSQL("ALTER TABLE Questions ADD COLUMN CarryForwardOptionSetId INTEGER");
+            database.execSQL("CREATE TABLE IF NOT EXISTS SurveyNotes (`UUID` TEXT NOT NULL, `SurveyUUID` TEXT NOT NULL, " +
+                    "`Text` TEXT, `Reference` TEXT, `SentToRemote` INTEGER NOT NULL, `DeviceUserId` INTEGER, PRIMARY KEY(`UUID`))");
+            database.execSQL("CREATE  INDEX `index_SurveyNotes_UUID` ON SurveyNotes (`UUID`)");
+            database.execSQL("CREATE  INDEX `index_SurveyNotes_SurveyUUID` ON SurveyNotes (`SurveyUUID`)");
+        }
+    };
     private static volatile SurveyRoomDatabase INSTANCE;
     private static RoomDatabase.Callback sRoomDatabaseCallback =
             new RoomDatabase.Callback() {
@@ -116,7 +130,7 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             SurveyRoomDatabase.class, "SurveyDatabase")
                             .addCallback(sRoomDatabaseCallback)
-                            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                             .build();
                 }
             }

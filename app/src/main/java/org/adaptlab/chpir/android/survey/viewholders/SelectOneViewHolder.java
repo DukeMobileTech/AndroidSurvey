@@ -42,7 +42,8 @@ public class SelectOneViewHolder extends QuestionViewHolder {
                     LinearLayout.LayoutParams.WRAP_CONTENT));
             radioButton.setText(TranslationUtil.getText(optionRelation.option, optionRelation.translations, getSurveyViewModel()));
             radioButton.setId(optionId);
-            radioButton.setTextColor(getContext().getResources().getColorStateList(R.color.states));
+            setOptionTextColor(radioButton);
+            toggleCarryForward(radioButton, optionId);
             radioButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

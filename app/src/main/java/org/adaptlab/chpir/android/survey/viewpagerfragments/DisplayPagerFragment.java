@@ -293,6 +293,9 @@ public class DisplayPagerFragment extends Fragment {
                 response.setQuestionRemoteId(questionRelation.question.getRemoteId());
                 response.setQuestionVersion(questionRelation.question.getQuestionVersion());
                 response.setTimeStarted(new Date());
+                if (!TextUtils.isEmpty(questionRelation.question.getDefaultResponse())) {
+                    response.setText(questionRelation.question.getDefaultResponse());
+                }
                 responses.add(response);
             }
         }

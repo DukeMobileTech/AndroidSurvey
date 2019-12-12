@@ -1,5 +1,7 @@
 package org.adaptlab.chpir.android.survey.entities;
 
+import android.text.TextUtils;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.StringDef;
 import androidx.room.ColumnInfo;
@@ -129,6 +131,16 @@ public class Question implements SurveyEntity, Translatable {
     @SerializedName("instruction_after_text")
     @ColumnInfo(name = "InstructionAfterText")
     private boolean mInstructionAfterText;
+    @SerializedName("carry_forward_identifier")
+    @ColumnInfo(name = "CarryForwardIdentifier")
+    private String mCarryForwardIdentifier;
+    @SerializedName("carry_forward_option_set_id")
+    @ColumnInfo(name = "CarryForwardOptionSetId")
+    private Long mCarryForwardOptionSetId;
+    @SerializedName("default_response")
+    @ColumnInfo(name = "DefaultResponse")
+    private String mDefaultResponse;
+
     @Ignore
     @SerializedName("question_translations")
     private List<QuestionTranslation> mQuestionTranslations;
@@ -393,6 +405,10 @@ public class Question implements SurveyEntity, Translatable {
         return mQuestionType.equals(LIST_OF_INTEGER_BOXES) || mQuestionType.equals(LIST_OF_TEXT_BOXES);
     }
 
+    public boolean isCarryForward() {
+        return !TextUtils.isEmpty(mCarryForwardIdentifier);
+    }
+
     @NonNull
     public String toString() {
         return new ToStringBuilder(this).
@@ -423,6 +439,30 @@ public class Question implements SurveyEntity, Translatable {
 
     public void setInstructionAfterText(boolean mInstructionAfterText) {
         this.mInstructionAfterText = mInstructionAfterText;
+    }
+
+    public String getCarryForwardIdentifier() {
+        return mCarryForwardIdentifier;
+    }
+
+    public void setCarryForwardIdentifier(String mCarryForwardIdentifier) {
+        this.mCarryForwardIdentifier = mCarryForwardIdentifier;
+    }
+
+    public String getDefaultResponse() {
+        return mDefaultResponse;
+    }
+
+    public void setDefaultResponse(String mDefaultResponse) {
+        this.mDefaultResponse = mDefaultResponse;
+    }
+
+    public Long getCarryForwardOptionSetId() {
+        return mCarryForwardOptionSetId;
+    }
+
+    public void setCarryForwardOptionSetId(Long mCarryForwardOptionSetId) {
+        this.mCarryForwardOptionSetId = mCarryForwardOptionSetId;
     }
 
     @Retention(RetentionPolicy.SOURCE)
