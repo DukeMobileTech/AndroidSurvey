@@ -198,7 +198,9 @@ public class SettingsFragment extends Fragment {
         languageCodes.addAll(mLanguages);
         ArrayList<String> displayLanguages = new ArrayList<>();
         for (String languageCode : languageCodes) {
-            displayLanguages.add(new Locale(languageCode).getDisplayLanguage());
+            if (!TextUtils.isEmpty(languageCode)) {
+                displayLanguages.add(new Locale(languageCode).getDisplayLanguage());
+            }
         }
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, displayLanguages);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

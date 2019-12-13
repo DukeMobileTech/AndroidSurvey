@@ -75,12 +75,12 @@ public class AppUtil {
     private static String mCurrentSyncTime;
 
     public static void appInit(Application application) {
-        if (AppUtil.REQUIRE_SECURITY_CHECKS) {
-            if (!AppUtil.runDeviceSecurityChecks(application)) {
-                // Device has failed security checks
-                return;
-            }
-        }
+//        if (AppUtil.REQUIRE_SECURITY_CHECKS) {
+//            if (!AppUtil.runDeviceSecurityChecks(application)) {
+//                // Device has failed security checks
+//                return;
+//            }
+//        }
         setSettings(application);
         setVersionCode(application);
         setVersionName(application);

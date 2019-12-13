@@ -51,6 +51,7 @@ public class SetLoopsTask extends AsyncTask<Void, Void, Void> {
     protected Void doInBackground(Void... voids) {
         SurveyRoomDatabase database = SurveyRoomDatabase.getDatabase(SurveyApp.getInstance());
         Settings settings = database.settingsDao().getInstanceSync();
+        if (settings == null || TextUtils.isEmpty(settings.getProjectId())) return null;
         mDisplayDao = database.displayDao();
         mInstrumentDao = database.instrumentDao();
         mQuestionDao = database.questionDao();

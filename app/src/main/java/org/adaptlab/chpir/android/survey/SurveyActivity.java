@@ -218,6 +218,7 @@ public class SurveyActivity extends AppCompatActivity {
         viewModel.getLanguages().observe(this, new Observer<List<String>>() {
             @Override
             public void onChanged(@Nullable List<String> languages) {
+                if (languages == null) return;
                 initializeLanguages();
                 mLanguageCodes.addAll(languages);
                 invalidateOptionsMenu();
@@ -257,8 +258,10 @@ public class SurveyActivity extends AppCompatActivity {
             @Override
             public void onChanged(@Nullable SurveyRelation surveyRelation) {
                 HashMap<String, Response> map = new HashMap<>();
-                for (Response response : surveyRelation.responses) {
-                    map.put(response.getQuestionIdentifier(), response);
+                if (surveyRelation != null) {
+                    for (Response response : surveyRelation.responses) {
+                        map.put(response.getQuestionIdentifier(), response);
+                    }
                 }
                 mSurveyViewModel.setResponses(map);
             }
@@ -302,7 +305,9 @@ public class SurveyActivity extends AppCompatActivity {
         if (AppUtil.getSettings() == null) return;
         ArrayList<String> displayLanguages = new ArrayList<>();
         for (String languageCode : mLanguageCodes) {
-            displayLanguages.add(new Locale(languageCode).getDisplayLanguage());
+            if (!TextUtils.isEmpty(languageCode)) {
+                displayLanguages.add(new Locale(languageCode).getDisplayLanguage());
+            }
         }
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, displayLanguages);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
