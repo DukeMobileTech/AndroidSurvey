@@ -1,10 +1,7 @@
 package org.adaptlab.chpir.android.survey.utils;
 
-import android.app.AlertDialog;
 import android.app.Application;
-import android.app.admin.DevicePolicyManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -54,9 +51,8 @@ import io.fabric.sdk.android.Fabric;
 import okhttp3.OkHttpClient;
 
 public class AppUtil {
-    public final static boolean PRODUCTION = !BuildConfig.DEBUG;
+    private final static boolean PRODUCTION = !BuildConfig.DEBUG;
     private final static String TAG = "AppUtil";
-    private final static boolean REQUIRE_SECURITY_CHECKS = PRODUCTION;
     private final static int REMOTE_TABLE_COUNT = 15;
     private static final int TIMEOUT = 10000;
     private static volatile int REMOTE_DOWNLOAD_COUNT = 0;
@@ -73,14 +69,9 @@ public class AppUtil {
     private static Settings mSettings;
     private static SettingsRepository mSettingsRepository;
     private static String mCurrentSyncTime;
+    private static String DATABASE_KEY;
 
     public static void appInit(Application application) {
-//        if (AppUtil.REQUIRE_SECURITY_CHECKS) {
-//            if (!AppUtil.runDeviceSecurityChecks(application)) {
-//                // Device has failed security checks
-//                return;
-//            }
-//        }
         setSettings(application);
         setVersionCode(application);
         setVersionName(application);
@@ -157,35 +148,6 @@ public class AppUtil {
 
     public static void setProjectId(Long projectId) {
         PROJECT_ID = projectId;
-    }
-
-    /*
-     * Security checks that must pass for the application to start.
-     *
-     * If the application fails any security checks, display
-     * AlertDialog indicating why and immediately stop execution
-     * of the application.
-     *
-     * Current security checks: require encryption
-     */
-    private static boolean runDeviceSecurityChecks(Context context) {
-        DevicePolicyManager devicePolicyManager = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
-        if (devicePolicyManager == null || devicePolicyManager.getStorageEncryptionStatus() != DevicePolicyManager.ENCRYPTION_STATUS_ACTIVE) {
-            new AlertDialog.Builder(context)
-                    .setTitle(R.string.encryption_required_title)
-                    .setMessage(R.string.encryption_required_text)
-                    .setCancelable(false)
-                    .setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            // Kill app on OK
-                            int pid = android.os.Process.myPid();
-                            android.os.Process.killProcess(pid);
-                        }
-                    })
-                    .show();
-            return false;
-        }
-        return true;
     }
 
     public static OkHttpClient getOkHttpClient() {
@@ -421,4 +383,11 @@ public class AppUtil {
         mCurrentSyncTime = null;
     }
 
+    public static String getDatabaseKey() {
+        return DATABASE_KEY;
+    }
+
+    public static void setDatabaseKey(String databaseKey) {
+        DATABASE_KEY = databaseKey;
+    }
 }

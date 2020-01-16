@@ -45,6 +45,17 @@ android {
         jumboMode true
     }
 
+    flavorDimensions 'wci'
+
+    productFlavors {
+        wci {
+            dimension 'wci'
+            applicationIdSuffix '.wci'
+            versionCode 6
+            versionName '0.0.1'
+        }
+    }
+
 }
 
 dependencies {
@@ -61,10 +72,6 @@ dependencies {
     implementation 'com.opencsv:opencsv:3.5'
     implementation 'org.apache.commons:commons-lang3:3.4'
     implementation 'commons-codec:commons-codec:1.8'
-    implementation 'com.madgag.spongycastle:core:1.51.0.0'
-    implementation 'com.madgag.spongycastle:pg:1.51.0.0'
-    implementation 'com.madgag.spongycastle:pkix:1.51.0.0'
-    implementation 'com.madgag.spongycastle:prov:1.51.0.0'
     implementation 'com.google.code.gson:gson:2.8.5'
     def room_version = "2.1.0"
     implementation "androidx.room:room-runtime:$room_version"
@@ -72,4 +79,5 @@ dependencies {
     def lifecycle_version = "2.0.0"
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
     annotationProcessor "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
+    implementation 'net.zetetic:android-database-sqlcipher:4.3.0'
 }

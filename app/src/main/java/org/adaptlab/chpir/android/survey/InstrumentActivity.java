@@ -1,12 +1,17 @@
 package org.adaptlab.chpir.android.survey;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -24,11 +29,21 @@ import org.adaptlab.chpir.android.survey.adapters.InstrumentSurveyPagerAdapter;
 import org.adaptlab.chpir.android.survey.entities.Project;
 import org.adaptlab.chpir.android.survey.entities.Settings;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
+import org.adaptlab.chpir.android.survey.utils.EncryptUtil;
 import org.adaptlab.chpir.android.survey.utils.LocaleManager;
 import org.adaptlab.chpir.android.survey.utils.LocationManager;
 import org.adaptlab.chpir.android.survey.viewmodelfactories.ProjectViewModelFactory;
 import org.adaptlab.chpir.android.survey.viewmodels.ProjectViewModel;
 import org.adaptlab.chpir.android.survey.viewmodels.SettingsViewModel;
+
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 public class InstrumentActivity extends AppCompatActivity {
     private final static String TAG = "InstrumentActivity";
@@ -38,10 +53,66 @@ public class InstrumentActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        AppUtil.appInit(getApplication());
         setContentView(R.layout.activity_instrument);
+        if (AppUtil.getDatabaseKey() == null) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                String password = EncryptUtil.getPassword();
+                if (password == null) {
+                    getDatabaseKeyFromUser();
+                } else {
+                    AppUtil.setDatabaseKey(password);
+                    init();
+                }
+            } else {
+                getDatabaseKeyFromUser();
+            }
+        } else {
+            init();
+        }
+    }
+
+    private void init() {
+        AppUtil.appInit(getApplication());
         setSettings();
         requestNeededPermissions();
+    }
+
+    private void getDatabaseKeyFromUser() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder.setTitle(getString(R.string.database_password))
+                    .setView(R.layout.fragment_database);
+            builder.setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            });
+            final AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+
+            final EditText password = alertDialog.findViewById(R.id.database_password_edit_text);
+            final EditText passwordConfirmation = alertDialog.findViewById(R.id.database_password_confirmation_edit_text);
+
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (!TextUtils.isEmpty(password.getText().toString()) &&
+                            password.getText().toString().equals(passwordConfirmation.getText().toString())) {
+                        AppUtil.setDatabaseKey(password.getText().toString());
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            try {
+                                EncryptUtil.encrypt(password.getText().toString());
+                            } catch (NoSuchAlgorithmException | NoSuchProviderException | NoSuchPaddingException | InvalidKeyException |
+                                    InvalidAlgorithmParameterException | BadPaddingException | IllegalBlockSizeException e) {
+                                Log.e(TAG, "Exception: " + e);
+                            }
+                        }
+                        alertDialog.dismiss();
+                        init();
+                    }
+                }
+            });
+        }
     }
 
     private void setSettings() {

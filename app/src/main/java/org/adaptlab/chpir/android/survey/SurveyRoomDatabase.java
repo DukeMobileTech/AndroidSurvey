@@ -13,6 +13,9 @@ import androidx.room.TypeConverters;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
+import net.sqlcipher.database.SQLiteDatabase;
+import net.sqlcipher.database.SupportFactory;
+
 import org.adaptlab.chpir.android.survey.converters.Converters;
 import org.adaptlab.chpir.android.survey.daos.ConditionSkipDao;
 import org.adaptlab.chpir.android.survey.daos.CriticalResponseDao;
@@ -69,6 +72,7 @@ import org.adaptlab.chpir.android.survey.entities.SectionTranslation;
 import org.adaptlab.chpir.android.survey.entities.Settings;
 import org.adaptlab.chpir.android.survey.entities.Survey;
 import org.adaptlab.chpir.android.survey.entities.SurveyNote;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
 
 import java.util.Locale;
 import java.util.UUID;
@@ -124,6 +128,9 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
             };
 
     public static SurveyRoomDatabase getDatabase(final Context context) {
+        String password = AppUtil.getDatabaseKey();
+        final byte[] passphrase = SQLiteDatabase.getBytes(password.toCharArray());
+        final SupportFactory factory = new SupportFactory(passphrase);
         if (INSTANCE == null) {
             synchronized (SurveyRoomDatabase.class) {
                 if (INSTANCE == null) {
@@ -131,6 +138,7 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
                             SurveyRoomDatabase.class, "SurveyDatabase")
                             .addCallback(sRoomDatabaseCallback)
                             .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                            .openHelperFactory(factory)
                             .build();
                 }
             }
