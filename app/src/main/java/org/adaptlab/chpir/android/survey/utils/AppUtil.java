@@ -2,10 +2,9 @@ package org.adaptlab.chpir.android.survey.utils;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
@@ -14,7 +13,10 @@ import com.crashlytics.android.Crashlytics;
 
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.SurveyApp;
+import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
 import org.adaptlab.chpir.android.survey.daos.DeviceUserDao;
+import org.adaptlab.chpir.android.survey.daos.SettingsDao;
 import org.adaptlab.chpir.android.survey.entities.DeviceUser;
 import org.adaptlab.chpir.android.survey.entities.Settings;
 import org.adaptlab.chpir.android.survey.repositories.ConditionSkipRepository;
@@ -35,15 +37,17 @@ import org.adaptlab.chpir.android.survey.repositories.ProjectRepository;
 import org.adaptlab.chpir.android.survey.repositories.QuestionRepository;
 import org.adaptlab.chpir.android.survey.repositories.SectionRepository;
 import org.adaptlab.chpir.android.survey.repositories.SettingsRepository;
+import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 import org.adaptlab.chpir.android.survey.tasks.EntityUploadTask;
 import org.adaptlab.chpir.android.survey.tasks.GetDeviceUserTask;
-import org.adaptlab.chpir.android.survey.tasks.GetSettingsTask;
 import org.adaptlab.chpir.android.survey.tasks.SetLoopsTask;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -96,19 +100,11 @@ public class AppUtil {
         }
     }
 
-    private static void checkDatabaseVersionChange(Context context) {
-        try {
-            ApplicationInfo ai = context.getPackageManager().getApplicationInfo(
-                    context.getPackageName(), PackageManager.GET_META_DATA);
-            int databaseVersion = 1;
-//            int databaseVersion = (int) ai.metaData.get("AA_DB_VERSION"); // TODO: 2019-04-25 FIX
-            if (databaseVersion != mSettings.getDatabaseVersion()) {
-                mSettings.resetLastSyncTime();
-                mSettings.setDatabaseVersion(databaseVersion);
-                mSettingsRepository.update(mSettings);
-            }
-        } catch (NameNotFoundException e) {
-            if (BuildConfig.DEBUG) Log.e(TAG, e.getMessage());
+    private static void checkDatabaseVersionChange() {
+        if (SurveyRoomDatabase.getDatabaseVersion() != mSettings.getDatabaseVersion()) {
+            mSettings.resetLastSyncTime();
+            mSettings.setDatabaseVersion(SurveyRoomDatabase.getDatabaseVersion());
+            mSettingsRepository.update(mSettings);
         }
     }
 
@@ -165,34 +161,33 @@ public class AppUtil {
         return Build.DISPLAY;
     }
 
-    public static String getBuildName() {
-        return Build.MODEL;
-    }
-
-    public static void downloadData(Application application) {
+    public static List<EntityDownloadTask> downloadData() {
+        Application application = SurveyApp.getInstance();
         // Record the time of the entity downloads
         Date currentTime = new Date();
         mCurrentSyncTime = Long.toString(currentTime.getTime());
         // Download survey entities
-        new ProjectRepository(application).download();
-        new InstrumentRepository(application).download();
-        new OptionRepository(application).download();
-        new OptionSetRepository(application).download();
-        new InstructionRepository(application).download();
-        new DisplayRepository(application).download();
-        new QuestionRepository(application).download();
-        new SectionRepository(application).download();
-        new DisplayInstructionRepository(application).download();
-        new OptionSetOptionRepository(application).download();
-        new ConditionSkipRepository(application).download();
-        new DeviceUserRepository(application).download();
-        new CriticalResponseRepository(application).download();
-        new LoopQuestionRepository(application).download();
-        new FollowUpQuestionRepository(application).download();
-        new MultipleSkipRepository(application).download();
-        new NextQuestionRepository(application).download();
+        List<EntityDownloadTask> tasks = new ArrayList<>();
+        tasks.add(new ProjectRepository(application).download());
+        tasks.add(new InstrumentRepository(application).download());
+        tasks.add(new OptionRepository(application).download());
+        tasks.add(new OptionSetRepository(application).download());
+        tasks.add(new InstructionRepository(application).download());
+        tasks.add(new DisplayRepository(application).download());
+        tasks.add(new QuestionRepository(application).download());
+        tasks.add(new SectionRepository(application).download());
+        tasks.add(new DisplayInstructionRepository(application).download());
+        tasks.add(new OptionSetOptionRepository(application).download());
+        tasks.add(new ConditionSkipRepository(application).download());
+        tasks.add(new DeviceUserRepository(application).download());
+        tasks.add(new CriticalResponseRepository(application).download());
+        tasks.add(new LoopQuestionRepository(application).download());
+        tasks.add(new FollowUpQuestionRepository(application).download());
+        tasks.add(new MultipleSkipRepository(application).download());
+        tasks.add(new NextQuestionRepository(application).download());
         // Upload queued surveys
         new EntityUploadTask().execute();
+        return tasks;
     }
 
     private static void incrementRemoteDownloadCount() {
@@ -311,20 +306,24 @@ public class AppUtil {
         getSettingsTask.setListener(new GetSettingsTask.AsyncTaskListener() {
             @Override
             public void onAsyncTaskFinished(Settings settings) {
-                mSettings = settings;
-                ACCESS_TOKEN = mSettings.getApiKey();
-                LAST_SYNC_TIME = mSettings.getLastSyncTime();
-                DOMAIN_NAME = mSettings.getApiUrl();
-                API_VERSION = mSettings.getApiVersion();
-                if (mSettings.getProjectId() != null)
-                    PROJECT_ID = Long.valueOf(mSettings.getProjectId());
-                checkDatabaseVersionChange(application);
-                setCrashLogs(application);
-                setDeviceLanguage();
-                if (mSettings.getDeviceUserName() != null) setDeviceUserId(application);
+                initializeSettings(settings, application);
             }
         });
         getSettingsTask.execute(mSettingsRepository.getSettingsDao());
+    }
+
+    public static void initializeSettings(Settings settings, Application application) {
+        mSettings = settings;
+        ACCESS_TOKEN = mSettings.getApiKey();
+        LAST_SYNC_TIME = mSettings.getLastSyncTime();
+        DOMAIN_NAME = mSettings.getApiUrl();
+        API_VERSION = mSettings.getApiVersion();
+        if (mSettings.getProjectId() != null)
+            PROJECT_ID = Long.valueOf(mSettings.getProjectId());
+        checkDatabaseVersionChange();
+        setCrashLogs(application);
+        setDeviceLanguage();
+        if (mSettings.getDeviceUserName() != null) setDeviceUserId(application);
     }
 
     public static Long getDeviceUserId() {
@@ -389,5 +388,28 @@ public class AppUtil {
 
     public static void setDatabaseKey(String databaseKey) {
         DATABASE_KEY = databaseKey;
+    }
+
+    static class GetSettingsTask extends AsyncTask<SettingsDao, Void, Settings> {
+        private AsyncTaskListener mListener;
+
+        public void setListener(AsyncTaskListener listener) {
+            mListener = listener;
+        }
+
+        @Override
+        protected Settings doInBackground(SettingsDao... params) {
+            return params[0].getInstanceSync();
+        }
+
+        @Override
+        protected void onPostExecute(Settings settings) {
+            super.onPostExecute(settings);
+            if (settings != null) mListener.onAsyncTaskFinished(settings);
+        }
+
+        public interface AsyncTaskListener {
+            void onAsyncTaskFinished(Settings settings);
+        }
     }
 }

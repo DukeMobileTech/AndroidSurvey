@@ -30,6 +30,7 @@ import java.util.TimerTask;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.EDIT_TEXT_DELAY;
+import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtmlWhitelist;
 
 public abstract class ListOfItemsViewHolder extends QuestionViewHolder {
     private ArrayList<EditText> mResponses;
@@ -47,7 +48,7 @@ public abstract class ListOfItemsViewHolder extends QuestionViewHolder {
         for (OptionRelation optionRelation : getOptionRelations()) {
             int optionId = getOptionRelations().indexOf(optionRelation);
             final TextView optionText = new TextView(getContext());
-            optionText.setText(TranslationUtil.getText(optionRelation.option, optionRelation.translations, getSurveyViewModel()));
+            optionText.setText(styleTextWithHtmlWhitelist(TranslationUtil.getText(optionRelation.option, optionRelation.translations, getSurveyViewModel())));
             toggleCarryForward(optionText, optionId);
             questionComponent.addView(optionText);
             EditText editText = createEditText();

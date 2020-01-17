@@ -37,7 +37,6 @@ import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.SurveyApp;
 import org.adaptlab.chpir.android.survey.entities.Settings;
 import org.adaptlab.chpir.android.survey.repositories.SettingsRepository;
-import org.adaptlab.chpir.android.survey.tasks.GetSettingsTask;
 import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -75,17 +74,10 @@ public class LocationManager {
 
     private void setSettings() {
         mSettingsRepository = new SettingsRepository(SurveyApp.getInstance());
-        GetSettingsTask getSettingsTask = new GetSettingsTask();
-        getSettingsTask.setListener(new GetSettingsTask.AsyncTaskListener() {
-            @Override
-            public void onAsyncTaskFinished(Settings settings) {
-                mSettings = settings;
-                createLocationCallback();
-                createLocationRequest();
-                buildLocationSettingsRequest();
-            }
-        });
-        getSettingsTask.execute(mSettingsRepository.getSettingsDao());
+        mSettings = AppUtil.getSettings();
+        createLocationCallback();
+        createLocationRequest();
+        buildLocationSettingsRequest();
     }
 
     private void createLocationCallback() {
@@ -135,8 +127,10 @@ public class LocationManager {
 
     private void recordSurveyLocation() {
         if (mSurveyViewModel != null && AppUtil.getSettings().isRecordSurveyLocation()) {
-            if (TextUtils.isEmpty(mSurveyViewModel.getSurvey().getLatitude())) mSurveyViewModel.getSurvey().setLatitude(getLatitude());
-            if (TextUtils.isEmpty(mSurveyViewModel.getSurvey().getLongitude())) mSurveyViewModel.getSurvey().setLongitude(getLongitude());
+            if (TextUtils.isEmpty(mSurveyViewModel.getSurvey().getLatitude()))
+                mSurveyViewModel.getSurvey().setLatitude(getLatitude());
+            if (TextUtils.isEmpty(mSurveyViewModel.getSurvey().getLongitude()))
+                mSurveyViewModel.getSurvey().setLongitude(getLongitude());
 
             JsonObject location = new JsonObject();
             location.addProperty("timestamp", new Date().getTime());
@@ -188,7 +182,8 @@ public class LocationManager {
                                             ResolvableApiException rae = (ResolvableApiException) e;
                                             rae.startResolutionForResult((Activity) mContext, REQUEST_CHECK_SETTINGS);
                                         } catch (IntentSender.SendIntentException sie) {
-                                            if (BuildConfig.DEBUG) Log.e(TAG, "PendingIntent unable to execute request.");
+                                            if (BuildConfig.DEBUG)
+                                                Log.e(TAG, "PendingIntent unable to execute request.");
                                         }
                                         break;
                                     case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:

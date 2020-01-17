@@ -1,9 +1,12 @@
 package org.adaptlab.chpir.android.survey.viewpagerfragments;
 
+import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.AsyncTask;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,15 +25,21 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.SettingsActivity;
+import org.adaptlab.chpir.android.survey.SurveyApp;
 import org.adaptlab.chpir.android.survey.adapters.InstrumentAdapter;
 import org.adaptlab.chpir.android.survey.entities.Instrument;
 import org.adaptlab.chpir.android.survey.entities.Settings;
+import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
+import org.adaptlab.chpir.android.survey.utils.NotificationUtils;
 import org.adaptlab.chpir.android.survey.viewmodelfactories.ProjectInstrumentViewModelFactory;
 import org.adaptlab.chpir.android.survey.viewmodels.ProjectInstrumentViewModel;
 import org.adaptlab.chpir.android.survey.viewmodels.SettingsViewModel;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class InstrumentPagerFragment extends Fragment {
     private static final String TAG = "InstrumentViewPagerFrag";
@@ -112,8 +121,7 @@ public class InstrumentPagerFragment extends Fragment {
                 }
                 return true;
             case R.id.menu_item_refresh:
-                showProgressBar();
-                AppUtil.downloadData(getActivity().getApplication());
+                downloadInstruments();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -127,6 +135,65 @@ public class InstrumentPagerFragment extends Fragment {
     private void hideProgressBar() {
         if (mActionProgressItem != null)
             mActionProgressItem.setVisible(false);
+    }
+
+    private void downloadInstruments() {
+        showProgressBar();
+        RefreshInstrumentsTask asyncTask = new RefreshInstrumentsTask();
+        asyncTask.setListener(new RefreshInstrumentsTask.AsyncTaskListener() {
+            @Override
+            public void onAsyncTaskFinished() {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        hideProgressBar();
+                    }
+                });
+            }
+        });
+        asyncTask.execute();
+    }
+
+    private static class RefreshInstrumentsTask extends AsyncTask<Void, Void, List<EntityDownloadTask>> {
+        private AsyncTaskListener mListener;
+
+        public interface AsyncTaskListener {
+            void onAsyncTaskFinished();
+        }
+
+        void setListener( AsyncTaskListener listener) {
+            this.mListener = listener;
+        }
+
+        void checkStatus(final List<EntityDownloadTask> tasks, Timer timer) {
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    for (EntityDownloadTask task: tasks) {
+                        if (task.getStatus() == Status.PENDING || task.getStatus() == Status.RUNNING) {
+                            checkStatus(tasks, new Timer());
+                            return;
+                        }
+                    }
+                    mListener.onAsyncTaskFinished();
+                }
+            }, 3000);
+        }
+
+        @Override
+        protected List<EntityDownloadTask> doInBackground(Void... params) {
+            List<EntityDownloadTask> tasks = new ArrayList<>();
+            if (NotificationUtils.checkForNetworkErrors(SurveyApp.getInstance())) {
+                tasks = AppUtil.downloadData();
+            }
+            return tasks;
+        }
+
+        @Override
+        protected void onPostExecute(List<EntityDownloadTask> tasks) {
+            super.onPostExecute(tasks);
+            checkStatus(tasks, new Timer());
+        }
     }
 
 }

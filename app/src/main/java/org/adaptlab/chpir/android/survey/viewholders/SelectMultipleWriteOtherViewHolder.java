@@ -20,10 +20,9 @@ public class SelectMultipleWriteOtherViewHolder extends SelectMultipleViewHolder
     protected void beforeAddViewHook(ViewGroup questionComponent) {
         CheckBox checkbox = new CheckBox(getContext());
         otherText = new EditText(getContext());
-        checkbox.setText(R.string.other_specify);
         final int otherId = getOptionRelations().size();
         checkbox.setId(otherId);
-        setOptionTextColor(checkbox);
+        setOptionText(getContext().getString(R.string.other_specify), checkbox);
         toggleCarryForward(checkbox, otherId);
         checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

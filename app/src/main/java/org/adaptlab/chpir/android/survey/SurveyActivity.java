@@ -302,7 +302,6 @@ public class SurveyActivity extends AppCompatActivity {
     }
 
     private void setLanguageSelection() {
-        if (AppUtil.getSettings() == null) return;
         ArrayList<String> displayLanguages = new ArrayList<>();
         for (String languageCode : mLanguageCodes) {
             if (!TextUtils.isEmpty(languageCode)) {

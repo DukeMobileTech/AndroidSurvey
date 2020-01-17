@@ -22,10 +22,9 @@ public class SelectOneWriteOtherViewHolder extends SelectOneViewHolder {
     protected void beforeAddViewHook(ViewGroup questionComponent) {
         radioButton = new RadioButton(getContext());
         otherText = new EditText(getContext());
-        radioButton.setText(R.string.other_specify);
         final int otherId = getOptionRelations().size();
         radioButton.setId(otherId);
-        setOptionTextColor(radioButton);
+        setOptionText(getContext().getString(R.string.other_specify), radioButton);
         toggleCarryForward(radioButton, otherId);
         radioButton.setLayoutParams(new RadioGroup.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,

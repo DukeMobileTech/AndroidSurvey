@@ -4,9 +4,10 @@ import com.google.gson.Gson;
 
 import org.adaptlab.chpir.android.survey.daos.BaseDao;
 import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
+import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 
 public abstract class Repository {
-    public abstract void download();
+    public abstract EntityDownloadTask download();
 
     public abstract String getRemoteTableName();
 

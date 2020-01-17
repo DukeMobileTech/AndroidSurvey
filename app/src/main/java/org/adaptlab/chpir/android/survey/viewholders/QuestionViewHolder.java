@@ -62,6 +62,7 @@ import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.BLANK;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.EDIT_TEXT_DELAY;
 import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtml;
+import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtmlWhitelist;
 
 public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     public final String TAG = this.getClass().getName();
@@ -113,7 +114,6 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void setRelations(QuestionRelation questionRelation) {
-//        Log.i(TAG, "setRelations: " + questionRelation.question.toString());
         mQuestionRelation = questionRelation;
         mQuestion = questionRelation.question;
         mResponse = questionRelation.response;
@@ -201,7 +201,8 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         }
     }
 
-    void setOptionTextColor(CompoundButton button) {
+    void setOptionText(String text, CompoundButton button) {
+        button.setText(styleTextWithHtmlWhitelist(text));
         button.setTextColor(getContext().getResources().getColorStateList(R.color.states));
     }
 
@@ -599,7 +600,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         for (String response : responses) {
             int responseId = responses.indexOf(response);
             final RadioButton button = new RadioButton(getContext());
-            button.setText(response);
+            button.setText(styleTextWithHtmlWhitelist(response));
             button.setId(responseId);
             button.setTextColor(getContext().getResources().getColorStateList(R.color.states));
 
@@ -666,7 +667,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
             OptionSetRelation optionSetRelation = questionRelation.specialOptionSets.get(0);
             if (optionSetRelation != null && optionSetRelation.optionSetOptions != null) {
                 for (OptionSetOptionRelation relation : optionSetRelation.optionSetOptions) {
-                    if (relation.options != null) {
+                    if (relation.options.size() > 0) {
                         mSpecialOptionRelations.add(relation.options.get(0));
                     }
                 }

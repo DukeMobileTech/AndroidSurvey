@@ -84,7 +84,7 @@ import java.util.UUID;
         OptionSetTranslation.class, OptionTranslation.class, ConditionSkip.class, DeviceUser.class,
         FollowUpQuestion.class, MultipleSkip.class, NextQuestion.class, Survey.class, Response.class,
         SurveyNote.class},
-        version = 4, exportSchema = true)
+        version = SurveyRoomDatabase.DATABASE_VERSION, exportSchema = true)
 @TypeConverters({Converters.class})
 public abstract class SurveyRoomDatabase extends RoomDatabase {
     private static final String TAG = SurveyRoomDatabase.class.getName();
@@ -117,6 +117,7 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
             database.execSQL("CREATE  INDEX `index_SurveyNotes_SurveyUUID` ON SurveyNotes (`SurveyUUID`)");
         }
     };
+    static final int DATABASE_VERSION = 4;
     private static volatile SurveyRoomDatabase INSTANCE;
     private static RoomDatabase.Callback sRoomDatabaseCallback =
             new RoomDatabase.Callback() {
@@ -216,10 +217,15 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
                 settings.setDeviceLabel(Build.MODEL);
                 settings.setLanguage(Locale.getDefault().getLanguage());
                 mSettingsDao.insert(settings);
+                AppUtil.initializeSettings(settings, SurveyApp.getInstance());
                 if (BuildConfig.DEBUG) Log.i(TAG, "Language: " + settings.getLanguage());
             }
             return null;
         }
+    }
+
+    public static int getDatabaseVersion() {
+        return DATABASE_VERSION;
     }
 
 }

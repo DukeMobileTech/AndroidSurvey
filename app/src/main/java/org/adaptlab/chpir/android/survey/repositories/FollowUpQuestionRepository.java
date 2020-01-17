@@ -22,10 +22,11 @@ public class FollowUpQuestionRepository extends Repository {
     }
 
     @Override
-    public void download() {
-        new EntityDownloadTask(this).execute();
+    public EntityDownloadTask download() {
+        EntityDownloadTask task = new EntityDownloadTask(this);
+        task.execute();
+        return task;
     }
-
     @Override
     public String getRemoteTableName() {
         return "follow_up_questions";

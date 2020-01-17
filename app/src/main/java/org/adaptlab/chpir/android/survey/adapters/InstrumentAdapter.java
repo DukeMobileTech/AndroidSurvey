@@ -44,42 +44,6 @@ public class InstrumentAdapter extends RecyclerView.Adapter<InstrumentAdapter.In
         notifyDataSetChanged();
     }
 
-//    void updateInstruments(List<Instrument> newInstruments) {
-//        final List<Instrument> oldInstruments = new ArrayList<>(this.mInstruments);
-//        this.mInstruments.clear();
-//        if (newInstruments != null) {
-//            this.mInstruments.addAll(newInstruments);
-//        }
-//
-//        DiffUtil.calculateDiff(new DiffUtil.Callback() {
-//
-//            @Override
-//            public int getOldListSize() {
-//                return oldInstruments.size();
-//            }
-//
-//            @Override
-//            public int getNewListSize() {
-//                return mInstruments.size();
-//            }
-//
-//            @Override
-//            public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-//                return oldInstruments.get(oldItemPosition).equals(mInstruments.get
-//                        (newItemPosition));
-//            }
-//
-//            @Override
-//            public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-//                Instrument oldInstrument = oldInstruments.get(oldItemPosition);
-//                Instrument newInstrument = mInstruments.get(newItemPosition);
-//                return oldInstrument.getVersionNumber() == newInstrument.getVersionNumber() &&
-//                        oldInstrument.questions().size() == newInstrument.questions().size() &&
-//                        oldInstrument.loaded() == newInstrument.loaded();
-//            }
-//        }).dispatchUpdatesTo(this);
-//    }
-
     @NonNull
     @Override
     public InstrumentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -113,28 +77,6 @@ public class InstrumentAdapter extends RecyclerView.Adapter<InstrumentAdapter.In
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//                    if (mInstrument == null || !mInstrument.loaded() || mInstrument.questions().size() == 0) {
-//                        Toast.makeText(mContext, R.string.instrument_not_loaded, Toast.LENGTH_LONG).show();
-//                    } else {
-//                        new RuleBuilder(mContext)
-//                                .addRule(new InstrumentLaunchRule(mInstrument,
-//                                        mContext.getString(R.string.rule_failure_instrument_launch)))
-//                                .showToastOnFailure(true)
-//                                .setCallbacks(new RuleCallback() {
-//                                    public void onRulesPass() {
-//                                        Intent i = new Intent(mContext, SurveyActivity.class);
-//                                        i.putExtra(SurveyFragment.EXTRA_INSTRUMENT_ID, mInstrument.getRemoteId());
-//                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//                                            mContext.startActivity(i, ActivityOptions.makeSceneTransitionAnimation((Activity) mContext).toBundle());
-//                                        } else {
-//                                            mContext.startActivity(i);
-//                                        }
-//                                    }
-//
-//                                    public void onRulesFail() {
-//                                    }
-//                                }).checkRules();
-//                    }
                     if (mInstrument == null || !mInstrument.isLoaded()) {
                         Toast.makeText(mContext, R.string.instrument_not_loaded, Toast.LENGTH_LONG).show();
                     } else {

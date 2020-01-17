@@ -8,7 +8,6 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
-import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.relations.OptionRelation;
 import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
 
@@ -40,9 +39,9 @@ public class SelectOneViewHolder extends QuestionViewHolder {
             radioButton.setLayoutParams(new RadioGroup.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT));
-            radioButton.setText(TranslationUtil.getText(optionRelation.option, optionRelation.translations, getSurveyViewModel()));
+            String text = TranslationUtil.getText(optionRelation.option, optionRelation.translations, getSurveyViewModel());
             radioButton.setId(optionId);
-            setOptionTextColor(radioButton);
+            setOptionText(text, radioButton);
             toggleCarryForward(radioButton, optionId);
             radioButton.setOnClickListener(new View.OnClickListener() {
                 @Override
