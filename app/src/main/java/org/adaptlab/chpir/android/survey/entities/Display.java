@@ -41,6 +41,9 @@ public class Display implements SurveyEntity {
     @SerializedName("section_id")
     @ColumnInfo(name = "SectionId")
     private Long mSectionId;
+    @SerializedName("instrument_position")
+    @ColumnInfo(name = "InstrumentPosition", index = true)
+    private int mInstrumentPosition;
     @Ignore
     @SerializedName("display_translations")
     private List<DisplayTranslation> mDisplayTranslations;
@@ -134,7 +137,15 @@ public class Display implements SurveyEntity {
                 append("Title", mTitle).
                 append("Position", mPosition).
                 append("QuestionCount", mQuestionCount).
+                append("InstrumentPosition", mInstrumentPosition).
                 toString();
     }
 
+    public int getInstrumentPosition() {
+        return mInstrumentPosition;
+    }
+
+    public void setInstrumentPosition(int mInstrumentPosition) {
+        this.mInstrumentPosition = mInstrumentPosition;
+    }
 }

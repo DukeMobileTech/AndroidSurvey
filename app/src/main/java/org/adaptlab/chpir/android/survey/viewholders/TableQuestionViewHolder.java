@@ -93,9 +93,9 @@ public abstract class TableQuestionViewHolder extends QuestionViewHolder {
         for (String response : responses) {
             int responseId = responses.indexOf(response);
             final RadioButton button = new RadioButton(getContext());
-            button.setText(response);
             button.setId(responseId);
-            button.setTextColor(getContext().getResources().getColorStateList(R.color.states));
+
+            setOptionText(response, button);
 
             button.setOnClickListener(new View.OnClickListener() {
                 @Override

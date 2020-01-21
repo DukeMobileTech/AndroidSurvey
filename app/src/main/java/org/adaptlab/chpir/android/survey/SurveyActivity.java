@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.LongSparseArray;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,7 +25,6 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
@@ -41,6 +39,7 @@ import org.adaptlab.chpir.android.survey.entities.Section;
 import org.adaptlab.chpir.android.survey.entities.Survey;
 import org.adaptlab.chpir.android.survey.relations.InstrumentRelation;
 import org.adaptlab.chpir.android.survey.relations.QuestionTranslationRelation;
+import org.adaptlab.chpir.android.survey.relations.SectionRelation;
 import org.adaptlab.chpir.android.survey.relations.SurveyRelation;
 import org.adaptlab.chpir.android.survey.repositories.SurveyRepository;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
@@ -173,20 +172,7 @@ public class SurveyActivity extends AppCompatActivity {
                     }
                     mSurveyViewModel.update();
 
-                    List<Display> displays = new ArrayList<>();
-                    for (Display display : relation.displays) {
-                        if (!display.isDeleted()) {
-                            displays.add(display);
-                        }
-                    }
-                    Collections.sort(displays, new Comparator<Display>() {
-                        @Override
-                        public int compare(Display o1, Display o2) {
-                            if (o1.getPosition() < o2.getPosition()) return -1;
-                            if (o1.getPosition() > o2.getPosition()) return 1;
-                            return 0;
-                        }
-                    });
+                    List<Display> displays = getSortedDisplays(relation.displays);
                     mSurveyViewModel.setDisplays(displays);
                     mDisplayPagerAdapter.setDisplays(displays);
 
@@ -205,12 +191,29 @@ public class SurveyActivity extends AppCompatActivity {
                     });
                     mSurveyViewModel.setQuestions(questions);
 
-                    setNavigationListData();
                     setViewPagerPosition();
                     invalidateOptionsMenu();
                 }
             }
         });
+    }
+
+    private List<Display> getSortedDisplays(List<Display> displayList) {
+        List<Display> displays = new ArrayList<>();
+        for (Display display : displayList) {
+            if (!display.isDeleted()) {
+                displays.add(display);
+            }
+        }
+        Collections.sort(displays, new Comparator<Display>() {
+            @Override
+            public int compare(Display o1, Display o2) {
+                if (o1.getInstrumentPosition() < o2.getInstrumentPosition()) return -1;
+                if (o1.getInstrumentPosition() > o2.getInstrumentPosition()) return 1;
+                return 0;
+            }
+        });
+        return displays;
     }
 
     private void setLanguage() {
@@ -271,34 +274,26 @@ public class SurveyActivity extends AppCompatActivity {
     private void setSectionViewModel(Long instrumentId) {
         SectionViewModelFactory factory = new SectionViewModelFactory(getApplication(), instrumentId);
         SectionViewModel viewModel = ViewModelProviders.of(this, factory).get(SectionViewModel.class);
-        viewModel.getSections().observe(this, new Observer<List<Section>>() {
+        viewModel.getSectionRelations().observe(this, new Observer<List<SectionRelation>>() {
             @Override
-            public void onChanged(@Nullable List<Section> sections) {
+            public void onChanged(@Nullable List<SectionRelation> sectionRelations) {
+                if (sectionRelations == null) return;
                 LongSparseArray<Section> longSparseArray = new LongSparseArray<>();
-                for (Section section : sections) {
-                    longSparseArray.put(section.getRemoteId(), section);
+                LinkedHashMap<String, List<String>> listData = new LinkedHashMap<>();
+                for (SectionRelation relation : sectionRelations) {
+                    longSparseArray.put(relation.section.getRemoteId(), relation.section);
+                    List<String> displayTitles = new ArrayList<>();
+                    for (Display display : getSortedDisplays(relation.displays)) {
+                        displayTitles.add(display.getTitle());
+                    }
+                    listData.put(relation.section.getTitle(), displayTitles);
                 }
                 mSurveyViewModel.setSections(longSparseArray);
-                setNavigationListData();
+                mSurveyViewModel.setExpandableListData(listData);
+                mSurveyViewModel.setExpandableListTitle(new ArrayList<>(listData.keySet()));
+                setNavigationDrawer();
             }
         });
-    }
-
-    private void setNavigationListData() {
-        if (mSurveyViewModel.getSections() == null || mSurveyViewModel.getDisplays() == null)
-            return;
-        LinkedHashMap<String, List<String>> listData = new LinkedHashMap<>();
-        for (int i = 0; i < mSurveyViewModel.getDisplays().size(); i++) {
-            Display display = mSurveyViewModel.getDisplays().get(i);
-            Section section = mSurveyViewModel.getSections().get(display.getSectionId());
-            List<String> displayTitles = listData.get(section.getTitle());
-            if (displayTitles == null) displayTitles = new ArrayList<>();
-            displayTitles.add(display.getTitle());
-            listData.put(section.getTitle(), displayTitles);
-        }
-        mSurveyViewModel.setExpandableListData(listData);
-        mSurveyViewModel.setExpandableListTitle(new ArrayList<>(listData.keySet()));
-        setNavigationDrawer();
     }
 
     private void setLanguageSelection() {

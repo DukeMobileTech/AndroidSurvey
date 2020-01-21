@@ -86,9 +86,11 @@ public class LocationManager {
             public void onLocationResult(LocationResult locationResult) {
                 super.onLocationResult(locationResult);
                 mCurrentLocation = locationResult.getLastLocation();
-                mSettings.setLatitude(getLatitude());
-                mSettings.setLongitude(getLongitude());
-                mSettingsRepository.update(mSettings);
+                if (mSettings != null) {
+                    mSettings.setLatitude(getLatitude());
+                    mSettings.setLongitude(getLongitude());
+                    mSettingsRepository.update(mSettings);
+                }
                 recordSurveyLocation();
             }
         };

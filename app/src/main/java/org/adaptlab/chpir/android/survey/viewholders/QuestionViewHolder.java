@@ -17,7 +17,6 @@ import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -39,8 +38,6 @@ import org.adaptlab.chpir.android.survey.entities.Option;
 import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.Response;
 import org.adaptlab.chpir.android.survey.entities.Survey;
-import org.adaptlab.chpir.android.survey.relations.DisplayInstructionRelation;
-import org.adaptlab.chpir.android.survey.relations.DisplayRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionSetOptionRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionSetRelation;
@@ -80,7 +77,6 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     private List<OptionRelation> mOptionRelations;
     private List<OptionRelation> mSpecialOptionRelations;
     private List<OptionRelation> mCarryForwardOptionRelations;
-    private List<DisplayInstructionRelation> mDisplayInstructions;
     private HashMap<String, Instruction> mOptionInstructions;
     private ResponseRelationAdapter mAdapter;
 
@@ -120,10 +116,12 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         setOptionSetItems(questionRelation);
         setSpecialOptions(questionRelation);
         setCarryForwardOptions(questionRelation);
-        setDisplayInstructions(questionRelation);
 
-        setSpannedText();
-        setDisplayInstructionsText();
+        if (mQuestion.getQuestionType().equals(Question.INSTRUCTIONS)) {
+            setInstructionsText();
+        } else {
+            setSpannedText();
+        }
         setOptionSetInstructionsText();
         // Overridden by subclasses to place their graphical elements on the fragment.
         createQuestionComponent(mQuestionComponent);
@@ -276,16 +274,6 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                         mOptionInstructions.put(relation.options.get(0).option.getIdentifier(), relation.instructions.get(0));
                     }
                 }
-            }
-        }
-    }
-
-    private void setDisplayInstructions(QuestionRelation questionRelation) {
-        mDisplayInstructions = new ArrayList<>();
-        if (questionRelation.displays != null) {
-            DisplayRelation displayRelation = questionRelation.displays.get(0);
-            if (displayRelation != null && displayRelation.displayInstructions != null) {
-                mDisplayInstructions.addAll(displayRelation.displayInstructions);
             }
         }
     }
@@ -450,7 +438,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
     private void setSpannedText() {
         if (mSpannedTextView == null) return;
-        String number = mQuestion.getNumberInInstrument() + ": ";
+        String number = mQuestion.getPosition() + ") ";
         int numLen = number.length();
         String identifier = mQuestion.getQuestionIdentifier() + "\n";
         int idLen = identifier.length();
@@ -509,7 +497,8 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         new AlertDialog.Builder(getContext())
                 .setMessage(instructions)
                 .setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {}
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
                 })
                 .show();
 
@@ -560,24 +549,16 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         return styleTextWithHtml(text);
     }
 
-    private void setDisplayInstructionsText() {
-        if (mDisplayInstructions != null) {
-            StringBuilder stringBuilder = new StringBuilder();
-            List<Instruction> instructions = new ArrayList<>();
-            for (DisplayInstructionRelation relation : mDisplayInstructions) {
-                if (relation.instructions.size() > 0) {
-                    if (relation.displayInstruction.getPosition() == mQuestion.getNumberInInstrument()) {
-                        instructions.add(relation.instructions.get(0));
-                    }
-                }
-            }
-            for (Instruction instruction : instructions) {
-                stringBuilder.append(instruction.getText());
-            }
-            if (stringBuilder.length() > 0 && mDisplayInstructionTextView != null) {
-                mDisplayInstructionTextView.setVisibility(View.VISIBLE);
-                mDisplayInstructionTextView.setText(styleTextWithHtml(stringBuilder.toString()));
-            }
+    private void setInstructionsText() {
+        StringBuilder stringBuilder = new StringBuilder();
+        List<Instruction> instructions = new ArrayList<>(mQuestionRelation.instructions);
+        for (Instruction instruction : instructions) {
+            stringBuilder.append(instruction.getText());
+        }
+        stringBuilder.append(mQuestion.getText());
+        if (stringBuilder.length() > 0 && mDisplayInstructionTextView != null) {
+            mDisplayInstructionTextView.setVisibility(View.VISIBLE);
+            mDisplayInstructionTextView.setText(styleTextWithHtml(stringBuilder.toString()));
         }
     }
 

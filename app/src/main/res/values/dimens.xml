@@ -6,4 +6,5 @@
     <dimen name="layout_margin_default">10dp</dimen>
     <dimen name="layout_padding_default">10dp</dimen>
     <dimen name="row_height">100dp</dimen>
+    <dimen name="question_bottom_margin">25dp</dimen>
 </resources>

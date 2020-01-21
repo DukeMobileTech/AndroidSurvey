@@ -80,6 +80,9 @@ public class Question implements SurveyEntity, Translatable {
     @SerializedName("number_in_instrument")
     @ColumnInfo(name = "NumberInInstrument", index = true)
     private int mNumberInInstrument;
+    @SerializedName("position")
+    @ColumnInfo(name = "Position", index = true)
+    private int mPosition;
     @SerializedName("identifies_survey")
     @ColumnInfo(name = "IdentifiesSurvey")
     private boolean mIdentifiesSurvey;
@@ -463,6 +466,14 @@ public class Question implements SurveyEntity, Translatable {
 
     public void setCarryForwardOptionSetId(Long mCarryForwardOptionSetId) {
         this.mCarryForwardOptionSetId = mCarryForwardOptionSetId;
+    }
+
+    public int getPosition() {
+        return mPosition;
+    }
+
+    public void setPosition(int mPosition) {
+        this.mPosition = mPosition;
     }
 
     @Retention(RetentionPolicy.SOURCE)

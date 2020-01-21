@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/layout_margin_default"
-        android:layout_marginBottom="@dimen/layout_margin_default"
+        android:layout_marginBottom="@dimen/question_bottom_margin"
         card_view:cardCornerRadius="4dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout

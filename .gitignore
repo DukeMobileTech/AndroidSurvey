@@ -30,6 +30,7 @@ app/fabric.properties
 # API Keys
 app/src/main/res/values/keys.xml
 app/src/main/res/values/defaults.xml
+app/src/wci/res/values/defaults.xml
 
 #Gradle
 build/

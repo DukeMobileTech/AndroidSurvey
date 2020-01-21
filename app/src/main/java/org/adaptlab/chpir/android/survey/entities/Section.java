@@ -31,6 +31,9 @@ public class Section implements SurveyEntity {
     @SerializedName("instrument_id")
     @ColumnInfo(name = "InstrumentRemoteId", index = true)
     private Long mInstrumentRemoteId;
+    @SerializedName("position")
+    @ColumnInfo(name = "Position", index = true)
+    private int mPosition;
     @Ignore
     @SerializedName("section_translations")
     private List<SectionTranslation> mSectionTranslations;
@@ -91,5 +94,13 @@ public class Section implements SurveyEntity {
     public void save(BaseDao dao, List list) {
         dao.updateAll(list);
         dao.insertAll(list);
+    }
+
+    public int getPosition() {
+        return mPosition;
+    }
+
+    public void setPosition(int mPosition) {
+        this.mPosition = mPosition;
     }
 }

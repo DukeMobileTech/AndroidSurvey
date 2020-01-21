@@ -18,6 +18,8 @@ import org.adaptlab.chpir.android.survey.relations.OptionRelation;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
 import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
 
+import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtmlWhitelist;
+
 public class TableHeaderViewHolder extends TableQuestionViewHolder {
 
     TableHeaderViewHolder(@NonNull View itemView, Context context) {
@@ -39,7 +41,7 @@ public class TableHeaderViewHolder extends TableQuestionViewHolder {
         for (int k = 0; k < getOptionRelations().size(); k++) {
             TextView textView = new TextView(getContext());
             OptionRelation optionRelation = getOptionRelations().get(k);
-            textView.setText(TranslationUtil.getText(optionRelation.option, optionRelation.translations, getSurveyViewModel()));
+            textView.setText(styleTextWithHtmlWhitelist(TranslationUtil.getText(optionRelation.option, optionRelation.translations, getSurveyViewModel())));
             textView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
             textView.setGravity(Gravity.CENTER | Gravity.CENTER_VERTICAL);
             textView.setWidth(getOptionWidth());
