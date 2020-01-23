@@ -19,12 +19,9 @@ public class ProjectViewModelFactory implements ViewModelProvider.Factory {
 
     @NonNull
     @Override
+    @SuppressWarnings("unchecked")
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-        if (modelClass.isAssignableFrom(ProjectViewModel.class)) {
-            return (T) new ProjectViewModel(mApplication, mProjectId);
-        } else {
-            return null;
-        }
+        return (T) new ProjectViewModel(mApplication, mProjectId);
     }
 
 }

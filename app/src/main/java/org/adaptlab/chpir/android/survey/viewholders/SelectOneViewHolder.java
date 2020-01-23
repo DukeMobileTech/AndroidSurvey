@@ -74,7 +74,7 @@ public class SelectOneViewHolder extends QuestionViewHolder {
         }
     }
 
-    protected void setResponseIndex(int index) {
+    void setResponseIndex(int index) {
         mResponseIndex = index;
         saveResponse();
     }

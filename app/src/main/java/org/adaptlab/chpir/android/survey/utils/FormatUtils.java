@@ -67,6 +67,11 @@ public class FormatUtils {
     }
 
     public static Spanned styleTextWithHtml(String text) {
+        text = text.replaceFirst("<p>", "<br>")
+                .replace("<p>", "")
+                .replace("</p>","<br><br>");
+        int index = text.lastIndexOf("<br>");
+        if (index > -1) text = text.substring(0, index);
         return Html.fromHtml(text);
     }
 

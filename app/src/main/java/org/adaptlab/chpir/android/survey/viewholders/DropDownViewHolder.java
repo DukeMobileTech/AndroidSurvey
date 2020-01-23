@@ -53,9 +53,9 @@ public class DropDownViewHolder extends QuestionViewHolder {
         return String.valueOf(mResponseIndex);
     }
 
-    protected void setResponseIndex(int index) {
+    private void setResponseIndex(int index) {
         mResponseIndex = index;
-//        setResponse(null);
+        saveResponse();
     }
 
     private void clearAdapter() {
@@ -69,8 +69,8 @@ public class DropDownViewHolder extends QuestionViewHolder {
             optionsArray.add(TranslationUtil.getText(optionRelation.option, optionRelation.translations, getSurveyViewModel()));
         }
         optionsArray.add(""); // Adds empty selection
-        mAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, optionsArray);
-        mAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mAdapter = new ArrayAdapter<>(getContext(), R.layout.simple_spinner_item, optionsArray);
+        mAdapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
         mSpinner.setAdapter(mAdapter);
         mSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 

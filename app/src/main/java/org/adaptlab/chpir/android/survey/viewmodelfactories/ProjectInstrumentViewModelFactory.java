@@ -19,12 +19,9 @@ public class ProjectInstrumentViewModelFactory implements ViewModelProvider.Fact
 
     @NonNull
     @Override
+    @SuppressWarnings("unchecked")
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-        if (modelClass.isAssignableFrom(ProjectInstrumentViewModel.class)) {
-            return (T) new ProjectInstrumentViewModel(mApplication, mProjectId);
-        } else {
-            return null;
-        }
+        return (T) new ProjectInstrumentViewModel(mApplication, mProjectId);
     }
 
 }

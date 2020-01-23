@@ -1,5 +1,6 @@
 package org.adaptlab.chpir.android.survey.adapters;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,20 +17,27 @@ import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
 
 public class ResponseRelationAdapter extends ListAdapter<QuestionRelation, QuestionViewHolder> {
     public static final String TAG = ResponseRelationAdapter.class.getName();
+
     private static final DiffUtil.ItemCallback<QuestionRelation> DIFF_CALLBACK = new DiffUtil.ItemCallback<QuestionRelation>() {
         @Override
         public boolean areItemsTheSame(@NonNull QuestionRelation oldQuestionRelation, @NonNull QuestionRelation newQuestionRelation) {
-            return oldQuestionRelation.response.getUUID().equals(newQuestionRelation.responses.get(0).getUUID());
+            boolean same = oldQuestionRelation.response.getUUID().equals(newQuestionRelation.response.getUUID());
+            Log.i(TAG, "areItemsTheSame: " + same);
+            return same;
         }
 
         @Override
         public boolean areContentsTheSame(@NonNull QuestionRelation oldQuestionRelation, @NonNull QuestionRelation newQuestionRelation) {
-            return oldQuestionRelation.response.getText().equals(newQuestionRelation.response.getText()) &&
+            boolean same = oldQuestionRelation.response.getText().equals(newQuestionRelation.response.getText()) &&
                     oldQuestionRelation.response.getSpecialResponse().equals(newQuestionRelation.response.getSpecialResponse()) &&
                     oldQuestionRelation.response.getOtherResponse().equals(newQuestionRelation.response.getOtherResponse());
+            Log.i(TAG, "areContentsTheSame: " + same);
+            return same;
         }
     };
+
     private QuestionViewHolder.OnResponseSelectedListener mListener;
+
     private SurveyViewModel mSurveyViewModel;
 
     public ResponseRelationAdapter(QuestionViewHolder.OnResponseSelectedListener listener, SurveyViewModel viewModel) {

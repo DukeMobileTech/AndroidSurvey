@@ -14,6 +14,8 @@
         <item name="android:checkboxStyle">@style/CheckBox.Survey</item>
         <item name="android:radioButtonStyle">@style/RadioButton.Survey</item>
         <item name="android:editTextStyle">@style/EditText.Survey</item>
+        <item name="android:spinnerItemStyle">@style/SpinnerItem</item>
+        <item name="android:spinnerDropDownItemStyle">@style/SpinnerDropDownItem</item>
     </style>
 
     <style name="TextView.Survey" parent="android:Widget.TextView">
@@ -40,4 +42,15 @@
         <item name="background">@color/transparent</item>
     </style>
 
+    <style name="SpinnerItem" parent="android:Widget.TextView.SpinnerItem">
+        <item name="android:textColor">@color/primary</item>
+    </style>
+
+    <style name="SpinnerDropDownItem" parent="android:TextAppearance.Widget.TextView.SpinnerItem">
+        <item name="android:textColor">@color/primary_text</item>
+    </style>
+
+    <style name="SpinnerTheme" parent="android:Widget.Spinner">
+        <item name="android:background">@drawable/spinner_background</item>
+    </style>
 </resources>

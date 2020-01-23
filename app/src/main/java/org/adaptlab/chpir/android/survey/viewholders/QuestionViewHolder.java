@@ -268,7 +268,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                 mOptionSetInstruction = optionSetRelation.instructions.get(0);
             }
             for (OptionSetOptionRelation relation : optionSetRelation.optionSetOptions) {
-                if (relation.options.size() > 0) {
+                if (!relation.optionSetOption.isDeleted() && relation.options.size() > 0) {
                     mOptionRelations.add(relation.options.get(0));
                     if (relation.instructions.size() > 0) {
                         mOptionInstructions.put(relation.options.get(0).option.getIdentifier(), relation.instructions.get(0));
@@ -279,11 +279,9 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     }
 
     void deserializeResponse() {
-        if (mResponse != null) {
-            deserialize(mResponse.getText());
-            deserializeSpecialResponse();
-            deserializeOtherResponse(mResponse.getOtherResponse());
-        }
+        deserialize(mResponse.getText());
+        deserializeSpecialResponse();
+        deserializeOtherResponse(mResponse.getOtherResponse());
     }
 
     void saveResponse() {
@@ -447,13 +445,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         Spanned text = getQuestionText();
         int textLen = text.length();
         SpannableString spannableText;
-        if (mQuestion.isPopUpInstruction()) {
-            spannableText = new SpannableString(number + identifier + text);
-            spannableText.setSpan(new ForegroundColorSpan(getContext().getResources().getColor(R.color.secondary_text)),
-                    0, numLen + idLen, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            spannableText.setSpan(new ForegroundColorSpan(getContext().getResources().getColor(R.color.blue)),
-                    numLen + idLen, numLen + idLen + textLen, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        } else if (mQuestion.isInstructionAfterText()) {
+        if (mQuestion.isInstructionAfterText()) {
             spannableText = new SpannableString(number + identifier + text + instructions);
             spannableText.setSpan(new ForegroundColorSpan(getContext().getResources().getColor(R.color.secondary_text)),
                     0, numLen + idLen, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -464,6 +456,8 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
             spannableText.setSpan(new ForegroundColorSpan(getContext().getResources().getColor(R.color.blue)),
                     numLen + idLen, numLen + idLen + textLen,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableText.setSpan(new RelativeSizeSpan(1.2f), numLen + idLen,
+                    numLen + idLen + textLen, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         } else {
             spannableText = new SpannableString(number + identifier + instructions + text);
             spannableText.setSpan(new ForegroundColorSpan(getContext().getResources().getColor(R.color.secondary_text)),
@@ -473,11 +467,11 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
             spannableText.setSpan(new ForegroundColorSpan(getContext().getResources().getColor(R.color.blue)),
                     numLen + idLen + insLen, numLen + idLen + insLen + textLen,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannableText.setSpan(new RelativeSizeSpan(1.2f), numLen + idLen + insLen,
+                    numLen + idLen + insLen + textLen, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
         spannableText.setSpan(new StyleSpan(Typeface.BOLD), 0, numLen, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        if (mQuestion.isPopUpInstruction()) {
-            spannableText.setSpan(new RelativeSizeSpan(1.2f), numLen + idLen,
-                    numLen + idLen + textLen, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        if (mQuestion.getPopUpInstructionId() != null) {
             mPopUpButton.setVisibility(View.VISIBLE);
             mPopUpButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -485,15 +479,12 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                     showPopUpInstruction();
                 }
             });
-        } else {
-            spannableText.setSpan(new RelativeSizeSpan(1.2f), numLen + idLen + insLen,
-                    numLen + idLen + insLen + textLen, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
         mSpannedTextView.setText(spannableText);
     }
 
     private void showPopUpInstruction() {
-        String instructions = getQuestionInstructions();
+        String instructions = getPopUpInstructions();
         new AlertDialog.Builder(getContext())
                 .setMessage(instructions)
                 .setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
@@ -502,6 +493,13 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                 })
                 .show();
 
+    }
+
+    String getPopUpInstructions() {
+        String instructions = "";
+        if (mQuestionRelation.popUpInstructions.size() > 0)
+            instructions = mQuestionRelation.popUpInstructions.get(0).getText();
+        return styleTextWithHtml(instructions).toString();
     }
 
     String getQuestionInstructions() {
@@ -555,7 +553,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         for (Instruction instruction : instructions) {
             stringBuilder.append(instruction.getText());
         }
-        stringBuilder.append(mQuestion.getText());
+        stringBuilder.append(TranslationUtil.getText(mQuestion, mQuestionRelation.translations, mSurveyViewModel));
         if (stringBuilder.length() > 0 && mDisplayInstructionTextView != null) {
             mDisplayInstructionTextView.setVisibility(View.VISIBLE);
             mDisplayInstructionTextView.setText(styleTextWithHtml(stringBuilder.toString()));

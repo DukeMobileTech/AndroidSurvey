@@ -19,12 +19,9 @@ public class SurveyRelationViewModelFactory implements ViewModelProvider.Factory
 
     @NonNull
     @Override
+    @SuppressWarnings("unchecked")
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-        if (modelClass.isAssignableFrom(SurveyRelationViewModel.class)) {
-            return (T) new SurveyRelationViewModel(mApplication, mUUID);
-        } else {
-            return null;
-        }
+        return (T) new SurveyRelationViewModel(mApplication, mUUID);
     }
 
 }

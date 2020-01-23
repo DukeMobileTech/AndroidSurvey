@@ -7,4 +7,5 @@
     <dimen name="layout_padding_default">10dp</dimen>
     <dimen name="row_height">100dp</dimen>
     <dimen name="question_bottom_margin">25dp</dimen>
+    <dimen name="spinner_right_margin">100dp</dimen>
 </resources>

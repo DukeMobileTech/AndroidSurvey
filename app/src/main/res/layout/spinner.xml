@@ -6,7 +6,10 @@
 
     <Spinner
         android:id="@+id/options_spinner"
+        style="@style/SpinnerTheme"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/spinner_right_margin"
+        android:layout_marginRight="@dimen/spinner_right_margin" />
 
 </LinearLayout>

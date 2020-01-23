@@ -2,6 +2,7 @@ package org.adaptlab.chpir.android.survey.adapters;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +19,7 @@ import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
 import java.util.List;
 
 public class DisplayAdapter extends ListAdapter<List<QuestionRelation>, DisplayAdapter.DisplayViewHolder> {
-    public final String TAG = this.getClass().getName();
+    public static final String TAG = "DisplayAdapter";
 
     private static final DiffUtil.ItemCallback<List<QuestionRelation>> DIFF_CALLBACK = new DiffUtil.ItemCallback<List<QuestionRelation>>() {
         @Override
@@ -31,28 +32,32 @@ public class DisplayAdapter extends ListAdapter<List<QuestionRelation>, DisplayA
                 same = oldQuestionRelation.response.getUUID().equals(newQuestionRelation.response.getUUID());
                 if (!same) break;
             }
+            Log.i(TAG, "areItemsTheSame: " + same);
             return same;
         }
 
         @Override
         public boolean areContentsTheSame(@NonNull List<QuestionRelation> oldQuestionRelations, @NonNull List<QuestionRelation> newQuestionRelations) {
             if (oldQuestionRelations.size() != newQuestionRelations.size()) return false;
-            boolean same = true;
             for (int k = 0; k < oldQuestionRelations.size(); k++) {
                 QuestionRelation oldQuestionRelation = oldQuestionRelations.get(k);
                 QuestionRelation newQuestionRelation = newQuestionRelations.get(k);
-                same = oldQuestionRelation.response.getText().equals(newQuestionRelation.response.getText()) &&
+                boolean same = oldQuestionRelation.response.getText().equals(newQuestionRelation.response.getText()) &&
                         oldQuestionRelation.response.getSpecialResponse().equals(newQuestionRelation.response.getSpecialResponse()) &&
                         oldQuestionRelation.response.getOtherResponse().equals(newQuestionRelation.response.getOtherResponse());
-                if (!same) break;
+                Log.i(TAG, "areContentsTheSame: " + same);
+                if (!same) return false;
             }
-            return same;
+            return true;
         }
     };
+
     private static final int DEFAULT = 0;
+
     private static final int TABLE = 1;
 
     private List<ResponseRelationAdapter> mResponseRelationAdapters;
+
     private Context mContext;
 
     public DisplayAdapter(Context context) {

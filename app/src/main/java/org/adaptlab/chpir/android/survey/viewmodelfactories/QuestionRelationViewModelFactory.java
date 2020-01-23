@@ -21,12 +21,9 @@ public class QuestionRelationViewModelFactory implements ViewModelProvider.Facto
 
     @NonNull
     @Override
+    @SuppressWarnings("unchecked")
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-        if (modelClass.isAssignableFrom(QuestionRelationViewModel.class)) {
-            return (T) new QuestionRelationViewModel(mApplication, mInstrumentId, mDisplayId);
-        } else {
-            return null;
-        }
+        return (T) new QuestionRelationViewModel(mApplication, mInstrumentId, mDisplayId);
     }
 
 }

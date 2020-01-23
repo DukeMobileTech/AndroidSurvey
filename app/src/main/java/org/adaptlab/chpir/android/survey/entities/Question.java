@@ -128,9 +128,9 @@ public class Question implements SurveyEntity, Translatable {
     private int mLoopNumber;
     @ColumnInfo(name = "TextToReplace")
     private String mTextToReplace;
-    @SerializedName("pop_up_instruction")
-    @ColumnInfo(name = "PopUpInstruction")
-    private boolean mPopUpInstruction;
+    @SerializedName("pop_up_instruction_id")
+    @ColumnInfo(name = "PopUpInstructionId")
+    private Long mPopUpInstructionId;
     @SerializedName("instruction_after_text")
     @ColumnInfo(name = "InstructionAfterText")
     private boolean mInstructionAfterText;
@@ -428,12 +428,12 @@ public class Question implements SurveyEntity, Translatable {
                 toString();
     }
 
-    public boolean isPopUpInstruction() {
-        return mPopUpInstruction;
+    public Long getPopUpInstructionId() {
+        return mPopUpInstructionId;
     }
 
-    public void setPopUpInstruction(boolean mPopUpInstruction) {
-        this.mPopUpInstruction = mPopUpInstruction;
+    public void setPopUpInstructionId(Long mPopUpInstruction) {
+        this.mPopUpInstructionId = mPopUpInstruction;
     }
 
     public boolean isInstructionAfterText() {

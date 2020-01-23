@@ -19,12 +19,9 @@ public class InstrumentRelationViewModelFactory implements ViewModelProvider.Fac
 
     @NonNull
     @Override
+    @SuppressWarnings("unchecked")
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-        if (modelClass.isAssignableFrom(InstrumentRelationViewModel.class)) {
-            return (T) new InstrumentRelationViewModel(mApplication, mInstrumentId);
-        } else {
-            return null;
-        }
+        return (T) new InstrumentRelationViewModel(mApplication, mInstrumentId);
     }
 
 }
