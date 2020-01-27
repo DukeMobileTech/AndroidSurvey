@@ -1,10 +1,17 @@
 package org.adaptlab.chpir.android.survey.viewholders;
 
 import android.content.Context;
+import android.os.Build;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 
+import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.entities.Instruction;
 import org.adaptlab.chpir.android.survey.relations.OptionRelation;
 import org.adaptlab.chpir.android.survey.utils.FormatUtils;
 import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
@@ -12,6 +19,7 @@ import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
 import java.util.ArrayList;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
+import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtml;
 
 public class SelectMultipleViewHolder extends QuestionViewHolder {
     private ArrayList<Integer> mResponseIndices;
@@ -44,7 +52,7 @@ public class SelectMultipleViewHolder extends QuestionViewHolder {
                 }
             });
             mCheckBoxes.add(checkbox);
-            questionComponent.addView(checkbox, optionId);
+            setOptionPopUpInstruction(questionComponent, checkbox, optionId, optionRelation);
         }
         beforeAddViewHook(questionComponent);
     }

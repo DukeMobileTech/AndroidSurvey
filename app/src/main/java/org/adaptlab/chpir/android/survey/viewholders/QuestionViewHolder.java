@@ -23,6 +23,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -204,6 +205,34 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         button.setTextColor(getContext().getResources().getColorStateList(R.color.states));
     }
 
+    void setOptionPopUpInstruction(ViewGroup questionComponent, View view, int viewId, OptionRelation optionRelation) {
+        final Instruction optionInstruction = getOptionInstruction(optionRelation.option.getIdentifier());
+        if (optionInstruction != null) {
+            LinearLayout optionLayout = new LinearLayout(getContext());
+            ViewGroup.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            optionLayout.setLayoutParams(layoutParams);
+            optionLayout.setOrientation(LinearLayout.HORIZONTAL);
+            optionLayout.addView(view);
+            ImageButton imageButton = new ImageButton(getContext());
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                imageButton.setBackgroundColor(getContext().getColor(R.color.white));
+                imageButton.setImageDrawable(getContext().getDrawable(R.drawable.ic_info_outline_blue_24dp));
+            }
+            imageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    showPopUpInstruction(styleTextWithHtml(optionInstruction.getText()).toString());
+                }
+            });
+            optionLayout.addView(imageButton);
+            questionComponent.addView(optionLayout, viewId);
+        } else {
+            questionComponent.addView(view, viewId);
+        }
+    }
+
     boolean isDeserialization() {
         return mDeserialization;
     }
@@ -276,6 +305,10 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                 }
             }
         }
+    }
+
+    Instruction getOptionInstruction(String optionIdentifier) {
+        return mOptionInstructions.get(optionIdentifier);
     }
 
     void deserializeResponse() {
@@ -476,15 +509,14 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
             mPopUpButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    showPopUpInstruction();
+                    showPopUpInstruction(getPopUpInstructions());
                 }
             });
         }
         mSpannedTextView.setText(spannableText);
     }
 
-    private void showPopUpInstruction() {
-        String instructions = getPopUpInstructions();
+    void showPopUpInstruction(String instructions) {
         new AlertDialog.Builder(getContext())
                 .setMessage(instructions)
                 .setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
