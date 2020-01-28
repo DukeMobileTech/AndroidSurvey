@@ -27,6 +27,7 @@ public class CriticalResponseRepository extends Repository {
         task.execute();
         return task;
     }
+
     @Override
     public String getRemoteTableName() {
         return "critical_responses";

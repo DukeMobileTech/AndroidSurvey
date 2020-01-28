@@ -31,6 +31,7 @@ public class OptionSetRepository extends Repository {
         task.execute();
         return task;
     }
+
     @Override
     public String getRemoteTableName() {
         return "option_sets";

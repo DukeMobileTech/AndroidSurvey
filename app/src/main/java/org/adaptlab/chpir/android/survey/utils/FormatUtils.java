@@ -69,14 +69,14 @@ public class FormatUtils {
     public static Spanned styleTextWithHtml(String text) {
         text = text.replaceFirst("<p>", "<br>")
                 .replace("<p>", "")
-                .replace("</p>","<br><br>");
+                .replace("</p>", "<br><br>");
         int index = text.lastIndexOf("<br>");
         if (index > -1) text = text.substring(0, index);
         return Html.fromHtml(text);
     }
 
     public static Spanned styleTextWithHtmlWhitelist(String text) {
-        text = text.replace("<p>", "").replace("</p>","");
+        text = text.replace("<p>", "").replace("</p>", "");
         return Html.fromHtml(text);
     }
 

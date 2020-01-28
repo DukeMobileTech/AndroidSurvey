@@ -23,7 +23,7 @@ public class SurveyNote implements Uploadable {
     @NonNull
     @ColumnInfo(name = "SurveyUUID", index = true)
     private String mSurveyUUID;
-   @ColumnInfo(name = "Text")
+    @ColumnInfo(name = "Text")
     private String mText;
     @ColumnInfo(name = "Reference")
     private String mReference;
@@ -32,9 +32,11 @@ public class SurveyNote implements Uploadable {
     @ColumnInfo(name = "DeviceUserId")
     private Long mDeviceUserId;
 
-    public SurveyNote() {
+    public SurveyNote(@NonNull String surveyUUID) {
+        mSurveyUUID = surveyUUID;
         mSent = false;
         mText = BLANK;
+        mReference = BLANK;
         mUUID = UUID.randomUUID().toString();
         mDeviceUserId = AppUtil.getDeviceUserId();
     }

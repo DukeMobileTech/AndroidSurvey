@@ -55,6 +55,7 @@ public class InstrumentRepository extends Repository {
         task.execute();
         return task;
     }
+
     @Override
     public String getRemoteTableName() {
         return "instruments";

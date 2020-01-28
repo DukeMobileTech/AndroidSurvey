@@ -27,6 +27,7 @@ public class FollowUpQuestionRepository extends Repository {
         task.execute();
         return task;
     }
+
     @Override
     public String getRemoteTableName() {
         return "follow_up_questions";

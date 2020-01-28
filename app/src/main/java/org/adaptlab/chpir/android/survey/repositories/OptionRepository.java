@@ -31,6 +31,7 @@ public class OptionRepository extends Repository {
         task.execute();
         return task;
     }
+
     @Override
     public String getRemoteTableName() {
         return "options";

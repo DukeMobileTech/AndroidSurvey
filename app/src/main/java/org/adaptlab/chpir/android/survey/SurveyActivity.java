@@ -288,12 +288,101 @@ public class SurveyActivity extends AppCompatActivity {
                     }
                     listData.put(relation.section.getTitle(), displayTitles);
                 }
+                setExtraItemLinks(listData);
                 mSurveyViewModel.setSections(longSparseArray);
                 mSurveyViewModel.setExpandableListData(listData);
                 mSurveyViewModel.setExpandableListTitle(new ArrayList<>(listData.keySet()));
                 setNavigationDrawer();
             }
         });
+    }
+
+    private void setExtraItemLinks(LinkedHashMap<String, List<String>> listData) {
+        List<String> notes = Collections.singletonList("Survey Notes");
+        List<String> review = Collections.singletonList("Survey Review");
+        listData.put("Survey Notes", notes);
+        listData.put("Survey Review", review);
+    }
+
+    private void setNavigationDrawer() {
+        mDrawerLayout = findViewById(R.id.drawerLayout);
+        mExpandableListView = findViewById(R.id.navigation);
+        int width = getResources().getDisplayMetrics().widthPixels / 3;
+        ViewGroup.LayoutParams params = mExpandableListView.getLayoutParams();
+        params.width = width;
+        mExpandableListView.setLayoutParams(params);
+
+        ExpandableListAdapter adapter = new NavigationDrawerAdapter(getApplicationContext(),
+                mSurveyViewModel.getExpandableListTitle(), mSurveyViewModel.getExpandableListData());
+        mExpandableListView.setAdapter(adapter);
+        mExpandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
+            @Override
+            public void onGroupExpand(int groupPosition) {
+                if (mLastPosition != -1 && groupPosition != mLastPosition) {
+                    mExpandableListView.collapseGroup(mLastPosition);
+                }
+                mLastPosition = groupPosition;
+            }
+        });
+
+        mExpandableListView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
+            @Override
+            public void onGroupCollapse(int groupPosition) {
+            }
+        });
+
+        mExpandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+                if (groupPosition == mSurveyViewModel.getExpandableListTitle().size() - 1) {
+                    beginSurveyCompletion();
+                }
+                if (groupPosition == mSurveyViewModel.getExpandableListTitle().size() - 2) {
+                    showNotes();
+                }
+
+                String selectedItem = ((List) (mSurveyViewModel.getExpandableListData().get(mSurveyViewModel.getExpandableListTitle().get(groupPosition)))).get(childPosition).toString();
+                int index = 0;
+                for (Display display : mSurveyViewModel.getDisplays()) {
+                    if (display.getTitle().equals(selectedItem)) {
+                        moveToDisplay(index);
+                        break;
+                    }
+                    index++;
+                }
+                mDrawerLayout.closeDrawer(GravityCompat.START);
+                mExpandableListView.collapseGroup(groupPosition);
+                return false;
+            }
+        });
+
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_open, R.string.drawer_close) {
+
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                invalidateOptionsMenu();
+            }
+
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                invalidateOptionsMenu();
+            }
+        };
+
+        mDrawerToggle.setDrawerIndicatorEnabled(true);
+        mDrawerLayout.addDrawerListener(mDrawerToggle);
+    }
+
+    private void showNotes() {
+        Intent intent = new Intent(this, SurveyNoteActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putString(SurveyNoteFragment.EXTRA_SURVEY_UUID, mSurveyUUID);
+        intent.putExtras(bundle);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+        } else {
+            startActivity(intent);
+        }
     }
 
     private void setLanguageSelection() {
@@ -398,68 +487,6 @@ public class SurveyActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    private void setNavigationDrawer() {
-        mDrawerLayout = findViewById(R.id.drawerLayout);
-        mExpandableListView = findViewById(R.id.navigation);
-        int width = getResources().getDisplayMetrics().widthPixels / 3;
-        ViewGroup.LayoutParams params = mExpandableListView.getLayoutParams();
-        params.width = width;
-        mExpandableListView.setLayoutParams(params);
-
-        ExpandableListAdapter adapter = new NavigationDrawerAdapter(getApplicationContext(),
-                mSurveyViewModel.getExpandableListTitle(), mSurveyViewModel.getExpandableListData());
-        mExpandableListView.setAdapter(adapter);
-        mExpandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
-            @Override
-            public void onGroupExpand(int groupPosition) {
-                if (mLastPosition != -1 && groupPosition != mLastPosition) {
-                    mExpandableListView.collapseGroup(mLastPosition);
-                }
-                mLastPosition = groupPosition;
-            }
-        });
-
-        mExpandableListView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
-            @Override
-            public void onGroupCollapse(int groupPosition) {
-            }
-        });
-
-        mExpandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                String selectedItem = ((List) (mSurveyViewModel.getExpandableListData().get(mSurveyViewModel.getExpandableListTitle().get(groupPosition)))).get(childPosition).toString();
-                int index = 0;
-                for (Display display : mSurveyViewModel.getDisplays()) {
-                    if (display.getTitle().equals(selectedItem)) {
-                        moveToDisplay(index);
-                        break;
-                    }
-                    index++;
-                }
-                mDrawerLayout.closeDrawer(GravityCompat.START);
-                mExpandableListView.collapseGroup(groupPosition);
-                return false;
-            }
-        });
-
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_open, R.string.drawer_close) {
-
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                invalidateOptionsMenu();
-            }
-
-            public void onDrawerClosed(View view) {
-                super.onDrawerClosed(view);
-                invalidateOptionsMenu();
-            }
-        };
-
-        mDrawerToggle.setDrawerIndicatorEnabled(true);
-        mDrawerLayout.addDrawerListener(mDrawerToggle);
     }
 
     private void moveToPreviousDisplay() {

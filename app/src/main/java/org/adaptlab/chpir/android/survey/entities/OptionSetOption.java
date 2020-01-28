@@ -45,7 +45,7 @@ public class OptionSetOption implements SurveyEntity {
     @SerializedName("allow_text_entry")
     @ColumnInfo(name = "AllowTextEntry")
     private boolean mAllowTextEntry;
-    
+
     @NonNull
     public Long getRemoteId() {
         return mRemoteId;

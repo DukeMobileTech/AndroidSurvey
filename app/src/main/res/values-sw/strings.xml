@@ -185,4 +185,8 @@
     <string name="survey_upload">surveys will be uploaded</string>
     <string name="survey_submitted">This survey has been marked for submission or is already submitted</string>
     <string name="english_iso_code">en</string>
+    <string name="add_note">Add Note</string>
+    <string name="reference">Reference</string>
+    <string name="text">Text</string>
+    <string name="show_pop_up_instructions">Show pop-up instructions</string>
 </resources>

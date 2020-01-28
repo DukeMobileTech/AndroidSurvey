@@ -1,12 +1,10 @@
 package org.adaptlab.chpir.android.survey.viewpagerfragments;
 
-import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.AsyncTask;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -157,11 +155,7 @@ public class InstrumentPagerFragment extends Fragment {
     private static class RefreshInstrumentsTask extends AsyncTask<Void, Void, List<EntityDownloadTask>> {
         private AsyncTaskListener mListener;
 
-        public interface AsyncTaskListener {
-            void onAsyncTaskFinished();
-        }
-
-        void setListener( AsyncTaskListener listener) {
+        void setListener(AsyncTaskListener listener) {
             this.mListener = listener;
         }
 
@@ -169,7 +163,7 @@ public class InstrumentPagerFragment extends Fragment {
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    for (EntityDownloadTask task: tasks) {
+                    for (EntityDownloadTask task : tasks) {
                         if (task.getStatus() == Status.PENDING || task.getStatus() == Status.RUNNING) {
                             checkStatus(tasks, new Timer());
                             return;
@@ -193,6 +187,10 @@ public class InstrumentPagerFragment extends Fragment {
         protected void onPostExecute(List<EntityDownloadTask> tasks) {
             super.onPostExecute(tasks);
             checkStatus(tasks, new Timer());
+        }
+
+        public interface AsyncTaskListener {
+            void onAsyncTaskFinished();
         }
     }
 

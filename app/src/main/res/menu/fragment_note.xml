@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/addNoteButton"
+        android:icon="@drawable/ic_note_add_black_24dp"
+        android:title="@string/add_note"
+        app:showAsAction="ifRoom|withText" />
+</menu>

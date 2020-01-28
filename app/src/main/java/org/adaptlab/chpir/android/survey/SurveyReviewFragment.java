@@ -8,7 +8,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -25,8 +24,10 @@ import androidx.fragment.app.ListFragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import org.adaptlab.chpir.android.survey.entities.Display;
 import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.Response;
+import org.adaptlab.chpir.android.survey.entities.Section;
 import org.adaptlab.chpir.android.survey.entities.Survey;
 import org.adaptlab.chpir.android.survey.relations.InstrumentRelation;
 import org.adaptlab.chpir.android.survey.relations.QuestionTranslationRelation;
@@ -225,19 +226,24 @@ public class SurveyReviewFragment extends ListFragment {
         @NonNull
         public View getView(int position, View convertView, @NonNull ViewGroup parent) {
             if (convertView == null) {
-                convertView = getActivity().getLayoutInflater().inflate(R.layout.review_page, null);
+                convertView = getActivity().getLayoutInflater().inflate(R.layout.fragment_review, null);
             }
 
             QuestionTranslationRelation relation = getItem(position);
+            if (relation != null) {
+                Display display = relation.displays.get(0).display;
+                Section section = relation.displays.get(0).sections.get(0);
 
-            TextView questionNumberTextView = convertView.findViewById(R.id.review_question_number);
-            questionNumberTextView.setText(String.valueOf(relation.question.getNumberInInstrument()));
-            questionNumberTextView.setTextColor(Color.BLACK);
+                TextView questionNumberTextView = convertView.findViewById(R.id.review_question_number);
+                questionNumberTextView.setText(section.getTitle() + " | " + display.getTitle() + " | " +
+                        relation.question.getPosition());
+                questionNumberTextView.setTextColor(Color.BLACK);
 
-            String text = TranslationUtil.getText(relation.question, relation.translations, mSurveyViewModel);
-            TextView questionTextView = convertView.findViewById(R.id.review_question_text);
-            if (text != null) questionTextView.setText(Html.fromHtml(text));
-            questionTextView.setMaxLines(2);
+                String text = TranslationUtil.getText(relation.question, relation.translations, mSurveyViewModel);
+                TextView questionTextView = convertView.findViewById(R.id.review_question_text);
+                if (text != null) questionTextView.setText(Html.fromHtml(text));
+                questionTextView.setMaxLines(2);
+            }
 
             return convertView;
         }

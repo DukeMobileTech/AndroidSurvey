@@ -1,7 +1,5 @@
 package org.adaptlab.chpir.android.survey.utils;
 
-import android.util.Log;
-
 import com.google.gson.JsonObject;
 
 import org.adaptlab.chpir.android.survey.SurveyApp;

@@ -31,6 +31,7 @@ public class InstructionRepository extends Repository {
         task.execute();
         return task;
     }
+
     @Override
     public String getRemoteTableName() {
         return "instructions";

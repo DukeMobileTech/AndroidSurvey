@@ -27,6 +27,7 @@ public class DisplayInstructionRepository extends Repository {
         task.execute();
         return task;
     }
+
     @Override
     public String getRemoteTableName() {
         return "display_instructions";

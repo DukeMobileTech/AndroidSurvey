@@ -287,6 +287,14 @@ public class SurveyViewModel extends AndroidViewModel {
                 mQuestionsWithoutResponses.remove(entry.getKey());
             }
         }
+        HashMap<String, Question> map = new HashMap<>(mQuestionsWithoutResponses);
+        for (Map.Entry<String, Question> entry : mQuestionsWithoutResponses.entrySet()) {
+            if (entry.getValue().isDeleted() || entry.getValue().getQuestionType() == null ||
+                    entry.getValue().getQuestionType().equals(Question.INSTRUCTIONS)) {
+                map.remove(entry.getKey());
+            }
+        }
+        mQuestionsWithoutResponses = map;
     }
 
     public HashMap<String, Question> getQuestionsWithoutResponses() {

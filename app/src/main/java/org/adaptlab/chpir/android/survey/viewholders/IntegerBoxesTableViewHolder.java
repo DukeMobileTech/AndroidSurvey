@@ -17,7 +17,6 @@ import androidx.multidex.BuildConfig;
 import com.opencsv.CSVReader;
 
 import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.relations.OptionRelation;
 import org.apache.commons.codec.Charsets;
 import org.apache.commons.lang3.StringEscapeUtils;
 

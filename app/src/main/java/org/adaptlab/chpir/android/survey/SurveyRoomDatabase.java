@@ -44,6 +44,7 @@ import org.adaptlab.chpir.android.survey.daos.SectionDao;
 import org.adaptlab.chpir.android.survey.daos.SectionTranslationDao;
 import org.adaptlab.chpir.android.survey.daos.SettingsDao;
 import org.adaptlab.chpir.android.survey.daos.SurveyDao;
+import org.adaptlab.chpir.android.survey.daos.SurveyNoteDao;
 import org.adaptlab.chpir.android.survey.entities.ConditionSkip;
 import org.adaptlab.chpir.android.survey.entities.CriticalResponse;
 import org.adaptlab.chpir.android.survey.entities.DeviceUser;
@@ -87,6 +88,7 @@ import java.util.UUID;
         version = SurveyRoomDatabase.DATABASE_VERSION, exportSchema = true)
 @TypeConverters({Converters.class})
 public abstract class SurveyRoomDatabase extends RoomDatabase {
+    static final int DATABASE_VERSION = 4;
     private static final String TAG = SurveyRoomDatabase.class.getName();
     private static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override
@@ -117,7 +119,6 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
             database.execSQL("CREATE  INDEX `index_SurveyNotes_SurveyUUID` ON SurveyNotes (`SurveyUUID`)");
         }
     };
-    static final int DATABASE_VERSION = 4;
     private static volatile SurveyRoomDatabase INSTANCE;
     private static RoomDatabase.Callback sRoomDatabaseCallback =
             new RoomDatabase.Callback() {
@@ -145,6 +146,10 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
             }
         }
         return INSTANCE;
+    }
+
+    public static int getDatabaseVersion() {
+        return DATABASE_VERSION;
     }
 
     public abstract InstrumentDao instrumentDao();
@@ -201,6 +206,8 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
 
     public abstract ProjectDao projectDao();
 
+    public abstract SurveyNoteDao surveyNoteDao();
+
     private static class CreateSettingsInstanceTask extends AsyncTask<Void, Void, Void> {
         private SettingsDao mSettingsDao;
 
@@ -222,10 +229,6 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
             }
             return null;
         }
-    }
-
-    public static int getDatabaseVersion() {
-        return DATABASE_VERSION;
     }
 
 }

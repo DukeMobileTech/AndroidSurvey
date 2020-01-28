@@ -27,6 +27,7 @@ public class LoopQuestionRepository extends Repository {
         task.execute();
         return task;
     }
+
     @Override
     public String getRemoteTableName() {
         return "loop_questions";

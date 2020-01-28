@@ -4,7 +4,6 @@ import androidx.room.Embedded;
 import androidx.room.Ignore;
 import androidx.room.Relation;
 
-import org.adaptlab.chpir.android.survey.entities.Display;
 import org.adaptlab.chpir.android.survey.entities.Instruction;
 import org.adaptlab.chpir.android.survey.entities.LoopQuestion;
 import org.adaptlab.chpir.android.survey.entities.MultipleSkip;
@@ -29,8 +28,6 @@ public class QuestionRelation {
     public List<OptionSetRelation> specialOptionSets;
     @Relation(parentColumn = "CarryForwardOptionSetId", entityColumn = "RemoteId", entity = OptionSet.class)
     public List<OptionSetRelation> carryForwardOptionSets;
-    @Relation(parentColumn = "DisplayId", entityColumn = "RemoteId", entity = Display.class)
-    public List<DisplayRelation> displays;
     @Relation(parentColumn = "QuestionIdentifier", entityColumn = "QuestionIdentifier", entity = NextQuestion.class)
     public List<NextQuestion> nextQuestions;
     @Relation(parentColumn = "QuestionIdentifier", entityColumn = "QuestionIdentifier", entity = MultipleSkip.class)

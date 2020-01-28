@@ -2,7 +2,6 @@ package org.adaptlab.chpir.android.survey.tasks;
 
 import android.os.AsyncTask;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.LongSparseArray;
 
 import androidx.annotation.NonNull;

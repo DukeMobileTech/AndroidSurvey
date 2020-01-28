@@ -4,13 +4,13 @@ import androidx.room.Embedded;
 import androidx.room.Relation;
 
 import org.adaptlab.chpir.android.survey.entities.Display;
-import org.adaptlab.chpir.android.survey.entities.DisplayInstruction;
+import org.adaptlab.chpir.android.survey.entities.Section;
 
 import java.util.List;
 
 public class DisplayRelation {
     @Embedded
     public Display display;
-    @Relation(parentColumn = "RemoteId", entityColumn = "DisplayRemoteId", entity = DisplayInstruction.class)
-    public List<DisplayInstructionRelation> displayInstructions;
+    @Relation(parentColumn = "SectionId", entityColumn = "RemoteId", entity = Section.class)
+    public List<Section> sections;
 }
