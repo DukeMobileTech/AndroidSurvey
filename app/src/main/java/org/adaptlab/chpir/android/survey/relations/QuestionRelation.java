@@ -22,6 +22,8 @@ public class QuestionRelation {
     public List<Instruction> instructions;
     @Relation(parentColumn = "PopUpInstructionId", entityColumn = "RemoteId", entity = Instruction.class)
     public List<Instruction> popUpInstructions;
+    @Relation(parentColumn = "AfterTextInstructionId", entityColumn = "RemoteId", entity = Instruction.class)
+    public List<Instruction> afterTextInstructions;
     @Relation(parentColumn = "RemoteOptionSetId", entityColumn = "RemoteId", entity = OptionSet.class)
     public List<OptionSetRelation> optionSets;
     @Relation(parentColumn = "RemoteSpecialOptionSetId", entityColumn = "RemoteId", entity = OptionSet.class)

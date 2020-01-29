@@ -131,9 +131,9 @@ public class Question implements SurveyEntity, Translatable {
     @SerializedName("pop_up_instruction_id")
     @ColumnInfo(name = "PopUpInstructionId")
     private Long mPopUpInstructionId;
-    @SerializedName("instruction_after_text")
-    @ColumnInfo(name = "InstructionAfterText")
-    private boolean mInstructionAfterText;
+    @SerializedName("after_text_instruction_id")
+    @ColumnInfo(name = "AfterTextInstructionId")
+    private Long mAfterTextInstructionId;
     @SerializedName("carry_forward_identifier")
     @ColumnInfo(name = "CarryForwardIdentifier")
     private String mCarryForwardIdentifier;
@@ -436,12 +436,12 @@ public class Question implements SurveyEntity, Translatable {
         this.mPopUpInstructionId = mPopUpInstruction;
     }
 
-    public boolean isInstructionAfterText() {
-        return mInstructionAfterText;
+    public Long getAfterTextInstructionId() {
+        return mAfterTextInstructionId;
     }
 
-    public void setInstructionAfterText(boolean mInstructionAfterText) {
-        this.mInstructionAfterText = mInstructionAfterText;
+    public void setAfterTextInstructionId(Long id) {
+        this.mAfterTextInstructionId = id;
     }
 
     public String getCarryForwardIdentifier() {
