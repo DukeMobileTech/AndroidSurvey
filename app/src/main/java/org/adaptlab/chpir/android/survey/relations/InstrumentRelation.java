@@ -6,14 +6,15 @@ import androidx.room.Relation;
 import org.adaptlab.chpir.android.survey.entities.Display;
 import org.adaptlab.chpir.android.survey.entities.Instrument;
 import org.adaptlab.chpir.android.survey.entities.Question;
+import org.adaptlab.chpir.android.survey.entities.Section;
 
 import java.util.List;
 
 public class InstrumentRelation {
     @Embedded
     public Instrument instrument;
-    @Relation(parentColumn = "RemoteId", entityColumn = "InstrumentRemoteId", entity = Display.class)
-    public List<Display> displays;
+    @Relation(parentColumn = "RemoteId", entityColumn = "InstrumentRemoteId", entity = Section.class)
+    public List<SectionRelation> sections;
     @Relation(parentColumn = "RemoteId", entityColumn = "InstrumentRemoteId", entity = Question.class)
     public List<QuestionTranslationRelation> questions;
 }

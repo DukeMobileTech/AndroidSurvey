@@ -25,7 +25,7 @@
     <string name="network_unavailable">No network available on the device.</string>
     <string name="api_unavailable">Remote api is not responsive.</string>
     <string name="unacceptable_version_code">You must upgrade your application before continuing.</string>
-    <string name="surveys">surveys</string>
+    <string name="ongoing_surveys">ongoing surveys</string>
     <string name="rosters">rosters</string>
     <string name="questions">questions</string>
     <string name="question">question</string>
@@ -190,4 +190,7 @@
     <string name="reference">Reference</string>
     <string name="text">Text</string>
     <string name="show_pop_up_instructions">Show pop-up instructions</string>
+    <string name="submitted_surveys">submitted surveys</string>
+    <string name="incomplete_survey">Incomplete Survey</string>
+    <string name="incomplete_survey_message">This survey has not been finished. Please complete it first before trying to submit.</string>
 </resources>

@@ -15,6 +15,7 @@ import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
 import java.util.ArrayList;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.BLANK;
+import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtmlWhitelist;
 
 public class DropDownViewHolder extends QuestionViewHolder {
     private Spinner mSpinner;
@@ -66,7 +67,8 @@ public class DropDownViewHolder extends QuestionViewHolder {
     private void setSpinnerAdapter() {
         ArrayList<String> optionsArray = new ArrayList<>();
         for (OptionRelation optionRelation : getOptionRelations()) {
-            optionsArray.add(TranslationUtil.getText(optionRelation.option, optionRelation.translations, getSurveyViewModel()));
+            optionsArray.add(styleTextWithHtmlWhitelist(
+                    TranslationUtil.getText(optionRelation.option, optionRelation.translations, getSurveyViewModel())).toString());
         }
         optionsArray.add(""); // Adds empty selection
         mAdapter = new ArrayAdapter<>(getContext(), R.layout.simple_spinner_item, optionsArray);

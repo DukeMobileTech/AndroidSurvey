@@ -31,6 +31,7 @@ import org.adaptlab.chpir.android.survey.entities.Section;
 import org.adaptlab.chpir.android.survey.entities.Survey;
 import org.adaptlab.chpir.android.survey.relations.InstrumentRelation;
 import org.adaptlab.chpir.android.survey.relations.QuestionTranslationRelation;
+import org.adaptlab.chpir.android.survey.relations.SectionRelation;
 import org.adaptlab.chpir.android.survey.relations.SurveyRelation;
 import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
 import org.adaptlab.chpir.android.survey.viewmodelfactories.InstrumentRelationViewModelFactory;
@@ -128,7 +129,11 @@ public class SurveyReviewFragment extends ListFragment {
             public void onChanged(@Nullable InstrumentRelation relation) {
                 if (relation != null) {
                     mSurveyViewModel.setInstrumentLanguage(relation.instrument.getLanguage());
-                    mSurveyViewModel.setDisplays(relation.displays);
+                    List<Display> displayList = new ArrayList<>();
+                    for (SectionRelation sectionRelation : relation.sections) {
+                        displayList.addAll(sectionRelation.displays);
+                    }
+                    mSurveyViewModel.setDisplays(displayList);
                     List<Question> questions = new ArrayList<>();
                     mQuestionTranslations = new HashMap<>();
                     for (QuestionTranslationRelation questionTranslationRelation : relation.questions) {

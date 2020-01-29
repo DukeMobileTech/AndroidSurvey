@@ -220,6 +220,7 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
             Settings settings = mSettingsDao.getInstanceSync();
             if (settings == null) {
                 settings = new Settings();
+                settings.setId(1L);
                 settings.setDeviceIdentifier(UUID.randomUUID().toString());
                 settings.setDeviceLabel(Build.MODEL);
                 settings.setLanguage(Locale.getDefault().getLanguage());

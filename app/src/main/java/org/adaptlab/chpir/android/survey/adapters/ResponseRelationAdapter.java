@@ -13,6 +13,7 @@ import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
 import org.adaptlab.chpir.android.survey.viewholders.QuestionViewHolder;
 import org.adaptlab.chpir.android.survey.viewholders.QuestionViewHolderFactory;
+import org.adaptlab.chpir.android.survey.viewmodels.DisplayViewModel;
 import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
 
 public class ResponseRelationAdapter extends ListAdapter<QuestionRelation, QuestionViewHolder> {
@@ -40,10 +41,16 @@ public class ResponseRelationAdapter extends ListAdapter<QuestionRelation, Quest
 
     private SurveyViewModel mSurveyViewModel;
 
+    private DisplayViewModel mDisplayViewModel;
+
     public ResponseRelationAdapter(QuestionViewHolder.OnResponseSelectedListener listener, SurveyViewModel viewModel) {
         super(DIFF_CALLBACK);
         mListener = listener;
         mSurveyViewModel = viewModel;
+    }
+
+    public void setDisplayViewModel(DisplayViewModel viewModel) {
+        mDisplayViewModel = viewModel;
     }
 
     @NonNull
@@ -59,6 +66,7 @@ public class ResponseRelationAdapter extends ListAdapter<QuestionRelation, Quest
         viewHolder.setSurveyViewModel(mSurveyViewModel);
         QuestionRelation questionRelation = getItem(position);
         viewHolder.setRelations(questionRelation);
+        viewHolder.setDisplayViewModel(mDisplayViewModel);
     }
 
     @Override

@@ -27,8 +27,10 @@ import org.adaptlab.chpir.android.survey.entities.Survey;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
 import org.adaptlab.chpir.android.survey.repositories.ResponseRepository;
 import org.adaptlab.chpir.android.survey.viewholders.QuestionViewHolder;
+import org.adaptlab.chpir.android.survey.viewmodelfactories.DisplayViewModelFactory;
 import org.adaptlab.chpir.android.survey.viewmodelfactories.QuestionRelationViewModelFactory;
 import org.adaptlab.chpir.android.survey.viewmodelfactories.SurveyViewModelFactory;
+import org.adaptlab.chpir.android.survey.viewmodels.DisplayViewModel;
 import org.adaptlab.chpir.android.survey.viewmodels.QuestionRelationViewModel;
 import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
 
@@ -52,6 +54,7 @@ public class DisplayPagerFragment extends Fragment {
     private static final String TAG = DisplayPagerFragment.class.getName();
 
     private SurveyViewModel mSurveyViewModel;
+    private DisplayViewModel mDisplayViewModel;
     private Long mInstrumentId;
     private Long mDisplayId;
     private String mSurveyUUID;
@@ -250,6 +253,9 @@ public class DisplayPagerFragment extends Fragment {
                     for (Response response : questionRelation.responses) {
                         if (response.getSurveyUUID().equals(mSurveyUUID)) {
                             questionRelation.response = response;
+                            if (mDisplayViewModel.getResponse(response.getQuestionIdentifier()) == null) {
+                                mDisplayViewModel.setResponse(response.getQuestionIdentifier(), response);
+                            }
                             break;
                         }
                     }
@@ -363,6 +369,13 @@ public class DisplayPagerFragment extends Fragment {
         });
     }
 
+    private void setDisplayViewModel() {
+        if (mDisplayId == null) return;
+        DisplayViewModelFactory factory = new DisplayViewModelFactory(getActivity().getApplication(), mDisplayId);
+        mDisplayViewModel = ViewModelProviders.of(this, factory).get(DisplayViewModel.class);
+        mDisplayAdapter.setDisplayViewModel(mDisplayViewModel);
+    }
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.recycler_view_display, container, false);
@@ -372,6 +385,7 @@ public class DisplayPagerFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         setSurvey();
         setQuestions();
+        setDisplayViewModel();
         return view;
     }
 

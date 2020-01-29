@@ -11,6 +11,7 @@ import android.text.InputType;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -39,6 +40,7 @@ import org.adaptlab.chpir.android.survey.relations.OptionSetRelation;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
 import org.adaptlab.chpir.android.survey.repositories.ResponseRepository;
 import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
+import org.adaptlab.chpir.android.survey.viewmodels.DisplayViewModel;
 import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
 
 import java.util.ArrayList;
@@ -62,6 +64,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     private Context mContext;
     private OnResponseSelectedListener mListener;
     private SurveyViewModel mSurveyViewModel;
+    private DisplayViewModel mDisplayViewModel;
     private ResponseRepository mResponseRepository;
 
     private QuestionRelation mQuestionRelation;
@@ -137,6 +140,11 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     public void setSurveyViewModel(SurveyViewModel model) {
         mSurveyViewModel = model;
         mSurvey = mSurveyViewModel.getSurvey();
+    }
+
+    public void setDisplayViewModel(DisplayViewModel viewModel) {
+        mDisplayViewModel = viewModel;
+        Log.i(TAG, "DisplayViewModel: " + mDisplayViewModel.getResponse(mQuestion.getQuestionIdentifier()).getText());
     }
 
     ResponseRelationAdapter getAdapter() {

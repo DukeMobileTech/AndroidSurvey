@@ -35,8 +35,8 @@ public class EntityUploadTask extends AsyncTask<Void, Integer, Void> {
         mSurveyRepository = new SurveyRepository(SurveyApp.getInstance());
         mResponseRepository = new ResponseRepository(SurveyApp.getInstance());
         List<ProjectSurveyRelation> projectSurveyRelations = new ArrayList<>();
-        for (ProjectSurveyRelation relation : mSurveyRepository.getSurveyDao().projectSurveysSync(AppUtil.getProjectId())) {
-            if (relation.survey.isQueued() && relation.responses.size() > 0) {
+        for (ProjectSurveyRelation relation : mSurveyRepository.getSurveyDao().queuedProjectSurveys(AppUtil.getProjectId())) {
+            if (relation.responses.size() > 0) {
                 projectSurveyRelations.add(relation);
             }
         }

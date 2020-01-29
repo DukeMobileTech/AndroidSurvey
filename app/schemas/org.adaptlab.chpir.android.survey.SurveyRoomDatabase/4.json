@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 4,
-    "identityHash": "e43dc1de4c94dd116866fd422dde90df",
+    "identityHash": "ced3eadf33da5c3bef666e651e96fedc",
     "entities": [
       {
         "tableName": "Instruments",
@@ -401,7 +401,7 @@
       },
       {
         "tableName": "Settings",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`Id` INTEGER PRIMARY KEY AUTOINCREMENT, `DeviceIdentifier` TEXT, `DeviceLabel` TEXT, `ApiUrl` TEXT, `CustomLocaleCode` TEXT, `ShowSurveys` INTEGER NOT NULL, `ShowSkip` INTEGER NOT NULL, `ShowNA` INTEGER NOT NULL, `ShowRF` INTEGER NOT NULL, `ShowDK` INTEGER NOT NULL, `ApiVersion` TEXT, `ProjectId` TEXT, `ApiKey` TEXT, `RequirePassword` INTEGER NOT NULL, `RecordSurveyLocation` INTEGER NOT NULL, `LastSyncTimes` TEXT, `SecondEndpoint` INTEGER NOT NULL, `Api2Url` TEXT, `Api2Version` TEXT, `Api2Key` TEXT, `ShowRosters` INTEGER NOT NULL, `ShowScores` INTEGER NOT NULL, `Language` TEXT, `DatabaseVersion` INTEGER NOT NULL, `DeviceUserName` TEXT, `Latitude` TEXT, `Longitude` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`Id` INTEGER, `DeviceIdentifier` TEXT, `DeviceLabel` TEXT, `ApiUrl` TEXT, `CustomLocaleCode` TEXT, `ShowSurveys` INTEGER NOT NULL, `ShowSkip` INTEGER NOT NULL, `ShowNA` INTEGER NOT NULL, `ShowRF` INTEGER NOT NULL, `ShowDK` INTEGER NOT NULL, `ApiVersion` TEXT, `ProjectId` TEXT, `ApiKey` TEXT, `RequirePassword` INTEGER NOT NULL, `RecordSurveyLocation` INTEGER NOT NULL, `LastSyncTimes` TEXT, `SecondEndpoint` INTEGER NOT NULL, `Api2Url` TEXT, `Api2Version` TEXT, `Api2Key` TEXT, `ShowRosters` INTEGER NOT NULL, `ShowScores` INTEGER NOT NULL, `Language` TEXT, `DatabaseVersion` INTEGER NOT NULL, `DeviceUserName` TEXT, `Latitude` TEXT, `Longitude` TEXT, PRIMARY KEY(`Id`))",
         "fields": [
           {
             "fieldPath": "mId",
@@ -570,7 +570,7 @@
           "columnNames": [
             "Id"
           ],
-          "autoGenerate": true
+          "autoGenerate": false
         },
         "indices": [
           {
@@ -2508,7 +2508,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e43dc1de4c94dd116866fd422dde90df')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ced3eadf33da5c3bef666e651e96fedc')"
     ]
   }
 }

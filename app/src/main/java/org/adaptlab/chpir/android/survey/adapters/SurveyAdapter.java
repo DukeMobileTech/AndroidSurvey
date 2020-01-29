@@ -78,9 +78,7 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
                 ProjectSurveyRelation surveyRelation = mProjectSurveyRelations.get(viewHolder.getAdapterPosition());
                 Survey survey = surveyRelation.survey;
                 Instrument instrument = surveyRelation.instruments.get(0);
-                if (survey.isQueued() || survey.isSent()) {
-                    Toast.makeText(mContext, R.string.survey_submitted, Toast.LENGTH_LONG).show();
-                } else if (!instrument.isLoaded()) {
+                if (!instrument.isLoaded()) {
                     Toast.makeText(mContext, R.string.instrument_not_loaded, Toast.LENGTH_LONG).show();
                 } else {
                     Intent i = new Intent(mContext, SurveyActivity.class);
@@ -132,25 +130,38 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
     }
 
     public void uploadItem(final int position) {
-        new AlertDialog.Builder(mContext)
-                .setTitle(R.string.submit_survey)
-                .setMessage(R.string.submit_survey_message)
-                .setPositiveButton(R.string.submit,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                ProjectSurveyRelation survey = mProjectSurveyRelations.get(position);
-                                prepareForSubmission(survey);
-                                new EntityUploadTask().execute();
-                                notifyItemChanged(position);
-                            }
-                        })
-                .setNegativeButton(R.string.cancel,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                notifyItemChanged(position);
-                            }
-                        })
-                .show();
+        final ProjectSurveyRelation survey = mProjectSurveyRelations.get(position);
+        if (survey.survey.isComplete()) {
+            new AlertDialog.Builder(mContext)
+                    .setTitle(R.string.submit_survey)
+                    .setMessage(R.string.submit_survey_message)
+                    .setPositiveButton(R.string.submit,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    prepareForSubmission(survey);
+                                    new EntityUploadTask().execute();
+                                    notifyItemChanged(position);
+                                }
+                            })
+                    .setNegativeButton(R.string.cancel,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    notifyItemChanged(position);
+                                }
+                            })
+                    .show();
+        } else {
+            new AlertDialog.Builder(mContext)
+                    .setTitle(mContext.getString(R.string.incomplete_survey))
+                    .setMessage(mContext.getString(R.string.incomplete_survey_message))
+                    .setPositiveButton(R.string.okay,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    notifyItemChanged(position);
+                                }
+                            })
+                    .show();
+        }
     }
 
     class SurveyViewHolder extends RecyclerView.ViewHolder {
@@ -220,22 +231,9 @@ public class SurveyAdapter extends RecyclerView.Adapter<SurveyAdapter.SurveyView
                 setInstrumentLabelTask.execute(new InstrumentListLabel(instrument, surveyTextView));
             }
 
-            String progress;
-            if (survey.isSent()) {
-                progress = mContext.getString(R.string.submitted) + " " + (survey.getCompletedResponseCount() - responses.size())
-                        + " " + mContext.getString(R.string.of) + " " + survey.getCompletedResponseCount();
-            } else if (survey.isQueued()) {
-                progress = mContext.getString(R.string.submitted) + " " +
-                        (survey.getCompletedResponseCount() - responses.size()) + " "
-                        + mContext.getString(R.string.of) + " " + survey.getCompletedResponseCount();
-            } else {
-                progress = mContext.getString(R.string.progress) + " " + responses.size() + " "
-                        + mContext.getString(R.string.of) + " " + instrument.getQuestionCount();
-            }
+            String progress = mContext.getString(R.string.progress) + " " + responses.size() + " " + mContext.getString(R.string.of) + " " + instrument.getQuestionCount();
             SpannableString progressString = new SpannableString(progress);
-            if (survey.isSent() || survey.isQueued()) {
-                progressString.setSpan(new ForegroundColorSpan(mContext.getResources().getColor(R.color.blue)), 0, progress.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            } else if (survey.isComplete()) {
+            if (survey.isComplete()) {
                 progressString.setSpan(new ForegroundColorSpan(mContext.getResources().getColor(R.color.green)), 0, progress.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             } else {
                 progressString.setSpan(new ForegroundColorSpan(mContext.getResources().getColor(R.color.red)), 0, progress.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);

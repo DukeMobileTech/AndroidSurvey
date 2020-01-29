@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey;
 
 @Entity(tableName = "Settings")
 public class Settings {
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey
     @ColumnInfo(name = "Id", index = true)
     private Long mId;
     @ColumnInfo(name = "DeviceIdentifier")

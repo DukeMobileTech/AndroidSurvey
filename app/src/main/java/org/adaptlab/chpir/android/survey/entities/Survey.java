@@ -71,6 +71,7 @@ public class Survey implements Uploadable {
     public Survey() {
         mSent = false;
         mComplete = false;
+        mQueued = false;
         mUUID = UUID.randomUUID().toString();
         mLastUpdated = new Date();
     }

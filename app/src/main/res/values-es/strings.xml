@@ -26,7 +26,7 @@
     <string name="network_unavailable">No hay red disponible en este dispositivo.</string>
     <string name="api_unavailable">Remoto Api no responde.</string>
     <string name="unacceptable_version_code">Debe actualizar su aplicación antes de continuar.</string>
-    <string name="surveys">encuestas</string>
+    <string name="ongoing_surveys">encuestas</string>
     <string name="questions">preguntas</string>
     <string name="question">pregunta</string>
     <string name="encryption_required_title">Codificación requerida.</string>
@@ -190,4 +190,7 @@
     <string name="reference">Reference</string>
     <string name="text">Text</string>
     <string name="show_pop_up_instructions">Show pop-up instructions</string>
+    <string name="submitted_surveys">submitted surveys</string>
+    <string name="incomplete_survey">Incomplete Survey</string>
+    <string name="incomplete_survey_message">This survey has not been finished. Please complete it first before trying to submit.</string>
 </resources>

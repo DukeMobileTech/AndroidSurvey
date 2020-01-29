@@ -172,9 +172,12 @@ public class SurveyActivity extends AppCompatActivity {
                     }
                     mSurveyViewModel.update();
 
-                    List<Display> displays = getSortedDisplays(relation.displays);
-                    mSurveyViewModel.setDisplays(displays);
-                    mDisplayPagerAdapter.setDisplays(displays);
+                    List<Display> displayList = new ArrayList<>();
+                    for (SectionRelation sectionRelation : relation.sections) {
+                        displayList.addAll(getSortedDisplays(sectionRelation.displays));
+                    }
+                    mSurveyViewModel.setDisplays(displayList);
+                    mDisplayPagerAdapter.setDisplays(displayList);
 
                     List<Question> questions = new ArrayList<>();
                     for (QuestionTranslationRelation questionTranslationRelation : relation.questions) {

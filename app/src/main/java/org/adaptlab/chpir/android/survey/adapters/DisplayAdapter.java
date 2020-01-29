@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
+import org.adaptlab.chpir.android.survey.viewmodels.DisplayViewModel;
 
 import java.util.List;
 
@@ -60,6 +61,8 @@ public class DisplayAdapter extends ListAdapter<List<QuestionRelation>, DisplayA
 
     private Context mContext;
 
+    private DisplayViewModel mDisplayViewModel;
+
     public DisplayAdapter(Context context) {
         super(DIFF_CALLBACK);
         mContext = context;
@@ -67,6 +70,10 @@ public class DisplayAdapter extends ListAdapter<List<QuestionRelation>, DisplayA
 
     public void setResponseRelationAdapters(List<ResponseRelationAdapter> adapters) {
         mResponseRelationAdapters = adapters;
+    }
+
+    public void setDisplayViewModel(DisplayViewModel viewModel) {
+        mDisplayViewModel = viewModel;
     }
 
     @NonNull
@@ -83,6 +90,7 @@ public class DisplayAdapter extends ListAdapter<List<QuestionRelation>, DisplayA
         if (viewHolder.recyclerView.getAdapter() == null) {
             viewHolder.recyclerView.setAdapter(adapter);
         }
+        adapter.setDisplayViewModel(mDisplayViewModel);
         adapter.submitList(questionRelations);
     }
 

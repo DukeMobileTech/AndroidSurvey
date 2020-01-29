@@ -14,6 +14,7 @@ import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.entities.Settings;
 import org.adaptlab.chpir.android.survey.viewmodels.SettingsViewModel;
 import org.adaptlab.chpir.android.survey.viewpagerfragments.InstrumentPagerFragment;
+import org.adaptlab.chpir.android.survey.viewpagerfragments.SubmittedSurveyPagerFragment;
 import org.adaptlab.chpir.android.survey.viewpagerfragments.SurveyPagerFragment;
 
 import java.util.ArrayList;
@@ -36,10 +37,11 @@ public class InstrumentSurveyPagerAdapter extends FragmentPagerAdapter {
                 mTabs = new ArrayList<>();
                 mTabs.add(mContext.getString(R.string.instruments));
                 if (settings != null) {
-                    if (settings.isShowSurveys()) mTabs.add(mContext.getString(R.string.surveys));
+                    if (settings.isShowSurveys()) mTabs.add(mContext.getString(R.string.ongoing_surveys));
                     if (settings.isShowRosters()) mTabs.add(mContext.getString(R.string.rosters));
                     if (settings.isShowScores()) mTabs.add(mContext.getString(R.string.rosters));
                 }
+                mTabs.add(mContext.getString(R.string.submitted_surveys));
                 notifyDataSetChanged();
             }
         });
@@ -53,8 +55,10 @@ public class InstrumentSurveyPagerAdapter extends FragmentPagerAdapter {
     private Fragment createPagerFragment(String name) {
         if (name.equals(mContext.getString(R.string.instruments))) {
             return new InstrumentPagerFragment();
-        } else if (name.equals(mContext.getString(R.string.surveys))) {
+        } else if (name.equals(mContext.getString(R.string.ongoing_surveys))) {
             return new SurveyPagerFragment();
+        } else if (name.equals(mContext.getString(R.string.submitted_surveys))) {
+            return new SubmittedSurveyPagerFragment();
         }
         return null;
     }

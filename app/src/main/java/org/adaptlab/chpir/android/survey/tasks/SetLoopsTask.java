@@ -23,6 +23,7 @@ import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.Settings;
 import org.adaptlab.chpir.android.survey.relations.InstrumentRelation;
 import org.adaptlab.chpir.android.survey.relations.QuestionTranslationRelation;
+import org.adaptlab.chpir.android.survey.relations.SectionRelation;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.apache.commons.lang3.RandomUtils;
 
@@ -142,12 +143,14 @@ public class SetLoopsTask extends AsyncTask<Void, Void, Void> {
             questions.add(questionTranslationRelation.question);
         }
         LongSparseArray<List<Question>> displayQuestions = getDisplayQuestions(questions);
-        for (Display display : instrumentRelation.displays) {
-            if (displayQuestions.get(display.getRemoteId()) != null) {
-                if (display.getQuestionCount() != displayQuestions.get(display.getRemoteId()).size()) {
-                    instrument.setLoaded(false);
-                    mInstrumentDao.update(instrument);
-                    return;
+        for (SectionRelation sectionRelation : instrumentRelation.sections) {
+            for (Display display : sectionRelation.displays) {
+                if (displayQuestions.get(display.getRemoteId()) != null) {
+                    if (display.getQuestionCount() != displayQuestions.get(display.getRemoteId()).size()) {
+                        instrument.setLoaded(false);
+                        mInstrumentDao.update(instrument);
+                        return;
+                    }
                 }
             }
         }

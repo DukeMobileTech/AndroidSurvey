@@ -15,6 +15,7 @@ public class SettingsViewModel extends AndroidViewModel {
     private SettingsRepository mSettingsRepository;
     private LiveData<Settings> mSettings;
     private LiveData<List<String>> mLanguages;
+    private boolean mSetting = false;
 
     public SettingsViewModel(@NonNull Application application) {
         super(application);
@@ -35,4 +36,11 @@ public class SettingsViewModel extends AndroidViewModel {
         mSettingsRepository.update(settings);
     }
 
+    public boolean isSetting() {
+        return mSetting;
+    }
+
+    public void setSetting(boolean setting) {
+        this.mSetting = setting;
+    }
 }

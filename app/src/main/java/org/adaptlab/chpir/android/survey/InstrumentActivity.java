@@ -89,7 +89,7 @@ public class InstrumentActivity extends AppCompatActivity {
     }
 
     private void setSettings() {
-        SettingsViewModel settingsViewModel = ViewModelProviders.of(this).get(SettingsViewModel.class);
+        final SettingsViewModel settingsViewModel = ViewModelProviders.of(this).get(SettingsViewModel.class);
         settingsViewModel.getSettings().observe(this, new Observer<Settings>() {
             @Override
             public void onChanged(@Nullable Settings settings) {
@@ -98,8 +98,11 @@ public class InstrumentActivity extends AppCompatActivity {
                     setProject(Long.valueOf(settings.getProjectId()));
                 if (TextUtils.isEmpty(settings.getApiUrl()) || TextUtils.isEmpty(settings.getApiVersion()) ||
                         TextUtils.isEmpty(settings.getProjectId()) || TextUtils.isEmpty(settings.getApiKey())) {
-                    Intent intent = new Intent(InstrumentActivity.this, SettingsActivity.class);
-                    startActivity(intent);
+                    if (!settingsViewModel.isSetting()) {
+                        settingsViewModel.setSetting(true);
+                        Intent intent = new Intent(InstrumentActivity.this, SettingsActivity.class);
+                        startActivity(intent);
+                    }
                 }
                 setupViewPager();
                 startLocationUpdates();
