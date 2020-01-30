@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity(tableName = "Displays")
-public class Display implements SurveyEntity {
+public class Display implements SurveyEntity, Translatable {
     @PrimaryKey
     @NonNull
     @SerializedName("id")
@@ -148,4 +148,10 @@ public class Display implements SurveyEntity {
     public void setInstrumentPosition(int mInstrumentPosition) {
         this.mInstrumentPosition = mInstrumentPosition;
     }
+
+    @Override
+    public String getText() {
+        return getTitle();
+    }
+
 }

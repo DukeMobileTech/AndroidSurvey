@@ -193,4 +193,6 @@
     <string name="submitted_surveys">encuestas enviadas</string>
     <string name="incomplete_survey">Incomplete Survey</string>
     <string name="incomplete_survey_message">This survey has not been finished. Please complete it first before trying to submit.</string>
+    <string name="survey_notes">Survey Notes</string>
+    <string name="survey_review">Survey Review</string>
 </resources>

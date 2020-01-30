@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity(tableName = "InstructionTranslations")
-public class InstructionTranslation implements SurveyEntity {
+public class InstructionTranslation implements SurveyEntity, Translation {
     @PrimaryKey
     @NonNull
     @SerializedName("id")

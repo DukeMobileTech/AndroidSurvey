@@ -37,6 +37,7 @@ import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.Response;
 import org.adaptlab.chpir.android.survey.entities.Section;
 import org.adaptlab.chpir.android.survey.entities.Survey;
+import org.adaptlab.chpir.android.survey.relations.DisplayRelation;
 import org.adaptlab.chpir.android.survey.relations.InstrumentRelation;
 import org.adaptlab.chpir.android.survey.relations.QuestionTranslationRelation;
 import org.adaptlab.chpir.android.survey.relations.SectionRelation;
@@ -45,6 +46,7 @@ import org.adaptlab.chpir.android.survey.repositories.SurveyRepository;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.utils.LocaleManager;
 import org.adaptlab.chpir.android.survey.utils.LocationManager;
+import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
 import org.adaptlab.chpir.android.survey.viewmodelfactories.InstrumentRelationViewModelFactory;
 import org.adaptlab.chpir.android.survey.viewmodelfactories.SectionViewModelFactory;
 import org.adaptlab.chpir.android.survey.viewmodelfactories.SurveyRelationViewModelFactory;
@@ -64,6 +66,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
+import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtmlWhitelist;
 
 public class SurveyActivity extends AppCompatActivity {
     public final static String EXTRA_INSTRUMENT_ID = "org.adaptlab.chpir.android.survey.EXTRA_INSTRUMENT_ID";
@@ -147,7 +150,7 @@ public class SurveyActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position) {
                 Display display = mSurveyViewModel.getDisplays().get(position);
-                mActionBar.setTitle(display.getTitle());
+                mActionBar.setTitle(mSurveyViewModel.getDisplayTitle(display.getRemoteId()));
             }
         });
     }
@@ -174,7 +177,11 @@ public class SurveyActivity extends AppCompatActivity {
 
                     List<Display> displayList = new ArrayList<>();
                     for (SectionRelation sectionRelation : relation.sections) {
-                        displayList.addAll(getSortedDisplays(sectionRelation.displays));
+                        List<Display> displays = new ArrayList<>();
+                        for (DisplayRelation displayRelation : sectionRelation.displays) {
+                            displays.add(displayRelation.display);
+                        }
+                        displayList.addAll(getSortedDisplays(displays));
                     }
                     mSurveyViewModel.setDisplays(displayList);
                     mDisplayPagerAdapter.setDisplays(displayList);
@@ -286,10 +293,14 @@ public class SurveyActivity extends AppCompatActivity {
                 for (SectionRelation relation : sectionRelations) {
                     longSparseArray.put(relation.section.getRemoteId(), relation.section);
                     List<String> displayTitles = new ArrayList<>();
-                    for (Display display : getSortedDisplays(relation.displays)) {
-                        displayTitles.add(display.getTitle());
+                    for (DisplayRelation displayRelation : getSortedDisplayRelations(relation.displays)) {
+                        String displayTitle = TranslationUtil.getText(displayRelation.display,
+                                displayRelation.translations, mSurveyViewModel);
+                        displayTitles.add(styleTextWithHtmlWhitelist(displayTitle).toString());
+                        mSurveyViewModel.addDisplayTitle(displayRelation.display.getRemoteId(), styleTextWithHtmlWhitelist(displayTitle).toString());
                     }
-                    listData.put(relation.section.getTitle(), displayTitles);
+                    String sectionTitle = TranslationUtil.getText(relation.section, relation.translations, mSurveyViewModel);
+                    listData.put(styleTextWithHtmlWhitelist(sectionTitle).toString(), displayTitles);
                 }
                 setExtraItemLinks(listData);
                 mSurveyViewModel.setSections(longSparseArray);
@@ -300,11 +311,31 @@ public class SurveyActivity extends AppCompatActivity {
         });
     }
 
+    private List<DisplayRelation> getSortedDisplayRelations(List<DisplayRelation> displayRelations) {
+        List<DisplayRelation> displays = new ArrayList<>();
+        for (DisplayRelation relation : displayRelations) {
+            if (!relation.display.isDeleted()) {
+                displays.add(relation);
+            }
+        }
+        Collections.sort(displays, new Comparator<DisplayRelation>() {
+            @Override
+            public int compare(DisplayRelation o1, DisplayRelation o2) {
+                if (o1.display.getInstrumentPosition() < o2.display.getInstrumentPosition())
+                    return -1;
+                if (o1.display.getInstrumentPosition() > o2.display.getInstrumentPosition())
+                    return 1;
+                return 0;
+            }
+        });
+        return displays;
+    }
+
     private void setExtraItemLinks(LinkedHashMap<String, List<String>> listData) {
-        List<String> notes = Collections.singletonList("Survey Notes");
-        List<String> review = Collections.singletonList("Survey Review");
-        listData.put("Survey Notes", notes);
-        listData.put("Survey Review", review);
+        List<String> notes = Collections.singletonList(getString(R.string.survey_notes));
+        List<String> review = Collections.singletonList(getString(R.string.survey_review));
+        listData.put(getString(R.string.survey_notes), notes);
+        listData.put(getString(R.string.survey_review), review);
     }
 
     private void setNavigationDrawer() {
@@ -347,7 +378,7 @@ public class SurveyActivity extends AppCompatActivity {
                 String selectedItem = ((List) (mSurveyViewModel.getExpandableListData().get(mSurveyViewModel.getExpandableListTitle().get(groupPosition)))).get(childPosition).toString();
                 int index = 0;
                 for (Display display : mSurveyViewModel.getDisplays()) {
-                    if (display.getTitle().equals(selectedItem)) {
+                    if (mSurveyViewModel.getDisplayTitle(display.getRemoteId()).equals(selectedItem)) {
                         moveToDisplay(index);
                         break;
                     }
@@ -431,7 +462,7 @@ public class SurveyActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-        saveData();
+        if (mSurveyViewModel != null && mSurveyViewModel.getSurvey() != null) saveData();
         if (mLocationManager != null) mLocationManager.stopLocationUpdates();
     }
 

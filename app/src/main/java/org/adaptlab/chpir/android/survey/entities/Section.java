@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity(tableName = "Sections")
-public class Section implements SurveyEntity {
+public class Section implements SurveyEntity, Translatable {
     @PrimaryKey
     @NonNull
     @SerializedName("id")
@@ -102,5 +102,10 @@ public class Section implements SurveyEntity {
 
     public void setPosition(int mPosition) {
         this.mPosition = mPosition;
+    }
+
+    @Override
+    public String getText() {
+        return getTitle();
     }
 }

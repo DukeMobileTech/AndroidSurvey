@@ -44,6 +44,7 @@ public class SurveyViewModel extends AndroidViewModel {
     private HashMap<String, Question> mQuestionsWithoutResponses;
     private LongSparseArray<Section> mSections;
     private LinkedHashMap<String, List<String>> mExpandableListData;
+    private LongSparseArray<String> mDisplayTitles;
     private List<Question> mQuestions;
     private List<String> mExpandableListTitle;
     private List<Display> mDisplays;
@@ -61,6 +62,15 @@ public class SurveyViewModel extends AndroidViewModel {
         mSurveyRepository = new SurveyRepository(application);
         if (uuid == null) return;
         mLiveDataSurvey = mSurveyRepository.getSurveyDao().findByUUID(uuid);
+        mDisplayTitles = new LongSparseArray<>();
+    }
+
+    public void addDisplayTitle(Long displayId, String translation) {
+        mDisplayTitles.put(displayId, translation);
+    }
+
+    public String getDisplayTitle(Long displayId) {
+        return mDisplayTitles.get(displayId);
     }
 
     public LiveData<Survey> getLiveDataSurvey() {

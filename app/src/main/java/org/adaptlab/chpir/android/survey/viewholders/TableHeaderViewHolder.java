@@ -28,7 +28,6 @@ public class TableHeaderViewHolder extends TableQuestionViewHolder {
 
     @Override
     public void setRelations(QuestionRelation questionRelation) {
-        setQuestion(questionRelation.question);
         setQuestionRelation(questionRelation);
         setOptionSetItems(questionRelation);
         setTableInstructions();

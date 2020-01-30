@@ -27,8 +27,8 @@ import androidx.lifecycle.ViewModelProviders;
 import org.adaptlab.chpir.android.survey.entities.Display;
 import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.Response;
-import org.adaptlab.chpir.android.survey.entities.Section;
 import org.adaptlab.chpir.android.survey.entities.Survey;
+import org.adaptlab.chpir.android.survey.relations.DisplayRelation;
 import org.adaptlab.chpir.android.survey.relations.InstrumentRelation;
 import org.adaptlab.chpir.android.survey.relations.QuestionTranslationRelation;
 import org.adaptlab.chpir.android.survey.relations.SectionRelation;
@@ -48,6 +48,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtmlWhitelist;
+
 public class SurveyReviewFragment extends ListFragment {
     final static String EXTRA_INSTRUMENT_ID = "org.adaptlab.chpir.android.survey.EXTRA_INSTRUMENT_ID";
     final static String EXTRA_SURVEY_UUID = "org.adaptlab.chpir.android.survey.EXTRA_SURVEY_UUID";
@@ -59,6 +61,7 @@ public class SurveyReviewFragment extends ListFragment {
     private String mLanguage;
     private SurveyViewModel mSurveyViewModel;
     private HashMap<String, QuestionTranslationRelation> mQuestionTranslations;
+    private InstrumentRelationViewModel mInstrumentRelationViewModel;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -123,16 +126,19 @@ public class SurveyReviewFragment extends ListFragment {
 
     private void setInstrumentViewModel() {
         InstrumentRelationViewModelFactory factory = new InstrumentRelationViewModelFactory(getActivity().getApplication(), mInstrumentId);
-        InstrumentRelationViewModel viewModel = ViewModelProviders.of(this, factory).get(InstrumentRelationViewModel.class);
-        viewModel.getInstrumentRelation().observe(this, new Observer<InstrumentRelation>() {
+        mInstrumentRelationViewModel = ViewModelProviders.of(this, factory).get(InstrumentRelationViewModel.class);
+        mInstrumentRelationViewModel.getInstrumentRelation().observe(this, new Observer<InstrumentRelation>() {
             @Override
             public void onChanged(@Nullable InstrumentRelation relation) {
                 if (relation != null) {
                     mSurveyViewModel.setInstrumentLanguage(relation.instrument.getLanguage());
                     List<Display> displayList = new ArrayList<>();
                     for (SectionRelation sectionRelation : relation.sections) {
-                        displayList.addAll(sectionRelation.displays);
+                        for (DisplayRelation displayRelation : sectionRelation.displays) {
+                            displayList.add(displayRelation.display);
+                        }
                     }
+                    mInstrumentRelationViewModel.addSectionRelations(relation.sections);
                     mSurveyViewModel.setDisplays(displayList);
                     List<Question> questions = new ArrayList<>();
                     mQuestionTranslations = new HashMap<>();
@@ -230,18 +236,21 @@ public class SurveyReviewFragment extends ListFragment {
         @Override
         @NonNull
         public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-            if (convertView == null) {
+            if (convertView == null && getActivity() != null) {
                 convertView = getActivity().getLayoutInflater().inflate(R.layout.fragment_review, null);
             }
 
             QuestionTranslationRelation relation = getItem(position);
             if (relation != null) {
-                Display display = relation.displays.get(0).display;
-                Section section = relation.displays.get(0).sections.get(0);
+                DisplayRelation displayRelation = mInstrumentRelationViewModel.getDisplay(relation.question.getDisplayId());
+                SectionRelation sectionRelation = mInstrumentRelationViewModel.getSection(displayRelation.display.getSectionId());
+                String displayTitle = TranslationUtil.getText(displayRelation.display, displayRelation.translations, mSurveyViewModel);
+                String sectionTitle = TranslationUtil.getText(sectionRelation.section, sectionRelation.translations, mSurveyViewModel);
+
+                String title = styleTextWithHtmlWhitelist(sectionTitle).toString() + " | " + styleTextWithHtmlWhitelist(displayTitle).toString() + " | " + relation.question.getPosition();
 
                 TextView questionNumberTextView = convertView.findViewById(R.id.review_question_number);
-                questionNumberTextView.setText(section.getTitle() + " | " + display.getTitle() + " | " +
-                        relation.question.getPosition());
+                questionNumberTextView.setText(title);
                 questionNumberTextView.setTextColor(Color.BLACK);
 
                 String text = TranslationUtil.getText(relation.question, relation.translations, mSurveyViewModel);
