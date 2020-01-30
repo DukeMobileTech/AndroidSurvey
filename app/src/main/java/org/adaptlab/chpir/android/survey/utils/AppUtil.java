@@ -4,10 +4,13 @@ import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
+
+import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.crashlytics.android.Crashlytics;
 
@@ -16,7 +19,6 @@ import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.SurveyApp;
 import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
 import org.adaptlab.chpir.android.survey.daos.DeviceUserDao;
-import org.adaptlab.chpir.android.survey.daos.SettingsDao;
 import org.adaptlab.chpir.android.survey.entities.DeviceUser;
 import org.adaptlab.chpir.android.survey.entities.Settings;
 import org.adaptlab.chpir.android.survey.repositories.ConditionSkipRepository;
@@ -36,11 +38,11 @@ import org.adaptlab.chpir.android.survey.repositories.OptionSetRepository;
 import org.adaptlab.chpir.android.survey.repositories.ProjectRepository;
 import org.adaptlab.chpir.android.survey.repositories.QuestionRepository;
 import org.adaptlab.chpir.android.survey.repositories.SectionRepository;
-import org.adaptlab.chpir.android.survey.repositories.SettingsRepository;
 import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 import org.adaptlab.chpir.android.survey.tasks.EntityUploadTask;
 import org.adaptlab.chpir.android.survey.tasks.GetDeviceUserTask;
 import org.adaptlab.chpir.android.survey.tasks.SetLoopsTask;
+import org.adaptlab.chpir.android.survey.viewmodels.SettingsViewModel;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -71,16 +73,16 @@ public class AppUtil {
     private static Long PROJECT_ID;
     private static OkHttpClient okHttpClient;
     private static Settings mSettings;
-    private static SettingsRepository mSettingsRepository;
     private static String mCurrentSyncTime;
     private static String DATABASE_KEY;
+    private static SettingsViewModel mSettingsViewModel;
 
-    public static void appInit(Application application) {
-        setSettings(application);
-        setVersionCode(application);
-        setVersionName(application);
+    public static void appInit(FragmentActivity activity) {
+        setSettings(activity);
+        setVersionCode(SurveyApp.getInstance());
+        setVersionName(SurveyApp.getInstance());
         getOkHttpClient();
-        PollService.setServiceAlarm(application, true);
+        PollService.setServiceAlarm(SurveyApp.getInstance(), true);
     }
 
     private static void setDeviceLanguage() {
@@ -104,7 +106,7 @@ public class AppUtil {
         if (SurveyRoomDatabase.getDatabaseVersion() != mSettings.getDatabaseVersion()) {
             mSettings.resetLastSyncTime();
             mSettings.setDatabaseVersion(SurveyRoomDatabase.getDatabaseVersion());
-            mSettingsRepository.update(mSettings);
+            mSettingsViewModel.update(mSettings);
         }
     }
 
@@ -260,7 +262,7 @@ public class AppUtil {
         LAST_SYNC_TIME = lastSyncTime;
         if (mSettings == null) return;
         mSettings.setLastSyncTime(LAST_SYNC_TIME);
-        mSettingsRepository.update(mSettings);
+        mSettingsViewModel.update(mSettings);
     }
 
     public static String getFullApiUrl() {
@@ -300,30 +302,25 @@ public class AppUtil {
         return mSettings;
     }
 
-    private static void setSettings(final Application application) {
-        mSettingsRepository = new SettingsRepository(application);
-        GetSettingsTask getSettingsTask = new GetSettingsTask();
-        getSettingsTask.setListener(new GetSettingsTask.AsyncTaskListener() {
+    private static void setSettings(FragmentActivity activity) {
+        mSettingsViewModel = ViewModelProviders.of(activity).get(SettingsViewModel.class);
+        mSettingsViewModel.getSettings().observe(activity, new Observer<Settings>() {
             @Override
-            public void onAsyncTaskFinished(Settings settings) {
-                initializeSettings(settings, application);
+            public void onChanged(Settings settings) {
+                if (settings == null) return;
+                mSettings = settings;
+                ACCESS_TOKEN = mSettings.getApiKey();
+                LAST_SYNC_TIME = mSettings.getLastSyncTime();
+                DOMAIN_NAME = mSettings.getApiUrl();
+                API_VERSION = mSettings.getApiVersion();
+                if (mSettings.getProjectId() != null)
+                    PROJECT_ID = Long.valueOf(mSettings.getProjectId());
+                checkDatabaseVersionChange();
+                setCrashLogs(SurveyApp.getInstance());
+                setDeviceLanguage();
+                if (mSettings.getDeviceUserName() != null) setDeviceUserId(SurveyApp.getInstance());
             }
         });
-        getSettingsTask.execute(mSettingsRepository.getSettingsDao());
-    }
-
-    public static void initializeSettings(Settings settings, Application application) {
-        mSettings = settings;
-        ACCESS_TOKEN = mSettings.getApiKey();
-        LAST_SYNC_TIME = mSettings.getLastSyncTime();
-        DOMAIN_NAME = mSettings.getApiUrl();
-        API_VERSION = mSettings.getApiVersion();
-        if (mSettings.getProjectId() != null)
-            PROJECT_ID = Long.valueOf(mSettings.getProjectId());
-        checkDatabaseVersionChange();
-        setCrashLogs(application);
-        setDeviceLanguage();
-        if (mSettings.getDeviceUserName() != null) setDeviceUserId(application);
     }
 
     public static Long getDeviceUserId() {
@@ -390,26 +387,4 @@ public class AppUtil {
         DATABASE_KEY = databaseKey;
     }
 
-    static class GetSettingsTask extends AsyncTask<SettingsDao, Void, Settings> {
-        private AsyncTaskListener mListener;
-
-        public void setListener(AsyncTaskListener listener) {
-            mListener = listener;
-        }
-
-        @Override
-        protected Settings doInBackground(SettingsDao... params) {
-            return params[0].getInstanceSync();
-        }
-
-        @Override
-        protected void onPostExecute(Settings settings) {
-            super.onPostExecute(settings);
-            if (settings != null) mListener.onAsyncTaskFinished(settings);
-        }
-
-        public interface AsyncTaskListener {
-            void onAsyncTaskFinished(Settings settings);
-        }
-    }
 }

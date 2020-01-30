@@ -1,7 +1,6 @@
 package org.adaptlab.chpir.android.survey.relations;
 
 import androidx.room.Embedded;
-import androidx.room.Ignore;
 import androidx.room.Relation;
 
 import org.adaptlab.chpir.android.survey.entities.Instruction;
@@ -42,6 +41,4 @@ public class QuestionRelation {
     public List<QuestionTranslation> translations;
     @Relation(parentColumn = "QuestionIdentifier", entityColumn = "QuestionIdentifier", entity = Response.class)
     public List<Response> responses;
-    @Ignore
-    public Response response = null;
 }

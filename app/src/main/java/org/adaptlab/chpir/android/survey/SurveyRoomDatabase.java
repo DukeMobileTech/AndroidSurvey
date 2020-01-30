@@ -225,7 +225,6 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
                 settings.setDeviceLabel(Build.MODEL);
                 settings.setLanguage(Locale.getDefault().getLanguage());
                 mSettingsDao.insert(settings);
-                AppUtil.initializeSettings(settings, SurveyApp.getInstance());
                 if (BuildConfig.DEBUG) Log.i(TAG, "Language: " + settings.getLanguage());
             }
             return null;

@@ -1,6 +1,5 @@
 package org.adaptlab.chpir.android.survey.repositories;
 
-
 import android.app.Application;
 import android.os.AsyncTask;
 

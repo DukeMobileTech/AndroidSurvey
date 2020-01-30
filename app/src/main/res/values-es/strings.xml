@@ -190,7 +190,7 @@
     <string name="reference">Reference</string>
     <string name="text">Text</string>
     <string name="show_pop_up_instructions">Show pop-up instructions</string>
-    <string name="submitted_surveys">submitted surveys</string>
+    <string name="submitted_surveys">encuestas enviadas</string>
     <string name="incomplete_survey">Incomplete Survey</string>
     <string name="incomplete_survey_message">This survey has not been finished. Please complete it first before trying to submit.</string>
 </resources>

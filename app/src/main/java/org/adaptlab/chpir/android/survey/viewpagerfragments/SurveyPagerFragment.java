@@ -74,6 +74,7 @@ public class SurveyPagerFragment extends Fragment {
             settingsViewModel.getSettings().observe(this, new Observer<Settings>() {
                 @Override
                 public void onChanged(@Nullable Settings settings) {
+                    if (settings == null || settings.getProjectId() == null) return;
                     setViewModels(Long.valueOf(settings.getProjectId()));
                 }
             });

@@ -36,11 +36,7 @@ public class InstrumentSurveyPagerAdapter extends FragmentPagerAdapter {
             public void onChanged(@Nullable Settings settings) {
                 mTabs = new ArrayList<>();
                 mTabs.add(mContext.getString(R.string.instruments));
-                if (settings != null) {
-                    if (settings.isShowSurveys()) mTabs.add(mContext.getString(R.string.ongoing_surveys));
-                    if (settings.isShowRosters()) mTabs.add(mContext.getString(R.string.rosters));
-                    if (settings.isShowScores()) mTabs.add(mContext.getString(R.string.rosters));
-                }
+                mTabs.add(mContext.getString(R.string.ongoing_surveys));
                 mTabs.add(mContext.getString(R.string.submitted_surveys));
                 notifyDataSetChanged();
             }

@@ -70,7 +70,7 @@ public class InstrumentActivity extends AppCompatActivity {
     }
 
     private void init() {
-        AppUtil.appInit(getApplication());
+        AppUtil.appInit(this);
         requestNeededPermissions();
     }
 

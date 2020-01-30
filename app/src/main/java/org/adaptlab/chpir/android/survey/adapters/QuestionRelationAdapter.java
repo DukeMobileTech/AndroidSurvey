@@ -1,6 +1,5 @@
 package org.adaptlab.chpir.android.survey.adapters;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,23 +15,19 @@ import org.adaptlab.chpir.android.survey.viewholders.QuestionViewHolderFactory;
 import org.adaptlab.chpir.android.survey.viewmodels.DisplayViewModel;
 import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
 
-public class ResponseRelationAdapter extends ListAdapter<QuestionRelation, QuestionViewHolder> {
-    public static final String TAG = ResponseRelationAdapter.class.getName();
+public class QuestionRelationAdapter extends ListAdapter<QuestionRelation, QuestionViewHolder> {
+    public static final String TAG = QuestionRelationAdapter.class.getName();
 
     private static final DiffUtil.ItemCallback<QuestionRelation> DIFF_CALLBACK = new DiffUtil.ItemCallback<QuestionRelation>() {
         @Override
         public boolean areItemsTheSame(@NonNull QuestionRelation oldQuestionRelation, @NonNull QuestionRelation newQuestionRelation) {
-            boolean same = oldQuestionRelation.response.getUUID().equals(newQuestionRelation.response.getUUID());
-            Log.i(TAG, "areItemsTheSame: " + same);
+            boolean same = oldQuestionRelation.question.getQuestionIdentifier().equals(newQuestionRelation.question.getQuestionIdentifier());
             return same;
         }
 
         @Override
         public boolean areContentsTheSame(@NonNull QuestionRelation oldQuestionRelation, @NonNull QuestionRelation newQuestionRelation) {
-            boolean same = oldQuestionRelation.response.getText().equals(newQuestionRelation.response.getText()) &&
-                    oldQuestionRelation.response.getSpecialResponse().equals(newQuestionRelation.response.getSpecialResponse()) &&
-                    oldQuestionRelation.response.getOtherResponse().equals(newQuestionRelation.response.getOtherResponse());
-            Log.i(TAG, "areContentsTheSame: " + same);
+            boolean same = oldQuestionRelation.question.getQuestionIdentifier().equals(newQuestionRelation.question.getQuestionIdentifier());
             return same;
         }
     };
@@ -43,14 +38,10 @@ public class ResponseRelationAdapter extends ListAdapter<QuestionRelation, Quest
 
     private DisplayViewModel mDisplayViewModel;
 
-    public ResponseRelationAdapter(QuestionViewHolder.OnResponseSelectedListener listener, SurveyViewModel viewModel) {
+    public QuestionRelationAdapter(QuestionViewHolder.OnResponseSelectedListener listener, SurveyViewModel viewModel) {
         super(DIFF_CALLBACK);
         mListener = listener;
         mSurveyViewModel = viewModel;
-    }
-
-    public void setDisplayViewModel(DisplayViewModel viewModel) {
-        mDisplayViewModel = viewModel;
     }
 
     @NonNull
@@ -78,6 +69,14 @@ public class ResponseRelationAdapter extends ListAdapter<QuestionRelation, Quest
 
     SurveyViewModel getSurveyViewModel() {
         return mSurveyViewModel;
+    }
+
+    DisplayViewModel getDisplayViewModel() {
+        return mDisplayViewModel;
+    }
+
+    void setDisplayViewModel(DisplayViewModel viewModel) {
+        mDisplayViewModel = viewModel;
     }
 
     protected QuestionViewHolder.OnResponseSelectedListener getListener() {

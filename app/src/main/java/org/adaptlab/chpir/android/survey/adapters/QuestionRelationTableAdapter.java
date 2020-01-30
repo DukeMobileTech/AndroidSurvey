@@ -18,9 +18,9 @@ import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.SELECT_MULTI
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.SELECT_ONE_TABLE;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.TABLE_HEADER;
 
-public class ResponseRelationTableAdapter extends ResponseRelationAdapter {
+public class QuestionRelationTableAdapter extends QuestionRelationAdapter {
 
-    public ResponseRelationTableAdapter(QuestionViewHolder.OnResponseSelectedListener listener, SurveyViewModel viewModel) {
+    public QuestionRelationTableAdapter(QuestionViewHolder.OnResponseSelectedListener listener, SurveyViewModel viewModel) {
         super(listener, viewModel);
     }
 
@@ -42,6 +42,7 @@ public class ResponseRelationTableAdapter extends ResponseRelationAdapter {
         viewHolder.setSurveyViewModel(getSurveyViewModel());
         QuestionRelation questionRelation = getQuestionRelation(position);
         viewHolder.setRelations(questionRelation);
+        viewHolder.setDisplayViewModel(getDisplayViewModel());
     }
 
     @Override

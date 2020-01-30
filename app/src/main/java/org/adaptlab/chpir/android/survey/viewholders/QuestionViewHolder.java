@@ -11,7 +11,6 @@ import android.text.InputType;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -27,7 +26,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.adapters.ResponseRelationAdapter;
+import org.adaptlab.chpir.android.survey.adapters.QuestionRelationAdapter;
 import org.adaptlab.chpir.android.survey.entities.Instruction;
 import org.adaptlab.chpir.android.survey.entities.NextQuestion;
 import org.adaptlab.chpir.android.survey.entities.Option;
@@ -76,7 +75,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     private List<OptionRelation> mSpecialOptionRelations;
     private List<OptionRelation> mCarryForwardOptionRelations;
     private HashMap<String, Instruction> mOptionInstructions;
-    private ResponseRelationAdapter mAdapter;
+    private QuestionRelationAdapter mAdapter;
 
     private TextView mNumberTextView;
     private TextView mBeforeTextInstructionTextView;
@@ -117,20 +116,14 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     public void setRelations(QuestionRelation questionRelation) {
         mQuestionRelation = questionRelation;
         mQuestion = questionRelation.question;
-        mResponse = questionRelation.response;
         setOptionSetItems(questionRelation);
         setSpecialOptions(questionRelation);
         setCarryForwardOptions(questionRelation);
-
         setQuestionTextComponents();
-
         setOptionSetInstructionsText();
         // Overridden by subclasses to place their graphical elements on the fragment.
         createQuestionComponent(mQuestionComponent);
         setSpecialResponseView();
-        mDeserialization = true;
-        deserializeResponse();
-        mDeserialization = false;
     }
 
     SurveyViewModel getSurveyViewModel() {
@@ -144,14 +137,17 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
     public void setDisplayViewModel(DisplayViewModel viewModel) {
         mDisplayViewModel = viewModel;
-        Log.i(TAG, "DisplayViewModel: " + mDisplayViewModel.getResponse(mQuestion.getQuestionIdentifier()).getText());
+        mResponse = mDisplayViewModel.getResponse(mQuestion.getQuestionIdentifier());
+        mDeserialization = true;
+        deserializeResponse();
+        mDeserialization = false;
     }
 
-    ResponseRelationAdapter getAdapter() {
+    QuestionRelationAdapter getAdapter() {
         return mAdapter;
     }
 
-    public void setAdapter(ResponseRelationAdapter adapter) {
+    public void setAdapter(QuestionRelationAdapter adapter) {
         mAdapter = adapter;
     }
 

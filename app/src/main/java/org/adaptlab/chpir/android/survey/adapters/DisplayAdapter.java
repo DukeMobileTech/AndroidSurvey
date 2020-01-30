@@ -2,7 +2,6 @@ package org.adaptlab.chpir.android.survey.adapters;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +19,7 @@ import org.adaptlab.chpir.android.survey.viewmodels.DisplayViewModel;
 import java.util.List;
 
 public class DisplayAdapter extends ListAdapter<List<QuestionRelation>, DisplayAdapter.DisplayViewHolder> {
-    public static final String TAG = "DisplayAdapter";
+    public static final String TAG = DisplayAdapter.class.getName();
 
     private static final DiffUtil.ItemCallback<List<QuestionRelation>> DIFF_CALLBACK = new DiffUtil.ItemCallback<List<QuestionRelation>>() {
         @Override
@@ -30,10 +29,9 @@ public class DisplayAdapter extends ListAdapter<List<QuestionRelation>, DisplayA
             for (int k = 0; k < oldQuestionRelations.size(); k++) {
                 QuestionRelation oldQuestionRelation = oldQuestionRelations.get(k);
                 QuestionRelation newQuestionRelation = newQuestionRelations.get(k);
-                same = oldQuestionRelation.response.getUUID().equals(newQuestionRelation.response.getUUID());
+                same = oldQuestionRelation.question.getQuestionIdentifier().equals(newQuestionRelation.question.getQuestionIdentifier());
                 if (!same) break;
             }
-            Log.i(TAG, "areItemsTheSame: " + same);
             return same;
         }
 
@@ -43,10 +41,7 @@ public class DisplayAdapter extends ListAdapter<List<QuestionRelation>, DisplayA
             for (int k = 0; k < oldQuestionRelations.size(); k++) {
                 QuestionRelation oldQuestionRelation = oldQuestionRelations.get(k);
                 QuestionRelation newQuestionRelation = newQuestionRelations.get(k);
-                boolean same = oldQuestionRelation.response.getText().equals(newQuestionRelation.response.getText()) &&
-                        oldQuestionRelation.response.getSpecialResponse().equals(newQuestionRelation.response.getSpecialResponse()) &&
-                        oldQuestionRelation.response.getOtherResponse().equals(newQuestionRelation.response.getOtherResponse());
-                Log.i(TAG, "areContentsTheSame: " + same);
+                boolean same = oldQuestionRelation.question.getQuestionIdentifier().equals(newQuestionRelation.question.getQuestionIdentifier());
                 if (!same) return false;
             }
             return true;
@@ -57,7 +52,7 @@ public class DisplayAdapter extends ListAdapter<List<QuestionRelation>, DisplayA
 
     private static final int TABLE = 1;
 
-    private List<ResponseRelationAdapter> mResponseRelationAdapters;
+    private List<QuestionRelationAdapter> mQuestionRelationAdapters;
 
     private Context mContext;
 
@@ -68,8 +63,8 @@ public class DisplayAdapter extends ListAdapter<List<QuestionRelation>, DisplayA
         mContext = context;
     }
 
-    public void setResponseRelationAdapters(List<ResponseRelationAdapter> adapters) {
-        mResponseRelationAdapters = adapters;
+    public void setResponseRelationAdapters(List<QuestionRelationAdapter> adapters) {
+        mQuestionRelationAdapters = adapters;
     }
 
     public void setDisplayViewModel(DisplayViewModel viewModel) {
@@ -85,7 +80,7 @@ public class DisplayAdapter extends ListAdapter<List<QuestionRelation>, DisplayA
 
     @Override
     public void onBindViewHolder(@NonNull DisplayViewHolder viewHolder, int position) {
-        ResponseRelationAdapter adapter = mResponseRelationAdapters.get(position);
+        QuestionRelationAdapter adapter = mQuestionRelationAdapters.get(position);
         List<QuestionRelation> questionRelations = getItem(position);
         if (viewHolder.recyclerView.getAdapter() == null) {
             viewHolder.recyclerView.setAdapter(adapter);

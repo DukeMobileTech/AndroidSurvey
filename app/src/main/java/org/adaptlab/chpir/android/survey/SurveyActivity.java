@@ -404,8 +404,10 @@ public class SurveyActivity extends AppCompatActivity {
                 if (position != mLanguageCodes.indexOf(AppUtil.getSettings().getLanguage())) {
                     AppUtil.getSettings().setLanguage(mLanguageCodes.get(position));
                     mSurveyViewModel.setDeviceLanguage(mLanguageCodes.get(position));
-                    mSurveyViewModel.setSurveyLanguage();
-                    mSurveyViewModel.update();
+                    if (mSurveyViewModel.getSurvey() != null) {
+                        mSurveyViewModel.setSurveyLanguage();
+                        mSurveyViewModel.update();
+                    }
                     LocaleManager.setNewLocale(SurveyActivity.this, mLanguageCodes.get(position));
                     recreate();
                 }

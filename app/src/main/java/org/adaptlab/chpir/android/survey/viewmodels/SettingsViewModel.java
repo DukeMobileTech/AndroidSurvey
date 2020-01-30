@@ -20,8 +20,8 @@ public class SettingsViewModel extends AndroidViewModel {
     public SettingsViewModel(@NonNull Application application) {
         super(application);
         mSettingsRepository = new SettingsRepository(application);
-        mSettings = mSettingsRepository.getSettings();
-        mLanguages = mSettingsRepository.languages();
+        mSettings = mSettingsRepository.getSettingsDao().getInstance();
+        mLanguages = mSettingsRepository.getSettingsDao().languages();
     }
 
     public LiveData<Settings> getSettings() {
@@ -32,7 +32,7 @@ public class SettingsViewModel extends AndroidViewModel {
         return mLanguages;
     }
 
-    public void updateSettings(Settings settings) {
+    public void update(Settings settings) {
         mSettingsRepository.update(settings);
     }
 

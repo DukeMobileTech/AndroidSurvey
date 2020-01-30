@@ -16,8 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.adapters.DisplayAdapter;
-import org.adaptlab.chpir.android.survey.adapters.ResponseRelationAdapter;
-import org.adaptlab.chpir.android.survey.adapters.ResponseRelationTableAdapter;
+import org.adaptlab.chpir.android.survey.adapters.QuestionRelationAdapter;
+import org.adaptlab.chpir.android.survey.adapters.QuestionRelationTableAdapter;
 import org.adaptlab.chpir.android.survey.entities.LoopQuestion;
 import org.adaptlab.chpir.android.survey.entities.MultipleSkip;
 import org.adaptlab.chpir.android.survey.entities.Option;
@@ -62,7 +62,7 @@ public class DisplayPagerFragment extends Fragment {
     private QuestionViewHolder.OnResponseSelectedListener mListener;
     private DisplayAdapter mDisplayAdapter;
     private List<List<QuestionRelation>> mQuestionRelationGroups;
-    private List<ResponseRelationAdapter> mResponseRelationAdapters;
+    private List<QuestionRelationAdapter> mQuestionRelationAdapters;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -239,7 +239,19 @@ public class DisplayPagerFragment extends Fragment {
             visibleRelations.add(questionRelations);
         }
 
-        mDisplayAdapter.submitList(visibleRelations);
+        boolean responsesPresent = true;
+        outerLoop:
+        for (List<QuestionRelation> questionRelationList : visibleRelations) {
+            for (QuestionRelation questionRelation : questionRelationList) {
+                if (mDisplayViewModel.getResponse(questionRelation.question.getQuestionIdentifier()) == null) {
+                    responsesPresent = false;
+                    break outerLoop;
+                }
+            }
+        }
+        if (responsesPresent) {
+            mDisplayAdapter.submitList(visibleRelations);
+        }
     }
 
     private void setQuestions() {
@@ -252,7 +264,6 @@ public class DisplayPagerFragment extends Fragment {
                 for (QuestionRelation questionRelation : questionRelations) {
                     for (Response response : questionRelation.responses) {
                         if (response.getSurveyUUID().equals(mSurveyUUID)) {
-                            questionRelation.response = response;
                             if (mDisplayViewModel.getResponse(response.getQuestionIdentifier()) == null) {
                                 mDisplayViewModel.setResponse(response.getQuestionIdentifier(), response);
                             }
@@ -274,7 +285,7 @@ public class DisplayPagerFragment extends Fragment {
                 });
 
                 if (questionRelations.size() > 0) {
-                    if (questionRelations.get(0).response == null) {
+                    if (mDisplayViewModel.getResponse(questionRelations.get(0).question.getQuestionIdentifier()) == null) {
                         initializeResponses(questionRelations);
                     } else {
                         groupQuestionRelations(questionRelations);
@@ -289,7 +300,7 @@ public class DisplayPagerFragment extends Fragment {
         ResponseRepository responseRepository = new ResponseRepository(getActivity().getApplication());
         List<Response> responses = new ArrayList<>();
         for (QuestionRelation questionRelation : questionRelations) {
-            Response response = questionRelation.response;
+            Response response = mDisplayViewModel.getResponse(questionRelation.question.getQuestionIdentifier());
             if (response == null) {
                 response = new Response();
                 response.setSurveyUUID(mSurveyUUID);
@@ -331,16 +342,16 @@ public class DisplayPagerFragment extends Fragment {
     }
 
     private void setAdapters() {
-        if (mResponseRelationAdapters == null || mResponseRelationAdapters.size() != mQuestionRelationGroups.size()) {
-            mResponseRelationAdapters = new ArrayList<>();
+        if (mQuestionRelationAdapters == null || mQuestionRelationAdapters.size() != mQuestionRelationGroups.size()) {
+            mQuestionRelationAdapters = new ArrayList<>();
             for (List<QuestionRelation> list : mQuestionRelationGroups) {
                 if (TextUtils.isEmpty(list.get(0).question.getTableIdentifier())) {
-                    mResponseRelationAdapters.add(new ResponseRelationAdapter(mListener, mSurveyViewModel));
+                    mQuestionRelationAdapters.add(new QuestionRelationAdapter(mListener, mSurveyViewModel));
                 } else {
-                    mResponseRelationAdapters.add(new ResponseRelationTableAdapter(mListener, mSurveyViewModel));
+                    mQuestionRelationAdapters.add(new QuestionRelationTableAdapter(mListener, mSurveyViewModel));
                 }
             }
-            mDisplayAdapter.setResponseRelationAdapters(mResponseRelationAdapters);
+            mDisplayAdapter.setResponseRelationAdapters(mQuestionRelationAdapters);
         }
     }
 
@@ -383,9 +394,9 @@ public class DisplayPagerFragment extends Fragment {
         mDisplayAdapter = new DisplayAdapter(getContext());
         recyclerView.setAdapter(mDisplayAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        setDisplayViewModel();
         setSurvey();
         setQuestions();
-        setDisplayViewModel();
         return view;
     }
 

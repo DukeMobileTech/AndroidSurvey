@@ -133,7 +133,7 @@ public class SettingsFragment extends Fragment {
             public void onClick(View v) {
                 mSettings.setLastSyncTime(null);
                 AppUtil.setLastSyncTime(null);
-                mSettingsViewModel.updateSettings(mSettings);
+                mSettingsViewModel.update(mSettings);
                 mLastUpdateTextView.setText(String.format(Locale.getDefault(), "%s%s%s",
                         getString(R.string.last_update), " ", getLastUpdateTime()));
             }
@@ -211,8 +211,8 @@ public class SettingsFragment extends Fragment {
                 if (position != languageCodes.indexOf(mSettings.getLanguage())) {
                     mSettings.setLanguage(languageCodes.get(position));
                     LocaleManager.setNewLocale(getActivity(), languageCodes.get(position));
-                    mSettingsViewModel.updateSettings(mSettings);
-                    getActivity().recreate();
+                    mSettingsViewModel.update(mSettings);
+                    if (getActivity() != null) getActivity().recreate();
                 }
             }
 
@@ -284,7 +284,7 @@ public class SettingsFragment extends Fragment {
                         AppUtil.setProjectId(Long.valueOf(project));
                         mSettings.setShowSurveys(surveysCheckBox.isChecked());
                         mSettings.setRecordSurveyLocation(recordSurveyLocation.isChecked());
-                        mSettingsViewModel.updateSettings(mSettings);
+                        mSettingsViewModel.update(mSettings);
                         mApiDomainNameEditText.setText(endpoint);
                         mApiVersionEditText.setText(version);
                         mProjectIdEditText.setText(project);
@@ -351,7 +351,7 @@ public class SettingsFragment extends Fragment {
             mSettings.setRequirePassword(mRequirePasswordCheckBox.isChecked());
             mSettings.setRecordSurveyLocation(mRecordSurveyLocationCheckBox.isChecked());
 
-            mSettingsViewModel.updateSettings(mSettings);
+            mSettingsViewModel.update(mSettings);
         }
     }
 
