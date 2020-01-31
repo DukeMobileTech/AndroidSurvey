@@ -21,6 +21,7 @@ public class DropDownViewHolder extends QuestionViewHolder {
     private Spinner mSpinner;
     private ArrayAdapter<String> mAdapter;
     private int mResponseIndex;
+    private boolean initialSetup;
 
     DropDownViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
         super(itemView, context, listener);
@@ -54,6 +55,12 @@ public class DropDownViewHolder extends QuestionViewHolder {
         return String.valueOf(mResponseIndex);
     }
 
+    @Override
+    protected void unSetResponse() {
+        clearAdapter();
+        setSpinnerAdapter();
+    }
+
     private void setResponseIndex(int index) {
         mResponseIndex = index;
         saveResponse();
@@ -70,7 +77,7 @@ public class DropDownViewHolder extends QuestionViewHolder {
             optionsArray.add(styleTextWithHtmlWhitelist(
                     TranslationUtil.getText(optionRelation.option, optionRelation.translations, getSurveyViewModel())).toString());
         }
-        optionsArray.add(""); // Adds empty selection
+        optionsArray.add(BLANK); // Adds empty selection
         mAdapter = new ArrayAdapter<>(getContext(), R.layout.simple_spinner_item, optionsArray);
         mAdapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
         mSpinner.setAdapter(mAdapter);
@@ -78,13 +85,15 @@ public class DropDownViewHolder extends QuestionViewHolder {
 
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                setResponseIndex(position);
+                if (!initialSetup) setResponseIndex(position);
+                initialSetup = false;
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
+        initialSetup = true;
         mSpinner.setSelection(getOptionRelations().size()); // Selects empty selection
     }
 }

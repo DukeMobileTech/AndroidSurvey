@@ -28,4 +28,7 @@ public class InstructionsViewHolder extends QuestionViewHolder {
     protected void deserialize(String responseText) {
     }
 
+    @Override
+    protected void unSetResponse() {
+    }
 }

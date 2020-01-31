@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Build;
 import android.text.Editable;
-import android.text.InputType;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -59,7 +58,7 @@ import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithH
 
 public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     public final String TAG = this.getClass().getName();
-    private RadioGroup mSpecialResponses;
+    private RadioGroup mSpecialResponseRadioGroup;
     private Context mContext;
     private OnResponseSelectedListener mListener;
     private SurveyViewModel mSurveyViewModel;
@@ -85,8 +84,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     private TextView mOptionSetInstructionTextView;
     private ViewGroup mQuestionComponent;
     private Button mClearButton;
-
-    private boolean mDeserialization = false;
+    private boolean mDeserializing = false;
 
     public QuestionViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
         super(itemView);
@@ -102,7 +100,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
         mOptionSetInstructionTextView = itemView.findViewById(R.id.optionSetInstructions);
         mQuestionComponent = itemView.findViewById(R.id.response_component);
-        mSpecialResponses = itemView.findViewById(R.id.specialResponseButtons);
+        mSpecialResponseRadioGroup = itemView.findViewById(R.id.specialResponseButtons);
         mClearButton = itemView.findViewById(R.id.clearResponsesButton);
     }
 
@@ -136,9 +134,9 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     public void setDisplayViewModel(DisplayViewModel viewModel) {
         mDisplayViewModel = viewModel;
         mResponse = mDisplayViewModel.getResponse(mQuestionRelation.question.getQuestionIdentifier());
-        mDeserialization = true;
+        mDeserializing = true;
         deserializeResponse();
-        mDeserialization = false;
+        mDeserializing = false;
     }
 
     QuestionRelationAdapter getAdapter() {
@@ -229,23 +227,24 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         }
     }
 
-    boolean isDeserialization() {
-        return mDeserialization;
+    boolean isDeserializing() {
+        return mDeserializing;
     }
 
     RadioGroup getSpecialResponses() {
-        return mSpecialResponses;
+        return mSpecialResponseRadioGroup;
     }
 
     protected abstract void createQuestionComponent(ViewGroup questionComponent);
 
+    protected abstract void unSetResponse();
+
     /**
      * @param otherText An EditText injected from a subclass i.e a write other subclass
      */
-    void addOtherResponseView(EditText otherText) {
+    void addOtherResponseView(final EditText otherText) {
         otherText.setHint(R.string.other_specify_edittext);
         otherText.setEnabled(false);
-        otherText.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         otherText.addTextChangedListener(new TextWatcher() {
             private Timer timer;
 
@@ -259,7 +258,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
             public void afterTextChanged(final Editable s) {
                 timer = new Timer();
-                if (!mDeserialization) {
+                if (!mDeserializing) {
                     timer.schedule(new TimerTask() {
                         @Override
                         public void run() {
@@ -280,7 +279,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     }
 
     private void setOtherResponse(String response) {
-        getResponse().setOtherResponse(response);
+        mResponse.setOtherResponse(response);
         saveResponse();
     }
 
@@ -307,7 +306,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         return mOptionInstructions.get(optionIdentifier);
     }
 
-    void deserializeResponse() {
+    private void deserializeResponse() {
         deserialize(mResponse.getText());
         deserializeSpecialResponse();
         deserializeOtherResponse(mResponse.getOtherResponse());
@@ -315,7 +314,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
     void saveResponse() {
         mResponse.setText(serialize());
-        mResponse.setSpecialResponse(BLANK);
+        clearSpecialResponse();
         updateResponse();
     }
 
@@ -438,13 +437,6 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         } else {
             return null;
         }
-    }
-
-    void saveSpecialResponse(String specialResponse) {
-        mResponse.setSpecialResponse(specialResponse);
-        mResponse.setText(BLANK);
-        mResponse.setOtherResponse(BLANK);
-        updateResponse();
     }
 
     Response getResponse() {
@@ -599,29 +591,23 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     }
 
     private void setSpecialResponseView() {
-        mSpecialResponses.removeAllViews();
-        List<String> responses = new ArrayList<>();
+        mSpecialResponseRadioGroup.removeAllViews();
         if (mSpecialOptionRelations != null) {
             for (OptionRelation optionRelation : mSpecialOptionRelations) {
-                responses.add(optionRelation.option.getText());
+                String text = TranslationUtil.getText(optionRelation.option, optionRelation.translations, mSurveyViewModel);
+                int responseId = mSpecialOptionRelations.indexOf(optionRelation);
+                final RadioButton button = new RadioButton(getContext());
+                button.setId(responseId);
+                setOptionText(text, button);
+
+                mSpecialResponseRadioGroup.addView(button, responseId);
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        saveSpecialResponse(v.getId());
+                    }
+                });
             }
-        }
-
-        for (String response : responses) {
-            int responseId = responses.indexOf(response);
-            final RadioButton button = new RadioButton(getContext());
-            button.setText(styleTextWithHtmlWhitelist(response));
-            button.setId(responseId);
-            button.setTextColor(getContext().getResources().getColorStateList(R.color.states));
-
-            mSpecialResponses.addView(button, responseId);
-            final List<String> finalResponses = responses;
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    saveSpecialResponse(finalResponses.get(v.getId()));
-                }
-            });
         }
 
         if (mQuestionRelation.question.getQuestionType().equals(Question.INSTRUCTIONS)) {
@@ -637,17 +623,36 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         }
     }
 
+    void saveSpecialResponse(int index) {
+        OptionRelation optionRelation = mSpecialOptionRelations.get(index);
+        mResponse.setSpecialResponse(optionRelation.option.getText());
+        clearNonSpecialResponse();
+        unSetResponse();
+        updateResponse();
+    }
+
     void clearResponse() {
+        clearNonSpecialResponse();
+        clearSpecialResponse();
+        unSetResponse();
+    }
+
+    private void clearSpecialResponse() {
+        mResponse.setSpecialResponse(BLANK);
+        mSpecialResponseRadioGroup.clearCheck();
+    }
+
+    private void clearNonSpecialResponse() {
         mResponse.setText(BLANK);
         mResponse.setOtherResponse(BLANK);
-        mResponse.setSpecialResponse(BLANK);
+        mResponse.setOtherText(BLANK);
     }
 
     protected void deserializeSpecialResponse() {
-        if (getResponse() == null || TextUtils.isEmpty(getResponse().getSpecialResponse())) return;
-        for (int i = 0; i < mSpecialResponses.getChildCount(); i++) {
-            if (((RadioButton) mSpecialResponses.getChildAt(i)).getText().equals(getResponse().getSpecialResponse())) {
-                mSpecialResponses.check(i);
+        if (mResponse == null || TextUtils.isEmpty(mResponse.getSpecialResponse())) return;
+        for (int k = 0; k < mSpecialOptionRelations.size(); k++) {
+            if (mSpecialOptionRelations.get(k).option.getText().equals(mResponse.getSpecialResponse())) {
+                mSpecialResponseRadioGroup.check(k);
             }
         }
     }

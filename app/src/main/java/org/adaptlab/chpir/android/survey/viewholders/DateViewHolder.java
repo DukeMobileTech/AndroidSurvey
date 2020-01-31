@@ -93,13 +93,13 @@ public class DateViewHolder extends QuestionViewHolder {
         }
     }
 
-//    @Override
-//    protected void unSetResponse() {
+    @Override
+    protected void unSetResponse() {
 //        setResponseTextBlank();
 //        setSelectedDate();
 //        Calendar calendar = Calendar.getInstance();
 //        mDatePicker.init(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH),
 //                calendar.get(Calendar.DAY_OF_MONTH), mListener);
-//    }
+    }
 
 }

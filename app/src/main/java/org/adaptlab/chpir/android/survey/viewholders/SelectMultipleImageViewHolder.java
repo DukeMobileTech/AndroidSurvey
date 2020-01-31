@@ -108,10 +108,9 @@ public class SelectMultipleImageViewHolder extends QuestionViewHolder {
 //            return view;
 //        }
 //    }
-//
-//    @Override
-//    protected void unSetResponse() {
-//
-//    }
+
+    @Override
+    protected void unSetResponse() {
+    }
 
 }

@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.BLANK;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.EDIT_TEXT_DELAY;
 import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtmlWhitelist;
@@ -69,7 +70,7 @@ public abstract class ListOfItemsViewHolder extends QuestionViewHolder {
 
                 public void afterTextChanged(Editable s) {
                     timer = new Timer();
-                    if (!isDeserialization()) {
+                    if (!isDeserializing()) {
                         timer.schedule(new TimerTask() {
                             @Override
                             public void run() {
@@ -115,6 +116,13 @@ public abstract class ListOfItemsViewHolder extends QuestionViewHolder {
             }
         } catch (IOException e) {
             if (BuildConfig.DEBUG) Log.e(TAG, "IOException " + e.getMessage());
+        }
+    }
+
+    @Override
+    protected void unSetResponse() {
+        for (EditText oneEditText : mResponses) {
+            oneEditText.setText(BLANK);
         }
     }
 

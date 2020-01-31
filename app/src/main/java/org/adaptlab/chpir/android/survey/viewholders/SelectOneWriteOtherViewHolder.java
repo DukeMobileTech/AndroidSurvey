@@ -3,6 +3,7 @@ package org.adaptlab.chpir.android.survey.viewholders;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -22,6 +23,8 @@ public class SelectOneWriteOtherViewHolder extends SelectOneViewHolder {
     protected void beforeAddViewHook(ViewGroup questionComponent) {
         radioButton = new RadioButton(getContext());
         otherText = new EditText(getContext());
+        otherText.setSingleLine(false);
+        otherText.setImeOptions(EditorInfo.IME_FLAG_NO_ENTER_ACTION);
         final int otherId = getOptionRelations().size();
         radioButton.setId(otherId);
         setOptionText(getContext().getString(R.string.other_specify), radioButton);

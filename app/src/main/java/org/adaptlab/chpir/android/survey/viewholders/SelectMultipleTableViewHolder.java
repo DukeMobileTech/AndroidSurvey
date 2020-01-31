@@ -45,6 +45,10 @@ public class SelectMultipleTableViewHolder extends TableQuestionViewHolder {
         setSpecialResponseView();
     }
 
+    @Override
+    protected void unSetResponse() {
+    }
+
     private void toggleResponseIndex(int index) {
         String selected = String.valueOf(index);
         if (mResponseIndices.contains(selected)) {

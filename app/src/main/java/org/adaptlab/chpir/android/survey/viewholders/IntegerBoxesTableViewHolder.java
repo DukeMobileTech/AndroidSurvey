@@ -65,7 +65,7 @@ public class IntegerBoxesTableViewHolder extends TableQuestionViewHolder {
 
                 public void afterTextChanged(Editable s) {
                     timer = new Timer();
-                    if (!isDeserialization()) {
+                    if (!isDeserializing()) {
                         timer.schedule(new TimerTask() {
                             @Override
                             public void run() {
@@ -113,6 +113,10 @@ public class IntegerBoxesTableViewHolder extends TableQuestionViewHolder {
         } catch (IOException e) {
             if (BuildConfig.DEBUG) Log.e(TAG, "IOException " + e.getMessage());
         }
+    }
+
+    @Override
+    protected void unSetResponse() {
     }
 
     private EditText createEditText() {

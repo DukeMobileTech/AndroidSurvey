@@ -15,6 +15,7 @@ import org.adaptlab.chpir.android.survey.utils.FormatUtils;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.BLANK;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.EDIT_TEXT_DELAY;
 
 public class FreeResponseViewHolder extends QuestionViewHolder {
@@ -48,7 +49,7 @@ public class FreeResponseViewHolder extends QuestionViewHolder {
                 mFreeText.addTextChangedListener(this);
             }
             timer = new Timer();
-            if (!isDeserialization()) {
+            if (!isDeserializing()) {
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
@@ -97,5 +98,12 @@ public class FreeResponseViewHolder extends QuestionViewHolder {
     @Override
     protected String serialize() {
         return mText;
+    }
+
+    @Override
+    protected void unSetResponse() {
+        mFreeText.removeTextChangedListener(mTextWatcher);
+        mFreeText.setText(BLANK);
+        mFreeText.addTextChangedListener(mTextWatcher);
     }
 }

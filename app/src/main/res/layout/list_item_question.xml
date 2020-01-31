@@ -168,15 +168,19 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/responseLayout2" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/clearResponsesButton"
+                style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/activity_vertical_margin"
                 android:text="@string/clear"
-                android:textColor="@color/primary_text"
+                android:textColor="@color/secondary_text"
+                app:backgroundTint="@color/transparent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/responseLayout2" />
+                app:layout_constraintTop_toBottomOf="@id/responseLayout2"
+                app:strokeColor="@color/secondary_light"
+                app:strokeWidth="1dp" />
 
             <androidx.constraintlayout.widget.Barrier
                 android:id="@+id/barrier1"

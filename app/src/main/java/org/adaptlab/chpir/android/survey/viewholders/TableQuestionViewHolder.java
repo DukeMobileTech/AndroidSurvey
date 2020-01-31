@@ -85,19 +85,17 @@ public abstract class TableQuestionViewHolder extends QuestionViewHolder {
         for (OptionRelation optionRelation : getSpecialOptionRelations()) {
             responses.add(TranslationUtil.getText(optionRelation.option, optionRelation.translations, getSurveyViewModel()));
         }
-        final List<String> finalResponses = responses;
 
         for (String response : responses) {
             int responseId = responses.indexOf(response);
             final RadioButton button = new RadioButton(getContext());
             button.setId(responseId);
-
             setOptionText(response, button);
 
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    saveSpecialResponse(finalResponses.get(v.getId()));
+                    saveSpecialResponse(v.getId());
                 }
             });
             mSpecialResponseRadioGroup.addView(button, responseId);

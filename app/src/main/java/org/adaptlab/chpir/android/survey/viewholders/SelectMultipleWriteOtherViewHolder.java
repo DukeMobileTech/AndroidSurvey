@@ -9,6 +9,8 @@ import android.widget.EditText;
 
 import org.adaptlab.chpir.android.survey.R;
 
+import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.BLANK;
+
 public class SelectMultipleWriteOtherViewHolder extends SelectMultipleViewHolder {
     private EditText otherText = null;
 
@@ -50,13 +52,13 @@ public class SelectMultipleWriteOtherViewHolder extends SelectMultipleViewHolder
         questionComponent.addView(otherText);
     }
 
-//    @Override
-//    protected void unSetResponse() {
-//        if (otherText.getText().length() > 0) {
-//            otherText.setText(Response.BLANK);
-//            otherText.setEnabled(false);
-//        }
-//        super.unSetResponse();
-//    }
+    @Override
+    protected void unSetResponse() {
+        if (otherText.getText().length() > 0) {
+            otherText.setText(BLANK);
+            otherText.setEnabled(false);
+        }
+        super.unSetResponse();
+    }
 
 }

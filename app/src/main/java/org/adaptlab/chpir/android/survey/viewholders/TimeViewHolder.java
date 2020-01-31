@@ -48,9 +48,8 @@ public class TimeViewHolder extends QuestionViewHolder {
         }
     }
 
-//    @Override
-//    protected void unSetResponse() {
-//        setResponseTextBlank();
-//    }
+    @Override
+    protected void unSetResponse() {
+    }
 
 }

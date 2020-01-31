@@ -115,10 +115,10 @@ public abstract class PictureViewHolder extends QuestionViewHolder {
 //        });
 //        return deleteButton;
 //    }
-//
-//    @Override
-//    protected void unSetResponse() {
-//
-//    }
+
+    @Override
+    protected void unSetResponse() {
+
+    }
 
 }

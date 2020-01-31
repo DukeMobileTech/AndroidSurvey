@@ -87,4 +87,12 @@ public class SelectMultipleViewHolder extends QuestionViewHolder {
         mCheckBoxes.add(checkbox);
     }
 
+    @Override
+    protected void unSetResponse() {
+        for (CheckBox box : mCheckBoxes) {
+            if (box.isChecked()) {
+                box.setChecked(false);
+            }
+        }
+    }
 }

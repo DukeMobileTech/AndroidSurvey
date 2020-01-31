@@ -8,6 +8,8 @@ import android.widget.EditText;
 
 import org.adaptlab.chpir.android.survey.utils.FormatUtils;
 
+import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.BLANK;
+
 public class RangeViewHolder extends QuestionViewHolder {
     private String mTextStart = "";
     private String mTextEnd = "";
@@ -18,14 +20,11 @@ public class RangeViewHolder extends QuestionViewHolder {
         super(itemView, context, listener);
     }
 
-//    @Override
-//    protected void unSetResponse() {
-//        mStart.setText(Response.BLANK);
-//        mEnd.setText(Response.BLANK);
-//        if (getResponse() != null) {
-//            getResponse().setResponse(Response.BLANK);
-//        }
-//    }
+    @Override
+    protected void unSetResponse() {
+        mStart.setText(BLANK);
+        mEnd.setText(BLANK);
+    }
 
     @Override
     public void createQuestionComponent(ViewGroup questionComponent) {

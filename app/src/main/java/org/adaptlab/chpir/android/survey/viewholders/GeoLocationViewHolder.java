@@ -10,6 +10,8 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.BLANK;
+
 public class GeoLocationViewHolder extends QuestionViewHolder {
     private TextView mLatitude;
     private TextView mLongitude;
@@ -19,13 +21,13 @@ public class GeoLocationViewHolder extends QuestionViewHolder {
         super(itemView, context, listener);
     }
 
-    //    @Override
-//    protected void unSetResponse() {
-//        mLatitude.setText(Response.BLANK);
-//        mLongitude.setText(Response.BLANK);
-//        mAltitude.setText(Response.BLANK);
-//    }
-//
+    @Override
+    protected void unSetResponse() {
+        mLatitude.setText(BLANK);
+        mLongitude.setText(BLANK);
+        mAltitude.setText(BLANK);
+    }
+
     @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
 //        final LocationManager locationManager = getSurveyFragment().getLocationManager();

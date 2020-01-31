@@ -44,6 +44,10 @@ public class SelectOneTableViewHolder extends TableQuestionViewHolder {
     }
 
     @Override
+    protected void unSetResponse() {
+    }
+
+    @Override
     protected void deserialize(String responseText) {
         if (TextUtils.isEmpty(responseText.trim())) {
             int checked = mRadioGroup.getCheckedRadioButtonId();
@@ -59,7 +63,7 @@ public class SelectOneTableViewHolder extends TableQuestionViewHolder {
         return String.valueOf(mResponseIndex);
     }
 
-    protected void setResponseIndex(int index) {
+    private void setResponseIndex(int index) {
         mResponseIndex = index;
         saveResponse();
     }

@@ -20,10 +20,9 @@ public class SignatureViewHolder extends QuestionViewHolder {
         super(itemView, context, listener);
     }
 
-//    @Override
-//    protected void unSetResponse() {
-//
-//    }
+    @Override
+    protected void unSetResponse() {
+    }
 
     @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {

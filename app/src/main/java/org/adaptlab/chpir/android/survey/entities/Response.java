@@ -61,6 +61,7 @@ public class Response implements Uploadable {
         mText = BLANK;
         mOtherResponse = BLANK;
         mSpecialResponse = BLANK;
+        mOtherText = BLANK;
         mUUID = UUID.randomUUID().toString();
         mDeviceUserId = AppUtil.getDeviceUserId();
     }

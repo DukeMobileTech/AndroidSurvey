@@ -74,6 +74,13 @@ public class SelectOneViewHolder extends QuestionViewHolder {
         }
     }
 
+    @Override
+    protected void unSetResponse() {
+        if (getRadioGroup() != null) {
+            getRadioGroup().clearCheck();
+        }
+    }
+
     void setResponseIndex(int index) {
         mResponseIndex = index;
         saveResponse();
