@@ -302,7 +302,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         }
     }
 
-    private Instruction getOptionInstruction(String optionIdentifier) {
+    Instruction getOptionInstruction(String optionIdentifier) {
         return mOptionInstructions.get(optionIdentifier);
     }
 
@@ -487,8 +487,9 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     private void setQuestionText() {
         if (mSpannedTextView == null) return;
         mSpannedTextView.setText(getQuestionText());
-        if (mQuestionRelation.question.getPopUpInstructionId() != null && mPopUpButton != null) {
-            mPopUpButton.setVisibility(View.VISIBLE);
+        if (mQuestionRelation.question.getPopUpInstructionId() == null) {
+            mPopUpButton.setVisibility(View.GONE);
+        } else {
             mPopUpButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -516,7 +517,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         return styleTextWithHtmlWhitelist(instructions).toString();
     }
 
-    private void showPopUpInstruction(String instructions) {
+    void showPopUpInstruction(String instructions) {
         new AlertDialog.Builder(getContext())
                 .setMessage(instructions)
                 .setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
