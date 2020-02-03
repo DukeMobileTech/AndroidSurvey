@@ -102,7 +102,6 @@ public class SetLoopsTask extends AsyncTask<Void, Void, Void> {
                     }
                 }
             }
-            orderDisplays();
             setInstrumentLoaded(instrument);
         }
         return null;
@@ -123,6 +122,8 @@ public class SetLoopsTask extends AsyncTask<Void, Void, Void> {
                 display.setSectionId(parent.getSectionId());
                 display.setRemoteId(getDisplayId());
                 display.setDeleted(parent.isDeleted());
+                display.setPosition(parent.getPosition());
+                display.setInstrumentPosition(parent.getInstrumentPosition());
                 mDisplayDao.insert(display);
                 mDisplayLongSparseArray.put(display.getRemoteId(), display);
                 int parentIndex = mDisplays.indexOf(parent);
@@ -159,19 +160,6 @@ public class SetLoopsTask extends AsyncTask<Void, Void, Void> {
         AppUtil.resetCurrentSyncTime();
         instrument.setLoaded(true);
         mInstrumentDao.update(instrument);
-    }
-
-    /**
-     * Number displays consecutively
-     */
-    private void orderDisplays() {
-        for (int k = 0; k < mDisplays.size(); k++) {
-            Display display = mDisplays.get(k);
-            if (display.getPosition() != k + 1) {
-                display.setPosition(k + 1);
-            }
-        }
-        mDisplayDao.updateAll(mDisplays);
     }
 
     private void createLoopQuestion(Question question, LoopQuestion lq, int index, Display display) {

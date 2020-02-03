@@ -193,10 +193,8 @@ public class SurveyActivity extends AppCompatActivity {
 
                     Collections.sort(questions, new Comparator<Question>() {
                         @Override
-                        public int compare(Question o1, Question o2) {
-                            if (o1.getNumberInInstrument() < o2.getNumberInInstrument()) return -1;
-                            if (o1.getNumberInInstrument() > o2.getNumberInInstrument()) return 1;
-                            return 0;
+                        public int compare(Question question1, Question question2) {
+                            return question1.getNumberInInstrument() - question2.getNumberInInstrument();
                         }
                     });
                     mSurveyViewModel.setQuestions(questions);
@@ -217,13 +215,19 @@ public class SurveyActivity extends AppCompatActivity {
         }
         Collections.sort(displays, new Comparator<Display>() {
             @Override
-            public int compare(Display o1, Display o2) {
-                if (o1.getInstrumentPosition() < o2.getInstrumentPosition()) return -1;
-                if (o1.getInstrumentPosition() > o2.getInstrumentPosition()) return 1;
-                return 0;
+            public int compare(Display display, Display display1) {
+                return compareDisplays(display, display1);
             }
         });
         return displays;
+    }
+
+    private int compareDisplays(Display display1, Display display2) {
+        if (display1.getInstrumentPosition() == display2.getInstrumentPosition()) {
+            return display1.getTitle().compareTo(display2.getTitle());
+        } else {
+            return display1.getInstrumentPosition() - display2.getInstrumentPosition();
+        }
     }
 
     private void setLanguage() {
@@ -320,12 +324,8 @@ public class SurveyActivity extends AppCompatActivity {
         }
         Collections.sort(displays, new Comparator<DisplayRelation>() {
             @Override
-            public int compare(DisplayRelation o1, DisplayRelation o2) {
-                if (o1.display.getInstrumentPosition() < o2.display.getInstrumentPosition())
-                    return -1;
-                if (o1.display.getInstrumentPosition() > o2.display.getInstrumentPosition())
-                    return 1;
-                return 0;
+            public int compare(DisplayRelation displayRelation, DisplayRelation displayRelation1) {
+                return compareDisplays(displayRelation.display, displayRelation1.display);
             }
         });
         return displays;
@@ -584,6 +584,7 @@ public class SurveyActivity extends AppCompatActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK && requestCode == REVIEW_CODE) {
             Long displayId = 0L;
             if (data.getExtras() != null) {
