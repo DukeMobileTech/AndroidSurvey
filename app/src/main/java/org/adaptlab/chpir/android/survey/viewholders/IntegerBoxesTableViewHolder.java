@@ -119,6 +119,10 @@ public class IntegerBoxesTableViewHolder extends TableQuestionViewHolder {
     protected void unSetResponse() {
     }
 
+    @Override
+    protected void showOtherText(int position) {
+    }
+
     private EditText createEditText() {
         EditText editText = new EditText(getContext());
         editText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_SIGNED);

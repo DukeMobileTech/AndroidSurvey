@@ -95,4 +95,8 @@ public class SelectMultipleViewHolder extends QuestionViewHolder {
             }
         }
     }
+
+    @Override
+    protected void showOtherText(int position) {
+    }
 }

@@ -97,4 +97,8 @@ public class SelectOneImageViewHolder extends QuestionViewHolder {
     protected void unSetResponse() {
     }
 
+    @Override
+    protected void showOtherText(int position) {
+    }
+
 }

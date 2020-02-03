@@ -38,8 +38,8 @@ public class SelectOneViewHolder extends QuestionViewHolder {
     protected void createQuestionComponent(ViewGroup questionComponent) {
         questionComponent.removeAllViews();
         mRadioGroup = new RadioGroup(getContext());
-        for (OptionRelation optionRelation : getOptionRelations()) {
-            int optionId = getOptionRelations().indexOf(optionRelation);
+        for (final OptionRelation optionRelation : getOptionRelations()) {
+            final int optionId = getOptionRelations().indexOf(optionRelation);
             CustomRadioButton radioButton = new CustomRadioButton(getContext());
             String text = TranslationUtil.getText(optionRelation.option, optionRelation.translations, getSurveyViewModel());
             radioButton.setId(optionId);
@@ -51,6 +51,7 @@ public class SelectOneViewHolder extends QuestionViewHolder {
                     int id = v.getId();
                     if (id != -1) {
                         setResponseIndex(id);
+                        setTextEntry(optionId);
                     }
                 }
             });
@@ -81,6 +82,25 @@ public class SelectOneViewHolder extends QuestionViewHolder {
     }
 
     @Override
+    protected void showOtherText(int position) {
+        String response = getResponse().getText();
+        for (int i = 0; i < getRadioGroup().getChildCount(); i++) {
+            if (getOptionRelations().size() > i) { // Handles SELECT_ONE_WRITE_OTHER
+                OptionRelation optionRelation = getOptionRelations().get(i);
+                RadioButton radioButton = ((RadioButton) getRadioGroup().getChildAt(i));
+                String text = TranslationUtil.getText(optionRelation.option, optionRelation.translations, getSurveyViewModel());
+                if (getTextEntryOptionIds().contains(optionRelation.option.getRemoteId())
+                        && !TextUtils.isEmpty(response) && Integer.parseInt(response) == i) {
+                    text = text + "  " + getResponse().getOtherText();
+                    setOptionText(text, radioButton);
+                } else {
+                    setOptionText(text, radioButton);
+                }
+            }
+        }
+    }
+
+    @Override
     protected String serialize() {
         return String.valueOf(mResponseIndex);
     }
@@ -92,7 +112,9 @@ public class SelectOneViewHolder extends QuestionViewHolder {
             if (checked > -1)
                 ((RadioButton) getRadioGroup().getChildAt(checked)).setChecked(false);
         } else {
-            ((RadioButton) getRadioGroup().getChildAt(Integer.parseInt(removeNonNumericCharacters(responseText)))).setChecked(true);
+            int index = Integer.parseInt(removeNonNumericCharacters(responseText));
+            ((RadioButton) getRadioGroup().getChildAt(index)).setChecked(true);
+            showOtherText(index);
         }
     }
 
@@ -101,6 +123,7 @@ public class SelectOneViewHolder extends QuestionViewHolder {
         if (getRadioGroup() != null) {
             getRadioGroup().clearCheck();
         }
+        showOtherText(0);
     }
 
     void setResponseIndex(int index) {

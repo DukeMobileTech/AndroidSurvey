@@ -118,7 +118,9 @@ public abstract class PictureViewHolder extends QuestionViewHolder {
 
     @Override
     protected void unSetResponse() {
-
     }
 
+    @Override
+    protected void showOtherText(int position) {
+    }
 }

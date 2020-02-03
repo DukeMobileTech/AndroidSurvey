@@ -52,4 +52,8 @@ public class TimeViewHolder extends QuestionViewHolder {
     protected void unSetResponse() {
     }
 
+    @Override
+    protected void showOtherText(int position) {
+    }
+
 }

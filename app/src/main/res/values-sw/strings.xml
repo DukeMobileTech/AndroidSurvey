@@ -194,4 +194,5 @@
     <string name="incomplete_survey_message">This survey has not been finished. Please complete it first before trying to submit.</string>
     <string name="survey_notes">Survey Notes</string>
     <string name="survey_review">Survey Review</string>
+    <string name="extra_text_header">Enter the appropriate response in the field below</string>
 </resources>

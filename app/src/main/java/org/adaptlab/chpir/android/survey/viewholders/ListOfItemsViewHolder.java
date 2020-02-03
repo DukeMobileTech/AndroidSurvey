@@ -126,4 +126,8 @@ public abstract class ListOfItemsViewHolder extends QuestionViewHolder {
         }
     }
 
+    @Override
+    protected void showOtherText(int position) {
+    }
+
 }

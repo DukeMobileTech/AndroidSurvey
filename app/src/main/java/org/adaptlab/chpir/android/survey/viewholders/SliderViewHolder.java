@@ -66,4 +66,9 @@ public class SliderViewHolder extends QuestionViewHolder {
     protected void unSetResponse() {
         mSlider.setProgress(0);
     }
+
+    @Override
+    protected void showOtherText(int position) {
+    }
+
 }

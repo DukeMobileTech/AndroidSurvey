@@ -25,6 +25,10 @@ public class SignatureViewHolder extends QuestionViewHolder {
     }
 
     @Override
+    protected void showOtherText(int position) {
+    }
+
+    @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
 //        loadOrCreateResponsePhoto();
 //        DisplayMetrics displayMetrics = new DisplayMetrics();

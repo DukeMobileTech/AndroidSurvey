@@ -57,4 +57,8 @@ public class RatingViewHolder extends QuestionViewHolder {
     protected void unSetResponse() {
         mRatingBar.setRating(0);
     }
+
+    @Override
+    protected void showOtherText(int position) {
+    }
 }

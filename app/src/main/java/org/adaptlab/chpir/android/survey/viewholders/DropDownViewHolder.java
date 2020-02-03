@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.relations.OptionRelation;
@@ -20,6 +21,7 @@ import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithH
 public class DropDownViewHolder extends QuestionViewHolder {
     private Spinner mSpinner;
     private ArrayAdapter<String> mAdapter;
+    private TextView mOtherTextView;
     private int mResponseIndex;
     private boolean initialSetup;
 
@@ -35,7 +37,33 @@ public class DropDownViewHolder extends QuestionViewHolder {
             View view = inflater.inflate(R.layout.spinner, null);
             mSpinner = view.findViewById(R.id.options_spinner);
             setSpinnerAdapter();
+
+            mOtherTextView = new TextView(getContext());
+            mOtherTextView.setVisibility(View.GONE);
+            mOtherTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    setTextEntry(mResponseIndex);
+                }
+            });
+
             questionComponent.addView(view);
+            questionComponent.addView(mOtherTextView);
+        }
+    }
+
+    @Override
+    protected void showOtherText(int position) {
+        if (position < getOptionRelations().size()) {
+            OptionRelation optionRelation = getOptionRelations().get(position);
+            if (getTextEntryOptionIds().contains(optionRelation.option.getRemoteId())) {
+                mOtherTextView.setVisibility(View.VISIBLE);
+                mOtherTextView.setText(getResponse().getOtherText());
+            } else {
+                mOtherTextView.setVisibility(View.GONE);
+            }
+        } else {
+            mOtherTextView.setVisibility(View.GONE);
         }
     }
 
@@ -59,6 +87,7 @@ public class DropDownViewHolder extends QuestionViewHolder {
     protected void unSetResponse() {
         clearAdapter();
         setSpinnerAdapter();
+        mOtherTextView.setVisibility(View.GONE);
     }
 
     private void setResponseIndex(int index) {
@@ -85,7 +114,12 @@ public class DropDownViewHolder extends QuestionViewHolder {
 
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (!initialSetup) setResponseIndex(position);
+                if (initialSetup) {
+                    showOtherText(position);
+                } else {
+                    setResponseIndex(position);
+                    setTextEntry(position);
+                }
                 initialSetup = false;
             }
 

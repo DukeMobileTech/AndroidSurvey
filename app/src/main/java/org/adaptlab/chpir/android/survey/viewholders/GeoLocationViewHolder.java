@@ -29,6 +29,10 @@ public class GeoLocationViewHolder extends QuestionViewHolder {
     }
 
     @Override
+    protected void showOtherText(int position) {
+    }
+
+    @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
 //        final LocationManager locationManager = getSurveyFragment().getLocationManager();
 //        locationManager.startLocationUpdates();

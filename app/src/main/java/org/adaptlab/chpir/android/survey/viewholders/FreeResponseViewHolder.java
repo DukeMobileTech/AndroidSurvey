@@ -106,4 +106,8 @@ public class FreeResponseViewHolder extends QuestionViewHolder {
         mFreeText.setText(BLANK);
         mFreeText.addTextChangedListener(mTextWatcher);
     }
+
+    @Override
+    protected void showOtherText(int position) {
+    }
 }

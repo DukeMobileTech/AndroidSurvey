@@ -12,6 +12,7 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -58,9 +59,12 @@ import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithH
 
 public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     public final String TAG = this.getClass().getName();
-    private RadioGroup mSpecialResponseRadioGroup;
+
     private Context mContext;
+
+    private QuestionRelationAdapter mAdapter;
     private OnResponseSelectedListener mListener;
+
     private SurveyViewModel mSurveyViewModel;
     private DisplayViewModel mDisplayViewModel;
     private ResponseRepository mResponseRepository;
@@ -73,17 +77,18 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     private List<OptionRelation> mSpecialOptionRelations;
     private List<OptionRelation> mCarryForwardOptionRelations;
     private HashMap<String, Instruction> mOptionInstructions;
-    private QuestionRelationAdapter mAdapter;
+    private List<Long> mTextEntryOptionIds;
 
     private TextView mNumberTextView;
     private TextView mBeforeTextInstructionTextView;
     private TextView mSpannedTextView;
     private ImageButton mPopUpButton;
     private TextView mAfterTextInstructionTextView;
-
     private TextView mOptionSetInstructionTextView;
     private ViewGroup mQuestionComponent;
     private Button mClearButton;
+    private RadioGroup mSpecialResponseRadioGroup;
+
     private boolean mDeserializing = false;
 
     public QuestionViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
@@ -167,6 +172,10 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         return mSpecialOptionRelations;
     }
 
+    List<Long> getTextEntryOptionIds() {
+        return mTextEntryOptionIds;
+    }
+
     private Response getCarryForwardResponse() {
         return getSurveyViewModel().getResponses().get(mQuestionRelation.question.getCarryForwardIdentifier());
     }
@@ -239,6 +248,8 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
     protected abstract void unSetResponse();
 
+    protected abstract void showOtherText(int position);
+
     /**
      * @param otherText An EditText injected from a subclass i.e a write other subclass
      */
@@ -283,9 +294,45 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         saveResponse();
     }
 
+    void setTextEntry(final int position) {
+        if (position < getOptionRelations().size()) {
+            OptionRelation optionRelation = getOptionRelations().get(position);
+            if (getTextEntryOptionIds().contains(optionRelation.option.getRemoteId())) {
+                final EditText otherText = new EditText(getContext());
+                otherText.setSingleLine(false);
+                otherText.setImeOptions(EditorInfo.IME_FLAG_NO_ENTER_ACTION);
+                otherText.setHint(R.string.free_response_edittext);
+                if (!TextUtils.isEmpty(getResponse().getOtherText()))
+                    otherText.setText(getResponse().getOtherText());
+
+                final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle(getContext().getString(R.string.extra_text_header))
+                        .setView(otherText)
+                        .setPositiveButton(R.string.save_button, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                setOtherText(otherText.getText().toString());
+                                showOtherText(position);
+                            }
+                        });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            } else {
+                setOtherText(BLANK);
+                showOtherText(position);
+            }
+        }
+    }
+
+    private void setOtherText(String otherText) {
+        mResponse.setOtherText(otherText);
+        saveResponse();
+    }
+
     void setOptionSetItems(QuestionRelation questionRelation) {
         mOptionRelations = new ArrayList<>();
         mOptionInstructions = new HashMap<>();
+        mTextEntryOptionIds = new ArrayList<>();
         if (questionRelation.optionSets.size() > 0) {
             OptionSetRelation optionSetRelation = questionRelation.optionSets.get(0);
             if (optionSetRelation.instructions.size() > 0) {
@@ -297,6 +344,9 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                     if (relation.instructions.size() > 0) {
                         mOptionInstructions.put(relation.options.get(0).option.getIdentifier(), relation.instructions.get(0));
                     }
+                }
+                if (relation.optionSetOption.isAllowTextEntry()) {
+                    mTextEntryOptionIds.add(relation.optionSetOption.getOptionRemoteId());
                 }
             }
         }

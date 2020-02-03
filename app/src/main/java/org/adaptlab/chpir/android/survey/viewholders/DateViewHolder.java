@@ -102,4 +102,8 @@ public class DateViewHolder extends QuestionViewHolder {
 //                calendar.get(Calendar.DAY_OF_MONTH), mListener);
     }
 
+    @Override
+    protected void showOtherText(int position) {
+    }
+
 }

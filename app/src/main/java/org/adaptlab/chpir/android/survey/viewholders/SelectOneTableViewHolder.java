@@ -48,6 +48,10 @@ public class SelectOneTableViewHolder extends TableQuestionViewHolder {
     }
 
     @Override
+    protected void showOtherText(int position) {
+    }
+
+    @Override
     protected void deserialize(String responseText) {
         if (TextUtils.isEmpty(responseText.trim())) {
             int checked = mRadioGroup.getCheckedRadioButtonId();

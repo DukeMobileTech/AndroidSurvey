@@ -27,6 +27,10 @@ public class RangeViewHolder extends QuestionViewHolder {
     }
 
     @Override
+    protected void showOtherText(int position) {
+    }
+
+    @Override
     public void createQuestionComponent(ViewGroup questionComponent) {
 //        mStart = setEditTexts(0);
 //        mEnd = setEditTexts(1);

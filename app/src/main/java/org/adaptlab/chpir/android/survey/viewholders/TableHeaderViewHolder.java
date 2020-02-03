@@ -61,6 +61,10 @@ public class TableHeaderViewHolder extends TableQuestionViewHolder {
     protected void unSetResponse() {
     }
 
+    @Override
+    protected void showOtherText(int position) {
+    }
+
     private void setTableInstructions() {
         int number = getQuestion().getNumberInInstrument();
         String range = number + " - " + (number + (getAdapter().getItemCount() - 2)) + "\n";
