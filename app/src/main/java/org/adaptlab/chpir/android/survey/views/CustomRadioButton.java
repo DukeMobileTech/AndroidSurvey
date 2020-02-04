@@ -14,13 +14,11 @@ import androidx.appcompat.widget.AppCompatRadioButton;
  */
 public class CustomRadioButton extends AppCompatRadioButton {
 
+    int actionX, actionY;
     private Drawable drawableRight;
     private Drawable drawableLeft;
     private Drawable drawableTop;
     private Drawable drawableBottom;
-
-    int actionX, actionY;
-
     private DrawableClickListener clickListener;
 
     public CustomRadioButton(Context context) {
@@ -92,8 +90,8 @@ public class CustomRadioButton extends AppCompatRadioButton {
 
                 if (!bounds.contains(actionX, actionY)) {
                     /* Gives the +20 area for tapping. */
-                    x = (int) (actionX - extraTapArea);
-                    y = (int) (actionY - extraTapArea);
+                    x = actionX - extraTapArea;
+                    y = actionY - extraTapArea;
 
                     if (x <= 0)
                         x = actionX;
@@ -130,8 +128,8 @@ public class CustomRadioButton extends AppCompatRadioButton {
                   BOUND. - this process help to increase the tap-able area of
                   the rectangle.
                  */
-                x = (int) (actionX + extraTapArea);
-                y = (int) (actionY - extraTapArea);
+                x = actionX + extraTapArea;
+                y = actionY - extraTapArea;
 
                 /*Since this is right drawable subtract the value of x from the width
                   of view. so that width - tapped area will result in x co-ordinate in drawable bound.

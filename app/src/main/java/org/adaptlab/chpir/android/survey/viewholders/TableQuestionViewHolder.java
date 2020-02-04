@@ -46,7 +46,7 @@ public abstract class TableQuestionViewHolder extends QuestionViewHolder {
         setQuestionRelation(questionRelation);
         setOptionSetItems(questionRelation);
         setSpecialOptions(questionRelation);
-
+        setCarryForwardOptions(questionRelation);
         setQuestionText();
         createQuestionComponent(getQuestionComponent());
     }

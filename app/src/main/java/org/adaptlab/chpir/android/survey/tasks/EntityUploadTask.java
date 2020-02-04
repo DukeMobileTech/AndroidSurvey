@@ -7,9 +7,11 @@ import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.SurveyApp;
 import org.adaptlab.chpir.android.survey.entities.Response;
 import org.adaptlab.chpir.android.survey.entities.Survey;
+import org.adaptlab.chpir.android.survey.entities.SurveyNote;
 import org.adaptlab.chpir.android.survey.entities.Uploadable;
 import org.adaptlab.chpir.android.survey.relations.ProjectSurveyRelation;
 import org.adaptlab.chpir.android.survey.repositories.ResponseRepository;
+import org.adaptlab.chpir.android.survey.repositories.SurveyNoteRepository;
 import org.adaptlab.chpir.android.survey.repositories.SurveyRepository;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.utils.DeviceSyncEntry;
@@ -29,11 +31,14 @@ public class EntityUploadTask extends AsyncTask<Void, Integer, Void> {
     private static final String TAG = EntityUploadTask.class.getName();
     private SurveyRepository mSurveyRepository;
     private ResponseRepository mResponseRepository;
+    private SurveyNoteRepository mSurveyNoteRepository;
 
     @Override
     protected Void doInBackground(Void... params) {
         mSurveyRepository = new SurveyRepository(SurveyApp.getInstance());
         mResponseRepository = new ResponseRepository(SurveyApp.getInstance());
+        mSurveyNoteRepository = new SurveyNoteRepository(SurveyApp.getInstance());
+
         List<ProjectSurveyRelation> projectSurveyRelations = new ArrayList<>();
         for (ProjectSurveyRelation relation : mSurveyRepository.getSurveyDao().queuedProjectSurveys(AppUtil.getProjectId())) {
             if (relation.responses.size() > 0) {
@@ -52,6 +57,9 @@ public class EntityUploadTask extends AsyncTask<Void, Integer, Void> {
                 sendData(relation.survey, "surveys");
                 for (Response response : relation.responses) {
                     sendData(response, "responses");
+                }
+                for (SurveyNote surveyNote : relation.surveyNotes) {
+                    sendData(surveyNote, "survey_notes");
                 }
             }
             sendData(new DeviceSyncEntry(), "device_sync_entries");
@@ -80,6 +88,8 @@ public class EntityUploadTask extends AsyncTask<Void, Integer, Void> {
                         mSurveyRepository.update((Survey) element);
                     } else if (element.getClass().getName().equals(Response.class.getName())) {
                         mResponseRepository.delete((Response) element);
+                    } else if (element.getClass().getName().equals(SurveyNote.class.getName())) {
+                        mSurveyNoteRepository.delete((SurveyNote) element);
                     }
                     response.close();
                 } else {

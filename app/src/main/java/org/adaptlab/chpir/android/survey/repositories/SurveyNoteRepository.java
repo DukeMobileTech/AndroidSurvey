@@ -13,17 +13,15 @@ import java.util.List;
 
 public class SurveyNoteRepository {
     public final String TAG = this.getClass().getName();
-    private LiveData<List<SurveyNote>> mSurveyNotes;
     private SurveyNoteDao mSurveyNoteDao;
 
-    public SurveyNoteRepository(Application application, String surveyUuid) {
+    public SurveyNoteRepository(Application application) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);
         mSurveyNoteDao = db.surveyNoteDao();
-        mSurveyNotes = mSurveyNoteDao.surveyNotes(surveyUuid);
     }
 
-    public LiveData<List<SurveyNote>> getSurveyNotes() {
-        return mSurveyNotes;
+    public LiveData<List<SurveyNote>> getSurveyNotes(String surveyUuid) {
+        return mSurveyNoteDao.surveyNotes(surveyUuid);
     }
 
     public void insert(SurveyNote surveyNote) {
@@ -32,6 +30,10 @@ public class SurveyNoteRepository {
 
     public void update(SurveyNote surveyNote) {
         new UpdateSurveyNoteTask(mSurveyNoteDao).execute(surveyNote);
+    }
+
+    public void delete(SurveyNote surveyNote) {
+        new DeleteSurveyNoteTask(mSurveyNoteDao).execute(surveyNote);
     }
 
     private static class InsertSurveyNoteTask extends AsyncTask<SurveyNote, Void, Void> {
@@ -58,6 +60,20 @@ public class SurveyNoteRepository {
         @Override
         protected Void doInBackground(SurveyNote... params) {
             mSurveyNoteDao.update(params[0]);
+            return null;
+        }
+    }
+
+    private static class DeleteSurveyNoteTask extends AsyncTask<SurveyNote, Void, Void> {
+        private SurveyNoteDao mSurveyNoteDao;
+
+        DeleteSurveyNoteTask(SurveyNoteDao dao) {
+            mSurveyNoteDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(SurveyNote... params) {
+            mSurveyNoteDao.delete(params[0]);
             return null;
         }
     }

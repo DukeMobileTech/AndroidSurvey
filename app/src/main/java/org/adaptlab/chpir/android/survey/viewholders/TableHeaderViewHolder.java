@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.view.Gravity;
@@ -30,6 +31,7 @@ public class TableHeaderViewHolder extends TableQuestionViewHolder {
     public void setRelations(QuestionRelation questionRelation) {
         setQuestionRelation(questionRelation);
         setOptionSetItems(questionRelation);
+        setCarryForwardOptions(questionRelation);
         setTableInstructions();
         createQuestionComponent(getQuestionComponent());
     }
@@ -40,7 +42,8 @@ public class TableHeaderViewHolder extends TableQuestionViewHolder {
         for (int k = 0; k < getOptionRelations().size(); k++) {
             TextView textView = new TextView(getContext());
             OptionRelation optionRelation = getOptionRelations().get(k);
-            textView.setText(styleTextWithHtmlWhitelist(TranslationUtil.getText(optionRelation.option, optionRelation.translations, getSurveyViewModel())));
+            Spanned text = styleTextWithHtmlWhitelist(TranslationUtil.getText(optionRelation.option, optionRelation.translations, getSurveyViewModel()));
+            textView.setText(text);
             textView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
             textView.setGravity(Gravity.CENTER | Gravity.CENTER_VERTICAL);
             textView.setWidth(getOptionWidth());

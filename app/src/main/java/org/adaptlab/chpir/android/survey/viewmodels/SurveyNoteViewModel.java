@@ -17,8 +17,8 @@ public class SurveyNoteViewModel extends AndroidViewModel {
 
     public SurveyNoteViewModel(@NonNull Application application, String uuid) {
         super(application);
-        mSurveyNoteRepository = new SurveyNoteRepository(application, uuid);
-        mSurveyNotes = mSurveyNoteRepository.getSurveyNotes();
+        mSurveyNoteRepository = new SurveyNoteRepository(application);
+        mSurveyNotes = mSurveyNoteRepository.getSurveyNotes(uuid);
     }
 
     public LiveData<List<SurveyNote>> getSurveyNotes() {

@@ -44,6 +44,8 @@ import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -338,7 +340,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
             if (optionSetRelation.instructions.size() > 0) {
                 mOptionSetInstruction = optionSetRelation.instructions.get(0);
             }
-            for (OptionSetOptionRelation relation : optionSetRelation.optionSetOptions) {
+            for (OptionSetOptionRelation relation : sortedRelations(optionSetRelation.optionSetOptions)) {
                 if (!relation.optionSetOption.isDeleted() && relation.options.size() > 0) {
                     mOptionRelations.add(relation.options.get(0));
                     if (relation.instructions.size() > 0) {
@@ -352,11 +354,22 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         }
     }
 
+    private List<OptionSetOptionRelation> sortedRelations(List<OptionSetOptionRelation> relations) {
+        Collections.sort(relations, new Comparator<OptionSetOptionRelation>() {
+            @Override
+            public int compare(OptionSetOptionRelation o1, OptionSetOptionRelation o2) {
+                return o1.optionSetOption.getPosition() - o2.optionSetOption.getPosition();
+            }
+        });
+        return relations;
+    }
+
     Instruction getOptionInstruction(String optionIdentifier) {
         return mOptionInstructions.get(optionIdentifier);
     }
 
     private void deserializeResponse() {
+        if (mResponse == null) return;
         deserialize(mResponse.getText());
         deserializeSpecialResponse();
         deserializeOtherResponse(mResponse.getOtherResponse());
@@ -690,7 +703,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
     private void clearSpecialResponse() {
         mResponse.setSpecialResponse(BLANK);
-        mSpecialResponseRadioGroup.clearCheck();
+        if (mSpecialResponseRadioGroup != null) mSpecialResponseRadioGroup.clearCheck();
     }
 
     private void clearNonSpecialResponse() {
@@ -741,7 +754,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         }
     }
 
-    private void setCarryForwardOptions(QuestionRelation questionRelation) {
+    void setCarryForwardOptions(QuestionRelation questionRelation) {
         mCarryForwardOptionRelations = new ArrayList<>();
         if (questionRelation.carryForwardOptionSets.size() > 0) {
             OptionSetRelation optionSetRelation = questionRelation.carryForwardOptionSets.get(0);

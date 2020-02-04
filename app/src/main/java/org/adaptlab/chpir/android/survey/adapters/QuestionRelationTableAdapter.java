@@ -17,6 +17,7 @@ import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.INTEGER_BOXE
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.SELECT_MULTIPLE_TABLE;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.SELECT_ONE_TABLE;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.TABLE_HEADER;
+import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.TEXT_BOXES_TABLE;
 
 public class QuestionRelationTableAdapter extends QuestionRelationAdapter {
 
@@ -50,7 +51,7 @@ public class QuestionRelationTableAdapter extends QuestionRelationAdapter {
         QuestionRelation questionRelation = getQuestionRelation(position);
         String type = questionRelation.question.getQuestionType();
         if (position == 0 && (type.equals(Question.SELECT_ONE) || type.equals(Question.SELECT_MULTIPLE) ||
-                type.equals(Question.LIST_OF_INTEGER_BOXES))) {
+                type.equals(Question.LIST_OF_INTEGER_BOXES) || type.equals(Question.LIST_OF_TEXT_BOXES))) {
             type = TABLE_HEADER;
         } else if (type.equals(Question.SELECT_ONE)) {
             type = SELECT_ONE_TABLE;
@@ -58,6 +59,8 @@ public class QuestionRelationTableAdapter extends QuestionRelationAdapter {
             type = SELECT_MULTIPLE_TABLE;
         } else if (type.equals(Question.LIST_OF_INTEGER_BOXES)) {
             type = INTEGER_BOXES_TABLE;
+        } else if (type.equals(Question.LIST_OF_TEXT_BOXES)) {
+            type = TEXT_BOXES_TABLE;
         }
         return QuestionViewHolderFactory.getQuestionViewType(type);
     }

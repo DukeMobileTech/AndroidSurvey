@@ -141,12 +141,14 @@ public class InstrumentPagerFragment extends Fragment {
         asyncTask.setListener(new RefreshInstrumentsTask.AsyncTaskListener() {
             @Override
             public void onAsyncTaskFinished() {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        hideProgressBar();
-                    }
-                });
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            hideProgressBar();
+                        }
+                    });
+                }
             }
         });
         asyncTask.execute();
