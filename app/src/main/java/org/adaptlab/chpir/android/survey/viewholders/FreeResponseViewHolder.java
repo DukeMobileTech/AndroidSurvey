@@ -7,6 +7,7 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import org.adaptlab.chpir.android.survey.R;
@@ -39,12 +40,8 @@ public class FreeResponseViewHolder extends QuestionViewHolder {
         }
 
         public void afterTextChanged(Editable s) {
-//            if (!backspacing && getQuestion().getValidation() != null && getQuestion()
-//                    .getValidation().getValidationType().equals(
-//                            Validation.Type.VERHOEFF.toString())) {
             if (!backspacing) {
                 mFreeText.removeTextChangedListener(this);
-//                mFreeText.setText(ParticipantIdValidator.formatText(s.toString()));
                 mFreeText.setSelection(mFreeText.getText().length());
                 mFreeText.addTextChangedListener(this);
             }
@@ -59,6 +56,8 @@ public class FreeResponseViewHolder extends QuestionViewHolder {
                                 @Override
                                 public void run() {
                                     saveResponse();
+                                    InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                                    imm.hideSoftInputFromWindow(mFreeText.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                                 }
                             });
                         }
@@ -84,10 +83,6 @@ public class FreeResponseViewHolder extends QuestionViewHolder {
     }
 
     protected void beforeAddViewHook(EditText editText) {
-//        if (getQuestion().getValidation() != null && getQuestion().getValidation()
-//                .getValidationType().equals(Validation.Type.VERHOEFF.toString())) {
-//            mFreeText.setInputType(InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
-//        }
     }
 
     @Override
@@ -105,6 +100,7 @@ public class FreeResponseViewHolder extends QuestionViewHolder {
         mFreeText.removeTextChangedListener(mTextWatcher);
         mFreeText.setText(BLANK);
         mFreeText.addTextChangedListener(mTextWatcher);
+        mFreeText.clearFocus();
     }
 
     @Override

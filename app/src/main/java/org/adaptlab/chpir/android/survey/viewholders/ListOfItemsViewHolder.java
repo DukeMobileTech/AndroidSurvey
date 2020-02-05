@@ -34,7 +34,8 @@ import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.EDIT_TEXT_DE
 import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtmlWhitelist;
 
 public abstract class ListOfItemsViewHolder extends QuestionViewHolder {
-    private ArrayList<EditText> mResponses;
+    private ArrayList<EditText> mEditTexts;
+    private boolean textResponseOn = true;
 
     ListOfItemsViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
         super(itemView, context, listener);
@@ -45,18 +46,18 @@ public abstract class ListOfItemsViewHolder extends QuestionViewHolder {
     protected void createQuestionComponent(ViewGroup questionComponent) {
         if (questionComponent == null) return;
         questionComponent.removeAllViews();
-        mResponses = new ArrayList<>();
+        mEditTexts = new ArrayList<>();
         for (OptionRelation optionRelation : getOptionRelations()) {
             int optionId = getOptionRelations().indexOf(optionRelation);
             final TextView optionText = new TextView(getContext());
             optionText.setText(styleTextWithHtmlWhitelist(TranslationUtil.getText(optionRelation.option, optionRelation.translations, getSurveyViewModel())));
             toggleCarryForward(optionText, optionId);
             questionComponent.addView(optionText);
-            EditText editText = createEditText();
+            final EditText editText = createEditText();
             editText.setHint(R.string.free_response_edittext);
             toggleCarryForward(editText, optionId);
             questionComponent.addView(editText);
-            mResponses.add(editText);
+            mEditTexts.add(editText);
             editText.addTextChangedListener(new TextWatcher() {
                 private Timer timer;
 
@@ -79,7 +80,10 @@ public abstract class ListOfItemsViewHolder extends QuestionViewHolder {
                                     ((Activity) getContext()).runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            saveResponse();
+                                            if (textResponseOn) {
+                                                saveResponse();
+                                                editText.clearFocus();
+                                            }
                                         }
                                     });
                                 }
@@ -94,9 +98,9 @@ public abstract class ListOfItemsViewHolder extends QuestionViewHolder {
     @Override
     protected String serialize() {
         StringBuilder serialized = new StringBuilder();
-        for (int i = 0; i < mResponses.size(); i++) {
-            serialized.append(StringEscapeUtils.escapeCsv(mResponses.get(i).getText().toString()));
-            if (i < mResponses.size() - 1) serialized.append(COMMA);
+        for (int i = 0; i < mEditTexts.size(); i++) {
+            serialized.append(StringEscapeUtils.escapeCsv(mEditTexts.get(i).getText().toString()));
+            if (i < mEditTexts.size() - 1) serialized.append(COMMA);
         }
         return serialized.toString();
     }
@@ -111,8 +115,8 @@ public abstract class ListOfItemsViewHolder extends QuestionViewHolder {
         try {
             listOfResponses = reader.readNext();
             for (int i = 0; i < listOfResponses.length; i++) {
-                if (mResponses.size() > i)
-                    mResponses.get(i).setText(listOfResponses[i]);
+                if (mEditTexts.size() > i)
+                    mEditTexts.get(i).setText(listOfResponses[i]);
             }
         } catch (IOException e) {
             if (BuildConfig.DEBUG) Log.e(TAG, "IOException " + e.getMessage());
@@ -121,8 +125,10 @@ public abstract class ListOfItemsViewHolder extends QuestionViewHolder {
 
     @Override
     protected void unSetResponse() {
-        for (EditText oneEditText : mResponses) {
-            oneEditText.setText(BLANK);
+        textResponseOn = false;
+        for (int i = 0; i < mEditTexts.size(); i++) {
+            mEditTexts.get(i).setText(BLANK);
+            mEditTexts.get(i).clearFocus();
         }
     }
 

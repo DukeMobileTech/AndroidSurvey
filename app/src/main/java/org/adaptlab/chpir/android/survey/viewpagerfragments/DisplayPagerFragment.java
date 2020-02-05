@@ -255,12 +255,13 @@ public class DisplayPagerFragment extends Fragment {
     }
 
     private void setQuestions() {
-        if (mDisplayId == null || mInstrumentId == null) return;
+        if (getActivity() == null || mDisplayId == null || mInstrumentId == null) return;
         QuestionRelationViewModelFactory factory = new QuestionRelationViewModelFactory(getActivity().getApplication(), mInstrumentId, mDisplayId);
         QuestionRelationViewModel questionRelationViewModel = ViewModelProviders.of(this, factory).get(QuestionRelationViewModel.class);
         questionRelationViewModel.getQuestionRelations().observe(getViewLifecycleOwner(), new Observer<List<QuestionRelation>>() {
             @Override
             public void onChanged(@Nullable List<QuestionRelation> questionRelations) {
+                if (questionRelations == null) return;
                 for (QuestionRelation questionRelation : questionRelations) {
                     for (Response response : questionRelation.responses) {
                         if (response.getSurveyUUID().equals(mSurveyUUID)) {
@@ -276,11 +277,7 @@ public class DisplayPagerFragment extends Fragment {
                 Collections.sort(questionRelations, new Comparator<QuestionRelation>() {
                     @Override
                     public int compare(QuestionRelation o1, QuestionRelation o2) {
-                        if (o1.question.getNumberInInstrument() < o2.question.getNumberInInstrument())
-                            return -1;
-                        if (o1.question.getNumberInInstrument() > o2.question.getNumberInInstrument())
-                            return 1;
-                        return 0;
+                        return o1.question.getNumberInInstrument() - o2.question.getNumberInInstrument();
                     }
                 });
 
@@ -296,7 +293,7 @@ public class DisplayPagerFragment extends Fragment {
     }
 
     private void initializeResponses(List<QuestionRelation> questionRelations) {
-        if (mSurveyUUID == null) return;
+        if (getActivity() == null || mSurveyUUID == null) return;
         ResponseRepository responseRepository = new ResponseRepository(getActivity().getApplication());
         List<Response> responses = new ArrayList<>();
         for (QuestionRelation questionRelation : questionRelations) {
@@ -366,7 +363,7 @@ public class DisplayPagerFragment extends Fragment {
     }
 
     private void setSurvey() {
-        if (mSurveyUUID == null) return;
+        if (getActivity() == null || mSurveyUUID == null) return;
         SurveyViewModelFactory factory = new SurveyViewModelFactory(getActivity().getApplication(), mSurveyUUID);
         mSurveyViewModel = ViewModelProviders.of(getActivity(), factory).get(SurveyViewModel.class);
         mSurveyViewModel.getLiveDataSurvey().observe(getViewLifecycleOwner(), new Observer<Survey>() {
@@ -381,7 +378,7 @@ public class DisplayPagerFragment extends Fragment {
     }
 
     private void setDisplayViewModel() {
-        if (mDisplayId == null) return;
+        if (getActivity() == null || mDisplayId == null) return;
         DisplayViewModelFactory factory = new DisplayViewModelFactory(getActivity().getApplication(), mDisplayId);
         mDisplayViewModel = ViewModelProviders.of(this, factory).get(DisplayViewModel.class);
         mDisplayAdapter.setDisplayViewModel(mDisplayViewModel);

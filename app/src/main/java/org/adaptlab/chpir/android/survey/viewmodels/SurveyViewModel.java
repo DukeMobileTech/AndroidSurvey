@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -63,6 +64,7 @@ public class SurveyViewModel extends AndroidViewModel {
         if (uuid == null) return;
         mLiveDataSurvey = mSurveyRepository.getSurveyDao().findByUUID(uuid);
         mDisplayTitles = new LongSparseArray<>();
+        mPreviousDisplays = new ArrayList<>();
     }
 
     public void addDisplayTitle(Long displayId, String translation) {

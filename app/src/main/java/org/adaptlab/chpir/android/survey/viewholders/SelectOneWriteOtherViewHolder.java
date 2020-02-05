@@ -20,7 +20,7 @@ public class SelectOneWriteOtherViewHolder extends SelectOneViewHolder {
     }
 
     @Override
-    protected void beforeAddViewHook(ViewGroup questionComponent) {
+    protected void beforeAddViewHook(final ViewGroup questionComponent) {
         radioButton = new RadioButton(getContext());
         otherText = new EditText(getContext());
         otherText.setSingleLine(false);
@@ -35,6 +35,7 @@ public class SelectOneWriteOtherViewHolder extends SelectOneViewHolder {
         radioButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                questionComponent.requestFocus();
                 int id = v.getId();
                 if (id != -1) {
                     if (id == otherId) {
@@ -45,7 +46,6 @@ public class SelectOneWriteOtherViewHolder extends SelectOneViewHolder {
                     }
                     setResponseIndex(id);
                 }
-
             }
         });
         getRadioGroup().addView(radioButton, otherId);

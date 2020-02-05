@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.LongSparseArray;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -251,6 +252,7 @@ public class SurveyActivity extends AppCompatActivity {
             public void onChanged(@Nullable Survey survey) {
                 mSurvey = survey;
                 if (survey != null && mSurveyViewModel.getSurvey() == null) {
+                    Log.i(TAG, "Last Display Position: " + mSurvey.getLastDisplayPosition()); // TODO: 2020-02-05 Investigate ineffectiveness 
                     mSurveyViewModel.setSurvey(mSurvey);
                     mSurveyViewModel.setSkipData();
                     mSurveyViewModel.setDisplayPosition(mSurvey.getLastDisplayPosition());

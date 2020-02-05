@@ -36,16 +36,6 @@ public class SelectMultipleWriteOtherViewHolder extends SelectMultipleViewHolder
                 }
             }
         });
-        checkbox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                if (mSpecialResponses != null) {
-//                    mSpecialResponses.clearCheck();
-//                }
-//                checkOptionExclusivity(v);
-//                toggleResponseIndex(otherId);
-            }
-        });
         questionComponent.addView(checkbox, otherId);
         addOtherResponseView(otherText);
         addCheckBox(checkbox);

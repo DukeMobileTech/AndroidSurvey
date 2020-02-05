@@ -35,7 +35,7 @@ public class SelectOneViewHolder extends QuestionViewHolder {
     }
 
     @Override
-    protected void createQuestionComponent(ViewGroup questionComponent) {
+    protected void createQuestionComponent(final ViewGroup questionComponent) {
         questionComponent.removeAllViews();
         mRadioGroup = new RadioGroup(getContext());
         for (final OptionRelation optionRelation : getOptionRelations()) {
@@ -48,6 +48,7 @@ public class SelectOneViewHolder extends QuestionViewHolder {
             radioButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    questionComponent.requestFocus();
                     int id = v.getId();
                     if (id != -1) {
                         setResponseIndex(id);

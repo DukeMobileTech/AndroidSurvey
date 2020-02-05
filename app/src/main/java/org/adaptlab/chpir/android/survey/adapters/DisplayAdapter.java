@@ -1,10 +1,13 @@
 package org.adaptlab.chpir.android.survey.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DiffUtil;
@@ -102,10 +105,19 @@ public class DisplayAdapter extends ListAdapter<List<QuestionRelation>, DisplayA
     class DisplayViewHolder extends RecyclerView.ViewHolder {
         RecyclerView recyclerView;
 
+        @SuppressLint("ClickableViewAccessibility")
         DisplayViewHolder(final View itemView) {
             super(itemView);
             recyclerView = itemView.findViewById(R.id.questionsRecyclerView);
             recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
+            recyclerView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                    return false;
+                }
+            });
         }
     }
 
