@@ -348,7 +348,7 @@ public class DisplayPagerFragment extends Fragment {
                     mQuestionRelationAdapters.add(new QuestionRelationTableAdapter(mListener, mSurveyViewModel));
                 }
             }
-            mDisplayAdapter.setResponseRelationAdapters(mQuestionRelationAdapters);
+            mDisplayAdapter.setQuestionRelationAdapters(mQuestionRelationAdapters);
         }
     }
 

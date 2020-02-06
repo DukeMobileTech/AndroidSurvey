@@ -27,27 +27,12 @@ public class DisplayAdapter extends ListAdapter<List<QuestionRelation>, DisplayA
     private static final DiffUtil.ItemCallback<List<QuestionRelation>> DIFF_CALLBACK = new DiffUtil.ItemCallback<List<QuestionRelation>>() {
         @Override
         public boolean areItemsTheSame(@NonNull List<QuestionRelation> oldQuestionRelations, @NonNull List<QuestionRelation> newQuestionRelations) {
-            if (oldQuestionRelations.size() != newQuestionRelations.size()) return false;
-            boolean same = true;
-            for (int k = 0; k < oldQuestionRelations.size(); k++) {
-                QuestionRelation oldQuestionRelation = oldQuestionRelations.get(k);
-                QuestionRelation newQuestionRelation = newQuestionRelations.get(k);
-                same = oldQuestionRelation.question.getQuestionIdentifier().equals(newQuestionRelation.question.getQuestionIdentifier());
-                if (!same) break;
-            }
-            return same;
+            return oldQuestionRelations.size() == newQuestionRelations.size();
         }
 
         @Override
         public boolean areContentsTheSame(@NonNull List<QuestionRelation> oldQuestionRelations, @NonNull List<QuestionRelation> newQuestionRelations) {
-            if (oldQuestionRelations.size() != newQuestionRelations.size()) return false;
-            for (int k = 0; k < oldQuestionRelations.size(); k++) {
-                QuestionRelation oldQuestionRelation = oldQuestionRelations.get(k);
-                QuestionRelation newQuestionRelation = newQuestionRelations.get(k);
-                boolean same = oldQuestionRelation.question.getQuestionIdentifier().equals(newQuestionRelation.question.getQuestionIdentifier());
-                if (!same) return false;
-            }
-            return true;
+            return oldQuestionRelations.size() == newQuestionRelations.size();
         }
     };
 
@@ -66,7 +51,7 @@ public class DisplayAdapter extends ListAdapter<List<QuestionRelation>, DisplayA
         mContext = context;
     }
 
-    public void setResponseRelationAdapters(List<QuestionRelationAdapter> adapters) {
+    public void setQuestionRelationAdapters(List<QuestionRelationAdapter> adapters) {
         mQuestionRelationAdapters = adapters;
     }
 

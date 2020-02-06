@@ -519,12 +519,11 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     }
 
     private void setQuestionTextComponents() {
+        setQuestionNumberView();
         if (mQuestionRelation.question.getQuestionType().equals(Question.INSTRUCTIONS)) {
-            mNumberTextView.setVisibility(View.GONE);
             mBeforeTextInstructionTextView.setVisibility(View.GONE);
             mAfterTextInstructionTextView.setVisibility(View.GONE);
         } else {
-            setQuestionNumberView();
             setBeforeTextInstructionView();
             setAfterTextInstructionView();
         }

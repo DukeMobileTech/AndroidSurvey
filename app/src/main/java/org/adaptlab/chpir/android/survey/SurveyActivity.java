@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.LongSparseArray;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -150,10 +149,28 @@ public class SurveyActivity extends AppCompatActivity {
         mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
-                Display display = mSurveyViewModel.getDisplays().get(position);
-                mActionBar.setTitle(mSurveyViewModel.getDisplayTitle(display.getRemoteId()));
+                setActionBarTitle(position);
+
+                if (position > mSurveyViewModel.getDisplayPosition()) {
+                    mSurveyViewModel.getPreviousDisplays().add(mSurveyViewModel.getDisplayPosition());
+                    mSurveyViewModel.incrementDisplayPosition();
+                } else if (position < mSurveyViewModel.getDisplayPosition()) {
+                    int current = mSurveyViewModel.getDisplayPosition();
+                    if (current > 0 && current < mSurveyViewModel.getDisplays().size() && mSurveyViewModel.getPreviousDisplays().size() > 0) {
+                        mSurveyViewModel.setDisplayPosition(mSurveyViewModel.getPreviousDisplays().remove(mSurveyViewModel.getPreviousDisplays().size() - 1));
+                    } else {
+                        mSurveyViewModel.decrementDisplayPosition();
+                    }
+                }
+                invalidateOptionsMenu();
             }
         });
+    }
+
+    private void setActionBarTitle(int position) {
+        if (mSurveyViewModel.getDisplays() == null) return;
+        Display display = mSurveyViewModel.getDisplays().get(position);
+        mActionBar.setTitle(mSurveyViewModel.getDisplayTitle(display.getRemoteId()));
     }
 
     private void setInstrumentViewModel(Long instrumentId) {
@@ -164,7 +181,6 @@ public class SurveyActivity extends AppCompatActivity {
             public void onChanged(@Nullable InstrumentRelation relation) {
                 if (relation != null) {
                     mInstrument = relation.instrument;
-                    mActionBar.setTitle(mInstrument.getTitle());
                     mSurveyViewModel.setInstrumentLanguage(mInstrument.getLanguage());
                     if (mSurveyViewModel.getSurvey() != null) {
                         if (mSurveyViewModel.getSurvey().getInstrumentTitle() == null) {
@@ -200,8 +216,7 @@ public class SurveyActivity extends AppCompatActivity {
                     });
                     mSurveyViewModel.setQuestions(questions);
 
-                    setViewPagerPosition();
-                    invalidateOptionsMenu();
+                    setActionBarTitle(mSurveyViewModel.getDisplayPosition());
                 }
             }
         });
@@ -252,7 +267,6 @@ public class SurveyActivity extends AppCompatActivity {
             public void onChanged(@Nullable Survey survey) {
                 mSurvey = survey;
                 if (survey != null && mSurveyViewModel.getSurvey() == null) {
-                    Log.i(TAG, "Last Display Position: " + mSurvey.getLastDisplayPosition()); // TODO: 2020-02-05 Investigate ineffectiveness 
                     mSurveyViewModel.setSurvey(mSurvey);
                     mSurveyViewModel.setSkipData();
                     mSurveyViewModel.setDisplayPosition(mSurvey.getLastDisplayPosition());
@@ -265,6 +279,9 @@ public class SurveyActivity extends AppCompatActivity {
                     mSurveyViewModel.setPreviousDisplays(previousDisplays);
                     mSurveyViewModel.setSurveyLanguage();
                     mLocationManager.setSurveyViewModel(mSurveyViewModel);
+
+                    setViewPagerPosition();
+                    setActionBarTitle(mSurveyViewModel.getDisplayPosition());
                 }
             }
         });
