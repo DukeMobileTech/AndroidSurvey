@@ -40,43 +40,16 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/numberTextView" />
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/textAndPopupLayout"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/spannedTextView"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:scrollbars="vertical"
+                android:textColor="@color/blue"
+                android:textSize="22sp"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/beforeTextInstructions">
-
-                <TextView
-                    android:id="@+id/spannedTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:scrollbars="vertical"
-                    android:textColor="@color/blue"
-                    android:textSize="22sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <ImageButton
-                    android:id="@+id/popupInstructions"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="24dp"
-                    android:layout_marginRight="24dp"
-                    android:background="@color/white"
-                    android:contentDescription="@string/show_pop_up_instructions"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@id/spannedTextView"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/ic_info_outline_blue_24dp" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                app:layout_constraintTop_toBottomOf="@+id/beforeTextInstructions" />
 
             <TextView
                 android:id="@+id/afterTextInstructions"
@@ -88,7 +61,7 @@
                 android:textStyle="italic"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/textAndPopupLayout" />
+                app:layout_constraintTop_toBottomOf="@id/spannedTextView" />
 
             <TextView
                 android:id="@+id/optionSetInstructions"

@@ -460,6 +460,7 @@ public class SurveyActivity extends AppCompatActivity {
                     }
                     if (!TextUtils.isEmpty(mLanguageCodes.get(position))) {
                         LocaleManager.setNewLocale(SurveyActivity.this, mLanguageCodes.get(position));
+                        saveData();
                         recreate();
                     }
                 }
@@ -483,11 +484,12 @@ public class SurveyActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-        if (mSurveyViewModel != null && mSurveyViewModel.getSurvey() != null) saveData();
+        saveData();
         if (mLocationManager != null) mLocationManager.stopLocationUpdates();
     }
 
     private void saveData() {
+        if (mSurveyViewModel == null || mSurveyViewModel.getSurvey() == null) return;
         mSurveyViewModel.persistSkipMaps();
         mSurveyViewModel.persistSkippedQuestions();
         mSurveyViewModel.persistPreviousDisplays();

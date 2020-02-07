@@ -1,15 +1,18 @@
 package org.adaptlab.chpir.android.survey.viewholders;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.Editable;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -84,7 +87,6 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     private TextView mNumberTextView;
     private TextView mBeforeTextInstructionTextView;
     private TextView mSpannedTextView;
-    private ImageButton mPopUpButton;
     private TextView mAfterTextInstructionTextView;
     private TextView mOptionSetInstructionTextView;
     private ViewGroup mQuestionComponent;
@@ -102,7 +104,6 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         mNumberTextView = itemView.findViewById(R.id.numberTextView);
         mBeforeTextInstructionTextView = itemView.findViewById(R.id.beforeTextInstructions);
         mSpannedTextView = itemView.findViewById(R.id.spannedTextView);
-        mPopUpButton = itemView.findViewById(R.id.popupInstructions);
         mAfterTextInstructionTextView = itemView.findViewById(R.id.afterTextInstructions);
 
         mOptionSetInstructionTextView = itemView.findViewById(R.id.optionSetInstructions);
@@ -548,17 +549,34 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
     private void setQuestionText() {
         if (mSpannedTextView == null) return;
-        mSpannedTextView.setText(getQuestionText());
         if (mQuestionRelation.question.getPopUpInstructionId() == null) {
-            mPopUpButton.setVisibility(View.GONE);
+            mSpannedTextView.setCompoundDrawables(null, null, null, null);
         } else {
-            mPopUpButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    showPopUpInstruction(getPopUpInstructions());
-                }
-            });
+            setCompoundDrawableRight(mSpannedTextView, getContext().getResources().getDrawable(R.drawable.ic_info_outline_blue_24dp), getPopUpInstructions());
         }
+        mSpannedTextView.setText(getQuestionText());
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    void setCompoundDrawableRight(final TextView textView, Drawable right, final String instructions) {
+        textView.setCompoundDrawablesWithIntrinsicBounds(null, null, right, null);
+        textView.setCompoundDrawablePadding(2);
+        textView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Drawable[] drawables = ((TextView) v).getCompoundDrawables();
+                if (drawables.length == 4 && drawables[2] != null) {
+                    Drawable drawable = drawables[2];
+                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                        if (event.getRawX() >= (textView.getRight() - drawable.getBounds().width())) {
+                            showPopUpInstruction(instructions);
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+        });
     }
 
     private void setAfterTextInstructionView() {
