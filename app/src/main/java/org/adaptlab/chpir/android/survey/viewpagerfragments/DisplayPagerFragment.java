@@ -15,9 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.adapters.DisplayAdapter;
 import org.adaptlab.chpir.android.survey.adapters.QuestionRelationAdapter;
-import org.adaptlab.chpir.android.survey.adapters.QuestionRelationTableAdapter;
 import org.adaptlab.chpir.android.survey.entities.LoopQuestion;
 import org.adaptlab.chpir.android.survey.entities.MultipleSkip;
 import org.adaptlab.chpir.android.survey.entities.Option;
@@ -60,9 +58,9 @@ public class DisplayPagerFragment extends Fragment {
     private String mSurveyUUID;
 
     private QuestionViewHolder.OnResponseSelectedListener mListener;
-    private DisplayAdapter mDisplayAdapter;
-    private List<List<QuestionRelation>> mQuestionRelationGroups;
-    private List<QuestionRelationAdapter> mQuestionRelationAdapters;
+    private QuestionRelationAdapter mQuestionRelationsAdapter;
+    private List<QuestionRelation> mQuestionRelations;
+    private RecyclerView mRecyclerView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -215,42 +213,32 @@ public class DisplayPagerFragment extends Fragment {
     }
 
     private void hideQuestions() {
-        if (mQuestionRelationGroups == null) return;
         HashSet<String> hideSet = new HashSet<>();
         List<String> displayQuestionIds = new ArrayList<>();
-        for (List<QuestionRelation> relationList : mQuestionRelationGroups) {
-            for (QuestionRelation questionRelation : relationList) {
-                displayQuestionIds.add(questionRelation.question.getQuestionIdentifier());
-            }
+        for (QuestionRelation questionRelation : mQuestionRelations) {
+            displayQuestionIds.add(questionRelation.question.getQuestionIdentifier());
         }
         for (String questionToSkip : mSurveyViewModel.getQuestionsToSkipSet()) {
             if (displayQuestionIds.contains(questionToSkip)) {
                 hideSet.add(questionToSkip);
             }
         }
-        List<List<QuestionRelation>> visibleRelations = new ArrayList<>();
-        for (List<QuestionRelation> relationList : mQuestionRelationGroups) {
-            List<QuestionRelation> questionRelations = new ArrayList<>();
-            for (QuestionRelation questionRelation : relationList) {
-                if (!hideSet.contains(questionRelation.question.getQuestionIdentifier())) {
-                    questionRelations.add(questionRelation);
-                }
+        List<QuestionRelation> visibleRelations = new ArrayList<>();
+        for (QuestionRelation questionRelation : mQuestionRelations) {
+            if (!hideSet.contains(questionRelation.question.getQuestionIdentifier())) {
+                visibleRelations.add(questionRelation);
             }
-            visibleRelations.add(questionRelations);
+        }
+        boolean responsesPresent = true;
+        for (QuestionRelation questionRelation : visibleRelations) {
+            if (mDisplayViewModel.getResponse(questionRelation.question.getQuestionIdentifier()) == null) {
+                responsesPresent = false;
+                break;
+            }
         }
 
-        boolean responsesPresent = true;
-        outerLoop:
-        for (List<QuestionRelation> questionRelationList : visibleRelations) {
-            for (QuestionRelation questionRelation : questionRelationList) {
-                if (mDisplayViewModel.getResponse(questionRelation.question.getQuestionIdentifier()) == null) {
-                    responsesPresent = false;
-                    break outerLoop;
-                }
-            }
-        }
         if (responsesPresent) {
-            mDisplayAdapter.submitList(visibleRelations);
+            mQuestionRelationsAdapter.submitList(visibleRelations);
         }
     }
 
@@ -285,11 +273,22 @@ public class DisplayPagerFragment extends Fragment {
                     if (mDisplayViewModel.getResponse(questionRelations.get(0).question.getQuestionIdentifier()) == null) {
                         initializeResponses(questionRelations);
                     } else {
-                        groupQuestionRelations(questionRelations);
+                        mQuestionRelations = questionRelations;
+                        hideQuestions();
                     }
                 }
             }
         });
+    }
+
+    private void hideLoopedQuestions(QuestionRelation questionRelation) {
+        if (questionRelation.loopedQuestions.size() > 0) {
+            List<String> questionsToHide = new ArrayList<>();
+            for (LoopQuestion lq : questionRelation.loopedQuestions) {
+                questionsToHide.add(lq.getLooped());
+            }
+            mSurveyViewModel.updateQuestionsToSkipMap(questionRelation.question.getQuestionIdentifier() + "/looped", questionsToHide);
+        }
     }
 
     private void initializeResponses(List<QuestionRelation> questionRelations) {
@@ -316,52 +315,6 @@ public class DisplayPagerFragment extends Fragment {
         }
     }
 
-    private void groupQuestionRelations(List<QuestionRelation> questionRelations) {
-        String tableName = questionRelations.get(0).question.getTableIdentifier();
-        mQuestionRelationGroups = new ArrayList<>();
-        List<QuestionRelation> group = new ArrayList<>();
-        for (QuestionRelation qr : questionRelations) {
-            if ((tableName == null && qr.question.getTableIdentifier() == null) ||
-                    (tableName != null && tableName.equals(qr.question.getTableIdentifier()))) {
-                group.add(qr);
-            } else {
-                tableName = qr.question.getTableIdentifier();
-                mQuestionRelationGroups.add(new ArrayList<>(group));
-                group.clear();
-                group.add(qr);
-            }
-            if (questionRelations.indexOf(qr) == questionRelations.size() - 1) {
-                mQuestionRelationGroups.add(new ArrayList<>(group));
-            }
-        }
-        setAdapters();
-        hideQuestions();
-    }
-
-    private void setAdapters() {
-        if (mQuestionRelationAdapters == null || mQuestionRelationAdapters.size() != mQuestionRelationGroups.size()) {
-            mQuestionRelationAdapters = new ArrayList<>();
-            for (List<QuestionRelation> list : mQuestionRelationGroups) {
-                if (TextUtils.isEmpty(list.get(0).question.getTableIdentifier())) {
-                    mQuestionRelationAdapters.add(new QuestionRelationAdapter(mListener, mSurveyViewModel));
-                } else {
-                    mQuestionRelationAdapters.add(new QuestionRelationTableAdapter(mListener, mSurveyViewModel));
-                }
-            }
-            mDisplayAdapter.setQuestionRelationAdapters(mQuestionRelationAdapters);
-        }
-    }
-
-    private void hideLoopedQuestions(QuestionRelation questionRelation) {
-        if (questionRelation.loopedQuestions.size() > 0) {
-            List<String> questionsToHide = new ArrayList<>();
-            for (LoopQuestion lq : questionRelation.loopedQuestions) {
-                questionsToHide.add(lq.getLooped());
-            }
-            mSurveyViewModel.updateQuestionsToSkipMap(questionRelation.question.getQuestionIdentifier() + "/looped", questionsToHide);
-        }
-    }
-
     private void setSurvey() {
         if (getActivity() == null || mSurveyUUID == null) return;
         SurveyViewModelFactory factory = new SurveyViewModelFactory(getActivity().getApplication(), mSurveyUUID);
@@ -375,22 +328,26 @@ public class DisplayPagerFragment extends Fragment {
                 }
             }
         });
+        mQuestionRelationsAdapter = new QuestionRelationAdapter(mListener, mSurveyViewModel);
+        if (mDisplayViewModel != null)
+            mQuestionRelationsAdapter.setDisplayViewModel(mDisplayViewModel);
+        mRecyclerView.setAdapter(mQuestionRelationsAdapter);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
     private void setDisplayViewModel() {
         if (getActivity() == null || mDisplayId == null) return;
         DisplayViewModelFactory factory = new DisplayViewModelFactory(getActivity().getApplication(), mDisplayId);
         mDisplayViewModel = ViewModelProviders.of(this, factory).get(DisplayViewModel.class);
-        mDisplayAdapter.setDisplayViewModel(mDisplayViewModel);
+        if (mQuestionRelationsAdapter != null)
+            mQuestionRelationsAdapter.setDisplayViewModel(mDisplayViewModel);
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.recycler_view_display, container, false);
-        RecyclerView recyclerView = view.findViewById(R.id.displayRecyclerView);
-        mDisplayAdapter = new DisplayAdapter(getContext());
-        recyclerView.setAdapter(mDisplayAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView = view.findViewById(R.id.displayQuestionsRecyclerView);
+        mQuestionRelations = new ArrayList<>();
         setDisplayViewModel();
         setSurvey();
         setQuestions();

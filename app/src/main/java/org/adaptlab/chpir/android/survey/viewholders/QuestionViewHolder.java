@@ -137,7 +137,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
     public void setSurveyViewModel(SurveyViewModel model) {
         mSurveyViewModel = model;
-        mSurvey = mSurveyViewModel.getSurvey();
+        if (mSurveyViewModel != null) mSurvey = mSurveyViewModel.getSurvey();
     }
 
     public void setDisplayViewModel(DisplayViewModel viewModel) {

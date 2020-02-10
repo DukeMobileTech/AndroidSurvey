@@ -51,8 +51,8 @@ android {
         wci {
             dimension 'wci'
             applicationIdSuffix '.wci'
-            versionCode 24
-            versionName '0.0.18'
+            versionCode 25
+            versionName '0.0.19'
         }
     }
 

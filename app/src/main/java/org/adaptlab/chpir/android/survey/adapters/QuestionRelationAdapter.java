@@ -73,7 +73,7 @@ public class QuestionRelationAdapter extends ListAdapter<QuestionRelation, Quest
         return mDisplayViewModel;
     }
 
-    void setDisplayViewModel(DisplayViewModel viewModel) {
+    public void setDisplayViewModel(DisplayViewModel viewModel) {
         mDisplayViewModel = viewModel;
     }
 
