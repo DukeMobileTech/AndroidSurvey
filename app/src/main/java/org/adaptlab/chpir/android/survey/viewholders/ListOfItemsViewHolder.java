@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import androidx.multidex.BuildConfig;
@@ -17,7 +16,7 @@ import androidx.multidex.BuildConfig;
 import com.opencsv.CSVReader;
 
 import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.entities.Instruction;
+import org.adaptlab.chpir.android.survey.relations.InstructionRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionRelation;
 import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
 import org.apache.commons.codec.Charsets;
@@ -34,7 +33,6 @@ import java.util.TimerTask;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.BLANK;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.EDIT_TEXT_DELAY;
-import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtml;
 import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtmlWhitelist;
 
 public abstract class ListOfItemsViewHolder extends QuestionViewHolder {
@@ -54,12 +52,12 @@ public abstract class ListOfItemsViewHolder extends QuestionViewHolder {
         for (OptionRelation optionRelation : getOptionRelations()) {
             int optionId = getOptionRelations().indexOf(optionRelation);
             final TextView optionText = new TextView(getContext());
-            final Instruction optionInstruction = getOptionInstruction(optionRelation.option.getIdentifier());
+            final InstructionRelation optionInstruction = getOptionInstruction(optionRelation.option.getIdentifier());
             if (optionInstruction != null) {
                 optionText.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT));
                 setCompoundDrawableRight(optionText, getContext().getResources().getDrawable(R.drawable.ic_info_outline_blue_24dp),
-                        styleTextWithHtml(optionInstruction.getText()).toString());
+                        getOptionPopUpInstructions(optionInstruction));
             }
             optionText.setText(styleTextWithHtmlWhitelist(TranslationUtil.getText(optionRelation.option, optionRelation.translations, getSurveyViewModel())));
             toggleCarryForward(optionText, optionId);

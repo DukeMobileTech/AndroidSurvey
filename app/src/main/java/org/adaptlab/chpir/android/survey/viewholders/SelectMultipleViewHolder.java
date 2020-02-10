@@ -89,6 +89,7 @@ public class SelectMultipleViewHolder extends QuestionViewHolder {
 
     @Override
     protected void unSetResponse() {
+        mResponseIndices = new ArrayList<>();
         for (CheckBox box : mCheckBoxes) {
             if (box.isChecked()) {
                 box.setChecked(false);

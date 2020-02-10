@@ -36,6 +36,7 @@ import org.adaptlab.chpir.android.survey.entities.Option;
 import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.Response;
 import org.adaptlab.chpir.android.survey.entities.Survey;
+import org.adaptlab.chpir.android.survey.relations.InstructionRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionSetOptionRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionSetRelation;
@@ -81,7 +82,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     private List<OptionRelation> mOptionRelations;
     private List<OptionRelation> mSpecialOptionRelations;
     private List<OptionRelation> mCarryForwardOptionRelations;
-    private HashMap<String, Instruction> mOptionInstructions;
+    private HashMap<String, InstructionRelation> mOptionInstructions;
     private List<Long> mTextEntryOptionIds;
 
     private TextView mNumberTextView;
@@ -212,7 +213,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     }
 
     void setOptionPopUpInstruction(ViewGroup questionComponent, View view, int viewId, OptionRelation optionRelation) {
-        final Instruction optionInstruction = getOptionInstruction(optionRelation.option.getIdentifier());
+        final InstructionRelation optionInstruction = getOptionInstruction(optionRelation.option.getIdentifier());
         if (optionInstruction != null) {
             LinearLayout optionLayout = new LinearLayout(getContext());
             ViewGroup.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
@@ -229,7 +230,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    showPopUpInstruction(styleTextWithHtml(optionInstruction.getText()).toString());
+                    showPopUpInstruction(getOptionPopUpInstructions(optionInstruction));
                 }
             });
             optionLayout.addView(imageButton);
@@ -365,7 +366,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         return relations;
     }
 
-    Instruction getOptionInstruction(String optionIdentifier) {
+    InstructionRelation getOptionInstruction(String optionIdentifier) {
         return mOptionInstructions.get(optionIdentifier);
     }
 
@@ -552,7 +553,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         if (mQuestionRelation.question.getPopUpInstructionId() == null) {
             mSpannedTextView.setCompoundDrawables(null, null, null, null);
         } else {
-            setCompoundDrawableRight(mSpannedTextView, getContext().getResources().getDrawable(R.drawable.ic_info_outline_blue_24dp), getPopUpInstructions());
+            setCompoundDrawableRight(mSpannedTextView, getContext().getResources().getDrawable(R.drawable.ic_info_outline_blue_24dp), getQuestionPopUpInstructions());
         }
         mSpannedTextView.setText(getQuestionText());
     }
@@ -608,11 +609,20 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
     }
 
-    private String getPopUpInstructions() {
+    private String getQuestionPopUpInstructions() {
         String instructions = "";
         if (mQuestionRelation.popUpInstructions.size() > 0) {
             instructions = TranslationUtil.getText(mQuestionRelation.popUpInstructions.get(0).instruction,
                     mQuestionRelation.popUpInstructions.get(0).translations, mSurveyViewModel);
+        }
+        return styleTextWithHtml(instructions).toString();
+    }
+
+    String getOptionPopUpInstructions(InstructionRelation instructionRelation) {
+        String instructions = instructionRelation.instruction.getText();
+        if (instructionRelation.translations.size() > 0) {
+            instructions = TranslationUtil.getText(instructionRelation.instruction,
+                    instructionRelation.translations, mSurveyViewModel);
         }
         return styleTextWithHtml(instructions).toString();
     }

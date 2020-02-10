@@ -15,5 +15,5 @@ public class OptionSetOptionRelation {
     @Relation(parentColumn = "OptionRemoteId", entityColumn = "RemoteId", entity = Option.class)
     public List<OptionRelation> options;
     @Relation(parentColumn = "InstructionId", entityColumn = "RemoteId", entity = Instruction.class)
-    public List<Instruction> instructions;
+    public List<InstructionRelation> instructions;
 }

@@ -9,14 +9,14 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.entities.Instruction;
+import org.adaptlab.chpir.android.survey.relations.InstructionRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionRelation;
 import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
 import org.adaptlab.chpir.android.survey.views.CustomRadioButton;
 import org.adaptlab.chpir.android.survey.views.DrawableClickListener;
 
+import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.BLANK;
 import static org.adaptlab.chpir.android.survey.utils.FormatUtils.removeNonNumericCharacters;
-import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtml;
 
 public class SelectOneViewHolder extends QuestionViewHolder {
     private RadioGroup mRadioGroup;
@@ -56,7 +56,7 @@ public class SelectOneViewHolder extends QuestionViewHolder {
                     }
                 }
             });
-            final Instruction optionInstruction = getOptionInstruction(optionRelation.option.getIdentifier());
+            final InstructionRelation optionInstruction = getOptionInstruction(optionRelation.option.getIdentifier());
             if (optionInstruction == null) {
                 radioButton.setLayoutParams(new RadioGroup.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
@@ -71,7 +71,7 @@ public class SelectOneViewHolder extends QuestionViewHolder {
                     @Override
                     public void onClick(DrawablePosition target) {
                         if (target == DrawablePosition.RIGHT) {
-                            showPopUpInstruction(styleTextWithHtml(optionInstruction.getText()).toString());
+                            showPopUpInstruction(getOptionPopUpInstructions(optionInstruction));
                         }
                     }
                 });
@@ -103,6 +103,7 @@ public class SelectOneViewHolder extends QuestionViewHolder {
 
     @Override
     protected String serialize() {
+        if (mResponseIndex == -1) return BLANK;
         return String.valueOf(mResponseIndex);
     }
 
@@ -121,6 +122,7 @@ public class SelectOneViewHolder extends QuestionViewHolder {
 
     @Override
     protected void unSetResponse() {
+        mResponseIndex = -1;
         if (getRadioGroup() != null) {
             getRadioGroup().clearCheck();
         }
