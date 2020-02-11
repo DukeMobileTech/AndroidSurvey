@@ -30,8 +30,8 @@ public class SurveyRepository {
         return mSurveyDao.projectIncompleteSurveys(AppUtil.getProjectId());
     }
 
-    public Survey initializeSurvey(Long projectId, Long instrumentId) {
-        Survey survey = new Survey();
+    public Survey initializeSurvey(String uuid, Long projectId, Long instrumentId) {
+        Survey survey = new Survey(uuid);
         survey.setProjectId(projectId);
         survey.setInstrumentRemoteId(instrumentId);
         survey.setLanguage(AppUtil.getDeviceLanguage());

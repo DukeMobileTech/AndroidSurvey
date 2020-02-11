@@ -12,8 +12,9 @@ import java.util.List;
 
 @Dao
 public abstract class QuestionDao extends BaseDao<Question> {
+    @Transaction
     @Query("SELECT * FROM Questions WHERE InstrumentRemoteId=:instrumentId AND Deleted=0 ORDER BY NumberInInstrument ASC")
-    public abstract List<Question> instrumentQuestionsSync(Long instrumentId);
+    public abstract List<QuestionRelation> instrumentQuestionsSync(Long instrumentId);
 
     @Query("SELECT * FROM Questions WHERE QuestionIdentifier=:identifier")
     public abstract Question findByQuestionIdentifierSync(String identifier);

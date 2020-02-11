@@ -168,6 +168,7 @@ public class Question implements SurveyEntity, Translatable {
         destination.mImageCount = source.mImageCount;
         destination.mInstructionId = source.mInstructionId;
         destination.mPopUpInstructionId = source.mPopUpInstructionId;
+        destination.mAfterTextInstructionId = source.mAfterTextInstructionId;
         destination.mCarryForwardIdentifier = source.mCarryForwardIdentifier;
         destination.mCarryForwardOptionSetId = source.mCarryForwardOptionSetId;
         destination.mDefaultResponse = source.mDefaultResponse;

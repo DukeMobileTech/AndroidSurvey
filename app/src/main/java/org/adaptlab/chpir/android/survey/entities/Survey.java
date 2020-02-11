@@ -76,6 +76,14 @@ public class Survey implements Uploadable {
         mLastUpdated = new Date();
     }
 
+    public Survey(@NonNull String uuid) {
+        mSent = false;
+        mComplete = false;
+        mQueued = false;
+        mUUID = uuid;
+        mLastUpdated = new Date();
+    }
+
     @NonNull
     public String getUUID() {
         return mUUID;

@@ -2,6 +2,7 @@ package org.adaptlab.chpir.android.survey;
 
 import android.app.Activity;
 import android.app.ActivityOptions;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -64,6 +65,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtmlWhitelist;
@@ -72,6 +74,7 @@ public class SurveyActivity extends AppCompatActivity {
     public final static String EXTRA_INSTRUMENT_ID = "org.adaptlab.chpir.android.survey.EXTRA_INSTRUMENT_ID";
     public final static String EXTRA_SURVEY_UUID = "org.adaptlab.chpir.android.survey.EXTRA_SURVEY_UUID";
     public final static String EXTRA_DISPLAY_ID = "org.adaptlab.chpir.android.survey.EXTRA_DISPLAY_ID";
+    public final static String EXTRA_DISPLAY_POSITION = "org.adaptlab.chpir.android.survey.EXTRA_DISPLAY_POSITION";
     private static final int REVIEW_CODE = 100;
     private final String TAG = this.getClass().getName();
     private DisplayPagerAdapter mDisplayPagerAdapter;
@@ -99,10 +102,14 @@ public class SurveyActivity extends AppCompatActivity {
             if (mInstrumentId == -1) return;
             mSurveyUUID = getIntent().getStringExtra(EXTRA_SURVEY_UUID);
         }
+        if (savedInstanceState != null) {
+            assignExtras(savedInstanceState);
+        }
         if (TextUtils.isEmpty(mSurveyUUID)) {
+            mSurveyUUID = UUID.randomUUID().toString();
             SurveyRepository surveyRepository = new SurveyRepository(getApplication());
-            Survey survey = surveyRepository.initializeSurvey(AppUtil.getProjectId(), mInstrumentId);
-            mSurveyUUID = survey.getUUID();
+            Survey survey = surveyRepository.initializeSurvey(mSurveyUUID, AppUtil.getProjectId(), mInstrumentId);
+            if (!mSurveyUUID.equals(survey.getUUID())) return;
         }
 
         setActionBar();
@@ -121,14 +128,6 @@ public class SurveyActivity extends AppCompatActivity {
         if (mLocationManager == null) {
             mLocationManager = new LocationManager(this);
             mLocationManager.startLocationUpdates();
-        }
-    }
-
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
-            mInstrumentId = savedInstanceState.getLong(EXTRA_INSTRUMENT_ID);
-            mSurveyUUID = savedInstanceState.getString(EXTRA_SURVEY_UUID);
         }
     }
 
@@ -479,6 +478,27 @@ public class SurveyActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         outState.putLong(EXTRA_INSTRUMENT_ID, mInstrumentId);
         outState.putString(EXTRA_SURVEY_UUID, mSurveyUUID);
+        outState.putInt(EXTRA_DISPLAY_POSITION, mSurveyViewModel.getDisplayPosition());
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            assignExtras(savedInstanceState);
+            int displayPosition = savedInstanceState.getInt(EXTRA_DISPLAY_POSITION);
+            mSurveyViewModel.setDisplayPosition(displayPosition);
+            setViewPagerPosition();
+        }
+    }
+
+    private void assignExtras(Bundle savedInstanceState) {
+        mInstrumentId = savedInstanceState.getLong(EXTRA_INSTRUMENT_ID);
+        mSurveyUUID = savedInstanceState.getString(EXTRA_SURVEY_UUID);
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(LocaleManager.setLocale(base));
     }
 
     @Override

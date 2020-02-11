@@ -9,20 +9,31 @@ import androidx.annotation.NonNull;
 import org.adaptlab.chpir.android.survey.SurveyApp;
 import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
 import org.adaptlab.chpir.android.survey.daos.DisplayDao;
+import org.adaptlab.chpir.android.survey.daos.DisplayTranslationDao;
+import org.adaptlab.chpir.android.survey.daos.InstructionDao;
+import org.adaptlab.chpir.android.survey.daos.InstructionTranslationDao;
 import org.adaptlab.chpir.android.survey.daos.InstrumentDao;
 import org.adaptlab.chpir.android.survey.daos.LoopQuestionDao;
 import org.adaptlab.chpir.android.survey.daos.MultipleSkipDao;
 import org.adaptlab.chpir.android.survey.daos.NextQuestionDao;
 import org.adaptlab.chpir.android.survey.daos.QuestionDao;
 import org.adaptlab.chpir.android.survey.entities.Display;
+import org.adaptlab.chpir.android.survey.entities.DisplayTranslation;
+import org.adaptlab.chpir.android.survey.entities.Instruction;
+import org.adaptlab.chpir.android.survey.entities.InstructionTranslation;
 import org.adaptlab.chpir.android.survey.entities.Instrument;
 import org.adaptlab.chpir.android.survey.entities.LoopQuestion;
 import org.adaptlab.chpir.android.survey.entities.MultipleSkip;
 import org.adaptlab.chpir.android.survey.entities.NextQuestion;
+import org.adaptlab.chpir.android.survey.entities.OptionTranslation;
 import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.Settings;
 import org.adaptlab.chpir.android.survey.relations.DisplayRelation;
+import org.adaptlab.chpir.android.survey.relations.InstructionRelation;
 import org.adaptlab.chpir.android.survey.relations.InstrumentRelation;
+import org.adaptlab.chpir.android.survey.relations.OptionRelation;
+import org.adaptlab.chpir.android.survey.relations.OptionSetOptionRelation;
+import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
 import org.adaptlab.chpir.android.survey.relations.QuestionTranslationRelation;
 import org.adaptlab.chpir.android.survey.relations.SectionRelation;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
@@ -36,6 +47,7 @@ import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.LOOP_MAX;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.LOWER_BOUND;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.UPPER_BOUND;
+import static org.adaptlab.chpir.android.survey.utils.SortUtils.sortedOptionSetOptionRelations;
 
 public class SetLoopsTask extends AsyncTask<Void, Void, Void> {
     private static final String TAG = "SetLoopsTask";
@@ -45,6 +57,9 @@ public class SetLoopsTask extends AsyncTask<Void, Void, Void> {
     private LoopQuestionDao mLoopQuestionDao;
     private NextQuestionDao mNextQuestionDao;
     private MultipleSkipDao mMultipleSkipDao;
+    private InstructionDao mInstructionDao;
+    private InstructionTranslationDao mInstructionTranslationDao;
+    private DisplayTranslationDao mDisplayTranslationDao;
     private List<Display> mDisplays;
     private LongSparseArray<Display> mDisplayLongSparseArray;
 
@@ -59,6 +74,9 @@ public class SetLoopsTask extends AsyncTask<Void, Void, Void> {
         mLoopQuestionDao = database.loopQuestionDao();
         mNextQuestionDao = database.nextQuestionDao();
         mMultipleSkipDao = database.multipleSkipDao();
+        mInstructionDao = database.instructionDao();
+        mInstructionTranslationDao = database.instructionTranslationDao();
+        mDisplayTranslationDao = database.displayTranslationDao();
 
         List<Instrument> instruments = mInstrumentDao.projectInstrumentsSync(Long.valueOf(settings.getProjectId()));
         for (Instrument instrument : instruments) {
@@ -67,34 +85,44 @@ public class SetLoopsTask extends AsyncTask<Void, Void, Void> {
             for (Display display : mDisplays) {
                 mDisplayLongSparseArray.put(display.getRemoteId(), display);
             }
-            List<Question> questions = mQuestionDao.instrumentQuestionsSync(instrument.getRemoteId());
-            for (Question question : questions) {
-                if (question.getLoopQuestionCount() > 0 && question.getLoopSource() == null) {
-                    List<LoopQuestion> loopQuestions = mLoopQuestionDao.allLoopQuestionsSync(question.getRemoteId());
+            List<QuestionRelation> questionRelations = mQuestionDao.instrumentQuestionsSync(instrument.getRemoteId());
+            for (QuestionRelation questionRelation : questionRelations) {
+                if (questionRelation.question.getLoopQuestionCount() > 0 && questionRelation.question.getLoopSource() == null) {
+                    List<LoopQuestion> loopQuestions = mLoopQuestionDao.allLoopQuestionsSync(questionRelation.question.getRemoteId());
                     if (loopQuestions.size() > 0) {
-                        if (question.getQuestionType().equals(Question.INTEGER)) {
+                        if (questionRelation.question.getQuestionType().equals(Question.INTEGER)) {
                             for (LoopQuestion loopQuestion : loopQuestions) {
-                                Display display = getDisplay(question, loopQuestion, loopQuestions);
+                                Display display = getDisplay(questionRelation.question, loopQuestion, loopQuestions);
                                 for (int k = 1; k <= LOOP_MAX; k++) {
-                                    createLoopQuestion(question, loopQuestion, k, display);
+                                    createLoopQuestion(questionRelation, loopQuestion, k, display, null);
                                 }
                             }
-                        } else if (question.isMultipleResponseLoop()) {
+                        } else if (questionRelation.question.isMultipleResponseLoop()) {
                             for (LoopQuestion loopQuestion : loopQuestions) {
-                                Display display = getDisplay(question, loopQuestion, loopQuestions);
+                                Display display = getDisplay(questionRelation.question, loopQuestion, loopQuestions);
                                 if (TextUtils.isEmpty(loopQuestion.getOptionIndices())) {
-                                    for (int k = 0; k < question.getOptionCount(); k++) {
-                                        createLoopQuestion(question, loopQuestion, k, display);
+                                    List<OptionSetOptionRelation> relations = new ArrayList<>();
+                                    for (OptionSetOptionRelation relation : sortedOptionSetOptionRelations(questionRelation.optionSets.get(0).optionSetOptions)) {
+                                        if (!relation.optionSetOption.isDeleted())
+                                            relations.add(relation);
                                     }
-                                    if (question.isOtherQuestionType()) {
-                                        createLoopQuestion(question, loopQuestion, question.getOptionCount(), display);
+                                    for (int k = 0; k < questionRelation.question.getOptionCount(); k++) {
+                                        Instruction instruction = null;
+                                        if (relations.size() > k) {
+                                            OptionRelation optionRelation = relations.get(k).options.get(0);
+                                            instruction = getInstruction(optionRelation);
+                                        }
+                                        createLoopQuestion(questionRelation, loopQuestion, k, display, instruction);
+                                    }
+                                    if (questionRelation.question.isOtherQuestionType()) {
+                                        createLoopQuestion(questionRelation, loopQuestion, questionRelation.optionSets.get(0).optionSetOptions.size(), display, null);
                                     }
                                 } else {
                                     // Loop only for particular options
                                     String[] indices = loopQuestion.getOptionIndices().split(COMMA);
                                     for (String index : indices) {
                                         int ind = Integer.parseInt(index);
-                                        createLoopQuestion(question, loopQuestion, ind, display);
+                                        createLoopQuestion(questionRelation, loopQuestion, ind, display, null);
                                     }
                                 }
                             }
@@ -105,6 +133,34 @@ public class SetLoopsTask extends AsyncTask<Void, Void, Void> {
             setInstrumentLoaded(instrument);
         }
         return null;
+    }
+
+    private Instruction getInstruction(OptionRelation optionRelation) {
+        String instructionText = optionRelation.option.getText();
+        Long instructionId = Long.valueOf(instructionText.hashCode());
+        InstructionRelation instructionRelation = mInstructionDao.instructionSync(instructionId);
+        Instruction instruction;
+        if (instructionRelation == null) {
+            instruction = new Instruction();
+            instruction.setRemoteId(instructionId);
+            instruction.setText(instructionText);
+            mInstructionDao.insert(instruction);
+            for (OptionTranslation optionTranslation : optionRelation.translations) {
+                Long translationId = Long.valueOf(optionTranslation.getText().hashCode());
+                InstructionTranslation translation = mInstructionTranslationDao.instructionTranslationSync(translationId);
+                if (translation == null) {
+                    InstructionTranslation instructionTranslation = new InstructionTranslation();
+                    instructionTranslation.setRemoteId(translationId);
+                    instructionTranslation.setText(optionTranslation.getText());
+                    instructionTranslation.setLanguage(optionTranslation.getLanguage());
+                    instructionTranslation.setInstructionRemoteId(instructionId);
+                    mInstructionTranslationDao.insert(instructionTranslation);
+                }
+            }
+        } else {
+            instruction = instructionRelation.instruction;
+        }
+        return instruction;
     }
 
     private Display getDisplay(Question q, LoopQuestion lq, List<LoopQuestion> lqs) {
@@ -134,6 +190,19 @@ public class SetLoopsTask extends AsyncTask<Void, Void, Void> {
                 display.setQuestionCount(questionCount);
                 mDisplayDao.update(display);
             }
+            List<DisplayTranslation> translations = mDisplayTranslationDao.displayTranslationsSync(parent.getRemoteId());
+            for (DisplayTranslation translation : translations) {
+                DisplayTranslation displayTranslation = mDisplayTranslationDao.findByTitleAndDisplayIdSync(
+                        translation.getText() + " p2", display.getRemoteId());
+                if (displayTranslation == null) {
+                    displayTranslation = new DisplayTranslation();
+                    displayTranslation.setLanguage(translation.getLanguage());
+                    displayTranslation.setText(translation.getText() + " p2");
+                    displayTranslation.setDisplayRemoteId(display.getRemoteId());
+                    displayTranslation.setRemoteId(Long.valueOf(translation.getText().hashCode()));
+                    mDisplayTranslationDao.insert(displayTranslation);
+                }
+            }
         }
         return display;
     }
@@ -148,7 +217,7 @@ public class SetLoopsTask extends AsyncTask<Void, Void, Void> {
         for (SectionRelation sectionRelation : instrumentRelation.sections) {
             for (DisplayRelation displayRelation : sectionRelation.displays) {
                 if (displayQuestions.get(displayRelation.display.getRemoteId()) != null) {
-                    if (displayRelation.display.getQuestionCount() != displayQuestions.get(displayRelation.display.getRemoteId()).size()) {
+                    if (displayRelation.display.getQuestionCount() > displayQuestions.get(displayRelation.display.getRemoteId()).size()) {
                         instrument.setLoaded(false);
                         mInstrumentDao.update(instrument);
                         return;
@@ -162,10 +231,10 @@ public class SetLoopsTask extends AsyncTask<Void, Void, Void> {
         mInstrumentDao.update(instrument);
     }
 
-    private void createLoopQuestion(Question question, LoopQuestion lq, int index, Display display) {
+    private void createLoopQuestion(QuestionRelation questionRelation, LoopQuestion lq, int index, Display display, Instruction instruction) {
         Question source = mQuestionDao.findByQuestionIdentifierSync(lq.getLooped());
         if (source == null) return;
-        String identifier = question.getQuestionIdentifier() + "_" + source.getQuestionIdentifier() + "_" + index;
+        String identifier = questionRelation.question.getQuestionIdentifier() + "_" + source.getQuestionIdentifier() + "_" + index;
         Question loopedQuestion = mQuestionDao.findByQuestionIdentifierSync(identifier);
         if (loopedQuestion == null) {
             loopedQuestion = new Question();
@@ -180,7 +249,7 @@ public class SetLoopsTask extends AsyncTask<Void, Void, Void> {
         if (lq.isSameDisplay()) {
             loopedQuestion.setNumberInInstrument(source.getNumberInInstrument());
         } else {
-            loopedQuestion.setNumberInInstrument(source.getNumberInInstrument() + (index * question.getLoopQuestionCount()));
+            loopedQuestion.setNumberInInstrument(source.getNumberInInstrument() + (index * questionRelation.question.getLoopQuestionCount()));
         }
         loopedQuestion.setTextToReplace(lq.getTextToReplace());
         if (lq.isDeleted()) {
@@ -188,10 +257,11 @@ public class SetLoopsTask extends AsyncTask<Void, Void, Void> {
             source.setLoopQuestionCount(mLoopQuestionDao.loopQuestionsSync(source.getRemoteId()).size());
             mQuestionDao.update(source);
         }
+        if (instruction != null) loopedQuestion.setInstructionId(instruction.getRemoteId());
         mQuestionDao.update(loopedQuestion);
 
-        setLoopedQuestionNextQuestions(question, source, loopedQuestion, index);
-        setLoopedQuestionMultipleSkips(question, source, loopedQuestion, index);
+        setLoopedQuestionNextQuestions(questionRelation.question, source, loopedQuestion, index);
+        setLoopedQuestionMultipleSkips(questionRelation.question, source, loopedQuestion, index);
         setSkipsLoopedQuestion(source, loopedQuestion);
     }
 
