@@ -88,7 +88,7 @@ import java.util.UUID;
         version = SurveyRoomDatabase.DATABASE_VERSION, exportSchema = true)
 @TypeConverters({Converters.class})
 public abstract class SurveyRoomDatabase extends RoomDatabase {
-    static final int DATABASE_VERSION = 5;
+    static final int DATABASE_VERSION = 6;
     private static final String TAG = SurveyRoomDatabase.class.getName();
     private static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override
@@ -126,6 +126,12 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
             database.execSQL("ALTER TABLE Questions ADD COLUMN SkipOperation TEXT");
         }
     };
+    private static final Migration MIGRATION_5_6 = new Migration(5, 6) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE NextQuestions ADD COLUMN ValueOperator TEXT");
+        }
+    };
     private static volatile SurveyRoomDatabase INSTANCE;
     private static RoomDatabase.Callback sRoomDatabaseCallback =
             new RoomDatabase.Callback() {
@@ -146,7 +152,7 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             SurveyRoomDatabase.class, "SurveyDatabase")
                             .addCallback(sRoomDatabaseCallback)
-                            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+                            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
                             .openHelperFactory(factory)
                             .build();
                 }

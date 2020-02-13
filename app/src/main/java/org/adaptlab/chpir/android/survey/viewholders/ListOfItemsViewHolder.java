@@ -4,28 +4,19 @@ import android.app.Activity;
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.multidex.BuildConfig;
-
-import com.opencsv.CSVReader;
-
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.relations.InstructionRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionRelation;
+import org.adaptlab.chpir.android.survey.utils.FormatUtils;
 import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
-import org.apache.commons.codec.Charsets;
 import org.apache.commons.lang3.StringEscapeUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -117,18 +108,10 @@ public abstract class ListOfItemsViewHolder extends QuestionViewHolder {
     @Override
     protected void deserialize(String responseText) {
         if (responseText.equals("")) return;
-        InputStream input = new ByteArrayInputStream(responseText.getBytes(Charsets.UTF_8));
-        InputStreamReader inputReader = new InputStreamReader(input);
-        CSVReader reader = new CSVReader(inputReader);
-        String[] listOfResponses;
-        try {
-            listOfResponses = reader.readNext();
-            for (int i = 0; i < listOfResponses.length; i++) {
-                if (mEditTexts.size() > i)
-                    mEditTexts.get(i).setText(listOfResponses[i]);
-            }
-        } catch (IOException e) {
-            if (BuildConfig.DEBUG) Log.e(TAG, "IOException " + e.getMessage());
+        String[] listOfResponses = FormatUtils.getStringArray(responseText);
+        for (int i = 0; i < listOfResponses.length; i++) {
+            if (mEditTexts.size() > i)
+                mEditTexts.get(i).setText(listOfResponses[i]);
         }
     }
 

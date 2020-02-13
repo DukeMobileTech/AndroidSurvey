@@ -9,6 +9,14 @@ public class ConstantUtils {
     public static final String TABLE_HEADER = "TABLE_HEADER";
     public static final String INTEGER_BOXES_TABLE = "INTEGER_BOXES_TABLE";
     public static final String TEXT_BOXES_TABLE = "TEXT_BOXES_TABLE";
+    public static final String DEFAULT = "DEFAULT";
+    public static final String INVERSE = "INVERSE";
+    public static final String EQUALS_TO = "EQUALS_TO";
+    public static final String LESS_THAN = "LESS_THAN";
+    public static final String EQUALS_TO_OR_LESS_THAN = "EQUALS_TO_OR_LESS_THAN";
+    public static final String NOT_EQUALS_TO = "NOT_EQUALS_TO";
+    public static final String MORE_THAN = "MORE_THAN";
+    public static final String EQUALS_TO_OR_MORE_THAN = "EQUALS_TO_OR_MORE_THAN";
     public static final int EDIT_TEXT_DELAY = 2000;
     public static final int LOOP_MAX = 12;
     public static final int LOWER_BOUND = 100000;

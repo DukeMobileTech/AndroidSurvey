@@ -62,7 +62,7 @@ public class SelectMultipleViewHolder extends QuestionViewHolder {
         if (mCheckBoxes.get(optionIndex).isChecked()) {
             String excluded = getOptionSetOptionRelation(optionRelation).optionSetOption.getExclusionIds();
             if (!TextUtils.isEmpty(excluded)) {
-                for (String id : excluded.split(",")) {
+                for (String id : excluded.split(COMMA)) {
                     for (int k = 0; k < getOptionSetOptionRelations().size(); k++) {
                         OptionSetOptionRelation relation = getOptionSetOptionRelations().valueAt(k);
                         if (relation.optionSetOption.getRemoteId().equals(Long.valueOf(id))) {

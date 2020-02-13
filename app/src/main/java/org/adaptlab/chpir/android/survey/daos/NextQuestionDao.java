@@ -9,7 +9,7 @@ import java.util.List;
 
 @Dao
 public abstract class NextQuestionDao extends BaseDao<NextQuestion> {
-    @Query("SELECT * FROM NextQuestions WHERE QuestionIdentifier=:identifier AND InstrumentRemoteId=:instrumentId AND Deleted=0")
+    @Query("SELECT * FROM NextQuestions WHERE QuestionIdentifier=:identifier AND InstrumentRemoteId=:instrumentId")
     public abstract List<NextQuestion> questionNextQuestionsSync(String identifier, Long instrumentId);
 
     @Query("SELECT * FROM NextQuestions WHERE QuestionIdentifier=:qIdentifier AND OptionIdentifier=:oIdentifier AND NextQuestionIdentifier=:nqIdentifier AND Value=:value LIMIT 1")

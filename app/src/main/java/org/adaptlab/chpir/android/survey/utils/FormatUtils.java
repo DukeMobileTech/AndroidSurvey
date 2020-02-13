@@ -3,13 +3,25 @@ package org.adaptlab.chpir.android.survey.utils;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
+import android.util.Log;
 
+import androidx.multidex.BuildConfig;
+
+import com.opencsv.CSVReader;
+
+import org.apache.commons.codec.Charsets;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 
 public class FormatUtils {
+    private static String TAG = "FormatUtils";
     public static String pluralize(int number, String singular, String plural) {
         if (number == 1) {
             return singular;
@@ -95,5 +107,19 @@ public class FormatUtils {
             if (i < list.size() - 1) serialized.append(COMMA);
         }
         return serialized.toString();
+    }
+
+    public static String[] getStringArray(String responseText) {
+        InputStream input = new ByteArrayInputStream(responseText.getBytes(Charsets.UTF_8));
+        InputStreamReader inputReader = new InputStreamReader(input);
+        CSVReader reader = new CSVReader(inputReader);
+        String[] listOfResponses = new String[0];
+        try {
+            listOfResponses = reader.readNext();
+
+        } catch (IOException e) {
+            if (BuildConfig.DEBUG) Log.e(TAG, "IOException " + e.getMessage());
+        }
+        return listOfResponses;
     }
 }

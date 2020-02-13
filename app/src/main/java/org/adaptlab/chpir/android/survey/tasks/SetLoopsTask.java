@@ -282,6 +282,9 @@ public class SetLoopsTask extends AsyncTask<Void, Void, Void> {
                 nq.setInstrumentRemoteId(nextQuestion.getInstrumentRemoteId());
                 nq.setValue(value);
                 mNextQuestionDao.insert(nq);
+            } else {
+                nq.setDeleted(nextQuestion.isDeleted());
+                mNextQuestionDao.update(nq);
             }
         }
     }
@@ -319,6 +322,9 @@ public class SetLoopsTask extends AsyncTask<Void, Void, Void> {
             ms.setDeleted(multipleSkip.isDeleted());
             ms.setInstrumentRemoteId(multipleSkip.getInstrumentRemoteId());
             mMultipleSkipDao.insert(ms);
+        } else {
+            ms.setDeleted(multipleSkip.isDeleted());
+            mMultipleSkipDao.update(ms);
         }
     }
 
