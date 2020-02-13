@@ -143,6 +143,9 @@ public class Question implements SurveyEntity, Translatable {
     @SerializedName("default_response")
     @ColumnInfo(name = "DefaultResponse")
     private String mDefaultResponse;
+    @SerializedName("skip_operation")
+    @ColumnInfo(name = "SkipOperation")
+    private String mSkipOperation;
 
     @Ignore
     @SerializedName("question_translations")
@@ -172,6 +175,7 @@ public class Question implements SurveyEntity, Translatable {
         destination.mCarryForwardIdentifier = source.mCarryForwardIdentifier;
         destination.mCarryForwardOptionSetId = source.mCarryForwardOptionSetId;
         destination.mDefaultResponse = source.mDefaultResponse;
+        destination.mSkipOperation = source.mSkipOperation;
         return destination;
     }
 
@@ -482,6 +486,14 @@ public class Question implements SurveyEntity, Translatable {
 
     public void setPosition(int mPosition) {
         this.mPosition = mPosition;
+    }
+
+    public String getSkipOperation() {
+        return mSkipOperation;
+    }
+
+    public void setSkipOperation(String mSkipOperation) {
+        this.mSkipOperation = mSkipOperation;
     }
 
     @Retention(RetentionPolicy.SOURCE)

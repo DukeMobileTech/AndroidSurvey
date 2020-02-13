@@ -12,6 +12,7 @@ import android.text.Editable;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.LongSparseArray;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -83,6 +84,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     private List<OptionRelation> mCarryForwardOptionRelations;
     private HashMap<String, InstructionRelation> mOptionInstructions;
     private List<Long> mTextEntryOptionIds;
+    private LongSparseArray<OptionSetOptionRelation> mOptionSetOptionRelations;
 
     private TextView mNumberTextView;
     private TextView mBeforeTextInstructionTextView;
@@ -336,6 +338,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         mOptionRelations = new ArrayList<>();
         mOptionInstructions = new HashMap<>();
         mTextEntryOptionIds = new ArrayList<>();
+        mOptionSetOptionRelations = new LongSparseArray<>();
         if (questionRelation.optionSets.size() > 0) {
             OptionSetRelation optionSetRelation = questionRelation.optionSets.get(0);
             if (optionSetRelation.instructions.size() > 0) {
@@ -344,15 +347,24 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
             for (OptionSetOptionRelation relation : sortedOptionSetOptionRelations(optionSetRelation.optionSetOptions)) {
                 if (!relation.optionSetOption.isDeleted() && relation.options.size() > 0) {
                     mOptionRelations.add(relation.options.get(0));
+                    mOptionSetOptionRelations.put(relation.options.get(0).option.getRemoteId(), relation);
                     if (relation.instructions.size() > 0) {
                         mOptionInstructions.put(relation.options.get(0).option.getIdentifier(), relation.instructions.get(0));
                     }
-                }
-                if (relation.optionSetOption.isAllowTextEntry()) {
-                    mTextEntryOptionIds.add(relation.optionSetOption.getOptionRemoteId());
+                    if (relation.optionSetOption.isAllowTextEntry()) {
+                        mTextEntryOptionIds.add(relation.optionSetOption.getOptionRemoteId());
+                    }
                 }
             }
         }
+    }
+
+    OptionSetOptionRelation getOptionSetOptionRelation(OptionRelation optionRelation) {
+        return mOptionSetOptionRelations.get(optionRelation.option.getRemoteId());
+    }
+
+    LongSparseArray<OptionSetOptionRelation> getOptionSetOptionRelations() {
+        return mOptionSetOptionRelations;
     }
 
     InstructionRelation getOptionInstruction(String optionIdentifier) {

@@ -45,6 +45,9 @@ public class OptionSetOption implements SurveyEntity {
     @SerializedName("allow_text_entry")
     @ColumnInfo(name = "AllowTextEntry")
     private boolean mAllowTextEntry;
+    @SerializedName("exclusion_ids")
+    @ColumnInfo(name = "ExclusionIds")
+    private String mExclusionIds;
 
     @NonNull
     public Long getRemoteId() {
@@ -134,5 +137,13 @@ public class OptionSetOption implements SurveyEntity {
 
     public void setAllowTextEntry(boolean mAllowTextEntry) {
         this.mAllowTextEntry = mAllowTextEntry;
+    }
+
+    public String getExclusionIds() {
+        return mExclusionIds;
+    }
+
+    public void setExclusionIds(String mExclusionIds) {
+        this.mExclusionIds = mExclusionIds;
     }
 }
