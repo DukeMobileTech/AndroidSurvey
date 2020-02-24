@@ -143,10 +143,20 @@ public class Question implements SurveyEntity, Translatable {
     @SerializedName("default_response")
     @ColumnInfo(name = "DefaultResponse")
     private String mDefaultResponse;
-    @SerializedName("skip_operation")
     @ColumnInfo(name = "SkipOperation")
-    private String mSkipOperation;
-
+    private String mSkipOperation; //TODO No-longer used - remove without changing the schema
+    @SerializedName("next_question_operator")
+    @ColumnInfo(name = "NextQuestionOperator")
+    private String mNextQuestionOperator;
+    @SerializedName("multiple_skip_operator")
+    @ColumnInfo(name = "MultipleSkipOperator")
+    private String mMultipleSkipOperator;
+    @SerializedName("next_question_neutral_ids")
+    @ColumnInfo(name = "NextQuestionNeutralIds")
+    private String mNextQuestionNeutralIds;
+    @SerializedName("multiple_skip_neutral_ids")
+    @ColumnInfo(name = "MultipleSkipNeutralIds")
+    private String mMultipleSkipNeutralIds;
     @Ignore
     @SerializedName("question_translations")
     private List<QuestionTranslation> mQuestionTranslations;
@@ -175,7 +185,10 @@ public class Question implements SurveyEntity, Translatable {
         destination.mCarryForwardIdentifier = source.mCarryForwardIdentifier;
         destination.mCarryForwardOptionSetId = source.mCarryForwardOptionSetId;
         destination.mDefaultResponse = source.mDefaultResponse;
-        destination.mSkipOperation = source.mSkipOperation;
+        destination.mNextQuestionOperator = source.mNextQuestionOperator;
+        destination.mMultipleSkipOperator = source.mMultipleSkipOperator;
+        destination.mNextQuestionNeutralIds = source.mNextQuestionNeutralIds;
+        destination.mMultipleSkipNeutralIds = source.mMultipleSkipNeutralIds;
         return destination;
     }
 
@@ -494,6 +507,38 @@ public class Question implements SurveyEntity, Translatable {
 
     public void setSkipOperation(String mSkipOperation) {
         this.mSkipOperation = mSkipOperation;
+    }
+
+    public String getNextQuestionOperator() {
+        return mNextQuestionOperator;
+    }
+
+    public void setNextQuestionOperator(String mNextQuestionOperator) {
+        this.mNextQuestionOperator = mNextQuestionOperator;
+    }
+
+    public String getMultipleSkipOperator() {
+        return mMultipleSkipOperator;
+    }
+
+    public void setMultipleSkipOperator(String mMultipleSkipOperator) {
+        this.mMultipleSkipOperator = mMultipleSkipOperator;
+    }
+
+    public String getNextQuestionNeutralIds() {
+        return mNextQuestionNeutralIds;
+    }
+
+    public void setNextQuestionNeutralIds(String mNextQuestionNeutralIds) {
+        this.mNextQuestionNeutralIds = mNextQuestionNeutralIds;
+    }
+
+    public String getMultipleSkipNeutralIds() {
+        return mMultipleSkipNeutralIds;
+    }
+
+    public void setMultipleSkipNeutralIds(String mMultipleSkipNeutralIds) {
+        this.mMultipleSkipNeutralIds = mMultipleSkipNeutralIds;
     }
 
     @Retention(RetentionPolicy.SOURCE)

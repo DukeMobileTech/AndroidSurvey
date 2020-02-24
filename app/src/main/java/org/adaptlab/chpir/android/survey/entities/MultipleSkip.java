@@ -42,6 +42,9 @@ public class MultipleSkip implements SurveyEntity {
     @SerializedName("value")
     @ColumnInfo(name = "Value")
     private String mValue;
+    @SerializedName("value_operator")
+    @ColumnInfo(name = "ValueOperator")
+    private String mValueOperator;
 
     @NonNull
     public Long getRemoteId() {
@@ -123,5 +126,13 @@ public class MultipleSkip implements SurveyEntity {
     public void save(BaseDao dao, List list) {
         dao.updateAll(list);
         dao.insertAll(list);
+    }
+
+    public String getValueOperator() {
+        return mValueOperator;
+    }
+
+    public void setValueOperator(String mValueOperator) {
+        this.mValueOperator = mValueOperator;
     }
 }

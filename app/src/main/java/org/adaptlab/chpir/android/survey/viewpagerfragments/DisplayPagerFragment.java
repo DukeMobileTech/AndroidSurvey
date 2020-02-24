@@ -22,6 +22,7 @@ import org.adaptlab.chpir.android.survey.entities.Option;
 import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.Response;
 import org.adaptlab.chpir.android.survey.entities.Survey;
+import org.adaptlab.chpir.android.survey.relations.OptionSetOptionRelation;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
 import org.adaptlab.chpir.android.survey.repositories.ResponseRepository;
 import org.adaptlab.chpir.android.survey.viewholders.QuestionViewHolder;
@@ -40,9 +41,13 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
+import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.ALL;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMPLETE_SURVEY;
+import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.EQUALS_TO;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.LOOP_MAX;
+import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.MORE_THAN;
+import static org.adaptlab.chpir.android.survey.utils.SortUtils.sortedOptionSetOptionRelations;
 
 public class DisplayPagerFragment extends Fragment {
     public final static String EXTRA_INSTRUMENT_ID = "org.adaptlab.chpir.android.survey.EXTRA_INSTRUMENT_ID";
@@ -96,7 +101,7 @@ public class DisplayPagerFragment extends Fragment {
             @Override
             public void onResponseSelected(QuestionRelation qr, Option selectedOption, List<Option> selectedOptions, String enteredValue, String nextQuestion, String text) {
                 setNextQuestions(qr, nextQuestion);
-                setMultipleSkips(qr, selectedOption, selectedOptions, enteredValue);
+                setMultipleSkips(qr, selectedOption, selectedOptions, enteredValue, text);
                 setQuestionLoops(qr, text);
                 mSurveyViewModel.updateQuestionsToSkipSet();
             }
@@ -117,12 +122,7 @@ public class DisplayPagerFragment extends Fragment {
                         }
                         mSurveyViewModel.updateQuestionsToSkipMap(qr.question.getQuestionIdentifier() + "/intLoop", questionsToHide);
                     } else if (qr.question.isMultipleResponseLoop()) {
-                        List<String> responses;
-                        if (qr.question.isListResponse()) {
-                            responses = Arrays.asList(text.split(COMMA, -1)); // Keep empty values
-                        } else {
-                            responses = Arrays.asList(text.split(COMMA)); // Ignore empty values
-                        }
+                        List<String> responses = getResponse(qr, text);
                         List<String> questionsToHide = new ArrayList<>();
                         int optionsSize = qr.optionSets.get(0).optionSetOptions.size() - 1;
                         if (qr.question.isOtherQuestionType()) {
@@ -149,7 +149,17 @@ public class DisplayPagerFragment extends Fragment {
                 }
             }
 
-            private void setMultipleSkips(QuestionRelation qr, Option selectedOption, List<Option> selectedOptions, String enteredValue) {
+            private List<String> getResponse(QuestionRelation qr, String text) {
+                List<String> responses;
+                if (qr.question.isListResponse()) {
+                    responses = Arrays.asList(text.split(COMMA, -1)); // Keep empty values
+                } else {
+                    responses = Arrays.asList(text.split(COMMA)); // Ignore empty values
+                }
+                return responses;
+            }
+
+            private void setMultipleSkips(QuestionRelation qr, Option selectedOption, List<Option> selectedOptions, String enteredValue, String response) {
                 if (qr.multipleSkips != null && !qr.multipleSkips.isEmpty()) {
                     List<String> skipList = new ArrayList<>();
                     if (selectedOption != null && selectedOption.getIdentifier() != null) {
@@ -162,18 +172,83 @@ public class DisplayPagerFragment extends Fragment {
                     }
                     if (enteredValue != null) {
                         for (MultipleSkip multipleSkip : qr.multipleSkips) {
-                            if (multipleSkip.getValue().equals(enteredValue)) {
-                                skipList.add(multipleSkip.getSkipQuestionIdentifier());
+                            if (!TextUtils.isEmpty(multipleSkip.getValueOperator()) &&
+                                    multipleSkip.getValueOperator().equals(EQUALS_TO)) {
+                                if (multipleSkip.getValue().equals(enteredValue)) {
+                                    skipList.add(multipleSkip.getSkipQuestionIdentifier());
+                                }
+                            } else if (!TextUtils.isEmpty(multipleSkip.getValueOperator()) &&
+                                    multipleSkip.getValueOperator().equals(MORE_THAN)) {
+                                if (Integer.parseInt(enteredValue) > Integer.parseInt(multipleSkip.getValue())) {
+                                    skipList.add(multipleSkip.getSkipQuestionIdentifier());
+                                }
                             }
                         }
                     }
                     mSurveyViewModel.updateQuestionsToSkipMap(qr.question.getQuestionIdentifier() + "/multi", skipList);
                     if (!selectedOptions.isEmpty()) {
                         HashSet<String> skipSet = new HashSet<>();
-                        for (Option option : selectedOptions) {
-                            for (MultipleSkip multipleSkip : qr.multipleSkips) {
-                                if (multipleSkip.getOptionIdentifier().equals(option.getIdentifier())) {
-                                    skipSet.add(multipleSkip.getSkipQuestionIdentifier());
+                        if (!TextUtils.isEmpty(qr.question.getMultipleSkipOperator()) &&
+                                qr.question.getMultipleSkipOperator().equals(ALL)) {
+                            List<String> responses = getResponse(qr, response);
+                            if (qr.question.getQuestionType().equals(Question.LIST_OF_INTEGER_BOXES)) {
+                                boolean allPass = true;
+                                List<OptionSetOptionRelation> relations = sortedOptionSetOptionRelations(qr.optionSets.get(0).optionSetOptions);
+                                for (Option option : selectedOptions) {
+                                    MultipleSkip skip = null;
+                                    for (MultipleSkip multipleSkip : qr.multipleSkips) {
+                                        if (multipleSkip.getOptionIdentifier().equals(option.getIdentifier())) {
+                                            skip = multipleSkip;
+                                            break;
+                                        }
+                                    }
+                                    if (skip != null) {
+                                        for (int k = 0; k < responses.size(); k++) {
+                                            if (!TextUtils.isEmpty(responses.get(k))) {
+                                                Option so = relations.get(k).options.get(0).option;
+                                                if (so.getIdentifier().equals(skip.getOptionIdentifier())) {
+                                                    if (!TextUtils.isEmpty(skip.getValueOperator()) &&
+                                                            skip.getValueOperator().equals(EQUALS_TO) &&
+                                                            !skip.getValue().equals(responses.get(k))) {
+                                                        allPass = false;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                if (allPass) {
+                                    for (MultipleSkip multipleSkip : qr.multipleSkips) {
+                                        skipSet.add(multipleSkip.getSkipQuestionIdentifier());
+                                    }
+                                }
+                            }
+                        } else {
+                            if (qr.question.getQuestionType().equals(Question.LIST_OF_INTEGER_BOXES)) {
+                                List<OptionSetOptionRelation> relations = sortedOptionSetOptionRelations(qr.optionSets.get(0).optionSetOptions);
+                                List<String> responses = getResponse(qr, response);
+                                for (MultipleSkip multipleSkip : qr.multipleSkips) {
+                                    for (int k = 0; k < responses.size(); k++) {
+                                        if (!TextUtils.isEmpty(responses.get(k))) {
+                                            Option so = relations.get(k).options.get(0).option;
+                                            if (so.getIdentifier().equals(multipleSkip.getOptionIdentifier())) {
+                                                if (!TextUtils.isEmpty(multipleSkip.getValueOperator()) &&
+                                                        multipleSkip.getValueOperator().equals(EQUALS_TO) &&
+                                                        multipleSkip.getValue().equals(responses.get(k))) {
+                                                    skipSet.add(multipleSkip.getSkipQuestionIdentifier());
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                for (Option option : selectedOptions) {
+                                    for (MultipleSkip multipleSkip : qr.multipleSkips) {
+                                        if (multipleSkip.getOptionIdentifier().equals(option.getIdentifier())) {
+                                            skipSet.add(multipleSkip.getSkipQuestionIdentifier());
+                                        }
+                                    }
                                 }
                             }
                         }

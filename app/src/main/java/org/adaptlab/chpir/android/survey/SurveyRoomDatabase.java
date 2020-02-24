@@ -88,7 +88,7 @@ import java.util.UUID;
         version = SurveyRoomDatabase.DATABASE_VERSION, exportSchema = true)
 @TypeConverters({Converters.class})
 public abstract class SurveyRoomDatabase extends RoomDatabase {
-    static final int DATABASE_VERSION = 6;
+    static final int DATABASE_VERSION = 7;
     private static final String TAG = SurveyRoomDatabase.class.getName();
     private static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override
@@ -132,6 +132,16 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
             database.execSQL("ALTER TABLE NextQuestions ADD COLUMN ValueOperator TEXT");
         }
     };
+    private static final Migration MIGRATION_6_7 = new Migration(6, 7) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE MultipleSkips ADD COLUMN ValueOperator TEXT");
+            database.execSQL("ALTER TABLE Questions ADD COLUMN NextQuestionOperator TEXT");
+            database.execSQL("ALTER TABLE Questions ADD COLUMN MultipleSkipOperator TEXT");
+            database.execSQL("ALTER TABLE Questions ADD COLUMN NextQuestionNeutralIds TEXT");
+            database.execSQL("ALTER TABLE Questions ADD COLUMN MultipleSkipNeutralIds TEXT");
+        }
+    };
     private static volatile SurveyRoomDatabase INSTANCE;
     private static RoomDatabase.Callback sRoomDatabaseCallback =
             new RoomDatabase.Callback() {
@@ -152,7 +162,8 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             SurveyRoomDatabase.class, "SurveyDatabase")
                             .addCallback(sRoomDatabaseCallback)
-                            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
+                            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5,
+                                    MIGRATION_5_6, MIGRATION_6_7)
                             .openHelperFactory(factory)
                             .build();
                 }

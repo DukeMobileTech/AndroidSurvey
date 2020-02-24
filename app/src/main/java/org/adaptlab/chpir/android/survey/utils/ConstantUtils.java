@@ -9,8 +9,9 @@ public class ConstantUtils {
     public static final String TABLE_HEADER = "TABLE_HEADER";
     public static final String INTEGER_BOXES_TABLE = "INTEGER_BOXES_TABLE";
     public static final String TEXT_BOXES_TABLE = "TEXT_BOXES_TABLE";
-    public static final String DEFAULT = "DEFAULT";
-    public static final String INVERSE = "INVERSE";
+    public static final String ALL = "ALL";
+    public static final String ANY_AND_NO_OTHER = "ANY_AND_NO_OTHER";
+    public static final String ANY_NOT_SELECTED = "ANY_NOT_SELECTED";
     public static final String EQUALS_TO = "EQUALS_TO";
     public static final String LESS_THAN = "LESS_THAN";
     public static final String EQUALS_TO_OR_LESS_THAN = "EQUALS_TO_OR_LESS_THAN";

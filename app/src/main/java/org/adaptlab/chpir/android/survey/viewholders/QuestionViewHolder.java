@@ -57,6 +57,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.ANY_NOT_SELECTED;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.BLANK;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.EDIT_TEXT_DELAY;
@@ -145,7 +146,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
     public void setDisplayViewModel(DisplayViewModel viewModel) {
         mDisplayViewModel = viewModel;
-        mResponse = mDisplayViewModel.getResponse(mQuestionRelation.question.getQuestionIdentifier());
+        mResponse = mDisplayViewModel.getResponse(getQuestion().getQuestionIdentifier());
         mDeserializing = true;
         deserializeResponse();
         mDeserializing = false;
@@ -168,7 +169,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     }
 
     List<OptionRelation> getOptionRelations() {
-        if (mQuestionRelation.question.isCarryForward()) {
+        if (getQuestion().isCarryForward()) {
             return mCarryForwardOptionRelations;
         } else {
             return mOptionRelations;
@@ -184,7 +185,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     }
 
     private Response getCarryForwardResponse() {
-        return getSurveyViewModel().getResponses().get(mQuestionRelation.question.getCarryForwardIdentifier());
+        return getSurveyViewModel().getResponses().get(getQuestion().getCarryForwardIdentifier());
     }
 
     void toggleCarryForward(View view, int optionId) {
@@ -389,7 +390,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     void updateResponse() {
         updateSkipData();
         mResponse.setTimeEnded(new Date());
-        mResponse.setIdentifiesSurvey(mQuestionRelation.question.isIdentifiesSurvey());
+        mResponse.setIdentifiesSurvey(getQuestion().isIdentifiesSurvey());
         mResponseRepository.update(mResponse);
     }
 
@@ -398,11 +399,11 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         String enteredValue = null;
         List<Option> selectedOptions = new ArrayList<>();
         if (!TextUtils.isEmpty(mResponse.getText())) {
-            if (mQuestionRelation.question.isSingleResponse()) {
+            if (getQuestion().isSingleResponse()) {
                 selectedOption = getSelectedOption(mResponse.getText());
-            } else if (mQuestionRelation.question.getQuestionType().equals(Question.INTEGER)) {
+            } else if (getQuestion().getQuestionType().equals(Question.INTEGER)) {
                 enteredValue = mResponse.getText();
-            } else if (mQuestionRelation.question.isMultipleResponse()) {
+            } else if (getQuestion().isMultipleResponse()) {
                 String[] responses = mResponse.getText().split(COMMA);
                 if (responses.length == 1) {
                     selectedOption = getSelectedOption(responses[0]);
@@ -412,7 +413,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                         if (option != null) selectedOptions.add(option);
                     }
                 }
-            } else if (mQuestionRelation.question.getQuestionType().equals(Question.LIST_OF_INTEGER_BOXES)) {
+            } else if (getQuestion().getQuestionType().equals(Question.LIST_OF_INTEGER_BOXES)) {
                 String[] responses = getStringArray(mResponse.getText());
                 for (int k = 0; k < responses.length; k++) {
                     if (!TextUtils.isEmpty(responses[k])) {
@@ -431,7 +432,10 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
             }
         }
         String nextQuestion = null;
-        if (selectedOptions.isEmpty()) {
+        if (!TextUtils.isEmpty(getQuestion().getNextQuestionOperator()) &&
+                getQuestion().getNextQuestionOperator().equals(ANY_NOT_SELECTED)) {
+            nextQuestion = getNextQuestionIdentifierForNot();
+        } else if (selectedOptions.isEmpty()) {
             if (selectedOption != null && enteredValue == null) {
                 nextQuestion = getNextQuestionIdentifier(selectedOption);
             } else if (selectedOption == null && enteredValue != null) {
@@ -442,6 +446,24 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         }
 
         getListener().onResponseSelected(mQuestionRelation, selectedOption, selectedOptions, enteredValue, nextQuestion, mResponse.getText());
+    }
+
+    private String getNextQuestionIdentifierForNot() {
+        List<String> selectedIndices = Arrays.asList(mResponse.getText().split(COMMA));
+        for (String string : getSkipOptionIndices()) {
+            if (selectedIndices.contains(string)) return null;
+        }
+
+        HashSet<String> nextQuestions = new HashSet<>();
+        for (NextQuestion nextQuestion : mQuestionRelation.nextQuestions) {
+            if (!nextQuestion.isDeleted())
+                nextQuestions.add(nextQuestion.getNextQuestionIdentifier());
+        }
+        if (nextQuestions.size() == 1) {
+            return nextQuestions.iterator().next();
+        } else {
+            return null;
+        }
     }
 
     private String getNextQuestionIdentifier(Option option) {
@@ -469,13 +491,26 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         return null;
     }
 
+    private List<String> neutralOptionIndices() {
+        List<String> list = new ArrayList<>();
+        for (String id : getQuestion().getNextQuestionNeutralIds().split(COMMA)) {
+            for (int k = 0; k < mOptionRelations.size(); k++) {
+                if (mOptionRelations.get(k).option.getRemoteId().equals(Long.valueOf(id))) {
+                    list.add(k + BLANK);
+                }
+            }
+        }
+        return list;
+    }
+
     private String getNextQuestionIdentifier(List<Option> options) {
-        if (!TextUtils.isEmpty(mQuestionRelation.question.getSkipOperation()) &&
-                mQuestionRelation.question.getSkipOperation().equals(ConstantUtils.INVERSE) &&
-                mQuestionRelation.question.isMultipleResponse()) {
+        if (!TextUtils.isEmpty(getQuestion().getNextQuestionOperator()) &&
+                getQuestion().getNextQuestionOperator().equals(ConstantUtils.ANY_AND_NO_OTHER) &&
+                getQuestion().isMultipleResponse()) {
             List<String> skipOptions = getSkipOptionIndices();
             for (String string : mResponse.getText().split(COMMA)) {
-                if (!skipOptions.contains(string)) return null;
+                if (!skipOptions.contains(string) && !neutralOptionIndices().contains(string))
+                    return null;
             }
         }
 
@@ -484,9 +519,9 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         for (Option option : options) {
             NextQuestion nextQuestion = getNextQuestionForOption(option);
             if (nextQuestion != null && !TextUtils.isEmpty(nextQuestion.getNextQuestionIdentifier())) {
-                if (mQuestionRelation.question.getQuestionType().equals(Question.LIST_OF_INTEGER_BOXES) &&
-                        !TextUtils.isEmpty(mQuestionRelation.question.getSkipOperation()) &&
-                        mQuestionRelation.question.getSkipOperation().equals(ConstantUtils.INVERSE) &&
+                if (getQuestion().getQuestionType().equals(Question.LIST_OF_INTEGER_BOXES) &&
+                        !TextUtils.isEmpty(getQuestion().getNextQuestionOperator()) &&
+                        getQuestion().getNextQuestionOperator().equals(ConstantUtils.ANY_AND_NO_OTHER) &&
                         !TextUtils.isEmpty(nextQuestion.getValueOperator())) {
                     String response = null;
                     for (int k = 0; k < mOptionRelations.size(); k++) {
@@ -500,6 +535,22 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                             nextQuestions.add(nextQuestion.getNextQuestionIdentifier());
                         } else {
                             return null;
+                        }
+                    }
+                } else if (getQuestion().getQuestionType().equals(Question.LIST_OF_INTEGER_BOXES) &&
+                        !TextUtils.isEmpty(getQuestion().getNextQuestionOperator()) &&
+                        getQuestion().getNextQuestionOperator().equals(ConstantUtils.ALL) &&
+                        !TextUtils.isEmpty(nextQuestion.getValueOperator())) {
+                    for (int k = 0; k < mOptionRelations.size(); k++) {
+                        if (mOptionRelations.get(k).option.getIdentifier().equals(option.getIdentifier())) {
+                            String response = getStringArray(mResponse.getText())[k];
+                            if (!TextUtils.isEmpty(response) && nextQuestion.getValueOperator().equals(ConstantUtils.EQUALS_TO)) {
+                                if (response.equals(nextQuestion.getValue())) {
+                                    nextQuestions.add(nextQuestion.getNextQuestionIdentifier());
+                                } else {
+                                    return null;
+                                }
+                            }
                         }
                     }
                 } else {
@@ -576,7 +627,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
     private void setQuestionTextComponents() {
         setQuestionNumberView();
-        if (mQuestionRelation.question.getQuestionType().equals(Question.INSTRUCTIONS)) {
+        if (getQuestion().getQuestionType().equals(Question.INSTRUCTIONS)) {
             mBeforeTextInstructionTextView.setVisibility(View.GONE);
             mAfterTextInstructionTextView.setVisibility(View.GONE);
         } else {
@@ -588,7 +639,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
     private void setQuestionNumberView() {
         if (mNumberTextView == null) return;
-        String text = mQuestionRelation.question.getPosition() + ") " + mQuestionRelation.question.getQuestionIdentifier();
+        String text = getQuestion().getPosition() + ") " + getQuestion().getQuestionIdentifier();
         mNumberTextView.setText(text);
     }
 
@@ -604,7 +655,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
     private void setQuestionText() {
         if (mSpannedTextView == null) return;
-        if (mQuestionRelation.question.getPopUpInstructionId() == null) {
+        if (getQuestion().getPopUpInstructionId() == null) {
             mSpannedTextView.setCompoundDrawables(null, null, null, null);
         } else {
             setCompoundDrawableRight(mSpannedTextView, getContext().getResources().getDrawable(R.drawable.ic_info_outline_blue_24dp), getQuestionPopUpInstructions());
@@ -691,25 +742,25 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     }
 
     Spanned getQuestionText() {
-        String text = TranslationUtil.getText(mQuestionRelation.question, mQuestionRelation.translations, mSurveyViewModel);
-        if (!TextUtils.isEmpty(mQuestionRelation.question.getLoopSource())) {
-            String causeId = mQuestionRelation.question.getQuestionIdentifier().split("_")[0];
+        String text = TranslationUtil.getText(getQuestion(), mQuestionRelation.translations, mSurveyViewModel);
+        if (!TextUtils.isEmpty(getQuestion().getLoopSource())) {
+            String causeId = getQuestion().getQuestionIdentifier().split("_")[0];
             Response response = getSurveyViewModel().getResponses().get(causeId);
             if (response != null && !TextUtils.isEmpty(response.getText())) {
                 String responseText = "";
                 String[] responses = response.getText().split(COMMA, -1);
                 Question causeQuestion = getSurveyViewModel().getQuestionsMap().get(causeId);
                 if (causeQuestion.isSingleResponse()) {
-                    int index = Integer.parseInt(responses[mQuestionRelation.question.getLoopNumber()]);
+                    int index = Integer.parseInt(responses[getQuestion().getLoopNumber()]);
                     responseText = mOptionRelations.get(index).option.getText();
                 } else if (causeQuestion.isMultipleResponse()) {
-                    if (Arrays.asList(responses).contains(Integer.toString(mQuestionRelation.question.getLoopNumber()))) {
-                        if (mQuestionRelation.question.getLoopNumber() < mOptionRelations.size())
-                            responseText = mOptionRelations.get(mQuestionRelation.question.getLoopNumber()).option.getText();
+                    if (Arrays.asList(responses).contains(Integer.toString(getQuestion().getLoopNumber()))) {
+                        if (getQuestion().getLoopNumber() < mOptionRelations.size())
+                            responseText = mOptionRelations.get(getQuestion().getLoopNumber()).option.getText();
                     }
                 } else {
-                    if (mQuestionRelation.question.getLoopNumber() < responses.length) {
-                        responseText = responses[mQuestionRelation.question.getLoopNumber()]; //Keep empty values
+                    if (getQuestion().getLoopNumber() < responses.length) {
+                        responseText = responses[getQuestion().getLoopNumber()]; //Keep empty values
                     }
                 }
                 if (!TextUtils.isEmpty(responseText)) {
@@ -718,8 +769,8 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                     if (begin != -1 && last != -1 && begin < last) {
                         text = text.replace(text.substring(begin, last + 1), responseText);
                     } else {
-                        if (!TextUtils.isEmpty(mQuestionRelation.question.getTextToReplace())) {
-                            text = mQuestionRelation.question.getText().replace(mQuestionRelation.question.getTextToReplace(), responseText);
+                        if (!TextUtils.isEmpty(getQuestion().getTextToReplace())) {
+                            text = getQuestion().getText().replace(getQuestion().getTextToReplace(), responseText);
                         }
                     }
                 }
@@ -755,7 +806,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
             }
         }
 
-        if (mQuestionRelation.question.getQuestionType().equals(Question.INSTRUCTIONS)) {
+        if (getQuestion().getQuestionType().equals(Question.INSTRUCTIONS)) {
             mClearButton.setVisibility(View.GONE);
         } else {
             mClearButton.setOnClickListener(new View.OnClickListener() {
