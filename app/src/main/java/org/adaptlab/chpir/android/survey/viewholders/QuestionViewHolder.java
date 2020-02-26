@@ -493,6 +493,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
     private List<String> neutralOptionIndices() {
         List<String> list = new ArrayList<>();
+        if (TextUtils.isEmpty(getQuestion().getNextQuestionNeutralIds())) return list;
         for (String id : getQuestion().getNextQuestionNeutralIds().split(COMMA)) {
             for (int k = 0; k < mOptionRelations.size(); k++) {
                 if (mOptionRelations.get(k).option.getRemoteId().equals(Long.valueOf(id))) {

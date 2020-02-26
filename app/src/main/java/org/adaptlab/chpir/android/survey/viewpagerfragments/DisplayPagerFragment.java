@@ -164,6 +164,7 @@ public class DisplayPagerFragment extends Fragment {
                     List<String> skipList = new ArrayList<>();
                     if (selectedOption != null && selectedOption.getIdentifier() != null) {
                         for (MultipleSkip multipleSkip : qr.multipleSkips) {
+                            if (multipleSkip.isDeleted()) continue;
                             if (multipleSkip.getOptionIdentifier() != null &&
                                     multipleSkip.getOptionIdentifier().equals(selectedOption.getIdentifier())) {
                                 skipList.add(multipleSkip.getSkipQuestionIdentifier());
@@ -172,6 +173,7 @@ public class DisplayPagerFragment extends Fragment {
                     }
                     if (enteredValue != null) {
                         for (MultipleSkip multipleSkip : qr.multipleSkips) {
+                            if (multipleSkip.isDeleted()) continue;
                             if (!TextUtils.isEmpty(multipleSkip.getValueOperator()) &&
                                     multipleSkip.getValueOperator().equals(EQUALS_TO)) {
                                 if (multipleSkip.getValue().equals(enteredValue)) {
@@ -197,6 +199,7 @@ public class DisplayPagerFragment extends Fragment {
                                 for (Option option : selectedOptions) {
                                     MultipleSkip skip = null;
                                     for (MultipleSkip multipleSkip : qr.multipleSkips) {
+                                        if (multipleSkip.isDeleted()) continue;
                                         if (multipleSkip.getOptionIdentifier().equals(option.getIdentifier())) {
                                             skip = multipleSkip;
                                             break;
@@ -220,6 +223,7 @@ public class DisplayPagerFragment extends Fragment {
                                 }
                                 if (allPass) {
                                     for (MultipleSkip multipleSkip : qr.multipleSkips) {
+                                        if (multipleSkip.isDeleted()) continue;
                                         skipSet.add(multipleSkip.getSkipQuestionIdentifier());
                                     }
                                 }
@@ -229,6 +233,7 @@ public class DisplayPagerFragment extends Fragment {
                                 List<OptionSetOptionRelation> relations = sortedOptionSetOptionRelations(qr.optionSets.get(0).optionSetOptions);
                                 List<String> responses = getResponse(qr, response);
                                 for (MultipleSkip multipleSkip : qr.multipleSkips) {
+                                    if (multipleSkip.isDeleted()) continue;
                                     for (int k = 0; k < responses.size(); k++) {
                                         if (!TextUtils.isEmpty(responses.get(k))) {
                                             Option so = relations.get(k).options.get(0).option;
@@ -245,6 +250,7 @@ public class DisplayPagerFragment extends Fragment {
                             } else {
                                 for (Option option : selectedOptions) {
                                     for (MultipleSkip multipleSkip : qr.multipleSkips) {
+                                        if (multipleSkip.isDeleted()) continue;
                                         if (multipleSkip.getOptionIdentifier().equals(option.getIdentifier())) {
                                             skipSet.add(multipleSkip.getSkipQuestionIdentifier());
                                         }
