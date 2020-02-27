@@ -10,6 +10,7 @@ import org.adaptlab.chpir.android.survey.relations.OptionRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionSetOptionRelation;
 import org.adaptlab.chpir.android.survey.utils.FormatUtils;
 import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -65,7 +66,7 @@ public class SelectMultipleViewHolder extends QuestionViewHolder {
                 for (String id : excluded.split(COMMA)) {
                     for (int k = 0; k < getOptionSetOptionRelations().size(); k++) {
                         OptionSetOptionRelation relation = getOptionSetOptionRelations().valueAt(k);
-                        if (relation.optionSetOption.getRemoteId().equals(Long.valueOf(id))) {
+                        if (NumberUtils.isNumber(id) && relation.optionSetOption.getRemoteId().equals(Long.valueOf(id))) {
                             int index = getOptionRelations().indexOf(relation.options.get(0));
                             resetExclusives(Integer.valueOf(index));
                             Set<Integer> set = mExclusives.get(index);

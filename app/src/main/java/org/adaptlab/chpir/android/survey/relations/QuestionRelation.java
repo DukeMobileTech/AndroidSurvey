@@ -3,6 +3,7 @@ package org.adaptlab.chpir.android.survey.relations;
 import androidx.room.Embedded;
 import androidx.room.Relation;
 
+import org.adaptlab.chpir.android.survey.entities.ConditionSkip;
 import org.adaptlab.chpir.android.survey.entities.Instruction;
 import org.adaptlab.chpir.android.survey.entities.LoopQuestion;
 import org.adaptlab.chpir.android.survey.entities.MultipleSkip;
@@ -33,6 +34,8 @@ public class QuestionRelation {
     public List<NextQuestion> nextQuestions;
     @Relation(parentColumn = "QuestionIdentifier", entityColumn = "QuestionIdentifier", entity = MultipleSkip.class)
     public List<MultipleSkip> multipleSkips;
+    @Relation(parentColumn = "QuestionIdentifier", entityColumn = "QuestionIdentifier", entity = ConditionSkip.class)
+    public List<ConditionSkip> conditionSkips;
     @Relation(parentColumn = "QuestionIdentifier", entityColumn = "Parent", entity = LoopQuestion.class)
     public List<LoopQuestion> loopQuestions;
     @Relation(parentColumn = "QuestionIdentifier", entityColumn = "Looped", entity = LoopQuestion.class)

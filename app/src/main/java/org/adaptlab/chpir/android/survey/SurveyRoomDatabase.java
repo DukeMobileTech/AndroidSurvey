@@ -88,7 +88,7 @@ import java.util.UUID;
         version = SurveyRoomDatabase.DATABASE_VERSION, exportSchema = true)
 @TypeConverters({Converters.class})
 public abstract class SurveyRoomDatabase extends RoomDatabase {
-    static final int DATABASE_VERSION = 7;
+    static final int DATABASE_VERSION = 8;
     private static final String TAG = SurveyRoomDatabase.class.getName();
     private static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override
@@ -142,6 +142,15 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
             database.execSQL("ALTER TABLE Questions ADD COLUMN MultipleSkipNeutralIds TEXT");
         }
     };
+    private static final Migration MIGRATION_7_8 = new Migration(7, 8) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE ConditionSkips ADD COLUMN QuestionIdentifiers TEXT");
+            database.execSQL("ALTER TABLE ConditionSkips ADD COLUMN OptionIds TEXT");
+            database.execSQL("ALTER TABLE ConditionSkips ADD COLUMN Entries TEXT");
+            database.execSQL("ALTER TABLE ConditionSkips ADD COLUMN ValueOperators TEXT");
+        }
+    };
     private static volatile SurveyRoomDatabase INSTANCE;
     private static RoomDatabase.Callback sRoomDatabaseCallback =
             new RoomDatabase.Callback() {
@@ -163,7 +172,7 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
                             SurveyRoomDatabase.class, "SurveyDatabase")
                             .addCallback(sRoomDatabaseCallback)
                             .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5,
-                                    MIGRATION_5_6, MIGRATION_6_7)
+                                    MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
                             .openHelperFactory(factory)
                             .build();
                 }

@@ -264,31 +264,29 @@ public class DisplayPagerFragment extends Fragment {
             }
 
             private void setNextQuestions(QuestionRelation qr, String nextQuestion) {
-                if (qr.nextQuestions != null && !qr.nextQuestions.isEmpty()) {
-                    List<String> skipList = new ArrayList<>();
-                    if (nextQuestion != null) {
-                        if (nextQuestion.equals(COMPLETE_SURVEY)) {
-                            List<String> questions = new ArrayList<>();
-                            for (Question q : mSurveyViewModel.getQuestions()) {
-                                questions.add(q.getQuestionIdentifier());
+                List<String> skipList = new ArrayList<>();
+                if (!TextUtils.isEmpty(nextQuestion)) {
+                    if (nextQuestion.equals(COMPLETE_SURVEY)) {
+                        List<String> questions = new ArrayList<>();
+                        for (Question q : mSurveyViewModel.getQuestions()) {
+                            questions.add(q.getQuestionIdentifier());
+                        }
+                        skipList = new ArrayList<>(questions.subList(questions.indexOf(qr.question.getQuestionIdentifier()) + 1, questions.size()));
+                    } else {
+                        boolean toBeSkipped = false;
+                        for (Question curQuestion : mSurveyViewModel.getQuestions()) {
+                            if (curQuestion.getQuestionIdentifier().equals(nextQuestion)) {
+                                break;
                             }
-                            skipList = new ArrayList<>(questions.subList(questions.indexOf(qr.question.getQuestionIdentifier()) + 1, questions.size()));
-                        } else {
-                            boolean toBeSkipped = false;
-                            for (Question curQuestion : mSurveyViewModel.getQuestions()) {
-                                if (curQuestion.getQuestionIdentifier().equals(nextQuestion)) {
-                                    break;
-                                }
-                                if (toBeSkipped) {
-                                    skipList.add(curQuestion.getQuestionIdentifier());
-                                }
-                                if (curQuestion.getQuestionIdentifier().equals(qr.question.getQuestionIdentifier()))
-                                    toBeSkipped = true;
+                            if (toBeSkipped) {
+                                skipList.add(curQuestion.getQuestionIdentifier());
                             }
+                            if (curQuestion.getQuestionIdentifier().equals(qr.question.getQuestionIdentifier()))
+                                toBeSkipped = true;
                         }
                     }
-                    mSurveyViewModel.updateQuestionsToSkipMap(qr.question.getQuestionIdentifier() + "/skipTo", skipList);
                 }
+                mSurveyViewModel.updateQuestionsToSkipMap(qr.question.getQuestionIdentifier() + "/skipTo", skipList);
             }
         };
     }
@@ -336,6 +334,7 @@ public class DisplayPagerFragment extends Fragment {
                         if (response.getSurveyUUID().equals(mSurveyUUID)) {
                             if (mDisplayViewModel.getResponse(response.getQuestionIdentifier()) == null) {
                                 mDisplayViewModel.setResponse(response.getQuestionIdentifier(), response);
+                                mDisplayViewModel.setQuestion(response.getQuestionIdentifier(), questionRelation);
                             }
                             break;
                         }
@@ -417,8 +416,8 @@ public class DisplayPagerFragment extends Fragment {
     }
 
     private void setDisplayViewModel() {
-        if (getActivity() == null || mDisplayId == null) return;
-        DisplayViewModelFactory factory = new DisplayViewModelFactory(getActivity().getApplication(), mDisplayId);
+        if (getActivity() == null) return;
+        DisplayViewModelFactory factory = new DisplayViewModelFactory(getActivity().getApplication());
         mDisplayViewModel = ViewModelProviders.of(this, factory).get(DisplayViewModel.class);
         if (mQuestionRelationsAdapter != null)
             mQuestionRelationsAdapter.setDisplayViewModel(mDisplayViewModel);

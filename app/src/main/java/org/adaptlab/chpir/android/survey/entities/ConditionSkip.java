@@ -24,15 +24,6 @@ public class ConditionSkip implements SurveyEntity {
     @SerializedName("question_identifier")
     @ColumnInfo(name = "QuestionIdentifier", index = true)
     private String mQuestionIdentifier;
-    @SerializedName("option_identifier")
-    @ColumnInfo(name = "OptionIdentifier", index = true)
-    private String mOptionIdentifier;
-    @SerializedName("condition_question_identifier")
-    @ColumnInfo(name = "ConditionQuestionIdentifier", index = true)
-    private String mConditionQuestionIdentifier;
-    @SerializedName("condition_option_identifier")
-    @ColumnInfo(name = "ConditionOptionIdentifier", index = true)
-    private String mConditionOptionIdentifier;
     @SerializedName("next_question_identifier")
     @ColumnInfo(name = "NextQuestionIdentifier", index = true)
     private String mNextQuestionIdentifier;
@@ -45,9 +36,27 @@ public class ConditionSkip implements SurveyEntity {
     @SerializedName("deleted_at")
     @ColumnInfo(name = "Deleted")
     private boolean mDeleted;
-    @SerializedName("condition")
+    @SerializedName("question_identifiers")
+    @ColumnInfo(name = "QuestionIdentifiers")
+    private String mQuestionIdentifiers;
+    @SerializedName("option_ids")
+    @ColumnInfo(name = "OptionIds")
+    private String mOptionIds;
+    @SerializedName("values")
+    @ColumnInfo(name = "Entries")
+    private String mValues;
+    @SerializedName("value_operators")
+    @ColumnInfo(name = "ValueOperators")
+    private String mValueOperators;
+    //TODO Remove columns below that are not in use
     @ColumnInfo(name = "Condition")
     private String mCondition;
+    @ColumnInfo(name = "ConditionOptionIdentifier", index = true)
+    private String mConditionOptionIdentifier;
+    @ColumnInfo(name = "OptionIdentifier", index = true)
+    private String mOptionIdentifier;
+    @ColumnInfo(name = "ConditionQuestionIdentifier", index = true)
+    private String mConditionQuestionIdentifier;
 
     @NonNull
     public Long getRemoteId() {
@@ -147,4 +156,35 @@ public class ConditionSkip implements SurveyEntity {
         dao.insertAll(list);
     }
 
+    public String getQuestionIdentifiers() {
+        return mQuestionIdentifiers;
+    }
+
+    public void setQuestionIdentifiers(String mQuestionIdentifiers) {
+        this.mQuestionIdentifiers = mQuestionIdentifiers;
+    }
+
+    public String getOptionIds() {
+        return mOptionIds;
+    }
+
+    public void setOptionIds(String mOptionIds) {
+        this.mOptionIds = mOptionIds;
+    }
+
+    public String getValues() {
+        return mValues;
+    }
+
+    public void setValues(String mValues) {
+        this.mValues = mValues;
+    }
+
+    public String getValueOperators() {
+        return mValueOperators;
+    }
+
+    public void setValueOperators(String mValueOperators) {
+        this.mValueOperators = mValueOperators;
+    }
 }

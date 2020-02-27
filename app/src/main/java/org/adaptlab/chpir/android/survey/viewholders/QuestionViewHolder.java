@@ -31,6 +31,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.adapters.QuestionRelationAdapter;
+import org.adaptlab.chpir.android.survey.entities.ConditionSkip;
 import org.adaptlab.chpir.android.survey.entities.Instruction;
 import org.adaptlab.chpir.android.survey.entities.NextQuestion;
 import org.adaptlab.chpir.android.survey.entities.Option;
@@ -432,7 +433,13 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
             }
         }
         String nextQuestion = null;
-        if (!TextUtils.isEmpty(getQuestion().getNextQuestionOperator()) &&
+        if (mQuestionRelation.conditionSkips.size() > 0) {
+            if (getQuestion().getQuestionType().equals(Question.INTEGER)) {
+                nextQuestion = integerConditionNextQuestionIdentifier();
+            } else if (getQuestion().getQuestionType().equals(Question.SELECT_ONE)) {
+                nextQuestion = selectOneConditionNextQuestionIdentifier();
+            }
+        } else if (!TextUtils.isEmpty(getQuestion().getNextQuestionOperator()) &&
                 getQuestion().getNextQuestionOperator().equals(ANY_NOT_SELECTED)) {
             nextQuestion = getNextQuestionIdentifierForNot();
         } else if (selectedOptions.isEmpty()) {
@@ -448,6 +455,51 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         getListener().onResponseSelected(mQuestionRelation, selectedOption, selectedOptions, enteredValue, nextQuestion, mResponse.getText());
     }
 
+    private String selectOneConditionNextQuestionIdentifier() {
+        HashSet<String> nextQuestions = new HashSet<>();
+        for (ConditionSkip conditionSkip : mQuestionRelation.conditionSkips) {
+            String[] optionIds = conditionSkip.getOptionIds().split(COMMA);
+            int index = 0;
+            List<String> responses = new ArrayList<>();
+            List<String> options = new ArrayList<>();
+            for (String identifier : conditionSkip.getQuestionIdentifiers().split(COMMA)) {
+                responses.add(mDisplayViewModel.getResponse(identifier).getText());
+                List<OptionSetOptionRelation> optionRelations = new ArrayList<>();
+                for (OptionSetOptionRelation optionSetOptionRelation : sortedOptionSetOptionRelations(
+                        mDisplayViewModel.getQuestion(identifier).optionSets.get(0).optionSetOptions)) {
+                    if (optionSetOptionRelation.optionSetOption.isDeleted()) continue;
+                    optionRelations.add(optionSetOptionRelation);
+                }
+                for (int k = 0; k < optionRelations.size(); k++) {
+                    String optionId = String.valueOf(optionRelations.get(k).options.get(0).option.getRemoteId());
+                    if (optionId.equals(optionIds[index])) {
+                        options.add(String.valueOf(k));
+                        break;
+                    }
+                }
+                index++;
+            }
+            if (responses.equals(options)) {
+                nextQuestions.add(conditionSkip.getNextQuestionIdentifier());
+            }
+        }
+        return nextQuestions.size() == 1 ? nextQuestions.iterator().next() : null;
+    }
+
+    private String integerConditionNextQuestionIdentifier() {
+        HashSet<String> nextQuestions = new HashSet<>();
+        for (ConditionSkip conditionSkip : mQuestionRelation.conditionSkips) {
+            List<String> responses = new ArrayList<>();
+            for (String identifier : conditionSkip.getQuestionIdentifiers().split(COMMA)) {
+                responses.add(mDisplayViewModel.getResponse(identifier).getText());
+            }
+            if (responses.equals(Arrays.asList(conditionSkip.getValues().split(COMMA)))) {
+                nextQuestions.add(conditionSkip.getNextQuestionIdentifier());
+            }
+        }
+        return nextQuestions.size() == 1 ? nextQuestions.iterator().next() : null;
+    }
+
     private String getNextQuestionIdentifierForNot() {
         List<String> selectedIndices = Arrays.asList(mResponse.getText().split(COMMA));
         for (String string : getSkipOptionIndices()) {
@@ -459,11 +511,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
             if (!nextQuestion.isDeleted())
                 nextQuestions.add(nextQuestion.getNextQuestionIdentifier());
         }
-        if (nextQuestions.size() == 1) {
-            return nextQuestions.iterator().next();
-        } else {
-            return null;
-        }
+        return nextQuestions.size() == 1 ? nextQuestions.iterator().next() : null;
     }
 
     private String getNextQuestionIdentifier(Option option) {
@@ -559,12 +607,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                 }
             }
         }
-
-        if (nextQuestions.size() == 1) {
-            return nextQuestions.iterator().next();
-        } else {
-            return null;
-        }
+        return nextQuestions.size() == 1 ? nextQuestions.iterator().next() : null;
     }
 
     private List<String> getSkipOptionIndices() {

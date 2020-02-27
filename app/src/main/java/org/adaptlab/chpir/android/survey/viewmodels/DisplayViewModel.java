@@ -6,23 +6,27 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 
 import org.adaptlab.chpir.android.survey.entities.Response;
-import org.adaptlab.chpir.android.survey.repositories.DisplayRepository;
+import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
 
 import java.util.HashMap;
 
 public class DisplayViewModel extends AndroidViewModel {
     public final String TAG = this.getClass().getName();
-    private DisplayRepository mDisplayRepository;
     private HashMap<String, Response> mResponses;
+    private HashMap<String, QuestionRelation> mQuestions;
 
-    public DisplayViewModel(@NonNull Application application, Long displayId) {
+    public DisplayViewModel(@NonNull Application application) {
         super(application);
-        mDisplayRepository = new DisplayRepository(application);
         mResponses = new HashMap<>();
+        mQuestions = new HashMap<>();
     }
 
     public HashMap<String, Response> getResponses() {
         return mResponses;
+    }
+
+    public HashMap<String, QuestionRelation> getQuestions() {
+        return mQuestions;
     }
 
     public Response getResponse(String questionIdentifier) {
@@ -31,5 +35,13 @@ public class DisplayViewModel extends AndroidViewModel {
 
     public void setResponse(String questionIdentifier, Response response) {
         mResponses.put(questionIdentifier, response);
+    }
+
+    public QuestionRelation getQuestion(String questionIdentifier) {
+        return mQuestions.get(questionIdentifier);
+    }
+
+    public void setQuestion(String questionIdentifier, QuestionRelation questionRelation) {
+        mQuestions.put(questionIdentifier, questionRelation);
     }
 }
