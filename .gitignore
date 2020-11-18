@@ -31,6 +31,7 @@ app/fabric.properties
 app/src/main/res/values/keys.xml
 app/src/main/res/values/defaults.xml
 app/src/wci/res/values/defaults.xml
+app/src/debug/res/values/defaults.xml
 
 #Gradle
 build/

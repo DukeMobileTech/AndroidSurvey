@@ -26,6 +26,7 @@ import org.adaptlab.chpir.android.survey.repositories.CriticalResponseRepository
 import org.adaptlab.chpir.android.survey.repositories.DeviceUserRepository;
 import org.adaptlab.chpir.android.survey.repositories.DisplayInstructionRepository;
 import org.adaptlab.chpir.android.survey.repositories.DisplayRepository;
+import org.adaptlab.chpir.android.survey.repositories.DomainRepository;
 import org.adaptlab.chpir.android.survey.repositories.FollowUpQuestionRepository;
 import org.adaptlab.chpir.android.survey.repositories.InstructionRepository;
 import org.adaptlab.chpir.android.survey.repositories.InstrumentRepository;
@@ -37,7 +38,9 @@ import org.adaptlab.chpir.android.survey.repositories.OptionSetOptionRepository;
 import org.adaptlab.chpir.android.survey.repositories.OptionSetRepository;
 import org.adaptlab.chpir.android.survey.repositories.ProjectRepository;
 import org.adaptlab.chpir.android.survey.repositories.QuestionRepository;
+import org.adaptlab.chpir.android.survey.repositories.ScoreSchemeRepository;
 import org.adaptlab.chpir.android.survey.repositories.SectionRepository;
+import org.adaptlab.chpir.android.survey.repositories.SubdomainRepository;
 import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 import org.adaptlab.chpir.android.survey.tasks.EntityUploadTask;
 import org.adaptlab.chpir.android.survey.tasks.GetDeviceUserTask;
@@ -187,6 +190,9 @@ public class AppUtil {
         tasks.add(new FollowUpQuestionRepository(application).download());
         tasks.add(new MultipleSkipRepository(application).download());
         tasks.add(new NextQuestionRepository(application).download());
+        tasks.add(new ScoreSchemeRepository(application).download());
+        tasks.add(new DomainRepository(application).download());
+        tasks.add(new SubdomainRepository(application).download());
         // Upload queued surveys
         new EntityUploadTask().execute();
         return tasks;

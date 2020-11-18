@@ -23,6 +23,7 @@ import org.adaptlab.chpir.android.survey.daos.DeviceUserDao;
 import org.adaptlab.chpir.android.survey.daos.DisplayDao;
 import org.adaptlab.chpir.android.survey.daos.DisplayInstructionDao;
 import org.adaptlab.chpir.android.survey.daos.DisplayTranslationDao;
+import org.adaptlab.chpir.android.survey.daos.DomainDao;
 import org.adaptlab.chpir.android.survey.daos.FollowUpQuestionDao;
 import org.adaptlab.chpir.android.survey.daos.InstructionDao;
 import org.adaptlab.chpir.android.survey.daos.InstructionTranslationDao;
@@ -40,17 +41,21 @@ import org.adaptlab.chpir.android.survey.daos.ProjectDao;
 import org.adaptlab.chpir.android.survey.daos.QuestionDao;
 import org.adaptlab.chpir.android.survey.daos.QuestionTranslationDao;
 import org.adaptlab.chpir.android.survey.daos.ResponseDao;
+import org.adaptlab.chpir.android.survey.daos.ScoreSchemeDao;
 import org.adaptlab.chpir.android.survey.daos.SectionDao;
 import org.adaptlab.chpir.android.survey.daos.SectionTranslationDao;
 import org.adaptlab.chpir.android.survey.daos.SettingsDao;
+import org.adaptlab.chpir.android.survey.daos.SubdomainDao;
 import org.adaptlab.chpir.android.survey.daos.SurveyDao;
 import org.adaptlab.chpir.android.survey.daos.SurveyNoteDao;
+import org.adaptlab.chpir.android.survey.daos.SurveyScoreDao;
 import org.adaptlab.chpir.android.survey.entities.ConditionSkip;
 import org.adaptlab.chpir.android.survey.entities.CriticalResponse;
 import org.adaptlab.chpir.android.survey.entities.DeviceUser;
 import org.adaptlab.chpir.android.survey.entities.Display;
 import org.adaptlab.chpir.android.survey.entities.DisplayInstruction;
 import org.adaptlab.chpir.android.survey.entities.DisplayTranslation;
+import org.adaptlab.chpir.android.survey.entities.Domain;
 import org.adaptlab.chpir.android.survey.entities.FollowUpQuestion;
 import org.adaptlab.chpir.android.survey.entities.Instruction;
 import org.adaptlab.chpir.android.survey.entities.InstructionTranslation;
@@ -68,11 +73,14 @@ import org.adaptlab.chpir.android.survey.entities.Project;
 import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.QuestionTranslation;
 import org.adaptlab.chpir.android.survey.entities.Response;
+import org.adaptlab.chpir.android.survey.entities.ScoreScheme;
 import org.adaptlab.chpir.android.survey.entities.Section;
 import org.adaptlab.chpir.android.survey.entities.SectionTranslation;
 import org.adaptlab.chpir.android.survey.entities.Settings;
+import org.adaptlab.chpir.android.survey.entities.Subdomain;
 import org.adaptlab.chpir.android.survey.entities.Survey;
 import org.adaptlab.chpir.android.survey.entities.SurveyNote;
+import org.adaptlab.chpir.android.survey.entities.SurveyScore;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 
 import java.util.Locale;
@@ -84,7 +92,7 @@ import java.util.UUID;
         Section.class, SectionTranslation.class, Option.class, OptionSet.class, OptionSetOption.class,
         OptionSetTranslation.class, OptionTranslation.class, ConditionSkip.class, DeviceUser.class,
         FollowUpQuestion.class, MultipleSkip.class, NextQuestion.class, Survey.class, Response.class,
-        SurveyNote.class},
+        SurveyNote.class, ScoreScheme.class, Domain.class, Subdomain.class, SurveyScore.class},
         version = SurveyRoomDatabase.DATABASE_VERSION, exportSchema = true)
 @TypeConverters({Converters.class})
 public abstract class SurveyRoomDatabase extends RoomDatabase {
@@ -240,6 +248,14 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
     public abstract ProjectDao projectDao();
 
     public abstract SurveyNoteDao surveyNoteDao();
+
+    public abstract ScoreSchemeDao scoreSchemeDao();
+
+    public abstract DomainDao domainDao();
+
+    public abstract SubdomainDao subdomainDao();
+
+    public abstract SurveyScoreDao surveyScoreDao();
 
     private static class CreateSettingsInstanceTask extends AsyncTask<Void, Void, Void> {
         private SettingsDao mSettingsDao;

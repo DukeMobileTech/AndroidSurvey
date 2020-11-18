@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 8,
-    "identityHash": "cf9230b96521b4b137ea8efbde682901",
+    "identityHash": "98240989ec262546c6f857a868dc9830",
     "entities": [
       {
         "tableName": "Instruments",
@@ -2575,12 +2575,252 @@
           }
         ],
         "foreignKeys": []
+      },
+      {
+        "tableName": "ScoreSchemes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Deleted` INTEGER NOT NULL, `Title` TEXT, `InstrumentRemoteId` INTEGER, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mTitle",
+            "columnName": "Title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mInstrumentRemoteId",
+            "columnName": "InstrumentRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_ScoreSchemes_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ScoreSchemes_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Domains",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Deleted` INTEGER NOT NULL, `Title` TEXT, `Name` TEXT, `Weight` REAL, `ScoreSchemeRemoteId` INTEGER, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mTitle",
+            "columnName": "Title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mName",
+            "columnName": "Name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mWeight",
+            "columnName": "Weight",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mScoreSchemeRemoteId",
+            "columnName": "ScoreSchemeRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_Domains_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Domains_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Subdomains",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Deleted` INTEGER NOT NULL, `Title` TEXT, `Name` TEXT, `Weight` REAL, `DomainRemoteId` INTEGER, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mTitle",
+            "columnName": "Title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mName",
+            "columnName": "Name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mWeight",
+            "columnName": "Weight",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDomainRemoteId",
+            "columnName": "DomainRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_Subdomains_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Subdomains_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "SurveyScores",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`UUID` TEXT NOT NULL, `SentToRemote` INTEGER NOT NULL, `SurveyUUID` TEXT NOT NULL, `Identifier` TEXT, `ScoreSum` REAL, `ScoreSchemeRemoteId` INTEGER, PRIMARY KEY(`UUID`))",
+        "fields": [
+          {
+            "fieldPath": "mUUID",
+            "columnName": "UUID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mSent",
+            "columnName": "SentToRemote",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mSurveyUUID",
+            "columnName": "SurveyUUID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mIdentifier",
+            "columnName": "Identifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mScoreSum",
+            "columnName": "ScoreSum",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mScoreSchemeRemoteId",
+            "columnName": "ScoreSchemeRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "UUID"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_SurveyScores_UUID",
+            "unique": false,
+            "columnNames": [
+              "UUID"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_SurveyScores_UUID` ON `${TABLE_NAME}` (`UUID`)"
+          },
+          {
+            "name": "index_SurveyScores_SurveyUUID",
+            "unique": false,
+            "columnNames": [
+              "SurveyUUID"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_SurveyScores_SurveyUUID` ON `${TABLE_NAME}` (`SurveyUUID`)"
+          },
+          {
+            "name": "index_SurveyScores_ScoreSchemeRemoteId",
+            "unique": false,
+            "columnNames": [
+              "ScoreSchemeRemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_SurveyScores_ScoreSchemeRemoteId` ON `${TABLE_NAME}` (`ScoreSchemeRemoteId`)"
+          }
+        ],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cf9230b96521b4b137ea8efbde682901')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '98240989ec262546c6f857a868dc9830')"
     ]
   }
 }

@@ -17,7 +17,6 @@ import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.BLANK;
 
 @Entity(tableName = "Responses", indices = {@Index(value = {"SurveyUUID", "QuestionIdentifier", "UUID"}, unique = true)})
 public class Response implements Uploadable {
-
     @NonNull
     @PrimaryKey
     @ColumnInfo(name = "UUID", index = true)

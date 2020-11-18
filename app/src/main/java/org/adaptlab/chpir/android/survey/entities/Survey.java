@@ -24,7 +24,6 @@ import java.util.UUID;
 @Entity(tableName = "Surveys")
 public class Survey implements Uploadable {
     private static final String TAG = "Survey";
-
     @PrimaryKey
     @NonNull
     @ColumnInfo(name = "UUID", index = true)
