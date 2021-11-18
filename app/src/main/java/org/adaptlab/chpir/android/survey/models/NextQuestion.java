@@ -17,19 +17,19 @@ public class NextQuestion extends ReceiveModel {
     public static final String COMPLETE_SURVEY = "COMPLETE_SURVEY";
     private static final String TAG = "NextQuestion";
 
-    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE, index = true)
     private Long mRemoteId;
-    @Column(name = "QuestionIdentifier")
+    @Column(name = "QuestionIdentifier", index = true)
     private String mQuestionIdentifier;
-    @Column(name = "OptionIdentifier")
+    @Column(name = "OptionIdentifier", index = true)
     private String mOptionIdentifier;
-    @Column(name = "NextQuestionIdentifier")
+    @Column(name = "NextQuestionIdentifier", index = true)
     private String mNextQuestionIdentifier;
     @Column(name = "RemoteQuestionId")
     private Long mRemoteQuestionId;
-    @Column(name = "RemoteInstrumentId")
+    @Column(name = "RemoteInstrumentId", index = true)
     private Long mRemoteInstrumentId;
-    @Column(name = "Deleted")
+    @Column(name = "Deleted", index = true)
     private boolean mDeleted;
     @Column(name = "Value")
     private String mValue;

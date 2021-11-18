@@ -42,13 +42,13 @@ public class Response extends SendModel {
     private Date mTimeStarted;
     @Column(name = "TimeEnded")
     private Date mTimeEnded;
-    @Column(name = "UUID")
+    @Column(name = "UUID", index = true)
     private String mUUID;
     @Column(name = "DeviceUser")
     private DeviceUser mDeviceUser;
     @Column(name = "QuestionVersion")
     private int mQuestionVersion;
-    @Column(name = "SurveyUUID")
+    @Column(name = "SurveyUUID", index = true)
     private String mSurveyUUID;
     @Column(name = "RandomizedData")
     private String mRandomizedData;

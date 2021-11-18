@@ -9,13 +9,13 @@ import com.activeandroid.query.Select;
 public class SectionTranslation extends Model {
 	@Column(name = "Section")
     private Section mSection;
-    @Column(name = "Language")
+    @Column(name = "Language", index = true)
     private String mLanguage;
     @Column(name = "Text")
     private String mText;
-    @Column(name = "InstrumentTranslation")
+    @Column(name = "InstrumentTranslation", index = true)
     private InstrumentTranslation mInstrumentTranslation;
-    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE, index = true)
     private Long mRemoteId;
     
     public SectionTranslation() {

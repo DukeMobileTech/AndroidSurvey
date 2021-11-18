@@ -48,7 +48,7 @@ public class Instrument extends ReceiveModel {
     @Column(name = "Title")
     private String mTitle;
     // https://github.com/pardom/ActiveAndroid/issues/22
-    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE, index = true)
     private Long mRemoteId;
     @Column(name = "Language")
     private String mLanguage;
@@ -58,11 +58,11 @@ public class Instrument extends ReceiveModel {
     private int mVersionNumber;
     @Column(name = "QuestionCount")
     private int mQuestionCount;
-    @Column(name = "ProjectId")
+    @Column(name = "ProjectId", index = true)
     private Long mProjectId;
-    @Column(name = "Published")
+    @Column(name = "Published", index = true)
     private boolean mPublished;
-    @Column(name = "Deleted")
+    @Column(name = "Deleted", index = true)
     private boolean mDeleted;
     @Column(name = "ShowSectionsFragment")
     private boolean mShowSectionsFragment;

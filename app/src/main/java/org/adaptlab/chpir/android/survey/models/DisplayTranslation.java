@@ -9,11 +9,11 @@ import com.activeandroid.query.Select;
 public class DisplayTranslation extends Model {
 	@Column(name = "Display")
     private Display mDisplay;
-    @Column(name = "Language")
+    @Column(name = "Language", index = true)
     private String mLanguage;
     @Column(name = "Text")
     private String mText;
-    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE, index = true)
     private Long mRemoteId;
 
     public DisplayTranslation() {

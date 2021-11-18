@@ -11,13 +11,13 @@ public class LoopQuestion extends Model {
 
     @Column(name = "Question")
     private Question mQuestion;
-    @Column(name = "Parent")
+    @Column(name = "Parent", index = true)
     private String mParent;
-    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE, index = true)
     private Long mRemoteId;
-    @Column(name = "Looped")
+    @Column(name = "Looped", index = true)
     private String mLooped;
-    @Column(name = "Deleted")
+    @Column(name = "Deleted", index = true)
     private boolean mDeleted;
     @Column(name = "OptionIndices")
     private String mOptionIndices;

@@ -14,15 +14,15 @@ import org.json.JSONObject;
 @Table(name = "DisplayInstructions")
 public class DisplayInstruction extends ReceiveModel {
     private static final String TAG = "DisplayInstruction";
-    @Column(name = "RemoteId")
+    @Column(name = "RemoteId", index = true)
     private Long mRemoteId;
-    @Column(name = "Position")
+    @Column(name = "Position", index = true)
     private int mPosition;
-    @Column(name = "RemoteDisplayId")
+    @Column(name = "RemoteDisplayId", index = true)
     private Long mRemoteDisplayId;
-    @Column(name = "InstructionId")
+    @Column(name = "InstructionId", index = true)
     private Long mInstructionId;
-    @Column(name = "Deleted")
+    @Column(name = "Deleted", index = true)
     private boolean mDeleted;
 
     public DisplayInstruction() {

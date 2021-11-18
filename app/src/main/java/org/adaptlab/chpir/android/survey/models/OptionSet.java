@@ -19,11 +19,11 @@ import java.util.List;
 public class OptionSet extends ReceiveModel {
     private static final String TAG = "OptionSet";
 
-    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE, index = true)
     private Long mRemoteId;
-    @Column(name = "Deleted")
+    @Column(name = "Deleted", index = true)
     private boolean mDeleted;
-    @Column(name = "Special")
+    @Column(name = "Special", index = true)
     private boolean mSpecial;
     @Column(name = "Title")
     private String mTitle;

@@ -18,11 +18,11 @@ import java.util.List;
 @Table(name = "Instructions")
 public class Instruction extends ReceiveModel {
     private static final String TAG = "Instructions";
-    @Column(name = "RemoteId")
+    @Column(name = "RemoteId", index = true)
     private Long mRemoteId;
     @Column(name = "Text")
     private String mText;
-    @Column(name = "Deleted")
+    @Column(name = "Deleted", index = true)
     private boolean mDeleted;
 
     public Instruction() {

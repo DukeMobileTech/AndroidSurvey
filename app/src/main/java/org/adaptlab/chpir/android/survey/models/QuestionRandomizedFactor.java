@@ -19,9 +19,9 @@ public class QuestionRandomizedFactor extends ReceiveModel {
     @Column(name = "RandomizedFactor")
     private RandomizedFactor mRandomizedFactor;
     // https://github.com/pardom/ActiveAndroid/issues/22
-    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE, index = true)
     private Long mRemoteId;
-    @Column(name = "Position")
+    @Column(name = "Position", index = true)
     private int mPosition;
 
     public QuestionRandomizedFactor() {

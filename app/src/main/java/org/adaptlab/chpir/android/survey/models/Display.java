@@ -18,25 +18,24 @@ import java.util.List;
 @Table(name = "Displays")
 public class Display extends ReceiveModel {
     private static final String TAG = "Display";
-    @Column(name = "RemoteId")
+    @Column(name = "RemoteId", index = true)
     private Long mRemoteId;
     @Column(name = "Mode")
     private String mMode;
-    @Column(name = "Position")
+    @Column(name = "Position", index = true)
     private int mPosition;
-    @Column(name = "InstrumentId")
+    @Column(name = "InstrumentId", index = true)
     private Long mInstrumentId;
-    @Column(name = "Title")
+    @Column(name = "Title", index = true)
     private String mTitle;
     @Column(name = "SectionId")
     private Long mSectionId;
-    @Column(name = "Deleted")
+    @Column(name = "Deleted", index = true)
     private boolean mDeleted;
     @Column(name = "QuestionCount")
     private int mQuestionCount;
 
     private double mDisplayPosition;
-
 
     public Display() {
         super();

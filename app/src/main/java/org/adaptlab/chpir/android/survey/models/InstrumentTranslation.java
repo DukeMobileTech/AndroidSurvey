@@ -11,15 +11,15 @@ public class InstrumentTranslation extends Model {
 
     @Column(name = "Title")
     private String mTitle;
-    @Column(name = "Language")
+    @Column(name = "Language", index = true)
     private String mLanguage;
     @Column(name = "Alignment")
     private String mAlignment;
-    @Column(name = "InstrumentRemoteId")
+    @Column(name = "InstrumentRemoteId", index = true)
     private Long mInstrumentRemoteId;
-    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE, index = true)
     private Long mRemoteId;
-    @Column(name = "Active")
+    @Column(name = "Active", index = true)
     private boolean mActive;
 
     public InstrumentTranslation() {

@@ -7,11 +7,11 @@ import com.activeandroid.query.Select;
 
 @Table(name = "ValidationTranslations")
 public class ValidationTranslation extends Model {
-    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE, index = true)
     private Long mRemoteId;
     @Column(name = "Validation")
     private Validation mValidation;
-    @Column(name = "Language")
+    @Column(name = "Language", index = true)
     private String mLanguage;
     @Column(name = "Text")
     private String mText;

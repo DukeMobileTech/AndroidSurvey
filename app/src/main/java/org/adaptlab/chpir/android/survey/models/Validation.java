@@ -20,7 +20,7 @@ import static org.adaptlab.chpir.android.survey.utils.AppUtil.getDeviceLanguage;
 public class Validation extends ReceiveModel {
     private static final String TAG = "Option";
 
-    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE, index = true)
     private Long mRemoteId;
     @Column(name = "Title")
     private String mTitle;

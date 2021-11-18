@@ -15,19 +15,19 @@ import org.json.JSONObject;
 public class OptionInOptionSet extends ReceiveModel {
     private static final String TAG = "OptionInOptionSet";
 
-    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE, index = true)
     private Long mRemoteId;
-    @Column(name = "NumberInQuestion")
+    @Column(name = "NumberInQuestion", index = true)
     private int mNumberInQuestion;
-    @Column(name = "RemoteOptionSetId")
+    @Column(name = "RemoteOptionSetId", index = true)
     private Long mRemoteOptionSetId;
     @Column(name = "RemoteOptionId")
     private Long mRemoteOptionId;
-    @Column(name = "Deleted")
+    @Column(name = "Deleted", index = true)
     private boolean mDeleted;
-    @Column(name = "Special")
+    @Column(name = "Special", index = true)
     private boolean mSpecial;
-    @Column(name = "IsExclusive")
+    @Column(name = "IsExclusive", index = true)
     private boolean mIsExclusive;
 
     @Override

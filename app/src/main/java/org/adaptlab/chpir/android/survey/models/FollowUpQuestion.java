@@ -16,17 +16,17 @@ import java.util.List;
 public class FollowUpQuestion extends ReceiveModel {
     private static final String TAG = "FollowUpQuestion";
     // TODO: 12/4/18 Add deleted attribute
-    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE, index = true)
     private Long mRemoteId;
-    @Column(name = "QuestionIdentifier")
+    @Column(name = "QuestionIdentifier", index = true)
     private String mQuestionIdentifier;
     @Column(name = "FollowingUpQuestionIdentifier")
     private String mFollowingUpQuestionIdentifier;
     @Column(name = "RemoteQuestionId")
     private Long mRemoteQuestionId;
-    @Column(name = "RemoteInstrumentId")
+    @Column(name = "RemoteInstrumentId", index = true)
     private Long mRemoteInstrumentId;
-    @Column(name = "Position")
+    @Column(name = "Position", index = true)
     private Long mPosition;
 
     @Override

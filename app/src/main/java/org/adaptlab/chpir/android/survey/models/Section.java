@@ -19,13 +19,13 @@ public class Section extends ReceiveModel {
 
 	private static final String TAG = "Section";
 	
-	@Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+	@Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE, index = true)
     private Long mRemoteId;
 	@Column(name = "Title")
     private String mTitle;
-	@Column(name = "InstrumentRemoteId")
+	@Column(name = "InstrumentRemoteId", index = true)
     private Long mInstrumentRemoteId;
-    @Column(name = "Deleted")
+    @Column(name = "Deleted", index = true)
     private boolean mDeleted;
 
 	@Override

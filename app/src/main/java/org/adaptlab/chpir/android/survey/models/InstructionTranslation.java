@@ -9,11 +9,11 @@ import com.activeandroid.query.Select;
 public class InstructionTranslation extends Model {
 	@Column(name = "Instruction")
     private Instruction mInstruction;
-    @Column(name = "Language")
+    @Column(name = "Language", index = true)
     private String mLanguage;
     @Column(name = "Text")
     private String mText;
-    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE, index = true)
     private Long mRemoteId;
 
     public InstructionTranslation() {

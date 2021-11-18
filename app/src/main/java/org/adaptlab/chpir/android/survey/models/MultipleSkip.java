@@ -17,19 +17,19 @@ import java.util.List;
 public class MultipleSkip extends ReceiveModel {
     private static final String TAG = "MultipleSkip";
 
-    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE, index = true)
     private Long mRemoteId;
-    @Column(name = "QuestionIdentifier")
+    @Column(name = "QuestionIdentifier", index = true)
     private String mQuestionIdentifier;
     @Column(name = "OptionIdentifier")
     private String mOptionIdentifier;
-    @Column(name = "SkipQuestionIdentifier")
+    @Column(name = "SkipQuestionIdentifier", index = true)
     private String mSkipQuestionIdentifier;
     @Column(name = "RemoteQuestionId")
     private Long mRemoteQuestionId;
-    @Column(name = "RemoteInstrumentId")
+    @Column(name = "RemoteInstrumentId", index = true)
     private Long mRemoteInstrumentId;
-    @Column(name = "Deleted")
+    @Column(name = "Deleted", index = true)
     private boolean mDeleted;
     @Column(name = "Value")
     private String mValue;

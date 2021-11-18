@@ -34,25 +34,25 @@ import java.util.UUID;
 public class Survey extends SendModel {
     private static final String TAG = "Survey";
 
-    @Column(name = "UUID")
+    @Column(name = "UUID", index = true)
     private String mUUID;
     @Column(name = "SentToRemote")
     private boolean mSent;
-    @Column(name = "Complete")
+    @Column(name = "Complete", index = true)
     private boolean mComplete;
     @Column(name = "Latitude")
     private String mLatitude;
     @Column(name = "Longitude")
     private String mLongitude;
-    @Column(name = "LastUpdated")
+    @Column(name = "LastUpdated", index = true)
     private Date mLastUpdated;
     @Column(name = "Metadata")
     private String mMetadata;
-    @Column(name = "ProjectId")
+    @Column(name = "ProjectId", index = true)
     private Long mProjectId;
-    @Column(name = "InstrumentRemoteId")
+    @Column(name = "InstrumentRemoteId", index = true)
     private Long mInstrumentRemoteId;
-    @Column(name = "RosterUUID")
+    @Column(name = "RosterUUID", index = true)
     private String mRosterUUID;
     @Column(name = "Language")
     private String mLanguage;

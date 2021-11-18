@@ -31,17 +31,17 @@ public class Question extends ReceiveModel {
     private String mText;
     @Column(name = "QuestionType")
     private QuestionType mQuestionType;
-    @Column(name = "QuestionIdentifier")
+    @Column(name = "QuestionIdentifier", index = true)
     private String mQuestionIdentifier;
     @Column(name = "OptionCount")
     private int mOptionCount;
     @Column(name = "InstrumentVersion")
     private int mInstrumentVersion;
-    @Column(name = "NumberInInstrument")
+    @Column(name = "NumberInInstrument", index = true)
     private int mNumberInInstrument;
     @Column(name = "IdentifiesSurvey")
     private boolean mIdentifiesSurvey;
-    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE, index = true)
     private Long mRemoteId;
     @Column(name = "ImageCount")
     private int mImageCount;
@@ -51,11 +51,11 @@ public class Question extends ReceiveModel {
     private int mQuestionVersion;
     @Column(name = "Grid")
     private Grid mGrid;
-    @Column(name = "Deleted")
+    @Column(name = "Deleted", index = true)
     private boolean mDeleted;
     @Column(name = "Section")
     private Section mSection;
-    @Column(name = "InstrumentRemoteId")
+    @Column(name = "InstrumentRemoteId", index = true)
     private Long mInstrumentRemoteId;
     @Column(name = "NumberInGrid")
     private int mNumberInGrid;
@@ -81,7 +81,7 @@ public class Question extends ReceiveModel {
     private Long mQuestionId;
     @Column(name = "TextToReplace")
     private String mTextToReplace;
-    @Column(name = "Position")
+    @Column(name = "Position", index = true)
     private String mPosition; // Used for display purposes
 
     public Question() {

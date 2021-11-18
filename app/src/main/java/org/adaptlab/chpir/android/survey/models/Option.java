@@ -20,11 +20,11 @@ public class Option extends ReceiveModel {
 
     @Column(name = "Text")
     private String mText;
-    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE)
+    @Column(name = "RemoteId", unique = true, onUniqueConflict = Column.ConflictAction.REPLACE, index = true)
     private Long mRemoteId;
-    @Column(name = "Deleted")
+    @Column(name = "Deleted", index = true)
     private boolean mDeleted;
-    @Column(name = "Identifier")
+    @Column(name = "Identifier", index = true)
     private String mIdentifier;
 
     public Option() {
