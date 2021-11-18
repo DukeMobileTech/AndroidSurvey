@@ -3,12 +3,14 @@ package org.adaptlab.chpir.android.survey;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.text.Editable;
 import android.text.InputType;
 import android.text.Spannable;
@@ -19,6 +21,7 @@ import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,8 +34,6 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-
-import com.crashlytics.android.Crashlytics;
 
 import org.adaptlab.chpir.android.survey.models.ConditionSkip;
 import org.adaptlab.chpir.android.survey.models.Display;
@@ -60,8 +61,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import io.fabric.sdk.android.Fabric;
 
 import static org.adaptlab.chpir.android.survey.utils.FormatUtils.isEmpty;
 import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtml;
@@ -337,11 +336,11 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         if (mSurveyFragment.getSpecialOptions() != null) {
             mSpecialOptions = mSurveyFragment.getSpecialOptions().get(mQuestion.getRemoteSpecialOptionSetId());
         }
-        if (AppUtil.PRODUCTION) {
-            Fabric.with(getActivity(), new Crashlytics());
-            Crashlytics.setString(getString(R.string.last_question),
-                    String.valueOf(mQuestion.getNumberInInstrument()));
-        }
+//        if (AppUtil.PRODUCTION) {
+//            Fabric.with(getActivity(), new Crashlytics());
+//            Crashlytics.setString(getString(R.string.last_question),
+//                    String.valueOf(mQuestion.getNumberInInstrument()));
+//        }
     }
 
     public void init() {
@@ -541,8 +540,12 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
             animation = new AlphaAnimation(0, 1);
             mValidationTextView.setVisibility(TextView.VISIBLE);
             if (mQuestion.getValidation() != null) {
-                mValidationTextView.setText(styleTextWithHtml(mQuestion.getValidation()
-                        .getValidationMessage(mInstrument)));
+                String valMsg = mQuestion.getValidation().getValidationMessage(mInstrument);
+                if (valMsg == null || valMsg.equals("null")) {
+                    mValidationTextView.setVisibility(TextView.GONE);
+                } else {
+                    mValidationTextView.setText(styleTextWithHtml(valMsg));
+                }
             } else {
                 mValidationTextView.setText(styleTextWithHtml(
                         getString(R.string.not_valid_response)));

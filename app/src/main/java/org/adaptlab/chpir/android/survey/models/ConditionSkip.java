@@ -1,8 +1,9 @@
 package org.adaptlab.chpir.android.survey.models;
 
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;

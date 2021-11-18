@@ -42,12 +42,16 @@ public class YearQuestionFragment extends DateQuestionFragment {
                         }
                     });
             component.addView(mDatePicker);
-            mDatePicker.findViewById(Resources.getSystem().getIdentifier(
-                    "day", "id", "android"))
-                    .setVisibility(View.GONE);
-            mDatePicker.findViewById(Resources.getSystem().getIdentifier(
-                    "month", "id", "android"))
-                    .setVisibility(View.GONE);
+            View day = mDatePicker.findViewById(Resources.getSystem().getIdentifier(
+                    "day", "id", "android"));
+            if (day != null) {
+                day.setVisibility(View.GONE);
+            }
+            View month = mDatePicker.findViewById(Resources.getSystem().getIdentifier(
+                    "month", "id", "android"));
+            if (month != null) {
+                month.setVisibility(View.GONE);
+            }
         }
         return mDatePicker;
     }

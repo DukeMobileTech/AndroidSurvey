@@ -1,8 +1,9 @@
 package org.adaptlab.chpir.android.survey;
 
 import android.content.Context;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import org.adaptlab.chpir.android.survey.models.AdminSettings;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
@@ -11,7 +12,7 @@ import org.adaptlab.chpir.android.survey.viewpagerfragments.SurveyViewPagerFragm
 
 import java.util.ArrayList;
 
-public class FragmentPagerAdapter extends android.support.v4.app.FragmentPagerAdapter {
+public class FragmentPagerAdapter extends androidx.fragment.app.FragmentPagerAdapter {
     private Context mContext;
     private ArrayList<String> mTabs;
     private InstrumentViewPagerFragment mInstrumentViewPagerFragment;

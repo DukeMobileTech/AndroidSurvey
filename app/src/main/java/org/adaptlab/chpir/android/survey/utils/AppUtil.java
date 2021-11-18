@@ -14,8 +14,6 @@ import android.util.Log;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
-import com.crashlytics.android.Crashlytics;
-import com.newrelic.agent.android.NewRelic;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.activerecordcloudsync.PollService;
@@ -72,7 +70,6 @@ import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import io.fabric.sdk.android.Fabric;
 import okhttp3.OkHttpClient;
 
 public class AppUtil {
@@ -141,9 +138,9 @@ public class AppUtil {
         ACCESS_TOKEN = adminSettingsInstance.getApiKey();
 
         if (PRODUCTION) {
-            Fabric.with(context, new Crashlytics());
-            Crashlytics.setUserIdentifier(adminSettingsInstance.getDeviceIdentifier());
-            Crashlytics.setString(getContext().getString(R.string.crashlytics_device_label), adminSettingsInstance.getDeviceLabel());
+//            Fabric.with(context, new Crashlytics());
+//            Crashlytics.setUserIdentifier(adminSettingsInstance.getDeviceIdentifier());
+//            Crashlytics.setString(getContext().getString(R.string.crashlytics_device_label), adminSettingsInstance.getDeviceLabel());
         }
 
         DatabaseSeed.seed(context);

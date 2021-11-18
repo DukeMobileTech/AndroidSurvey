@@ -3,9 +3,10 @@ package org.adaptlab.chpir.android.activerecordcloudsync;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
-import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
+
+import androidx.core.app.NotificationCompat;
 
 import org.adaptlab.chpir.android.survey.models.DeviceSyncEntry;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;

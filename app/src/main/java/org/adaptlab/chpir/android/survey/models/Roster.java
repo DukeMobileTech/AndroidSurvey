@@ -6,8 +6,9 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.provider.BaseColumns;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+
+import androidx.core.app.NotificationCompat;
 
 import com.activeandroid.Cache;
 import com.activeandroid.annotation.Column;

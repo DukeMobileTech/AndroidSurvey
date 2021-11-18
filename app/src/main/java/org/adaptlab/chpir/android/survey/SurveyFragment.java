@@ -13,19 +13,19 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.util.LongSparseArray;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.NestedScrollView;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.collection.LongSparseArray;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.core.widget.NestedScrollView;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.util.Log;
@@ -49,7 +49,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.activeandroid.Model;
-import com.crashlytics.android.Crashlytics;
 
 import org.adaptlab.chpir.android.survey.location.LocationManager;
 import org.adaptlab.chpir.android.survey.models.ConditionSkip;
@@ -92,7 +91,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import io.fabric.sdk.android.Fabric;
 
 import static org.adaptlab.chpir.android.survey.utils.FormatUtils.isEmpty;
 import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtml;
@@ -439,10 +437,10 @@ public class SurveyFragment extends Fragment {
 
     private void registerCrashlytics() {
         if (AppUtil.PRODUCTION) {
-            Fabric.with(getActivity(), new Crashlytics());
-            Crashlytics.setString(getString(R.string.last_instrument), mInstrument.getTitle());
-            Crashlytics.setString(getString(R.string.last_survey), mSurvey.getUUID());
-            Crashlytics.setString(getString(R.string.last_display), mDisplay.getTitle());
+//            Fabric.with(getActivity(), new Crashlytics());
+//            Crashlytics.setString(getString(R.string.last_instrument), mInstrument.getTitle());
+//            Crashlytics.setString(getString(R.string.last_survey), mSurvey.getUUID());
+//            Crashlytics.setString(getString(R.string.last_display), mDisplay.getTitle());
         }
     }
 
@@ -516,7 +514,7 @@ public class SurveyFragment extends Fragment {
 
     private void setDrawerListViewWidth() {
         int width = getResources().getDisplayMetrics().widthPixels / 2;
-        DrawerLayout.LayoutParams params = (android.support.v4.widget.DrawerLayout.LayoutParams) mExpandableListView.getLayoutParams();
+        DrawerLayout.LayoutParams params = (DrawerLayout.LayoutParams) mExpandableListView.getLayoutParams();
         params.width = width;
         mExpandableListView.setLayoutParams(params);
     }

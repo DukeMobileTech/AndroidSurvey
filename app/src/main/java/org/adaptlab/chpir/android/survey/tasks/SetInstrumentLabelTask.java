@@ -1,10 +1,11 @@
 package org.adaptlab.chpir.android.survey.tasks;
 
 import android.os.AsyncTask;
-import android.support.v4.app.Fragment;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+
+import androidx.fragment.app.Fragment;
 
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.models.Instrument;
