@@ -49,6 +49,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.activeandroid.Model;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.adaptlab.chpir.android.survey.location.LocationManager;
 import org.adaptlab.chpir.android.survey.models.ConditionSkip;
@@ -437,10 +438,10 @@ public class SurveyFragment extends Fragment {
 
     private void registerCrashlytics() {
         if (AppUtil.PRODUCTION) {
-//            Fabric.with(getActivity(), new Crashlytics());
-//            Crashlytics.setString(getString(R.string.last_instrument), mInstrument.getTitle());
-//            Crashlytics.setString(getString(R.string.last_survey), mSurvey.getUUID());
-//            Crashlytics.setString(getString(R.string.last_display), mDisplay.getTitle());
+            FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+            crashlytics.setCustomKey(getString(R.string.last_instrument), mInstrument.getTitle());
+            crashlytics.setCustomKey(getString(R.string.last_survey), mSurvey.getUUID());
+            crashlytics.setCustomKey(getString(R.string.last_display), mDisplay.getTitle());
         }
     }
 

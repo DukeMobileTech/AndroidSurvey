@@ -110,7 +110,7 @@
                 android:layout_gravity="fill"
                 android:layout_weight="1"
                 android:maxLines="2"
-                android:text="@string/project_id" />
+                android:text="@string/app_project_id" />
 
             <EditText
                 android:id="@+id/project_id_text"
@@ -132,7 +132,7 @@
                 android:layout_gravity="fill"
                 android:layout_weight="1"
                 android:maxLines="2"
-                android:text="@string/api_key" />
+                android:text="@string/app_api_key" />
 
             <EditText
                 android:id="@+id/api_key_text"
@@ -191,7 +191,7 @@
                 android:layout_gravity="fill"
                 android:layout_weight="1"
                 android:maxLines="2"
-                android:text="@string/device_identifier" />
+                android:text="@string/app_device_identifier" />
 
             <EditText
                 android:id="@+id/device_identifier_edit_text"

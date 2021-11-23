@@ -14,6 +14,7 @@ import android.util.Log;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Delete;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ActiveRecordCloudSync;
 import org.adaptlab.chpir.android.activerecordcloudsync.PollService;
@@ -73,8 +74,8 @@ import java.util.concurrent.TimeUnit;
 import okhttp3.OkHttpClient;
 
 public class AppUtil {
-    private final static String TAG = "AppUtil";
     public final static boolean PRODUCTION = !BuildConfig.DEBUG;
+    private final static String TAG = "AppUtil";
     private final static boolean REQUIRE_SECURITY_CHECKS = PRODUCTION;
     public static boolean DEBUG = !PRODUCTION;
 
@@ -138,9 +139,9 @@ public class AppUtil {
         ACCESS_TOKEN = adminSettingsInstance.getApiKey();
 
         if (PRODUCTION) {
-//            Fabric.with(context, new Crashlytics());
-//            Crashlytics.setUserIdentifier(adminSettingsInstance.getDeviceIdentifier());
-//            Crashlytics.setString(getContext().getString(R.string.crashlytics_device_label), adminSettingsInstance.getDeviceLabel());
+            FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+            crashlytics.setUserId(adminSettingsInstance.getDeviceIdentifier());
+            crashlytics.setCustomKey(getContext().getString(R.string.crashlytics_device_label), adminSettingsInstance.getDeviceLabel());
         }
 
         DatabaseSeed.seed(context);

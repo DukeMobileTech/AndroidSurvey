@@ -22,10 +22,8 @@ local.properties
 .settings/
 proguard/
 
-# Crashlytics/Fabric
-app/src/main/res/values/com_crashlytics_export_strings.xml
-app/src/main/assets/crashlytics-build.properties\
-app/fabric.properties
+# Services
+app/google-services.json
 
 # API Keys
 app/src/main/res/values/keys.xml

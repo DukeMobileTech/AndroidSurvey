@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
 
 repositories {
     mavenCentral()
@@ -52,6 +54,7 @@ dependencies {
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
     implementation 'com.google.android.gms:play-services-location:18.0.0'
+    implementation 'com.google.firebase:firebase-crashlytics:18.2.4'
     implementation 'com.github.gcacace:signature-pad:1.2.1'
     implementation 'com.squareup.okhttp3:okhttp:3.11.0'
     implementation files('libs/core-1.51.0.0.jar')

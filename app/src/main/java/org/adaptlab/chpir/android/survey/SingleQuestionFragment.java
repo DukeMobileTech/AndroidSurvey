@@ -3,14 +3,6 @@ package org.adaptlab.chpir.android.survey;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.text.Editable;
 import android.text.InputType;
 import android.text.Spannable;
@@ -21,7 +13,6 @@ import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +25,15 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.adaptlab.chpir.android.survey.models.ConditionSkip;
 import org.adaptlab.chpir.android.survey.models.Display;
@@ -336,11 +336,10 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         if (mSurveyFragment.getSpecialOptions() != null) {
             mSpecialOptions = mSurveyFragment.getSpecialOptions().get(mQuestion.getRemoteSpecialOptionSetId());
         }
-//        if (AppUtil.PRODUCTION) {
-//            Fabric.with(getActivity(), new Crashlytics());
-//            Crashlytics.setString(getString(R.string.last_question),
-//                    String.valueOf(mQuestion.getNumberInInstrument()));
-//        }
+        if (AppUtil.PRODUCTION) {
+            FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+            crashlytics.setCustomKey(getString(R.string.last_question), String.valueOf(mQuestion.getNumberInInstrument()));
+        }
     }
 
     public void init() {
