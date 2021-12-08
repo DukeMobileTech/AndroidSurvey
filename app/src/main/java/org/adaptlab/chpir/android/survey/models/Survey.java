@@ -146,6 +146,31 @@ public class Survey extends SendModel {
             return identifier.toString();
     }
 
+    public String identifier(Context context, List<Response> responses) {
+        if (isSent() && !TextUtils.isEmpty(getSubmittedIdentifier()))
+            return getSubmittedIdentifier();
+        String surveyLabel = null;
+        StringBuilder identifier = new StringBuilder();
+
+        if (!TextUtils.isEmpty(getMetadata())) {
+            surveyLabel = getMetadataLabel();
+        }
+        if (!TextUtils.isEmpty(surveyLabel)) {
+            return surveyLabel;
+        }
+
+        for (Response response : responses) {
+            if (response.getQuestion().identifiesSurvey()) {
+                identifier.append(response.getText()).append(" ");
+            }
+        }
+
+        if (identifier.toString().trim().isEmpty())
+            return context.getString(R.string.unidentified_survey) + " " + getId();
+        else
+            return identifier.toString();
+    }
+
     public String getIdentifier() {
         for (Response response : responses()) {
             if (response.getQuestion().identifiesSurvey()) {

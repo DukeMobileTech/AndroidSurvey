@@ -27,6 +27,8 @@
     <string name="api_unavailable">远程服务器未响应</string>
     <string name="unacceptable_version_code">您必须先更新本应用才能继续。</string>
     <string name="surveys">调查表</string>
+    <string name="ongoing_surveys">ongoing surveys</string>
+    <string name="submitted_surveys">submitted surveys</string>
     <string name="rosters">名册</string>
     <string name="questions">多个问题</string>
     <string name="question">一个问题</string>
@@ -185,4 +187,6 @@
     <string name="uploading_surveys">Uploading Surveys</string>
     <string name="survey_upload">surveys will be uploaded</string>
     <string name="survey_submitted">This survey has been marked for submission or is already submitted</string>
+    <string name="incomplete_survey">Incomplete Survey</string>
+    <string name="incomplete_survey_message">This survey has not been finished. Please complete it first before trying to submit.</string>
 </resources>

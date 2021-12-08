@@ -27,6 +27,8 @@
     <string name="api_unavailable">Remoto Api no responde.</string>
     <string name="unacceptable_version_code">Debe actualizar su aplicación antes de continuar.</string>
     <string name="surveys">encuestas</string>
+    <string name="ongoing_surveys">ongoing surveys</string>
+    <string name="submitted_surveys">submitted surveys</string>
     <string name="questions">preguntas</string>
     <string name="question">pregunta</string>
     <string name="encryption_required_title">Codificación requerida.</string>
@@ -185,4 +187,6 @@
     <string name="uploading_surveys">Uploading Surveys</string>
     <string name="survey_upload">surveys will be uploaded</string>
     <string name="survey_submitted">This survey has been marked for submission or is already submitted</string>
+    <string name="incomplete_survey">Incomplete Survey</string>
+    <string name="incomplete_survey_message">This survey has not been finished. Please complete it first before trying to submit.</string>
 </resources>

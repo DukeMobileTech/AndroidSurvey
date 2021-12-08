@@ -18,6 +18,8 @@
     <string name="network_unavailable">በመሳሪያው ላይ ኔትዎረክ የለም.</string>
     <string name="api_unavailable">API ሪሞት አይሰራም.</string>
     <string name="surveys">ቃለ መጠይቆች</string>
+    <string name="ongoing_surveys">ongoing surveys</string>
+    <string name="submitted_surveys">submitted surveys</string>
     <string name="questions">ጥያቄዎች</string>
     <string name="question">ጥያቄ </string>
     <string name="okay">እሺ</string>
@@ -78,4 +80,6 @@
     <string name="uploading_surveys">ቃለ መጠይቁ ገብቷል</string>
     <string name="survey_upload">ይህ ቃለ መጠይቅ በመግባት ላይ ነው</string>
     <string name="survey_submitted">ይህ ቃለ መጠይቅ ግልፅ መደረግ ይፈልጋል ወይም ቀድሙ የገባ ነው.</string>
+    <string name="incomplete_survey">Incomplete Survey</string>
+    <string name="incomplete_survey_message">This survey has not been finished. Please complete it first before trying to submit.</string>
 </resources>

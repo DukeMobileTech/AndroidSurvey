@@ -2,6 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/menu_item_progress_action"
+        android:orderInCategory="100"
+        android:visible="false"
+        app:actionLayout="@layout/action_view_progress"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/menu_item_settings"
         android:icon="@drawable/ic_settings_black_24dp"
         android:title="@string/settings"
@@ -10,5 +16,10 @@
         android:id="@+id/menu_item_refresh"
         android:icon="@drawable/ic_refresh_black_24dp"
         android:title="@string/refresh"
+        app:showAsAction="ifRoom|withText" />
+    <item
+        android:id="@+id/menu_item_submit_all"
+        android:icon="@drawable/ic_cloud_upload_black_24dp"
+        android:title="@string/submit"
         app:showAsAction="ifRoom|withText" />
 </menu>

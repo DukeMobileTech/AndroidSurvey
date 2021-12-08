@@ -28,7 +28,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 public class SubmitSurveyTask extends AsyncTask<Void, Integer, Void> {
-    private static final String TAG = "SurveyViewPagerFragment";
+    private static final String TAG = "SubmitSurveyTask";
     private Context mContext;
     private List<Survey> mSurveys;
 
