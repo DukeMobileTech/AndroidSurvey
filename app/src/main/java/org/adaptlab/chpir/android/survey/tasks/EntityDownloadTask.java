@@ -1,6 +1,7 @@
 package org.adaptlab.chpir.android.survey.tasks;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -9,14 +10,22 @@ import com.google.gson.Gson;
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.SurveyApp;
 import org.adaptlab.chpir.android.survey.daos.BaseDao;
+import org.adaptlab.chpir.android.survey.daos.OptionSetOptionDao;
+import org.adaptlab.chpir.android.survey.entities.OptionSetOption;
 import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.repositories.Repository;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.utils.NotificationUtils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -38,6 +47,26 @@ public class EntityDownloadTask extends AsyncTask<Void, Void, Void> {
         mTranslationEntity = repository.getTranslationEntity();
         mTableName = repository.getRemoteTableName();
         mGson = repository.getGson();
+    }
+
+    private static byte[] getUrlBytes(String urlSpec) throws IOException {
+        URL url = new URL(urlSpec);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) return null;
+            InputStream in = connection.getInputStream();
+            int bytesRead = 0;
+            byte[] buffer = new byte[1024];
+            while ((bytesRead = in.read(buffer)) > 0) {
+                out.write(buffer, 0, bytesRead);
+            }
+            out.close();
+            return out.toByteArray();
+        } finally {
+            connection.disconnect();
+        }
     }
 
     @Override
@@ -74,6 +103,9 @@ public class EntityDownloadTask extends AsyncTask<Void, Void, Void> {
                                 }
                                 mTranslationEntity.save(mTranslationDao, translations);
                             }
+                            if (mEntity.getClass().getName().equals(OptionSetOption.class.getName())) {
+                                downloadImages();
+                            }
                             AppUtil.updateDownloadProgress();
                         } catch (IOException e) {
                             if (BuildConfig.DEBUG) Log.e(TAG, "Exception: ", e);
@@ -89,6 +121,42 @@ public class EntityDownloadTask extends AsyncTask<Void, Void, Void> {
             AppUtil.updateDownloadProgress();
         }
         return null;
+    }
+
+    private void downloadImages() {
+        List<OptionSetOption> withImages = ((OptionSetOptionDao) mBaseDao).withImages();
+        for (OptionSetOption optionSetOption : withImages) {
+            if (optionSetOption.hasImage()) {
+                String url = AppUtil.getFullApiUrl() + "images/" + optionSetOption.getOptionRemoteId() + AppUtil.getParams();
+                getFile(url, optionSetOption);
+            }
+        }
+    }
+
+    public void getFile(String url, OptionSetOption optionSetOption) {
+        if (BuildConfig.DEBUG) Log.i(TAG, "Image url: " + url);
+        String filename = UUID.randomUUID().toString() + ".png";
+        FileOutputStream fileWriter = null;
+        try {
+            byte[] imageBytes = getUrlBytes(url);
+            if (imageBytes != null) {
+                fileWriter = SurveyApp.getInstance().openFileOutput(filename, Context.MODE_PRIVATE);
+                fileWriter.write(imageBytes);
+                optionSetOption.setBitmapPath(filename);
+                mBaseDao.update(optionSetOption);
+            }
+            if (BuildConfig.DEBUG) Log.i(TAG, "Image saved in " + filename);
+        } catch (IOException e) {
+            if (BuildConfig.DEBUG) Log.e(TAG, "IOException ", e);
+        } finally {
+            try {
+                if (fileWriter != null) {
+                    fileWriter.close();
+                }
+            } catch (Exception e) {
+                if (BuildConfig.DEBUG) Log.e(TAG, "Exception ", e);
+            }
+        }
     }
 
 }

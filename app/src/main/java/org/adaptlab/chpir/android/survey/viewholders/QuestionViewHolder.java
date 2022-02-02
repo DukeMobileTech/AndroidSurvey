@@ -165,6 +165,10 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         mQuestionRelation = relation;
     }
 
+    QuestionRelation getQuestionRelation() {
+        return mQuestionRelation;
+    }
+
     Question getQuestion() {
         return mQuestionRelation.question;
     }

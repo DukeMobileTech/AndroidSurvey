@@ -12,8 +12,6 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
-import com.crashlytics.android.Crashlytics;
-
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.SurveyApp;
@@ -56,7 +54,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import io.fabric.sdk.android.Fabric;
 import okhttp3.OkHttpClient;
 
 public class AppUtil {
@@ -99,9 +96,9 @@ public class AppUtil {
 
     private static void setCrashLogs(Context context) {
         if (PRODUCTION) {
-            Fabric.with(context, new Crashlytics());
-            Crashlytics.setUserIdentifier(mSettings.getDeviceIdentifier());
-            Crashlytics.setString(context.getString(R.string.crashlytics_device_label), mSettings.getDeviceLabel());
+//            FirebaseCrashlytics instance = FirebaseCrashlytics.getInstance();
+//            instance.setUserId(mSettings.getDeviceIdentifier());
+//            instance.setCustomKey(context.getString(R.string.crashlytics_device_label), mSettings.getDeviceLabel());
         }
     }
 

@@ -157,6 +157,9 @@ public class Question implements SurveyEntity, Translatable {
     @SerializedName("multiple_skip_neutral_ids")
     @ColumnInfo(name = "MultipleSkipNeutralIds")
     private String mMultipleSkipNeutralIds;
+    @SerializedName("has_images")
+    @ColumnInfo(name = "HasImages")
+    private boolean mHasImages;
     @Ignore
     @SerializedName("question_translations")
     private List<QuestionTranslation> mQuestionTranslations;
@@ -384,6 +387,14 @@ public class Question implements SurveyEntity, Translatable {
 
     public void setTextToReplace(String textToReplace) {
         this.mTextToReplace = textToReplace;
+    }
+
+    public boolean hasImages() {
+        return mHasImages;
+    }
+
+    public void setHasImages(boolean mHasImages) {
+        this.mHasImages = mHasImages;
     }
 
     public List<QuestionTranslation> getQuestionTranslations() {

@@ -63,7 +63,7 @@
             android:layout_gravity="fill"
             android:layout_weight="1"
             android:maxLines="2"
-            android:text="@string/project_id" />
+            android:text="@string/app_project_id" />
 
         <EditText
             android:id="@+id/projectIdEditText"

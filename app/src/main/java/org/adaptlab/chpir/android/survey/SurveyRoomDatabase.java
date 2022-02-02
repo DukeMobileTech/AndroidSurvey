@@ -96,7 +96,7 @@ import java.util.UUID;
         version = SurveyRoomDatabase.DATABASE_VERSION, exportSchema = true)
 @TypeConverters({Converters.class})
 public abstract class SurveyRoomDatabase extends RoomDatabase {
-    static final int DATABASE_VERSION = 8;
+    static final int DATABASE_VERSION = 9;
     private static final String TAG = SurveyRoomDatabase.class.getName();
     private static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override

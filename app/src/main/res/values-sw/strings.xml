@@ -11,7 +11,7 @@
     <string name="other_specify_edittext">Taja nyingine</string>
     <string name="free_response_edittext">Jibu hapa</string>
     <string name="refresh">Shusha</string>
-    <string name="device_identifier">Kitambulisho Cha Kifaa</string>
+    <string name="app_device_identifier">Kitambulisho Cha Kifaa</string>
     <string name="save_button">Hifadhi</string>
     <string name="admin_settings">Usimamizi</string>
     <string name="settings">Mipangilio</string>
@@ -32,9 +32,9 @@
     <string name="cancel">Futa</string>
     <string name="incorrect_password">Nenosiri hili si sahihi.</string>
     <string name="skip_button">Ruka</string>
-    <string name="api_key">Api Key</string>
+    <string name="app_api_key">Api Key</string>
     <string name="api_version">Api Version</string>
-    <string name="project_id">Project Id</string>
+    <string name="app_project_id">Project Id</string>
     <string name="unacceptable_version_code">Ni lazima usasishe programu yako ndipo uweze kuendelea.</string>
     <string name="rosters">rosters</string>
     <string name="custom_locale">ISO-639-1 Code</string>

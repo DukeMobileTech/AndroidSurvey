@@ -48,6 +48,11 @@ public class OptionSetOption implements SurveyEntity {
     @SerializedName("exclusion_ids")
     @ColumnInfo(name = "ExclusionIds")
     private String mExclusionIds;
+    @SerializedName("has_image")
+    @ColumnInfo(name = "HasImage")
+    private boolean mHasImage;
+    @ColumnInfo(name = "BitmapPath")
+    private String mBitmapPath;
 
     @NonNull
     public Long getRemoteId() {
@@ -105,6 +110,18 @@ public class OptionSetOption implements SurveyEntity {
     public void setExclusive(boolean mExclusive) {
         this.mExclusive = mExclusive;
     }
+
+    public boolean hasImage() {
+        return mHasImage;
+    }
+
+    public void setHasImage(boolean mHasImage) {
+        this.mHasImage = mHasImage;
+    }
+
+    public String getBitmapPath() { return mBitmapPath; }
+
+    public void setBitmapPath(String path) { this.mBitmapPath = path; }
 
     @Override
     public Type getType() {

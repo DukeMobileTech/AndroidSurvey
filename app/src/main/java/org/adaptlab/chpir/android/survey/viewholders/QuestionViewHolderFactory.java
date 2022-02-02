@@ -54,8 +54,6 @@ public class QuestionViewHolderFactory {
                 return new DropDownViewHolder(view, context, listener);
             case EMAIL:
                 return new EmailViewHolder(view, context, listener);
-            case FREE_RESPONSE:
-                return new FreeResponseViewHolder(view, context, listener);
             case FRONT_PICTURE:
                 return new FrontPictureViewHolder(view, context, listener);
             case GEO_LOCATION:
@@ -129,8 +127,6 @@ public class QuestionViewHolderFactory {
                 return DROP_DOWN;
             case Question.EMAIL_ADDRESS:
                 return EMAIL;
-            case Question.FREE_RESPONSE:
-                return FREE_RESPONSE;
             case Question.FRONT_PICTURE:
                 return FRONT_PICTURE;
             case Question.GEO_LOCATION:

@@ -1,5 +1,6 @@
 package org.adaptlab.chpir.android.survey.adapters;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 
 import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
 import org.adaptlab.chpir.android.survey.viewholders.QuestionViewHolder;
 import org.adaptlab.chpir.android.survey.viewholders.QuestionViewHolderFactory;
@@ -62,6 +64,11 @@ public class QuestionRelationAdapter extends ListAdapter<QuestionRelation, Quest
     public int getItemViewType(int position) {
         QuestionRelation questionRelation = getItem(position);
         String type = questionRelation.question.getQuestionType();
+        if (type.equals(Question.SELECT_ONE)) {
+            if (questionRelation.question.hasImages()) {
+                type = Question.SELECT_ONE_IMAGE;
+            }
+        }
         return QuestionViewHolderFactory.getQuestionViewType(type);
     }
 

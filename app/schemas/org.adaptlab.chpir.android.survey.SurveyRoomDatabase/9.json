@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 8,
-    "identityHash": "89f3b10a7739827b3f7711d09ec62d73",
+    "version": 9,
+    "identityHash": "b4e52a67b0ea1b0ab7ba4ad85ad16282",
     "entities": [
       {
         "tableName": "Instruments",
@@ -1392,7 +1392,7 @@
       },
       {
         "tableName": "OptionSets",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Title` TEXT, `Deleted` INTEGER NOT NULL, `InstructionRemoteId` INTEGER, `Special` INTEGER NOT NULL, `HasImages` INTEGER NOT NULL, PRIMARY KEY(`RemoteId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Title` TEXT, `Deleted` INTEGER NOT NULL, `InstructionRemoteId` INTEGER, `Special` INTEGER NOT NULL, `HasImages` INTEGER NOT NULL, `AlignImageVertical` INTEGER NOT NULL, PRIMARY KEY(`RemoteId`))",
         "fields": [
           {
             "fieldPath": "mRemoteId",
@@ -1427,6 +1427,12 @@
           {
             "fieldPath": "mHasImages",
             "columnName": "HasImages",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mAlignImageVertical",
+            "columnName": "AlignImageVertical",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -2844,7 +2850,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '89f3b10a7739827b3f7711d09ec62d73')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b4e52a67b0ea1b0ab7ba4ad85ad16282')"
     ]
   }
 }

@@ -34,6 +34,12 @@ public class OptionSet implements SurveyEntity {
     @SerializedName("special")
     @ColumnInfo(name = "Special")
     private boolean mSpecial;
+    @SerializedName("has_images")
+    @ColumnInfo(name = "HasImages")
+    private boolean mHasImages;
+    @SerializedName("align_image_vertical")
+    @ColumnInfo(name = "AlignImageVertical")
+    private boolean mAlignImageVertical;
     @Ignore
     @SerializedName("option_set_translations")
     private List<OptionSetTranslation> mOptionSetTranslations;
@@ -77,6 +83,22 @@ public class OptionSet implements SurveyEntity {
 
     public void setSpecial(boolean mSpecial) {
         this.mSpecial = mSpecial;
+    }
+
+    public boolean hasImages() {
+        return mHasImages;
+    }
+
+    public void setHasImages(boolean mHasImages) {
+        this.mHasImages = mHasImages;
+    }
+
+    public boolean isAlignImageVertical() {
+        return mAlignImageVertical;
+    }
+
+    public void setAlignImageVertical(boolean mAlignImageVertical) {
+        this.mAlignImageVertical = mAlignImageVertical;
     }
 
     public List<OptionSetTranslation> getOptionSetTranslations() {

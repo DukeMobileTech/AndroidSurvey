@@ -5,10 +5,9 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.util.Log;
 
-import androidx.multidex.BuildConfig;
-
 import com.opencsv.CSVReader;
 
+import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.apache.commons.codec.Charsets;
 
 import java.io.ByteArrayInputStream;

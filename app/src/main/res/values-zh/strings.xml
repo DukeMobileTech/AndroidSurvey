@@ -12,14 +12,14 @@
     <string name="other_specify_edittext">详细说明需要补充的内容</string>
     <string name="free_response_edittext">请将回答写在此处</string>
     <string name="refresh">刷新</string>
-    <string name="device_identifier">设备身份识别号</string>
+    <string name="app_device_identifier">设备身份识别号</string>
     <string name="save_button">保存</string>
     <string name="admin_settings">管理员</string>
     <string name="settings">设置</string>
     <string name="api_endpoint">应用程序编程接口域名</string>
-    <string name="api_key">应用程序编程接口钥匙</string>
+    <string name="app_api_key">应用程序编程接口钥匙</string>
     <string name="api_version">应用程序编程接口版本</string>
-    <string name="project_id">项目编号</string>
+    <string name="app_project_id">项目编号</string>
     <string name="last_update">上一次更新：</string>
     <string name="sync_notification_text">与服务器同步</string>
     <string name="sync_notification_complete_text">与服务器同步完成</string>

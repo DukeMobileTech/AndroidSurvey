@@ -1,18 +1,29 @@
 package org.adaptlab.chpir.android.survey.viewholders;
 
 import android.content.Context;
-import android.graphics.Color;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.text.TextUtils;
+import android.util.LongSparseArray;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 
+import com.google.android.material.card.MaterialCardView;
+
+import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.relations.OptionSetOptionRelation;
+import org.adaptlab.chpir.android.survey.relations.OptionSetRelation;
+
+import java.util.ArrayList;
+
+import static org.adaptlab.chpir.android.survey.utils.FormatUtils.removeNonNumericCharacters;
 
 public class SelectOneImageViewHolder extends QuestionViewHolder {
-    private final int SELECTED = Color.GREEN;
-    private int mResponseIndex;
-    //    private ArrayList<Image> mImages;
-    private Integer mPreviouslySelectedViewIndex = Integer.MAX_VALUE;
-    private GridView mGridView;
+    private int mResponseIndex = -1;
+    private ArrayList<MaterialCardView> mCardViews;
 
     SelectOneImageViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
         super(itemView, context, listener);
@@ -20,76 +31,99 @@ public class SelectOneImageViewHolder extends QuestionViewHolder {
 
     @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
-//        LayoutInflater inflater = getActivity().getLayoutInflater();
-//        View v = inflater.inflate(R.layout.fragment_image, questionComponent, false);
-//        mImages = (ArrayList<Image>) getQuestion().images();
-//        mGridView = (GridView) v.findViewById(R.id.imageGridView);
-//        setUpAdapter();
-//        mGridView.setOnItemClickListener(new OnItemClickListener() {
-//            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-//                clearBackgroundColor();
-//                setBackgroundColor((ImageView) v);
-//                setResponseIndex(position);
-//            }
-//        });
-//        questionComponent.addView(mGridView);
+        questionComponent.removeAllViews();
+        mCardViews = new ArrayList<>();
+        LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LongSparseArray<OptionSetOptionRelation> longSparseArray = getOptionSetOptionRelations();
+
+        OptionSetRelation optionSetRelation = getQuestionRelation().optionSets.get(0);
+        if (!optionSetRelation.optionSet.isAlignImageVertical()) {
+            LinearLayout view = (LinearLayout) inflater.inflate(R.layout.card_images, null);
+            view.setWeightSum(longSparseArray.size());
+            for (int k = 0; k < longSparseArray.size(); k++) {
+                OptionSetOptionRelation relation = longSparseArray.valueAt(k);
+                View layout = inflater.inflate(R.layout.list_item_card, null);
+                MaterialCardView cardView = layout.findViewById(R.id.material_card_view);
+                cardView.setId(k);
+                ImageView imageView = cardView.findViewById(R.id.item_image);
+                String path = getContext().getFileStreamPath(relation.optionSetOption.getBitmapPath()).getAbsolutePath();
+                Bitmap bitmap = BitmapFactory.decodeFile(path);
+                cardView.setMinimumHeight(bitmap.getHeight());
+                imageView.setImageBitmap(bitmap);
+
+                cardView.setOnClickListener(v -> {
+                    int index = v.getId();
+                    cardView.setSelected(!cardView.isSelected());
+                    cardView.setChecked(!cardView.isChecked());
+                    setResponseIndex(index, cardView.isChecked());
+                });
+                mCardViews.add(cardView);
+                view.addView(layout);
+
+                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) layout.getLayoutParams();
+                if (params != null) {
+                    params.weight = 1;
+                    layout.setLayoutParams(params);
+                }
+            }
+            questionComponent.addView(view);
+        } else {
+            for (int k = 0; k < longSparseArray.size(); k++) {
+                OptionSetOptionRelation relation = longSparseArray.valueAt(k);
+                View view = inflater.inflate(R.layout.list_item_image, null);
+                final MaterialCardView cardView = view.findViewById(R.id.material_card_view);
+                cardView.setId(k);
+                ImageView imageView = cardView.findViewById(R.id.item_image);
+                String path = getContext().getFileStreamPath(relation.optionSetOption.getBitmapPath()).getAbsolutePath();
+                Bitmap bitmap = BitmapFactory.decodeFile(path);
+                imageView.setImageBitmap(bitmap);
+
+                cardView.setOnClickListener(v -> {
+                    int index = v.getId();
+                    cardView.setSelected(!cardView.isSelected());
+                    cardView.setChecked(!cardView.isChecked());
+                    setResponseIndex(index, cardView.isChecked());
+                });
+
+                mCardViews.add(cardView);
+                questionComponent.addView(view);
+            }
+        }
     }
 
-//    private void setUpAdapter() {
-//        if (getActivity() == null || mGridView == null) return;
-//        if (mImages != null) {
-//            mGridView.setAdapter(new ImageAdapter(mImages));
-//        } else {
-//            mGridView.setAdapter(null);
-//        }
-//    }
-//
-//    private class ImageAdapter extends ArrayAdapter<Image> {
-//        public ImageAdapter(ArrayList<Image> images) {
-//            super(getActivity(), 0, images);
-//        }
-//
-//        public View getView(int position, View view, ViewGroup parent) {
-//            if (view == null) {
-//                view = getActivity().getLayoutInflater().inflate(R.layout.image_item, parent,
-//                        false);
-//            }
-//            Image img = getItem(position);
-//            ImageView imageView = (ImageView) view.findViewById(R.id.image_item_view);
-//            String path = getActivity().getFileStreamPath(img.getBitmapPath()).getAbsolutePath();
-//            BitmapDrawable bitmap = PictureUtils.getScaledDrawable(getActivity(), path);
-//            imageView.setImageDrawable(bitmap);
-//            if (mPreviouslySelectedViewIndex == position) {
-//                imageView.setBackgroundColor(SELECTED);
-//            }
-//            return view;
-//        }
-//    }
-//
-//    private void setBackgroundColor(ImageView view) {
-//        view.setBackgroundColor(SELECTED);
-//    }
-//
-//    private void clearBackgroundColor() {
-//        for (int i = 0; i < mGridView.getChildCount(); i++) {
-//            mGridView.getChildAt(i).setBackgroundColor(Color.TRANSPARENT);
-//        }
-//    }
-//
-//    private void setResponseIndex(int index) {
-//        mResponseIndex = index;
-//        setResponse(null);
-//    }
+    private void setResponseIndex(int index, boolean status) {
+        MaterialCardView cardView;
+        if (mResponseIndex != -1) {
+            cardView = mCardViews.get(mResponseIndex);
+            cardView.setChecked(false);
+            cardView.setSelected(false);
+        }
+        mResponseIndex = index;
+        cardView = mCardViews.get(mResponseIndex);
+        cardView.setChecked(status);
+        cardView.setSelected(status);
+
+        saveResponse();
+    }
 
     @Override
     protected String serialize() {
+        if (mResponseIndex == -1) {
+            return "";
+        }
         return String.valueOf(mResponseIndex);
     }
 
     @Override
     protected void deserialize(String responseText) {
-        if (!responseText.equals("")) {
-            mPreviouslySelectedViewIndex = Integer.parseInt(responseText);
+        if (TextUtils.isEmpty(responseText.trim())) {
+            mResponseIndex = -1;
+        } else {
+            int index = Integer.parseInt(removeNonNumericCharacters(responseText));
+            MaterialCardView cardView = mCardViews.get(index);
+            cardView.setChecked(true);
+            cardView.setSelected(true);
+            mResponseIndex = index;
         }
     }
 

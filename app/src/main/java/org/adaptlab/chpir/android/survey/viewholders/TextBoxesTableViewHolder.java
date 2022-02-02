@@ -11,10 +11,9 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-import androidx.multidex.BuildConfig;
-
 import com.opencsv.CSVReader;
 
+import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.R;
 import org.apache.commons.codec.Charsets;
 import org.apache.commons.lang3.StringEscapeUtils;
