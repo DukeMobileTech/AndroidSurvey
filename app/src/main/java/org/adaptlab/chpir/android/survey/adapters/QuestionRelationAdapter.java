@@ -1,6 +1,5 @@
 package org.adaptlab.chpir.android.survey.adapters;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,6 +57,7 @@ public class QuestionRelationAdapter extends ListAdapter<QuestionRelation, Quest
         QuestionRelation questionRelation = getItem(position);
         viewHolder.setRelations(questionRelation);
         viewHolder.setDisplayViewModel(mDisplayViewModel);
+        viewHolder.setImageDimensions();
     }
 
     @Override
@@ -67,6 +67,11 @@ public class QuestionRelationAdapter extends ListAdapter<QuestionRelation, Quest
         if (type.equals(Question.SELECT_ONE)) {
             if (questionRelation.question.hasImages()) {
                 type = Question.SELECT_ONE_IMAGE;
+            }
+        }
+        if (type.equals(Question.SELECT_MULTIPLE)) {
+            if (questionRelation.question.hasImages()) {
+                type = Question.SELECT_MULTIPLE_IMAGE;
             }
         }
         return QuestionViewHolderFactory.getQuestionViewType(type);

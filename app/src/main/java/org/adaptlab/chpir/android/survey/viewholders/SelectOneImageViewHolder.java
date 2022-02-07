@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.LongSparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -89,6 +90,11 @@ public class SelectOneImageViewHolder extends QuestionViewHolder {
                 questionComponent.addView(view);
             }
         }
+    }
+
+
+    @Override
+    public void setImageDimensions() {
     }
 
     private void setResponseIndex(int index, boolean status) {

@@ -12,6 +12,7 @@ import android.text.Editable;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.util.LongSparseArray;
 import android.view.MotionEvent;
 import android.view.View;
@@ -947,6 +948,8 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
             }
         }
     }
+
+    public void setImageDimensions() { }
 
     public interface OnResponseSelectedListener {
         void onResponseSelected(QuestionRelation questionRelation, Option selectedOption,
