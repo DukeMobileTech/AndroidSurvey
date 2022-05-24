@@ -125,12 +125,12 @@ public class AppUtil {
         mContext = context;
         getContext();
         getOkHttpClient();
-        if (AppUtil.REQUIRE_SECURITY_CHECKS) {
-            if (!AppUtil.runDeviceSecurityChecks(context)) {
-                // Device has failed security checks
-                return;
-            }
-        }
+//        if (AppUtil.REQUIRE_SECURITY_CHECKS) {
+//            if (!AppUtil.runDeviceSecurityChecks(context)) {
+//                // Device has failed security checks
+//                return;
+//            }
+//        }
 
         setAdminSettingsInstance();
         checkDatabaseVersionChange();
