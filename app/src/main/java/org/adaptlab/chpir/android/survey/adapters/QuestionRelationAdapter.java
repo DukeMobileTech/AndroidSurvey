@@ -57,7 +57,7 @@ public class QuestionRelationAdapter extends ListAdapter<QuestionRelation, Quest
         QuestionRelation questionRelation = getItem(position);
         viewHolder.setRelations(questionRelation);
         viewHolder.setDisplayViewModel(mDisplayViewModel);
-        viewHolder.setImageDimensions();
+//        viewHolder.setImageDimensions();
     }
 
     @Override
@@ -65,12 +65,12 @@ public class QuestionRelationAdapter extends ListAdapter<QuestionRelation, Quest
         QuestionRelation questionRelation = getItem(position);
         String type = questionRelation.question.getQuestionType();
         if (type.equals(Question.SELECT_ONE)) {
-            if (questionRelation.question.hasImages()) {
+            if (questionRelation.question.hasOptionImages()) {
                 type = Question.SELECT_ONE_IMAGE;
             }
         }
         if (type.equals(Question.SELECT_MULTIPLE)) {
-            if (questionRelation.question.hasImages()) {
+            if (questionRelation.question.hasOptionImages()) {
                 type = Question.SELECT_MULTIPLE_IMAGE;
             }
         }

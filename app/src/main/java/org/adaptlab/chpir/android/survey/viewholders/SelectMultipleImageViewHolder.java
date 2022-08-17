@@ -86,8 +86,11 @@ public class SelectMultipleImageViewHolder extends QuestionViewHolder {
                 cardView.setId(k);
                 ImageView imageView = cardView.findViewById(R.id.item_image);
                 String path = getContext().getFileStreamPath(relation.optionSetOption.getBitmapPath()).getAbsolutePath();
-                Bitmap bitmap = BitmapFactory.decodeFile(path);
-                cardView.setMinimumHeight(bitmap.getHeight());
+
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inScaled = true;
+                Bitmap bitmap = BitmapFactory.decodeFile(path, options);
+//                cardView.setMinimumHeight(bitmap.getHeight());
                 imageView.setImageBitmap(bitmap);
 
                 cardView.setOnClickListener(v -> {

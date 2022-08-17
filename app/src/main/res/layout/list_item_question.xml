@@ -51,6 +51,25 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/beforeTextInstructions" />
 
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/question_card_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/spannedTextView">
+
+                <ImageView
+                    android:id="@+id/question_image"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:scaleType="centerCrop" />
+
+            </com.google.android.material.card.MaterialCardView>
+
             <TextView
                 android:id="@+id/afterTextInstructions"
                 android:layout_width="match_parent"
@@ -61,7 +80,7 @@
                 android:textStyle="italic"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/spannedTextView" />
+                app:layout_constraintTop_toBottomOf="@id/question_card_view" />
 
             <TextView
                 android:id="@+id/optionSetInstructions"

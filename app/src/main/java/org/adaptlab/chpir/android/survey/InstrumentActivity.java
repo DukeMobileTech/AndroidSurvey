@@ -77,13 +77,11 @@ public class InstrumentActivity extends AppCompatActivity {
     private void generatePass() {
         String passPhrase = RandomStringUtils.randomAlphanumeric(32);
         AppUtil.setDatabaseKey(passPhrase);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            try {
-                EncryptUtil.encrypt(passPhrase);
-            } catch (NoSuchAlgorithmException | NoSuchProviderException | NoSuchPaddingException | InvalidKeyException |
-                    InvalidAlgorithmParameterException | BadPaddingException | IllegalBlockSizeException e) {
-                Log.e(TAG, "Exception: " + e);
-            }
+        try {
+            EncryptUtil.encrypt(passPhrase);
+        } catch (NoSuchAlgorithmException | NoSuchProviderException | NoSuchPaddingException | InvalidKeyException |
+                InvalidAlgorithmParameterException | BadPaddingException | IllegalBlockSizeException e) {
+            Log.e(TAG, "Exception: " + e);
         }
         init();
     }
@@ -135,7 +133,8 @@ public class InstrumentActivity extends AppCompatActivity {
 
     private void requestNeededPermissions() {
         String[] permissions = {android.Manifest.permission.ACCESS_FINE_LOCATION,
-                android.Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE
+                android.Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.RECORD_AUDIO,
         };
         if (hasPermission(permissions)) {
             setSettings();

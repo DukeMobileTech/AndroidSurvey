@@ -12,6 +12,7 @@
     <color name="transparent">#00000000</color>
     <color name="background">#FFFFFF</color>
     <color name="blue">#4981CE</color>
+    <color name="black">#000000</color>
 
     <color name="primary">#006A4E</color>
     <color name="primary_variant">#0D4D42</color>

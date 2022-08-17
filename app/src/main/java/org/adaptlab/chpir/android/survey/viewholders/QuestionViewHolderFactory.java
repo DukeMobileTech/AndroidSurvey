@@ -41,6 +41,7 @@ public class QuestionViewHolderFactory {
     private static final int SELECT_MULTIPLE_TABLE = 30;
     private static final int INTEGER_BOXES_TABLE = 32;
     private static final int TEXT_BOXES_TABLE = 33;
+    private static final int AUDIO = 34;
 
     public static QuestionViewHolder createViewHolder(View view, Context context, int viewType, QuestionViewHolder.OnResponseSelectedListener listener) {
         switch (viewType) {
@@ -110,6 +111,8 @@ public class QuestionViewHolderFactory {
                 return new IntegerBoxesTableViewHolder(view, context, listener);
             case TEXT_BOXES_TABLE:
                 return new TextBoxesTableViewHolder(view, context, listener);
+            case AUDIO:
+                return new AudioViewHolder(view, context, listener);
             default:
                 return new FreeResponseViewHolder(view, context, listener);
         }
@@ -173,6 +176,8 @@ public class QuestionViewHolderFactory {
                 return TIME;
             case Question.YEAR:
                 return YEAR;
+            case Question.AUDIO:
+                return AUDIO;
             case ConstantUtils.SELECT_ONE_TABLE:
                 return SELECT_ONE_TABLE;
             case ConstantUtils.SELECT_MULTIPLE_TABLE:

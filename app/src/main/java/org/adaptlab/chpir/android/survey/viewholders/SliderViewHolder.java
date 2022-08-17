@@ -1,51 +1,39 @@
 package org.adaptlab.chpir.android.survey.viewholders;
 
 import android.content.Context;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.SeekBar;
+
+import com.google.android.material.slider.LabelFormatter;
+import com.google.android.material.slider.Slider;
+
+import org.adaptlab.chpir.android.survey.R;
 
 public class SliderViewHolder extends QuestionViewHolder {
-    private int mProgress;
-    private SeekBar mSlider;
+    private float mProgress;
+    private Slider mSlider;
 
     SliderViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
         super(itemView, context, listener);
     }
 
     protected void beforeAddViewHook(ViewGroup questionComponent) {
-
     }
 
     @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
-//        mSlider = new SeekBar(getActivity());
-//        mSlider.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
-//            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-//                mProgress = progress;
-//                if (mProgress > -1) {
-//                    setResponse(null);
-//                }
-//            }
-//
-//            // Required by interface
-//            public void onStartTrackingTouch(SeekBar seekBar) {
-//            }
-//
-//            public void onStopTrackingTouch(SeekBar seekBar) {
-//            }
-//        });
-//        mSlider.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                if (mSpecialResponses != null) {
-//                    mSpecialResponses.clearCheck();
-//                }
-//                return false;
-//            }
-//        });
-//        beforeAddViewHook(questionComponent);
-//        questionComponent.addView(mSlider);
+        questionComponent.removeAllViews();
+        LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View layout = inflater.inflate(R.layout.slider, null);
+        mSlider = layout.findViewById(R.id.discreteSlider);
+        LabelFormatter formatter = value -> Math.abs((int) value) + "";
+        mSlider.setLabelFormatter(formatter);
+        mSlider.addOnChangeListener((slider, value, fromUser) -> {
+            mProgress = value;
+            saveResponse();
+        });
+        questionComponent.addView(layout);
     }
 
     @Override
@@ -56,15 +44,15 @@ public class SliderViewHolder extends QuestionViewHolder {
     @Override
     protected void deserialize(String responseText) {
         if (responseText.equals("")) {
-            mSlider.setProgress(-1);
+            mSlider.setValue((float) 0.0);
         } else {
-            mSlider.setProgress(Integer.parseInt(responseText));
+            mSlider.setValue(Float.parseFloat(responseText));
         }
     }
 
     @Override
     protected void unSetResponse() {
-        mSlider.setProgress(0);
+        mSlider.setValue((float) 0.0);
     }
 
     @Override

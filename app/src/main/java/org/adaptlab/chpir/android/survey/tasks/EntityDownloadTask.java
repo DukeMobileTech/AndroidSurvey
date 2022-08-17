@@ -11,7 +11,10 @@ import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.SurveyApp;
 import org.adaptlab.chpir.android.survey.daos.BaseDao;
 import org.adaptlab.chpir.android.survey.daos.OptionSetOptionDao;
+import org.adaptlab.chpir.android.survey.daos.QuestionDao;
+import org.adaptlab.chpir.android.survey.entities.BitmapEntity;
 import org.adaptlab.chpir.android.survey.entities.OptionSetOption;
+import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.repositories.Repository;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
@@ -104,7 +107,10 @@ public class EntityDownloadTask extends AsyncTask<Void, Void, Void> {
                                 mTranslationEntity.save(mTranslationDao, translations);
                             }
                             if (mEntity.getClass().getName().equals(OptionSetOption.class.getName())) {
-                                downloadImages();
+                                downloadOptionImages();
+                            }
+                            if (mEntity.getClass().getName().equals(Question.class.getName())) {
+                                downloadQuestionImages();
                             }
                             AppUtil.updateDownloadProgress();
                         } catch (IOException e) {
@@ -123,17 +129,27 @@ public class EntityDownloadTask extends AsyncTask<Void, Void, Void> {
         return null;
     }
 
-    private void downloadImages() {
+    private void downloadOptionImages() {
         List<OptionSetOption> withImages = ((OptionSetOptionDao) mBaseDao).withImages();
         for (OptionSetOption optionSetOption : withImages) {
             if (optionSetOption.hasImage()) {
-                String url = AppUtil.getFullApiUrl() + "images/" + optionSetOption.getOptionRemoteId() + AppUtil.getParams();
+                String url = AppUtil.getFullApiUrl() + "images/" + optionSetOption.getOptionRemoteId() + AppUtil.getParams() + "&option_id=" + optionSetOption.getOptionRemoteId();
                 getFile(url, optionSetOption);
             }
         }
     }
 
-    public void getFile(String url, OptionSetOption optionSetOption) {
+    private void downloadQuestionImages() {
+        List<Question> withImages = ((QuestionDao) mBaseDao).withImages();
+        for (Question question : withImages) {
+            if (question.hasQuestionImage()) {
+                String url = AppUtil.getFullApiUrl() + "images/" + question.getRemoteId() + AppUtil.getParams() + "&question_id=" + question.getRemoteId();
+                getFile(url, question);
+            }
+        }
+    }
+
+    public void getFile(String url, BitmapEntity bitmapEntity) {
         if (BuildConfig.DEBUG) Log.i(TAG, "Image url: " + url);
         String filename = UUID.randomUUID().toString() + ".png";
         FileOutputStream fileWriter = null;
@@ -142,8 +158,8 @@ public class EntityDownloadTask extends AsyncTask<Void, Void, Void> {
             if (imageBytes != null) {
                 fileWriter = SurveyApp.getInstance().openFileOutput(filename, Context.MODE_PRIVATE);
                 fileWriter.write(imageBytes);
-                optionSetOption.setBitmapPath(filename);
-                mBaseDao.update(optionSetOption);
+                bitmapEntity.setBitmapPath(filename);
+                mBaseDao.update(bitmapEntity);
             }
             if (BuildConfig.DEBUG) Log.i(TAG, "Image saved in " + filename);
         } catch (IOException e) {

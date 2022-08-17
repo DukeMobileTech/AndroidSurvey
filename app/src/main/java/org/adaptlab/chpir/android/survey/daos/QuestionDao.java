@@ -5,6 +5,7 @@ import androidx.room.Dao;
 import androidx.room.Query;
 import androidx.room.Transaction;
 
+import org.adaptlab.chpir.android.survey.entities.OptionSetOption;
 import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
 
@@ -27,4 +28,6 @@ public abstract class QuestionDao extends BaseDao<Question> {
             "WHERE Questions.DisplayId=:displayId AND Questions.InstrumentRemoteId=:instrumentId AND Questions.Deleted=0")
     public abstract LiveData<List<QuestionRelation>> displayQuestions(Long instrumentId, Long displayId);
 
+    @Query("SELECT * FROM Questions WHERE HasQuestionImage=1")
+    public abstract List<Question> withImages();
 }

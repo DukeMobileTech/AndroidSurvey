@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity(tableName = "OptionSetOptions")
-public class OptionSetOption implements SurveyEntity {
+public class OptionSetOption implements SurveyEntity, BitmapEntity {
     @PrimaryKey
     @NonNull
     @SerializedName("id")
