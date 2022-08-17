@@ -1,10 +1,11 @@
 package org.adaptlab.chpir.android.survey.viewholders;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.TextUtils;
-import android.util.Log;
+import android.util.DisplayMetrics;
 import android.util.LongSparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,8 +38,42 @@ public class SelectOneImageViewHolder extends QuestionViewHolder {
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         LongSparseArray<OptionSetOptionRelation> longSparseArray = getOptionSetOptionRelations();
 
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int deviceWidth = displayMetrics.widthPixels;
+        double targetWidth = deviceWidth - (0.25 * deviceWidth);
+
         OptionSetRelation optionSetRelation = getQuestionRelation().optionSets.get(0);
-        if (!optionSetRelation.optionSet.isAlignImageVertical()) {
+        if (optionSetRelation.optionSet.isAlignImageVertical()) {
+            for (int k = 0; k < longSparseArray.size(); k++) {
+                OptionSetOptionRelation relation = longSparseArray.valueAt(k);
+                View view = inflater.inflate(R.layout.list_item_image, null);
+                final MaterialCardView cardView = view.findViewById(R.id.material_card_view);
+                cardView.setId(k);
+                ImageView imageView = cardView.findViewById(R.id.item_image);
+                String path = getContext().getFileStreamPath(relation.optionSetOption.getBitmapPath()).getAbsolutePath();
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inScaled = true;
+                Bitmap bitmap = BitmapFactory.decodeFile(path, options);
+                int width = bitmap.getWidth();
+                int height = bitmap.getHeight();
+                if (width < targetWidth) {
+                    double scale = targetWidth / width;
+                    width = (int) Math.round(width * scale);
+                    height = (int) Math.round(height * scale);
+                }
+                bitmap = Bitmap.createScaledBitmap(bitmap, width, height, true);
+                imageView.setImageBitmap(bitmap);
+                cardView.setOnClickListener(v -> {
+                    int index = v.getId();
+                    cardView.setSelected(!cardView.isSelected());
+                    cardView.setChecked(!cardView.isChecked());
+                    setResponseIndex(index, cardView.isChecked());
+                });
+                mCardViews.add(cardView);
+                questionComponent.addView(view);
+            }
+        } else {
             LinearLayout view = (LinearLayout) inflater.inflate(R.layout.card_images, null);
             view.setWeightSum(longSparseArray.size());
             for (int k = 0; k < longSparseArray.size(); k++) {
@@ -52,8 +87,6 @@ public class SelectOneImageViewHolder extends QuestionViewHolder {
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inScaled = true;
                 Bitmap bitmap = BitmapFactory.decodeFile(path, options);
-//                cardView.setMinimumHeight(bitmap.getHeight());
-//                imageView.setMinimumHeight(50);
                 imageView.setImageBitmap(bitmap);
 
                 cardView.setOnClickListener(v -> {
@@ -72,30 +105,6 @@ public class SelectOneImageViewHolder extends QuestionViewHolder {
                 }
             }
             questionComponent.addView(view);
-        } else {
-            for (int k = 0; k < longSparseArray.size(); k++) {
-                OptionSetOptionRelation relation = longSparseArray.valueAt(k);
-                View view = inflater.inflate(R.layout.list_item_image, null);
-                final MaterialCardView cardView = view.findViewById(R.id.material_card_view);
-                cardView.setId(k);
-                ImageView imageView = cardView.findViewById(R.id.item_image);
-                String path = getContext().getFileStreamPath(relation.optionSetOption.getBitmapPath()).getAbsolutePath();
-
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inScaled = true;
-                Bitmap bitmap = BitmapFactory.decodeFile(path, options);
-                imageView.setImageBitmap(bitmap);
-
-                cardView.setOnClickListener(v -> {
-                    int index = v.getId();
-                    cardView.setSelected(!cardView.isSelected());
-                    cardView.setChecked(!cardView.isChecked());
-                    setResponseIndex(index, cardView.isChecked());
-                });
-
-                mCardViews.add(cardView);
-                questionComponent.addView(view);
-            }
         }
     }
 
