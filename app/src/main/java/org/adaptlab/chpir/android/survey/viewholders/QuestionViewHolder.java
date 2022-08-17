@@ -729,30 +729,24 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         if (mQuestionRelation.question.hasQuestionImage()) {
             mCardView.setVisibility(View.VISIBLE);
             String path = getContext().getFileStreamPath(mQuestionRelation.question.getBitmapPath()).getAbsolutePath();
-
             BitmapFactory.Options options = new BitmapFactory.Options();
-//            options.inSampleSize = 1;
             options.inScaled = true;
-
             Bitmap bitmap = BitmapFactory.decodeFile(path, options);
-
             DisplayMetrics displayMetrics = new DisplayMetrics();
             ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
             int height = displayMetrics.heightPixels;
             int width = displayMetrics.widthPixels;
+
             Log.i(TAG, "SCREEN SIZE => Height: " + height + " Width: " + width);
-            Log.i(TAG, getQuestion().getQuestionIdentifier() +" BITMAP SIZE => Height: " + bitmap.getHeight() + " Width: " + bitmap.getWidth());
+            Log.i(TAG, getQuestion().getQuestionIdentifier() + " BITMAP SIZE => Height: " + bitmap.getHeight() + " Width: " + bitmap.getWidth());
 
-//            bitmap = Bitmap.createScaledBitmap(bitmap, width, bitmap.getHeight(), true);
-
-//            mCardView.setMinimumHeight(400);
+            if (bitmap.getWidth() < (width - 0.25 * width)) {
+                double scale = (width - 0.25 * width) / bitmap.getWidth();
+                width = (int) Math.round(bitmap.getWidth() * scale);
+                height = (int) Math.round(bitmap.getHeight() * scale);
+            }
+            bitmap = Bitmap.createScaledBitmap(bitmap, width, height, true);
             mImageView.setImageBitmap(bitmap);
-//            mImageView.setMaxWidth(500);
-//            mImageView.setMinimumHeight(mQuestionRelation.question.getQuestionImageHeight());
-//            mImageView.setMinimumHeight(bitmap.getHeight());
-
-//            mImageView.setMaxWidth(width);
-//            mImageView.setMinimumHeight(bitmap.getHeight() * 3);
         }
     }
 

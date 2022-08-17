@@ -200,4 +200,6 @@
     <string name="stop_recording">Stop Recording</string>
     <string name="play_recording">Play Recording</string>
     <string name="stop_playing">Stop Playing</string>
+    <string name="strongly_prefer">Strongly Prefer</string>
+    <string name="no_preference">No Preference</string>
 </resources>

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.LongSparseArray;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -199,6 +200,12 @@ public class SurveyActivity extends AppCompatActivity {
                         }
                         displayList.addAll(getSortedDisplays(displays));
                     }
+                    Collections.sort(displayList, new Comparator<Display>() {
+                        @Override
+                        public int compare(Display display1, Display display2) {
+                            return display1.getPosition() - display2.getPosition();
+                        }
+                    });
                     mSurveyViewModel.setDisplays(displayList);
                     mDisplayPagerAdapter.setDisplays(displayList);
 
@@ -206,7 +213,6 @@ public class SurveyActivity extends AppCompatActivity {
                     for (QuestionTranslationRelation questionTranslationRelation : relation.questions) {
                         questions.add(questionTranslationRelation.question);
                     }
-
                     Collections.sort(questions, new Comparator<Question>() {
                         @Override
                         public int compare(Question question1, Question question2) {
@@ -216,6 +222,7 @@ public class SurveyActivity extends AppCompatActivity {
                     mSurveyViewModel.setQuestions(questions);
 
                     setActionBarTitle(mSurveyViewModel.getDisplayPosition());
+                    invalidateOptionsMenu();
                 }
             }
         });

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -8,8 +9,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
         android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
         android:orientation="horizontal">
 
         <TextView
@@ -17,21 +18,21 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="start"
-            android:text="Strongly Prefer" />
+            android:text="@string/strongly_prefer" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="No Preference" />
+            android:text="@string/no_preference" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="end"
-            android:text="Strongly Prefer" />
+            android:text="@string/strongly_prefer" />
 
     </LinearLayout>
 
@@ -42,7 +43,10 @@
         android:stepSize="1.0"
         android:value="0.0"
         android:valueFrom="-5.0"
-        android:valueTo="5.0" />
+        android:valueTo="5.0"
+        app:tickColor="@color/blue"
+        app:trackColor="@color/bg_gray"
+        app:trackHeight="8dp" />
 
     <LinearLayout
         android:layout_width="match_parent"

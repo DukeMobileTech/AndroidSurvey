@@ -11,6 +11,7 @@
         <item name="android:checkboxStyle">@style/CheckBox.Survey</item>
         <item name="android:radioButtonStyle">@style/RadioButton.Survey</item>
         <item name="android:editTextStyle">@style/EditText.Survey</item>
+        <item name="android:statusBarColor">@color/primary_variant</item>
 
         <!--Transitions-->
         <item name="android:windowActivityTransitions">true</item>

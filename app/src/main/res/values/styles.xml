@@ -4,6 +4,8 @@
     <style name="Theme.Survey" parent="Theme.MaterialComponents.DayNight">
         <item name="android:colorBackground">@color/md_theme_light_background</item>
         <item name="colorPrimary">@color/md_theme_light_primary</item>
+        <item name="colorPrimaryVariant">@color/primary_variant</item>
+        <item name="android:statusBarColor">@color/primary_variant</item>
         <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
         <item name="colorSecondary">@color/md_theme_light_secondary</item>
         <item name="colorOnSecondary">@color/md_theme_light_onSecondary</item>
@@ -12,7 +14,6 @@
         <item name="colorOnBackground">@color/md_theme_light_onBackground</item>
         <item name="colorSurface">@color/md_theme_light_surface</item>
         <item name="colorOnSurface">@color/md_theme_light_onSurface</item>
-        <item name="colorPrimaryVariant">@color/primary_variant</item>
 
         <item name="homeAsUpIndicator">@drawable/ic_menu_black_24dp</item>
         <item name="android:homeAsUpIndicator">@drawable/ic_menu_black_24dp</item>
