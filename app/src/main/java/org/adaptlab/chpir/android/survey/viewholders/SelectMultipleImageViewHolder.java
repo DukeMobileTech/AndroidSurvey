@@ -1,8 +1,10 @@
 package org.adaptlab.chpir.android.survey.viewholders;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.DisplayMetrics;
 import android.util.LongSparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,10 +26,9 @@ import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 public class SelectMultipleImageViewHolder extends QuestionViewHolder {
     private ArrayList<Integer> mResponseIndices;
     private ArrayList<MaterialCardView> mCardViews;
-    private ArrayList<ImageView> mImageViews;
-    private int minHeight;
-    private int minWidth;
-    private int maxSelection = 2;
+//    private int minHeight;
+//    private int minWidth;
+//    private int maxSelection = 2;
 
     SelectMultipleImageViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
         super(itemView, context, listener);
@@ -35,11 +36,11 @@ public class SelectMultipleImageViewHolder extends QuestionViewHolder {
 
     @Override
     public void setImageDimensions() {
-        for (ImageView imageView : mImageViews) {
-            imageView.setMinimumHeight(minHeight * 2);
-            imageView.setMinimumWidth(minWidth * 2);
-            imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-        }
+//        for (ImageView imageView : mImageViews) {
+//            imageView.setMinimumHeight(minHeight * 2);
+//            imageView.setMinimumWidth(minWidth * 2);
+//            imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+//        }
     }
 
     @Override
@@ -47,10 +48,14 @@ public class SelectMultipleImageViewHolder extends QuestionViewHolder {
         questionComponent.removeAllViews();
         mCardViews = new ArrayList<>();
         mResponseIndices = new ArrayList<>();
-        mImageViews = new ArrayList<>();
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         LongSparseArray<OptionSetOptionRelation> longSparseArray = getOptionSetOptionRelations();
         OptionSetRelation optionSetRelation = getQuestionRelation().optionSets.get(0);
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int deviceWidth = displayMetrics.widthPixels;
+        double targetWidth = deviceWidth - (0.25 * deviceWidth);
 
         if (optionSetRelation.optionSet.isAlignImageVertical()) {
             for (int k = 0; k < longSparseArray.size(); k++) {
@@ -60,11 +65,18 @@ public class SelectMultipleImageViewHolder extends QuestionViewHolder {
                 cardView.setId(k);
                 ImageView imageView = cardView.findViewById(R.id.item_image);
                 String path = getContext().getFileStreamPath(relation.optionSetOption.getBitmapPath()).getAbsolutePath();
-                Bitmap bitmap = BitmapFactory.decodeFile(path);
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inScaled = true;
+                Bitmap bitmap = BitmapFactory.decodeFile(path, options);
+                int width = bitmap.getWidth();
+                int height = bitmap.getHeight();
+                if (width < targetWidth) {
+                    double scale = targetWidth / width;
+                    width = (int) Math.round(width * scale);
+                    height = (int) Math.round(height * scale);
+                }
+                bitmap = Bitmap.createScaledBitmap(bitmap, width, height, true);
                 imageView.setImageBitmap(bitmap);
-                mImageViews.add(imageView);
-                minHeight = bitmap.getHeight();
-                minWidth = bitmap.getWidth();
 
                 cardView.setOnClickListener(v -> {
                     int index = v.getId();
@@ -94,33 +106,37 @@ public class SelectMultipleImageViewHolder extends QuestionViewHolder {
                 imageView.setImageBitmap(bitmap);
 
                 cardView.setOnClickListener(v -> {
+//                    int index = v.getId();
+//                    if (mResponseIndices.size() == maxSelection) {
+//                        for (MaterialCardView materialCardView : mCardViews) {
+//                            if (materialCardView.isChecked()) {
+//                                materialCardView.setChecked(false);
+//                                materialCardView.setSelected(false);
+//                            }
+//                        }
+//                        mResponseIndices.clear();
+//                    } else {
+//                        if (mResponseIndices.size() == 1) {
+//                            cardView.setCheckedIcon(getContext().getDrawable(R.drawable.ic_baseline_cancel_24));
+//                        }
+//
+//                        cardView.setSelected(!cardView.isSelected());
+//                        cardView.setChecked(!cardView.isChecked());
+//                        setResponseIndex(index, cardView.isChecked());
+//                    }
                     int index = v.getId();
-                    if (mResponseIndices.size() == maxSelection) {
-                        for (MaterialCardView materialCardView : mCardViews) {
-                            if (materialCardView.isChecked()) {
-                                materialCardView.setChecked(false);
-                                materialCardView.setSelected(false);
-                            }
-                        }
-                        mResponseIndices.clear();
-                    } else {
-                        if (mResponseIndices.size() == 1) {
-                            cardView.setCheckedIcon(getContext().getDrawable(R.drawable.ic_baseline_cancel_24));
-                        }
-
-                        cardView.setSelected(!cardView.isSelected());
-                        cardView.setChecked(!cardView.isChecked());
-                        setResponseIndex(index, cardView.isChecked());
-                    }
+                    cardView.setSelected(!cardView.isSelected());
+                    cardView.setChecked(!cardView.isChecked());
+                    setResponseIndex(index, cardView.isChecked());
                 });
                 mCardViews.add(cardView);
                 view.addView(layout);
 
-                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) layout.getLayoutParams();
-                if (params != null) {
-                    params.weight = 1;
-                    layout.setLayoutParams(params);
-                }
+//                LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) layout.getLayoutParams();
+//                if (params != null) {
+//                    params.weight = 1;
+//                    layout.setLayoutParams(params);
+//                }
             }
             questionComponent.addView(view);
         }
@@ -159,9 +175,9 @@ public class SelectMultipleImageViewHolder extends QuestionViewHolder {
                     cardView.setChecked(true);
                     cardView.setSelected(true);
 
-                    if (mResponseIndices.size() == 1) {
-                        cardView.setCheckedIcon(getContext().getDrawable(R.drawable.ic_baseline_cancel_24));
-                    }
+//                    if (mResponseIndices.size() == 1) {
+//                        cardView.setCheckedIcon(getContext().getDrawable(R.drawable.ic_baseline_cancel_24));
+//                    }
 
                     mResponseIndices.add(indexInteger);
                 }

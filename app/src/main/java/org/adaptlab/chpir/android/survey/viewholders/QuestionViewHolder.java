@@ -742,6 +742,9 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
             if (bitmap.getWidth() < (width - 0.25 * width)) {
                 double scale = (width - 0.25 * width) / bitmap.getWidth();
+                if (mQuestionRelation.question.getQuestionType().equals(Question.SLIDER)) {
+                    scale = (width * 1.0) / bitmap.getWidth();
+                }
                 width = (int) Math.round(bitmap.getWidth() * scale);
                 height = (int) Math.round(bitmap.getHeight() * scale);
             }
