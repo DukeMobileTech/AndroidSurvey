@@ -16,10 +16,12 @@ import android.widget.LinearLayout;
 import com.google.android.material.card.MaterialCardView;
 
 import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.relations.OptionRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionSetOptionRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionSetRelation;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.adaptlab.chpir.android.survey.utils.FormatUtils.removeNonNumericCharacters;
 
@@ -36,7 +38,6 @@ public class SelectOneImageViewHolder extends QuestionViewHolder {
         questionComponent.removeAllViews();
         mCardViews = new ArrayList<>();
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        LongSparseArray<OptionSetOptionRelation> longSparseArray = getOptionSetOptionRelations();
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -44,14 +45,16 @@ public class SelectOneImageViewHolder extends QuestionViewHolder {
         double targetWidth = deviceWidth - (0.25 * deviceWidth);
 
         OptionSetRelation optionSetRelation = getQuestionRelation().optionSets.get(0);
+        List<OptionRelation> optionRelations = getOptionRelations();
         if (optionSetRelation.optionSet.isAlignImageVertical()) {
-            for (int k = 0; k < longSparseArray.size(); k++) {
-                OptionSetOptionRelation relation = longSparseArray.valueAt(k);
+            for (final OptionRelation optionRelation : optionRelations) {
                 View view = inflater.inflate(R.layout.list_item_image, null);
                 final MaterialCardView cardView = view.findViewById(R.id.material_card_view);
-                cardView.setId(k);
+                cardView.setId(optionRelations.indexOf(optionRelation));
                 ImageView imageView = cardView.findViewById(R.id.item_image);
-                String path = getContext().getFileStreamPath(relation.optionSetOption.getBitmapPath()).getAbsolutePath();
+                String path = getContext().getFilesDir().getAbsolutePath() + "/" +
+                        getQuestionRelation().question.getInstrumentRemoteId() + "/" +
+                        optionRelation.option.getIdentifier() + ".png";
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inScaled = true;
                 Bitmap bitmap = BitmapFactory.decodeFile(path, options);
@@ -75,15 +78,16 @@ public class SelectOneImageViewHolder extends QuestionViewHolder {
             }
         } else {
             LinearLayout view = (LinearLayout) inflater.inflate(R.layout.card_images, null);
-            view.setWeightSum(longSparseArray.size());
-            for (int k = 0; k < longSparseArray.size(); k++) {
-                OptionSetOptionRelation relation = longSparseArray.valueAt(k);
+            view.setWeightSum(optionRelations.size());
+            for (int k = 0; k < optionRelations.size(); k++) {
+                OptionRelation relation = optionRelations.get(k);
                 View layout = inflater.inflate(R.layout.list_item_card, null);
                 MaterialCardView cardView = layout.findViewById(R.id.material_card_view);
                 cardView.setId(k);
                 ImageView imageView = cardView.findViewById(R.id.item_image);
-                String path = getContext().getFileStreamPath(relation.optionSetOption.getBitmapPath()).getAbsolutePath();
-
+                String path = getContext().getFilesDir().getAbsolutePath() + "/" +
+                        getQuestionRelation().question.getInstrumentRemoteId() + "/" +
+                        relation.option.getIdentifier() + ".png";
                 BitmapFactory.Options options = new BitmapFactory.Options();
                 options.inScaled = true;
                 Bitmap bitmap = BitmapFactory.decodeFile(path, options);

@@ -728,7 +728,11 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
         if (mQuestionRelation.question.hasQuestionImage()) {
             mCardView.setVisibility(View.VISIBLE);
-            String path = getContext().getFileStreamPath(mQuestionRelation.question.getBitmapPath()).getAbsolutePath();
+//            String path = getContext().getFileStreamPath(mQuestionRelation.question.getBitmapPath()).getAbsolutePath();
+            String path = getContext().getFilesDir().getAbsolutePath() + "/" +
+                    mQuestionRelation.question.getInstrumentRemoteId() + "/" +
+                    mQuestionRelation.question.getQuestionIdentifier() + ".png";
+            Log.i(TAG, "PATH: " + path);
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inScaled = true;
             Bitmap bitmap = BitmapFactory.decodeFile(path, options);
