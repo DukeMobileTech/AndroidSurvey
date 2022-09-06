@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.LongSparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +16,6 @@ import com.google.android.material.card.MaterialCardView;
 
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.relations.OptionRelation;
-import org.adaptlab.chpir.android.survey.relations.OptionSetOptionRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionSetRelation;
 
 import java.util.ArrayList;
@@ -112,10 +110,6 @@ public class SelectOneImageViewHolder extends QuestionViewHolder {
         }
     }
 
-
-    @Override
-    public void setImageDimensions() {
-    }
 
     private void setResponseIndex(int index, boolean status) {
         MaterialCardView cardView;

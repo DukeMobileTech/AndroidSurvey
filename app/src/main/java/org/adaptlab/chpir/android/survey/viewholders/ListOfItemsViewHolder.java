@@ -54,7 +54,7 @@ public abstract class ListOfItemsViewHolder extends QuestionViewHolder {
             toggleCarryForward(optionText, optionId);
             questionComponent.addView(optionText);
             final EditText editText = createEditText();
-            editText.setHint(R.string.free_response_edittext);
+            editText.setHint(R.string.free_response_edit_text);
             toggleCarryForward(editText, optionId);
             questionComponent.addView(editText);
             mEditTexts.add(editText);

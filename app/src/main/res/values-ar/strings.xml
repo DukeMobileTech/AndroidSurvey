@@ -7,8 +7,8 @@
     <string name="next_button">التالي</string>
     <string name="finish_button">نهاية</string>
     <string name="other_specify">آخر</string>
-    <string name="other_specify_edittext">تحديد أخرى</string>
-    <string name="free_response_edittext">الإجابة هنا</string>
+    <string name="other_specify_edit_text">تحديد أخرى</string>
+    <string name="free_response_edit_text">الإجابة هنا</string>
     <string name="refresh">تحديث</string>
     <string name="app_device_identifier">Device Identifier</string>
     <string name="save_button">Save</string>
@@ -202,4 +202,7 @@
     <string name="stop_playing">Stop Playing</string>
     <string name="strongly_prefer">Strongly Prefer</string>
     <string name="no_preference">No Preference</string>
+    <string name="image">Image</string>
+    <string name="_5">5</string>
+    <string name="_0">0</string>
 </resources>

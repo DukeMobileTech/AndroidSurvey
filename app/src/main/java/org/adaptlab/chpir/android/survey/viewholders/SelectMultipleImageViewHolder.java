@@ -35,15 +35,6 @@ public class SelectMultipleImageViewHolder extends QuestionViewHolder {
     }
 
     @Override
-    public void setImageDimensions() {
-//        for (ImageView imageView : mImageViews) {
-//            imageView.setMinimumHeight(minHeight * 2);
-//            imageView.setMinimumWidth(minWidth * 2);
-//            imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-//        }
-    }
-
-    @Override
     protected void createQuestionComponent(ViewGroup questionComponent) {
         questionComponent.removeAllViews();
         mCardViews = new ArrayList<>();

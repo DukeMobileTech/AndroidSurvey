@@ -8,8 +8,8 @@
     <string name="previous_button">Iliyopita</string>
     <string name="finish_button">Maliza</string>
     <string name="other_specify">Nyingine</string>
-    <string name="other_specify_edittext">Taja nyingine</string>
-    <string name="free_response_edittext">Jibu hapa</string>
+    <string name="other_specify_edit_text">Taja nyingine</string>
+    <string name="free_response_edit_text">Jibu hapa</string>
     <string name="refresh">Shusha</string>
     <string name="app_device_identifier">Kitambulisho Cha Kifaa</string>
     <string name="save_button">Hifadhi</string>
@@ -201,4 +201,7 @@
     <string name="stop_playing">Stop Playing</string>
     <string name="strongly_prefer">Strongly Prefer</string>
     <string name="no_preference">No Preference</string>
+    <string name="image">Image</string>
+    <string name="_5">5</string>
+    <string name="_0">0</string>
 </resources>

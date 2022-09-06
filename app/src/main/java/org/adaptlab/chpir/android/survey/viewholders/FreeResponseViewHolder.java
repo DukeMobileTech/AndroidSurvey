@@ -77,7 +77,7 @@ public class FreeResponseViewHolder extends QuestionViewHolder {
         mFreeText = new EditText(getContext());
         mFreeText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
         beforeAddViewHook(mFreeText);
-        mFreeText.setHint(R.string.free_response_edittext);
+        mFreeText.setHint(R.string.free_response_edit_text);
         mFreeText.addTextChangedListener(mTextWatcher);
         questionComponent.addView(mFreeText);
     }

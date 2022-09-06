@@ -42,6 +42,7 @@ public class QuestionViewHolderFactory {
     private static final int INTEGER_BOXES_TABLE = 32;
     private static final int TEXT_BOXES_TABLE = 33;
     private static final int AUDIO = 34;
+    private static final int PAIRWISE_COMPARISON = 35;
 
     public static QuestionViewHolder createViewHolder(View view, Context context, int viewType, QuestionViewHolder.OnResponseSelectedListener listener) {
         switch (viewType) {
@@ -113,6 +114,8 @@ public class QuestionViewHolderFactory {
                 return new TextBoxesTableViewHolder(view, context, listener);
             case AUDIO:
                 return new AudioViewHolder(view, context, listener);
+            case PAIRWISE_COMPARISON:
+                return new PairwiseComparisonViewHolder(view, context, listener);
             default:
                 return new FreeResponseViewHolder(view, context, listener);
         }
@@ -178,6 +181,8 @@ public class QuestionViewHolderFactory {
                 return YEAR;
             case Question.AUDIO:
                 return AUDIO;
+            case Question.PAIRWISE_COMPARISON:
+                return PAIRWISE_COMPARISON;
             case ConstantUtils.SELECT_ONE_TABLE:
                 return SELECT_ONE_TABLE;
             case ConstantUtils.SELECT_MULTIPLE_TABLE:

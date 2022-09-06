@@ -49,7 +49,7 @@ public class IntegerBoxesTableViewHolder extends TableQuestionViewHolder {
                     ViewGroup.LayoutParams.WRAP_CONTENT);
             params.leftMargin = getOptionWidth() / 2;
             editText.setLayoutParams(params);
-            editText.setHint(R.string.free_response_edittext);
+            editText.setHint(R.string.free_response_edit_text);
             questionComponent.addView(editText);
             editText.addTextChangedListener(new TextWatcher() {
                 private Timer timer;

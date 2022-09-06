@@ -9,8 +9,8 @@
     <string name="finish_button">Enviar</string>
     <string name="skip_button">Omitir</string>
     <string name="other_specify">Otros</string>
-    <string name="other_specify_edittext">Especifique otros</string>
-    <string name="free_response_edittext">Responda aquí</string>
+    <string name="other_specify_edit_text">Especifique otros</string>
+    <string name="free_response_edit_text">Responda aquí</string>
     <string name="refresh">Actualizar</string>
     <string name="app_device_identifier">Device Identifier</string>
     <string name="save_button">Guardar</string>
@@ -202,4 +202,7 @@
     <string name="stop_playing">Stop Playing</string>
     <string name="strongly_prefer">Strongly Prefer</string>
     <string name="no_preference">No Preference</string>
+    <string name="image">Image</string>
+    <string name="_5">5</string>
+    <string name="_0">0</string>
 </resources>

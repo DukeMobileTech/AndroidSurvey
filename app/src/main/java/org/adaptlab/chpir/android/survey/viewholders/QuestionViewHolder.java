@@ -283,7 +283,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
      * @param otherText An EditText injected from a subclass i.e a write other subclass
      */
     void addOtherResponseView(final EditText otherText) {
-        otherText.setHint(R.string.other_specify_edittext);
+        otherText.setHint(R.string.other_specify_edit_text);
         otherText.setEnabled(false);
         otherText.addTextChangedListener(new TextWatcher() {
             private Timer timer;
@@ -330,7 +330,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                 final EditText otherText = new EditText(getContext());
                 otherText.setSingleLine(false);
                 otherText.setImeOptions(EditorInfo.IME_FLAG_NO_ENTER_ACTION);
-                otherText.setHint(R.string.free_response_edittext);
+                otherText.setHint(R.string.free_response_edit_text);
                 if (!TextUtils.isEmpty(getResponse().getOtherText()))
                     otherText.setText(getResponse().getOtherText());
 
@@ -990,9 +990,6 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                 }
             }
         }
-    }
-
-    public void setImageDimensions() {
     }
 
     public interface OnResponseSelectedListener {

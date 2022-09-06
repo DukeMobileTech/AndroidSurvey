@@ -9,8 +9,8 @@
     <string name="finish_button">完成</string>
     <string name="skip_button">跳过</string>
     <string name="other_specify">其他</string>
-    <string name="other_specify_edittext">详细说明需要补充的内容</string>
-    <string name="free_response_edittext">请将回答写在此处</string>
+    <string name="other_specify_edit_text">详细说明需要补充的内容</string>
+    <string name="free_response_edit_text">请将回答写在此处</string>
     <string name="refresh">刷新</string>
     <string name="app_device_identifier">设备身份识别号</string>
     <string name="save_button">保存</string>
@@ -202,4 +202,7 @@
     <string name="stop_playing">Stop Playing</string>
     <string name="strongly_prefer">Strongly Prefer</string>
     <string name="no_preference">No Preference</string>
+    <string name="image">Image</string>
+    <string name="_5">5</string>
+    <string name="_0">0</string>
 </resources>

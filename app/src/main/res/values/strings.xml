@@ -8,8 +8,8 @@
     <string name="finish_button">Finish</string>
     <string name="skip_button">Skip</string>
     <string name="other_specify">Other</string>
-    <string name="other_specify_edittext">Specify other</string>
-    <string name="free_response_edittext">Answer here</string>
+    <string name="other_specify_edit_text">Specify other</string>
+    <string name="free_response_edit_text">Answer here</string>
     <string name="refresh">Refresh</string>
     <string name="app_device_identifier">Device Identifier</string>
     <string name="save_button">Save</string>
@@ -20,7 +20,7 @@
     <string name="api_version">Api Version</string>
     <string name="app_project_id">Project Id</string>
     <string name="last_update">Last Update:  </string>
-    <string name="sync_notification_text">Syncing with server...</string>
+    <string name="sync_notification_text">Syncing with server…</string>
     <string name="sync_notification_complete_text">Syncing with server complete.</string>
     <string name="network_unavailable">No network available on the device.</string>
     <string name="api_unavailable">Remote api is not responsive.</string>
@@ -36,7 +36,7 @@
     <string name="password_message">This action requires a password.  Please enter the password below.</string>
     <string name="cancel">Cancel</string>
     <string name="incorrect_password">This password is incorrect.</string>
-    <string name="custom_locale">ISO-639-1 Code</string>
+    <string name="custom_locale">ISO–639–1 Code</string>
     <string name="not_valid_response">This is not a valid response for this question.</string>
     <string name="of">of</string>
     <string name="instrument_loading_progress_header">Loading</string>
@@ -67,7 +67,7 @@
     <string name="rf">Refuse to answer this question</string>
     <string name="dk">Don\'t know</string>
     <string name="na">Not applicable</string>
-    <string name="desc"></string>
+    <string name="desc" />
     <string name="device_label">Device Label</string>
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
@@ -200,6 +200,9 @@
     <string name="stop_recording">Stop Recording</string>
     <string name="play_recording">Play Recording</string>
     <string name="stop_playing">Stop Playing</string>
-    <string name="strongly_prefer">Strongly Prefer</string>
-    <string name="no_preference">No Preference</string>
+    <string name="strongly_prefer">Strongly\nPrefer</string>
+    <string name="no_preference">No\nPreference</string>
+    <string name="image">Image</string>
+    <string name="_5">5</string>
+    <string name="_0">0</string>
 </resources>
