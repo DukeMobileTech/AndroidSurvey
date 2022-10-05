@@ -14,7 +14,7 @@ import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 
 public class ConditionSkipRepository extends Repository {
-    private ConditionSkipDao mConditionSkipDao;
+    private final ConditionSkipDao mConditionSkipDao;
 
     public ConditionSkipRepository(Application application) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);

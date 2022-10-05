@@ -3,6 +3,7 @@ package org.adaptlab.chpir.android.survey.relations;
 import androidx.room.Embedded;
 import androidx.room.Relation;
 
+import org.adaptlab.chpir.android.survey.entities.Collage;
 import org.adaptlab.chpir.android.survey.entities.ConditionSkip;
 import org.adaptlab.chpir.android.survey.entities.Instruction;
 import org.adaptlab.chpir.android.survey.entities.LoopQuestion;
@@ -44,4 +45,6 @@ public class QuestionRelation {
     public List<QuestionTranslation> translations;
     @Relation(parentColumn = "QuestionIdentifier", entityColumn = "QuestionIdentifier", entity = Response.class)
     public List<Response> responses;
+    @Relation(parentColumn = "QuestionId", entityColumn = "QuestionId", entity = Collage.class)
+    public List<CollageRelation> collages;
 }

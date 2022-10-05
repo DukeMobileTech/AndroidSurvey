@@ -12,8 +12,8 @@ import java.util.HashMap;
 
 public class DisplayViewModel extends AndroidViewModel {
     public final String TAG = this.getClass().getName();
-    private HashMap<String, Response> mResponses;
-    private HashMap<String, QuestionRelation> mQuestions;
+    private final HashMap<String, Response> mResponses;
+    private final HashMap<String, QuestionRelation> mQuestions;
 
     public DisplayViewModel(@NonNull Application application) {
         super(application);

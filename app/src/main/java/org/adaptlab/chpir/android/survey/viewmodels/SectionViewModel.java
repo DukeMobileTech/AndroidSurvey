@@ -13,7 +13,7 @@ import org.adaptlab.chpir.android.survey.repositories.SectionRepository;
 import java.util.List;
 
 public class SectionViewModel extends AndroidViewModel {
-    private LiveData<List<SectionRelation>> mSectionRelations;
+    private final LiveData<List<SectionRelation>> mSectionRelations;
 
     public SectionViewModel(@NonNull Application application, Long instrumentId) {
         super(application);

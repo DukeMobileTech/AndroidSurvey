@@ -16,8 +16,8 @@ import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 
 public class DisplayRepository extends Repository {
-    private DisplayDao mDisplayDao;
-    private DisplayTranslationDao mDisplayTranslationDao;
+    private final DisplayDao mDisplayDao;
+    private final DisplayTranslationDao mDisplayTranslationDao;
 
     public DisplayRepository(Application application) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);

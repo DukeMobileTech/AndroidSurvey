@@ -36,7 +36,7 @@ import java.util.UUID;
 public class ApkUpdateTask extends AsyncTask<Void, Void, Void> {
 
     private static final String TAG = "ApkUpdateTask";
-    private Context mContext;
+    private final Context mContext;
     private int mApkId;
     private Integer mLatestVersion;
     private String mFileName;

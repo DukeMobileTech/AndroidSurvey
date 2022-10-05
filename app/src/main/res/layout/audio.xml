@@ -14,12 +14,12 @@
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
         android:layout_weight="1"
-        android:padding="5dp"
+        android:background="@color/bg_gray"
         android:lines="2"
+        android:padding="5dp"
         android:text="@string/start_recording"
         android:textAlignment="center"
         android:textColor="@color/black"
-        android:background="@color/bg_gray"
         app:drawableTopCompat="@drawable/ic_baseline_mic_24" />
 
     <androidx.appcompat.widget.AppCompatButton
@@ -28,12 +28,12 @@
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
         android:layout_weight="1"
-        android:padding="5dp"
+        android:background="@color/bg_gray"
         android:lines="2"
+        android:padding="5dp"
         android:text="@string/stop_recording"
         android:textAlignment="center"
         android:textColor="@color/black"
-        android:background="@color/bg_gray"
         app:drawableTopCompat="@drawable/ic_baseline_mic_off_24" />
 
     <androidx.appcompat.widget.AppCompatButton
@@ -42,12 +42,12 @@
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
         android:layout_weight="1"
-        android:padding="5dp"
+        android:background="@color/bg_gray"
         android:lines="2"
+        android:padding="5dp"
         android:text="@string/play_recording"
         android:textAlignment="center"
         android:textColor="@color/black"
-        android:background="@color/bg_gray"
         app:drawableTopCompat="@drawable/ic_baseline_play_arrow_24" />
 
     <androidx.appcompat.widget.AppCompatButton
@@ -56,12 +56,12 @@
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
         android:layout_weight="1"
+        android:background="@color/bg_gray"
         android:lines="2"
         android:padding="5dp"
         android:text="@string/stop_playing"
         android:textAlignment="center"
         android:textColor="@color/black"
-        android:background="@color/bg_gray"
         app:drawableTopCompat="@drawable/ic_baseline_pause_24" />
 
 </LinearLayout>

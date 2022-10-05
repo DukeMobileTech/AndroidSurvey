@@ -1,7 +1,7 @@
 package org.adaptlab.chpir.android.survey.verhoeff;
 
 public class VerhoeffErrorDetection {
-    private static int[][] op = {
+    private static final int[][] op = {
             {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
             {1, 2, 3, 4, 0, 6, 7, 8, 9, 5},
             {2, 3, 4, 0, 1, 7, 8, 9, 5, 6},
@@ -13,9 +13,9 @@ public class VerhoeffErrorDetection {
             {8, 7, 6, 5, 9, 3, 2, 1, 0, 4},
             {9, 8, 7, 6, 5, 4, 3, 2, 1, 0}};
 
-    private static int[][] F = new int[8][];
-    private static int[] F0 = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    private static int[] F1 = {1, 5, 7, 6, 2, 8, 3, 0, 9, 4};
+    private static final int[][] F = new int[8][];
+    private static final int[] F0 = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    private static final int[] F1 = {1, 5, 7, 6, 2, 8, 3, 0, 9, 4};
 
     public VerhoeffErrorDetection() {
         F[0] = F0;

@@ -15,9 +15,9 @@ import java.util.TimeZone;
 public class DeviceSyncEntry implements Uploadable {
     private final static String TAG = DeviceSyncEntry.class.getName();
 
-    private Settings mSettings;
-    private InstrumentRepository mInstrumentRepository;
-    private SurveyRepository mSurveyRepository;
+    private final Settings mSettings;
+    private final InstrumentRepository mInstrumentRepository;
+    private final SurveyRepository mSurveyRepository;
 
     public DeviceSyncEntry() {
         mSettings = new SettingsRepository(SurveyApp.getInstance()).getSettingsDao().getInstanceSync();

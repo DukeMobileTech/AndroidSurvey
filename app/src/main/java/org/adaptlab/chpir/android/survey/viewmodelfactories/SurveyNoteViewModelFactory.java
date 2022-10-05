@@ -9,8 +9,8 @@ import androidx.lifecycle.ViewModelProvider;
 import org.adaptlab.chpir.android.survey.viewmodels.SurveyNoteViewModel;
 
 public class SurveyNoteViewModelFactory implements ViewModelProvider.Factory {
-    private String mUUID;
-    private Application mApplication;
+    private final String mUUID;
+    private final Application mApplication;
 
     public SurveyNoteViewModelFactory(@NonNull Application application, String uuid) {
         this.mApplication = application;

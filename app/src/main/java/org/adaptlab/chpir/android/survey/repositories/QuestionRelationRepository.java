@@ -12,7 +12,7 @@ import java.util.List;
 
 public class QuestionRelationRepository {
     public final String TAG = this.getClass().getName();
-    private LiveData<List<QuestionRelation>> questions;
+    private final LiveData<List<QuestionRelation>> questions;
 
     public QuestionRelationRepository(Application application, Long instrumentId, Long displayId) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);

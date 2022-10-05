@@ -31,9 +31,9 @@ public class QuestionRelationAdapter extends ListAdapter<QuestionRelation, Quest
         }
     };
 
-    private QuestionViewHolder.OnResponseSelectedListener mListener;
+    private final QuestionViewHolder.OnResponseSelectedListener mListener;
 
-    private SurveyViewModel mSurveyViewModel;
+    private final SurveyViewModel mSurveyViewModel;
 
     private DisplayViewModel mDisplayViewModel;
 
@@ -57,7 +57,6 @@ public class QuestionRelationAdapter extends ListAdapter<QuestionRelation, Quest
         QuestionRelation questionRelation = getItem(position);
         viewHolder.setRelations(questionRelation);
         viewHolder.setDisplayViewModel(mDisplayViewModel);
-//        viewHolder.setImageDimensions();
     }
 
     @Override

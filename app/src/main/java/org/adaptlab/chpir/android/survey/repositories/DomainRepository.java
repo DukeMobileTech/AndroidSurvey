@@ -14,7 +14,7 @@ import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 
 public class DomainRepository extends Repository {
-    private DomainDao mDomainDao;
+    private final DomainDao mDomainDao;
 
     public DomainRepository(Application application) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);

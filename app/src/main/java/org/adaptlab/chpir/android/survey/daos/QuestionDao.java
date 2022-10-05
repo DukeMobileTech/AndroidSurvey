@@ -5,7 +5,6 @@ import androidx.room.Dao;
 import androidx.room.Query;
 import androidx.room.Transaction;
 
-import org.adaptlab.chpir.android.survey.entities.OptionSetOption;
 import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
 

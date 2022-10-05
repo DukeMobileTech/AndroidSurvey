@@ -9,8 +9,8 @@ import androidx.lifecycle.ViewModelProvider;
 import org.adaptlab.chpir.android.survey.viewmodels.SectionViewModel;
 
 public class SectionViewModelFactory implements ViewModelProvider.Factory {
-    private Application mApplication;
-    private Long mInstrumentId;
+    private final Application mApplication;
+    private final Long mInstrumentId;
 
     public SectionViewModelFactory(@NonNull Application application, Long id) {
         this.mApplication = application;

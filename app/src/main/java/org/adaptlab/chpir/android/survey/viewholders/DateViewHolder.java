@@ -17,9 +17,7 @@ public class DateViewHolder extends QuestionViewHolder {
     protected int mDay;
     protected int mMonth;
     protected int mYear;
-    private DatePicker mDatePicker;
-    private TextView mSelectedDate;
-    private DatePicker.OnDateChangedListener mListener = new DatePicker.OnDateChangedListener() {
+    private final DatePicker.OnDateChangedListener mListener = new DatePicker.OnDateChangedListener() {
         @Override
         public void onDateChanged(DatePicker view, int newYear, int newMonth, int newDay) {
             mDay = newDay;
@@ -32,6 +30,8 @@ public class DateViewHolder extends QuestionViewHolder {
 //            }
         }
     };
+    private DatePicker mDatePicker;
+    private TextView mSelectedDate;
 
     DateViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
         super(itemView, context, listener);

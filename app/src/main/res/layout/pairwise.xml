@@ -18,8 +18,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:adjustViewBounds="true"
-            android:scaleType="centerCrop"
-            android:contentDescription="@string/image" />
+            android:contentDescription="@string/image"
+            android:scaleType="centerCrop" />
     </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.card.MaterialCardView xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:adjustViewBounds="true"
-            android:scaleType="centerCrop"
-            android:contentDescription="@string/image" />
+            android:contentDescription="@string/image"
+            android:scaleType="centerCrop" />
     </com.google.android.material.card.MaterialCardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

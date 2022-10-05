@@ -8,7 +8,7 @@ import org.adaptlab.chpir.android.survey.daos.SurveyScoreDao;
 import org.adaptlab.chpir.android.survey.entities.SurveyScore;
 
 public class SurveyScoreRepository {
-    private SurveyScoreDao mSurveyScoreDao;
+    private final SurveyScoreDao mSurveyScoreDao;
 
     public SurveyScoreRepository(Application application) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);
@@ -25,7 +25,7 @@ public class SurveyScoreRepository {
     }
 
     private static class InsertSurveyScoreTask extends AsyncTask<SurveyScore, Void, Void> {
-        private SurveyScoreDao surveyScoreDao;
+        private final SurveyScoreDao surveyScoreDao;
 
         InsertSurveyScoreTask(SurveyScoreDao surveyDao) {
             surveyScoreDao = surveyDao;

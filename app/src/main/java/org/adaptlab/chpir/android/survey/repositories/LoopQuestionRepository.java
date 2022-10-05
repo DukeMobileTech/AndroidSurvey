@@ -14,7 +14,7 @@ import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 
 public class LoopQuestionRepository extends Repository {
-    private LoopQuestionDao mLoopQuestionDao;
+    private final LoopQuestionDao mLoopQuestionDao;
 
     public LoopQuestionRepository(Application application) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);

@@ -6,8 +6,8 @@ import org.adaptlab.chpir.android.survey.daos.DeviceUserDao;
 import org.adaptlab.chpir.android.survey.entities.DeviceUser;
 
 public class GetDeviceUserTask extends AsyncTask<DeviceUserDao, Void, DeviceUser> {
+    private final String mUserName;
     private AsyncTaskListener mListener;
-    private String mUserName;
 
     public GetDeviceUserTask(String userName) {
         mUserName = userName;

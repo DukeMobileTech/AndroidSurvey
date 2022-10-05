@@ -6,17 +6,15 @@ import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.Editable;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.LongSparseArray;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,8 +22,8 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -34,9 +32,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.card.MaterialCardView;
-
 import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.adapters.ImageAdapter;
 import org.adaptlab.chpir.android.survey.adapters.QuestionRelationAdapter;
 import org.adaptlab.chpir.android.survey.entities.ConditionSkip;
 import org.adaptlab.chpir.android.survey.entities.Instruction;
@@ -77,15 +74,12 @@ import static org.adaptlab.chpir.android.survey.utils.SortUtils.sortedOptionSetO
 public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     public final String TAG = this.getClass().getName();
 
-    private Context mContext;
-
+    private final Context mContext;
+    private final ResponseRepository mResponseRepository;
     private QuestionRelationAdapter mAdapter;
     private OnResponseSelectedListener mListener;
-
     private SurveyViewModel mSurveyViewModel;
     private DisplayViewModel mDisplayViewModel;
-    private ResponseRepository mResponseRepository;
-
     private QuestionRelation mQuestionRelation;
     private Survey mSurvey;
     private Response mResponse;
@@ -105,9 +99,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     private ViewGroup mQuestionComponent;
     private Button mClearButton;
     private RadioGroup mSpecialResponseRadioGroup;
-
-    private MaterialCardView mCardView;
-    private ImageView mImageView;
+    private LinearLayout mGridViewLayout;
 
     private boolean mDeserializing = false;
 
@@ -120,18 +112,13 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         mNumberTextView = itemView.findViewById(R.id.numberTextView);
         mBeforeTextInstructionTextView = itemView.findViewById(R.id.beforeTextInstructions);
         mSpannedTextView = itemView.findViewById(R.id.spannedTextView);
-        setImage(itemView);
+        mGridViewLayout = itemView.findViewById(R.id.gridViewLayout);
         mAfterTextInstructionTextView = itemView.findViewById(R.id.afterTextInstructions);
 
         mOptionSetInstructionTextView = itemView.findViewById(R.id.optionSetInstructions);
         mQuestionComponent = itemView.findViewById(R.id.response_component);
         mSpecialResponseRadioGroup = itemView.findViewById(R.id.specialResponseButtons);
         mClearButton = itemView.findViewById(R.id.clearResponsesButton);
-    }
-
-    private void setImage(View itemView) {
-        mCardView = itemView.findViewById(R.id.question_card_view);
-        mImageView = mCardView.findViewById(R.id.question_image);
     }
 
     public QuestionViewHolder(@NonNull View itemView, Context context) {
@@ -177,12 +164,12 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         mAdapter = adapter;
     }
 
-    void setQuestionRelation(QuestionRelation relation) {
-        mQuestionRelation = relation;
-    }
-
     QuestionRelation getQuestionRelation() {
         return mQuestionRelation;
+    }
+
+    void setQuestionRelation(QuestionRelation relation) {
+        mQuestionRelation = relation;
     }
 
     Question getQuestion() {
@@ -726,35 +713,50 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         }
         mSpannedTextView.setText(getQuestionText());
 
-        if (mQuestionRelation.question.hasQuestionImage()) {
-            mCardView.setVisibility(View.VISIBLE);
-//            String path = getContext().getFileStreamPath(mQuestionRelation.question.getBitmapPath()).getAbsolutePath();
-            String path = getContext().getFilesDir().getAbsolutePath() + "/" +
-                    mQuestionRelation.question.getInstrumentRemoteId() + "/" +
-                    mQuestionRelation.question.getQuestionIdentifier() + ".png";
-            Log.i(TAG, "PATH: " + path);
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inScaled = true;
-            Bitmap bitmap = BitmapFactory.decodeFile(path, options);
-            DisplayMetrics displayMetrics = new DisplayMetrics();
-            ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-            int height = displayMetrics.heightPixels;
-            int width = displayMetrics.widthPixels;
+        setQuestionDiagrams();
+    }
 
-            Log.i(TAG, "SCREEN SIZE => Height: " + height + " Width: " + width);
-            Log.i(TAG, getQuestion().getQuestionIdentifier() + " BITMAP SIZE => Height: " + bitmap.getHeight() + " Width: " + bitmap.getWidth());
-
-            if (bitmap.getWidth() < (width - 0.25 * width)) {
-                double scale = (width - 0.25 * width) / bitmap.getWidth();
-                if (mQuestionRelation.question.getQuestionType().equals(Question.SLIDER)) {
-                    scale = (width * 1.0) / bitmap.getWidth();
-                }
-                width = (int) Math.round(bitmap.getWidth() * scale);
-                height = (int) Math.round(bitmap.getHeight() * scale);
+    private void setQuestionDiagrams() {
+        Log.i(TAG, "Identifier => " + mQuestionRelation.question.getQuestionIdentifier() +
+                " ID => " + mQuestionRelation.question.getQuestionId() +
+                " Collages => " + mQuestionRelation.collages.size());
+        if (mQuestionRelation.collages.size() > 0) {
+            mGridViewLayout.setVisibility(View.VISIBLE);
+            for (int k = 0; k < mQuestionRelation.collages.size(); k++) {
+                GridView gridView = (GridView) LayoutInflater.from(mContext).inflate(R.layout.grid_view, null, false);
+                gridView.setAdapter(new ImageAdapter(mContext, mQuestionRelation, mQuestionRelation.collages.get(k)));
+                mGridViewLayout.addView(gridView);
             }
-            bitmap = Bitmap.createScaledBitmap(bitmap, width, height, true);
-            mImageView.setImageBitmap(bitmap);
         }
+//        if (mQuestionRelation.question.hasQuestionImage()) {
+//            mCardView.setVisibility(View.VISIBLE);
+////            String path = getContext().getFileStreamPath(mQuestionRelation.question.getBitmapPath()).getAbsolutePath();
+//            String path = getContext().getFilesDir().getAbsolutePath() + "/" +
+//                    mQuestionRelation.question.getInstrumentRemoteId() + "/" +
+//                    mQuestionRelation.question.getQuestionIdentifier() + ".png";
+////            Log.i(TAG, "PATH: " + path);
+//            BitmapFactory.Options options = new BitmapFactory.Options();
+//            options.inScaled = true;
+//            Bitmap bitmap = BitmapFactory.decodeFile(path, options);
+//            DisplayMetrics displayMetrics = new DisplayMetrics();
+//            ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+//            int height = displayMetrics.heightPixels;
+//            int width = displayMetrics.widthPixels;
+//
+////            Log.i(TAG, "SCREEN SIZE => Height: " + height + " Width: " + width);
+////            Log.i(TAG, getQuestion().getQuestionIdentifier() + " BITMAP SIZE => Height: " + bitmap.getHeight() + " Width: " + bitmap.getWidth());
+//
+//            if (bitmap.getWidth() < (width - 0.25 * width)) {
+//                double scale = (width - 0.25 * width) / bitmap.getWidth();
+//                if (mQuestionRelation.question.getQuestionType().equals(Question.SLIDER)) {
+//                    scale = (width * 1.0) / bitmap.getWidth();
+//                }
+//                width = (int) Math.round(bitmap.getWidth() * scale);
+//                height = (int) Math.round(bitmap.getHeight() * scale);
+//            }
+//            bitmap = Bitmap.createScaledBitmap(bitmap, width, height, true);
+//            mImageView.setImageBitmap(bitmap);
+//        }
     }
 
     @SuppressLint("ClickableViewAccessibility")

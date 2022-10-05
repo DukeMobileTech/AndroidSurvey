@@ -10,7 +10,7 @@ import org.adaptlab.chpir.android.survey.relations.InstrumentRelation;
 
 public class InstrumentRelationRepository {
     public final String TAG = this.getClass().getName();
-    private LiveData<InstrumentRelation> mInstrumentRelation;
+    private final LiveData<InstrumentRelation> mInstrumentRelation;
 
     public InstrumentRelationRepository(Application application, Long instrumentId) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);

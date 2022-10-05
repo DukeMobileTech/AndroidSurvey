@@ -168,6 +168,9 @@ public class Question implements SurveyEntity, Translatable, BitmapEntity {
     @SerializedName("question_image_height")
     @ColumnInfo(name = "QuestionImageHeight")
     private int mQuestionImageHeight;
+    @SerializedName("task_id")
+    @ColumnInfo(name = "TaskId")
+    private Long mTaskId;
     @ColumnInfo(name = "BitmapPath")
     private String mBitmapPath;
     @Ignore
@@ -293,6 +296,14 @@ public class Question implements SurveyEntity, Translatable, BitmapEntity {
 
     public void setInstructionId(Long instructionId) {
         this.mInstructionId = instructionId;
+    }
+
+    public Long getTaskId() {
+        return mTaskId;
+    }
+
+    public void setTaskId(Long taskId) {
+        this.mTaskId = taskId;
     }
 
     public int getQuestionVersion() {
@@ -423,9 +434,13 @@ public class Question implements SurveyEntity, Translatable, BitmapEntity {
         this.mQuestionImageHeight = height;
     }
 
-    public String getBitmapPath() { return mBitmapPath; }
+    public String getBitmapPath() {
+        return mBitmapPath;
+    }
 
-    public void setBitmapPath(String path) { this.mBitmapPath = path; }
+    public void setBitmapPath(String path) {
+        this.mBitmapPath = path;
+    }
 
     public List<QuestionTranslation> getQuestionTranslations() {
         return mQuestionTranslations;

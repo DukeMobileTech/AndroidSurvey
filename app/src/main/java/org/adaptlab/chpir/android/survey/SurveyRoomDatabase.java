@@ -17,9 +17,11 @@ import net.sqlcipher.database.SQLiteDatabase;
 import net.sqlcipher.database.SupportFactory;
 
 import org.adaptlab.chpir.android.survey.converters.Converters;
+import org.adaptlab.chpir.android.survey.daos.CollageDao;
 import org.adaptlab.chpir.android.survey.daos.ConditionSkipDao;
 import org.adaptlab.chpir.android.survey.daos.CriticalResponseDao;
 import org.adaptlab.chpir.android.survey.daos.DeviceUserDao;
+import org.adaptlab.chpir.android.survey.daos.DiagramDao;
 import org.adaptlab.chpir.android.survey.daos.DisplayDao;
 import org.adaptlab.chpir.android.survey.daos.DisplayInstructionDao;
 import org.adaptlab.chpir.android.survey.daos.DisplayTranslationDao;
@@ -49,9 +51,12 @@ import org.adaptlab.chpir.android.survey.daos.SubdomainDao;
 import org.adaptlab.chpir.android.survey.daos.SurveyDao;
 import org.adaptlab.chpir.android.survey.daos.SurveyNoteDao;
 import org.adaptlab.chpir.android.survey.daos.SurveyScoreDao;
+import org.adaptlab.chpir.android.survey.daos.TaskDao;
+import org.adaptlab.chpir.android.survey.entities.Collage;
 import org.adaptlab.chpir.android.survey.entities.ConditionSkip;
 import org.adaptlab.chpir.android.survey.entities.CriticalResponse;
 import org.adaptlab.chpir.android.survey.entities.DeviceUser;
+import org.adaptlab.chpir.android.survey.entities.Diagram;
 import org.adaptlab.chpir.android.survey.entities.Display;
 import org.adaptlab.chpir.android.survey.entities.DisplayInstruction;
 import org.adaptlab.chpir.android.survey.entities.DisplayTranslation;
@@ -81,6 +86,7 @@ import org.adaptlab.chpir.android.survey.entities.Subdomain;
 import org.adaptlab.chpir.android.survey.entities.Survey;
 import org.adaptlab.chpir.android.survey.entities.SurveyNote;
 import org.adaptlab.chpir.android.survey.entities.SurveyScore;
+import org.adaptlab.chpir.android.survey.entities.Task;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 
 import java.util.Locale;
@@ -92,7 +98,8 @@ import java.util.UUID;
         Section.class, SectionTranslation.class, Option.class, OptionSet.class, OptionSetOption.class,
         OptionSetTranslation.class, OptionTranslation.class, ConditionSkip.class, DeviceUser.class,
         FollowUpQuestion.class, MultipleSkip.class, NextQuestion.class, Survey.class, Response.class,
-        SurveyNote.class, ScoreScheme.class, Domain.class, Subdomain.class, SurveyScore.class},
+        SurveyNote.class, ScoreScheme.class, Domain.class, Subdomain.class, SurveyScore.class, Task.class,
+        Diagram.class, Collage.class},
         version = SurveyRoomDatabase.DATABASE_VERSION, exportSchema = true)
 @TypeConverters({Converters.class})
 public abstract class SurveyRoomDatabase extends RoomDatabase {
@@ -160,7 +167,7 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
         }
     };
     private static volatile SurveyRoomDatabase INSTANCE;
-    private static RoomDatabase.Callback sRoomDatabaseCallback =
+    private static final RoomDatabase.Callback sRoomDatabaseCallback =
             new RoomDatabase.Callback() {
                 @Override
                 public void onOpen(@NonNull SupportSQLiteDatabase db) {
@@ -257,8 +264,14 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
 
     public abstract SurveyScoreDao surveyScoreDao();
 
+    public abstract TaskDao taskDao();
+
+    public abstract DiagramDao diagramDao();
+
+    public abstract CollageDao collageDao();
+
     private static class CreateSettingsInstanceTask extends AsyncTask<Void, Void, Void> {
-        private SettingsDao mSettingsDao;
+        private final SettingsDao mSettingsDao;
 
         CreateSettingsInstanceTask(SurveyRoomDatabase database) {
             mSettingsDao = database.settingsDao();

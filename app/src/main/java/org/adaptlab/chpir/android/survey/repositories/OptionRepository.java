@@ -16,8 +16,8 @@ import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 
 public class OptionRepository extends Repository {
-    private OptionDao mOptionDao;
-    private OptionTranslationDao mOptionTranslationDao;
+    private final OptionDao mOptionDao;
+    private final OptionTranslationDao mOptionTranslationDao;
 
     public OptionRepository(Application application) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);

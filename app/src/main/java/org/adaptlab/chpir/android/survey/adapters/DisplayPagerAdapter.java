@@ -12,7 +12,7 @@ import org.adaptlab.chpir.android.survey.viewpagerfragments.DisplayPagerFragment
 import java.util.List;
 
 public class DisplayPagerAdapter extends FragmentStatePagerAdapter {
-    private String mSurveyUUUID;
+    private final String mSurveyUUUID;
     private List<Display> mDisplays;
 
     public DisplayPagerAdapter(FragmentManager fm, String uuid) {

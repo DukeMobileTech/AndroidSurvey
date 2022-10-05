@@ -14,7 +14,7 @@ import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 
 public class ScoreSchemeRepository extends Repository {
-    private ScoreSchemeDao mScoreSchemeDao;
+    private final ScoreSchemeDao mScoreSchemeDao;
 
     public ScoreSchemeRepository(Application application) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);

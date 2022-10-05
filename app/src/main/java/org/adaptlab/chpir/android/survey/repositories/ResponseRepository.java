@@ -10,7 +10,7 @@ import org.adaptlab.chpir.android.survey.entities.Response;
 import java.util.List;
 
 public class ResponseRepository {
-    private ResponseDao mResponseDao;
+    private final ResponseDao mResponseDao;
 
     public ResponseRepository(Application application) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);
@@ -34,7 +34,7 @@ public class ResponseRepository {
     }
 
     private static class InsertResponseTask extends AsyncTask<Response, Void, Void> {
-        private ResponseDao mResponseDao;
+        private final ResponseDao mResponseDao;
 
         InsertResponseTask(ResponseDao dao) {
             mResponseDao = dao;
@@ -48,7 +48,7 @@ public class ResponseRepository {
     }
 
     private static class UpdateResponseTask extends AsyncTask<Response, Void, Void> {
-        private ResponseDao mResponseDao;
+        private final ResponseDao mResponseDao;
 
         UpdateResponseTask(ResponseDao dao) {
             mResponseDao = dao;
@@ -62,7 +62,7 @@ public class ResponseRepository {
     }
 
     private static class DeleteResponseTask extends AsyncTask<Response, Void, Void> {
-        private ResponseDao mResponseDao;
+        private final ResponseDao mResponseDao;
 
         DeleteResponseTask(ResponseDao dao) {
             mResponseDao = dao;
@@ -76,8 +76,8 @@ public class ResponseRepository {
     }
 
     private static class InsertAllResponsesTask extends AsyncTask<Void, Void, Void> {
-        private ResponseDao mResponseDao;
-        private List<Response> mResponses;
+        private final ResponseDao mResponseDao;
+        private final List<Response> mResponses;
 
         InsertAllResponsesTask(ResponseDao dao, List<Response> responses) {
             mResponseDao = dao;

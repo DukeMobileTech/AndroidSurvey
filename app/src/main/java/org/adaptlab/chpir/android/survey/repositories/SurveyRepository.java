@@ -11,7 +11,7 @@ import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import java.util.List;
 
 public class SurveyRepository {
-    private SurveyDao mSurveyDao;
+    private final SurveyDao mSurveyDao;
 
     public SurveyRepository(Application application) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);
@@ -51,7 +51,7 @@ public class SurveyRepository {
 
     private static class UpdateSurveyTask extends AsyncTask<Survey, Void, Void> {
 
-        private SurveyDao mSurveyDao;
+        private final SurveyDao mSurveyDao;
 
         UpdateSurveyTask(SurveyDao dao) {
             mSurveyDao = dao;
@@ -66,7 +66,7 @@ public class SurveyRepository {
     }
 
     private static class InsertSurveyTask extends AsyncTask<Survey, Void, Void> {
-        private SurveyDao mSurveyDao;
+        private final SurveyDao mSurveyDao;
 
         InsertSurveyTask(SurveyDao surveyDao) {
             mSurveyDao = surveyDao;
@@ -81,7 +81,7 @@ public class SurveyRepository {
     }
 
     private static class DeleteSurveyTask extends AsyncTask<Survey, Void, Void> {
-        private SurveyDao surveyDao;
+        private final SurveyDao surveyDao;
 
         DeleteSurveyTask(SurveyDao dao) {
             surveyDao = dao;

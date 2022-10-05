@@ -14,7 +14,7 @@ import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 
 public class OptionSetOptionRepository extends Repository {
-    private OptionSetOptionDao mOptionSetOptionDao;
+    private final OptionSetOptionDao mOptionSetOptionDao;
 
     public OptionSetOptionRepository(Application application) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);

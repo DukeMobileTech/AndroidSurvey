@@ -12,9 +12,9 @@ import org.adaptlab.chpir.android.survey.repositories.SettingsRepository;
 import java.util.List;
 
 public class SettingsViewModel extends AndroidViewModel {
-    private SettingsRepository mSettingsRepository;
-    private LiveData<Settings> mSettings;
-    private LiveData<List<String>> mLanguages;
+    private final SettingsRepository mSettingsRepository;
+    private final LiveData<Settings> mSettings;
+    private final LiveData<List<String>> mLanguages;
     private boolean mSetting = false;
 
     public SettingsViewModel(@NonNull Application application) {

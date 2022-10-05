@@ -11,8 +11,8 @@ import org.adaptlab.chpir.android.survey.utils.FormatUtils;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.BLANK;
 
 public class RangeViewHolder extends QuestionViewHolder {
-    private String mTextStart = "";
-    private String mTextEnd = "";
+    private final String mTextStart = "";
+    private final String mTextEnd = "";
     private EditText mStart;
     private EditText mEnd;
 

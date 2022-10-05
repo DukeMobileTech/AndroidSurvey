@@ -48,13 +48,13 @@ public class ScoreScheme implements SurveyEntity {
         dao.insertAll(list);
     }
 
+    public boolean isDeleted() {
+        return mDeleted;
+    }
+
     @Override
     public void setDeleted(boolean deleted) {
         this.mDeleted = deleted;
-    }
-
-    public boolean isDeleted() {
-        return mDeleted;
     }
 
     @NonNull

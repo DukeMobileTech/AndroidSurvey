@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModelProvider;
 import org.adaptlab.chpir.android.survey.viewmodels.DisplayViewModel;
 
 public class DisplayViewModelFactory implements ViewModelProvider.Factory {
-    private Application mApplication;
+    private final Application mApplication;
 
     public DisplayViewModelFactory(@NonNull Application application) {
         this.mApplication = application;

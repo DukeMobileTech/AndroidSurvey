@@ -28,10 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class TableQuestionViewHolder extends QuestionViewHolder {
-    private TextView mQuestionTextView;
-    private ViewGroup mQuestionComponent;
-    private RadioGroup mSpecialResponseRadioGroup;
-    private Button mClearButton;
+    private final TextView mQuestionTextView;
+    private final ViewGroup mQuestionComponent;
+    private final RadioGroup mSpecialResponseRadioGroup;
+    private final Button mClearButton;
 
     TableQuestionViewHolder(@NonNull View itemView, Context context) {
         super(itemView, context);

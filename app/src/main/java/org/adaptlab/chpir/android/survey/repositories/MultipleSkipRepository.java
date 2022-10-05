@@ -14,7 +14,7 @@ import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 
 public class MultipleSkipRepository extends Repository {
-    private MultipleSkipDao dao;
+    private final MultipleSkipDao dao;
 
     public MultipleSkipRepository(Application application) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);

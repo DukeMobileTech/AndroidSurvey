@@ -43,12 +43,12 @@ import okhttp3.Request;
 
 public class EntityDownloadTask extends AsyncTask<Void, Void, Void> {
     private static final String TAG = "EntityDownloadTask";
-    private BaseDao mBaseDao;
-    private BaseDao mTranslationDao;
-    private SurveyEntity mEntity;
-    private SurveyEntity mTranslationEntity;
-    private String mTableName;
-    private Gson mGson;
+    private final BaseDao mBaseDao;
+    private final BaseDao mTranslationDao;
+    private final SurveyEntity mEntity;
+    private final SurveyEntity mTranslationEntity;
+    private final String mTableName;
+    private final Gson mGson;
 
     public EntityDownloadTask(Repository repository) {
         mBaseDao = repository.getDao();

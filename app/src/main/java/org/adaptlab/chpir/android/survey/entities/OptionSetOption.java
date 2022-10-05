@@ -119,9 +119,13 @@ public class OptionSetOption implements SurveyEntity, BitmapEntity {
         this.mHasImage = mHasImage;
     }
 
-    public String getBitmapPath() { return mBitmapPath; }
+    public String getBitmapPath() {
+        return mBitmapPath;
+    }
 
-    public void setBitmapPath(String path) { this.mBitmapPath = path; }
+    public void setBitmapPath(String path) {
+        this.mBitmapPath = path;
+    }
 
     @Override
     public Type getType() {

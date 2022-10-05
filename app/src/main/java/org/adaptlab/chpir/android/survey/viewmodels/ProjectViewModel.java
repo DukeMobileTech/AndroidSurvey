@@ -11,7 +11,7 @@ import org.adaptlab.chpir.android.survey.entities.Project;
 import org.adaptlab.chpir.android.survey.repositories.ProjectRepository;
 
 public class ProjectViewModel extends AndroidViewModel {
-    private LiveData<Project> mProject;
+    private final LiveData<Project> mProject;
 
     public ProjectViewModel(@NonNull Application application, Long projectId) {
         super(application);

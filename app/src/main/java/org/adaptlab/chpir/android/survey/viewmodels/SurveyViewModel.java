@@ -34,10 +34,8 @@ import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 
 public class SurveyViewModel extends AndroidViewModel {
     public final String TAG = this.getClass().getName();
-
+    private final SurveyRepository mSurveyRepository;
     private LiveData<Survey> mLiveDataSurvey;
-    private SurveyRepository mSurveyRepository;
-
     private HashSet<String> mQuestionsToSkipSet;
     private HashMap<String, List<String>> mQuestionsToSkipMap;
     private HashMap<String, Question> mQuestionsMap;

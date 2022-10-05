@@ -14,9 +14,9 @@ import java.util.Map;
 
 public class NavigationDrawerAdapter extends BaseExpandableListAdapter {
 
-    private List<String> mExpandableListTitle;
-    private Map<String, List<String>> mExpandableListDetail;
-    private LayoutInflater mLayoutInflater;
+    private final List<String> mExpandableListTitle;
+    private final Map<String, List<String>> mExpandableListDetail;
+    private final LayoutInflater mLayoutInflater;
 
     public NavigationDrawerAdapter(Context context, List<String> expandableListTitle,
                                    Map<String, List<String>> expandableListDetail) {

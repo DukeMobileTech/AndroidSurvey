@@ -17,8 +17,8 @@ import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 
 public class QuestionRepository extends Repository {
     private static final String TAG = "QuestionRepository";
-    private QuestionDao mQuestionDao;
-    private QuestionTranslationDao mQuestionTranslationDao;
+    private final QuestionDao mQuestionDao;
+    private final QuestionTranslationDao mQuestionTranslationDao;
 
     public QuestionRepository(Application application) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);

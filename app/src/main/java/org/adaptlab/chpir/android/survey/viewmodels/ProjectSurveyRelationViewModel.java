@@ -12,8 +12,8 @@ import org.adaptlab.chpir.android.survey.repositories.SurveyRepository;
 import java.util.List;
 
 public class ProjectSurveyRelationViewModel extends AndroidViewModel {
-    private LiveData<List<ProjectSurveyRelation>> mOngoingSurveys;
-    private LiveData<List<ProjectSurveyRelation>> mSubmittedSurveys;
+    private final LiveData<List<ProjectSurveyRelation>> mOngoingSurveys;
+    private final LiveData<List<ProjectSurveyRelation>> mSubmittedSurveys;
 
     public ProjectSurveyRelationViewModel(@NonNull Application application, long projectId) {
         super(application);

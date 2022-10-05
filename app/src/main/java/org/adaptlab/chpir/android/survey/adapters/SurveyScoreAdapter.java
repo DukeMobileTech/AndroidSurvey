@@ -26,9 +26,9 @@ import java.util.List;
 public class SurveyScoreAdapter extends RecyclerView.Adapter<SurveyScoreAdapter.SurveyViewHolder> {
     private final String TAG = SurveyScoreAdapter.class.getName();
     private final LayoutInflater mInflater;
+    private final Context mContext;
+    private final SurveyRepository mSurveyRepository;
     private List<ProjectSurveyRelation> mProjectSurveyRelations;
-    private Context mContext;
-    private SurveyRepository mSurveyRepository;
 
     public SurveyScoreAdapter(Context context, SurveyRepository repository) {
         mInflater = LayoutInflater.from(context);

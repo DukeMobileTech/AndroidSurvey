@@ -9,8 +9,8 @@ import androidx.lifecycle.ViewModelProvider;
 import org.adaptlab.chpir.android.survey.viewmodels.ProjectSurveyRelationViewModel;
 
 public class ProjectSurveyRelationViewModelFactory implements ViewModelProvider.Factory {
-    private Application mApplication;
-    private long mProjectId;
+    private final Application mApplication;
+    private final long mProjectId;
 
     public ProjectSurveyRelationViewModelFactory(@NonNull Application application, long projectId) {
         this.mApplication = application;

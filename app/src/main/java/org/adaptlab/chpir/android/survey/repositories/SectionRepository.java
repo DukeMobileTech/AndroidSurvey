@@ -16,8 +16,8 @@ import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 
 public class SectionRepository extends Repository {
-    private SectionDao mSectionDao;
-    private SectionTranslationDao mSectionTranslationDao;
+    private final SectionDao mSectionDao;
+    private final SectionTranslationDao mSectionTranslationDao;
 
     public SectionRepository(Application application) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);

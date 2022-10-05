@@ -5,8 +5,8 @@ import android.widget.TextView;
 import org.adaptlab.chpir.android.survey.entities.Instrument;
 
 public class InstrumentListLabel {
-    private Instrument mInstrument;
-    private TextView mTextView;
+    private final Instrument mInstrument;
+    private final TextView mTextView;
     private Boolean mLoaded;
 
     public InstrumentListLabel(Instrument instrument, TextView textView) {

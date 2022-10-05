@@ -12,7 +12,7 @@ import org.adaptlab.chpir.android.survey.repositories.InstrumentRepository;
 import java.util.List;
 
 public class ProjectInstrumentViewModel extends AndroidViewModel {
-    private LiveData<List<Instrument>> mInstruments;
+    private final LiveData<List<Instrument>> mInstruments;
 
     public ProjectInstrumentViewModel(@NonNull Application application, long projectId) {
         super(application);

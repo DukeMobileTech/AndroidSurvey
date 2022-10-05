@@ -13,7 +13,7 @@ import java.util.List;
 
 public class SurveyNoteRepository {
     public final String TAG = this.getClass().getName();
-    private SurveyNoteDao mSurveyNoteDao;
+    private final SurveyNoteDao mSurveyNoteDao;
 
     public SurveyNoteRepository(Application application) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);
@@ -37,7 +37,7 @@ public class SurveyNoteRepository {
     }
 
     private static class InsertSurveyNoteTask extends AsyncTask<SurveyNote, Void, Void> {
-        private SurveyNoteDao mSurveyNoteDao;
+        private final SurveyNoteDao mSurveyNoteDao;
 
         InsertSurveyNoteTask(SurveyNoteDao dao) {
             mSurveyNoteDao = dao;
@@ -51,7 +51,7 @@ public class SurveyNoteRepository {
     }
 
     private static class UpdateSurveyNoteTask extends AsyncTask<SurveyNote, Void, Void> {
-        private SurveyNoteDao mSurveyNoteDao;
+        private final SurveyNoteDao mSurveyNoteDao;
 
         UpdateSurveyNoteTask(SurveyNoteDao dao) {
             mSurveyNoteDao = dao;
@@ -65,7 +65,7 @@ public class SurveyNoteRepository {
     }
 
     private static class DeleteSurveyNoteTask extends AsyncTask<SurveyNote, Void, Void> {
-        private SurveyNoteDao mSurveyNoteDao;
+        private final SurveyNoteDao mSurveyNoteDao;
 
         DeleteSurveyNoteTask(SurveyNoteDao dao) {
             mSurveyNoteDao = dao;

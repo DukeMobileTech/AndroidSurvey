@@ -22,7 +22,7 @@ import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.EDIT_TEXT_DE
 public class FreeResponseViewHolder extends QuestionViewHolder {
     private EditText mFreeText;
     private String mText = "";
-    private TextWatcher mTextWatcher = new TextWatcher() {
+    private final TextWatcher mTextWatcher = new TextWatcher() {
         private boolean backspacing = false;
         private Timer timer;
 

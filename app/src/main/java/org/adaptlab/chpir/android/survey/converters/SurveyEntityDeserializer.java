@@ -11,7 +11,7 @@ import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import java.lang.reflect.Type;
 
 public class SurveyEntityDeserializer<T extends SurveyEntity> implements JsonDeserializer<SurveyEntity> {
-    private Class<T> mClass;
+    private final Class<T> mClass;
 
     public SurveyEntityDeserializer(Class<T> klass) {
         mClass = klass;
@@ -20,11 +20,7 @@ public class SurveyEntityDeserializer<T extends SurveyEntity> implements JsonDes
     @Override
     public SurveyEntity deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         SurveyEntity entity = new Gson().fromJson(json.getAsJsonObject(), mClass);
-        if (json.getAsJsonObject().get("deleted_at").isJsonNull()) {
-            entity.setDeleted(false);
-        } else {
-            entity.setDeleted(true);
-        }
+        entity.setDeleted(!json.getAsJsonObject().get("deleted_at").isJsonNull());
         return entity;
     }
 

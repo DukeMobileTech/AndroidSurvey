@@ -14,7 +14,7 @@ import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 
 public class SubdomainRepository extends Repository {
-    private SubdomainDao mSubdomainDao;
+    private final SubdomainDao mSubdomainDao;
 
     public SubdomainRepository(Application application) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);

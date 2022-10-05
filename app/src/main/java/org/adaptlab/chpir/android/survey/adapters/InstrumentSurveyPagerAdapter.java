@@ -20,7 +20,7 @@ import org.adaptlab.chpir.android.survey.viewpagerfragments.SurveyPagerFragment;
 import java.util.ArrayList;
 
 public class InstrumentSurveyPagerAdapter extends FragmentPagerAdapter {
-    private Context mContext;
+    private final Context mContext;
     private ArrayList<String> mTabs;
 
     public InstrumentSurveyPagerAdapter(FragmentManager fm, Context context) {

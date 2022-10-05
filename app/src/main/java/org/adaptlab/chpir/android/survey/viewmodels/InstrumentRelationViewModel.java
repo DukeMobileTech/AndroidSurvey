@@ -15,7 +15,7 @@ import org.adaptlab.chpir.android.survey.repositories.InstrumentRelationReposito
 import java.util.List;
 
 public class InstrumentRelationViewModel extends AndroidViewModel {
-    private LiveData<InstrumentRelation> mInstrumentRelation;
+    private final LiveData<InstrumentRelation> mInstrumentRelation;
     private LongSparseArray<SectionRelation> mSections;
     private LongSparseArray<DisplayRelation> mDisplays;
 

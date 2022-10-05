@@ -14,7 +14,7 @@ import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 
 public class CriticalResponseRepository extends Repository {
-    private CriticalResponseDao mCriticalResponseDao;
+    private final CriticalResponseDao mCriticalResponseDao;
 
     public CriticalResponseRepository(Application application) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);

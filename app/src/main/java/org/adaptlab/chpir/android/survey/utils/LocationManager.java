@@ -54,13 +54,13 @@ public class LocationManager {
     private static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
             UPDATE_INTERVAL_IN_MILLISECONDS / 2;
     private static final int REQUEST_CHECK_SETTINGS = 0x1;
-    private FusedLocationProviderClient mFusedLocationClient;
-    private SettingsClient mSettingsClient;
+    private final FusedLocationProviderClient mFusedLocationClient;
+    private final SettingsClient mSettingsClient;
+    private final Context mContext;
     private LocationRequest mLocationRequest;
     private LocationSettingsRequest mLocationSettingsRequest;
     private LocationCallback mLocationCallback;
     private Location mCurrentLocation;
-    private Context mContext;
     private SettingsRepository mSettingsRepository;
     private Settings mSettings;
     private SurveyViewModel mSurveyViewModel;

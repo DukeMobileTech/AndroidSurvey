@@ -31,8 +31,8 @@ import java.util.List;
 
 public class InstrumentAdapter extends RecyclerView.Adapter<InstrumentAdapter.InstrumentViewHolder> {
     private final LayoutInflater mInflater;
+    private final Context mContext;
     private List<Instrument> mInstruments;
-    private Context mContext;
 
     public InstrumentAdapter(Context context) {
         mInflater = LayoutInflater.from(context);

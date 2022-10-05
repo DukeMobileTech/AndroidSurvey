@@ -8,7 +8,7 @@ import org.adaptlab.chpir.android.survey.daos.SettingsDao;
 import org.adaptlab.chpir.android.survey.entities.Settings;
 
 public class SettingsRepository {
-    private SettingsDao mSettingsDao;
+    private final SettingsDao mSettingsDao;
 
     public SettingsRepository(Application application) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);
@@ -25,7 +25,7 @@ public class SettingsRepository {
 
     private static class UpdateAsyncTask extends AsyncTask<Settings, Void, Void> {
 
-        private SettingsDao mAsyncTaskDao;
+        private final SettingsDao mAsyncTaskDao;
 
         UpdateAsyncTask(SettingsDao dao) {
             mAsyncTaskDao = dao;

@@ -14,7 +14,7 @@ import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 
 public class DisplayInstructionRepository extends Repository {
-    private DisplayInstructionDao mDisplayInstructionDao;
+    private final DisplayInstructionDao mDisplayInstructionDao;
 
     public DisplayInstructionRepository(Application application) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);

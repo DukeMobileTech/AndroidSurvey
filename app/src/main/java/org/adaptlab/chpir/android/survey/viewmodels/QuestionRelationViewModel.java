@@ -14,7 +14,7 @@ import java.util.List;
 public class QuestionRelationViewModel extends AndroidViewModel {
     public final String TAG = this.getClass().getName();
 
-    private LiveData<List<QuestionRelation>> questionRelations;
+    private final LiveData<List<QuestionRelation>> questionRelations;
 
     public QuestionRelationViewModel(@NonNull Application application, Long instrumentId, Long displayId) {
         super(application);

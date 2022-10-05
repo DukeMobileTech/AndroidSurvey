@@ -10,7 +10,7 @@ import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.tasks.EntityDownloadTask;
 
 public class DeviceUserRepository extends Repository {
-    private DeviceUserDao deviceUserDao;
+    private final DeviceUserDao deviceUserDao;
 
     public DeviceUserRepository(Application application) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);

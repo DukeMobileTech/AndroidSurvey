@@ -20,7 +20,8 @@ import java.util.GregorianCalendar;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 
 public class FormatUtils {
-    private static String TAG = "FormatUtils";
+    private static final String TAG = "FormatUtils";
+
     public static String pluralize(int number, String singular, String plural) {
         if (number == 1) {
             return singular;

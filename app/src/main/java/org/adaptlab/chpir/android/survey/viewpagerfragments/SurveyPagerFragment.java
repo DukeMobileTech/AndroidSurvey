@@ -145,9 +145,9 @@ public class SurveyPagerFragment extends Fragment {
 
         private final ColorDrawable mDeleteBackground;
         private final ColorDrawable mUploadBackground;
-        private SurveyAdapter mAdapter;
-        private Drawable mDeleteIcon;
-        private Drawable mUploadIcon;
+        private final SurveyAdapter mAdapter;
+        private final Drawable mDeleteIcon;
+        private final Drawable mUploadIcon;
 
         SwipeCallback(SurveyAdapter adapter, Context context) {
             super(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);

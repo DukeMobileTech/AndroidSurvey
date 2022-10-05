@@ -22,8 +22,8 @@ import org.json.JSONObject;
 
 public class InstrumentRepository extends Repository {
     private final static String TAG = "InstrumentRepository";
-    private InstrumentDao mInstrumentDao;
-    private InstrumentTranslationDao mInstrumentTranslationDao;
+    private final InstrumentDao mInstrumentDao;
+    private final InstrumentTranslationDao mInstrumentTranslationDao;
 
     public InstrumentRepository(Application application) {
         SurveyRoomDatabase db = SurveyRoomDatabase.getDatabase(application);

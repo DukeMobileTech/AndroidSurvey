@@ -10,7 +10,7 @@ import org.adaptlab.chpir.android.survey.relations.SurveyRelation;
 import org.adaptlab.chpir.android.survey.repositories.SurveyRepository;
 
 public class SurveyRelationViewModel extends AndroidViewModel {
-    private LiveData<SurveyRelation> mSurveyRelation;
+    private final LiveData<SurveyRelation> mSurveyRelation;
 
     public SurveyRelationViewModel(@NonNull Application application, String uuid) {
         super(application);
