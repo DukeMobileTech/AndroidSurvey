@@ -5,16 +5,18 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import org.adaptlab.chpir.android.survey.relations.CollageRelation;
 import org.adaptlab.chpir.android.survey.relations.DiagramRelation;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ImageAdapter extends BaseAdapter {
@@ -22,11 +24,46 @@ public class ImageAdapter extends BaseAdapter {
     private final Context mContext;
     private final List<DiagramRelation> mDiagramRelations;
     private final QuestionRelation mQuestionRelation;
+    private List<Bitmap> mBitmaps;
+    private List<Integer> mWidths;
+    private List<Integer> mHeights;
+    private int mHeight;
 
     public ImageAdapter(Context context, QuestionRelation questionRelation, CollageRelation collageRelation) {
         this.mContext = context;
         this.mQuestionRelation = questionRelation;
         this.mDiagramRelations = collageRelation.diagrams;
+        this.mDiagramRelations.sort((dr1, dr2) -> dr1.diagram.getPosition().compareTo(dr2.diagram.getPosition()));
+        setBitmaps();
+    }
+
+    private void setBitmaps() {
+        mWidths = new ArrayList<>();
+        mHeights = new ArrayList<>();
+        mBitmaps = new ArrayList<>();
+        for (int k = 0; k < mDiagramRelations.size(); k++) {
+            DiagramRelation diagramRelation = mDiagramRelations.get(k);
+            String path = mContext.getFilesDir().getAbsolutePath() + "/" +
+                    mQuestionRelation.question.getInstrumentRemoteId() + "/" +
+                    diagramRelation.options.get(0).option.getIdentifier() + ".png";
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inScaled = true;
+            Bitmap bitmap = BitmapFactory.decodeFile(path, options);
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            ((Activity) mContext).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+            int width = displayMetrics.widthPixels - 32;
+            int height = bitmap.getHeight();
+            double imageViewWidth = (width - (width * 0.1)) / mDiagramRelations.size();
+            if (imageViewWidth > bitmap.getWidth()) {
+                double scale = imageViewWidth / bitmap.getWidth();
+                width = (int) Math.round(bitmap.getWidth() * scale);
+                height = (int) Math.round(bitmap.getHeight() * scale);
+            }
+            mBitmaps.add(bitmap);
+            mHeights.add(height);
+            mWidths.add(width);
+        }
+        mHeight = Collections.max(mHeights);
     }
 
     @Override
@@ -46,62 +83,19 @@ public class ImageAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ImageView imageView;
-
+        LinearLayout linearLayout;
         if (convertView == null) {
-            Log.i(TAG, "convertView is null");
+            linearLayout = new LinearLayout(mContext);
+            ImageView imageView;
             imageView = new ImageView(mContext);
-
-            DiagramRelation diagramRelation = mDiagramRelations.get(position);
-            String path = mContext.getFilesDir().getAbsolutePath() + "/" +
-                    mQuestionRelation.question.getInstrumentRemoteId() + "/" +
-                    diagramRelation.options.get(0).option.getIdentifier() + ".png";
-            Log.i(TAG, "PATH: " + path);
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inScaled = true;
-            Bitmap bitmap = BitmapFactory.decodeFile(path, options);
-            DisplayMetrics displayMetrics = new DisplayMetrics();
-            ((Activity) mContext).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-            int width = displayMetrics.widthPixels;
-            double imageViewWidth = (width - (width * 0.1)) / mDiagramRelations.size();
-            double scale = imageViewWidth / bitmap.getWidth();
-            width = (int) Math.round(bitmap.getWidth() * scale);
-            int height = (int) Math.round(bitmap.getHeight() * scale);
-
-            bitmap = Bitmap.createScaledBitmap(bitmap, width, height, true);
+            Bitmap bitmap = Bitmap.createScaledBitmap(mBitmaps.get(position), mWidths.get(position),
+                    mHeights.get(position), true);
             imageView.setImageBitmap(bitmap);
-
-//            gridView = parent.findViewById(R.id.gridView);
-
-//            // get layout from mobile.xml
-//            gridView = inflater.inflate(R.layout.mobile, null);
-//
-//            // set value into textview
-//            TextView textView = (TextView) gridView
-//                    .findViewById(R.id.grid_item_label);
-//            textView.setText(mobileValues[position]);
-//
-//            // set image based on selected text
-//            ImageView imageView = (ImageView) gridView
-//                    .findViewById(R.id.grid_item_image);
-//
-//            String mobile = mobileValues[position];
-//
-//            if (mobile.equals("Windows")) {
-//                imageView.setImageResource(R.drawable.windows_logo);
-//            } else if (mobile.equals("iOS")) {
-//                imageView.setImageResource(R.drawable.ios_logo);
-//            } else if (mobile.equals("Blackberry")) {
-//                imageView.setImageResource(R.drawable.blackberry_logo);
-//            } else {
-//                imageView.setImageResource(R.drawable.android_logo);
-//            }
-
+            linearLayout.addView(imageView);
+            linearLayout.setMinimumHeight(mHeight);
         } else {
-            imageView = (ImageView) convertView;
-            Log.i("ImageAdapter", "convertView is NOT null");
+            linearLayout = (LinearLayout) convertView;
         }
-
-        return imageView;
+        return linearLayout;
     }
 }

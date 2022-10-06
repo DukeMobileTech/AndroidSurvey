@@ -51,35 +51,16 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/beforeTextInstructions" />
 
-            <!--            <com.google.android.material.card.MaterialCardView-->
-            <!--                android:id="@+id/question_card_view"-->
-            <!--                android:layout_width="wrap_content"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:layout_margin="16dp"-->
-            <!--                android:visibility="gone"-->
-            <!--                app:layout_constraintStart_toStartOf="parent"-->
-            <!--                app:layout_constraintEnd_toEndOf="parent"-->
-            <!--                app:layout_constraintTop_toBottomOf="@+id/spannedTextView">-->
-
-            <!--                <ImageView-->
-            <!--                    android:id="@+id/question_image"-->
-            <!--                    android:layout_width="wrap_content"-->
-            <!--                    android:layout_height="wrap_content"-->
-            <!--                    android:layout_gravity="center"-->
-            <!--                    android:scaleType="centerCrop" />-->
-
-            <!--            </com.google.android.material.card.MaterialCardView>-->
-
             <LinearLayout
                 android:id="@+id/gridViewLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
+                android:orientation="vertical"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/spannedTextView"
-                android:orientation="vertical">
+                app:layout_constraintTop_toBottomOf="@+id/spannedTextView">
 
             </LinearLayout>
 

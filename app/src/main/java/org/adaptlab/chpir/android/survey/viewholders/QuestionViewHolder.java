@@ -12,7 +12,6 @@ import android.text.Editable;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.util.LongSparseArray;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -709,54 +708,26 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         if (getQuestion().getPopUpInstructionId() == null) {
             mSpannedTextView.setCompoundDrawables(null, null, null, null);
         } else {
-            setCompoundDrawableRight(mSpannedTextView, getContext().getResources().getDrawable(R.drawable.ic_info_outline_blue_24dp), getQuestionPopUpInstructions());
+            setCompoundDrawableRight(mSpannedTextView,
+                    getContext().getResources().getDrawable(R.drawable.ic_info_outline_blue_24dp),
+                    getQuestionPopUpInstructions());
         }
         mSpannedTextView.setText(getQuestionText());
-
         setQuestionDiagrams();
     }
 
     private void setQuestionDiagrams() {
-        Log.i(TAG, "Identifier => " + mQuestionRelation.question.getQuestionIdentifier() +
-                " ID => " + mQuestionRelation.question.getQuestionId() +
-                " Collages => " + mQuestionRelation.collages.size());
         if (mQuestionRelation.collages.size() > 0) {
             mGridViewLayout.setVisibility(View.VISIBLE);
             for (int k = 0; k < mQuestionRelation.collages.size(); k++) {
-                GridView gridView = (GridView) LayoutInflater.from(mContext).inflate(R.layout.grid_view, null, false);
-                gridView.setAdapter(new ImageAdapter(mContext, mQuestionRelation, mQuestionRelation.collages.get(k)));
+                GridView gridView = (GridView) LayoutInflater.from(mContext).inflate(R.layout.grid_view,
+                        null, false);
+                gridView.setNumColumns(mQuestionRelation.collages.get(k).diagrams.size());
+                gridView.setAdapter(new ImageAdapter(mContext, mQuestionRelation,
+                        mQuestionRelation.collages.get(k)));
                 mGridViewLayout.addView(gridView);
             }
         }
-//        if (mQuestionRelation.question.hasQuestionImage()) {
-//            mCardView.setVisibility(View.VISIBLE);
-////            String path = getContext().getFileStreamPath(mQuestionRelation.question.getBitmapPath()).getAbsolutePath();
-//            String path = getContext().getFilesDir().getAbsolutePath() + "/" +
-//                    mQuestionRelation.question.getInstrumentRemoteId() + "/" +
-//                    mQuestionRelation.question.getQuestionIdentifier() + ".png";
-////            Log.i(TAG, "PATH: " + path);
-//            BitmapFactory.Options options = new BitmapFactory.Options();
-//            options.inScaled = true;
-//            Bitmap bitmap = BitmapFactory.decodeFile(path, options);
-//            DisplayMetrics displayMetrics = new DisplayMetrics();
-//            ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-//            int height = displayMetrics.heightPixels;
-//            int width = displayMetrics.widthPixels;
-//
-////            Log.i(TAG, "SCREEN SIZE => Height: " + height + " Width: " + width);
-////            Log.i(TAG, getQuestion().getQuestionIdentifier() + " BITMAP SIZE => Height: " + bitmap.getHeight() + " Width: " + bitmap.getWidth());
-//
-//            if (bitmap.getWidth() < (width - 0.25 * width)) {
-//                double scale = (width - 0.25 * width) / bitmap.getWidth();
-//                if (mQuestionRelation.question.getQuestionType().equals(Question.SLIDER)) {
-//                    scale = (width * 1.0) / bitmap.getWidth();
-//                }
-//                width = (int) Math.round(bitmap.getWidth() * scale);
-//                height = (int) Math.round(bitmap.getHeight() * scale);
-//            }
-//            bitmap = Bitmap.createScaledBitmap(bitmap, width, height, true);
-//            mImageView.setImageBitmap(bitmap);
-//        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
