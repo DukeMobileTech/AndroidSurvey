@@ -724,7 +724,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                         null, false);
                 gridView.setNumColumns(mQuestionRelation.collages.get(k).diagrams.size());
                 gridView.setAdapter(new ImageAdapter(mContext, mQuestionRelation,
-                        mQuestionRelation.collages.get(k)));
+                        mQuestionRelation.collages.get(k), mSurveyViewModel));
                 mGridViewLayout.addView(gridView);
             }
         }

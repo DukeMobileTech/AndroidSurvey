@@ -153,7 +153,6 @@ public class EntityDownloadTask extends AsyncTask<Void, Void, Void> {
             for (ZipEntry zipEntry = zipInputStream.getNextEntry(); zipEntry != null; zipEntry = zipInputStream.getNextEntry()) {
                 if (BuildConfig.DEBUG) Log.i(TAG, "Extracting: " + zipEntry.getName() + " ...");
                 String path = SurveyApp.getInstance().getFilesDir().getAbsolutePath() + "/" + instrument.getRemoteId();
-                if (BuildConfig.DEBUG) Log.i(TAG, "Folder: " + path);
                 File folder = new File(path);
                 if (!folder.exists()) {
                     folder.mkdir();
