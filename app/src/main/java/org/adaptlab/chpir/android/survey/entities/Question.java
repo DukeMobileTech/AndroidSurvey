@@ -44,7 +44,7 @@ public class Question implements SurveyEntity, Translatable, BitmapEntity {
     public static final String PHONE_NUMBER = "PHONE_NUMBER";
     public static final String ADDRESS = "ADDRESS";
     public static final String SELECT_ONE_IMAGE = "SELECT_ONE_IMAGE";
-    public static final String SELECT_MULTIPLE_IMAGE = "SELECT_MULTIPLE_IMAGE";
+    public static final String SELECT_MULTIPLE_IMAGES = "SELECT_MULTIPLE_IMAGES";
     public static final String LIST_OF_INTEGER_BOXES = "LIST_OF_INTEGER_BOXES";
     public static final String LABELED_SLIDER = "LABELED_SLIDER";
     public static final String GEO_LOCATION = "GEO_LOCATION";
@@ -159,15 +159,6 @@ public class Question implements SurveyEntity, Translatable, BitmapEntity {
     @SerializedName("multiple_skip_neutral_ids")
     @ColumnInfo(name = "MultipleSkipNeutralIds")
     private String mMultipleSkipNeutralIds;
-    @SerializedName("has_option_images")
-    @ColumnInfo(name = "HasOptionImages")
-    private boolean mHasOptionImages;
-    @SerializedName("has_question_image")
-    @ColumnInfo(name = "HasQuestionImage")
-    private boolean mHasQuestionImage;
-    @SerializedName("question_image_height")
-    @ColumnInfo(name = "QuestionImageHeight")
-    private int mQuestionImageHeight;
     @SerializedName("task_id")
     @ColumnInfo(name = "TaskId")
     private Long mTaskId;
@@ -410,30 +401,6 @@ public class Question implements SurveyEntity, Translatable, BitmapEntity {
         this.mTextToReplace = textToReplace;
     }
 
-    public boolean hasOptionImages() {
-        return mHasOptionImages;
-    }
-
-    public void setHasOptionImages(boolean mHasImages) {
-        this.mHasOptionImages = mHasImages;
-    }
-
-    public boolean hasQuestionImage() {
-        return mHasQuestionImage;
-    }
-
-    public void setHasQuestionImage(boolean mHasImages) {
-        this.mHasQuestionImage = mHasImages;
-    }
-
-    public int getQuestionImageHeight() {
-        return mQuestionImageHeight;
-    }
-
-    public void setQuestionImageHeight(int height) {
-        this.mQuestionImageHeight = height;
-    }
-
     public String getBitmapPath() {
         return mBitmapPath;
     }
@@ -601,7 +568,7 @@ public class Question implements SurveyEntity, Translatable, BitmapEntity {
     @StringDef({SELECT_ONE, SELECT_MULTIPLE, SELECT_ONE_WRITE_OTHER, SELECT_MULTIPLE_WRITE_OTHER,
             FREE_RESPONSE, SLIDER, FRONT_PICTURE, REAR_PICTURE, DATE, RATING, TIME, LIST_OF_TEXT_BOXES,
             INTEGER, EMAIL_ADDRESS, DECIMAL_NUMBER, INSTRUCTIONS, MONTH_AND_YEAR, YEAR, PHONE_NUMBER,
-            ADDRESS, SELECT_ONE_IMAGE, SELECT_MULTIPLE_IMAGE, LIST_OF_INTEGER_BOXES, LABELED_SLIDER,
+            ADDRESS, SELECT_ONE_IMAGE, SELECT_MULTIPLE_IMAGES, LIST_OF_INTEGER_BOXES, LABELED_SLIDER,
             GEO_LOCATION, DROP_DOWN, RANGE, SUM_OF_PARTS, SIGNATURE, AUDIO, PAIRWISE_COMPARISON})
     public @interface QuestionType {
     }

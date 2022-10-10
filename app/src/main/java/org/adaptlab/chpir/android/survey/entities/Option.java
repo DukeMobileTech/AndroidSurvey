@@ -28,12 +28,6 @@ public class Option implements SurveyEntity, Translatable {
     @SerializedName("identifier")
     @ColumnInfo(name = "Identifier", index = true)
     private String mIdentifier;
-    @SerializedName("text_one")
-    @ColumnInfo(name = "TextOne")
-    private String mTextOne;
-    @SerializedName("text_two")
-    @ColumnInfo(name = "TextTwo")
-    private String mTextTwo;
     @SerializedName("deleted_at")
     @ColumnInfo(name = "Deleted")
     private boolean mDeleted;
@@ -72,22 +66,6 @@ public class Option implements SurveyEntity, Translatable {
 
     public void setDeleted(boolean mDeleted) {
         this.mDeleted = mDeleted;
-    }
-
-    public String getTextOne() {
-        return mTextOne;
-    }
-
-    public void setTextOne(String mText) {
-        this.mTextOne = mText;
-    }
-
-    public String getTextTwo() {
-        return mTextTwo;
-    }
-
-    public void setTextTwo(String mText) {
-        this.mTextTwo = mText;
     }
 
     public List<OptionTranslation> getOptionTranslations() {

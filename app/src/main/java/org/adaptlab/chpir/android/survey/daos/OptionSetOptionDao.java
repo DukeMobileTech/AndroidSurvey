@@ -12,7 +12,4 @@ import java.util.List;
 public abstract class OptionSetOptionDao extends BaseDao<OptionSetOption> {
     @Query("SELECT * FROM OptionSetOptions")
     public abstract LiveData<List<OptionSetOption>> getAllOptionSetOptions();
-
-    @Query("SELECT * FROM OptionSetOptions WHERE HasImage=1")
-    public abstract List<OptionSetOption> withImages();
 }

@@ -9,13 +9,16 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.google.android.material.card.MaterialCardView;
 
 import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.adapters.OptionDiagramAdapter;
 import org.adaptlab.chpir.android.survey.relations.OptionRelation;
+import org.adaptlab.chpir.android.survey.relations.OptionSetOptionRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionSetRelation;
 
 import java.util.ArrayList;
@@ -39,32 +42,27 @@ public class SelectOneImageViewHolder extends QuestionViewHolder {
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int deviceWidth = displayMetrics.widthPixels;
-        double targetWidth = deviceWidth - (0.25 * deviceWidth);
+        int rightMargin = (int) (displayMetrics.widthPixels * 0.1);
 
         OptionSetRelation optionSetRelation = getQuestionRelation().optionSets.get(0);
         List<OptionRelation> optionRelations = getOptionRelations();
         if (optionSetRelation.optionSet.isAlignImageVertical()) {
             for (final OptionRelation optionRelation : optionRelations) {
-                View view = inflater.inflate(R.layout.list_item_image, null);
-                final MaterialCardView cardView = view.findViewById(R.id.material_card_view);
+                OptionSetOptionRelation relation = getOptionSetOptionRelation(optionRelation);
+                GridView gridView = (GridView) inflater.inflate(R.layout.list_item_grid_view, null);
+                gridView.setNumColumns(relation.collages.get(0).diagrams.size());
+                gridView.setAdapter(new OptionDiagramAdapter(getContext(), getQuestionRelation(),
+                        relation, getSurveyViewModel()));
+
+                View view = inflater.inflate(R.layout.list_item_collage, null);
+                final MaterialCardView cardView = view.findViewById(R.id.materialCardView);
                 cardView.setId(optionRelations.indexOf(optionRelation));
-                ImageView imageView = cardView.findViewById(R.id.item_image);
-                String path = getContext().getFilesDir().getAbsolutePath() + "/" +
-                        getQuestionRelation().question.getInstrumentRemoteId() + "/" +
-                        optionRelation.option.getIdentifier() + ".png";
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inScaled = true;
-                Bitmap bitmap = BitmapFactory.decodeFile(path, options);
-                int width = bitmap.getWidth();
-                int height = bitmap.getHeight();
-                if (width < targetWidth) {
-                    double scale = targetWidth / width;
-                    width = (int) Math.round(width * scale);
-                    height = (int) Math.round(height * scale);
-                }
-                bitmap = Bitmap.createScaledBitmap(bitmap, width, height, true);
-                imageView.setImageBitmap(bitmap);
+                LinearLayout linearLayout = cardView.findViewById(R.id.gridViewLayout);
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                layoutParams.setMargins(0, 0, rightMargin, 0);
+                linearLayout.addView(gridView, layoutParams);
+
                 cardView.setOnClickListener(v -> {
                     int index = v.getId();
                     cardView.setSelected(!cardView.isSelected());

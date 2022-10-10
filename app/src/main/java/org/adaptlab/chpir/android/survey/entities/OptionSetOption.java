@@ -48,9 +48,9 @@ public class OptionSetOption implements SurveyEntity, BitmapEntity {
     @SerializedName("exclusion_ids")
     @ColumnInfo(name = "ExclusionIds")
     private String mExclusionIds;
-    @SerializedName("has_image")
-    @ColumnInfo(name = "HasImage")
-    private boolean mHasImage;
+    @SerializedName("collage_id")
+    @ColumnInfo(name = "CollageId")
+    private Long mCollageId;
     @ColumnInfo(name = "BitmapPath")
     private String mBitmapPath;
 
@@ -111,12 +111,12 @@ public class OptionSetOption implements SurveyEntity, BitmapEntity {
         this.mExclusive = mExclusive;
     }
 
-    public boolean hasImage() {
-        return mHasImage;
+    public Long getCollageId() {
+        return mCollageId;
     }
 
-    public void setHasImage(boolean mHasImage) {
-        this.mHasImage = mHasImage;
+    public void setCollageId(Long id) {
+        this.mCollageId = id;
     }
 
     public String getBitmapPath() {

@@ -32,7 +32,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.adapters.ImageAdapter;
+import org.adaptlab.chpir.android.survey.adapters.QuestionDiagramAdapter;
 import org.adaptlab.chpir.android.survey.adapters.QuestionRelationAdapter;
 import org.adaptlab.chpir.android.survey.entities.ConditionSkip;
 import org.adaptlab.chpir.android.survey.entities.Instruction;
@@ -95,7 +95,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     private TextView mSpannedTextView;
     private TextView mAfterTextInstructionTextView;
     private TextView mOptionSetInstructionTextView;
-    private ViewGroup mQuestionComponent;
+    private ViewGroup mResponseComponent;
     private Button mClearButton;
     private RadioGroup mSpecialResponseRadioGroup;
     private LinearLayout mGridViewLayout;
@@ -115,7 +115,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         mAfterTextInstructionTextView = itemView.findViewById(R.id.afterTextInstructions);
 
         mOptionSetInstructionTextView = itemView.findViewById(R.id.optionSetInstructions);
-        mQuestionComponent = itemView.findViewById(R.id.response_component);
+        mResponseComponent = itemView.findViewById(R.id.responseComponent);
         mSpecialResponseRadioGroup = itemView.findViewById(R.id.specialResponseButtons);
         mClearButton = itemView.findViewById(R.id.clearResponsesButton);
     }
@@ -134,7 +134,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         setQuestionTextComponents();
         setOptionSetInstructionsText();
         // Overridden by subclasses to place their graphical elements on the fragment.
-        createQuestionComponent(mQuestionComponent);
+        createQuestionComponent(mResponseComponent);
         setSpecialResponseView();
     }
 
@@ -723,7 +723,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                 GridView gridView = (GridView) LayoutInflater.from(mContext).inflate(R.layout.grid_view,
                         null, false);
                 gridView.setNumColumns(mQuestionRelation.collages.get(k).diagrams.size());
-                gridView.setAdapter(new ImageAdapter(mContext, mQuestionRelation,
+                gridView.setAdapter(new QuestionDiagramAdapter(mContext, mQuestionRelation,
                         mQuestionRelation.collages.get(k), mSurveyViewModel));
                 mGridViewLayout.addView(gridView);
             }

@@ -83,7 +83,7 @@ public class QuestionViewHolderFactory {
             case MULTIPLE:
                 return new SelectMultipleViewHolder(view, context, listener);
             case MULTIPLE_IMAGE:
-                return new SelectMultipleImageViewHolder(view, context, listener);
+                return new SelectMultipleImagesViewHolder(view, context, listener);
             case MULTIPLE_WRITE_OTHER:
                 return new SelectMultipleWriteOtherViewHolder(view, context, listener);
             case ONE:
@@ -159,7 +159,7 @@ public class QuestionViewHolderFactory {
                 return REAR_PICTURE;
             case Question.SELECT_MULTIPLE:
                 return MULTIPLE;
-            case Question.SELECT_MULTIPLE_IMAGE:
+            case Question.SELECT_MULTIPLE_IMAGES:
                 return MULTIPLE_IMAGE;
             case Question.SELECT_MULTIPLE_WRITE_OTHER:
                 return MULTIPLE_WRITE_OTHER;

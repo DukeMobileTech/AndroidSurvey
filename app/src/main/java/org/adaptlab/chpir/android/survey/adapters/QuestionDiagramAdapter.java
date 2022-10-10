@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ImageAdapter extends BaseAdapter {
-    private final String TAG = "ImageAdapter";
+public class QuestionDiagramAdapter extends BaseAdapter {
+    private final String TAG = "QuestionDiagramAdapter";
     private final Context mContext;
     private final List<DiagramRelation> mDiagramRelations;
     private final QuestionRelation mQuestionRelation;
@@ -33,8 +33,8 @@ public class ImageAdapter extends BaseAdapter {
     private List<Integer> mHeights;
     private int mHeight;
 
-    public ImageAdapter(Context context, QuestionRelation questionRelation,
-                        CollageRelation collageRelation, SurveyViewModel surveyViewModel) {
+    public QuestionDiagramAdapter(Context context, QuestionRelation questionRelation,
+                                  CollageRelation collageRelation, SurveyViewModel surveyViewModel) {
         this.mContext = context;
         this.mQuestionRelation = questionRelation;
         this.mDiagramRelations = collageRelation.diagrams;

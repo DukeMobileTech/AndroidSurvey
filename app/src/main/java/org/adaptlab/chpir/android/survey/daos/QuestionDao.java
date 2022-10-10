@@ -26,7 +26,4 @@ public abstract class QuestionDao extends BaseDao<Question> {
     @Query("SELECT Questions.* FROM Questions INNER JOIN Displays ON Displays.RemoteId=Questions.DisplayId " +
             "WHERE Questions.DisplayId=:displayId AND Questions.InstrumentRemoteId=:instrumentId AND Questions.Deleted=0")
     public abstract LiveData<List<QuestionRelation>> displayQuestions(Long instrumentId, Long displayId);
-
-    @Query("SELECT * FROM Questions WHERE HasQuestionImage=1")
-    public abstract List<Question> withImages();
 }

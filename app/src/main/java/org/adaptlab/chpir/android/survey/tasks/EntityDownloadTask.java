@@ -10,12 +10,8 @@ import com.google.gson.Gson;
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.SurveyApp;
 import org.adaptlab.chpir.android.survey.daos.BaseDao;
-import org.adaptlab.chpir.android.survey.daos.OptionSetOptionDao;
-import org.adaptlab.chpir.android.survey.daos.QuestionDao;
 import org.adaptlab.chpir.android.survey.entities.BitmapEntity;
 import org.adaptlab.chpir.android.survey.entities.Instrument;
-import org.adaptlab.chpir.android.survey.entities.OptionSetOption;
-import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.SurveyEntity;
 import org.adaptlab.chpir.android.survey.repositories.Repository;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
@@ -175,26 +171,6 @@ public class EntityDownloadTask extends AsyncTask<Void, Void, Void> {
             if (BuildConfig.DEBUG) Log.e(TAG, "MalformedURLException: ", e);
         } catch (IOException e) {
             if (BuildConfig.DEBUG) Log.e(TAG, "IOException: ", e);
-        }
-    }
-
-    private void downloadOptionImages() {
-        List<OptionSetOption> withImages = ((OptionSetOptionDao) mBaseDao).withImages();
-        for (OptionSetOption optionSetOption : withImages) {
-            if (optionSetOption.hasImage()) {
-                String url = AppUtil.getFullApiUrl() + "images/" + optionSetOption.getOptionRemoteId() + AppUtil.getParams() + "&option_id=" + optionSetOption.getOptionRemoteId();
-                getFile(url, optionSetOption);
-            }
-        }
-    }
-
-    private void downloadQuestionImages() {
-        List<Question> withImages = ((QuestionDao) mBaseDao).withImages();
-        for (Question question : withImages) {
-            if (question.hasQuestionImage()) {
-                String url = AppUtil.getFullApiUrl() + "images/" + question.getRemoteId() + AppUtil.getParams() + "&question_id=" + question.getRemoteId();
-                getFile(url, question);
-            }
         }
     }
 

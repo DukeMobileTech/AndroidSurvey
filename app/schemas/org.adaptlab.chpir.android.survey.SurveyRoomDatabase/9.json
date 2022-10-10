@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 9,
-    "identityHash": "1871d7c2df83bb1b2a931ad45da46568",
+    "identityHash": "bad4f1fe0c1baf3dd55614e39e2c5f42",
     "entities": [
       {
         "tableName": "Instruments",
@@ -158,7 +158,7 @@
       },
       {
         "tableName": "Questions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Text` TEXT, `QuestionType` TEXT, `QuestionIdentifier` TEXT, `QuestionId` INTEGER, `OptionCount` INTEGER NOT NULL, `InstrumentVersion` INTEGER NOT NULL, `NumberInInstrument` INTEGER NOT NULL, `Position` INTEGER NOT NULL, `IdentifiesSurvey` INTEGER NOT NULL, `ImageCount` INTEGER NOT NULL, `InstructionId` INTEGER, `QuestionVersion` INTEGER NOT NULL, `Deleted` INTEGER NOT NULL, `InstrumentRemoteId` INTEGER, `RemoteOptionSetId` INTEGER, `DisplayId` INTEGER, `RemoteSpecialOptionSetId` INTEGER, `TableIdentifier` TEXT, `ValidationId` INTEGER, `RankResponses` INTEGER NOT NULL, `LoopQuestionCount` INTEGER NOT NULL, `LoopSource` TEXT, `LoopNumber` INTEGER NOT NULL, `TextToReplace` TEXT, `PopUpInstructionId` INTEGER, `AfterTextInstructionId` INTEGER, `CarryForwardIdentifier` TEXT, `CarryForwardOptionSetId` INTEGER, `DefaultResponse` TEXT, `SkipOperation` TEXT, `NextQuestionOperator` TEXT, `MultipleSkipOperator` TEXT, `NextQuestionNeutralIds` TEXT, `MultipleSkipNeutralIds` TEXT, `HasOptionImages` INTEGER NOT NULL, `HasQuestionImage` INTEGER NOT NULL, `QuestionImageHeight` INTEGER NOT NULL, `TaskId` INTEGER, `BitmapPath` TEXT, PRIMARY KEY(`RemoteId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Text` TEXT, `QuestionType` TEXT, `QuestionIdentifier` TEXT, `QuestionId` INTEGER, `OptionCount` INTEGER NOT NULL, `InstrumentVersion` INTEGER NOT NULL, `NumberInInstrument` INTEGER NOT NULL, `Position` INTEGER NOT NULL, `IdentifiesSurvey` INTEGER NOT NULL, `ImageCount` INTEGER NOT NULL, `InstructionId` INTEGER, `QuestionVersion` INTEGER NOT NULL, `Deleted` INTEGER NOT NULL, `InstrumentRemoteId` INTEGER, `RemoteOptionSetId` INTEGER, `DisplayId` INTEGER, `RemoteSpecialOptionSetId` INTEGER, `TableIdentifier` TEXT, `ValidationId` INTEGER, `RankResponses` INTEGER NOT NULL, `LoopQuestionCount` INTEGER NOT NULL, `LoopSource` TEXT, `LoopNumber` INTEGER NOT NULL, `TextToReplace` TEXT, `PopUpInstructionId` INTEGER, `AfterTextInstructionId` INTEGER, `CarryForwardIdentifier` TEXT, `CarryForwardOptionSetId` INTEGER, `DefaultResponse` TEXT, `SkipOperation` TEXT, `NextQuestionOperator` TEXT, `MultipleSkipOperator` TEXT, `NextQuestionNeutralIds` TEXT, `MultipleSkipNeutralIds` TEXT, `TaskId` INTEGER, `BitmapPath` TEXT, PRIMARY KEY(`RemoteId`))",
         "fields": [
           {
             "fieldPath": "mRemoteId",
@@ -369,24 +369,6 @@
             "columnName": "MultipleSkipNeutralIds",
             "affinity": "TEXT",
             "notNull": false
-          },
-          {
-            "fieldPath": "mHasOptionImages",
-            "columnName": "HasOptionImages",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "mHasQuestionImage",
-            "columnName": "HasQuestionImage",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "mQuestionImageHeight",
-            "columnName": "QuestionImageHeight",
-            "affinity": "INTEGER",
-            "notNull": true
           },
           {
             "fieldPath": "mTaskId",
@@ -1361,7 +1343,7 @@
       },
       {
         "tableName": "Options",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Text` TEXT, `Identifier` TEXT, `TextOne` TEXT, `TextTwo` TEXT, `Deleted` INTEGER NOT NULL, PRIMARY KEY(`RemoteId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Text` TEXT, `Identifier` TEXT, `Deleted` INTEGER NOT NULL, PRIMARY KEY(`RemoteId`))",
         "fields": [
           {
             "fieldPath": "mRemoteId",
@@ -1378,18 +1360,6 @@
           {
             "fieldPath": "mIdentifier",
             "columnName": "Identifier",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "mTextOne",
-            "columnName": "TextOne",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "mTextTwo",
-            "columnName": "TextTwo",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -1501,7 +1471,7 @@
       },
       {
         "tableName": "OptionSetOptions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Position` INTEGER NOT NULL, `OptionSetRemoteId` INTEGER, `OptionRemoteId` INTEGER, `Special` INTEGER NOT NULL, `Deleted` INTEGER NOT NULL, `Exclusive` INTEGER NOT NULL, `InstructionId` INTEGER, `AllowTextEntry` INTEGER NOT NULL, `ExclusionIds` TEXT, `HasImage` INTEGER NOT NULL, `BitmapPath` TEXT, PRIMARY KEY(`RemoteId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Position` INTEGER NOT NULL, `OptionSetRemoteId` INTEGER, `OptionRemoteId` INTEGER, `Special` INTEGER NOT NULL, `Deleted` INTEGER NOT NULL, `Exclusive` INTEGER NOT NULL, `InstructionId` INTEGER, `AllowTextEntry` INTEGER NOT NULL, `ExclusionIds` TEXT, `CollageId` INTEGER, `BitmapPath` TEXT, PRIMARY KEY(`RemoteId`))",
         "fields": [
           {
             "fieldPath": "mRemoteId",
@@ -1564,10 +1534,10 @@
             "notNull": false
           },
           {
-            "fieldPath": "mHasImage",
-            "columnName": "HasImage",
+            "fieldPath": "mCollageId",
+            "columnName": "CollageId",
             "affinity": "INTEGER",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "mBitmapPath",
@@ -3027,7 +2997,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1871d7c2df83bb1b2a931ad45da46568')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'bad4f1fe0c1baf3dd55614e39e2c5f42')"
     ]
   }
 }
