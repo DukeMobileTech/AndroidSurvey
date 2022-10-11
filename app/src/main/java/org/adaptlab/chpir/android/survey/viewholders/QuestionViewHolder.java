@@ -720,12 +720,17 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         if (mQuestionRelation.collages.size() > 0) {
             mGridViewLayout.setVisibility(View.VISIBLE);
             for (int k = 0; k < mQuestionRelation.collages.size(); k++) {
-                GridView gridView = (GridView) LayoutInflater.from(mContext).inflate(R.layout.grid_view,
-                        null, false);
+                LinearLayout layout = (LinearLayout) LayoutInflater.from(mContext).inflate(
+                        R.layout.list_item_question_grid_view, null, false);
+                GridView gridView = layout.findViewById(R.id.gridView);
                 gridView.setNumColumns(mQuestionRelation.collages.get(k).diagrams.size());
-                gridView.setAdapter(new QuestionDiagramAdapter(mContext, mQuestionRelation,
-                        mQuestionRelation.collages.get(k), mSurveyViewModel));
-                mGridViewLayout.addView(gridView);
+                QuestionDiagramAdapter adapter = new QuestionDiagramAdapter(mContext, mQuestionRelation,
+                        mQuestionRelation.collages.get(k), mSurveyViewModel);
+                gridView.setAdapter(adapter);
+                ViewGroup.LayoutParams layoutParams = mGridViewLayout.getLayoutParams();
+                layoutParams.width = adapter.getViewWidth();
+                mGridViewLayout.setLayoutParams(layoutParams);
+                mGridViewLayout.addView(layout);
             }
         }
     }

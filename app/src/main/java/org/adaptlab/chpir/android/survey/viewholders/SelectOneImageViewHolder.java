@@ -49,7 +49,7 @@ public class SelectOneImageViewHolder extends QuestionViewHolder {
         if (optionSetRelation.optionSet.isAlignImageVertical()) {
             for (final OptionRelation optionRelation : optionRelations) {
                 OptionSetOptionRelation relation = getOptionSetOptionRelation(optionRelation);
-                GridView gridView = (GridView) inflater.inflate(R.layout.list_item_grid_view, null);
+                GridView gridView = (GridView) inflater.inflate(R.layout.list_item_option_grid_view, null);
                 gridView.setNumColumns(relation.collages.get(0).diagrams.size());
                 gridView.setAdapter(new OptionDiagramAdapter(getContext(), getQuestionRelation(),
                         relation, getSurveyViewModel()));
