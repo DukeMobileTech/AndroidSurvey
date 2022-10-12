@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
@@ -16,8 +17,12 @@ import com.google.android.material.slider.LabelFormatter;
 import com.google.android.material.slider.Slider;
 
 import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.relations.DiagramRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionRelation;
+import org.adaptlab.chpir.android.survey.relations.OptionSetOptionRelation;
+import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
 
+import java.io.File;
 import java.util.List;
 
 public class PairwiseComparisonViewHolder extends QuestionViewHolder {
@@ -39,34 +44,42 @@ public class PairwiseComparisonViewHolder extends QuestionViewHolder {
         List<OptionRelation> optionRelations = getOptionRelations();
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int deviceWidth = displayMetrics.widthPixels;
-        double targetWidth = 0.25 * deviceWidth;
 
-        ConstraintLayout imageLayout = (ConstraintLayout) inflater.inflate(R.layout.pairwise, null);
+        ConstraintLayout imageLayout = (ConstraintLayout) inflater.inflate(R.layout.pair_wise, null);
         for (final OptionRelation optionRelation : optionRelations) {
+            OptionSetOptionRelation relation = getOptionSetOptionRelation(optionRelation);
             int index = optionRelations.indexOf(optionRelation);
-            ImageView imageView;
+            LinearLayout linearLayout;
             if (index == 0) {
-                imageView = imageLayout.findViewById(R.id.item_image_left);
+                linearLayout = imageLayout.findViewById(R.id.leftLayout);
             } else {
-                imageView = imageLayout.findViewById(R.id.item_image_right);
+                linearLayout = imageLayout.findViewById(R.id.rightLayout);
             }
-
-            String path = getContext().getFilesDir().getAbsolutePath() + "/" +
-                    getQuestionRelation().question.getInstrumentRemoteId() + "/" +
-                    optionRelation.option.getIdentifier() + ".png";
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inScaled = true;
-            Bitmap bitmap = BitmapFactory.decodeFile(path, options);
-            int width = bitmap.getWidth();
-            int height = bitmap.getHeight();
-            if (width > targetWidth) {
-                double scale = targetWidth / width;
-                width = (int) Math.round(width * scale);
-                height = (int) Math.round(height * scale);
+            if (!relation.collages.isEmpty()) {
+                List<DiagramRelation> diagramRelations = relation.collages.get(0).diagrams;
+                for (int k = 0; k < diagramRelations.size(); k++) {
+                    DiagramRelation diagramRelation = diagramRelations.get(k);
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inScaled = true;
+                    String path = getPath(diagramRelation);
+                    if (!path.isEmpty()) {
+                        Bitmap bitmap = BitmapFactory.decodeFile(path, options);
+                        int width = bitmap.getWidth();
+                        int height = bitmap.getHeight();
+                        double targetHeight = displayMetrics.heightPixels * 0.12;
+                        // Scale based on height
+                        if (targetHeight > bitmap.getHeight()) {
+                            double scale = targetHeight / height;
+                            width = (int) Math.round(width * scale);
+                            height = (int) Math.round(height * scale);
+                        }
+                        ImageView imageView = new ImageView(getContext());
+                        bitmap = Bitmap.createScaledBitmap(bitmap, width, height, true);
+                        imageView.setImageBitmap(bitmap);
+                        linearLayout.addView(imageView);
+                    }
+                }
             }
-            bitmap = Bitmap.createScaledBitmap(bitmap, width, height, true);
-            imageView.setImageBitmap(bitmap);
         }
         questionComponent.addView(imageLayout);
 
@@ -79,6 +92,31 @@ public class PairwiseComparisonViewHolder extends QuestionViewHolder {
             saveResponse();
         });
         questionComponent.addView(sliderLayout);
+    }
+
+    private String getPath(DiagramRelation diagramRelation) {
+        if (diagramRelation.options.isEmpty()) return "";
+        String path;
+        String optionIdentifier = diagramRelation.options.get(0).option.getIdentifier();
+        String translatedOptionIdentifier = "";
+        SurveyViewModel mSurveyViewModel = getSurveyViewModel();
+        String absolutePath = getContext().getFilesDir().getAbsolutePath();
+        Long instrumentId = getQuestionRelation().question.getInstrumentRemoteId();
+
+        if (!mSurveyViewModel.getInstrumentLanguage().equals(mSurveyViewModel.getDeviceLanguage())) {
+            translatedOptionIdentifier = diagramRelation.options.get(0).option.getIdentifier() + "_" +
+                    mSurveyViewModel.getDeviceLanguage().toUpperCase();
+        }
+        if (translatedOptionIdentifier.isEmpty()) {
+            path = absolutePath + "/" + instrumentId + "/" + optionIdentifier + ".png";
+        } else {
+            path = absolutePath + "/" + instrumentId + "/" + translatedOptionIdentifier + ".png";
+            File file = new File(path);
+            if (!file.exists()) {
+                path = absolutePath + "/" + instrumentId + "/" + optionIdentifier + ".png";
+            }
+        }
+        return path;
     }
 
     @Override
