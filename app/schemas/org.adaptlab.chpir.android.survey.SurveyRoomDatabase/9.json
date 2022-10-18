@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 9,
-    "identityHash": "bad4f1fe0c1baf3dd55614e39e2c5f42",
+    "identityHash": "d2fda0b08c66a12942aad356d747c37c",
     "entities": [
       {
         "tableName": "Instruments",
@@ -1471,7 +1471,7 @@
       },
       {
         "tableName": "OptionSetOptions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Position` INTEGER NOT NULL, `OptionSetRemoteId` INTEGER, `OptionRemoteId` INTEGER, `Special` INTEGER NOT NULL, `Deleted` INTEGER NOT NULL, `Exclusive` INTEGER NOT NULL, `InstructionId` INTEGER, `AllowTextEntry` INTEGER NOT NULL, `ExclusionIds` TEXT, `CollageId` INTEGER, `BitmapPath` TEXT, PRIMARY KEY(`RemoteId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Position` INTEGER NOT NULL, `OptionSetRemoteId` INTEGER, `OptionRemoteId` INTEGER, `Special` INTEGER NOT NULL, `Deleted` INTEGER NOT NULL, `Exclusive` INTEGER NOT NULL, `InstructionId` INTEGER, `AllowTextEntry` INTEGER NOT NULL, `ExclusionIds` TEXT, PRIMARY KEY(`RemoteId`))",
         "fields": [
           {
             "fieldPath": "mRemoteId",
@@ -1530,18 +1530,6 @@
           {
             "fieldPath": "mExclusionIds",
             "columnName": "ExclusionIds",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "mCollageId",
-            "columnName": "CollageId",
-            "affinity": "INTEGER",
-            "notNull": false
-          },
-          {
-            "fieldPath": "mBitmapPath",
-            "columnName": "BitmapPath",
             "affinity": "TEXT",
             "notNull": false
           }
@@ -2948,7 +2936,7 @@
       },
       {
         "tableName": "Collages",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `QuestionId` INTEGER, `Position` INTEGER, `Deleted` INTEGER NOT NULL, PRIMARY KEY(`RemoteId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Name` TEXT, `Deleted` INTEGER NOT NULL, PRIMARY KEY(`RemoteId`))",
         "fields": [
           {
             "fieldPath": "mRemoteId",
@@ -2957,15 +2945,9 @@
             "notNull": true
           },
           {
-            "fieldPath": "mQuestionId",
-            "columnName": "QuestionId",
-            "affinity": "INTEGER",
-            "notNull": false
-          },
-          {
-            "fieldPath": "mPosition",
-            "columnName": "Position",
-            "affinity": "INTEGER",
+            "fieldPath": "mName",
+            "columnName": "Name",
+            "affinity": "TEXT",
             "notNull": false
           },
           {
@@ -2992,12 +2974,118 @@
           }
         ],
         "foreignKeys": []
+      },
+      {
+        "tableName": "OptionCollages",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `OptionInOptionSetId` INTEGER, `Position` INTEGER, `Deleted` INTEGER NOT NULL, `CollageId` INTEGER, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mOptionInOptionSetId",
+            "columnName": "OptionInOptionSetId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mPosition",
+            "columnName": "Position",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mCollageId",
+            "columnName": "CollageId",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_OptionCollages_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_OptionCollages_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "QuestionCollages",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `QuestionId` INTEGER, `CollageId` INTEGER, `Position` INTEGER, `Deleted` INTEGER NOT NULL, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mQuestionId",
+            "columnName": "QuestionId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mCollageId",
+            "columnName": "CollageId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mPosition",
+            "columnName": "Position",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_QuestionCollages_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_QuestionCollages_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          }
+        ],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'bad4f1fe0c1baf3dd55614e39e2c5f42')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd2fda0b08c66a12942aad356d747c37c')"
     ]
   }
 }

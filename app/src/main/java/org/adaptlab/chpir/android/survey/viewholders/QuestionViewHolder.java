@@ -9,9 +9,11 @@ import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.Editable;
+import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.util.LongSparseArray;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -31,7 +33,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.card.MaterialCardView;
+
 import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.adapters.ChoiceDiagramAdapter;
 import org.adaptlab.chpir.android.survey.adapters.QuestionDiagramAdapter;
 import org.adaptlab.chpir.android.survey.adapters.QuestionRelationAdapter;
 import org.adaptlab.chpir.android.survey.entities.ConditionSkip;
@@ -41,10 +46,13 @@ import org.adaptlab.chpir.android.survey.entities.Option;
 import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.Response;
 import org.adaptlab.chpir.android.survey.entities.Survey;
+import org.adaptlab.chpir.android.survey.relations.CollageRelation;
 import org.adaptlab.chpir.android.survey.relations.InstructionRelation;
+import org.adaptlab.chpir.android.survey.relations.OptionCollageRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionSetOptionRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionSetRelation;
+import org.adaptlab.chpir.android.survey.relations.QuestionCollageRelation;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
 import org.adaptlab.chpir.android.survey.repositories.ResponseRepository;
 import org.adaptlab.chpir.android.survey.utils.ConstantUtils;
@@ -60,6 +68,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.ANY_NOT_SELECTED;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.BLANK;
@@ -176,7 +185,8 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     }
 
     List<OptionRelation> getOptionRelations() {
-        if (getQuestion().isCarryForward()) {
+        if (getQuestion().isCarryForward() &&
+                !(getCarryForwardQuestion().getQuestionType().equals(Question.CHOICE_TASK))) {
             return mCarryForwardOptionRelations;
         } else {
             return mOptionRelations;
@@ -195,8 +205,13 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         return getSurveyViewModel().getResponses().get(getQuestion().getCarryForwardIdentifier());
     }
 
+    private Question getCarryForwardQuestion() {
+        return getSurveyViewModel().getQuestionsMap().get(getQuestion().getCarryForwardIdentifier());
+    }
+
     void toggleCarryForward(View view, int optionId) {
-        if (getQuestion().isCarryForward()) {
+        if (getQuestion().isCarryForward() &&
+                !(getCarryForwardQuestion().getQuestionType().equals(Question.CHOICE_TASK))) {
             ArrayList<Integer> responseIndices = new ArrayList<>();
             String[] listOfIndices = getCarryForwardResponse().getText().split(COMMA);
             for (String index : listOfIndices) {
@@ -717,20 +732,105 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     }
 
     private void setQuestionDiagrams() {
-        if (mQuestionRelation.collages.size() > 0) {
+        List<QuestionCollageRelation> questionCollageRelations = mQuestionRelation.questionCollages.stream()
+                .filter(questionCollageRelation -> !questionCollageRelation.questionCollage.isDeleted())
+                .collect(Collectors.toList());
+        if (questionCollageRelations.size() > 0) {
             mGridViewLayout.setVisibility(View.VISIBLE);
-            for (int k = 0; k < mQuestionRelation.collages.size(); k++) {
+            for (int k = 0; k < questionCollageRelations.size(); k++) {
                 LinearLayout layout = (LinearLayout) LayoutInflater.from(mContext).inflate(
                         R.layout.list_item_question_grid_view, null, false);
                 GridView gridView = layout.findViewById(R.id.gridView);
-                gridView.setNumColumns(mQuestionRelation.collages.get(k).diagrams.size());
+                CollageRelation collageRelation = questionCollageRelations.get(k).collages.get(0);
+                gridView.setNumColumns(collageRelation.diagrams.size());
                 QuestionDiagramAdapter adapter = new QuestionDiagramAdapter(mContext, mQuestionRelation,
-                        mQuestionRelation.collages.get(k), mSurveyViewModel);
+                        collageRelation, mSurveyViewModel);
                 gridView.setAdapter(adapter);
                 ViewGroup.LayoutParams layoutParams = mGridViewLayout.getLayoutParams();
                 layoutParams.width = adapter.getViewWidth();
                 mGridViewLayout.setLayoutParams(layoutParams);
                 mGridViewLayout.addView(layout);
+            }
+        }
+
+        // Choice task carry forward
+        setCarryForwardDiagrams();
+    }
+
+    private void setCarryForwardDiagrams() {
+        if (mQuestionRelation.question.isCarryForward()) {
+            if (getCarryForwardQuestion().getQuestionType().equals(Question.CHOICE_TASK)) {
+                if (!getCarryForwardResponse().getText().isEmpty()) {
+                    String[] listOfIndices = getCarryForwardResponse().getText().split(COMMA);
+                    int best = Integer.parseInt(listOfIndices[0]);
+
+                    mGridViewLayout.setVisibility(View.VISIBLE);
+                    DisplayMetrics displayMetrics = new DisplayMetrics();
+                    ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+
+                    LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    LinearLayout imageLayout = (LinearLayout) inflater.inflate(R.layout.choice_task, null);
+                    for (final OptionRelation optionRelation : mCarryForwardOptionRelations) {
+                        OptionSetOptionRelation relation = null;
+                        for (OptionSetOptionRelation optionSetOptionRelation :
+                                getQuestionRelation().carryForwardOptionSets.get(0).optionSetOptions) {
+                            if (optionSetOptionRelation.optionSetOption.getOptionRemoteId()
+                                    .equals(optionRelation.option.getRemoteId())) {
+                                relation = optionSetOptionRelation;
+                            }
+                        }
+                        if (relation == null) return;
+
+                        int index = mCarryForwardOptionRelations.indexOf(optionRelation);
+                        LinearLayout linearLayout;
+                        TextView textView;
+                        MaterialCardView cardView;
+                        if (index == 0) {
+                            cardView = imageLayout.findViewById(R.id.leftCardView);
+                            linearLayout = imageLayout.findViewById(R.id.leftLayout);
+                            textView = imageLayout.findViewById(R.id.leftTitle);
+                        } else if (index == 1) {
+                            cardView = imageLayout.findViewById(R.id.middleCardView);
+                            linearLayout = imageLayout.findViewById(R.id.middleLayout);
+                            textView = imageLayout.findViewById(R.id.middleTitle);
+                        } else {
+                            cardView = imageLayout.findViewById(R.id.rightCardView);
+                            linearLayout = imageLayout.findViewById(R.id.rightLayout);
+                            textView = imageLayout.findViewById(R.id.rightTitle);
+                        }
+                        cardView.setId(index);
+
+                        String text = TranslationUtil.getText(optionRelation.option, optionRelation.translations, getSurveyViewModel());
+                        textView.setText(styleTextWithHtmlWhitelist(text));
+
+                        for (OptionCollageRelation optionCollageRelation : relation.optionCollages) {
+                            for (CollageRelation collageRelation : optionCollageRelation.collages) {
+                                GridView gridView = (GridView) inflater.inflate(R.layout.list_item_option_grid_view, null);
+                                gridView.setNumColumns(collageRelation.diagrams.size());
+                                gridView.setAdapter(new ChoiceDiagramAdapter(getContext(), getQuestionRelation(),
+                                        collageRelation.diagrams, getSurveyViewModel(), mCarryForwardOptionRelations.size()));
+                                LinearLayout gridViewLayout = new LinearLayout(getContext());
+                                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                                        LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                                layoutParams.setMargins(0, 0, 0, 5);
+                                gridViewLayout.addView(gridView, layoutParams);
+                                linearLayout.addView(gridViewLayout);
+                            }
+                        }
+
+                        if (best == index) {
+                            cardView.setCheckable(true);
+                            cardView.setChecked(true);
+                            cardView.setCardForegroundColor(getContext().getColorStateList(R.color.first));
+                        } else {
+                            cardView.setCheckable(false);
+                            cardView.setChecked(false);
+                            cardView.setCardForegroundColor(getContext().getColorStateList(R.color.third));
+                        }
+                    }
+                    mGridViewLayout.addView(imageLayout);
+
+                }
             }
         }
     }
@@ -845,6 +945,17 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                             text = getQuestion().getText().replace(getQuestion().getTextToReplace(), responseText);
                         }
                     }
+                }
+            }
+        }
+        if (mQuestionRelation.question.isCarryForward()) {
+            if (getCarryForwardQuestion().getQuestionType().equals(Question.CHOICE_TASK)) {
+                if (!getCarryForwardResponse().getText().isEmpty()) {
+                    String[] listOfIndices = getCarryForwardResponse().getText().split(COMMA);
+                    String best = listOfIndices[0];
+                    OptionRelation optionRelation = mCarryForwardOptionRelations.get(Integer.parseInt(best));
+                    text = getQuestion().getText().replaceFirst("\\[followup\\]",
+                            Html.fromHtml(optionRelation.option.getText()).toString().trim());
                 }
             }
         }

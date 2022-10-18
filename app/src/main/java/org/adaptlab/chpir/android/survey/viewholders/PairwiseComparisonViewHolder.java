@@ -55,8 +55,8 @@ public class PairwiseComparisonViewHolder extends QuestionViewHolder {
             } else {
                 linearLayout = imageLayout.findViewById(R.id.rightLayout);
             }
-            if (!relation.collages.isEmpty()) {
-                List<DiagramRelation> diagramRelations = relation.collages.get(0).diagrams;
+            if (!relation.optionCollages.isEmpty()) {
+                List<DiagramRelation> diagramRelations = relation.optionCollages.get(0).collages.get(0).diagrams;
                 for (int k = 0; k < diagramRelations.size(); k++) {
                     DiagramRelation diagramRelation = diagramRelations.get(k);
                     BitmapFactory.Options options = new BitmapFactory.Options();

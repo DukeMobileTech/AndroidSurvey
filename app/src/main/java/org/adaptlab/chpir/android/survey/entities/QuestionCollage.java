@@ -14,16 +14,22 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity(tableName = "Collages")
-public class Collage implements SurveyEntity {
+@Entity(tableName = "QuestionCollages")
+public class QuestionCollage implements SurveyEntity {
     @PrimaryKey
     @NonNull
     @SerializedName("id")
     @ColumnInfo(name = "RemoteId", index = true)
     private Long mRemoteId;
-    @SerializedName("name")
-    @ColumnInfo(name = "Name")
-    private String mName;
+    @SerializedName("question_id")
+    @ColumnInfo(name = "QuestionId")
+    private Long mQuestionId;
+    @SerializedName("collage_id")
+    @ColumnInfo(name = "CollageId")
+    private Long mCollageId;
+    @SerializedName("position")
+    @ColumnInfo(name = "Position")
+    private Integer mPosition;
     @SerializedName("deleted_at")
     @ColumnInfo(name = "Deleted")
     private boolean mDeleted;
@@ -37,17 +43,33 @@ public class Collage implements SurveyEntity {
         this.mRemoteId = mRemoteId;
     }
 
-    public String getName() {
-        return mName;
+    public Long getQuestionId() {
+        return mQuestionId;
     }
 
-    public void setName(String name) {
-        this.mName = name;
+    public void setQuestionId(Long id) {
+        this.mQuestionId = id;
+    }
+
+    public Integer getPosition() {
+        return mPosition;
+    }
+
+    public void setPosition(Integer id) {
+        this.mPosition = id;
+    }
+
+    public Long getCollageId() {
+        return mCollageId;
+    }
+
+    public void setCollageId(Long id) {
+        this.mCollageId = id;
     }
 
     @Override
     public Type getType() {
-        return new TypeToken<ArrayList<Collage>>() {
+        return new TypeToken<ArrayList<QuestionCollage>>() {
         }.getType();
     }
 

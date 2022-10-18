@@ -54,6 +54,7 @@ public class Question implements SurveyEntity, Translatable, BitmapEntity {
     public static final String SIGNATURE = "SIGNATURE";
     public static final String AUDIO = "AUDIO";
     public static final String PAIRWISE_COMPARISON = "PAIRWISE_COMPARISON";
+    public static final String CHOICE_TASK = "CHOICE_TASK";
 
     @PrimaryKey
     @NonNull
@@ -569,7 +570,8 @@ public class Question implements SurveyEntity, Translatable, BitmapEntity {
             FREE_RESPONSE, SLIDER, FRONT_PICTURE, REAR_PICTURE, DATE, RATING, TIME, LIST_OF_TEXT_BOXES,
             INTEGER, EMAIL_ADDRESS, DECIMAL_NUMBER, INSTRUCTIONS, MONTH_AND_YEAR, YEAR, PHONE_NUMBER,
             ADDRESS, SELECT_ONE_IMAGE, SELECT_MULTIPLE_IMAGES, LIST_OF_INTEGER_BOXES, LABELED_SLIDER,
-            GEO_LOCATION, DROP_DOWN, RANGE, SUM_OF_PARTS, SIGNATURE, AUDIO, PAIRWISE_COMPARISON})
+            GEO_LOCATION, DROP_DOWN, RANGE, SUM_OF_PARTS, SIGNATURE, AUDIO, PAIRWISE_COMPARISON,
+            CHOICE_TASK})
     public @interface QuestionType {
     }
 

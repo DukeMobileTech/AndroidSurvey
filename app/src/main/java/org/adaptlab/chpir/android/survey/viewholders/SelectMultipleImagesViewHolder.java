@@ -16,6 +16,7 @@ import com.google.android.material.card.MaterialCardView;
 
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.adapters.OptionDiagramAdapter;
+import org.adaptlab.chpir.android.survey.relations.DiagramRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionSetOptionRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionSetRelation;
@@ -51,9 +52,10 @@ public class SelectMultipleImagesViewHolder extends QuestionViewHolder {
             for (final OptionRelation optionRelation : optionRelations) {
                 OptionSetOptionRelation relation = getOptionSetOptionRelation(optionRelation);
                 GridView gridView = (GridView) inflater.inflate(R.layout.list_item_option_grid_view, null);
-                gridView.setNumColumns(relation.collages.get(0).diagrams.size());
+                List<DiagramRelation> diagrams = relation.optionCollages.get(0).collages.get(0).diagrams;
+                gridView.setNumColumns(diagrams.size());
                 gridView.setAdapter(new OptionDiagramAdapter(getContext(), getQuestionRelation(),
-                        relation, getSurveyViewModel()));
+                        diagrams, getSurveyViewModel()));
                 View view = inflater.inflate(R.layout.list_item_collage, null);
                 final MaterialCardView cardView = view.findViewById(R.id.materialCardView);
                 cardView.setId(optionRelations.indexOf(optionRelation));
@@ -134,11 +136,6 @@ public class SelectMultipleImagesViewHolder extends QuestionViewHolder {
                     MaterialCardView cardView = mCardViews.get(indexInteger);
                     cardView.setChecked(true);
                     cardView.setSelected(true);
-
-//                    if (mResponseIndices.size() == 1) {
-//                        cardView.setCheckedIcon(getContext().getDrawable(R.drawable.ic_baseline_cancel_24));
-//                    }
-
                     mResponseIndices.add(indexInteger);
                 }
             }

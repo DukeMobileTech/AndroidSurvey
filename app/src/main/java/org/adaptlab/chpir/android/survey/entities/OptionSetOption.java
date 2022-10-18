@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity(tableName = "OptionSetOptions")
-public class OptionSetOption implements SurveyEntity, BitmapEntity {
+public class OptionSetOption implements SurveyEntity {
     @PrimaryKey
     @NonNull
     @SerializedName("id")
@@ -48,11 +48,6 @@ public class OptionSetOption implements SurveyEntity, BitmapEntity {
     @SerializedName("exclusion_ids")
     @ColumnInfo(name = "ExclusionIds")
     private String mExclusionIds;
-    @SerializedName("collage_id")
-    @ColumnInfo(name = "CollageId")
-    private Long mCollageId;
-    @ColumnInfo(name = "BitmapPath")
-    private String mBitmapPath;
 
     @NonNull
     public Long getRemoteId() {
@@ -111,39 +106,6 @@ public class OptionSetOption implements SurveyEntity, BitmapEntity {
         this.mExclusive = mExclusive;
     }
 
-    public Long getCollageId() {
-        return mCollageId;
-    }
-
-    public void setCollageId(Long id) {
-        this.mCollageId = id;
-    }
-
-    public String getBitmapPath() {
-        return mBitmapPath;
-    }
-
-    public void setBitmapPath(String path) {
-        this.mBitmapPath = path;
-    }
-
-    @Override
-    public Type getType() {
-        return new TypeToken<ArrayList<OptionSetOption>>() {
-        }.getType();
-    }
-
-    @Override
-    public List<? extends SurveyEntity> getTranslations() {
-        return null;
-    }
-
-    @Override
-    public void save(BaseDao dao, List list) {
-        dao.updateAll(list);
-        dao.insertAll(list);
-    }
-
     public Long getInstructionId() {
         return mInstructionId;
     }
@@ -166,5 +128,22 @@ public class OptionSetOption implements SurveyEntity, BitmapEntity {
 
     public void setExclusionIds(String mExclusionIds) {
         this.mExclusionIds = mExclusionIds;
+    }
+
+    @Override
+    public Type getType() {
+        return new TypeToken<ArrayList<OptionSetOption>>() {
+        }.getType();
+    }
+
+    @Override
+    public List<? extends SurveyEntity> getTranslations() {
+        return null;
+    }
+
+    @Override
+    public void save(BaseDao dao, List list) {
+        dao.updateAll(list);
+        dao.insertAll(list);
     }
 }

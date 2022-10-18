@@ -34,12 +34,14 @@ import org.adaptlab.chpir.android.survey.daos.InstrumentTranslationDao;
 import org.adaptlab.chpir.android.survey.daos.LoopQuestionDao;
 import org.adaptlab.chpir.android.survey.daos.MultipleSkipDao;
 import org.adaptlab.chpir.android.survey.daos.NextQuestionDao;
+import org.adaptlab.chpir.android.survey.daos.OptionCollageDao;
 import org.adaptlab.chpir.android.survey.daos.OptionDao;
 import org.adaptlab.chpir.android.survey.daos.OptionSetDao;
 import org.adaptlab.chpir.android.survey.daos.OptionSetOptionDao;
 import org.adaptlab.chpir.android.survey.daos.OptionSetTranslationDao;
 import org.adaptlab.chpir.android.survey.daos.OptionTranslationDao;
 import org.adaptlab.chpir.android.survey.daos.ProjectDao;
+import org.adaptlab.chpir.android.survey.daos.QuestionCollageDao;
 import org.adaptlab.chpir.android.survey.daos.QuestionDao;
 import org.adaptlab.chpir.android.survey.daos.QuestionTranslationDao;
 import org.adaptlab.chpir.android.survey.daos.ResponseDao;
@@ -70,12 +72,14 @@ import org.adaptlab.chpir.android.survey.entities.LoopQuestion;
 import org.adaptlab.chpir.android.survey.entities.MultipleSkip;
 import org.adaptlab.chpir.android.survey.entities.NextQuestion;
 import org.adaptlab.chpir.android.survey.entities.Option;
+import org.adaptlab.chpir.android.survey.entities.OptionCollage;
 import org.adaptlab.chpir.android.survey.entities.OptionSet;
 import org.adaptlab.chpir.android.survey.entities.OptionSetOption;
 import org.adaptlab.chpir.android.survey.entities.OptionSetTranslation;
 import org.adaptlab.chpir.android.survey.entities.OptionTranslation;
 import org.adaptlab.chpir.android.survey.entities.Project;
 import org.adaptlab.chpir.android.survey.entities.Question;
+import org.adaptlab.chpir.android.survey.entities.QuestionCollage;
 import org.adaptlab.chpir.android.survey.entities.QuestionTranslation;
 import org.adaptlab.chpir.android.survey.entities.Response;
 import org.adaptlab.chpir.android.survey.entities.ScoreScheme;
@@ -99,7 +103,7 @@ import java.util.UUID;
         OptionSetTranslation.class, OptionTranslation.class, ConditionSkip.class, DeviceUser.class,
         FollowUpQuestion.class, MultipleSkip.class, NextQuestion.class, Survey.class, Response.class,
         SurveyNote.class, ScoreScheme.class, Domain.class, Subdomain.class, SurveyScore.class, Task.class,
-        Diagram.class, Collage.class},
+        Diagram.class, Collage.class, OptionCollage.class, QuestionCollage.class},
         version = SurveyRoomDatabase.DATABASE_VERSION, exportSchema = true)
 @TypeConverters({Converters.class})
 public abstract class SurveyRoomDatabase extends RoomDatabase {
@@ -269,6 +273,10 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
     public abstract DiagramDao diagramDao();
 
     public abstract CollageDao collageDao();
+
+    public abstract OptionCollageDao optionCollageDao();
+
+    public abstract QuestionCollageDao questionCollageDao();
 
     private static class CreateSettingsInstanceTask extends AsyncTask<Void, Void, Void> {
         private final SettingsDao mSettingsDao;

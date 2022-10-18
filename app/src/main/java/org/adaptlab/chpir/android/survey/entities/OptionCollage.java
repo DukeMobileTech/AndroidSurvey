@@ -14,19 +14,25 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity(tableName = "Collages")
-public class Collage implements SurveyEntity {
+@Entity(tableName = "OptionCollages")
+public class OptionCollage implements SurveyEntity {
     @PrimaryKey
     @NonNull
     @SerializedName("id")
     @ColumnInfo(name = "RemoteId", index = true)
     private Long mRemoteId;
-    @SerializedName("name")
-    @ColumnInfo(name = "Name")
-    private String mName;
+    @SerializedName("option_in_option_set_id")
+    @ColumnInfo(name = "OptionInOptionSetId")
+    private Long mOptionInOptionSetId;
+    @SerializedName("position")
+    @ColumnInfo(name = "Position")
+    private Integer mPosition;
     @SerializedName("deleted_at")
     @ColumnInfo(name = "Deleted")
     private boolean mDeleted;
+    @SerializedName("collage_id")
+    @ColumnInfo(name = "CollageId")
+    private Long mCollageId;
 
     @NonNull
     public Long getRemoteId() {
@@ -37,17 +43,33 @@ public class Collage implements SurveyEntity {
         this.mRemoteId = mRemoteId;
     }
 
-    public String getName() {
-        return mName;
+    public Integer getPosition() {
+        return mPosition;
     }
 
-    public void setName(String name) {
-        this.mName = name;
+    public void setPosition(Integer id) {
+        this.mPosition = id;
+    }
+
+    public Long getOptionInOptionSetId() {
+        return mOptionInOptionSetId;
+    }
+
+    public void setOptionInOptionSetId(Long optionInOptionSetId) {
+        this.mOptionInOptionSetId = optionInOptionSetId;
+    }
+
+    public Long getCollageId() {
+        return mCollageId;
+    }
+
+    public void setCollageId(Long collageId) {
+        this.mCollageId = collageId;
     }
 
     @Override
     public Type getType() {
-        return new TypeToken<ArrayList<Collage>>() {
+        return new TypeToken<ArrayList<OptionCollage>>() {
         }.getType();
     }
 
