@@ -13,7 +13,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import org.adaptlab.chpir.android.survey.relations.DiagramRelation;
-import org.adaptlab.chpir.android.survey.relations.OptionSetOptionRelation;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
 import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
 
@@ -74,25 +73,26 @@ public class OptionDiagramAdapter extends BaseAdapter {
         mWidths = new ArrayList<>();
         mHeights = new ArrayList<>();
         mBitmaps = new ArrayList<>();
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inScaled = true;
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        ((Activity) mContext).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int rightMargin = (int) (displayMetrics.widthPixels * 0.1);
+        int availableWidth = displayMetrics.widthPixels - 32 - rightMargin;
         for (int k = 0; k < mDiagramRelations.size(); k++) {
             DiagramRelation diagramRelation = mDiagramRelations.get(k);
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inScaled = true;
             Bitmap bitmap = BitmapFactory.decodeFile(getPath(diagramRelation), options);
-            DisplayMetrics displayMetrics = new DisplayMetrics();
-            ((Activity) mContext).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-            int rightMargin = (int) (displayMetrics.widthPixels * 0.1);
-            int width = displayMetrics.widthPixels - 32 - rightMargin;
             int height = bitmap.getHeight();
-            double imageViewWidth = (width - (width * 0.1)) / mDiagramRelations.size();
+            int width = bitmap.getWidth();
+            double imageViewWidth = (availableWidth - (availableWidth * 0.1)) / mDiagramRelations.size();
             double targetHeight = displayMetrics.heightPixels * 0.1;
             Log.i(TAG, "Target width: " + imageViewWidth + " Actual width: " + bitmap.getWidth());
             Log.i(TAG, "Target height: " + targetHeight + " Actual height: " + bitmap.getHeight());
             // Scale based on height
-            if (targetHeight > bitmap.getHeight()) {
-                double scale = targetHeight / bitmap.getHeight();
-                width = (int) Math.round(bitmap.getWidth() * scale);
-                height = (int) Math.round(bitmap.getHeight() * scale);
+            if (targetHeight > height) {
+                double scale = targetHeight / height;
+                width = (int) Math.round(width * scale);
+                height = (int) Math.round(height * scale);
             }
             mBitmaps.add(bitmap);
             mHeights.add(height);
@@ -137,13 +137,13 @@ public class OptionDiagramAdapter extends BaseAdapter {
         return linearLayout;
     }
 
-//    @Override
-//    public boolean areAllItemsEnabled() {
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean isEnabled(int position) {
-//        return false;
-//    }
+    @Override
+    public boolean areAllItemsEnabled() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled(int position) {
+        return false;
+    }
 }

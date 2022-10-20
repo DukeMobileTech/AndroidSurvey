@@ -50,16 +50,22 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-//    flavorDimensions 'wci'
-//
-//    productFlavors {
-//        wci {
-//            dimension 'wci'
-//            applicationIdSuffix '.wci'
-//            versionCode 33
-//            versionName '0.0.27'
-//        }
-//    }
+    flavorDimensions 'dce'
+
+    productFlavors {
+        dce {
+            dimension 'dce'
+            applicationIdSuffix '.dce'
+            versionCode 34
+            versionName '0.0.28'
+        }
+        wci {
+            dimension 'wci'
+            applicationIdSuffix '.wci'
+            versionCode 33
+            versionName '0.0.27'
+        }
+    }
 
 }
 

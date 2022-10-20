@@ -78,31 +78,40 @@ public class QuestionDiagramAdapter extends BaseAdapter {
         mBitmaps = new ArrayList<>();
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) mContext).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inScaled = true;
         mDisplayWidth = displayMetrics.widthPixels - 32;
+        double targetHeight = displayMetrics.heightPixels * 0.1;
+        double targetWidth = ((mDisplayWidth - (mDisplayWidth * 0.1)) / mDiagramRelations.size());
         for (int k = 0; k < mDiagramRelations.size(); k++) {
             DiagramRelation diagramRelation = mDiagramRelations.get(k);
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inScaled = true;
             Bitmap bitmap = BitmapFactory.decodeFile(getPath(diagramRelation), options);
             int height = bitmap.getHeight();
-            int imageViewWidth = (int) ((mDisplayWidth - (mDisplayWidth * 0.1)) / mDiagramRelations.size());
-            double targetHeight = displayMetrics.heightPixels * 0.1;
-            Log.i(TAG, "Target width: " + imageViewWidth + " Actual width: " + bitmap.getWidth());
+            int width = bitmap.getWidth();
+            Log.i(TAG, "Target width: " + targetWidth + " Actual width: " + bitmap.getWidth());
             Log.i(TAG, "Target height: " + targetHeight + " Actual height: " + bitmap.getHeight());
             // Scale based on height
-            if (targetHeight > bitmap.getHeight()) {
-                double scale = targetHeight / bitmap.getHeight();
-                imageViewWidth = (int) Math.round(bitmap.getWidth() * scale);
-                height = (int) Math.round(bitmap.getHeight() * scale);
+            if (targetHeight > height) {
+                double scale = targetHeight / height;
+                width = (int) Math.round(width * scale);
+                height = (int) Math.round(height * scale);
             }
-//            if (imageViewWidth > bitmap.getWidth()) {
-//                double scale = imageViewWidth / bitmap.getWidth();
-//                width = (int) Math.round(bitmap.getWidth() * scale);
-//                height = (int) Math.round(bitmap.getHeight() * scale);
+            // TODO : Use different target widths for each image
+            // default to original sizes
+//            if (width > targetWidth) {
+//                if (bitmap.getWidth() > targetWidth) {
+//                    double scale = bitmap.getWidth() / targetWidth;
+//                    width = (int) Math.round(bitmap.getWidth() * scale);
+//                    height = (int) Math.round(bitmap.getHeight() * scale);
+//                }
+//                else {
+//                    height = bitmap.getHeight();
+//                    width = bitmap.getWidth();
+//                }
 //            }
             mBitmaps.add(bitmap);
             mHeights.add(height);
-            mWidths.add(imageViewWidth);
+            mWidths.add(width);
         }
         mHeight = Collections.max(mHeights);
         for (int imgWidth : mWidths) {
@@ -145,5 +154,15 @@ public class QuestionDiagramAdapter extends BaseAdapter {
 
     public int getViewWidth() {
         return Math.min(mLayoutWidth, mDisplayWidth);
+    }
+
+    @Override
+    public boolean areAllItemsEnabled() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled(int position) {
+        return false;
     }
 }
