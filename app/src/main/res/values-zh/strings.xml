@@ -205,4 +205,8 @@
     <string name="image">Image</string>
     <string name="_5">5</string>
     <string name="_0">0</string>
+    <string name="a5">A5</string>
+    <string name="b5">B5</string>
+    <string name="a">A</string>
+    <string name="b">B</string>
 </resources>

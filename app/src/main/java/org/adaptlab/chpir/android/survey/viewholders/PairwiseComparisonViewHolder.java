@@ -13,7 +13,6 @@ import android.widget.LinearLayout;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.google.android.material.slider.LabelFormatter;
 import com.google.android.material.slider.Slider;
 
 import org.adaptlab.chpir.android.survey.R;
@@ -85,8 +84,15 @@ public class PairwiseComparisonViewHolder extends QuestionViewHolder {
 
         View sliderLayout = inflater.inflate(R.layout.slider, null);
         mSlider = sliderLayout.findViewById(R.id.discreteSlider);
-        LabelFormatter formatter = value -> Math.abs((int) value) + "";
-        mSlider.setLabelFormatter(formatter);
+        mSlider.setLabelFormatter(value -> {
+            if (value < 0) {
+                return "A" + Math.abs((int) value);
+            } else if (value > 0) {
+                return "B" + Math.abs((int) value);
+            } else {
+                return "0";
+            }
+        });
         mSlider.addOnChangeListener((slider, value, fromUser) -> {
             mProgress = value;
             saveResponse();
