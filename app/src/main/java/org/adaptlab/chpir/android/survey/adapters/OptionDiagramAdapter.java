@@ -12,6 +12,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.relations.DiagramRelation;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
 import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
@@ -65,7 +66,7 @@ public class OptionDiagramAdapter extends BaseAdapter {
                         optionIdentifier + ".png";
             }
         }
-        Log.i(TAG, "PATH: " + path);
+        if (BuildConfig.DEBUG) Log.i(TAG, "PATH: " + path);
         return path;
     }
 
@@ -86,8 +87,10 @@ public class OptionDiagramAdapter extends BaseAdapter {
             int width = bitmap.getWidth();
             double imageViewWidth = (availableWidth - (availableWidth * 0.1)) / mDiagramRelations.size();
             double targetHeight = displayMetrics.heightPixels * 0.1;
-            Log.i(TAG, "Target width: " + imageViewWidth + " Actual width: " + bitmap.getWidth());
-            Log.i(TAG, "Target height: " + targetHeight + " Actual height: " + bitmap.getHeight());
+            if (BuildConfig.DEBUG) {
+                Log.i(TAG, "Target width: " + imageViewWidth + " Actual width: " + bitmap.getWidth());
+                Log.i(TAG, "Target height: " + targetHeight + " Actual height: " + bitmap.getHeight());
+            }
             // Scale based on height
             if (targetHeight > height) {
                 double scale = targetHeight / height;

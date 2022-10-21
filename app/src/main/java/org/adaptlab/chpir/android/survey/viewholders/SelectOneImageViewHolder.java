@@ -2,6 +2,7 @@ package org.adaptlab.chpir.android.survey.viewholders;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.TextUtils;
@@ -70,6 +71,7 @@ public class SelectOneImageViewHolder extends QuestionViewHolder {
                     cardView.setSelected(!cardView.isSelected());
                     cardView.setChecked(!cardView.isChecked());
                     setResponseIndex(index, cardView.isChecked());
+                    setForeGroundSelection();
                 });
                 mCardViews.add(cardView);
                 questionComponent.addView(view);
@@ -110,6 +112,17 @@ public class SelectOneImageViewHolder extends QuestionViewHolder {
         }
     }
 
+    private void setForeGroundSelection() {
+        MaterialCardView materialCardView = new MaterialCardView(getContext());
+        ColorStateList colorStateList = materialCardView.getCardForegroundColor();
+        for (MaterialCardView cardView : mCardViews) {
+            if (cardView.isChecked()) {
+                cardView.setCardForegroundColor(getContext().getColorStateList(R.color.first));
+            } else {
+                cardView.setCardForegroundColor(colorStateList);
+            }
+        }
+    }
 
     private void setResponseIndex(int index, boolean status) {
         MaterialCardView cardView;
@@ -144,11 +157,22 @@ public class SelectOneImageViewHolder extends QuestionViewHolder {
             cardView.setChecked(true);
             cardView.setSelected(true);
             mResponseIndex = index;
+            cardView.setCardForegroundColor(getContext().getColorStateList(R.color.first));
         }
     }
 
     @Override
     protected void unSetResponse() {
+        mResponseIndex = -1;
+        MaterialCardView materialCardView = new MaterialCardView(getContext());
+        ColorStateList colorStateList = materialCardView.getCardForegroundColor();
+        for (MaterialCardView cardView : mCardViews) {
+            if (cardView.isChecked()) {
+                cardView.setChecked(false);
+                cardView.setSelected(false);
+                cardView.setCardForegroundColor(colorStateList);
+            }
+        }
     }
 
     @Override

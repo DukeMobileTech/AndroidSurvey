@@ -2,6 +2,7 @@ package org.adaptlab.chpir.android.survey.viewholders;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.DisplayMetrics;
@@ -70,6 +71,7 @@ public class SelectMultipleImagesViewHolder extends QuestionViewHolder {
                     cardView.setSelected(!cardView.isSelected());
                     cardView.setChecked(!cardView.isChecked());
                     setResponseIndex(index, cardView.isChecked());
+                    setForeGroundSelection();
                 });
 
                 mCardViews.add(cardView);
@@ -113,6 +115,18 @@ public class SelectMultipleImagesViewHolder extends QuestionViewHolder {
         saveResponse();
     }
 
+    private void setForeGroundSelection() {
+        MaterialCardView materialCardView = new MaterialCardView(getContext());
+        ColorStateList colorStateList = materialCardView.getCardForegroundColor();
+        for (MaterialCardView cardView : mCardViews) {
+            if (cardView.isChecked()) {
+                cardView.setCardForegroundColor(getContext().getColorStateList(R.color.first));
+            } else {
+                cardView.setCardForegroundColor(colorStateList);
+            }
+        }
+    }
+
     @Override
     protected String serialize() {
         return FormatUtils.arrayListToString(mResponseIndices);
@@ -136,6 +150,7 @@ public class SelectMultipleImagesViewHolder extends QuestionViewHolder {
                     MaterialCardView cardView = mCardViews.get(indexInteger);
                     cardView.setChecked(true);
                     cardView.setSelected(true);
+                    cardView.setCardForegroundColor(getContext().getColorStateList(R.color.first));
                     mResponseIndices.add(indexInteger);
                 }
             }
@@ -145,10 +160,13 @@ public class SelectMultipleImagesViewHolder extends QuestionViewHolder {
     @Override
     protected void unSetResponse() {
         mResponseIndices = new ArrayList<>();
+        MaterialCardView materialCardView = new MaterialCardView(getContext());
+        ColorStateList colorStateList = materialCardView.getCardForegroundColor();
         for (MaterialCardView cardView : mCardViews) {
             if (cardView.isChecked()) {
                 cardView.setChecked(false);
                 cardView.setSelected(false);
+                cardView.setCardForegroundColor(colorStateList);
             }
         }
     }
