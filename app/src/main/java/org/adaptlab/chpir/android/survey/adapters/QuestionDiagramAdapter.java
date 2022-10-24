@@ -5,7 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.DisplayMetrics;
-import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -68,7 +68,6 @@ public class QuestionDiagramAdapter extends BaseAdapter {
                         optionIdentifier + ".png";
             }
         }
-        Log.i(TAG, "PATH: " + path);
         return path;
     }
 
@@ -80,42 +79,46 @@ public class QuestionDiagramAdapter extends BaseAdapter {
         ((Activity) mContext).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inScaled = true;
-        mDisplayWidth = displayMetrics.widthPixels - 32;
-        double targetHeight = displayMetrics.heightPixels * 0.1;
-        double targetWidth = ((mDisplayWidth - (mDisplayWidth * 0.1)) / mDiagramRelations.size());
+        if (mDiagramRelations.size() == 2) {
+            mDisplayWidth = (int) (displayMetrics.widthPixels * 0.5);
+        } else {
+            mDisplayWidth = (int) (displayMetrics.widthPixels * 0.9);
+        }
         for (int k = 0; k < mDiagramRelations.size(); k++) {
             DiagramRelation diagramRelation = mDiagramRelations.get(k);
             Bitmap bitmap = BitmapFactory.decodeFile(getPath(diagramRelation), options);
             int height = bitmap.getHeight();
             int width = bitmap.getWidth();
-            Log.i(TAG, "Target width: " + targetWidth + " Actual width: " + bitmap.getWidth());
-            Log.i(TAG, "Target height: " + targetHeight + " Actual height: " + bitmap.getHeight());
             // Scale based on height
-            if (targetHeight > height) {
-                double scale = targetHeight / height;
-                width = (int) Math.round(width * scale);
-                height = (int) Math.round(height * scale);
-            }
-            // TODO : Use different target widths for each image
-            // default to original sizes
-//            if (width > targetWidth) {
-//                if (bitmap.getWidth() > targetWidth) {
-//                    double scale = bitmap.getWidth() / targetWidth;
-//                    width = (int) Math.round(bitmap.getWidth() * scale);
-//                    height = (int) Math.round(bitmap.getHeight() * scale);
-//                }
-//                else {
-//                    height = bitmap.getHeight();
-//                    width = bitmap.getWidth();
-//                }
+//            if (targetHeight > height) {
+//                double scale = targetHeight / height;
+//                width = (int) Math.round(width * scale);
+//                height = (int) Math.round(height * scale);
 //            }
             mBitmaps.add(bitmap);
             mHeights.add(height);
             mWidths.add(width);
         }
+
+        double total = 0.0;
+        for (int imgWidth : mWidths) {
+            total += imgWidth;
+        }
+        double remainder = mDisplayWidth - total;
+        for (int i = 0; i < mWidths.size(); i++) {
+            int width = mWidths.get(i);
+            double portion = (width / total) * remainder;
+            double newWidth = width + portion;
+            double scale = newWidth / width;
+            int width1 = (int) Math.round(width * scale);
+            int height1 = (int) Math.round(mHeights.get(i) * scale);
+            mWidths.set(i, width1);
+            mHeights.set(i, height1);
+        }
+
         mHeight = Collections.max(mHeights);
         for (int imgWidth : mWidths) {
-            mLayoutWidth += (imgWidth + (0.1 * mDisplayWidth));
+            mLayoutWidth += imgWidth;
         }
     }
 
@@ -139,13 +142,16 @@ public class QuestionDiagramAdapter extends BaseAdapter {
         LinearLayout linearLayout;
         if (convertView == null) {
             linearLayout = new LinearLayout(mContext);
-            ImageView imageView;
-            imageView = new ImageView(mContext);
+            ImageView imageView = new ImageView(mContext);
             Bitmap bitmap = Bitmap.createScaledBitmap(mBitmaps.get(position), mWidths.get(position),
                     mHeights.get(position), true);
             imageView.setImageBitmap(bitmap);
-            linearLayout.addView(imageView);
             linearLayout.setMinimumHeight(mHeight);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.gravity = Gravity.CENTER;
+            linearLayout.setLayoutParams(params);
+            linearLayout.addView(imageView);
         } else {
             linearLayout = (LinearLayout) convertView;
         }
