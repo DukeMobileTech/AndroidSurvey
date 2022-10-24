@@ -963,10 +963,19 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     }
 
     private void setOptionSetInstructionsText() {
-        if (mOptionSetInstruction != null && mOptionSetInstructionTextView != null) {
-            mOptionSetInstructionTextView.setText(styleTextWithHtml(mOptionSetInstruction.getText()));
+        if (mOptionSetInstruction != null && mOptionSetInstructionTextView != null &&
+                !mQuestionRelation.question.getQuestionType().equals(Question.PAIRWISE_COMPARISON)) {
+            mOptionSetInstructionTextView.setText(getOptionSetInstructions());
             mOptionSetInstructionTextView.setVisibility(View.VISIBLE);
         }
+    }
+
+    public String getOptionSetInstructions() {
+        String instructions = "";
+        if (mOptionSetInstruction != null) {
+            instructions = mOptionSetInstruction.getText();
+        }
+        return styleTextWithHtml(instructions).toString();
     }
 
     private void setSpecialResponseView() {

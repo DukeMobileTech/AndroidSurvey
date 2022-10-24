@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
@@ -83,6 +84,9 @@ public class PairwiseComparisonViewHolder extends QuestionViewHolder {
         questionComponent.addView(imageLayout);
 
         View sliderLayout = inflater.inflate(R.layout.slider, null);
+        TextView textView = sliderLayout.findViewById(R.id.beforeSliderTextView);
+        textView.setText(getOptionSetInstructions());
+
         mSlider = sliderLayout.findViewById(R.id.discreteSlider);
         mSlider.setLabelFormatter(value -> {
             if (value < 0) {
