@@ -413,6 +413,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         updateSkipData();
         mResponse.setTimeEnded(new Date());
         mResponse.setIdentifiesSurvey(getQuestion().isIdentifiesSurvey());
+        mSurveyViewModel.setResponse(getQuestion().getQuestionIdentifier(), mResponse);
         mResponseRepository.update(mResponse);
     }
 
@@ -763,7 +764,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                 if (!getCarryForwardResponse().getText().isEmpty()) {
                     String[] listOfIndices = getCarryForwardResponse().getText().split(COMMA);
                     int best = Integer.parseInt(listOfIndices[0]);
-
+                    mGridViewLayout.removeAllViews();
                     mGridViewLayout.setVisibility(View.VISIBLE);
                     DisplayMetrics displayMetrics = new DisplayMetrics();
                     ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -1081,7 +1082,9 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         if (questionRelation.carryForwardOptionSets.size() > 0) {
             OptionSetRelation optionSetRelation = questionRelation.carryForwardOptionSets.get(0);
             if (optionSetRelation != null && optionSetRelation.optionSetOptions != null) {
-                for (OptionSetOptionRelation relation : optionSetRelation.optionSetOptions) {
+                List<OptionSetOptionRelation> optionSetOptionRelations = optionSetRelation.optionSetOptions;
+                optionSetOptionRelations.sort((o1, o2) -> o1.optionSetOption.getPosition().compareTo(o2.optionSetOption.getPosition()));
+                for (OptionSetOptionRelation relation : optionSetOptionRelations) {
                     if (relation.options.size() > 0) {
                         mCarryForwardOptionRelations.add(relation.options.get(0));
                     }

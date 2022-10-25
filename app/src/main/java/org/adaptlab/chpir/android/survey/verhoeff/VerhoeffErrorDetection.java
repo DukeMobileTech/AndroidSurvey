@@ -54,7 +54,7 @@ public class VerhoeffErrorDetection {
         String[] splitString = checkString.split("-");
 
         int[] checkArray = new int[8];
-        int charToAscii = (int) splitString[0].charAt(0);
+        int charToAscii = splitString[0].charAt(0);
         checkArray[7] = charToAscii / 10;
         checkArray[6] = charToAscii % 10;
 

@@ -29,6 +29,8 @@ public class QuestionRelation {
     public List<OptionSetRelation> optionSets;
     @Relation(parentColumn = "RemoteSpecialOptionSetId", entityColumn = "RemoteId", entity = OptionSet.class)
     public List<OptionSetRelation> specialOptionSets;
+    @Relation(parentColumn = "CarryForwardIdentifier", entityColumn = "QuestionIdentifier", entity = Question.class)
+    public List<Question> carryForwardQuestions;
     @Relation(parentColumn = "CarryForwardOptionSetId", entityColumn = "RemoteId", entity = OptionSet.class)
     public List<OptionSetRelation> carryForwardOptionSets;
     @Relation(parentColumn = "QuestionIdentifier", entityColumn = "QuestionIdentifier", entity = NextQuestion.class)
@@ -45,6 +47,8 @@ public class QuestionRelation {
     public List<QuestionTranslation> translations;
     @Relation(parentColumn = "QuestionIdentifier", entityColumn = "QuestionIdentifier", entity = Response.class)
     public List<Response> responses;
+    @Relation(parentColumn = "CarryForwardIdentifier", entityColumn = "QuestionIdentifier", entity = Response.class)
+    public List<Response> carryForwardResponses;
     @Relation(parentColumn = "QuestionId", entityColumn = "QuestionId", entity = QuestionCollage.class)
     public List<QuestionCollageRelation> questionCollages;
 }

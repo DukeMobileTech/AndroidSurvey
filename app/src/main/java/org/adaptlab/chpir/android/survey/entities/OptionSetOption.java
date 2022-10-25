@@ -23,7 +23,7 @@ public class OptionSetOption implements SurveyEntity {
     private Long mRemoteId;
     @SerializedName("number_in_question")
     @ColumnInfo(name = "Position")
-    private int mPosition;
+    private Integer mPosition;
     @SerializedName("option_set_id")
     @ColumnInfo(name = "OptionSetRemoteId", index = true)
     private Long mOptionSetRemoteId;
@@ -58,11 +58,11 @@ public class OptionSetOption implements SurveyEntity {
         this.mRemoteId = mRemoteId;
     }
 
-    public int getPosition() {
+    public Integer getPosition() {
         return mPosition;
     }
 
-    public void setPosition(int mPosition) {
+    public void setPosition(Integer mPosition) {
         this.mPosition = mPosition;
     }
 

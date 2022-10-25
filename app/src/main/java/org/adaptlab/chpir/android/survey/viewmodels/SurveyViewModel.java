@@ -267,6 +267,10 @@ public class SurveyViewModel extends AndroidViewModel {
         mResponses = map;
     }
 
+    public void setResponse(String questionIdentifier, Response response) {
+        mResponses.put(questionIdentifier, response);
+    }
+
     public String getDeviceLanguage() {
         return mDeviceLanguage;
     }

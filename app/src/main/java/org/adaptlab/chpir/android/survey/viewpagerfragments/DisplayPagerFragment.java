@@ -2,6 +2,7 @@ package org.adaptlab.chpir.android.survey.viewpagerfragments;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -334,6 +335,11 @@ public class DisplayPagerFragment extends Fragment {
                         if (response.getSurveyUUID().equals(mSurveyUUID)) {
                             if (mDisplayViewModel.getResponse(response.getQuestionIdentifier()) == null) {
                                 mDisplayViewModel.setResponse(response.getQuestionIdentifier(), response);
+                                mDisplayViewModel.setQuestion(response.getQuestionIdentifier(), questionRelation);
+                            }
+                            Response followUp = mSurveyViewModel.getResponses().get(questionRelation.question.getCarryForwardIdentifier());
+                            if (followUp != null && !followUp.getText().isEmpty()) {
+                                questionRelation.question.setCarriedForwardText(followUp, questionRelation);
                                 mDisplayViewModel.setQuestion(response.getQuestionIdentifier(), questionRelation);
                             }
                             break;

@@ -20,13 +20,24 @@ public class QuestionRelationAdapter extends ListAdapter<QuestionRelation, Quest
 
     private static final DiffUtil.ItemCallback<QuestionRelation> DIFF_CALLBACK = new DiffUtil.ItemCallback<QuestionRelation>() {
         @Override
-        public boolean areItemsTheSame(@NonNull QuestionRelation oldQuestionRelation, @NonNull QuestionRelation newQuestionRelation) {
-            return oldQuestionRelation.question.getQuestionIdentifier().equals(newQuestionRelation.question.getQuestionIdentifier());
+        public boolean areItemsTheSame(@NonNull QuestionRelation oldItem, @NonNull QuestionRelation newItem) {
+            if (oldItem.carryForwardResponses.isEmpty() && newItem.carryForwardResponses.isEmpty()) {
+                return oldItem.question.getQuestionIdentifier().equals(newItem.question.getQuestionIdentifier());
+            } else {
+                return oldItem.carryForwardResponses.get(0).getQuestionIdentifier().equals(
+                        newItem.carryForwardResponses.get(0).getQuestionIdentifier()) &&
+                        oldItem.question.getQuestionIdentifier().equals(newItem.question.getQuestionIdentifier());
+            }
         }
 
         @Override
-        public boolean areContentsTheSame(@NonNull QuestionRelation oldQuestionRelation, @NonNull QuestionRelation newQuestionRelation) {
-            return oldQuestionRelation.question.getQuestionIdentifier().equals(newQuestionRelation.question.getQuestionIdentifier());
+        public boolean areContentsTheSame(@NonNull QuestionRelation oldItem, @NonNull QuestionRelation newItem) {
+            if (oldItem.carryForwardResponses.isEmpty() && newItem.carryForwardResponses.isEmpty()) {
+                return oldItem.question.getText().equals(newItem.question.getText());
+            } else {
+                return oldItem.carryForwardResponses.get(0).getText().equals(newItem.carryForwardResponses.get(0).getText()) &&
+                        oldItem.question.getText().equals(newItem.question.getText());
+            }
         }
     };
 

@@ -1,5 +1,6 @@
 package org.adaptlab.chpir.android.survey.entities;
 
+import android.text.Html;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
@@ -13,6 +14,10 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
 import org.adaptlab.chpir.android.survey.daos.BaseDao;
+import org.adaptlab.chpir.android.survey.relations.OptionRelation;
+import org.adaptlab.chpir.android.survey.relations.OptionSetOptionRelation;
+import org.adaptlab.chpir.android.survey.relations.OptionSetRelation;
+import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.lang.annotation.Retention;
@@ -20,6 +25,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 
 @Entity(tableName = "Questions")
 public class Question implements SurveyEntity, Translatable, BitmapEntity {
@@ -215,6 +222,29 @@ public class Question implements SurveyEntity, Translatable, BitmapEntity {
 
     public void setText(String text) {
         this.mText = text;
+    }
+
+    public void setCarriedForwardText(Response carriedForwardResponse, QuestionRelation questionRelation) {
+        List<OptionRelation> carryForwardOptionRelations = new ArrayList<>();
+        if (questionRelation.carryForwardOptionSets.size() > 0) {
+            OptionSetRelation optionSetRelation = questionRelation.carryForwardOptionSets.get(0);
+            if (optionSetRelation != null && optionSetRelation.optionSetOptions != null) {
+                List<OptionSetOptionRelation> optionSetOptionRelations = optionSetRelation.optionSetOptions;
+                optionSetOptionRelations.sort((o1, o2) -> o1.optionSetOption.getPosition().compareTo(o2.optionSetOption.getPosition()));
+                for (OptionSetOptionRelation relation : optionSetOptionRelations) {
+                    if (relation.options.size() > 0) {
+                        carryForwardOptionRelations.add(relation.options.get(0));
+                    }
+                }
+            }
+        }
+        String text = mText;
+        String[] listOfIndices = carriedForwardResponse.getText().split(COMMA);
+        String best = listOfIndices[0];
+        OptionRelation optionRelation = carryForwardOptionRelations.get(Integer.parseInt(best));
+        text = text.replaceFirst("\\[followup\\]",
+                Html.fromHtml(optionRelation.option.getText()).toString().trim());
+        mText = text;
     }
 
     @QuestionType

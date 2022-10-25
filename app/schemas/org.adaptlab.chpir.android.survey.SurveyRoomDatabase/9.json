@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 9,
-    "identityHash": "d2fda0b08c66a12942aad356d747c37c",
+    "identityHash": "3652fcb1584c1591e68f4d3490e024a8",
     "entities": [
       {
         "tableName": "Instruments",
@@ -1471,7 +1471,7 @@
       },
       {
         "tableName": "OptionSetOptions",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Position` INTEGER NOT NULL, `OptionSetRemoteId` INTEGER, `OptionRemoteId` INTEGER, `Special` INTEGER NOT NULL, `Deleted` INTEGER NOT NULL, `Exclusive` INTEGER NOT NULL, `InstructionId` INTEGER, `AllowTextEntry` INTEGER NOT NULL, `ExclusionIds` TEXT, PRIMARY KEY(`RemoteId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Position` INTEGER, `OptionSetRemoteId` INTEGER, `OptionRemoteId` INTEGER, `Special` INTEGER NOT NULL, `Deleted` INTEGER NOT NULL, `Exclusive` INTEGER NOT NULL, `InstructionId` INTEGER, `AllowTextEntry` INTEGER NOT NULL, `ExclusionIds` TEXT, PRIMARY KEY(`RemoteId`))",
         "fields": [
           {
             "fieldPath": "mRemoteId",
@@ -1483,7 +1483,7 @@
             "fieldPath": "mPosition",
             "columnName": "Position",
             "affinity": "INTEGER",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "mOptionSetRemoteId",
@@ -3085,7 +3085,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd2fda0b08c66a12942aad356d747c37c')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3652fcb1584c1591e68f4d3490e024a8')"
     ]
   }
 }
