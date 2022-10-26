@@ -2,6 +2,8 @@
 <resources>
     <color name="emphasis">#31b6e7</color>
     <color name="bg_gray">#cecbce</color>
+    <color name="gray_bg">#E7E6E6</color>
+    <color name="gray_b">#AEAAAA</color>
     <color name="item_selected">#1C939D</color>
     <color name="red">#CD0000</color>
     <color name="green">#006A4E</color>

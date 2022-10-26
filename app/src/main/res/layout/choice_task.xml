@@ -8,14 +8,13 @@
         android:id="@+id/leftCardView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
         android:layout_weight="1"
         android:checkable="true"
         android:clickable="true"
         android:focusable="true"
-        app:checkedIcon="@drawable/ic_check_black_24dp"
-        app:strokeColor="@color/bg_gray"
-        app:strokeWidth="3dp">
+        app:cardCornerRadius="0dp"
+        app:cardElevation="0dp"
+        app:checkedIcon="@drawable/ic_check_black_24dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -23,12 +22,20 @@
             android:gravity="center"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/leftTitle"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:textStyle="bold" />
+                android:background="@drawable/choice_title_border"
+                android:gravity="center"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp">
+
+                <TextView
+                    android:id="@+id/leftTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/leftLayout"
@@ -44,14 +51,13 @@
         android:id="@+id/middleCardView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
         android:layout_weight="1"
         android:checkable="true"
         android:clickable="true"
         android:focusable="true"
-        app:checkedIcon="@drawable/ic_check_black_24dp"
-        app:strokeColor="@color/bg_gray"
-        app:strokeWidth="3dp">
+        app:cardCornerRadius="0dp"
+        app:cardElevation="0dp"
+        app:checkedIcon="@drawable/ic_check_black_24dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -59,12 +65,20 @@
             android:gravity="center"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/middleTitle"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:textStyle="bold" />
+                android:background="@drawable/choice_title_border"
+                android:gravity="center"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp">
+
+                <TextView
+                    android:id="@+id/middleTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/middleLayout"
@@ -79,14 +93,13 @@
         android:id="@+id/rightCardView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
         android:layout_weight="1"
         android:checkable="true"
         android:clickable="true"
         android:focusable="true"
-        app:checkedIcon="@drawable/ic_check_black_24dp"
-        app:strokeColor="@color/bg_gray"
-        app:strokeWidth="3dp">
+        app:cardCornerRadius="0dp"
+        app:cardElevation="0dp"
+        app:checkedIcon="@drawable/ic_check_black_24dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -94,12 +107,20 @@
             android:gravity="center"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/rightTitle"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:textStyle="bold" />
+                android:background="@drawable/choice_title_border"
+                android:gravity="center"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp">
+
+                <TextView
+                    android:id="@+id/rightTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/rightLayout"

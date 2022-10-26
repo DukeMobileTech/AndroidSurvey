@@ -31,6 +31,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
@@ -62,6 +63,7 @@ import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -766,12 +768,16 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                     int best = Integer.parseInt(listOfIndices[0]);
                     mGridViewLayout.removeAllViews();
                     mGridViewLayout.setVisibility(View.VISIBLE);
+                    ArrayList<ArrayList<LinearLayout>> layouts = new ArrayList<>();
+                    ArrayList<ArrayList<Integer>> heights = new ArrayList<>();
                     DisplayMetrics displayMetrics = new DisplayMetrics();
                     ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
                     LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                     LinearLayout imageLayout = (LinearLayout) inflater.inflate(R.layout.choice_task, null);
                     for (final OptionRelation optionRelation : mCarryForwardOptionRelations) {
+                        ArrayList<Integer> collageHeights = new ArrayList<>();
+                        ArrayList<LinearLayout> collageLayouts = new ArrayList<>();
                         OptionSetOptionRelation relation = null;
                         for (OptionSetOptionRelation optionSetOptionRelation :
                                 getQuestionRelation().carryForwardOptionSets.get(0).optionSetOptions) {
@@ -808,17 +814,23 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                             for (CollageRelation collageRelation : optionCollageRelation.collages) {
                                 GridView gridView = (GridView) inflater.inflate(R.layout.list_item_option_grid_view, null);
                                 gridView.setNumColumns(collageRelation.diagrams.size());
-                                gridView.setAdapter(new ChoiceDiagramAdapter(getContext(), getQuestionRelation(),
-                                        collageRelation.diagrams, getSurveyViewModel(), mCarryForwardOptionRelations.size()));
+                                ChoiceDiagramAdapter adapter = new ChoiceDiagramAdapter(getContext(), getQuestionRelation(),
+                                        collageRelation.diagrams, getSurveyViewModel(), mCarryForwardOptionRelations.size());
+                                gridView.setAdapter(adapter);
                                 LinearLayout gridViewLayout = new LinearLayout(getContext());
+                                gridViewLayout.setBackground(AppCompatResources.getDrawable(getContext(), R.drawable.choice_option_border));
+                                gridViewLayout.setPadding(5, 0, 5, 0);
                                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                                         LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                                layoutParams.setMargins(0, 0, 0, 5);
+                                layoutParams.setMargins(0, 5, 0, 5);
                                 gridViewLayout.addView(gridView, layoutParams);
                                 linearLayout.addView(gridViewLayout);
+                                collageHeights.add(adapter.getMaxHeight());
+                                collageLayouts.add(gridViewLayout);
                             }
                         }
-
+                        heights.add(collageHeights);
+                        layouts.add(collageLayouts);
                         if (best == index) {
                             cardView.setCheckable(true);
                             cardView.setChecked(true);
@@ -829,8 +841,19 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                             cardView.setCardForegroundColor(getContext().getColorStateList(R.color.third));
                         }
                     }
+                    // Set layout heights to the maximum height of the layouts in the row
+                    for (int j = 0; j < layouts.size(); j++) {
+                        ArrayList<Integer> rowHeights = new ArrayList<>();
+                        for (int k = 0; k < heights.size(); k++) {
+                            rowHeights.add(heights.get(k).get(j));
+                        }
+                        int max = Collections.max(rowHeights);
+                        for (int k = 0; k < heights.size(); k++) {
+                            ViewGroup.LayoutParams layoutParams = layouts.get(k).get(j).getLayoutParams();
+                            layoutParams.height = max;
+                        }
+                    }
                     mGridViewLayout.addView(imageLayout);
-
                 }
             }
         }

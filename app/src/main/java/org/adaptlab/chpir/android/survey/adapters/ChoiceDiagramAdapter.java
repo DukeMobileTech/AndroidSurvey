@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -76,29 +77,44 @@ public class ChoiceDiagramAdapter extends BaseAdapter {
         mBitmaps = new ArrayList<>();
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) mContext).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int width = (displayMetrics.widthPixels - 32) / mCount;
+        int optionWidth = (displayMetrics.widthPixels - 32) / mCount;
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inScaled = true;
         for (int k = 0; k < mDiagramRelations.size(); k++) {
             DiagramRelation diagramRelation = mDiagramRelations.get(k);
             Bitmap bitmap = BitmapFactory.decodeFile(getPath(diagramRelation), options);
             int height = bitmap.getHeight();
-            int imageViewWidth = width / mDiagramRelations.size();
-            double targetHeight = displayMetrics.heightPixels * 0.15;
-            // Scale height
-            if (targetHeight > height) {
-                double scale = targetHeight / height;
-                height = (int) Math.round(height * scale);
-            }
+            int width = bitmap.getWidth();
             mBitmaps.add(bitmap);
             mHeights.add(height);
-            mWidths.add(imageViewWidth);
+            mWidths.add(width);
         }
+
+        double total = 0.0;
+        for (int imgWidth : mWidths) {
+            total += imgWidth;
+        }
+        double remainder = optionWidth - total;
+        for (int i = 0; i < mWidths.size(); i++) {
+            int width = mWidths.get(i);
+            double portion = (width / total) * remainder;
+            double newWidth = width + portion;
+            double scale = newWidth / width;
+            int width1 = (int) Math.round(width * scale);
+            int height1 = (int) Math.round(mHeights.get(i) * scale);
+            mWidths.set(i, width1);
+            mHeights.set(i, height1);
+        }
+
         if (mHeights.isEmpty()) {
             mHeight = 0;
         } else {
             mHeight = Collections.max(mHeights);
         }
+    }
+
+    public int getMaxHeight() {
+        return mHeight;
     }
 
     @Override
@@ -120,13 +136,14 @@ public class ChoiceDiagramAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         LinearLayout linearLayout;
         if (convertView == null) {
-            linearLayout = new LinearLayout(mContext);
             ImageView imageView = new ImageView(mContext);
             Bitmap bitmap = Bitmap.createScaledBitmap(mBitmaps.get(position), mWidths.get(position),
                     mHeights.get(position), true);
             imageView.setImageBitmap(bitmap);
-            linearLayout.addView(imageView);
+            linearLayout = new LinearLayout(mContext);
             linearLayout.setMinimumHeight(mHeight);
+            linearLayout.setGravity(Gravity.CENTER);
+            linearLayout.addView(imageView);
         } else {
             linearLayout = (LinearLayout) convertView;
         }
