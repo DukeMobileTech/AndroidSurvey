@@ -141,16 +141,13 @@ public class QuestionDiagramAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         LinearLayout linearLayout;
         if (convertView == null) {
-            linearLayout = new LinearLayout(mContext);
             ImageView imageView = new ImageView(mContext);
             Bitmap bitmap = Bitmap.createScaledBitmap(mBitmaps.get(position), mWidths.get(position),
                     mHeights.get(position), true);
             imageView.setImageBitmap(bitmap);
+            linearLayout = new LinearLayout(mContext);
             linearLayout.setMinimumHeight(mHeight);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            params.gravity = Gravity.CENTER;
-            linearLayout.setLayoutParams(params);
+            linearLayout.setGravity(Gravity.CENTER);
             linearLayout.addView(imageView);
         } else {
             linearLayout = (LinearLayout) convertView;

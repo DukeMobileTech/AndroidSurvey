@@ -47,7 +47,7 @@ public class SelectMultipleImagesViewHolder extends QuestionViewHolder {
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int rightMargin = (int) (displayMetrics.widthPixels * 0.1);
+        int margin = (int) (displayMetrics.widthPixels * 0.1);
 
         if (optionSetRelation.optionSet.isAlignImageVertical()) {
             for (final OptionRelation optionRelation : optionRelations) {
@@ -63,7 +63,7 @@ public class SelectMultipleImagesViewHolder extends QuestionViewHolder {
                 LinearLayout linearLayout = cardView.findViewById(R.id.gridViewLayout);
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                layoutParams.setMargins(0, 0, rightMargin, 0);
+                layoutParams.setMargins(margin / 2, 0, margin / 2, 0);
                 linearLayout.addView(gridView, layoutParams);
 
                 cardView.setOnClickListener(v -> {

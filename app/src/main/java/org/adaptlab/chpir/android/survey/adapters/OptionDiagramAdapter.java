@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -33,12 +34,11 @@ public class OptionDiagramAdapter extends BaseAdapter {
     private List<Integer> mHeights;
     private int mHeight;
 
-    public OptionDiagramAdapter(Context context, QuestionRelation questionRelation,
-                                List<DiagramRelation> diagramRelations, SurveyViewModel surveyViewModel) {
-        this.mContext = context;
-        this.mQuestionRelation = questionRelation;
-        this.mDiagramRelations = diagramRelations;
-        this.mSurveyViewModel = surveyViewModel;
+    public OptionDiagramAdapter(Context c, QuestionRelation qr, List<DiagramRelation> dr, SurveyViewModel svm) {
+        this.mContext = c;
+        this.mQuestionRelation = qr;
+        this.mDiagramRelations = dr;
+        this.mSurveyViewModel = svm;
         this.mDiagramRelations.sort((dr1, dr2) -> dr1.diagram.getPosition().compareTo(dr2.diagram.getPosition()));
         setBitmaps();
     }
@@ -78,29 +78,40 @@ public class OptionDiagramAdapter extends BaseAdapter {
         options.inScaled = true;
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) mContext).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int rightMargin = (int) (displayMetrics.widthPixels * 0.1);
-        int availableWidth = displayMetrics.widthPixels - 32 - rightMargin;
+        int margin = (int) (displayMetrics.widthPixels * 0.1);
+        int availableWidth = displayMetrics.widthPixels - 32 - margin;
         for (int k = 0; k < mDiagramRelations.size(); k++) {
             DiagramRelation diagramRelation = mDiagramRelations.get(k);
             Bitmap bitmap = BitmapFactory.decodeFile(getPath(diagramRelation), options);
             int height = bitmap.getHeight();
             int width = bitmap.getWidth();
-            double imageViewWidth = (availableWidth - (availableWidth * 0.1)) / mDiagramRelations.size();
-            double targetHeight = displayMetrics.heightPixels * 0.1;
-            if (BuildConfig.DEBUG) {
-                Log.i(TAG, "Target width: " + imageViewWidth + " Actual width: " + bitmap.getWidth());
-                Log.i(TAG, "Target height: " + targetHeight + " Actual height: " + bitmap.getHeight());
-            }
-            // Scale based on height
-            if (targetHeight > height) {
-                double scale = targetHeight / height;
-                width = (int) Math.round(width * scale);
-                height = (int) Math.round(height * scale);
-            }
+//            // Scale based on height
+//            if (targetHeight > height) {
+//                double scale = targetHeight / height;
+//                width = (int) Math.round(width * scale);
+//                height = (int) Math.round(height * scale);
+//            }
             mBitmaps.add(bitmap);
             mHeights.add(height);
             mWidths.add(width);
         }
+
+        double total = 0.0;
+        for (int imgWidth : mWidths) {
+            total += imgWidth;
+        }
+        double remainder = availableWidth - total;
+        for (int i = 0; i < mWidths.size(); i++) {
+            int width = mWidths.get(i);
+            double portion = (width / total) * remainder;
+            double newWidth = width + portion;
+            double scale = newWidth / width;
+            int width1 = (int) Math.round(width * scale);
+            int height1 = (int) Math.round(mHeights.get(i) * scale);
+            mWidths.set(i, width1);
+            mHeights.set(i, height1);
+        }
+
         if (mHeights.isEmpty()) {
             mHeight = 0;
         } else {
@@ -127,13 +138,18 @@ public class OptionDiagramAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         LinearLayout linearLayout;
         if (convertView == null) {
-            linearLayout = new LinearLayout(mContext);
-            ImageView imageView = new ImageView(mContext);
             Bitmap bitmap = Bitmap.createScaledBitmap(mBitmaps.get(position), mWidths.get(position),
                     mHeights.get(position), true);
+            ImageView imageView = new ImageView(mContext);
             imageView.setImageBitmap(bitmap);
-            linearLayout.addView(imageView);
+            linearLayout = new LinearLayout(mContext);
             linearLayout.setMinimumHeight(mHeight);
+//            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+//                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+//            params.gravity = Gravity.CENTER;
+//            linearLayout.setLayoutParams(params);
+            linearLayout.setGravity(Gravity.CENTER);
+            linearLayout.addView(imageView);
         } else {
             linearLayout = (LinearLayout) convertView;
         }

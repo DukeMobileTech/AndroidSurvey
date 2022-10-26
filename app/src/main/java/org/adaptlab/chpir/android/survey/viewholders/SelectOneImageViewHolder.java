@@ -44,7 +44,7 @@ public class SelectOneImageViewHolder extends QuestionViewHolder {
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int rightMargin = (int) (displayMetrics.widthPixels * 0.1);
+        int margin = (int) (displayMetrics.widthPixels * 0.1);
 
         OptionSetRelation optionSetRelation = getQuestionRelation().optionSets.get(0);
         List<OptionRelation> optionRelations = getOptionRelations();
@@ -60,11 +60,11 @@ public class SelectOneImageViewHolder extends QuestionViewHolder {
                 View view = inflater.inflate(R.layout.list_item_collage, null);
                 final MaterialCardView cardView = view.findViewById(R.id.materialCardView);
                 cardView.setId(optionRelations.indexOf(optionRelation));
-                LinearLayout linearLayout = cardView.findViewById(R.id.gridViewLayout);
-                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout gridViewLayout = cardView.findViewById(R.id.gridViewLayout);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                layoutParams.setMargins(0, 0, rightMargin, 0);
-                linearLayout.addView(gridView, layoutParams);
+                params.setMargins(margin / 2, 0, margin / 2, 0);
+                gridViewLayout.addView(gridView, params);
 
                 cardView.setOnClickListener(v -> {
                     int index = v.getId();
