@@ -707,8 +707,12 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
     private void setQuestionNumberView() {
         if (mNumberTextView == null) return;
-        String text = getQuestion().getPosition() + ") " + getQuestion().getQuestionIdentifier();
-        mNumberTextView.setText(text);
+        if (getQuestion().getShowNumber()) {
+            String text = getQuestion().getPosition() + ") " + getQuestion().getQuestionIdentifier();
+            mNumberTextView.setText(text);
+        } else {
+            mNumberTextView.setVisibility(View.GONE);
+        }
     }
 
     private void setBeforeTextInstructionView() {

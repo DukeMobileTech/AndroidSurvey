@@ -29,7 +29,7 @@ import java.util.List;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 
 @Entity(tableName = "Questions")
-public class Question implements SurveyEntity, Translatable, BitmapEntity {
+public class Question implements SurveyEntity, Translatable {
     public static final String SELECT_ONE = "SELECT_ONE";
     public static final String SELECT_MULTIPLE = "SELECT_MULTIPLE";
     public static final String SELECT_ONE_WRITE_OTHER = "SELECT_ONE_WRITE_OTHER";
@@ -170,8 +170,12 @@ public class Question implements SurveyEntity, Translatable, BitmapEntity {
     @SerializedName("task_id")
     @ColumnInfo(name = "TaskId")
     private Long mTaskId;
-    @ColumnInfo(name = "BitmapPath")
-    private String mBitmapPath;
+    @SerializedName("record_audio")
+    @ColumnInfo(name = "RecordAudio")
+    private boolean mRecordAudio;
+    @SerializedName("show_number")
+    @ColumnInfo(name = "ShowNumber")
+    private boolean mShowNumber;
     @Ignore
     @SerializedName("question_translations")
     private List<QuestionTranslation> mQuestionTranslations;
@@ -432,12 +436,20 @@ public class Question implements SurveyEntity, Translatable, BitmapEntity {
         this.mTextToReplace = textToReplace;
     }
 
-    public String getBitmapPath() {
-        return mBitmapPath;
+    public boolean getRecordAudio() {
+        return mRecordAudio;
     }
 
-    public void setBitmapPath(String path) {
-        this.mBitmapPath = path;
+    public void setRecordAudio(boolean record) {
+        this.mRecordAudio = record;
+    }
+
+    public boolean getShowNumber() {
+        return mShowNumber;
+    }
+
+    public void setShowNumber(boolean show) {
+        this.mShowNumber = show;
     }
 
     public List<QuestionTranslation> getQuestionTranslations() {
