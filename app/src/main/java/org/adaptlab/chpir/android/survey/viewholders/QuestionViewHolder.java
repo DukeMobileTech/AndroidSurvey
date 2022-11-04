@@ -7,6 +7,8 @@ import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
+import android.media.MediaRecorder;
 import android.os.Build;
 import android.text.Editable;
 import android.text.Html;
@@ -14,6 +16,7 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.LongSparseArray;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -32,6 +35,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
@@ -61,6 +65,7 @@ import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
 import org.adaptlab.chpir.android.survey.viewmodels.DisplayViewModel;
 import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -107,6 +112,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     private TextView mAfterTextInstructionTextView;
     private TextView mOptionSetInstructionTextView;
     private ViewGroup mResponseComponent;
+    private ViewGroup mAudioComponent;
     private Button mClearButton;
     private RadioGroup mSpecialResponseRadioGroup;
     private LinearLayout mGridViewLayout;
@@ -127,6 +133,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
         mOptionSetInstructionTextView = itemView.findViewById(R.id.optionSetInstructions);
         mResponseComponent = itemView.findViewById(R.id.responseComponent);
+        mAudioComponent = itemView.findViewById(R.id.audioComponent);
         mSpecialResponseRadioGroup = itemView.findViewById(R.id.specialResponseButtons);
         mClearButton = itemView.findViewById(R.id.clearResponsesButton);
     }
@@ -144,6 +151,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         setCarryForwardOptions(questionRelation);
         setQuestionTextComponents();
         setOptionSetInstructionsText();
+        createAudioComponent(mAudioComponent);
         // Overridden by subclasses to place their graphical elements on the fragment.
         createQuestionComponent(mResponseComponent);
         setSpecialResponseView();
@@ -281,6 +289,81 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     protected abstract void unSetResponse();
 
     protected abstract void showOtherText(int position);
+
+    private void createAudioComponent(ViewGroup viewGroup) {
+        if (getQuestion().getRecordAudio()) {
+            viewGroup.removeAllViews();
+
+            String fileName = getContext().getExternalCacheDir().getAbsolutePath();
+            fileName += "/" + getQuestion().getQuestionIdentifier() + ".3gp";
+            Log.i(TAG, "FILE NAME " + fileName);
+            final String finalFileName = fileName;
+
+            MediaPlayer player = new MediaPlayer();
+            MediaRecorder recorder = new MediaRecorder();
+
+            LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View view = inflater.inflate(R.layout.audio, null);
+            AppCompatButton recordBtn = view.findViewById(R.id.record);
+            recordBtn.setOnClickListener(v -> startRecording(recordBtn, recorder, finalFileName));
+            AppCompatButton stopRecording = view.findViewById(R.id.stopRecord);
+            stopRecording.setOnClickListener(v -> stopRecording(recorder, recordBtn));
+            AppCompatButton playBtn = view.findViewById(R.id.play);
+            playBtn.setOnClickListener(v -> startPlaying(playBtn, finalFileName, player));
+            AppCompatButton stopPlaying = view.findViewById(R.id.stopPlay);
+            stopPlaying.setOnClickListener(v -> stopPlaying(player, playBtn));
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.setMargins(5, 5, 5, 10);
+            viewGroup.addView(view, params);
+        } else {
+            viewGroup.setVisibility(View.GONE);
+        }
+    }
+
+    private void startPlaying(AppCompatButton playBtn, String fileName, MediaPlayer player) {
+        playBtn.setBackgroundColor(getContext().getColor(R.color.blue));
+        try {
+            player.setDataSource(fileName);
+            player.prepare();
+            player.start();
+        } catch (IOException e) {
+            Log.e(TAG, "prepare() failed");
+        }
+    }
+
+    private void stopPlaying(MediaPlayer player, AppCompatButton playBtn) {
+        if (player == null) return;
+        player.release();
+        player = null;
+        playBtn.setBackgroundColor(getContext().getColor(R.color.bg_gray));
+    }
+
+    private void startRecording(AppCompatButton recordBtn, MediaRecorder recorder, String fileName) {
+        recordBtn.setBackgroundColor(getContext().getColor(R.color.blue));
+
+        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+        recorder.setOutputFile(fileName);
+        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+
+        try {
+            recorder.prepare();
+        } catch (IOException e) {
+            Log.e(TAG, "prepare() failed");
+        }
+
+        recorder.start();
+    }
+
+    private void stopRecording(MediaRecorder recorder, AppCompatButton recordBtn) {
+        if (recorder == null) return;
+        recorder.stop();
+        recorder.release();
+        recorder = null;
+        recordBtn.setBackgroundColor(getContext().getColor(R.color.bg_gray));
+    }
 
     /**
      * @param otherText An EditText injected from a subclass i.e a write other subclass

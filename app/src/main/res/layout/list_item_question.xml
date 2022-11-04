@@ -90,6 +90,17 @@
                 app:layout_constraintTop_toBottomOf="@id/afterTextInstructions" />
 
             <LinearLayout
+                android:id="@+id/audioComponent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/optionSetInstructions"
+                android:orientation="horizontal">
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/responseComponent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -98,7 +109,7 @@
                 android:orientation="vertical"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/optionSetInstructions">
+                app:layout_constraintTop_toBottomOf="@id/audioComponent">
 
             </LinearLayout>
 
