@@ -30,6 +30,8 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
+
 import org.adaptlab.chpir.android.survey.adapters.DisplayPagerAdapter;
 import org.adaptlab.chpir.android.survey.adapters.NavigationDrawerAdapter;
 import org.adaptlab.chpir.android.survey.entities.Display;
@@ -122,6 +124,16 @@ public class SurveyActivity extends AppCompatActivity {
         setSurveyRelationViewModel(mSurveyUUID);
         setLanguage();
         startLocationUpdates();
+        setCrashlytics();
+    }
+
+    private void setCrashlytics() {
+        if (AppUtil.PRODUCTION) {
+            FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+            crashlytics.setCustomKey(getString(R.string.last_instrument), mInstrument.getTitle());
+            crashlytics.setCustomKey(getString(R.string.last_survey), mSurvey.getUUID());
+            crashlytics.setCustomKey(getString(R.string.last_display), mSurveyViewModel.lastDisplay().getTitle());
+        }
     }
 
     private void startLocationUpdates() {

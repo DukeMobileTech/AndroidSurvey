@@ -90,6 +90,10 @@ public class SurveyViewModel extends AndroidViewModel {
         return mQuestionsToSkipSet;
     }
 
+    public Display lastDisplay () {
+        return mDisplays.get(mDisplayPosition);
+    }
+
     public int getDisplayPosition() {
         return mDisplayPosition;
     }

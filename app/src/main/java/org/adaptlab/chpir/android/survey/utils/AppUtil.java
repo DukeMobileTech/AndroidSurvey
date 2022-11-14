@@ -12,7 +12,10 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
+
 import org.adaptlab.chpir.android.survey.BuildConfig;
+import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.SurveyApp;
 import org.adaptlab.chpir.android.survey.SurveyRoomDatabase;
 import org.adaptlab.chpir.android.survey.daos.DeviceUserDao;
@@ -61,7 +64,7 @@ import java.util.concurrent.TimeUnit;
 import okhttp3.OkHttpClient;
 
 public class AppUtil {
-    private final static boolean PRODUCTION = !BuildConfig.DEBUG;
+    public final static boolean PRODUCTION = !BuildConfig.DEBUG;
     private final static String TAG = "AppUtil";
     private final static int REMOTE_TABLE_COUNT = 15;
     private static final int TIMEOUT = 10000;
@@ -100,9 +103,9 @@ public class AppUtil {
 
     private static void setCrashLogs(Context context) {
         if (PRODUCTION) {
-//            FirebaseCrashlytics instance = FirebaseCrashlytics.getInstance();
-//            instance.setUserId(mSettings.getDeviceIdentifier());
-//            instance.setCustomKey(context.getString(R.string.crashlytics_device_label), mSettings.getDeviceLabel());
+            FirebaseCrashlytics instance = FirebaseCrashlytics.getInstance();
+            instance.setUserId(mSettings.getDeviceIdentifier());
+            instance.setCustomKey(context.getString(R.string.crashlytics_device_label), mSettings.getDeviceLabel());
         }
     }
 

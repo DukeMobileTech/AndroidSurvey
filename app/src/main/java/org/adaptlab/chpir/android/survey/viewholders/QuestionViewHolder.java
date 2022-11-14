@@ -39,6 +39,7 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.adapters.ChoiceDiagramAdapter;
@@ -60,6 +61,7 @@ import org.adaptlab.chpir.android.survey.relations.OptionSetRelation;
 import org.adaptlab.chpir.android.survey.relations.QuestionCollageRelation;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
 import org.adaptlab.chpir.android.survey.repositories.ResponseRepository;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.utils.ConstantUtils;
 import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
 import org.adaptlab.chpir.android.survey.viewmodels.DisplayViewModel;
@@ -144,8 +146,17 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         mResponseRepository = new ResponseRepository((Application) context.getApplicationContext());
     }
 
+    private void setCrashlytics() {
+        if (AppUtil.PRODUCTION) {
+            FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+            crashlytics.setCustomKey(mContext.getString(R.string.last_question), String.valueOf(
+                    mQuestionRelation.question.getNumberInInstrument()));
+        }
+    }
+
     public void setRelations(QuestionRelation questionRelation) {
         mQuestionRelation = questionRelation;
+        setCrashlytics();
         setOptionSetItems(questionRelation);
         setSpecialOptions(questionRelation);
         setCarryForwardOptions(questionRelation);
