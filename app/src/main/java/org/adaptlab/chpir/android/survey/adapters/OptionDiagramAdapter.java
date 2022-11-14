@@ -33,8 +33,11 @@ public class OptionDiagramAdapter extends BaseAdapter {
     private List<Integer> mWidths;
     private List<Integer> mHeights;
     private int mHeight;
+    private OnItemClickListener onClickListener;
 
-    public OptionDiagramAdapter(Context c, QuestionRelation qr, List<DiagramRelation> dr, SurveyViewModel svm) {
+    public OptionDiagramAdapter(Context c, QuestionRelation qr, List<DiagramRelation> dr,
+                                SurveyViewModel svm, OnItemClickListener listener) {
+        this.onClickListener = listener;
         this.mContext = c;
         this.mQuestionRelation = qr;
         this.mDiagramRelations = dr;
@@ -153,6 +156,13 @@ public class OptionDiagramAdapter extends BaseAdapter {
         } else {
             linearLayout = (LinearLayout) convertView;
         }
+
+        linearLayout.setOnClickListener(v -> {
+            if (onClickListener != null) {
+                onClickListener.onItemClicked();
+            }
+        });
+
         return linearLayout;
     }
 

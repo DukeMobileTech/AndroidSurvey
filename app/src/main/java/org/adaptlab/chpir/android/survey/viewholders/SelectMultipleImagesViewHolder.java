@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import com.google.android.material.card.MaterialCardView;
 
 import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.adapters.OnItemClickListener;
 import org.adaptlab.chpir.android.survey.adapters.OptionDiagramAdapter;
 import org.adaptlab.chpir.android.survey.relations.DiagramRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionRelation;
@@ -51,15 +52,19 @@ public class SelectMultipleImagesViewHolder extends QuestionViewHolder {
 
         if (optionSetRelation.optionSet.isAlignImageVertical()) {
             for (final OptionRelation optionRelation : optionRelations) {
+                View view = inflater.inflate(R.layout.list_item_collage, null);
+                final MaterialCardView cardView = view.findViewById(R.id.materialCardView);
+                cardView.setId(optionRelations.indexOf(optionRelation));
+
                 OptionSetOptionRelation relation = getOptionSetOptionRelation(optionRelation);
                 GridView gridView = (GridView) inflater.inflate(R.layout.list_item_option_grid_view, null);
                 List<DiagramRelation> diagrams = relation.optionCollages.get(0).collages.get(0).diagrams;
                 gridView.setNumColumns(diagrams.size());
+
+                OnItemClickListener listener = cardView::performClick;
                 gridView.setAdapter(new OptionDiagramAdapter(getContext(), getQuestionRelation(),
-                        diagrams, getSurveyViewModel()));
-                View view = inflater.inflate(R.layout.list_item_collage, null);
-                final MaterialCardView cardView = view.findViewById(R.id.materialCardView);
-                cardView.setId(optionRelations.indexOf(optionRelation));
+                        diagrams, getSurveyViewModel(), listener));
+
                 LinearLayout linearLayout = cardView.findViewById(R.id.gridViewLayout);
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
