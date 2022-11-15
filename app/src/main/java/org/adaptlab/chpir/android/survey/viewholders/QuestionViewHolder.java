@@ -36,6 +36,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
@@ -67,6 +68,8 @@ import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
 import org.adaptlab.chpir.android.survey.viewmodels.DisplayViewModel;
 import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -117,8 +120,16 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     private Button mClearButton;
     private RadioGroup mSpecialResponseRadioGroup;
     private LinearLayout mGridViewLayout;
+    private AppCompatButton mRecordButton;
+    private AppCompatButton mPlayButton;
 
     private boolean mDeserializing = false;
+    private boolean mRecord;
+    private boolean mPlay;
+    private String mAudioFolder;
+    private MediaRecorder mRecorder = null;
+    private MediaPlayer mPlayer = null;
+    private int mFileCount = 0;
 
     public QuestionViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
         super(itemView);
@@ -304,24 +315,21 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         if (getQuestion().getRecordAudio()) {
             viewGroup.removeAllViews();
 
-            String fileName = getContext().getExternalCacheDir().getAbsolutePath();
-            fileName += "/" + getQuestion().getQuestionIdentifier() + ".3gp";
-            Log.i(TAG, "FILE NAME " + fileName);
-            final String finalFileName = fileName;
-
-            MediaPlayer player = new MediaPlayer();
-            MediaRecorder recorder = new MediaRecorder();
+            mAudioFolder = getContext().getExternalCacheDir().getAbsolutePath() +
+                    "/" + getSurvey().getUUID() + "/" + getQuestion().getQuestionIdentifier();
+            File folder = new File(mAudioFolder);
+            if (!folder.exists()) {
+                folder.mkdirs();
+            }
 
             LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View view = inflater.inflate(R.layout.audio, null);
-            AppCompatButton recordBtn = view.findViewById(R.id.record);
-            recordBtn.setOnClickListener(v -> startRecording(recordBtn, recorder, finalFileName));
-            AppCompatButton stopRecording = view.findViewById(R.id.stopRecord);
-            stopRecording.setOnClickListener(v -> stopRecording(recorder, recordBtn));
-            AppCompatButton playBtn = view.findViewById(R.id.play);
-            playBtn.setOnClickListener(v -> startPlaying(playBtn, finalFileName, player));
-            AppCompatButton stopPlaying = view.findViewById(R.id.stopPlay);
-            stopPlaying.setOnClickListener(v -> stopPlaying(player, playBtn));
+            mRecordButton = view.findViewById(R.id.record);
+            mRecord = true;
+            mRecordButton.setOnClickListener(v -> prepareRecording());
+            mPlayButton = view.findViewById(R.id.play);
+            mPlay = true;
+            mPlayButton.setOnClickListener(v -> preparePlaying());
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -332,46 +340,97 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         }
     }
 
-    private void startPlaying(AppCompatButton playBtn, String fileName, MediaPlayer player) {
-        playBtn.setBackgroundColor(getContext().getColor(R.color.blue));
-//        try {
-//            player.setDataSource(fileName);
-//            player.prepare();
-//            player.start();
-//        } catch (IOException e) {
-//            Log.e(TAG, "prepare() failed");
-//        }
+    private int getFileCount() {
+        mFileCount += 1;
+        return mFileCount;
     }
 
-    private void stopPlaying(MediaPlayer player, AppCompatButton playBtn) {
-//        if (player == null) return;
-//        player.release();
-//        player = null;
-        playBtn.setBackgroundColor(getContext().getColor(R.color.bg_gray));
+    private void resetFileCounter() {
+        mFileCount = 0;
     }
 
-    private void startRecording(AppCompatButton recordBtn, MediaRecorder recorder, String fileName) {
-        recordBtn.setBackgroundColor(getContext().getColor(R.color.blue));
-//        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-//        recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-//        recorder.setOutputFile(fileName);
-//        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-//
-//        try {
-//            recorder.prepare();
-//        } catch (IOException e) {
-//            Log.e(TAG, "prepare() failed");
-//        }
-//
-//        recorder.start();
+    private void preparePlaying() {
+        File folder = new File(mAudioFolder);
+        File[] files = folder.listFiles();
+        if (files == null || files.length == 0) return;
+        for (File file : files) {
+            Log.i(TAG, "File: " + file.getAbsolutePath());
+        }
+        if (mPlay) {
+            mPlayButton.setBackgroundColor(getContext().getColor(R.color.blue));
+            mPlayButton.setText(R.string.stop_playing);
+            Drawable top = ContextCompat.getDrawable(getContext(), R.drawable.ic_baseline_pause_24);
+            mPlayButton.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
+            mPlayer = new MediaPlayer();
+            try {
+                mPlayer.setDataSource(files[0].getAbsolutePath());
+                mPlayer.prepare();
+                mPlayer.start();
+                mPlayer.setOnCompletionListener(mp -> {
+                    final int index = getFileCount();
+                    if ( index < files.length) {
+                        try {
+                            mp.reset();
+                            mp.setDataSource(files[index].getAbsolutePath());
+                            mp.prepare();
+                        } catch (IOException e) {
+                            Log.e(TAG, "prepare() failed");
+                        }
+                        mp.start();
+                    } else {
+                        stopPlayer();
+                        resetFileCounter();
+                        mPlay = true;
+                    }
+                });
+            } catch (IOException e) {
+                Log.e(TAG, "prepare() failed");
+            }
+        } else {
+            stopPlayer();
+        }
+        mPlay = !mPlay;
     }
 
-    private void stopRecording(MediaRecorder recorder, AppCompatButton recordBtn) {
-//        if (recorder == null) return;
-//        recorder.stop();
-//        recorder.release();
-//        recorder = null;
-        recordBtn.setBackgroundColor(getContext().getColor(R.color.bg_gray));
+    private void stopPlayer() {
+        if (mPlayer == null) return;
+        mPlayer.release();
+        mPlayer = null;
+        mPlayButton.setBackgroundColor(getContext().getColor(R.color.bg_gray));
+        mPlayButton.setText(R.string.play_recording);
+        Drawable top = ContextCompat.getDrawable(getContext(), R.drawable.ic_baseline_play_arrow_24);
+        mPlayButton.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
+    }
+
+    private void prepareRecording() {
+        if (mRecord) {
+            mRecordButton.setBackgroundColor(getContext().getColor(R.color.blue));
+            mRecordButton.setText(R.string.stop_recording);
+            Drawable top = ContextCompat.getDrawable(getContext(), R.drawable.ic_baseline_mic_off_24);
+            mRecordButton.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
+            mRecorder = new MediaRecorder();
+            String fileName = mAudioFolder + "/" + System.currentTimeMillis() + ".3gp";
+            try {
+                mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+                mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+                mRecorder.setOutputFile(fileName);
+                mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+                mRecorder.prepare();
+                mRecorder.start();
+            } catch (IOException e) {
+                Log.e(TAG, "prepare() failed");
+            }
+        } else {
+            mRecordButton.setBackgroundColor(getContext().getColor(R.color.bg_gray));
+            mRecordButton.setText(R.string.start_recording);
+            Drawable top = ContextCompat.getDrawable(getContext(), R.drawable.ic_baseline_mic_24);
+            mRecordButton.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
+            if (mRecorder == null) return;
+            mRecorder.stop();
+            mRecorder.release();
+            mRecorder = null;
+        }
+        mRecord = !mRecord;
     }
 
     /**

@@ -32,7 +32,7 @@ public class AudioViewHolder extends QuestionViewHolder {
         Log.i(TAG, "FILE NAME " + fileName);
 
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.audio, null);
+        View view = inflater.inflate(R.layout.audio_controls, null);
         recordBtn = view.findViewById(R.id.record);
         recordBtn.setOnClickListener(v -> startRecording());
         AppCompatButton stopRecording = view.findViewById(R.id.stopRecord);

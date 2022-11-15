@@ -10,13 +10,13 @@ repositories {
 }
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 29
 
     defaultConfig {
         applicationId "org.adaptlab.chpir.android.survey"
         vectorDrawables.useSupportLibrary = true
         minSdkVersion 26
-        targetSdkVersion 30
+        targetSdkVersion 29 // Storage permission issues above this
         multiDexEnabled true
 
         javaCompileOptions {
@@ -58,8 +58,8 @@ android {
         dce {
             dimension 'dce'
             applicationIdSuffix '.dce'
-            versionCode 40
-            versionName '0.0.34'
+            versionCode 41
+            versionName '0.0.35'
         }
         wci {
             dimension 'wci'
