@@ -109,7 +109,7 @@ public class SurveyReviewFragment extends ListFragment {
     }
 
     private void setSurveyViewModel() {
-        SurveyViewModelFactory factory = new SurveyViewModelFactory(getActivity().getApplication(), mSurveyUUID);
+        SurveyViewModelFactory factory = new SurveyViewModelFactory(getActivity().getApplication(), mSurveyUUID, null);
         mSurveyViewModel = ViewModelProviders.of(this, factory).get(SurveyViewModel.class);
         mSurveyViewModel.getLiveDataSurvey().observe(this, new Observer<Survey>() {
             @Override

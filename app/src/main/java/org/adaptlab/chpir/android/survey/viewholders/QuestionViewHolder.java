@@ -67,7 +67,6 @@ import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
 import org.adaptlab.chpir.android.survey.viewmodels.DisplayViewModel;
 import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -335,44 +334,43 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
     private void startPlaying(AppCompatButton playBtn, String fileName, MediaPlayer player) {
         playBtn.setBackgroundColor(getContext().getColor(R.color.blue));
-        try {
-            player.setDataSource(fileName);
-            player.prepare();
-            player.start();
-        } catch (IOException e) {
-            Log.e(TAG, "prepare() failed");
-        }
+//        try {
+//            player.setDataSource(fileName);
+//            player.prepare();
+//            player.start();
+//        } catch (IOException e) {
+//            Log.e(TAG, "prepare() failed");
+//        }
     }
 
     private void stopPlaying(MediaPlayer player, AppCompatButton playBtn) {
-        if (player == null) return;
-        player.release();
-        player = null;
+//        if (player == null) return;
+//        player.release();
+//        player = null;
         playBtn.setBackgroundColor(getContext().getColor(R.color.bg_gray));
     }
 
     private void startRecording(AppCompatButton recordBtn, MediaRecorder recorder, String fileName) {
         recordBtn.setBackgroundColor(getContext().getColor(R.color.blue));
-
-        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        recorder.setOutputFile(fileName);
-        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-
-        try {
-            recorder.prepare();
-        } catch (IOException e) {
-            Log.e(TAG, "prepare() failed");
-        }
-
-        recorder.start();
+//        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+//        recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+//        recorder.setOutputFile(fileName);
+//        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+//
+//        try {
+//            recorder.prepare();
+//        } catch (IOException e) {
+//            Log.e(TAG, "prepare() failed");
+//        }
+//
+//        recorder.start();
     }
 
     private void stopRecording(MediaRecorder recorder, AppCompatButton recordBtn) {
-        if (recorder == null) return;
-        recorder.stop();
-        recorder.release();
-        recorder = null;
+//        if (recorder == null) return;
+//        recorder.stop();
+//        recorder.release();
+//        recorder = null;
         recordBtn.setBackgroundColor(getContext().getColor(R.color.bg_gray));
     }
 

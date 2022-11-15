@@ -14,11 +14,13 @@ public class DisplayViewModel extends AndroidViewModel {
     public final String TAG = this.getClass().getName();
     private final HashMap<String, Response> mResponses;
     private final HashMap<String, QuestionRelation> mQuestions;
+    private final Long mRemoteId;
 
-    public DisplayViewModel(@NonNull Application application) {
+    public DisplayViewModel(@NonNull Application application, Long id) {
         super(application);
         mResponses = new HashMap<>();
         mQuestions = new HashMap<>();
+        mRemoteId = id;
     }
 
     public HashMap<String, Response> getResponses() {
@@ -43,5 +45,9 @@ public class DisplayViewModel extends AndroidViewModel {
 
     public void setQuestion(String questionIdentifier, QuestionRelation questionRelation) {
         mQuestions.put(questionIdentifier, questionRelation);
+    }
+
+    public Long getRemoteId() {
+        return mRemoteId;
     }
 }

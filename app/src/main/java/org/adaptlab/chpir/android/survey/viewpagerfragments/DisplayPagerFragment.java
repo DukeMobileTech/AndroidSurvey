@@ -2,6 +2,7 @@ package org.adaptlab.chpir.android.survey.viewpagerfragments;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.SurveyActivity;
+import org.adaptlab.chpir.android.survey.adapters.OnEmptyDisplayListener;
 import org.adaptlab.chpir.android.survey.adapters.QuestionRelationAdapter;
 import org.adaptlab.chpir.android.survey.entities.LoopQuestion;
 import org.adaptlab.chpir.android.survey.entities.MultipleSkip;
@@ -294,10 +297,13 @@ public class DisplayPagerFragment extends Fragment {
     private void hideQuestions() {
         HashSet<String> hideSet = new HashSet<>();
         List<String> displayQuestionIds = new ArrayList<>();
+        Log.i(TAG, "COUNT === " + mQuestionRelations.size());
         for (QuestionRelation questionRelation : mQuestionRelations) {
             displayQuestionIds.add(questionRelation.question.getQuestionIdentifier());
+            Log.i(TAG, "DISPLAY QUESTION => " + questionRelation.question.getQuestionIdentifier());
         }
         for (String questionToSkip : mSurveyViewModel.getQuestionsToSkipSet()) {
+            Log.i(TAG, "TO SKIP => " + questionToSkip);
             if (displayQuestionIds.contains(questionToSkip)) {
                 hideSet.add(questionToSkip);
             }
@@ -308,6 +314,7 @@ public class DisplayPagerFragment extends Fragment {
                 visibleRelations.add(questionRelation);
             }
         }
+        Log.i(TAG, "VISIBLE COUNT => " + visibleRelations.size());
         boolean responsesPresent = true;
         for (QuestionRelation questionRelation : visibleRelations) {
             if (mDisplayViewModel.getResponse(questionRelation.question.getQuestionIdentifier()) == null) {
@@ -318,6 +325,16 @@ public class DisplayPagerFragment extends Fragment {
 
         if (responsesPresent) {
             mQuestionRelationsAdapter.submitList(visibleRelations);
+        }
+
+        int position = ((SurveyActivity) getActivity()).getCurrentPosition();
+        Log.i(TAG, "POS " + position);
+        Log.i(TAG, "Current ID => " + mSurveyViewModel.getDisplay(position).getRemoteId());
+        Log.i(TAG, "This ID => " + mDisplayId);
+        if (visibleRelations.isEmpty()) {
+            if (mSurveyViewModel.getDisplay(position).getRemoteId().equals(mDisplayId)) {
+                mSurveyViewModel.moveToNextDisplayOnEmpty();
+            }
         }
     }
 
@@ -402,7 +419,11 @@ public class DisplayPagerFragment extends Fragment {
 
     private void setSurvey() {
         if (getActivity() == null || mSurveyUUID == null) return;
-        SurveyViewModelFactory factory = new SurveyViewModelFactory(getActivity().getApplication(), mSurveyUUID);
+        OnEmptyDisplayListener listener = () -> {
+            Log.i(TAG, "onDisplayEmpty");
+            ((SurveyActivity) getActivity()).setViewPagerPosition();
+        };
+        SurveyViewModelFactory factory = new SurveyViewModelFactory(getActivity().getApplication(), mSurveyUUID, listener);
         mSurveyViewModel = ViewModelProviders.of(getActivity(), factory).get(SurveyViewModel.class);
         mSurveyViewModel.getLiveDataSurvey().observe(getViewLifecycleOwner(), new Observer<Survey>() {
             @Override
@@ -422,7 +443,7 @@ public class DisplayPagerFragment extends Fragment {
 
     private void setDisplayViewModel() {
         if (getActivity() == null) return;
-        DisplayViewModelFactory factory = new DisplayViewModelFactory(getActivity().getApplication());
+        DisplayViewModelFactory factory = new DisplayViewModelFactory(getActivity().getApplication(), mDisplayId);
         mDisplayViewModel = ViewModelProviders.of(this, factory).get(DisplayViewModel.class);
         if (mQuestionRelationsAdapter != null)
             mQuestionRelationsAdapter.setDisplayViewModel(mDisplayViewModel);
@@ -439,4 +460,8 @@ public class DisplayPagerFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
 }

@@ -10,6 +10,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import org.adaptlab.chpir.android.survey.BuildConfig;
+import org.adaptlab.chpir.android.survey.adapters.OnEmptyDisplayListener;
 import org.adaptlab.chpir.android.survey.entities.Display;
 import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.Response;
@@ -35,6 +36,7 @@ import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 public class SurveyViewModel extends AndroidViewModel {
     public final String TAG = this.getClass().getName();
     private final SurveyRepository mSurveyRepository;
+    private OnEmptyDisplayListener onEmptyDisplayListener;
     private LiveData<Survey> mLiveDataSurvey;
     private HashSet<String> mQuestionsToSkipSet;
     private HashMap<String, List<String>> mQuestionsToSkipMap;
@@ -56,13 +58,23 @@ public class SurveyViewModel extends AndroidViewModel {
     private String mDeviceLanguage;
     private String mInstrumentLanguage;
 
-    public SurveyViewModel(@NonNull Application application, String uuid) {
+    public SurveyViewModel(@NonNull Application application, String uuid, OnEmptyDisplayListener listener) {
         super(application);
         mSurveyRepository = new SurveyRepository(application);
         if (uuid == null) return;
         mLiveDataSurvey = mSurveyRepository.getSurveyDao().findByUUID(uuid);
         mDisplayTitles = new LongSparseArray<>();
         mPreviousDisplays = new ArrayList<>();
+        onEmptyDisplayListener = listener;
+    }
+
+    public Display getDisplay(int position) {
+        return mDisplays.get(position);
+    }
+
+    public void moveToNextDisplayOnEmpty() {
+        incrementDisplayPosition();
+        onEmptyDisplayListener.onDisplayEmpty();
     }
 
     public void addDisplayTitle(Long displayId, String translation) {
@@ -90,7 +102,7 @@ public class SurveyViewModel extends AndroidViewModel {
         return mQuestionsToSkipSet;
     }
 
-    public Display lastDisplay () {
+    public Display lastDisplay() {
         return mDisplays.get(mDisplayPosition);
     }
 

@@ -10,16 +10,18 @@ import org.adaptlab.chpir.android.survey.viewmodels.DisplayViewModel;
 
 public class DisplayViewModelFactory implements ViewModelProvider.Factory {
     private final Application mApplication;
+    private final Long mRemoteId;
 
-    public DisplayViewModelFactory(@NonNull Application application) {
+    public DisplayViewModelFactory(@NonNull Application application, Long id) {
         this.mApplication = application;
+        this.mRemoteId = id;
     }
 
     @NonNull
     @Override
     @SuppressWarnings("unchecked")
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-        return (T) new DisplayViewModel(mApplication);
+        return (T) new DisplayViewModel(mApplication, mRemoteId);
     }
 
 }

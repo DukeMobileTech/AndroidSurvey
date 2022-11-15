@@ -5,7 +5,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +12,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.relations.DiagramRelation;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
 import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
@@ -29,11 +27,11 @@ public class OptionDiagramAdapter extends BaseAdapter {
     private final List<DiagramRelation> mDiagramRelations;
     private final QuestionRelation mQuestionRelation;
     private final SurveyViewModel mSurveyViewModel;
+    private final OnItemClickListener onClickListener;
     private List<Bitmap> mBitmaps;
     private List<Integer> mWidths;
     private List<Integer> mHeights;
     private int mHeight;
-    private OnItemClickListener onClickListener;
 
     public OptionDiagramAdapter(Context c, QuestionRelation qr, List<DiagramRelation> dr,
                                 SurveyViewModel svm, OnItemClickListener listener) {
@@ -69,7 +67,7 @@ public class OptionDiagramAdapter extends BaseAdapter {
                         optionIdentifier + ".png";
             }
         }
-        if (BuildConfig.DEBUG) Log.i(TAG, "PATH: " + path);
+//        if (BuildConfig.DEBUG) Log.i(TAG, "PATH: " + path);
         return path;
     }
 
