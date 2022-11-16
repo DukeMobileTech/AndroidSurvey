@@ -368,7 +368,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                 mPlayer.start();
                 mPlayer.setOnCompletionListener(mp -> {
                     final int index = getFileCount();
-                    if ( index < files.length) {
+                    if (index < files.length) {
                         try {
                             mp.reset();
                             mp.setDataSource(files[index].getAbsolutePath());
@@ -567,6 +567,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         mResponse.setTimeEnded(new Date());
         mResponse.setIdentifiesSurvey(getQuestion().isIdentifiesSurvey());
         mSurveyViewModel.setResponse(getQuestion().getQuestionIdentifier(), mResponse);
+        mDisplayViewModel.setResponse(getQuestion().getQuestionIdentifier(), mResponse);
         mResponseRepository.update(mResponse);
     }
 

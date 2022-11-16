@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.SurveyActivity;
 import org.adaptlab.chpir.android.survey.adapters.OnEmptyDisplayListener;
@@ -420,7 +421,7 @@ public class DisplayPagerFragment extends Fragment {
     private void setSurvey() {
         if (getActivity() == null || mSurveyUUID == null) return;
         OnEmptyDisplayListener listener = () -> {
-            Log.i(TAG, "onDisplayEmpty");
+            if (BuildConfig.DEBUG) Log.i(TAG, "onDisplayEmpty");
             ((SurveyActivity) getActivity()).setViewPagerPosition();
         };
         SurveyViewModelFactory factory = new SurveyViewModelFactory(getActivity().getApplication(), mSurveyUUID, listener);
@@ -435,8 +436,10 @@ public class DisplayPagerFragment extends Fragment {
             }
         });
         mQuestionRelationsAdapter = new QuestionRelationAdapter(mListener, mSurveyViewModel);
-        if (mDisplayViewModel != null)
+        if (mDisplayViewModel != null) {
             mQuestionRelationsAdapter.setDisplayViewModel(mDisplayViewModel);
+            mSurveyViewModel.setDisplayViewModel(mDisplayId, mDisplayViewModel);
+        }
         mRecyclerView.setAdapter(mQuestionRelationsAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
@@ -447,6 +450,8 @@ public class DisplayPagerFragment extends Fragment {
         mDisplayViewModel = ViewModelProviders.of(this, factory).get(DisplayViewModel.class);
         if (mQuestionRelationsAdapter != null)
             mQuestionRelationsAdapter.setDisplayViewModel(mDisplayViewModel);
+        if (mSurveyViewModel != null)
+            mSurveyViewModel.setDisplayViewModel(mDisplayId, mDisplayViewModel);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.adaptlab.chpir.android.survey;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Context;
@@ -24,6 +25,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -136,8 +138,8 @@ public class SurveyActivity extends AppCompatActivity {
                 crashlytics.setCustomKey(getString(R.string.last_instrument), mInstrument.getTitle());
             if (mSurvey != null)
                 crashlytics.setCustomKey(getString(R.string.last_survey), mSurvey.getUUID());
-            if (mSurveyViewModel != null && mSurveyViewModel.lastDisplay() != null)
-                crashlytics.setCustomKey(getString(R.string.last_display), mSurveyViewModel.lastDisplay().getTitle());
+            if (mSurveyViewModel != null && mSurveyViewModel.currentDisplay() != null)
+                crashlytics.setCustomKey(getString(R.string.last_display), mSurveyViewModel.currentDisplay().getTitle());
         }
     }
 
@@ -224,12 +226,7 @@ public class SurveyActivity extends AppCompatActivity {
                     for (QuestionTranslationRelation questionTranslationRelation : relation.questions) {
                         questions.add(questionTranslationRelation.question);
                     }
-                    Collections.sort(questions, new Comparator<Question>() {
-                        @Override
-                        public int compare(Question question1, Question question2) {
-                            return question1.getNumberInInstrument() - question2.getNumberInInstrument();
-                        }
-                    });
+                    questions.sort((question1, question2) -> question1.getNumberInInstrument() - question2.getNumberInInstrument());
                     mSurveyViewModel.setQuestions(questions);
 
                     setActionBarTitle(mSurveyViewModel.getDisplayPosition());
@@ -575,8 +572,9 @@ public class SurveyActivity extends AppCompatActivity {
         return true;
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
@@ -611,6 +609,15 @@ public class SurveyActivity extends AppCompatActivity {
     }
 
     private void moveToNextDisplay() {
+        String emptyResponses = mSurveyViewModel.checkForEmptyResponses();
+        if (emptyResponses.length() > 0) {
+            promptForResponses(emptyResponses, false);
+        } else {
+            toNextDisplay();
+        }
+    }
+
+    private void toNextDisplay() {
         mSurveyViewModel.getPreviousDisplays().add(mSurveyViewModel.getDisplayPosition());
         mSurveyViewModel.incrementDisplayPosition();
         setViewPagerPosition();
@@ -636,11 +643,7 @@ public class SurveyActivity extends AppCompatActivity {
             b.putLong(SurveyReviewFragment.EXTRA_INSTRUMENT_ID, mInstrumentId);
             b.putString(SurveyReviewFragment.EXTRA_DEVICE_LANGUAGE, mSurveyViewModel.getDeviceLanguage());
             i.putExtras(b);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                startActivityForResult(i, REVIEW_CODE, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
-            } else {
-                startActivityForResult(i, REVIEW_CODE);
-            }
+            startActivityForResult(i, REVIEW_CODE, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
         } else {
             finishSurvey();
         }
@@ -654,6 +657,20 @@ public class SurveyActivity extends AppCompatActivity {
         mSurveyViewModel.setSurveyComplete();
         mSurveyViewModel.update();
         finish();
+    }
+
+    private void promptForResponses(String empty, boolean finish) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(empty)
+                .setTitle(R.string.response_prompt)
+                .setNegativeButton(R.string.respond, (dialog, id) -> {
+                }).setPositiveButton(R.string.proceed, (dialog, id) -> {
+            if (finish) {
+                finishSurvey();
+            } else {
+                toNextDisplay();
+            }
+        }).create().show();
     }
 
     @Override
