@@ -56,6 +56,7 @@ public class SurveyViewModel extends AndroidViewModel {
     private List<Integer> mPreviousDisplays;
     private List<String> mLocations;
     private HashMap<Long, DisplayViewModel> mDisplayViewModels;
+    private HashMap<Long, List<Question>> mVisibleQuestions;
 
     private Survey mSurvey;
 
@@ -73,10 +74,15 @@ public class SurveyViewModel extends AndroidViewModel {
         mPreviousDisplays = new ArrayList<>();
         onEmptyDisplayListener = listener;
         mDisplayViewModels = new HashMap<>();
+        mVisibleQuestions = new HashMap<>();
     }
 
     public void setDisplayViewModel(Long displayId, DisplayViewModel displayViewModel) {
         mDisplayViewModels.put(displayId, displayViewModel);
+    }
+
+    public void updateVisibleQuestions(Long displayId, List<Question> displayQuestions) {
+        mVisibleQuestions.put(displayId, displayQuestions);
     }
 
     public Display getDisplay(int position) {
@@ -131,6 +137,12 @@ public class SurveyViewModel extends AndroidViewModel {
 
     public void incrementDisplayPosition() {
         mDisplayPosition += 1;
+        if (mDisplayPosition >= mDisplays.size()) return;
+        Display display = getDisplay(mDisplayPosition);
+        List<Question> questions = mVisibleQuestions.get(display.getRemoteId());
+        if (questions == null || questions.isEmpty()) {
+            incrementDisplayPosition();
+        }
     }
 
     public HashMap<String, Question> getQuestionsMap() {
@@ -153,8 +165,8 @@ public class SurveyViewModel extends AndroidViewModel {
         return mDisplays;
     }
 
-    public void setDisplays(List<Display> mDisplays) {
-        this.mDisplays = mDisplays;
+    public void setDisplays(List<Display> displays) {
+        this.mDisplays = displays;
     }
 
     public List<Integer> getPreviousDisplays() {

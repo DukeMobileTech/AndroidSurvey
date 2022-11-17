@@ -39,11 +39,10 @@ import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.ALL;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
@@ -328,6 +327,11 @@ public class DisplayPagerFragment extends Fragment {
             mQuestionRelationsAdapter.submitList(visibleRelations);
         }
 
+        List<Question> displayQuestions = visibleRelations.stream()
+                .map(questionRelation -> questionRelation.question)
+                .collect(Collectors.toList());
+        mSurveyViewModel.updateVisibleQuestions(mDisplayId, displayQuestions);
+
         int position = ((SurveyActivity) getActivity()).getCurrentPosition();
         Log.i(TAG, "POS " + position);
         Log.i(TAG, "Current ID => " + mSurveyViewModel.getDisplay(position).getRemoteId());
@@ -365,12 +369,7 @@ public class DisplayPagerFragment extends Fragment {
                     hideLoopedQuestions(questionRelation);
                 }
 
-                Collections.sort(questionRelations, new Comparator<QuestionRelation>() {
-                    @Override
-                    public int compare(QuestionRelation o1, QuestionRelation o2) {
-                        return o1.question.getNumberInInstrument() - o2.question.getNumberInInstrument();
-                    }
-                });
+                questionRelations.sort((o1, o2) -> o1.question.getNumberInInstrument() - o2.question.getNumberInInstrument());
 
                 if (questionRelations.size() > 0) {
                     if (mDisplayViewModel.getResponse(questionRelations.get(0).question.getQuestionIdentifier()) == null) {

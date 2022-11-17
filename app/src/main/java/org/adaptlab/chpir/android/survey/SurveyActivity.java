@@ -45,7 +45,6 @@ import org.adaptlab.chpir.android.survey.entities.Response;
 import org.adaptlab.chpir.android.survey.entities.Section;
 import org.adaptlab.chpir.android.survey.entities.Survey;
 import org.adaptlab.chpir.android.survey.relations.DisplayRelation;
-import org.adaptlab.chpir.android.survey.relations.InstrumentRelation;
 import org.adaptlab.chpir.android.survey.relations.QuestionTranslationRelation;
 import org.adaptlab.chpir.android.survey.relations.SectionRelation;
 import org.adaptlab.chpir.android.survey.relations.SurveyRelation;
@@ -72,6 +71,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtmlWhitelist;
@@ -160,8 +160,8 @@ public class SurveyActivity extends AppCompatActivity {
 
     private void setDisplayViewPagers() {
         mViewPager = findViewById(R.id.displayPager);
-        mViewPager.setOffscreenPageLimit(0);
         mViewPager.setAdapter(mDisplayPagerAdapter);
+        mViewPager.setOffscreenPageLimit(5); // TODO Fix
     }
 
     private void addOnPageChangeListener() {
@@ -195,44 +195,48 @@ public class SurveyActivity extends AppCompatActivity {
     private void setInstrumentViewModel(Long instrumentId) {
         InstrumentRelationViewModelFactory factory = new InstrumentRelationViewModelFactory(getApplication(), instrumentId);
         InstrumentRelationViewModel viewModel = ViewModelProviders.of(this, factory).get(InstrumentRelationViewModel.class);
-        viewModel.getInstrumentRelation().observe(this, new Observer<InstrumentRelation>() {
-            @Override
-            public void onChanged(@Nullable InstrumentRelation relation) {
-                if (relation != null) {
-                    mInstrument = relation.instrument;
-                    mSurveyViewModel.setInstrumentLanguage(mInstrument.getLanguage());
-                    if (mSurveyViewModel.getSurvey() != null) {
-                        if (mSurveyViewModel.getSurvey().getInstrumentTitle() == null) {
-                            mSurveyViewModel.getSurvey().setInstrumentTitle(mInstrument.getTitle());
-                        }
-                        if (mSurveyViewModel.getSurvey().getInstrumentVersionNumber() == null) {
-                            mSurveyViewModel.getSurvey().setInstrumentVersionNumber(String.valueOf(mInstrument.getVersionNumber()));
-                        }
+        viewModel.getInstrumentRelation().observe(this, relation -> {
+            if (relation != null) {
+                mInstrument = relation.instrument;
+                mSurveyViewModel.setInstrumentLanguage(mInstrument.getLanguage());
+                if (mSurveyViewModel.getSurvey() != null) {
+                    if (mSurveyViewModel.getSurvey().getInstrumentTitle() == null) {
+                        mSurveyViewModel.getSurvey().setInstrumentTitle(mInstrument.getTitle());
                     }
-                    mSurveyViewModel.update();
-
-                    List<Display> displayList = new ArrayList<>();
-                    for (SectionRelation sectionRelation : relation.sections) {
-                        for (DisplayRelation displayRelation : sectionRelation.displays) {
-                            displayList.add(displayRelation.display);
-                        }
+                    if (mSurveyViewModel.getSurvey().getInstrumentVersionNumber() == null) {
+                        mSurveyViewModel.getSurvey().setInstrumentVersionNumber(String.valueOf(mInstrument.getVersionNumber()));
                     }
-                    displayList = getSortedDisplays(displayList);
-
-                    mSurveyViewModel.setDisplays(displayList);
-                    mDisplayPagerAdapter.setDisplays(displayList);
-
-                    List<Question> questions = new ArrayList<>();
-                    for (QuestionTranslationRelation questionTranslationRelation : relation.questions) {
-                        questions.add(questionTranslationRelation.question);
-                    }
-                    questions.sort((question1, question2) -> question1.getNumberInInstrument() - question2.getNumberInInstrument());
-                    mSurveyViewModel.setQuestions(questions);
-
-                    setActionBarTitle(mSurveyViewModel.getDisplayPosition());
-                    invalidateOptionsMenu();
-                    setCrashlytics();
                 }
+                mSurveyViewModel.update();
+
+                List<Display> displayList = new ArrayList<>();
+                for (SectionRelation sectionRelation : relation.sections) {
+                    for (DisplayRelation displayRelation : sectionRelation.displays) {
+                        displayList.add(displayRelation.display);
+                    }
+                }
+                displayList = getSortedDisplays(displayList);
+
+                mSurveyViewModel.setDisplays(displayList);
+                mDisplayPagerAdapter.setDisplays(displayList);
+
+                List<Question> questions = new ArrayList<>();
+                for (QuestionTranslationRelation questionTranslationRelation : relation.questions) {
+                    questions.add(questionTranslationRelation.question);
+                }
+                questions.sort((question1, question2) -> question1.getNumberInInstrument() - question2.getNumberInInstrument());
+                mSurveyViewModel.setQuestions(questions);
+
+                for (Display display : displayList) {
+                    List<Question> displayQuestions = questions.stream()
+                            .filter(question -> question.getDisplayId().equals(display.getRemoteId()))
+                            .collect(Collectors.toList());
+                    mSurveyViewModel.updateVisibleQuestions(display.getRemoteId(), displayQuestions);
+                }
+
+                setActionBarTitle(mSurveyViewModel.getDisplayPosition());
+                invalidateOptionsMenu();
+                setCrashlytics();
             }
         });
     }
