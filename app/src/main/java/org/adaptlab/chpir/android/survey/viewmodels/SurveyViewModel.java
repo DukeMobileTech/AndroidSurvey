@@ -12,6 +12,7 @@ import androidx.lifecycle.LiveData;
 
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.SurveyApp;
 import org.adaptlab.chpir.android.survey.adapters.OnEmptyDisplayListener;
 import org.adaptlab.chpir.android.survey.entities.Display;
 import org.adaptlab.chpir.android.survey.entities.Question;
@@ -39,7 +40,6 @@ import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 public class SurveyViewModel extends AndroidViewModel {
     public final String TAG = this.getClass().getName();
     private final SurveyRepository mSurveyRepository;
-    private final Context mContext;
     private OnEmptyDisplayListener onEmptyDisplayListener;
     private LiveData<Survey> mLiveDataSurvey;
     private HashSet<String> mQuestionsToSkipSet;
@@ -67,7 +67,6 @@ public class SurveyViewModel extends AndroidViewModel {
     public SurveyViewModel(@NonNull Application application, String uuid, OnEmptyDisplayListener listener) {
         super(application);
         mSurveyRepository = new SurveyRepository(application);
-        mContext = application.getApplicationContext();
         if (uuid == null) return;
         mLiveDataSurvey = mSurveyRepository.getSurveyDao().findByUUID(uuid);
         mDisplayTitles = new LongSparseArray<>();
@@ -370,13 +369,14 @@ public class SurveyViewModel extends AndroidViewModel {
         List<QuestionRelation> displayQuestions = new ArrayList<>(displayViewModel.getQuestions().values());
         displayQuestions.sort((dq1, dq2) -> dq1.question.getPosition() - dq2.question.getPosition());
         HashMap<String, Response> displayResponses = displayViewModel.getResponses();
+        Context context = SurveyApp.getInstance();
         for (QuestionRelation questionRelation : displayQuestions) {
             Question question = questionRelation.question;
             if (!question.getQuestionType().equals(Question.INSTRUCTIONS) &&
                     !mQuestionsToSkipSet.contains(question.getQuestionIdentifier()) &&
                     displayResponses.get(question.getQuestionIdentifier()).isEmptyResponse()) {
                 if (stringBuilder.length() > 0) stringBuilder.append(System.lineSeparator());
-                stringBuilder.append(mContext.getResources().getString(R.string.question))
+                stringBuilder.append(context.getResources().getString(R.string.question))
                         .append(" ").append(question.getPosition())
                         .append(") ")
                         .append(question.getQuestionIdentifier());
