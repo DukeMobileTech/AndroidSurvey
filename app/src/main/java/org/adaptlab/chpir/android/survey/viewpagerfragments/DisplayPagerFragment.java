@@ -2,7 +2,6 @@ package org.adaptlab.chpir.android.survey.viewpagerfragments;
 
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +14,8 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.SurveyActivity;
-import org.adaptlab.chpir.android.survey.adapters.OnEmptyDisplayListener;
 import org.adaptlab.chpir.android.survey.adapters.QuestionRelationAdapter;
 import org.adaptlab.chpir.android.survey.entities.LoopQuestion;
 import org.adaptlab.chpir.android.survey.entities.MultipleSkip;
@@ -42,7 +39,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.ALL;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
@@ -297,13 +293,10 @@ public class DisplayPagerFragment extends Fragment {
     private void hideQuestions() {
         HashSet<String> hideSet = new HashSet<>();
         List<String> displayQuestionIds = new ArrayList<>();
-        Log.i(TAG, "COUNT === " + mQuestionRelations.size());
         for (QuestionRelation questionRelation : mQuestionRelations) {
             displayQuestionIds.add(questionRelation.question.getQuestionIdentifier());
-            Log.i(TAG, "DISPLAY QUESTION => " + questionRelation.question.getQuestionIdentifier());
         }
         for (String questionToSkip : mSurveyViewModel.getQuestionsToSkipSet()) {
-            Log.i(TAG, "TO SKIP => " + questionToSkip);
             if (displayQuestionIds.contains(questionToSkip)) {
                 hideSet.add(questionToSkip);
             }
@@ -314,7 +307,7 @@ public class DisplayPagerFragment extends Fragment {
                 visibleRelations.add(questionRelation);
             }
         }
-        Log.i(TAG, "VISIBLE COUNT => " + visibleRelations.size());
+
         boolean responsesPresent = true;
         for (QuestionRelation questionRelation : visibleRelations) {
             if (mDisplayViewModel.getResponse(questionRelation.question.getQuestionIdentifier()) == null) {
@@ -322,25 +315,14 @@ public class DisplayPagerFragment extends Fragment {
                 break;
             }
         }
-
         if (responsesPresent) {
             mQuestionRelationsAdapter.submitList(visibleRelations);
         }
 
-        List<Question> displayQuestions = visibleRelations.stream()
-                .map(questionRelation -> questionRelation.question)
-                .collect(Collectors.toList());
-        mSurveyViewModel.updateVisibleQuestions(mDisplayId, displayQuestions);
-
-        int position = ((SurveyActivity) getActivity()).getCurrentPosition();
-        Log.i(TAG, "POS " + position);
-        Log.i(TAG, "Current ID => " + mSurveyViewModel.getDisplay(position).getRemoteId());
-        Log.i(TAG, "This ID => " + mDisplayId);
-        if (visibleRelations.isEmpty()) {
-            if (mSurveyViewModel.getDisplay(position).getRemoteId().equals(mDisplayId)) {
-                mSurveyViewModel.moveToNextDisplayOnEmpty();
-            }
-        }
+        SurveyActivity activity = ((SurveyActivity) getActivity());
+        if (activity == null) return;
+        int position = activity.getCurrentPosition();
+        mSurveyViewModel.hideQuestions(position);
     }
 
     private void setQuestions() {
@@ -419,11 +401,7 @@ public class DisplayPagerFragment extends Fragment {
 
     private void setSurvey() {
         if (getActivity() == null || mSurveyUUID == null) return;
-        OnEmptyDisplayListener listener = () -> {
-            if (BuildConfig.DEBUG) Log.i(TAG, "onDisplayEmpty");
-            ((SurveyActivity) getActivity()).setViewPagerPosition();
-        };
-        SurveyViewModelFactory factory = new SurveyViewModelFactory(getActivity().getApplication(), mSurveyUUID, listener);
+        SurveyViewModelFactory factory = new SurveyViewModelFactory(getActivity().getApplication(), mSurveyUUID);
         mSurveyViewModel = ViewModelProviders.of(getActivity(), factory).get(SurveyViewModel.class);
         mSurveyViewModel.getLiveDataSurvey().observe(getViewLifecycleOwner(), new Observer<Survey>() {
             @Override

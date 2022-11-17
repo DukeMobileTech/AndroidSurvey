@@ -13,7 +13,6 @@ import androidx.lifecycle.LiveData;
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.SurveyApp;
-import org.adaptlab.chpir.android.survey.adapters.OnEmptyDisplayListener;
 import org.adaptlab.chpir.android.survey.entities.Display;
 import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.Response;
@@ -40,7 +39,6 @@ import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 public class SurveyViewModel extends AndroidViewModel {
     public final String TAG = this.getClass().getName();
     private final SurveyRepository mSurveyRepository;
-    private OnEmptyDisplayListener onEmptyDisplayListener;
     private LiveData<Survey> mLiveDataSurvey;
     private HashSet<String> mQuestionsToSkipSet;
     private HashMap<String, List<String>> mQuestionsToSkipMap;
@@ -56,24 +54,24 @@ public class SurveyViewModel extends AndroidViewModel {
     private List<Integer> mPreviousDisplays;
     private List<String> mLocations;
     private HashMap<Long, DisplayViewModel> mDisplayViewModels;
-    private HashMap<Long, List<Question>> mVisibleQuestions;
+    private HashMap<Long, List<Question>> mVisibleDisplayQuestions;
+    private HashMap<Long, List<Question>> mDisplayQuestions;
 
     private Survey mSurvey;
-
     private int mDisplayPosition;
     private String mDeviceLanguage;
     private String mInstrumentLanguage;
 
-    public SurveyViewModel(@NonNull Application application, String uuid, OnEmptyDisplayListener listener) {
+    public SurveyViewModel(@NonNull Application application, String uuid) {
         super(application);
         mSurveyRepository = new SurveyRepository(application);
         if (uuid == null) return;
         mLiveDataSurvey = mSurveyRepository.getSurveyDao().findByUUID(uuid);
         mDisplayTitles = new LongSparseArray<>();
         mPreviousDisplays = new ArrayList<>();
-        onEmptyDisplayListener = listener;
         mDisplayViewModels = new HashMap<>();
-        mVisibleQuestions = new HashMap<>();
+        mVisibleDisplayQuestions = new HashMap<>();
+        mDisplayQuestions = new HashMap<>();
     }
 
     public void setDisplayViewModel(Long displayId, DisplayViewModel displayViewModel) {
@@ -81,16 +79,11 @@ public class SurveyViewModel extends AndroidViewModel {
     }
 
     public void updateVisibleQuestions(Long displayId, List<Question> displayQuestions) {
-        mVisibleQuestions.put(displayId, displayQuestions);
+        mVisibleDisplayQuestions.put(displayId, displayQuestions);
     }
 
-    public Display getDisplay(int position) {
-        return mDisplays.get(position);
-    }
-
-    public void moveToNextDisplayOnEmpty() {
-        incrementDisplayPosition();
-        onEmptyDisplayListener.onDisplayEmpty();
+    public void setDisplayQuestions(Long displayId, List<Question> displayQuestions) {
+        mDisplayQuestions.put(displayId, displayQuestions);
     }
 
     public void addDisplayTitle(Long displayId, String translation) {
@@ -137,8 +130,8 @@ public class SurveyViewModel extends AndroidViewModel {
     public void incrementDisplayPosition() {
         mDisplayPosition += 1;
         if (mDisplayPosition >= mDisplays.size()) return;
-        Display display = getDisplay(mDisplayPosition);
-        List<Question> questions = mVisibleQuestions.get(display.getRemoteId());
+        Display display = mDisplays.get(mDisplayPosition);
+        List<Question> questions = mVisibleDisplayQuestions.get(display.getRemoteId());
         if (questions == null || questions.isEmpty()) {
             incrementDisplayPosition();
         }
@@ -384,4 +377,34 @@ public class SurveyViewModel extends AndroidViewModel {
         }
         return stringBuilder.toString();
     }
+
+
+    public void hideQuestions(int position) {
+        HashSet<String> hideSet = new HashSet<>();
+        for (int k = position; k < mDisplays.size(); k++) {
+            Display display = mDisplays.get(k);
+            List<Question> displayQuestions = mDisplayQuestions.get(display.getRemoteId());
+            if (displayQuestions == null) continue;
+
+            List<String> displayQuestionIds = new ArrayList<>();
+            for (Question question : displayQuestions) {
+                displayQuestionIds.add(question.getQuestionIdentifier());
+            }
+
+            for (String questionToSkip : getQuestionsToSkipSet()) {
+                if (displayQuestionIds.contains(questionToSkip)) {
+                    hideSet.add(questionToSkip);
+                }
+            }
+
+            List<Question> visibleDisplayQuestions = new ArrayList<>();
+            for (Question question : displayQuestions) {
+                if (!hideSet.contains(question.getQuestionIdentifier())) {
+                    visibleDisplayQuestions.add(question);
+                }
+            }
+            mVisibleDisplayQuestions.put(display.getRemoteId(), visibleDisplayQuestions);
+        }
+    }
+
 }

@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.LongSparseArray;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,7 +36,6 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.adaptlab.chpir.android.survey.adapters.DisplayPagerAdapter;
 import org.adaptlab.chpir.android.survey.adapters.NavigationDrawerAdapter;
-import org.adaptlab.chpir.android.survey.adapters.OnEmptyDisplayListener;
 import org.adaptlab.chpir.android.survey.entities.Display;
 import org.adaptlab.chpir.android.survey.entities.Instrument;
 import org.adaptlab.chpir.android.survey.entities.Question;
@@ -98,7 +96,6 @@ public class SurveyActivity extends AppCompatActivity {
     private Long mInstrumentId;
     private String mSurveyUUID;
     private LocationManager mLocationManager;
-    private OnEmptyDisplayListener mOnEmptyDisplayListener;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -161,7 +158,6 @@ public class SurveyActivity extends AppCompatActivity {
     private void setDisplayViewPagers() {
         mViewPager = findViewById(R.id.displayPager);
         mViewPager.setAdapter(mDisplayPagerAdapter);
-        mViewPager.setOffscreenPageLimit(5); // TODO Fix
     }
 
     private void addOnPageChangeListener() {
@@ -231,6 +227,7 @@ public class SurveyActivity extends AppCompatActivity {
                     List<Question> displayQuestions = questions.stream()
                             .filter(question -> question.getDisplayId().equals(display.getRemoteId()))
                             .collect(Collectors.toList());
+                    mSurveyViewModel.setDisplayQuestions(display.getRemoteId(), displayQuestions);
                     mSurveyViewModel.updateVisibleQuestions(display.getRemoteId(), displayQuestions);
                 }
 
@@ -273,17 +270,8 @@ public class SurveyActivity extends AppCompatActivity {
         });
     }
 
-    public OnEmptyDisplayListener getOnEmptyDisplayListener() {
-        return mOnEmptyDisplayListener;
-    }
-
     private void setSurveyViewModel(final String surveyUUID) {
-        mOnEmptyDisplayListener = () -> {
-            if (BuildConfig.DEBUG) Log.i(TAG, "onDisplayEmpty");
-            setViewPagerPosition();
-        };
-        SurveyViewModelFactory factory = new SurveyViewModelFactory(getApplication(), surveyUUID,
-                mOnEmptyDisplayListener);
+        SurveyViewModelFactory factory = new SurveyViewModelFactory(getApplication(), surveyUUID);
         mSurveyViewModel = ViewModelProviders.of(this, factory).get(SurveyViewModel.class);
 
         mSurveyViewModel.getLiveDataSurvey().observe(this, survey -> {
