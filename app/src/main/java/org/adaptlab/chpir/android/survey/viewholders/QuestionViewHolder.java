@@ -6,11 +6,9 @@ import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
-import android.os.Build;
 import android.text.Editable;
 import android.text.Html;
 import android.text.Spanned;
@@ -19,7 +17,6 @@ import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.LongSparseArray;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -51,7 +48,6 @@ import org.adaptlab.chpir.android.survey.adapters.ChoiceDiagramAdapter;
 import org.adaptlab.chpir.android.survey.adapters.QuestionDiagramAdapter;
 import org.adaptlab.chpir.android.survey.adapters.QuestionRelationAdapter;
 import org.adaptlab.chpir.android.survey.entities.ConditionSkip;
-import org.adaptlab.chpir.android.survey.entities.Instruction;
 import org.adaptlab.chpir.android.survey.entities.NextQuestion;
 import org.adaptlab.chpir.android.survey.entities.Option;
 import org.adaptlab.chpir.android.survey.entities.Question;
@@ -106,7 +102,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     private QuestionRelation mQuestionRelation;
     private Survey mSurvey;
     private Response mResponse;
-    private Instruction mOptionSetInstruction;
+    private InstructionRelation mOptionSetInstruction;
     private List<OptionRelation> mOptionRelations;
     private List<OptionRelation> mSpecialOptionRelations;
     private List<OptionRelation> mCarryForwardOptionRelations;
@@ -262,9 +258,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                     ((EditText) view).setHint(null);
                 }
                 if (view instanceof TextView) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        ((TextView) view).setTextColor(getContext().getColor(R.color.secondary_text));
-                    }
+                    ((TextView) view).setTextColor(getContext().getColor(R.color.secondary_text));
                 }
             }
         }
@@ -272,7 +266,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
     void setOptionText(String text, CompoundButton button) {
         button.setText(styleTextWithHtmlWhitelist(text));
-        button.setTextColor(getContext().getResources().getColorStateList(R.color.states));
+        button.setTextColor(ContextCompat.getColorStateList(getContext(), R.color.states));
     }
 
     void setOptionPopUpInstruction(ViewGroup questionComponent, View view, int viewId, OptionRelation optionRelation) {
@@ -1051,6 +1045,9 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
             mAfterTextInstructionTextView.setVisibility(View.GONE);
         } else {
             mAfterTextInstructionTextView.setText(getAfterTextInstructions());
+            if (mQuestionRelation.question.isCarryForward()) {
+                mAfterTextInstructionTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.blue));
+            }
         }
     }
 
@@ -1142,8 +1139,9 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                     String[] listOfIndices = getCarryForwardResponse().getText().split(COMMA);
                     String best = listOfIndices[0];
                     OptionRelation optionRelation = mCarryForwardOptionRelations.get(Integer.parseInt(best));
-                    text = getQuestion().getText().replaceFirst("\\[followup\\]",
-                            Html.fromHtml(optionRelation.option.getText()).toString().trim());
+                    text = TranslationUtil.getText(getQuestion(), mQuestionRelation.translations, mSurveyViewModel);
+                    String oText = TranslationUtil.getText(optionRelation.option, optionRelation.translations, mSurveyViewModel);
+                    text = text.replaceFirst("\\[followup\\]", Html.fromHtml(oText).toString().trim());
                 }
             }
         }
@@ -1152,7 +1150,9 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
     private void setOptionSetInstructionsText() {
         if (mOptionSetInstruction != null && mOptionSetInstructionTextView != null &&
-                !mQuestionRelation.question.getQuestionType().equals(Question.PAIRWISE_COMPARISON)) {
+                !mQuestionRelation.question.getQuestionType().equals(Question.PAIRWISE_COMPARISON) &&
+                !mQuestionRelation.question.getQuestionType().equals(Question.CHOICE_TASK)
+        ) {
             mOptionSetInstructionTextView.setText(getOptionSetInstructions());
             mOptionSetInstructionTextView.setVisibility(View.VISIBLE);
         }
@@ -1161,7 +1161,8 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     public String getOptionSetInstructions() {
         String instructions = "";
         if (mOptionSetInstruction != null) {
-            instructions = mOptionSetInstruction.getText();
+            instructions = TranslationUtil.getText(mOptionSetInstruction.instruction,
+                    mOptionSetInstruction.translations, getSurveyViewModel());
         }
         return styleTextWithHtml(instructions).toString();
     }

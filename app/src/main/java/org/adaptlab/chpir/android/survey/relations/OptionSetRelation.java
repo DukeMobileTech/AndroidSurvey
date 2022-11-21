@@ -13,7 +13,7 @@ public class OptionSetRelation {
     @Embedded
     public OptionSet optionSet;
     @Relation(parentColumn = "InstructionRemoteId", entityColumn = "RemoteId", entity = Instruction.class)
-    public List<Instruction> instructions;
+    public List<InstructionRelation> instructions;
     @Relation(parentColumn = "RemoteId", entityColumn = "OptionSetRemoteId", entity = OptionSetOption.class)
     public List<OptionSetOptionRelation> optionSetOptions;
 }

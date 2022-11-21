@@ -48,9 +48,9 @@
                 android:scrollbars="vertical"
                 android:textColor="@color/blue"
                 android:textSize="22sp"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/beforeTextInstructions" />
 
             <LinearLayout
@@ -70,6 +70,7 @@
                 android:id="@+id/afterTextInstructions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
                 android:scrollbars="vertical"
                 android:textColor="@color/secondary_text"
                 android:textSize="20sp"

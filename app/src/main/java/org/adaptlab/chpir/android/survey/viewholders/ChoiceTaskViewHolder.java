@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.content.res.AppCompatResources;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.card.MaterialCardView;
 
@@ -36,12 +37,29 @@ import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithH
 public class ChoiceTaskViewHolder extends QuestionViewHolder {
     private ArrayList<Integer> mResponseIndices;
     private ArrayList<MaterialCardView> mCardViews;
+    private TextView mAfterChoiceText;
 
     ChoiceTaskViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
         super(itemView, context, listener);
     }
 
     protected void beforeAddViewHook(ViewGroup questionComponent) {
+        mAfterChoiceText = new TextView(getContext());
+        mAfterChoiceText.setText(getOptionSetInstructions());
+        mAfterChoiceText.setTextSize(22);
+        mAfterChoiceText.setTextColor(ContextCompat.getColor(getContext(), R.color.blue));
+        questionComponent.addView(mAfterChoiceText);
+        setAfterChoiceTextVisibility();
+    }
+
+    private void setAfterChoiceTextVisibility() {
+        if (mAfterChoiceText == null) return;
+
+        if (mResponseIndices.size() == 0) {
+            mAfterChoiceText.setVisibility(View.GONE);
+        } else {
+            mAfterChoiceText.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -123,6 +141,7 @@ public class ChoiceTaskViewHolder extends QuestionViewHolder {
             }
         }
         questionComponent.addView(imageLayout);
+        beforeAddViewHook(questionComponent);
     }
 
     private void setResponseIndex(int index, boolean isChecked) {
@@ -149,6 +168,7 @@ public class ChoiceTaskViewHolder extends QuestionViewHolder {
                 unCheckCards();
             }
         }
+        setAfterChoiceTextVisibility();
         saveResponse();
     }
 
@@ -198,12 +218,14 @@ public class ChoiceTaskViewHolder extends QuestionViewHolder {
                 cardView.setCardForegroundColor(getContext().getColorStateList(R.color.second));
             }
         }
+        setAfterChoiceTextVisibility();
     }
 
     @Override
     protected void unSetResponse() {
         mResponseIndices = new ArrayList<>();
         unCheckCards();
+        setAfterChoiceTextVisibility();
     }
 
     @Override
