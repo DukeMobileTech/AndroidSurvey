@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
@@ -18,6 +19,7 @@ import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.LongSparseArray;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -36,6 +38,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -122,6 +126,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     private LinearLayout mGridViewLayout;
     private AppCompatButton mRecordButton;
     private AppCompatButton mPlayButton;
+    private ConstraintLayout mConstraintLayout;
 
     private boolean mDeserializing = false;
     private boolean mRecord;
@@ -137,6 +142,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         mListener = listener;
         mResponseRepository = new ResponseRepository((Application) context.getApplicationContext());
 
+        mConstraintLayout = itemView.findViewById(R.id.constraintLayout);
         mNumberTextView = itemView.findViewById(R.id.numberTextView);
         mBeforeTextInstructionTextView = itemView.findViewById(R.id.beforeTextInstructions);
         mSpannedTextView = itemView.findViewById(R.id.spannedTextView);
@@ -279,21 +285,16 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
             optionLayout.setOrientation(LinearLayout.HORIZONTAL);
             optionLayout.addView(view);
             ImageButton imageButton = new ImageButton(getContext());
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                imageButton.setBackgroundColor(getContext().getColor(R.color.white));
-                imageButton.setImageDrawable(getContext().getDrawable(R.drawable.ic_info_outline_blue_24dp));
-            }
-            imageButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    showPopUpInstruction(getOptionPopUpInstructions(optionInstruction));
-                }
-            });
+            imageButton.setBackgroundColor(getContext().getColor(R.color.white));
+            imageButton.setImageDrawable(getContext().getDrawable(R.drawable.ic_info_outline_blue_24dp));
+            imageButton.setOnClickListener(view1 -> showPopUpInstruction(getOptionPopUpInstructions(optionInstruction)));
             optionLayout.addView(imageButton);
             questionComponent.addView(optionLayout, viewId);
         } else {
-            questionComponent.addView(view, viewId);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.setMargins(0, 10, 0, 10);
+            questionComponent.addView(view, viewId, params);
         }
     }
 
@@ -887,6 +888,13 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                     getQuestionPopUpInstructions());
         }
         mSpannedTextView.setText(getQuestionText());
+        if (mQuestionRelation.question.getQuestionType().equals(Question.PAIRWISE_COMPARISON)) {
+            ConstraintSet constraintSet = new ConstraintSet();
+            constraintSet.clone(mConstraintLayout);
+            constraintSet.center(R.id.spannedTextView, ConstraintSet.PARENT_ID, ConstraintSet.LEFT, 0,
+                    ConstraintSet.PARENT_ID, ConstraintSet.RIGHT, 0, 0.5f);
+            constraintSet.applyTo(mConstraintLayout);
+        }
         setQuestionDiagrams();
     }
 

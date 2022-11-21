@@ -46,12 +46,9 @@ public class SelectMultipleViewHolder extends QuestionViewHolder {
             setOptionText(text, checkbox);
             checkbox.setId(optionId);
             toggleCarryForward(checkbox, optionId);
-            checkbox.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    toggleExclusiveOptions(v.getId(), optionRelation);
-                    toggleResponseIndex(v.getId());
-                }
+            checkbox.setOnClickListener(v -> {
+                toggleExclusiveOptions(v.getId(), optionRelation);
+                toggleResponseIndex(v.getId());
             });
             mCheckBoxes.add(checkbox);
             setOptionPopUpInstruction(questionComponent, checkbox, optionId, optionRelation);
@@ -68,7 +65,7 @@ public class SelectMultipleViewHolder extends QuestionViewHolder {
                         OptionSetOptionRelation relation = getOptionSetOptionRelations().valueAt(k);
                         if (NumberUtils.isNumber(id) && relation.optionSetOption.getRemoteId().equals(Long.valueOf(id))) {
                             int index = getOptionRelations().indexOf(relation.options.get(0));
-                            resetExclusives(Integer.valueOf(index));
+                            resetExclusives(index);
                             Set<Integer> set = mExclusives.get(index);
                             if (set == null) set = new HashSet<>();
                             set.add(optionIndex);

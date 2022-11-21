@@ -199,8 +199,8 @@
     <string name="stop_recording">Acha Kurekodi</string>
     <string name="play_recording">Cheza Rekodi</string>
     <string name="stop_playing">Acha Kucheza</string>
-    <string name="strongly_prefer">Napendelea zaidi</string>
-    <string name="no_preference">Hakuna kupendelea</string>
+    <string name="strongly_prefer">Napendelea\n zaidi</string>
+    <string name="no_preference">Hapana\n sipendelei</string>
     <string name="image">Image</string>
     <string name="_5">5</string>
     <string name="_0">0</string>
