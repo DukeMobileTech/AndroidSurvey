@@ -8,7 +8,7 @@
     android:orientation="vertical"
     tools:openDrawer="start">
 
-    <androidx.viewpager.widget.ViewPager
+    <org.adaptlab.chpir.android.survey.views.CustomViewPager
         android:id="@+id/displayPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
