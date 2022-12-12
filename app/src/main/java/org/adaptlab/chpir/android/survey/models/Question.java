@@ -100,7 +100,13 @@ public class Question extends ReceiveModel {
                 .executeSingle();
     }
 
-    static Question copyAttributes(Question destination, Question source) {
+    public static Question findByQuestionIdentifier(String identifier, Long instrumentId, boolean isDeleted) {
+        if (identifier == null) return null;
+        return new Select().from(Question.class).where("QuestionIdentifier = ? AND InstrumentRemoteId = ? AND Deleted = ?",
+                identifier, instrumentId, isDeleted ? 1 : 0).executeSingle();
+    }
+
+    static void copyAttributes(Question destination, Question source) {
         destination.mText = source.mText;
         destination.mQuestionType = source.mQuestionType;
         destination.mOptionCount = source.mOptionCount;
@@ -118,7 +124,6 @@ public class Question extends ReceiveModel {
         destination.mLoopQuestionCount = source.mLoopQuestionCount;
         destination.mQuestionId = source.mQuestionId;
         destination.mInstructionId = source.mInstructionId;
-        return destination;
     }
 
     public static Question findByRemoteId(Long id) {
@@ -805,4 +810,12 @@ public class Question extends ReceiveModel {
         GEO_LOCATION, DROP_DOWN, RANGE, SUM_OF_PARTS, SIGNATURE
     }
 
+    public String toString() {
+        return "identifier: " + getQuestionIdentifier() +
+                " instrumentId: " + getInstrumentRemoteId() +
+                " displayId: " + getDisplayId() +
+                " displayInstrumentId: " + getDisplay().getInstrument().getRemoteId() +
+                " deleted: " + isDeleted()
+                ;
+    }
 }

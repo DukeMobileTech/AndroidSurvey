@@ -215,7 +215,8 @@ public class DisplayFragment extends Fragment {
         if (mSurveyFragment == null || mDisplay == null) return "";
         StringBuilder stringBuilder = new StringBuilder();
         for (Question question : mSurveyFragment.getDisplayQuestions(mDisplay)) {
-            if (!mSurveyFragment.getQuestionsToSkipSet().contains(question.getQuestionIdentifier()) &&
+            if (!question.getQuestionType().equals(Question.QuestionType.INSTRUCTIONS) &&
+                    !mSurveyFragment.getQuestionsToSkipSet().contains(question.getQuestionIdentifier()) &&
                     mSurveyFragment.getResponses().get(question.getQuestionIdentifier()).isResponseEmpty()) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                     if (stringBuilder.length() > 0) stringBuilder.append(System.lineSeparator());

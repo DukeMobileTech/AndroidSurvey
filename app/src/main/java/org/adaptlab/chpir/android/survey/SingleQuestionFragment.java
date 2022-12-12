@@ -272,20 +272,24 @@ public abstract class SingleQuestionFragment extends QuestionFragment {
         }
 
         Button clearButton = v.findViewById(R.id.clearResponsesButton);
-        clearButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mSpecialResponses.clearCheck();
-                unSetResponse();
-                if (mQuestion.rankResponses()) {
-                    if (mRankLayout != null && mOptionsAdapter != null) {
-                        mOptionsAdapter.clear();
-                        mRankLayout.setVisibility(View.GONE);
+        if (mQuestion.getQuestionType().equals(Question.QuestionType.INSTRUCTIONS)) {
+            clearButton.setVisibility(View.GONE);
+        } else {
+            clearButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mSpecialResponses.clearCheck();
+                    unSetResponse();
+                    if (mQuestion.rankResponses()) {
+                        if (mRankLayout != null && mOptionsAdapter != null) {
+                            mOptionsAdapter.clear();
+                            mRankLayout.setVisibility(View.GONE);
+                        }
                     }
+                    setResponse(Response.BLANK);
                 }
-                setResponse(Response.BLANK);
-            }
-        });
+            });
+        }
     }
 
     protected void setDisplayInstructions() {

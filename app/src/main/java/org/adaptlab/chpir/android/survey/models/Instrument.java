@@ -176,11 +176,55 @@ public class Instrument extends ReceiveModel {
         mRemoteId = id;
     }
 
+    private void sanitizeDisplays() {
+        HashMap<Long, List<Question>> displayQuestions = getDisplayQuestions();
+        for (Iterator<Display> iterator = mDisplays.iterator(); iterator.hasNext(); ) {
+            Display display = iterator.next();
+            if (displayQuestions.get(display.getRemoteId()) == null) {
+                // Display has no questions, so delete it
+                display.delete();
+                iterator.remove();
+            }
+            // Temp fix
+            List<Question> questions = displayQuestions.get(display.getRemoteId());
+            if (questions != null && display.getQuestionCount() != questions.size()) {
+                boolean getOut = false;
+                for (Question question : questions) {
+                    if (question.getLoopQuestionCount() > 0 ) {
+                        List<LoopQuestion> loopQuestions = question.loopQuestions();
+                        for (LoopQuestion loopQuestion : loopQuestions) {
+                            if (loopQuestion.isSameDisplay()) {
+                                display.setQuestionCount(questions.size());
+                                getOut = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (getOut) break;
+                }
+            }
+        }
+        // Ensure they are numbered consecutively
+        Collections.sort(mDisplays, new Comparator<Display>() {
+            @Override
+            public int compare(Display o1, Display o2) {
+                return Double.compare(o1.getDisplayPosition(), o2.getDisplayPosition());
+            }
+        });
+        for (int k = 0; k < mDisplays.size(); k++) {
+            Display display = mDisplays.get(k);
+            if (display.getPosition() != k + 1) {
+                display.setPosition(k + 1);
+                display.save();
+            }
+        }
+    }
+
     private void sanitize() {
         HashMap<Long, List<Question>> mDisplayQuestions = getDisplayQuestions();
         for (Display display : displays()) {
-            if (mDisplayQuestions.get(display.getRemoteId()) == null || display.getQuestionCount()
-                    != mDisplayQuestions.get(display.getRemoteId()).size()) {
+            List<Question> questionList = mDisplayQuestions.get(display.getRemoteId());
+            if (questionList == null || display.getQuestionCount() != questionList.size()) {
                 setLoaded(false);
                 return;
             }
@@ -650,50 +694,6 @@ public class Instrument extends ReceiveModel {
         }
     }
 
-    private void sanitizeDisplays() {
-        HashMap<Long, List<Question>> displayQuestions = getDisplayQuestions();
-        for (Iterator<Display> iterator = mDisplays.iterator(); iterator.hasNext(); ) {
-            Display display = iterator.next();
-            if (displayQuestions.get(display.getRemoteId()) == null) {
-                // Display has no questions, so delete it
-                display.delete();
-                iterator.remove();
-            }
-            // Temp fix
-            List<Question> questions = displayQuestions.get(display.getRemoteId());
-            if (questions != null && display.getQuestionCount() != questions.size()) {
-                boolean getOut = false;
-                for (Question question : questions) {
-                    if (question.getLoopQuestionCount() > 0 ) {
-                        List<LoopQuestion> loopQuestions = question.loopQuestions();
-                        for (LoopQuestion loopQuestion : loopQuestions) {
-                            if (loopQuestion.isSameDisplay()) {
-                                display.setQuestionCount(questions.size());
-                                getOut = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (getOut) break;
-                }
-            }
-        }
-        // Ensure they are numbered consecutively
-        Collections.sort(mDisplays, new Comparator<Display>() {
-            @Override
-            public int compare(Display o1, Display o2) {
-                return Double.compare(o1.getDisplayPosition(), o2.getDisplayPosition());
-            }
-        });
-        for (int k = 0; k < mDisplays.size(); k++) {
-            Display display = mDisplays.get(k);
-            if (display.getPosition() != k + 1) {
-                display.setPosition(k + 1);
-                display.save();
-            }
-        }
-    }
-
     private Display getDisplay(Question q, LoopQuestion lq, List<LoopQuestion> lqs) {
         Display parent = q.getDisplay();
         if (lq.isSameDisplay()) {
@@ -744,7 +744,7 @@ public class Instrument extends ReceiveModel {
         Question source = lq.loopedQuestion();
         if (source == null) return;
         String identifier = question.getQuestionIdentifier() + "_" + source.getQuestionIdentifier() + "_" + index;
-        Question loopedQuestion = Question.findByQuestionIdentifier(identifier);
+        Question loopedQuestion = Question.findByQuestionIdentifier(identifier, mRemoteId, lq.isDeleted());
         if (loopedQuestion == null) {
             loopedQuestion = new Question();
             loopedQuestion.setRemoteId(getBoundedRemoteId());
@@ -753,7 +753,7 @@ public class Instrument extends ReceiveModel {
             loopedQuestion.setQuestionIdentifier(identifier);
         }
         loopedQuestion.setLoopSource(source.getQuestionIdentifier());
-        loopedQuestion = Question.copyAttributes(loopedQuestion, source);
+        Question.copyAttributes(loopedQuestion, source);
         if (lq.isSameDisplay()) {
             loopedQuestion.setNumberInInstrument(source.getNumberInInstrument());
         } else {
@@ -765,6 +765,8 @@ public class Instrument extends ReceiveModel {
             loopedQuestion.setDeleted(true);
             source.setLoopQuestionCount(source.loopQuestions().size());
             source.save();
+        } else {
+            loopedQuestion.setDeleted(false);
         }
         loopedQuestion.save();
         setLoopedQuestionSkips(question, source, loopedQuestion, index);

@@ -72,8 +72,8 @@ public class LoopQuestion extends Model {
     }
 
     public Question loopedQuestion() {
-        return new Select().from(Question.class).where("QuestionIdentifier = ?",
-                getLooped()).executeSingle();
+        return new Select().from(Question.class).where("QuestionIdentifier = ? AND InstrumentRemoteId = ?",
+                getLooped(), getQuestion().getInstrumentRemoteId()).executeSingle();
     }
 
     public String getOptionIndices() {
