@@ -7,7 +7,6 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.viewpager.widget.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -82,19 +81,23 @@ public class DisplayFragment extends Fragment {
     public void onResume() {
         super.onResume();
         // Scroll to the top question
-        mSurveyFragment.getScrollView().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mSurveyFragment.getScrollView().scrollTo(0, 0);
-            }
-        }, 100);
+        if (mSurveyFragment != null) {
+            mSurveyFragment.getScrollView().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mSurveyFragment.getScrollView().scrollTo(0, 0);
+                }
+            }, 100);
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mSurveyFragment.persistSkippedQuestions();
-        mSurveyFragment.persistSkipMaps();
+        if (mSurveyFragment != null) {
+            mSurveyFragment.persistSkippedQuestions();
+            mSurveyFragment.persistSkipMaps();
+        }
     }
 
     @Override
@@ -114,7 +117,7 @@ public class DisplayFragment extends Fragment {
     }
 
     private void createQuestionFragments() {
-        if (mSurveyFragment == null || getActivity() == null) return;
+        if (mSurveyFragment == null || getActivity() == null || mDisplayLayout == null) return;
         FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         for (Question question : mSurveyFragment.getDisplayQuestions(mDisplay)) {
@@ -136,7 +139,7 @@ public class DisplayFragment extends Fragment {
             if (frameLayout == null) {
                 frameLayout = new FrameLayout(getActivity());
                 frameLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup
-                        .LayoutParams.MATCH_PARENT, ViewPager.LayoutParams.WRAP_CONTENT));
+                        .LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                 frameLayout.setId(frameLayoutId);
                 mDisplayLayout.addView(frameLayout);
             }
@@ -149,7 +152,6 @@ public class DisplayFragment extends Fragment {
 
                     questionFragment = (QuestionFragment) QuestionFragmentFactory.createQuestionFragment(question);
                     questionFragment.setArguments(bundle);
-                    fragmentTransaction.add(frameLayout.getId(), questionFragment, qfTag);
                 } else {
                     if (question.getQuestionType() == Question.QuestionType.SELECT_ONE) {
                         questionFragment = new SingleSelectMultipleQuestionsFragment();
@@ -169,8 +171,8 @@ public class DisplayFragment extends Fragment {
                     bundle.putLong(MultipleQuestionsFragment.EXTRA_SURVEY_ID, mSurvey.getId());
                     bundle.putString(MultipleQuestionsFragment.EXTRA_TABLE_ID, question.getTableIdentifier());
                     questionFragment.setArguments(bundle);
-                    fragmentTransaction.add(frameLayout.getId(), questionFragment, qfTag);
                 }
+                fragmentTransaction.add(frameLayout.getId(), questionFragment, qfTag);
             } else {
                 fragmentTransaction.show(questionFragment);
             }

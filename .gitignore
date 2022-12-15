@@ -24,6 +24,7 @@ proguard/
 
 # Services
 app/google-services.json
+app/src/dce/google-services.json
 
 # API Keys
 app/src/main/res/values/keys.xml

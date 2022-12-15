@@ -358,6 +358,7 @@ public class SurveyFragment extends Fragment {
     }
 
     private void finishActivity() {
+        if (getActivity() == null) return;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getActivity().finishAfterTransition();
         } else {
@@ -825,6 +826,7 @@ public class SurveyFragment extends Fragment {
             responses = Arrays.asList(text.split(Response.LIST_DELIMITER)); // Ignore empty values
         }
         List<LoopQuestion> loopQuestions = mLoopQuestions.get(question.getQuestionIdentifier());
+        if (loopQuestions == null) loopQuestions = new ArrayList<>();
         List<String> questionsToHide = new ArrayList<>();
         for (LoopQuestion lq : loopQuestions) {
             questionsToHide.add(lq.getLooped());
