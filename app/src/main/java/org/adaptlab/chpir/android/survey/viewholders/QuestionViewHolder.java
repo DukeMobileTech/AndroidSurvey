@@ -1045,7 +1045,8 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
             mAfterTextInstructionTextView.setVisibility(View.GONE);
         } else {
             mAfterTextInstructionTextView.setText(getAfterTextInstructions());
-            if (mQuestionRelation.question.isCarryForward()) {
+            if (mQuestionRelation.question.isCarryForward() ||
+                    mQuestionRelation.question.getQuestionType().equals(Question.CHOICE_TASK)) {
                 mAfterTextInstructionTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.blue));
             }
         }
