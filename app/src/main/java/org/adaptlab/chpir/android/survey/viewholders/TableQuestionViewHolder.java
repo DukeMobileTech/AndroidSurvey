@@ -23,6 +23,7 @@ import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.relations.OptionRelation;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
 import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
+import org.adaptlab.chpir.android.survey.viewmodels.DisplayViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +43,7 @@ public abstract class TableQuestionViewHolder extends QuestionViewHolder {
     }
 
     @Override
-    public void setRelations(QuestionRelation questionRelation) {
+    public void setRelations(QuestionRelation questionRelation, DisplayViewModel viewModel) {
         setQuestionRelation(questionRelation);
         setOptionSetItems(questionRelation);
         setSpecialOptions(questionRelation);

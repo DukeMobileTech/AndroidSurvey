@@ -42,8 +42,7 @@ public class QuestionRelationTableAdapter extends QuestionRelationAdapter {
         viewHolder.setAdapter(this);
         viewHolder.setSurveyViewModel(getSurveyViewModel());
         QuestionRelation questionRelation = getQuestionRelation(position);
-        viewHolder.setRelations(questionRelation);
-        viewHolder.setDisplayViewModel(getDisplayViewModel());
+        viewHolder.setRelations(questionRelation, getDisplayViewModel());
     }
 
     @Override

@@ -2,7 +2,6 @@ package org.adaptlab.chpir.android.survey.views;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 
 import androidx.annotation.NonNull;
@@ -10,7 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.viewpager.widget.ViewPager;
 
 public class CustomViewPager extends ViewPager {
-    private    final     int minimumDistance = 100;
+    private final int minimumDistance = 100;
     private SwipeListener mSwipeListener;
     private float x1, x2;
     private boolean swipe;
@@ -29,7 +28,7 @@ public class CustomViewPager extends ViewPager {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
-        Log.i("CustomViewPager", "onInterceptTouchEvent");
+//        Log.i("CustomViewPager", "onInterceptTouchEvent");
 //        switch (event.getAction()) {
 //            case MotionEvent.ACTION_DOWN:
 //                x1 = event.getX();

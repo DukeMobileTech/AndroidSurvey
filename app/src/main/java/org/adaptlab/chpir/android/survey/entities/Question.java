@@ -245,7 +245,14 @@ public class Question implements SurveyEntity, Translatable {
         String text = mText;
         String[] listOfIndices = carriedForwardResponse.getText().split(COMMA);
         String best = listOfIndices[0];
-        OptionRelation optionRelation = carryForwardOptionRelations.get(Integer.parseInt(best));
+        OptionRelation optionRelation;
+        if (carriedForwardResponse.getRandomizedData() != null && !carriedForwardResponse.getRandomizedData().isEmpty()) {
+            String[] orderList = carriedForwardResponse.getRandomizedData().split(COMMA);
+            int bestReordered = Integer.parseInt(orderList[Integer.parseInt(best)]);
+            optionRelation = carryForwardOptionRelations.get(bestReordered);
+        } else {
+            optionRelation = carryForwardOptionRelations.get(Integer.parseInt(best));
+        }
         text = text.replaceFirst("\\[followup\\]",
                 Html.fromHtml(optionRelation.option.getText()).toString().trim());
         mText = text;

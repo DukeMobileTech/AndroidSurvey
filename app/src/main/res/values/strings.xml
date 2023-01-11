@@ -209,4 +209,7 @@
     <string name="b5">B5</string>
     <string name="a">A</string>
     <string name="b">B</string>
+    <string name="c">C</string>
+    <string name="order">Order: %s</string>
+    <string name="option">Option </string>
 </resources>

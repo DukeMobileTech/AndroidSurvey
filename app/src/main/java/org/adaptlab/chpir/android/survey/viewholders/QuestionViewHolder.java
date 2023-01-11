@@ -10,7 +10,6 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.text.Editable;
-import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -166,8 +165,10 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         }
     }
 
-    public void setRelations(QuestionRelation questionRelation) {
+    public void setRelations(QuestionRelation questionRelation, DisplayViewModel viewModel) {
         mQuestionRelation = questionRelation;
+        mDisplayViewModel = viewModel;
+        mResponse = mDisplayViewModel.getResponse(getQuestion().getQuestionIdentifier());
         setCrashlytics();
         setOptionSetItems(questionRelation);
         setSpecialOptions(questionRelation);
@@ -178,6 +179,10 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         // Overridden by subclasses to place their graphical elements on the fragment.
         createQuestionComponent(mResponseComponent);
         setSpecialResponseView();
+
+        mDeserializing = true;
+        deserializeResponse();
+        mDeserializing = false;
     }
 
     SurveyViewModel getSurveyViewModel() {
@@ -187,14 +192,6 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     public void setSurveyViewModel(SurveyViewModel model) {
         mSurveyViewModel = model;
         if (mSurveyViewModel != null) mSurvey = mSurveyViewModel.getSurvey();
-    }
-
-    public void setDisplayViewModel(DisplayViewModel viewModel) {
-        mDisplayViewModel = viewModel;
-        mResponse = mDisplayViewModel.getResponse(getQuestion().getQuestionIdentifier());
-        mDeserializing = true;
-        deserializeResponse();
-        mDeserializing = false;
     }
 
     QuestionRelationAdapter getAdapter() {
@@ -878,7 +875,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
             mSpannedTextView.setCompoundDrawables(null, null, null, null);
         } else {
             setCompoundDrawableRight(mSpannedTextView,
-                    getContext().getResources().getDrawable(R.drawable.ic_info_outline_blue_24dp),
+                    ContextCompat.getDrawable(getContext(), R.drawable.ic_info_outline_blue_24dp),
                     getQuestionPopUpInstructions());
         }
         mSpannedTextView.setText(getQuestionText());
@@ -921,8 +918,9 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     private void setCarryForwardDiagrams() {
         if (mQuestionRelation.question.isCarryForward()) {
             if (getCarryForwardQuestion().getQuestionType().equals(Question.CHOICE_TASK)) {
-                if (!getCarryForwardResponse().getText().isEmpty()) {
-                    String[] listOfIndices = getCarryForwardResponse().getText().split(COMMA);
+                Response carryForwardResponse = getCarryForwardResponse();
+                if (!carryForwardResponse.getText().isEmpty()) {
+                    String[] listOfIndices = carryForwardResponse.getText().split(COMMA);
                     int best = Integer.parseInt(listOfIndices[0]);
                     mGridViewLayout.removeAllViews();
                     mGridViewLayout.setVisibility(View.VISIBLE);
@@ -933,6 +931,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
                     LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                     LinearLayout imageLayout = (LinearLayout) inflater.inflate(R.layout.choice_task, null);
+
                     for (final OptionRelation optionRelation : mCarryForwardOptionRelations) {
                         ArrayList<Integer> collageHeights = new ArrayList<>();
                         ArrayList<LinearLayout> collageLayouts = new ArrayList<>();
@@ -1134,18 +1133,6 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                 }
             }
         }
-        if (mQuestionRelation.question.isCarryForward()) {
-            if (getCarryForwardQuestion().getQuestionType().equals(Question.CHOICE_TASK)) {
-                if (!getCarryForwardResponse().getText().isEmpty()) {
-                    String[] listOfIndices = getCarryForwardResponse().getText().split(COMMA);
-                    String best = listOfIndices[0];
-                    OptionRelation optionRelation = mCarryForwardOptionRelations.get(Integer.parseInt(best));
-                    text = TranslationUtil.getText(getQuestion(), mQuestionRelation.translations, mSurveyViewModel);
-                    String oText = TranslationUtil.getText(optionRelation.option, optionRelation.translations, mSurveyViewModel);
-                    text = text.replaceFirst("\\[followup\\]", Html.fromHtml(oText).toString().trim());
-                }
-            }
-        }
         return styleTextWithHtml(text);
     }
 
@@ -1277,6 +1264,25 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                     if (relation.options.size() > 0) {
                         mCarryForwardOptionRelations.add(relation.options.get(0));
                     }
+                }
+            }
+
+            if (getCarryForwardQuestion().getQuestionType().equals(Question.CHOICE_TASK)) {
+                Response carryForwardResponse = getCarryForwardResponse();
+                List<OptionRelation> carryForwardOptionRelations = new ArrayList<>();
+                if (carryForwardResponse.getRandomizedData() != null && !carryForwardResponse.getRandomizedData().isEmpty()) {
+                    String[] orderList = carryForwardResponse.getRandomizedData().split(COMMA);
+                    List<Integer> order = new ArrayList<>();
+                    for (String index : orderList) {
+                        if (!index.isEmpty()) {
+                            int indexInteger = Integer.parseInt(index);
+                            order.add(indexInteger);
+                        }
+                    }
+                    for (Integer integer : order) {
+                        carryForwardOptionRelations.add(mCarryForwardOptionRelations.get(integer));
+                    }
+                    mCarryForwardOptionRelations = carryForwardOptionRelations;
                 }
             }
         }

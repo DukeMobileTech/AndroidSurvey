@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +16,6 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.material.card.MaterialCardView;
 
-import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.adapters.ChoiceDiagramAdapter;
 import org.adaptlab.chpir.android.survey.relations.CollageRelation;
@@ -30,6 +28,7 @@ import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtmlWhitelist;
@@ -70,15 +69,48 @@ public class ChoiceTaskViewHolder extends QuestionViewHolder {
         ArrayList<ArrayList<LinearLayout>> layouts = new ArrayList<>();
         ArrayList<ArrayList<Integer>> heights = new ArrayList<>();
         List<OptionRelation> optionRelations = getOptionRelations();
+
+        List<OptionRelation> shuffledOptionRelations;
+        if (getResponse().getRandomizedData() == null || getResponse().getRandomizedData().isEmpty()) {
+            shuffledOptionRelations = new ArrayList<>(optionRelations);
+            Collections.shuffle(shuffledOptionRelations);
+            List<Integer> order = new ArrayList<>();
+            for (OptionRelation optionRelation : shuffledOptionRelations) {
+                int index = optionRelations.indexOf(optionRelation);
+                order.add(index);
+            }
+            String result = order.stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.joining(COMMA));
+            getResponse().setRandomizedData(result);
+        } else {
+            shuffledOptionRelations = new ArrayList<>();
+            String[] listOfIndices = getResponse().getRandomizedData().split(COMMA);
+            List<Integer> order = new ArrayList<>();
+            for (String index : listOfIndices) {
+                if (!index.isEmpty()) {
+                    int indexInteger = Integer.parseInt(index);
+                    order.add(indexInteger);
+                }
+            }
+            for (Integer integer : order) {
+                shuffledOptionRelations.add(optionRelations.get(integer));
+            }
+        }
+
+        TextView orderView = new TextView(getContext());
+        orderView.setText(getContext().getResources().getString(R.string.order, getResponse().getRandomizedData()));
+        questionComponent.addView(orderView);
+
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         LinearLayout imageLayout = (LinearLayout) inflater.inflate(R.layout.choice_task, null);
-        for (final OptionRelation optionRelation : optionRelations) {
+        for (final OptionRelation optionRelation : shuffledOptionRelations) {
             ArrayList<Integer> collageHeights = new ArrayList<>();
             ArrayList<LinearLayout> collageLayouts = new ArrayList<>();
             OptionSetOptionRelation relation = getOptionSetOptionRelation(optionRelation);
-            int index = optionRelations.indexOf(optionRelation);
+            int index = shuffledOptionRelations.indexOf(optionRelation);
             LinearLayout linearLayout;
             TextView textView;
             MaterialCardView cardView;
@@ -95,6 +127,10 @@ public class ChoiceTaskViewHolder extends QuestionViewHolder {
                 linearLayout = imageLayout.findViewById(R.id.rightLayout);
                 textView = imageLayout.findViewById(R.id.rightTitle);
             }
+            /* index is used to record response. For randomized response options,
+             * to arrive at the location of the original response option,
+             * use the value located at the recorded index in the randomized data list.
+             */
             cardView.setId(index);
             cardView.setOnClickListener(v -> {
                 int clickedIndex = v.getId();
@@ -134,7 +170,7 @@ public class ChoiceTaskViewHolder extends QuestionViewHolder {
                 rowHeights.add(heights.get(k).get(j));
             }
             int max = Collections.max(rowHeights);
-            if (BuildConfig.DEBUG) Log.i(TAG, "Row => " + j + " MAX => " + max);
+//            if (BuildConfig.DEBUG) Log.i(TAG, "Row => " + j + " MAX => " + max);
             for (int k = 0; k < heights.size(); k++) {
                 ViewGroup.LayoutParams layoutParams = layouts.get(k).get(j).getLayoutParams();
                 layoutParams.height = max;

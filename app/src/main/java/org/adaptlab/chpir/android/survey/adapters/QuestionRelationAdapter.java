@@ -65,8 +65,7 @@ public class QuestionRelationAdapter extends ListAdapter<QuestionRelation, Quest
         viewHolder.setAdapter(this);
         viewHolder.setSurveyViewModel(mSurveyViewModel);
         QuestionRelation questionRelation = getItem(position);
-        viewHolder.setRelations(questionRelation);
-        viewHolder.setDisplayViewModel(mDisplayViewModel);
+        viewHolder.setRelations(questionRelation, mDisplayViewModel);
     }
 
     @Override
