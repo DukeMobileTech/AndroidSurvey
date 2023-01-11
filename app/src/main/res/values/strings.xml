@@ -211,5 +211,5 @@
     <string name="b">B</string>
     <string name="c">C</string>
     <string name="order">Order: %s</string>
-    <string name="option">Option </string>
+    <string name="option">Option %s</string>
 </resources>

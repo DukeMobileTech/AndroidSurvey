@@ -23,7 +23,6 @@ import org.adaptlab.chpir.android.survey.relations.OptionCollageRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionSetOptionRelation;
 import org.adaptlab.chpir.android.survey.utils.FormatUtils;
-import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,7 +30,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
-import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtmlWhitelist;
 
 public class ChoiceTaskViewHolder extends QuestionViewHolder {
     private ArrayList<Integer> mResponseIndices;
@@ -71,6 +69,7 @@ public class ChoiceTaskViewHolder extends QuestionViewHolder {
         List<OptionRelation> optionRelations = getOptionRelations();
 
         List<OptionRelation> shuffledOptionRelations;
+        List<String> letters = new ArrayList<>();
         if (getResponse().getRandomizedData() == null || getResponse().getRandomizedData().isEmpty()) {
             shuffledOptionRelations = new ArrayList<>(optionRelations);
             Collections.shuffle(shuffledOptionRelations);
@@ -78,6 +77,7 @@ public class ChoiceTaskViewHolder extends QuestionViewHolder {
             for (OptionRelation optionRelation : shuffledOptionRelations) {
                 int index = optionRelations.indexOf(optionRelation);
                 order.add(index);
+                letters.add(optionRelations.get(index).option.getIdentifier());
             }
             String result = order.stream()
                     .map(String::valueOf)
@@ -94,12 +94,17 @@ public class ChoiceTaskViewHolder extends QuestionViewHolder {
                 }
             }
             for (Integer integer : order) {
-                shuffledOptionRelations.add(optionRelations.get(integer));
+                OptionRelation or = optionRelations.get(integer);
+                shuffledOptionRelations.add(or);
+                letters.add(or.option.getIdentifier());
             }
         }
-
+        String ids = letters.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(COMMA));
         TextView orderView = new TextView(getContext());
-        orderView.setText(getContext().getResources().getString(R.string.order, getResponse().getRandomizedData()));
+        orderView.setText(getContext().getResources().getString(R.string.order,
+                getResponse().getRandomizedData() + " | " + ids));
         questionComponent.addView(orderView);
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -118,14 +123,17 @@ public class ChoiceTaskViewHolder extends QuestionViewHolder {
                 cardView = imageLayout.findViewById(R.id.leftCardView);
                 linearLayout = imageLayout.findViewById(R.id.leftLayout);
                 textView = imageLayout.findViewById(R.id.leftTitle);
+                textView.setText(getContext().getResources().getString(R.string.option, 'A'));
             } else if (index == 1) {
                 cardView = imageLayout.findViewById(R.id.middleCardView);
                 linearLayout = imageLayout.findViewById(R.id.middleLayout);
                 textView = imageLayout.findViewById(R.id.middleTitle);
+                textView.setText(getContext().getResources().getString(R.string.option, 'B'));
             } else {
                 cardView = imageLayout.findViewById(R.id.rightCardView);
                 linearLayout = imageLayout.findViewById(R.id.rightLayout);
                 textView = imageLayout.findViewById(R.id.rightTitle);
+                textView.setText(getContext().getResources().getString(R.string.option, 'C'));
             }
             /* index is used to record response. For randomized response options,
              * to arrive at the location of the original response option,
@@ -139,8 +147,7 @@ public class ChoiceTaskViewHolder extends QuestionViewHolder {
                 setResponseIndex(clickedIndex, cardView.isChecked());
             });
             mCardViews.add(cardView);
-            String text = TranslationUtil.getText(optionRelation.option, optionRelation.translations, getSurveyViewModel());
-            textView.setText(styleTextWithHtmlWhitelist(text));
+
             for (OptionCollageRelation optionCollageRelation : relation.optionCollages) {
                 for (CollageRelation collageRelation : optionCollageRelation.collages) {
                     GridView gridView = (GridView) inflater.inflate(R.layout.list_item_option_grid_view, null);

@@ -341,8 +341,9 @@ public class DisplayPagerFragment extends Fragment {
                                 mDisplayViewModel.setQuestion(response.getQuestionIdentifier(), questionRelation);
                             }
                             Response followUp = mSurveyViewModel.getResponses().get(questionRelation.question.getCarryForwardIdentifier());
+                            Question qst = mSurveyViewModel.getQuestionsMap().get(questionRelation.question.getCarryForwardIdentifier());
                             if (followUp != null && !followUp.getText().isEmpty()) {
-                                questionRelation.question.setCarriedForwardText(followUp, questionRelation);
+                                questionRelation.question.setCarriedForwardText(followUp, questionRelation, qst);
                                 mDisplayViewModel.setQuestion(response.getQuestionIdentifier(), questionRelation);
                             }
                             break;

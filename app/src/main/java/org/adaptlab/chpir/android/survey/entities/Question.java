@@ -13,6 +13,8 @@ import androidx.room.PrimaryKey;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
+import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.SurveyApp;
 import org.adaptlab.chpir.android.survey.daos.BaseDao;
 import org.adaptlab.chpir.android.survey.relations.OptionRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionSetOptionRelation;
@@ -228,7 +230,7 @@ public class Question implements SurveyEntity, Translatable {
         this.mText = text;
     }
 
-    public void setCarriedForwardText(Response carriedForwardResponse, QuestionRelation questionRelation) {
+    public void setCarriedForwardText(Response carriedForwardResponse, QuestionRelation questionRelation, Question question) {
         List<OptionRelation> carryForwardOptionRelations = new ArrayList<>();
         if (questionRelation.carryForwardOptionSets.size() > 0) {
             OptionSetRelation optionSetRelation = questionRelation.carryForwardOptionSets.get(0);
@@ -244,17 +246,31 @@ public class Question implements SurveyEntity, Translatable {
         }
         String text = mText;
         String[] listOfIndices = carriedForwardResponse.getText().split(COMMA);
-        String best = listOfIndices[0];
+        int best = Integer.parseInt(listOfIndices[0]);
         OptionRelation optionRelation;
         if (carriedForwardResponse.getRandomizedData() != null && !carriedForwardResponse.getRandomizedData().isEmpty()) {
             String[] orderList = carriedForwardResponse.getRandomizedData().split(COMMA);
-            int bestReordered = Integer.parseInt(orderList[Integer.parseInt(best)]);
+            int bestReordered = Integer.parseInt(orderList[best]);
             optionRelation = carryForwardOptionRelations.get(bestReordered);
         } else {
-            optionRelation = carryForwardOptionRelations.get(Integer.parseInt(best));
+            optionRelation = carryForwardOptionRelations.get(best);
         }
-        text = text.replaceFirst("\\[followup\\]",
-                Html.fromHtml(optionRelation.option.getText()).toString().trim());
+
+        if (question != null && question.getQuestionType().equals(Question.CHOICE_TASK)) {
+            String replacement;
+            if (best == 0) {
+                replacement = "A";
+            } else if (best == 1) {
+                replacement = "B";
+            } else {
+                replacement = "C";
+            }
+            text = text.replaceFirst("\\[followup\\]",
+                    SurveyApp.getInstance().getResources().getString(R.string.option, replacement));
+        } else {
+            text = text.replaceFirst("\\[followup\\]",
+                    Html.fromHtml(optionRelation.option.getText()).toString().trim());
+        }
         mText = text;
     }
 

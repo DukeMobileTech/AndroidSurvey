@@ -953,19 +953,19 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                             cardView = imageLayout.findViewById(R.id.leftCardView);
                             linearLayout = imageLayout.findViewById(R.id.leftLayout);
                             textView = imageLayout.findViewById(R.id.leftTitle);
+                            textView.setText(getContext().getResources().getString(R.string.option, 'A'));
                         } else if (index == 1) {
                             cardView = imageLayout.findViewById(R.id.middleCardView);
                             linearLayout = imageLayout.findViewById(R.id.middleLayout);
                             textView = imageLayout.findViewById(R.id.middleTitle);
+                            textView.setText(getContext().getResources().getString(R.string.option, 'B'));
                         } else {
                             cardView = imageLayout.findViewById(R.id.rightCardView);
                             linearLayout = imageLayout.findViewById(R.id.rightLayout);
                             textView = imageLayout.findViewById(R.id.rightTitle);
+                            textView.setText(getContext().getResources().getString(R.string.option, 'C'));
                         }
                         cardView.setId(index);
-
-                        String text = TranslationUtil.getText(optionRelation.option, optionRelation.translations, getSurveyViewModel());
-                        textView.setText(styleTextWithHtmlWhitelist(text));
 
                         for (OptionCollageRelation optionCollageRelation : relation.optionCollages) {
                             for (CollageRelation collageRelation : optionCollageRelation.collages) {
