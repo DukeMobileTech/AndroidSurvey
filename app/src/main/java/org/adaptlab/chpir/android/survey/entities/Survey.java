@@ -264,6 +264,35 @@ public class Survey implements Uploadable {
         return "";
     }
 
+    public String getDisplayOrder() {
+        if (!TextUtils.isEmpty(getMetadata())) {
+            try {
+                JSONObject metadata = new JSONObject(getMetadata());
+                if (metadata.has("display_order")) {
+                    return metadata.getString("display_order");
+                }
+            } catch (JSONException er) {
+                if (BuildConfig.DEBUG) Log.e(TAG, er.toString());
+            }
+        }
+        return "";
+    }
+
+    public void setDisplayOrder(String order) {
+        try {
+            JSONObject metadata;
+            if (TextUtils.isEmpty(getMetadata())) {
+                metadata = new JSONObject();
+            } else {
+                metadata = new JSONObject(getMetadata());
+            }
+            metadata.put("display_order", order);
+            setMetadata(metadata.toString());
+        } catch (JSONException er) {
+            if (BuildConfig.DEBUG) Log.e(TAG, er.getMessage());
+        }
+    }
+
     public String getPreviousDisplays() {
         return mPreviousDisplays;
     }

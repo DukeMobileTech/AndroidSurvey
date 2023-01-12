@@ -919,7 +919,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         if (mQuestionRelation.question.isCarryForward()) {
             if (getCarryForwardQuestion().getQuestionType().equals(Question.CHOICE_TASK)) {
                 Response carryForwardResponse = getCarryForwardResponse();
-                if (!carryForwardResponse.getText().isEmpty()) {
+                if (carryForwardResponse != null && !carryForwardResponse.getText().isEmpty()) {
                     String[] listOfIndices = carryForwardResponse.getText().split(COMMA);
                     int best = Integer.parseInt(listOfIndices[0]);
                     mGridViewLayout.removeAllViews();
@@ -1270,7 +1270,8 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
             if (getCarryForwardQuestion().getQuestionType().equals(Question.CHOICE_TASK)) {
                 Response carryForwardResponse = getCarryForwardResponse();
                 List<OptionRelation> carryForwardOptionRelations = new ArrayList<>();
-                if (carryForwardResponse.getRandomizedData() != null && !carryForwardResponse.getRandomizedData().isEmpty()) {
+                if (carryForwardResponse != null && carryForwardResponse.getRandomizedData() != null
+                        && !carryForwardResponse.getRandomizedData().isEmpty()) {
                     String[] orderList = carryForwardResponse.getRandomizedData().split(COMMA);
                     List<Integer> order = new ArrayList<>();
                     for (String index : orderList) {

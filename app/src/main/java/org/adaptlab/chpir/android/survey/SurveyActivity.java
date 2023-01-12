@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -55,11 +54,9 @@ import org.adaptlab.chpir.android.survey.utils.LocaleManager;
 import org.adaptlab.chpir.android.survey.utils.LocationManager;
 import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
 import org.adaptlab.chpir.android.survey.viewmodelfactories.InstrumentRelationViewModelFactory;
-import org.adaptlab.chpir.android.survey.viewmodelfactories.SectionViewModelFactory;
 import org.adaptlab.chpir.android.survey.viewmodelfactories.SurveyRelationViewModelFactory;
 import org.adaptlab.chpir.android.survey.viewmodelfactories.SurveyViewModelFactory;
 import org.adaptlab.chpir.android.survey.viewmodels.InstrumentRelationViewModel;
-import org.adaptlab.chpir.android.survey.viewmodels.SectionViewModel;
 import org.adaptlab.chpir.android.survey.viewmodels.SettingsViewModel;
 import org.adaptlab.chpir.android.survey.viewmodels.SurveyRelationViewModel;
 import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
@@ -68,7 +65,6 @@ import org.adaptlab.chpir.android.survey.views.SwipeListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -127,7 +123,6 @@ public class SurveyActivity extends AppCompatActivity implements GestureDetector
         addOnPageChangeListener();
         setInstrumentViewModel(mInstrumentId);
         setSurveyViewModel(mSurveyUUID);
-        setSectionViewModel(mInstrumentId);
         setSurveyRelationViewModel(mSurveyUUID);
         setLanguage();
         startLocationUpdates();
@@ -227,16 +222,23 @@ public class SurveyActivity extends AppCompatActivity implements GestureDetector
                         mSurveyViewModel.getSurvey().setInstrumentVersionNumber(String.valueOf(mInstrument.getVersionNumber()));
                     }
                 }
-                mSurveyViewModel.update();
-
+                mSurveyViewModel.setSectionRelations(relation.sections);
                 List<Display> displayList = new ArrayList<>();
-                for (SectionRelation sectionRelation : relation.sections) {
-                    for (DisplayRelation displayRelation : sectionRelation.displays) {
-                        displayList.add(displayRelation.display);
+                if (mSurveyViewModel.getSurvey().getDisplayOrder().isEmpty()) {
+                    randomizeDisplays(relation.sections, displayList);
+                    displayList = getSortedDisplays(displayList);
+                    mSurveyViewModel.setDisplayOrder(displayList);
+                } else {
+                    for (SectionRelation sectionRelation : relation.sections) {
+                        mSurveyViewModel.updateSectionDisplays(sectionRelation.section.getRemoteId(),
+                                getSortedDisplayRelations(sectionRelation.displays));
+                        for (DisplayRelation displayRelation : sectionRelation.displays) {
+                            displayList.add(displayRelation.display);
+                        }
                     }
+                    displayList = getSortedDisplays(displayList);
                 }
-                displayList = getSortedDisplays(displayList);
-
+                mSurveyViewModel.update();
                 mSurveyViewModel.setDisplays(displayList);
                 mDisplayPagerAdapter.setDisplays(displayList);
 
@@ -258,8 +260,29 @@ public class SurveyActivity extends AppCompatActivity implements GestureDetector
                 setActionBarTitle(mSurveyViewModel.getDisplayPosition());
                 invalidateOptionsMenu();
                 setCrashlytics();
+                setSectionViewModel();
             }
         });
+    }
+
+    private void randomizeDisplays(List<SectionRelation> sectionRelations, List<Display> displayList) {
+        int index = 1;
+        for (SectionRelation sectionRelation : sectionRelations) {
+            List<List<DisplayRelation>> relations = new ArrayList<>();
+            for (int k = 0; k < sectionRelation.displays.size(); k += 2) {
+                relations.add(sectionRelation.displays.subList(k, k + 2));
+            }
+            Collections.shuffle(relations);
+            List<DisplayRelation> displayRelations = relations.stream()
+                    .flatMap(List::stream)
+                    .collect(Collectors.toList());
+            for (DisplayRelation displayRelation : displayRelations) {
+                displayRelation.display.setInstrumentPosition(index);
+                index += 1;
+                displayList.add(displayRelation.display);
+            }
+            mSurveyViewModel.updateSectionDisplays(sectionRelation.section.getRemoteId(), displayRelations);
+        }
     }
 
     private List<Display> getSortedDisplays(List<Display> displayList) {
@@ -337,34 +360,29 @@ public class SurveyActivity extends AppCompatActivity implements GestureDetector
         });
     }
 
-    private void setSectionViewModel(Long instrumentId) {
-        SectionViewModelFactory factory = new SectionViewModelFactory(getApplication(), instrumentId);
-        SectionViewModel viewModel = ViewModelProviders.of(this, factory).get(SectionViewModel.class);
-        viewModel.getSectionRelations().observe(this, new Observer<List<SectionRelation>>() {
-            @Override
-            public void onChanged(@Nullable List<SectionRelation> sectionRelations) {
-                if (sectionRelations == null) return;
-                LongSparseArray<Section> longSparseArray = new LongSparseArray<>();
-                LinkedHashMap<String, List<String>> listData = new LinkedHashMap<>();
-                for (SectionRelation relation : sectionRelations) {
-                    longSparseArray.put(relation.section.getRemoteId(), relation.section);
-                    List<String> displayTitles = new ArrayList<>();
-                    for (DisplayRelation displayRelation : getSortedDisplayRelations(relation.displays)) {
-                        String displayTitle = TranslationUtil.getText(displayRelation.display,
-                                displayRelation.translations, mSurveyViewModel);
-                        displayTitles.add(styleTextWithHtmlWhitelist(displayTitle).toString());
-                        mSurveyViewModel.addDisplayTitle(displayRelation.display.getRemoteId(), styleTextWithHtmlWhitelist(displayTitle).toString());
-                    }
-                    String sectionTitle = TranslationUtil.getText(relation.section, relation.translations, mSurveyViewModel);
-                    listData.put(styleTextWithHtmlWhitelist(sectionTitle).toString(), displayTitles);
-                }
-                setExtraItemLinks(listData);
-                mSurveyViewModel.setSections(longSparseArray);
-                mSurveyViewModel.setExpandableListData(listData);
-                mSurveyViewModel.setExpandableListTitle(new ArrayList<>(listData.keySet()));
-                setNavigationDrawer();
+    private void setSectionViewModel() {
+        LongSparseArray<Section> longSparseArray = new LongSparseArray<>();
+        LinkedHashMap<String, List<String>> listData = new LinkedHashMap<>();
+        List<SectionRelation> sectionRelations = mSurveyViewModel.getSectionRelations();
+        for (SectionRelation relation : sectionRelations) {
+            longSparseArray.put(relation.section.getRemoteId(), relation.section);
+            List<String> displayTitles = new ArrayList<>();
+            List<DisplayRelation> displayRelations = mSurveyViewModel.getSectionDisplayRelations(relation.section.getRemoteId());
+            for (DisplayRelation displayRelation : displayRelations) {
+                String displayTitle = TranslationUtil.getText(displayRelation.display,
+                        displayRelation.translations, mSurveyViewModel);
+                displayTitles.add(styleTextWithHtmlWhitelist(displayTitle).toString());
+                mSurveyViewModel.addDisplayTitle(displayRelation.display.getRemoteId(),
+                        styleTextWithHtmlWhitelist(displayTitle).toString());
             }
-        });
+            String sectionTitle = TranslationUtil.getText(relation.section, relation.translations, mSurveyViewModel);
+            listData.put(styleTextWithHtmlWhitelist(sectionTitle).toString(), displayTitles);
+        }
+        setExtraItemLinks(listData);
+        mSurveyViewModel.setSections(longSparseArray);
+        mSurveyViewModel.setExpandableListData(listData);
+        mSurveyViewModel.setExpandableListTitle(new ArrayList<>(listData.keySet()));
+        setNavigationDrawer();
     }
 
     private List<DisplayRelation> getSortedDisplayRelations(List<DisplayRelation> displayRelations) {
@@ -374,12 +392,7 @@ public class SurveyActivity extends AppCompatActivity implements GestureDetector
                 displays.add(relation);
             }
         }
-        Collections.sort(displays, new Comparator<DisplayRelation>() {
-            @Override
-            public int compare(DisplayRelation displayRelation, DisplayRelation displayRelation1) {
-                return compareDisplays(displayRelation.display, displayRelation1.display);
-            }
-        });
+        displays.sort((dr0, dr1) -> compareDisplays(dr0.display, dr1.display));
         return displays;
     }
 
@@ -464,11 +477,7 @@ public class SurveyActivity extends AppCompatActivity implements GestureDetector
         Bundle bundle = new Bundle();
         bundle.putString(SurveyNoteFragment.EXTRA_SURVEY_UUID, mSurveyUUID);
         intent.putExtras(bundle);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
-        } else {
-            startActivity(intent);
-        }
+        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
     }
 
     private void setLanguageSelection() {
@@ -516,13 +525,11 @@ public class SurveyActivity extends AppCompatActivity implements GestureDetector
     }
 
     @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
-            assignExtras(savedInstanceState);
-            int displayPosition = savedInstanceState.getInt(EXTRA_DISPLAY_POSITION);
-            mSurveyViewModel.setDisplayPosition(displayPosition);
-            setViewPagerPosition();
-        }
+    public void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        assignExtras(savedInstanceState);
+        int displayPosition = savedInstanceState.getInt(EXTRA_DISPLAY_POSITION);
+        mSurveyViewModel.setDisplayPosition(displayPosition);
+        setViewPagerPosition();
     }
 
     private void assignExtras(Bundle savedInstanceState) {
