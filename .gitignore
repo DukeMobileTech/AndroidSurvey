@@ -29,6 +29,7 @@ app/src/dce/google-services.json
 # API Keys
 app/src/main/res/values/keys.xml
 app/src/main/res/values/defaults.xml
+app/src/dce/res/values/defaults.xml
 
 #Gradle
 build/
