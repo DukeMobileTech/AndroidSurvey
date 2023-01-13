@@ -60,6 +60,9 @@ public class ReviewPageFragment extends ListFragment {
             if (questionSkipSet.contains(question.getQuestionIdentifier())) {
                 answeredQuestions.add(question);
             }
+            if (question.getQuestionType().equals(Question.QuestionType.INSTRUCTIONS)) {
+                answeredQuestions.add(question);
+            }
         }
         for (Response response : survey.responses()) {
             if (!TextUtils.isEmpty(response.getText()) ||
