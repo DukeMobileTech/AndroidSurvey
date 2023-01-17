@@ -66,7 +66,7 @@ import okhttp3.OkHttpClient;
 public class AppUtil {
     public final static boolean PRODUCTION = !BuildConfig.DEBUG;
     private final static String TAG = "AppUtil";
-    private final static int REMOTE_TABLE_COUNT = 15;
+    private final static int REMOTE_TABLE_COUNT = 25;
     private static final int TIMEOUT = 10000;
     private static volatile int REMOTE_DOWNLOAD_COUNT = 0;
     private static String ACCESS_TOKEN;

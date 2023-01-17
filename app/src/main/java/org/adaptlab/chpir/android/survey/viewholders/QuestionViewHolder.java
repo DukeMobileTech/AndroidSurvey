@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.text.Editable;
+import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -43,6 +44,7 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.adaptlab.chpir.android.survey.R;
+import org.adaptlab.chpir.android.survey.SurveyApp;
 import org.adaptlab.chpir.android.survey.adapters.ChoiceDiagramAdapter;
 import org.adaptlab.chpir.android.survey.adapters.QuestionDiagramAdapter;
 import org.adaptlab.chpir.android.survey.adapters.QuestionRelationAdapter;
@@ -1129,6 +1131,33 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                         if (!TextUtils.isEmpty(getQuestion().getTextToReplace())) {
                             text = getQuestion().getText().replace(getQuestion().getTextToReplace(), responseText);
                         }
+                    }
+                }
+            }
+        }
+        if (mQuestionRelation.question.isCarryForward()) {
+            Question cfq = getCarryForwardQuestion();
+            if (cfq.getQuestionType().equals(Question.CHOICE_TASK)) {
+                Response resp = getCarryForwardResponse();
+                if (!resp.getText().isEmpty()) {
+                    text = TranslationUtil.getText(getQuestion(), mQuestionRelation.translations, mSurveyViewModel);
+                    String[] listOfIndices = resp.getText().split(COMMA);
+                    int best = Integer.parseInt(listOfIndices[0]);
+                    if (resp.getRandomizedData() == null || resp.getRandomizedData().isEmpty()) {
+                        OptionRelation optionRelation = mCarryForwardOptionRelations.get(best);
+                        String oText = TranslationUtil.getText(optionRelation.option, optionRelation.translations, mSurveyViewModel);
+                        text = text.replaceFirst("\\[followup\\]", Html.fromHtml(oText).toString().trim());
+                    } else {
+                        String replacement;
+                        if (best == 0) {
+                            replacement = "A";
+                        } else if (best == 1) {
+                            replacement = "B";
+                        } else {
+                            replacement = "C";
+                        }
+                        text = text.replaceFirst("\\[followup\\]",
+                                getContext().getResources().getString(R.string.option, replacement));
                     }
                 }
             }

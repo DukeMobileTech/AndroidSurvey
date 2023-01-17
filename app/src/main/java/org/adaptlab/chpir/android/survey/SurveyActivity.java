@@ -121,8 +121,8 @@ public class SurveyActivity extends AppCompatActivity implements GestureDetector
         mDisplayPagerAdapter = new DisplayPagerAdapter(getSupportFragmentManager(), mSurveyUUID);
         setDisplayViewPagers();
         addOnPageChangeListener();
-        setInstrumentViewModel(mInstrumentId);
         setSurveyViewModel(mSurveyUUID);
+        setInstrumentViewModel(mInstrumentId);
         setSurveyRelationViewModel(mSurveyUUID);
         setLanguage();
         startLocationUpdates();
@@ -224,7 +224,8 @@ public class SurveyActivity extends AppCompatActivity implements GestureDetector
                 }
                 mSurveyViewModel.setSectionRelations(relation.sections);
                 List<Display> displayList = new ArrayList<>();
-                if (mSurveyViewModel.getSurvey().getDisplayOrder().isEmpty()) {
+                if (mSurveyViewModel.getSurvey() != null &&
+                        mSurveyViewModel.getSurvey().getDisplayOrder().isEmpty()) {
                     randomizeDisplays(relation.sections, displayList);
                     displayList = getSortedDisplays(displayList);
                     mSurveyViewModel.setDisplayOrder(displayList);
@@ -270,7 +271,11 @@ public class SurveyActivity extends AppCompatActivity implements GestureDetector
         for (SectionRelation sectionRelation : sectionRelations) {
             List<List<DisplayRelation>> relations = new ArrayList<>();
             for (int k = 0; k < sectionRelation.displays.size(); k += 2) {
-                relations.add(sectionRelation.displays.subList(k, k + 2));
+                if (k + 2 < sectionRelation.displays.size()) {
+                    relations.add(sectionRelation.displays.subList(k, k + 2));
+                } else {
+                    relations.add(sectionRelation.displays.subList(k, sectionRelation.displays.size()));
+                }
             }
             Collections.shuffle(relations);
             List<DisplayRelation> displayRelations = relations.stream()
