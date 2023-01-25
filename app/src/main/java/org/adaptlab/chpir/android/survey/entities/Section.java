@@ -34,6 +34,9 @@ public class Section implements SurveyEntity, Translatable {
     @SerializedName("position")
     @ColumnInfo(name = "Position", index = true)
     private int mPosition;
+    @SerializedName("randomize_displays")
+    @ColumnInfo(name = "RandomizeDisplays")
+    private boolean mRandomizeDisplays;
     @Ignore
     @SerializedName("section_translations")
     private List<SectionTranslation> mSectionTranslations;
@@ -69,6 +72,14 @@ public class Section implements SurveyEntity, Translatable {
 
     public void setInstrumentRemoteId(Long mInstrumentRemoteId) {
         this.mInstrumentRemoteId = mInstrumentRemoteId;
+    }
+
+    public boolean isRandomizeDisplays() {
+        return mRandomizeDisplays;
+    }
+
+    public void setRandomizeDisplays(boolean randomizeDisplays) {
+        this.mRandomizeDisplays = randomizeDisplays;
     }
 
     public List<SectionTranslation> getSectionTranslations() {

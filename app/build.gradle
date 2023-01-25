@@ -58,8 +58,8 @@ android {
         dce {
             dimension 'dce'
             applicationIdSuffix '.dce'
-            versionCode 47
-            versionName '0.0.42'
+            versionCode 48
+            versionName '0.0.43'
         }
         wci {
             dimension 'wci'

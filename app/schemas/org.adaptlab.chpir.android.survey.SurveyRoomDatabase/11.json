@@ -1,0 +1,3103 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 11,
+    "identityHash": "03a4dc8c05e2ed4f19852a104c4953cd",
+    "entities": [
+      {
+        "tableName": "Instruments",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Title` TEXT, `Language` TEXT, `Alignment` TEXT, `VersionNumber` INTEGER NOT NULL, `QuestionCount` INTEGER NOT NULL, `ProjectId` INTEGER, `Published` INTEGER NOT NULL, `Deleted` INTEGER NOT NULL, `Loaded` INTEGER NOT NULL, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mTitle",
+            "columnName": "Title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mLanguage",
+            "columnName": "Language",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mAlignment",
+            "columnName": "Alignment",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mVersionNumber",
+            "columnName": "VersionNumber",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mQuestionCount",
+            "columnName": "QuestionCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mProjectId",
+            "columnName": "ProjectId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mPublished",
+            "columnName": "Published",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mLoaded",
+            "columnName": "Loaded",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_Instruments_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Instruments_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          },
+          {
+            "name": "index_Instruments_ProjectId",
+            "unique": false,
+            "columnNames": [
+              "ProjectId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Instruments_ProjectId` ON `${TABLE_NAME}` (`ProjectId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "InstrumentTranslations",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Title` TEXT, `Language` TEXT, `Alignment` TEXT, `InstrumentRemoteId` INTEGER, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mTitle",
+            "columnName": "Title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mLanguage",
+            "columnName": "Language",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mAlignment",
+            "columnName": "Alignment",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mInstrumentRemoteId",
+            "columnName": "InstrumentRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_InstrumentTranslations_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_InstrumentTranslations_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          },
+          {
+            "name": "index_InstrumentTranslations_InstrumentRemoteId",
+            "unique": false,
+            "columnNames": [
+              "InstrumentRemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_InstrumentTranslations_InstrumentRemoteId` ON `${TABLE_NAME}` (`InstrumentRemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Questions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Text` TEXT, `QuestionType` TEXT, `QuestionIdentifier` TEXT, `QuestionId` INTEGER, `OptionCount` INTEGER NOT NULL, `InstrumentVersion` INTEGER NOT NULL, `NumberInInstrument` INTEGER NOT NULL, `Position` INTEGER NOT NULL, `IdentifiesSurvey` INTEGER NOT NULL, `ImageCount` INTEGER NOT NULL, `InstructionId` INTEGER, `QuestionVersion` INTEGER NOT NULL, `Deleted` INTEGER NOT NULL, `InstrumentRemoteId` INTEGER, `RemoteOptionSetId` INTEGER, `DisplayId` INTEGER, `RemoteSpecialOptionSetId` INTEGER, `TableIdentifier` TEXT, `ValidationId` INTEGER, `RankResponses` INTEGER NOT NULL, `LoopQuestionCount` INTEGER NOT NULL, `LoopSource` TEXT, `LoopNumber` INTEGER NOT NULL, `TextToReplace` TEXT, `PopUpInstructionId` INTEGER, `AfterTextInstructionId` INTEGER, `CarryForwardIdentifier` TEXT, `CarryForwardOptionSetId` INTEGER, `DefaultResponse` TEXT, `SkipOperation` TEXT, `NextQuestionOperator` TEXT, `MultipleSkipOperator` TEXT, `NextQuestionNeutralIds` TEXT, `MultipleSkipNeutralIds` TEXT, `TaskId` INTEGER, `RecordAudio` INTEGER NOT NULL, `ShowNumber` INTEGER NOT NULL, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mText",
+            "columnName": "Text",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mQuestionType",
+            "columnName": "QuestionType",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mQuestionIdentifier",
+            "columnName": "QuestionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mQuestionId",
+            "columnName": "QuestionId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mOptionCount",
+            "columnName": "OptionCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mInstrumentVersion",
+            "columnName": "InstrumentVersion",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mNumberInInstrument",
+            "columnName": "NumberInInstrument",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mPosition",
+            "columnName": "Position",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mIdentifiesSurvey",
+            "columnName": "IdentifiesSurvey",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mImageCount",
+            "columnName": "ImageCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mInstructionId",
+            "columnName": "InstructionId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mQuestionVersion",
+            "columnName": "QuestionVersion",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mInstrumentRemoteId",
+            "columnName": "InstrumentRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mRemoteOptionSetId",
+            "columnName": "RemoteOptionSetId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDisplayId",
+            "columnName": "DisplayId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mRemoteSpecialOptionSetId",
+            "columnName": "RemoteSpecialOptionSetId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mTableIdentifier",
+            "columnName": "TableIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mValidationId",
+            "columnName": "ValidationId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mRankResponses",
+            "columnName": "RankResponses",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mLoopQuestionCount",
+            "columnName": "LoopQuestionCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mLoopSource",
+            "columnName": "LoopSource",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mLoopNumber",
+            "columnName": "LoopNumber",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mTextToReplace",
+            "columnName": "TextToReplace",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mPopUpInstructionId",
+            "columnName": "PopUpInstructionId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mAfterTextInstructionId",
+            "columnName": "AfterTextInstructionId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mCarryForwardIdentifier",
+            "columnName": "CarryForwardIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mCarryForwardOptionSetId",
+            "columnName": "CarryForwardOptionSetId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDefaultResponse",
+            "columnName": "DefaultResponse",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mSkipOperation",
+            "columnName": "SkipOperation",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mNextQuestionOperator",
+            "columnName": "NextQuestionOperator",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mMultipleSkipOperator",
+            "columnName": "MultipleSkipOperator",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mNextQuestionNeutralIds",
+            "columnName": "NextQuestionNeutralIds",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mMultipleSkipNeutralIds",
+            "columnName": "MultipleSkipNeutralIds",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mTaskId",
+            "columnName": "TaskId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mRecordAudio",
+            "columnName": "RecordAudio",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mShowNumber",
+            "columnName": "ShowNumber",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_Questions_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Questions_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          },
+          {
+            "name": "index_Questions_QuestionIdentifier",
+            "unique": false,
+            "columnNames": [
+              "QuestionIdentifier"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Questions_QuestionIdentifier` ON `${TABLE_NAME}` (`QuestionIdentifier`)"
+          },
+          {
+            "name": "index_Questions_QuestionId",
+            "unique": false,
+            "columnNames": [
+              "QuestionId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Questions_QuestionId` ON `${TABLE_NAME}` (`QuestionId`)"
+          },
+          {
+            "name": "index_Questions_NumberInInstrument",
+            "unique": false,
+            "columnNames": [
+              "NumberInInstrument"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Questions_NumberInInstrument` ON `${TABLE_NAME}` (`NumberInInstrument`)"
+          },
+          {
+            "name": "index_Questions_Position",
+            "unique": false,
+            "columnNames": [
+              "Position"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Questions_Position` ON `${TABLE_NAME}` (`Position`)"
+          },
+          {
+            "name": "index_Questions_InstrumentRemoteId",
+            "unique": false,
+            "columnNames": [
+              "InstrumentRemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Questions_InstrumentRemoteId` ON `${TABLE_NAME}` (`InstrumentRemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Settings",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`Id` INTEGER, `DeviceIdentifier` TEXT, `DeviceLabel` TEXT, `ApiUrl` TEXT, `CustomLocaleCode` TEXT, `ShowSurveys` INTEGER NOT NULL, `ShowSkip` INTEGER NOT NULL, `ShowNA` INTEGER NOT NULL, `ShowRF` INTEGER NOT NULL, `ShowDK` INTEGER NOT NULL, `ApiVersion` TEXT, `ProjectId` TEXT, `ApiKey` TEXT, `RequirePassword` INTEGER NOT NULL, `RecordSurveyLocation` INTEGER NOT NULL, `LastSyncTimes` TEXT, `SecondEndpoint` INTEGER NOT NULL, `Api2Url` TEXT, `Api2Version` TEXT, `Api2Key` TEXT, `ShowRosters` INTEGER NOT NULL, `ShowScores` INTEGER NOT NULL, `Language` TEXT, `DatabaseVersion` INTEGER NOT NULL, `DeviceUserName` TEXT, `Latitude` TEXT, `Longitude` TEXT, PRIMARY KEY(`Id`))",
+        "fields": [
+          {
+            "fieldPath": "mId",
+            "columnName": "Id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDeviceIdentifier",
+            "columnName": "DeviceIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDeviceLabel",
+            "columnName": "DeviceLabel",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mApiUrl",
+            "columnName": "ApiUrl",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mCustomLocaleCode",
+            "columnName": "CustomLocaleCode",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mShowSurveys",
+            "columnName": "ShowSurveys",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mShowSkip",
+            "columnName": "ShowSkip",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mShowNA",
+            "columnName": "ShowNA",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mShowRF",
+            "columnName": "ShowRF",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mShowDK",
+            "columnName": "ShowDK",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mApiVersion",
+            "columnName": "ApiVersion",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mProjectId",
+            "columnName": "ProjectId",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mApiKey",
+            "columnName": "ApiKey",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mRequirePassword",
+            "columnName": "RequirePassword",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mRecordSurveyLocation",
+            "columnName": "RecordSurveyLocation",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mLastSyncTime",
+            "columnName": "LastSyncTimes",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mSecondEndpoint",
+            "columnName": "SecondEndpoint",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mApi2Url",
+            "columnName": "Api2Url",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mApi2Version",
+            "columnName": "Api2Version",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mApi2Key",
+            "columnName": "Api2Key",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mShowRosters",
+            "columnName": "ShowRosters",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mShowScores",
+            "columnName": "ShowScores",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mLanguage",
+            "columnName": "Language",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDatabaseVersion",
+            "columnName": "DatabaseVersion",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mDeviceUserName",
+            "columnName": "DeviceUserName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mLatitude",
+            "columnName": "Latitude",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mLongitude",
+            "columnName": "Longitude",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "Id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_Settings_Id",
+            "unique": false,
+            "columnNames": [
+              "Id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Settings_Id` ON `${TABLE_NAME}` (`Id`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "QuestionTranslations",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Text` TEXT, `Language` TEXT, `QuestionRemoteId` INTEGER, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mText",
+            "columnName": "Text",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mLanguage",
+            "columnName": "Language",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mQuestionRemoteId",
+            "columnName": "QuestionRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_QuestionTranslations_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_QuestionTranslations_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          },
+          {
+            "name": "index_QuestionTranslations_QuestionRemoteId",
+            "unique": false,
+            "columnNames": [
+              "QuestionRemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_QuestionTranslations_QuestionRemoteId` ON `${TABLE_NAME}` (`QuestionRemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "LoopQuestions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Parent` TEXT, `Looped` TEXT, `Deleted` INTEGER NOT NULL, `OptionIndices` TEXT, `SameDisplay` INTEGER NOT NULL, `TextToReplace` TEXT, `QuestionRemoteId` INTEGER, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mParent",
+            "columnName": "Parent",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mLooped",
+            "columnName": "Looped",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mOptionIndices",
+            "columnName": "OptionIndices",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mSameDisplay",
+            "columnName": "SameDisplay",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mTextToReplace",
+            "columnName": "TextToReplace",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mQuestionRemoteId",
+            "columnName": "QuestionRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_LoopQuestions_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_LoopQuestions_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          },
+          {
+            "name": "index_LoopQuestions_Parent",
+            "unique": false,
+            "columnNames": [
+              "Parent"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_LoopQuestions_Parent` ON `${TABLE_NAME}` (`Parent`)"
+          },
+          {
+            "name": "index_LoopQuestions_Looped",
+            "unique": false,
+            "columnNames": [
+              "Looped"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_LoopQuestions_Looped` ON `${TABLE_NAME}` (`Looped`)"
+          },
+          {
+            "name": "index_LoopQuestions_QuestionRemoteId",
+            "unique": false,
+            "columnNames": [
+              "QuestionRemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_LoopQuestions_QuestionRemoteId` ON `${TABLE_NAME}` (`QuestionRemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "CriticalResponses",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `InstructionId` INTEGER, `QuestionIdentifier` TEXT, `OptionIdentifier` TEXT, `Deleted` INTEGER NOT NULL, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mInstructionId",
+            "columnName": "InstructionId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mQuestionIdentifier",
+            "columnName": "QuestionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mOptionIdentifier",
+            "columnName": "OptionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_CriticalResponses_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_CriticalResponses_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          },
+          {
+            "name": "index_CriticalResponses_InstructionId",
+            "unique": false,
+            "columnNames": [
+              "InstructionId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_CriticalResponses_InstructionId` ON `${TABLE_NAME}` (`InstructionId`)"
+          },
+          {
+            "name": "index_CriticalResponses_QuestionIdentifier",
+            "unique": false,
+            "columnNames": [
+              "QuestionIdentifier"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_CriticalResponses_QuestionIdentifier` ON `${TABLE_NAME}` (`QuestionIdentifier`)"
+          },
+          {
+            "name": "index_CriticalResponses_OptionIdentifier",
+            "unique": false,
+            "columnNames": [
+              "OptionIdentifier"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_CriticalResponses_OptionIdentifier` ON `${TABLE_NAME}` (`OptionIdentifier`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Displays",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Title` TEXT, `Position` INTEGER NOT NULL, `QuestionCount` INTEGER NOT NULL, `InstrumentRemoteId` INTEGER, `Deleted` INTEGER NOT NULL, `SectionId` INTEGER, `InstrumentPosition` INTEGER NOT NULL, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mTitle",
+            "columnName": "Title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mPosition",
+            "columnName": "Position",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mQuestionCount",
+            "columnName": "QuestionCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mInstrumentRemoteId",
+            "columnName": "InstrumentRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mSectionId",
+            "columnName": "SectionId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mInstrumentPosition",
+            "columnName": "InstrumentPosition",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_Displays_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Displays_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          },
+          {
+            "name": "index_Displays_Title",
+            "unique": false,
+            "columnNames": [
+              "Title"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Displays_Title` ON `${TABLE_NAME}` (`Title`)"
+          },
+          {
+            "name": "index_Displays_Position",
+            "unique": false,
+            "columnNames": [
+              "Position"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Displays_Position` ON `${TABLE_NAME}` (`Position`)"
+          },
+          {
+            "name": "index_Displays_InstrumentRemoteId",
+            "unique": false,
+            "columnNames": [
+              "InstrumentRemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Displays_InstrumentRemoteId` ON `${TABLE_NAME}` (`InstrumentRemoteId`)"
+          },
+          {
+            "name": "index_Displays_InstrumentPosition",
+            "unique": false,
+            "columnNames": [
+              "InstrumentPosition"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Displays_InstrumentPosition` ON `${TABLE_NAME}` (`InstrumentPosition`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Projects",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Name` TEXT, `Description` TEXT, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mName",
+            "columnName": "Name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDescription",
+            "columnName": "Description",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_Projects_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Projects_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "DisplayTranslations",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Text` TEXT, `Language` TEXT, `DisplayRemoteId` INTEGER, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mText",
+            "columnName": "Text",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mLanguage",
+            "columnName": "Language",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDisplayRemoteId",
+            "columnName": "DisplayRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_DisplayTranslations_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_DisplayTranslations_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          },
+          {
+            "name": "index_DisplayTranslations_DisplayRemoteId",
+            "unique": false,
+            "columnNames": [
+              "DisplayRemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_DisplayTranslations_DisplayRemoteId` ON `${TABLE_NAME}` (`DisplayRemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "DisplayInstructions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Position` INTEGER NOT NULL, `DisplayRemoteId` INTEGER, `InstructionRemoteId` INTEGER, `Deleted` INTEGER NOT NULL, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mPosition",
+            "columnName": "Position",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mDisplayRemoteId",
+            "columnName": "DisplayRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mInstructionRemoteId",
+            "columnName": "InstructionRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_DisplayInstructions_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_DisplayInstructions_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          },
+          {
+            "name": "index_DisplayInstructions_DisplayRemoteId",
+            "unique": false,
+            "columnNames": [
+              "DisplayRemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_DisplayInstructions_DisplayRemoteId` ON `${TABLE_NAME}` (`DisplayRemoteId`)"
+          },
+          {
+            "name": "index_DisplayInstructions_InstructionRemoteId",
+            "unique": false,
+            "columnNames": [
+              "InstructionRemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_DisplayInstructions_InstructionRemoteId` ON `${TABLE_NAME}` (`InstructionRemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Instructions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Text` TEXT, `Deleted` INTEGER NOT NULL, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mText",
+            "columnName": "Text",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_Instructions_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Instructions_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "InstructionTranslations",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Text` TEXT, `Language` TEXT, `InstructionRemoteId` INTEGER, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mText",
+            "columnName": "Text",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mLanguage",
+            "columnName": "Language",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mInstructionRemoteId",
+            "columnName": "InstructionRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_InstructionTranslations_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_InstructionTranslations_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          },
+          {
+            "name": "index_InstructionTranslations_InstructionRemoteId",
+            "unique": false,
+            "columnNames": [
+              "InstructionRemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_InstructionTranslations_InstructionRemoteId` ON `${TABLE_NAME}` (`InstructionRemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Sections",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Title` TEXT, `Deleted` INTEGER NOT NULL, `InstrumentRemoteId` INTEGER, `Position` INTEGER NOT NULL, `RandomizeDisplays` INTEGER NOT NULL, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mTitle",
+            "columnName": "Title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mInstrumentRemoteId",
+            "columnName": "InstrumentRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mPosition",
+            "columnName": "Position",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mRandomizeDisplays",
+            "columnName": "RandomizeDisplays",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_Sections_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Sections_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          },
+          {
+            "name": "index_Sections_InstrumentRemoteId",
+            "unique": false,
+            "columnNames": [
+              "InstrumentRemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Sections_InstrumentRemoteId` ON `${TABLE_NAME}` (`InstrumentRemoteId`)"
+          },
+          {
+            "name": "index_Sections_Position",
+            "unique": false,
+            "columnNames": [
+              "Position"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Sections_Position` ON `${TABLE_NAME}` (`Position`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "SectionTranslations",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Text` TEXT, `Language` TEXT, `SectionRemoteId` INTEGER, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mText",
+            "columnName": "Text",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mLanguage",
+            "columnName": "Language",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mSectionRemoteId",
+            "columnName": "SectionRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_SectionTranslations_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_SectionTranslations_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          },
+          {
+            "name": "index_SectionTranslations_SectionRemoteId",
+            "unique": false,
+            "columnNames": [
+              "SectionRemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_SectionTranslations_SectionRemoteId` ON `${TABLE_NAME}` (`SectionRemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Options",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Text` TEXT, `Identifier` TEXT, `Deleted` INTEGER NOT NULL, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mText",
+            "columnName": "Text",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mIdentifier",
+            "columnName": "Identifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_Options_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Options_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          },
+          {
+            "name": "index_Options_Identifier",
+            "unique": false,
+            "columnNames": [
+              "Identifier"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Options_Identifier` ON `${TABLE_NAME}` (`Identifier`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "OptionSets",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Title` TEXT, `Deleted` INTEGER NOT NULL, `InstructionRemoteId` INTEGER, `Special` INTEGER NOT NULL, `HasImages` INTEGER NOT NULL, `AlignImageVertical` INTEGER NOT NULL, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mTitle",
+            "columnName": "Title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mInstructionRemoteId",
+            "columnName": "InstructionRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mSpecial",
+            "columnName": "Special",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mHasImages",
+            "columnName": "HasImages",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mAlignImageVertical",
+            "columnName": "AlignImageVertical",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_OptionSets_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_OptionSets_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          },
+          {
+            "name": "index_OptionSets_InstructionRemoteId",
+            "unique": false,
+            "columnNames": [
+              "InstructionRemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_OptionSets_InstructionRemoteId` ON `${TABLE_NAME}` (`InstructionRemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "OptionSetOptions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Position` INTEGER, `OptionSetRemoteId` INTEGER, `OptionRemoteId` INTEGER, `Special` INTEGER NOT NULL, `Deleted` INTEGER NOT NULL, `Exclusive` INTEGER NOT NULL, `InstructionId` INTEGER, `AllowTextEntry` INTEGER NOT NULL, `ExclusionIds` TEXT, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mPosition",
+            "columnName": "Position",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mOptionSetRemoteId",
+            "columnName": "OptionSetRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mOptionRemoteId",
+            "columnName": "OptionRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mSpecial",
+            "columnName": "Special",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mExclusive",
+            "columnName": "Exclusive",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mInstructionId",
+            "columnName": "InstructionId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mAllowTextEntry",
+            "columnName": "AllowTextEntry",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mExclusionIds",
+            "columnName": "ExclusionIds",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_OptionSetOptions_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_OptionSetOptions_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          },
+          {
+            "name": "index_OptionSetOptions_OptionSetRemoteId",
+            "unique": false,
+            "columnNames": [
+              "OptionSetRemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_OptionSetOptions_OptionSetRemoteId` ON `${TABLE_NAME}` (`OptionSetRemoteId`)"
+          },
+          {
+            "name": "index_OptionSetOptions_OptionRemoteId",
+            "unique": false,
+            "columnNames": [
+              "OptionRemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_OptionSetOptions_OptionRemoteId` ON `${TABLE_NAME}` (`OptionRemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "OptionSetTranslations",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Language` TEXT, `OptionSetRemoteId` INTEGER, `OptionRemoteId` INTEGER, `OptionTranslationRemoteId` INTEGER, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mLanguage",
+            "columnName": "Language",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mOptionSetRemoteId",
+            "columnName": "OptionSetRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mOptionRemoteId",
+            "columnName": "OptionRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mOptionTranslationRemoteId",
+            "columnName": "OptionTranslationRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_OptionSetTranslations_OptionSetRemoteId",
+            "unique": false,
+            "columnNames": [
+              "OptionSetRemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_OptionSetTranslations_OptionSetRemoteId` ON `${TABLE_NAME}` (`OptionSetRemoteId`)"
+          },
+          {
+            "name": "index_OptionSetTranslations_OptionRemoteId",
+            "unique": false,
+            "columnNames": [
+              "OptionRemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_OptionSetTranslations_OptionRemoteId` ON `${TABLE_NAME}` (`OptionRemoteId`)"
+          },
+          {
+            "name": "index_OptionSetTranslations_OptionTranslationRemoteId",
+            "unique": false,
+            "columnNames": [
+              "OptionTranslationRemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_OptionSetTranslations_OptionTranslationRemoteId` ON `${TABLE_NAME}` (`OptionTranslationRemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "OptionTranslations",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Text` TEXT, `Language` TEXT, `OptionRemoteId` INTEGER, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mText",
+            "columnName": "Text",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mLanguage",
+            "columnName": "Language",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mOptionRemoteId",
+            "columnName": "OptionRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_OptionTranslations_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_OptionTranslations_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          },
+          {
+            "name": "index_OptionTranslations_OptionRemoteId",
+            "unique": false,
+            "columnNames": [
+              "OptionRemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_OptionTranslations_OptionRemoteId` ON `${TABLE_NAME}` (`OptionRemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "ConditionSkips",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `QuestionIdentifier` TEXT, `NextQuestionIdentifier` TEXT, `QuestionId` INTEGER, `InstrumentRemoteId` INTEGER, `Deleted` INTEGER NOT NULL, `QuestionIdentifiers` TEXT, `OptionIds` TEXT, `Entries` TEXT, `ValueOperators` TEXT, `Condition` TEXT, `ConditionOptionIdentifier` TEXT, `OptionIdentifier` TEXT, `ConditionQuestionIdentifier` TEXT, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mQuestionIdentifier",
+            "columnName": "QuestionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mNextQuestionIdentifier",
+            "columnName": "NextQuestionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mQuestionId",
+            "columnName": "QuestionId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mInstrumentRemoteId",
+            "columnName": "InstrumentRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mQuestionIdentifiers",
+            "columnName": "QuestionIdentifiers",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mOptionIds",
+            "columnName": "OptionIds",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mValues",
+            "columnName": "Entries",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mValueOperators",
+            "columnName": "ValueOperators",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mCondition",
+            "columnName": "Condition",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mConditionOptionIdentifier",
+            "columnName": "ConditionOptionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mOptionIdentifier",
+            "columnName": "OptionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mConditionQuestionIdentifier",
+            "columnName": "ConditionQuestionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_ConditionSkips_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ConditionSkips_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          },
+          {
+            "name": "index_ConditionSkips_QuestionIdentifier",
+            "unique": false,
+            "columnNames": [
+              "QuestionIdentifier"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ConditionSkips_QuestionIdentifier` ON `${TABLE_NAME}` (`QuestionIdentifier`)"
+          },
+          {
+            "name": "index_ConditionSkips_NextQuestionIdentifier",
+            "unique": false,
+            "columnNames": [
+              "NextQuestionIdentifier"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ConditionSkips_NextQuestionIdentifier` ON `${TABLE_NAME}` (`NextQuestionIdentifier`)"
+          },
+          {
+            "name": "index_ConditionSkips_InstrumentRemoteId",
+            "unique": false,
+            "columnNames": [
+              "InstrumentRemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ConditionSkips_InstrumentRemoteId` ON `${TABLE_NAME}` (`InstrumentRemoteId`)"
+          },
+          {
+            "name": "index_ConditionSkips_ConditionOptionIdentifier",
+            "unique": false,
+            "columnNames": [
+              "ConditionOptionIdentifier"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ConditionSkips_ConditionOptionIdentifier` ON `${TABLE_NAME}` (`ConditionOptionIdentifier`)"
+          },
+          {
+            "name": "index_ConditionSkips_OptionIdentifier",
+            "unique": false,
+            "columnNames": [
+              "OptionIdentifier"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ConditionSkips_OptionIdentifier` ON `${TABLE_NAME}` (`OptionIdentifier`)"
+          },
+          {
+            "name": "index_ConditionSkips_ConditionQuestionIdentifier",
+            "unique": false,
+            "columnNames": [
+              "ConditionQuestionIdentifier"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ConditionSkips_ConditionQuestionIdentifier` ON `${TABLE_NAME}` (`ConditionQuestionIdentifier`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "DeviceUsers",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Active` INTEGER NOT NULL, `Name` TEXT, `UserName` TEXT, `PasswordDigest` TEXT, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mActive",
+            "columnName": "Active",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mName",
+            "columnName": "Name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mUserName",
+            "columnName": "UserName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mPasswordDigest",
+            "columnName": "PasswordDigest",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_DeviceUsers_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_DeviceUsers_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          },
+          {
+            "name": "index_DeviceUsers_UserName",
+            "unique": false,
+            "columnNames": [
+              "UserName"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_DeviceUsers_UserName` ON `${TABLE_NAME}` (`UserName`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "FollowUpQuestions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `QuestionIdentifier` TEXT, `FollowingUpQuestionIdentifier` TEXT, `QuestionId` INTEGER, `InstrumentRemoteId` INTEGER, `Deleted` INTEGER NOT NULL, `Position` INTEGER, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mQuestionIdentifier",
+            "columnName": "QuestionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mFollowingUpQuestionIdentifier",
+            "columnName": "FollowingUpQuestionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mQuestionId",
+            "columnName": "QuestionId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mInstrumentRemoteId",
+            "columnName": "InstrumentRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mPosition",
+            "columnName": "Position",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_FollowUpQuestions_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_FollowUpQuestions_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          },
+          {
+            "name": "index_FollowUpQuestions_QuestionIdentifier",
+            "unique": false,
+            "columnNames": [
+              "QuestionIdentifier"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_FollowUpQuestions_QuestionIdentifier` ON `${TABLE_NAME}` (`QuestionIdentifier`)"
+          },
+          {
+            "name": "index_FollowUpQuestions_FollowingUpQuestionIdentifier",
+            "unique": false,
+            "columnNames": [
+              "FollowingUpQuestionIdentifier"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_FollowUpQuestions_FollowingUpQuestionIdentifier` ON `${TABLE_NAME}` (`FollowingUpQuestionIdentifier`)"
+          },
+          {
+            "name": "index_FollowUpQuestions_QuestionId",
+            "unique": false,
+            "columnNames": [
+              "QuestionId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_FollowUpQuestions_QuestionId` ON `${TABLE_NAME}` (`QuestionId`)"
+          },
+          {
+            "name": "index_FollowUpQuestions_InstrumentRemoteId",
+            "unique": false,
+            "columnNames": [
+              "InstrumentRemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_FollowUpQuestions_InstrumentRemoteId` ON `${TABLE_NAME}` (`InstrumentRemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "MultipleSkips",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `QuestionIdentifier` TEXT, `OptionIdentifier` TEXT, `SkipQuestionIdentifier` TEXT, `QuestionId` INTEGER, `InstrumentRemoteId` INTEGER, `Deleted` INTEGER NOT NULL, `Value` TEXT, `ValueOperator` TEXT, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mQuestionIdentifier",
+            "columnName": "QuestionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mOptionIdentifier",
+            "columnName": "OptionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mSkipQuestionIdentifier",
+            "columnName": "SkipQuestionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mQuestionId",
+            "columnName": "QuestionId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mInstrumentRemoteId",
+            "columnName": "InstrumentRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mValue",
+            "columnName": "Value",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mValueOperator",
+            "columnName": "ValueOperator",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_MultipleSkips_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_MultipleSkips_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          },
+          {
+            "name": "index_MultipleSkips_QuestionIdentifier",
+            "unique": false,
+            "columnNames": [
+              "QuestionIdentifier"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_MultipleSkips_QuestionIdentifier` ON `${TABLE_NAME}` (`QuestionIdentifier`)"
+          },
+          {
+            "name": "index_MultipleSkips_OptionIdentifier",
+            "unique": false,
+            "columnNames": [
+              "OptionIdentifier"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_MultipleSkips_OptionIdentifier` ON `${TABLE_NAME}` (`OptionIdentifier`)"
+          },
+          {
+            "name": "index_MultipleSkips_SkipQuestionIdentifier",
+            "unique": false,
+            "columnNames": [
+              "SkipQuestionIdentifier"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_MultipleSkips_SkipQuestionIdentifier` ON `${TABLE_NAME}` (`SkipQuestionIdentifier`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "NextQuestions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `QuestionIdentifier` TEXT, `OptionIdentifier` TEXT, `NextQuestionIdentifier` TEXT, `QuestionId` INTEGER, `InstrumentRemoteId` INTEGER, `Deleted` INTEGER NOT NULL, `CompleteSurvey` INTEGER NOT NULL, `Value` TEXT, `ValueOperator` TEXT, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mQuestionIdentifier",
+            "columnName": "QuestionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mOptionIdentifier",
+            "columnName": "OptionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mNextQuestionIdentifier",
+            "columnName": "NextQuestionIdentifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mQuestionId",
+            "columnName": "QuestionId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mInstrumentRemoteId",
+            "columnName": "InstrumentRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mCompleteSurvey",
+            "columnName": "CompleteSurvey",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mValue",
+            "columnName": "Value",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mValueOperator",
+            "columnName": "ValueOperator",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_NextQuestions_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_NextQuestions_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          },
+          {
+            "name": "index_NextQuestions_QuestionIdentifier",
+            "unique": false,
+            "columnNames": [
+              "QuestionIdentifier"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_NextQuestions_QuestionIdentifier` ON `${TABLE_NAME}` (`QuestionIdentifier`)"
+          },
+          {
+            "name": "index_NextQuestions_OptionIdentifier",
+            "unique": false,
+            "columnNames": [
+              "OptionIdentifier"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_NextQuestions_OptionIdentifier` ON `${TABLE_NAME}` (`OptionIdentifier`)"
+          },
+          {
+            "name": "index_NextQuestions_NextQuestionIdentifier",
+            "unique": false,
+            "columnNames": [
+              "NextQuestionIdentifier"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_NextQuestions_NextQuestionIdentifier` ON `${TABLE_NAME}` (`NextQuestionIdentifier`)"
+          },
+          {
+            "name": "index_NextQuestions_InstrumentRemoteId",
+            "unique": false,
+            "columnNames": [
+              "InstrumentRemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_NextQuestions_InstrumentRemoteId` ON `${TABLE_NAME}` (`InstrumentRemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Surveys",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`UUID` TEXT NOT NULL, `SentToRemote` INTEGER NOT NULL, `Complete` INTEGER NOT NULL, `Latitude` TEXT, `Longitude` TEXT, `LastUpdated` INTEGER, `Metadata` TEXT, `ProjectId` INTEGER, `InstrumentRemoteId` INTEGER, `RosterUUID` TEXT, `Language` TEXT, `SkippedQuestions` TEXT, `SkipMaps` TEXT, `Identifier` TEXT, `CompletedResponseCount` INTEGER NOT NULL, `Queued` INTEGER NOT NULL, `LastDisplayPosition` INTEGER NOT NULL, `PreviousDisplays` TEXT, `InstrumentTitle` TEXT, `InstrumentVersionNumber` TEXT, PRIMARY KEY(`UUID`))",
+        "fields": [
+          {
+            "fieldPath": "mUUID",
+            "columnName": "UUID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mSent",
+            "columnName": "SentToRemote",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mComplete",
+            "columnName": "Complete",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mLatitude",
+            "columnName": "Latitude",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mLongitude",
+            "columnName": "Longitude",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mLastUpdated",
+            "columnName": "LastUpdated",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mMetadata",
+            "columnName": "Metadata",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mProjectId",
+            "columnName": "ProjectId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mInstrumentRemoteId",
+            "columnName": "InstrumentRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mRosterUUID",
+            "columnName": "RosterUUID",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mLanguage",
+            "columnName": "Language",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mSkippedQuestions",
+            "columnName": "SkippedQuestions",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mSkipMaps",
+            "columnName": "SkipMaps",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mIdentifier",
+            "columnName": "Identifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mCompletedResponseCount",
+            "columnName": "CompletedResponseCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mQueued",
+            "columnName": "Queued",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mLastDisplayPosition",
+            "columnName": "LastDisplayPosition",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mPreviousDisplays",
+            "columnName": "PreviousDisplays",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mInstrumentTitle",
+            "columnName": "InstrumentTitle",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mInstrumentVersionNumber",
+            "columnName": "InstrumentVersionNumber",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "UUID"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_Surveys_UUID",
+            "unique": false,
+            "columnNames": [
+              "UUID"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Surveys_UUID` ON `${TABLE_NAME}` (`UUID`)"
+          },
+          {
+            "name": "index_Surveys_ProjectId",
+            "unique": false,
+            "columnNames": [
+              "ProjectId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Surveys_ProjectId` ON `${TABLE_NAME}` (`ProjectId`)"
+          },
+          {
+            "name": "index_Surveys_InstrumentRemoteId",
+            "unique": false,
+            "columnNames": [
+              "InstrumentRemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Surveys_InstrumentRemoteId` ON `${TABLE_NAME}` (`InstrumentRemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Responses",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`UUID` TEXT NOT NULL, `SurveyUUID` TEXT NOT NULL, `QuestionRemoteId` INTEGER NOT NULL, `QuestionIdentifier` TEXT NOT NULL, `Text` TEXT, `OtherResponse` TEXT, `SpecialResponse` TEXT, `SentToRemote` INTEGER NOT NULL, `TimeStarted` INTEGER, `TimeEnded` INTEGER, `DeviceUserId` INTEGER, `QuestionVersion` INTEGER NOT NULL, `RandomizedData` TEXT, `RankOrder` TEXT, `IdentifiesSurvey` INTEGER NOT NULL, `OtherText` TEXT, PRIMARY KEY(`UUID`))",
+        "fields": [
+          {
+            "fieldPath": "mUUID",
+            "columnName": "UUID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mSurveyUUID",
+            "columnName": "SurveyUUID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mQuestionRemoteId",
+            "columnName": "QuestionRemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mQuestionIdentifier",
+            "columnName": "QuestionIdentifier",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mText",
+            "columnName": "Text",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mOtherResponse",
+            "columnName": "OtherResponse",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mSpecialResponse",
+            "columnName": "SpecialResponse",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mSent",
+            "columnName": "SentToRemote",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mTimeStarted",
+            "columnName": "TimeStarted",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mTimeEnded",
+            "columnName": "TimeEnded",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDeviceUserId",
+            "columnName": "DeviceUserId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mQuestionVersion",
+            "columnName": "QuestionVersion",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mRandomizedData",
+            "columnName": "RandomizedData",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mRankOrder",
+            "columnName": "RankOrder",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mIdentifiesSurvey",
+            "columnName": "IdentifiesSurvey",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mOtherText",
+            "columnName": "OtherText",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "UUID"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_Responses_SurveyUUID_QuestionIdentifier_UUID",
+            "unique": true,
+            "columnNames": [
+              "SurveyUUID",
+              "QuestionIdentifier",
+              "UUID"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_Responses_SurveyUUID_QuestionIdentifier_UUID` ON `${TABLE_NAME}` (`SurveyUUID`, `QuestionIdentifier`, `UUID`)"
+          },
+          {
+            "name": "index_Responses_UUID",
+            "unique": false,
+            "columnNames": [
+              "UUID"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Responses_UUID` ON `${TABLE_NAME}` (`UUID`)"
+          },
+          {
+            "name": "index_Responses_SurveyUUID",
+            "unique": false,
+            "columnNames": [
+              "SurveyUUID"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Responses_SurveyUUID` ON `${TABLE_NAME}` (`SurveyUUID`)"
+          },
+          {
+            "name": "index_Responses_QuestionRemoteId",
+            "unique": false,
+            "columnNames": [
+              "QuestionRemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Responses_QuestionRemoteId` ON `${TABLE_NAME}` (`QuestionRemoteId`)"
+          },
+          {
+            "name": "index_Responses_QuestionIdentifier",
+            "unique": false,
+            "columnNames": [
+              "QuestionIdentifier"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Responses_QuestionIdentifier` ON `${TABLE_NAME}` (`QuestionIdentifier`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "SurveyNotes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`UUID` TEXT NOT NULL, `SurveyUUID` TEXT NOT NULL, `Text` TEXT, `Reference` TEXT, `SentToRemote` INTEGER NOT NULL, `DeviceUserId` INTEGER, PRIMARY KEY(`UUID`))",
+        "fields": [
+          {
+            "fieldPath": "mUUID",
+            "columnName": "UUID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mSurveyUUID",
+            "columnName": "SurveyUUID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mText",
+            "columnName": "Text",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mReference",
+            "columnName": "Reference",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mSent",
+            "columnName": "SentToRemote",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mDeviceUserId",
+            "columnName": "DeviceUserId",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "UUID"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_SurveyNotes_UUID",
+            "unique": false,
+            "columnNames": [
+              "UUID"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_SurveyNotes_UUID` ON `${TABLE_NAME}` (`UUID`)"
+          },
+          {
+            "name": "index_SurveyNotes_SurveyUUID",
+            "unique": false,
+            "columnNames": [
+              "SurveyUUID"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_SurveyNotes_SurveyUUID` ON `${TABLE_NAME}` (`SurveyUUID`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "ScoreSchemes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Deleted` INTEGER NOT NULL, `Title` TEXT, `InstrumentRemoteId` INTEGER, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mTitle",
+            "columnName": "Title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mInstrumentRemoteId",
+            "columnName": "InstrumentRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_ScoreSchemes_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ScoreSchemes_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Domains",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Deleted` INTEGER NOT NULL, `Title` TEXT, `Name` TEXT, `Weight` REAL, `ScoreSchemeRemoteId` INTEGER, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mTitle",
+            "columnName": "Title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mName",
+            "columnName": "Name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mWeight",
+            "columnName": "Weight",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mScoreSchemeRemoteId",
+            "columnName": "ScoreSchemeRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_Domains_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Domains_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Subdomains",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Deleted` INTEGER NOT NULL, `Title` TEXT, `Name` TEXT, `Weight` REAL, `DomainRemoteId` INTEGER, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mTitle",
+            "columnName": "Title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mName",
+            "columnName": "Name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mWeight",
+            "columnName": "Weight",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDomainRemoteId",
+            "columnName": "DomainRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_Subdomains_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Subdomains_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "SurveyScores",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`UUID` TEXT NOT NULL, `SentToRemote` INTEGER NOT NULL, `SurveyUUID` TEXT NOT NULL, `Identifier` TEXT, `ScoreSum` REAL, `ScoreSchemeRemoteId` INTEGER, PRIMARY KEY(`UUID`))",
+        "fields": [
+          {
+            "fieldPath": "mUUID",
+            "columnName": "UUID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mSent",
+            "columnName": "SentToRemote",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mSurveyUUID",
+            "columnName": "SurveyUUID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mIdentifier",
+            "columnName": "Identifier",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mScoreSum",
+            "columnName": "ScoreSum",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mScoreSchemeRemoteId",
+            "columnName": "ScoreSchemeRemoteId",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "UUID"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_SurveyScores_UUID",
+            "unique": false,
+            "columnNames": [
+              "UUID"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_SurveyScores_UUID` ON `${TABLE_NAME}` (`UUID`)"
+          },
+          {
+            "name": "index_SurveyScores_SurveyUUID",
+            "unique": false,
+            "columnNames": [
+              "SurveyUUID"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_SurveyScores_SurveyUUID` ON `${TABLE_NAME}` (`SurveyUUID`)"
+          },
+          {
+            "name": "index_SurveyScores_ScoreSchemeRemoteId",
+            "unique": false,
+            "columnNames": [
+              "ScoreSchemeRemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_SurveyScores_ScoreSchemeRemoteId` ON `${TABLE_NAME}` (`ScoreSchemeRemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Tasks",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Name` TEXT, `Deleted` INTEGER NOT NULL, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mName",
+            "columnName": "Name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_Tasks_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Tasks_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Diagrams",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `OptionId` INTEGER, `CollageId` INTEGER, `Position` INTEGER, `Deleted` INTEGER NOT NULL, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mOptionId",
+            "columnName": "OptionId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mCollageId",
+            "columnName": "CollageId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mPosition",
+            "columnName": "Position",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_Diagrams_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Diagrams_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Collages",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `Name` TEXT, `Deleted` INTEGER NOT NULL, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mName",
+            "columnName": "Name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_Collages_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Collages_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "OptionCollages",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `OptionInOptionSetId` INTEGER, `Position` INTEGER, `Deleted` INTEGER NOT NULL, `CollageId` INTEGER, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mOptionInOptionSetId",
+            "columnName": "OptionInOptionSetId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mPosition",
+            "columnName": "Position",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mCollageId",
+            "columnName": "CollageId",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_OptionCollages_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_OptionCollages_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "QuestionCollages",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`RemoteId` INTEGER NOT NULL, `QuestionId` INTEGER, `CollageId` INTEGER, `Position` INTEGER, `Deleted` INTEGER NOT NULL, PRIMARY KEY(`RemoteId`))",
+        "fields": [
+          {
+            "fieldPath": "mRemoteId",
+            "columnName": "RemoteId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mQuestionId",
+            "columnName": "QuestionId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mCollageId",
+            "columnName": "CollageId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mPosition",
+            "columnName": "Position",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mDeleted",
+            "columnName": "Deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "RemoteId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_QuestionCollages_RemoteId",
+            "unique": false,
+            "columnNames": [
+              "RemoteId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_QuestionCollages_RemoteId` ON `${TABLE_NAME}` (`RemoteId`)"
+          }
+        ],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '03a4dc8c05e2ed4f19852a104c4953cd')"
+    ]
+  }
+}

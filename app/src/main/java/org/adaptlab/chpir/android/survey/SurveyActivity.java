@@ -222,15 +222,19 @@ public class SurveyActivity extends AppCompatActivity implements GestureDetector
                         mSurveyViewModel.getSurvey().setInstrumentVersionNumber(String.valueOf(mInstrument.getVersionNumber()));
                     }
                 }
-                mSurveyViewModel.setSectionRelations(relation.sections);
+
+                List<SectionRelation> sectionRelations = relation.sections;
+                sectionRelations.sort((SectionRelation sr1, SectionRelation sr2) -> sr1.section.getPosition() - sr2.section.getPosition());
+
+                mSurveyViewModel.setSectionRelations(sectionRelations);
                 List<Display> displayList = new ArrayList<>();
                 if (mSurveyViewModel.getSurvey() != null &&
                         mSurveyViewModel.getSurvey().getDisplayOrder().isEmpty()) {
-                    randomizeDisplays(relation.sections, displayList);
+                    randomizeDisplays(sectionRelations, displayList);
                     displayList = getSortedDisplays(displayList);
                     mSurveyViewModel.setDisplayOrder(displayList);
                 } else {
-                    for (SectionRelation sectionRelation : relation.sections) {
+                    for (SectionRelation sectionRelation : sectionRelations) {
                         mSurveyViewModel.updateSectionDisplays(sectionRelation.section.getRemoteId(),
                                 getSortedDisplayRelations(sectionRelation.displays));
                         for (DisplayRelation displayRelation : sectionRelation.displays) {
@@ -269,18 +273,23 @@ public class SurveyActivity extends AppCompatActivity implements GestureDetector
     private void randomizeDisplays(List<SectionRelation> sectionRelations, List<Display> displayList) {
         int index = 1;
         for (SectionRelation sectionRelation : sectionRelations) {
-            List<List<DisplayRelation>> relations = new ArrayList<>();
-            for (int k = 0; k < sectionRelation.displays.size(); k += 2) {
-                if (k + 2 < sectionRelation.displays.size()) {
-                    relations.add(sectionRelation.displays.subList(k, k + 2));
-                } else {
-                    relations.add(sectionRelation.displays.subList(k, sectionRelation.displays.size()));
+            List<DisplayRelation> displayRelations;
+            if (sectionRelation.section.isRandomizeDisplays()) {
+                List<List<DisplayRelation>> relations = new ArrayList<>();
+                for (int k = 0; k < sectionRelation.displays.size(); k += 2) {
+                    if (k + 2 < sectionRelation.displays.size()) {
+                        relations.add(sectionRelation.displays.subList(k, k + 2));
+                    } else {
+                        relations.add(sectionRelation.displays.subList(k, sectionRelation.displays.size()));
+                    }
                 }
+                Collections.shuffle(relations);
+                displayRelations = relations.stream()
+                        .flatMap(List::stream)
+                        .collect(Collectors.toList());
+            } else {
+                displayRelations = sectionRelation.displays;
             }
-            Collections.shuffle(relations);
-            List<DisplayRelation> displayRelations = relations.stream()
-                    .flatMap(List::stream)
-                    .collect(Collectors.toList());
             for (DisplayRelation displayRelation : displayRelations) {
                 displayRelation.display.setInstrumentPosition(index);
                 index += 1;

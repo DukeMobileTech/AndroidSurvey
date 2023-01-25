@@ -107,7 +107,7 @@ import java.util.UUID;
         version = SurveyRoomDatabase.DATABASE_VERSION, exportSchema = true)
 @TypeConverters({Converters.class})
 public abstract class SurveyRoomDatabase extends RoomDatabase {
-    static final int DATABASE_VERSION = 10;
+    static final int DATABASE_VERSION = 11;
     private static final String TAG = SurveyRoomDatabase.class.getName();
     private static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override
@@ -170,9 +170,20 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
             database.execSQL("ALTER TABLE ConditionSkips ADD COLUMN ValueOperators TEXT");
         }
     };
+    private static final Migration MIGRATION_8_9 = new Migration(8, 9) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+        }
+    };
     private static final Migration MIGRATION_9_10 = new Migration(9, 10) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
+        }
+    };
+    private static final Migration MIGRATION_10_11 = new Migration(10, 11) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE Sections ADD COLUMN RandomizeDisplays INTEGER DEFAULT 0 NOT NULL");
         }
     };
     private static volatile SurveyRoomDatabase INSTANCE;
@@ -196,7 +207,8 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
                             SurveyRoomDatabase.class, "SurveyDatabase")
                             .addCallback(sRoomDatabaseCallback)
                             .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5,
-                                    MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_9_10)
+                                    MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9,
+                                    MIGRATION_9_10, MIGRATION_10_11)
                             .openHelperFactory(factory)
                             .build();
                 }

@@ -1139,7 +1139,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
             Question cfq = getCarryForwardQuestion();
             if (cfq.getQuestionType().equals(Question.CHOICE_TASK)) {
                 Response resp = getCarryForwardResponse();
-                if (!resp.getText().isEmpty()) {
+                if (resp != null && !resp.getText().isEmpty()) {
                     text = TranslationUtil.getText(getQuestion(), mQuestionRelation.translations, mSurveyViewModel);
                     String[] listOfIndices = resp.getText().split(COMMA);
                     int best = Integer.parseInt(listOfIndices[0]);

@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.View;
@@ -12,6 +14,9 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import androidx.core.content.ContextCompat;
+
+import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.relations.DiagramRelation;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
 import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
@@ -71,6 +76,16 @@ public class ChoiceDiagramAdapter extends BaseAdapter {
         return path;
     }
 
+    private Bitmap getMissingBitmap() {
+        Drawable drawable = ContextCompat.getDrawable(mContext, R.drawable.ic_baseline_image_not_supported_24);
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
+                drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+        return bitmap;
+    }
+
     private void setBitmaps() {
         mWidths = new ArrayList<>();
         mHeights = new ArrayList<>();
@@ -83,6 +98,9 @@ public class ChoiceDiagramAdapter extends BaseAdapter {
         for (int k = 0; k < mDiagramRelations.size(); k++) {
             DiagramRelation diagramRelation = mDiagramRelations.get(k);
             Bitmap bitmap = BitmapFactory.decodeFile(getPath(diagramRelation), options);
+            if (bitmap == null) {
+                bitmap = getMissingBitmap();
+            }
             int height = bitmap.getHeight();
             int width = bitmap.getWidth();
             mBitmaps.add(bitmap);
