@@ -1162,7 +1162,20 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                 }
             }
         }
-        return styleTextWithHtml(text);
+        return styleTextWithHtml(subNewLine(text));
+    }
+
+    private String subNewLine(String text) {
+        if (text.contains("\n")) {
+            String[] paras = text.split("\n");
+            StringBuilder builder = new StringBuilder();
+            for (String para : paras) {
+                builder.append("<p>").append(para).append("</p>");
+            }
+            return builder.toString();
+        } else {
+            return text;
+        }
     }
 
     private void setOptionSetInstructionsText() {

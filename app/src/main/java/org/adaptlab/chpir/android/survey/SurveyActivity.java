@@ -7,13 +7,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.LongSparseArray;
-import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -61,7 +58,6 @@ import org.adaptlab.chpir.android.survey.viewmodels.SettingsViewModel;
 import org.adaptlab.chpir.android.survey.viewmodels.SurveyRelationViewModel;
 import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
 import org.adaptlab.chpir.android.survey.views.CustomViewPager;
-import org.adaptlab.chpir.android.survey.views.SwipeListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -75,7 +71,7 @@ import java.util.stream.Collectors;
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtmlWhitelist;
 
-public class SurveyActivity extends AppCompatActivity implements GestureDetector.OnGestureListener {
+public class SurveyActivity extends AppCompatActivity {
     public final static String EXTRA_INSTRUMENT_ID = "org.adaptlab.chpir.android.survey.EXTRA_INSTRUMENT_ID";
     public final static String EXTRA_SURVEY_UUID = "org.adaptlab.chpir.android.survey.EXTRA_SURVEY_UUID";
     public final static String EXTRA_DISPLAY_ID = "org.adaptlab.chpir.android.survey.EXTRA_DISPLAY_ID";
@@ -158,24 +154,6 @@ public class SurveyActivity extends AppCompatActivity implements GestureDetector
     private void setDisplayViewPagers() {
         mViewPager = findViewById(R.id.displayPager);
         mViewPager.setAdapter(mDisplayPagerAdapter);
-        SwipeListener swipeListener = new SwipeListener() {
-            @Override
-            public boolean onSwipe() {
-                String emptyResponses = mSurveyViewModel.checkForEmptyResponses();
-                if (emptyResponses.length() > 0) {
-                    promptForResponses(emptyResponses, false);
-                }
-                return emptyResponses.isEmpty();
-            }
-        };
-        mViewPager.setSwipeListener(swipeListener);
-
-//        mViewPager.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                return false;
-//            }
-//        });
     }
 
     private void addOnPageChangeListener() {
@@ -185,18 +163,9 @@ public class SurveyActivity extends AppCompatActivity implements GestureDetector
                 setActionBarTitle(position);
                 if (position > mSurveyViewModel.getDisplayPosition()) {
                     toNextDisplay();
-//                    mSurveyViewModel.getPreviousDisplays().add(mSurveyViewModel.getDisplayPosition());
-//                    mSurveyViewModel.incrementDisplayPosition();
                 } else if (position < mSurveyViewModel.getDisplayPosition()) {
                     moveToPreviousDisplay();
-//                    int current = mSurveyViewModel.getDisplayPosition();
-//                    if (current > 0 && current < mSurveyViewModel.getDisplays().size() && mSurveyViewModel.getPreviousDisplays().size() > 0) {
-//                        mSurveyViewModel.setDisplayPosition(mSurveyViewModel.getPreviousDisplays().remove(mSurveyViewModel.getPreviousDisplays().size() - 1));
-//                    } else {
-//                        mSurveyViewModel.decrementDisplayPosition();
-//                    }
                 }
-//                invalidateOptionsMenu();
             }
         });
     }
@@ -731,36 +700,5 @@ public class SurveyActivity extends AppCompatActivity implements GestureDetector
                 }
             }
         }
-    }
-
-    @Override
-    public boolean onDown(MotionEvent e) {
-        return false;
-    }
-
-    @Override
-    public void onShowPress(MotionEvent e) {
-
-    }
-
-    @Override
-    public boolean onSingleTapUp(MotionEvent e) {
-        return false;
-    }
-
-    @Override
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-        return false;
-    }
-
-    @Override
-    public void onLongPress(MotionEvent e) {
-
-    }
-
-    @Override
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        Log.i(TAG, "onFling: " + e1.toString() + e2.toString());
-        return false;
     }
 }

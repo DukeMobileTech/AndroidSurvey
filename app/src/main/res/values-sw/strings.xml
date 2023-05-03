@@ -81,7 +81,7 @@
     <string name="rule_failure_instrument_survey_limit">You cannot take a survey for this instrument.  You have taken the maximum number of surveys allowed.</string>
     <string name="rule_instrument_survey_limit_per_minute">You cannot take a survey for this instrument. You have taken the maximum number of surveys allowed for this time interval.</string>
     <string name="rule_failure_instrument_launch">You cannot launch a survey for this instrument from this app.  Please create a survey from the appropriate application.</string>
-    <string name="version">version</string>
+    <string name="version">toleo</string>
     <string name="record_survey_location">Record Survey Location</string>
     <string name="event_log_sent_survey">Sent %1$s for %2$s.</string>
     <string name="delete">Futa</string>
@@ -189,7 +189,7 @@
     <string name="reference">Reference</string>
     <string name="text">Text</string>
     <string name="show_pop_up_instructions">Show pop-up instructions</string>
-    <string name="submitted_surveys">submitted surveys</string>
+    <string name="submitted_surveys">Tafiti Zilizowasilishwa</string>
     <string name="incomplete_survey">Incomplete Survey</string>
     <string name="incomplete_survey_message">This survey has not been finished. Please complete it first before trying to submit.</string>
     <string name="survey_notes">Survey Notes</string>
