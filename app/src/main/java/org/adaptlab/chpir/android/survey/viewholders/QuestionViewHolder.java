@@ -663,7 +663,9 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         List<String> skipOptions = new ArrayList<>();
         for (NextQuestion nextQuestion : mQuestionRelation.nextQuestions) {
             for (int k = 0; k < mOptionRelations.size(); k++) {
-                if (!nextQuestion.isDeleted() && mOptionRelations.get(k).option.getIdentifier().equals(nextQuestion.getOptionIdentifier())) {
+                if (!nextQuestion.isDeleted() &&
+                        nextQuestion.getInstrumentRemoteId().equals(mQuestionRelation.question.getInstrumentRemoteId()) &&
+                        mOptionRelations.get(k).option.getIdentifier().equals(nextQuestion.getOptionIdentifier())) {
                     skipOptions.add(String.valueOf(k));
                 }
             }
@@ -675,7 +677,9 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         List<NextQuestion> nextQuestions = mQuestionRelation.nextQuestions;
         if (nextQuestions == null) return null;
         for (NextQuestion nextQuestion : nextQuestions) {
-            if (!nextQuestion.isDeleted() && nextQuestion.getOptionIdentifier().equals(option.getIdentifier())) {
+            if (!nextQuestion.isDeleted() &&
+                    nextQuestion.getInstrumentRemoteId().equals(mQuestionRelation.question.getInstrumentRemoteId()) &&
+                    nextQuestion.getOptionIdentifier().equals(option.getIdentifier())) {
                 return nextQuestion;
             }
         }
@@ -686,7 +690,8 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         List<NextQuestion> nextQuestions = mQuestionRelation.nextQuestions;
         if (nextQuestions == null) return null;
         for (NextQuestion nextQuestion : nextQuestions) {
-            if (!nextQuestion.isDeleted() && nextQuestion.getValue().equals(value)) {
+            if (!nextQuestion.isDeleted() && nextQuestion.getValue().equals(value) &&
+                    nextQuestion.getInstrumentRemoteId().equals(mQuestionRelation.question.getInstrumentRemoteId())) {
                 return nextQuestion;
             }
         }

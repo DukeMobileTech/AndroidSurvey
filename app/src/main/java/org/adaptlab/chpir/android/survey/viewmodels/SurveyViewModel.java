@@ -387,9 +387,12 @@ public class SurveyViewModel extends AndroidViewModel {
         Context context = SurveyApp.getInstance();
         for (QuestionRelation questionRelation : displayQuestions) {
             Question question = questionRelation.question;
-            if (!question.getQuestionType().equals(Question.INSTRUCTIONS) &&
+            Response response = displayResponses.get(question.getQuestionIdentifier());
+            boolean oneChoice = question.getQuestionType().equals(Question.CHOICE_TASK)
+                    && response != null && !response.getText().contains(",");
+            if ((!question.getQuestionType().equals(Question.INSTRUCTIONS) &&
                     !mQuestionsToSkipSet.contains(question.getQuestionIdentifier()) &&
-                    displayResponses.get(question.getQuestionIdentifier()).isEmptyResponse()) {
+                    response != null && response.isEmptyResponse()) || (oneChoice)) {
                 if (stringBuilder.length() > 0) stringBuilder.append(System.lineSeparator());
                 stringBuilder.append(context.getResources().getString(R.string.question))
                         .append(" ").append(question.getPosition())
