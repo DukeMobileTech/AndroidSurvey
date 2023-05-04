@@ -187,7 +187,7 @@ public class Response implements Uploadable {
     }
 
     public boolean isEmptyResponse() {
-        return mText.isEmpty() && mOtherResponse.isEmpty() && mSpecialResponse.isEmpty();
+        return mText.isEmpty() && mOtherResponse.isEmpty() && mSpecialResponse.isEmpty() && mOtherText.isEmpty();
     }
 
     @Override

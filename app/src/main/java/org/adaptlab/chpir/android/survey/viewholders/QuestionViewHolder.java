@@ -7,15 +7,12 @@ import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
-import android.media.MediaPlayer;
-import android.media.MediaRecorder;
 import android.text.Editable;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.LongSparseArray;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -34,7 +31,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
-import androidx.appcompat.widget.AppCompatButton;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.content.ContextCompat;
@@ -44,7 +40,6 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.adaptlab.chpir.android.survey.R;
-import org.adaptlab.chpir.android.survey.SurveyApp;
 import org.adaptlab.chpir.android.survey.adapters.ChoiceDiagramAdapter;
 import org.adaptlab.chpir.android.survey.adapters.QuestionDiagramAdapter;
 import org.adaptlab.chpir.android.survey.adapters.QuestionRelationAdapter;
@@ -69,8 +64,6 @@ import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
 import org.adaptlab.chpir.android.survey.viewmodels.DisplayViewModel;
 import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -121,17 +114,8 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     private Button mClearButton;
     private RadioGroup mSpecialResponseRadioGroup;
     private LinearLayout mGridViewLayout;
-    private AppCompatButton mRecordButton;
-    private AppCompatButton mPlayButton;
     private ConstraintLayout mConstraintLayout;
-
     private boolean mDeserializing = false;
-    private boolean mRecord;
-    private boolean mPlay;
-    private String mAudioFolder;
-    private MediaRecorder mRecorder = null;
-    private MediaPlayer mPlayer = null;
-    private int mFileCount = 0;
 
     public QuestionViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
         super(itemView);
@@ -177,7 +161,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         setCarryForwardOptions(questionRelation);
         setQuestionTextComponents();
         setOptionSetInstructionsText();
-        createAudioComponent(mAudioComponent);
+        createAudioComponent();
         // Overridden by subclasses to place their graphical elements on the fragment.
         createQuestionComponent(mResponseComponent);
         setSpecialResponseView();
@@ -185,6 +169,23 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         mDeserializing = true;
         deserializeResponse();
         mDeserializing = false;
+    }
+
+    protected ViewGroup getAudioComponent() {
+        return mAudioComponent;
+    }
+
+    protected String getAudioFolder() {
+        return getContext().getExternalCacheDir().getAbsolutePath() +
+                "/" + getSurvey().getUUID() + "/" + getQuestion().getQuestionIdentifier();
+    }
+
+    private void createAudioComponent() {
+        if (getQuestion().getRecordAudio()) {
+            new AudioComponent(mContext, mAudioComponent, getAudioFolder(), this);
+        } else {
+            mAudioComponent.setVisibility(View.GONE);
+        }
     }
 
     SurveyViewModel getSurveyViewModel() {
@@ -304,128 +305,6 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     protected abstract void unSetResponse();
 
     protected abstract void showOtherText(int position);
-
-    private void createAudioComponent(ViewGroup viewGroup) {
-        if (getQuestion().getRecordAudio()) {
-            viewGroup.removeAllViews();
-
-            mAudioFolder = getContext().getExternalCacheDir().getAbsolutePath() +
-                    "/" + getSurvey().getUUID() + "/" + getQuestion().getQuestionIdentifier();
-            File folder = new File(mAudioFolder);
-            if (!folder.exists()) {
-                folder.mkdirs();
-            }
-
-            LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View view = inflater.inflate(R.layout.audio, null);
-            mRecordButton = view.findViewById(R.id.record);
-            mRecord = true;
-            mRecordButton.setOnClickListener(v -> prepareRecording());
-            mPlayButton = view.findViewById(R.id.play);
-            mPlay = true;
-            mPlayButton.setOnClickListener(v -> preparePlaying());
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
-            params.setMargins(5, 5, 5, 10);
-            viewGroup.addView(view, params);
-        } else {
-            viewGroup.setVisibility(View.GONE);
-        }
-    }
-
-    private int getFileCount() {
-        mFileCount += 1;
-        return mFileCount;
-    }
-
-    private void resetFileCounter() {
-        mFileCount = 0;
-    }
-
-    private void preparePlaying() {
-        File folder = new File(mAudioFolder);
-        File[] files = folder.listFiles();
-        if (files == null || files.length == 0) return;
-        for (File file : files) {
-            Log.i(TAG, "File: " + file.getAbsolutePath());
-        }
-        if (mPlay) {
-            mPlayButton.setBackgroundColor(getContext().getColor(R.color.blue));
-            mPlayButton.setText(R.string.stop_playing);
-            Drawable top = ContextCompat.getDrawable(getContext(), R.drawable.ic_baseline_pause_24);
-            mPlayButton.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
-            mPlayer = new MediaPlayer();
-            try {
-                mPlayer.setDataSource(files[0].getAbsolutePath());
-                mPlayer.prepare();
-                mPlayer.start();
-                mPlayer.setOnCompletionListener(mp -> {
-                    final int index = getFileCount();
-                    if (index < files.length) {
-                        try {
-                            mp.reset();
-                            mp.setDataSource(files[index].getAbsolutePath());
-                            mp.prepare();
-                        } catch (IOException e) {
-                            Log.e(TAG, "prepare() failed");
-                        }
-                        mp.start();
-                    } else {
-                        stopPlayer();
-                        resetFileCounter();
-                        mPlay = true;
-                    }
-                });
-            } catch (IOException e) {
-                Log.e(TAG, "prepare() failed");
-            }
-        } else {
-            stopPlayer();
-        }
-        mPlay = !mPlay;
-    }
-
-    private void stopPlayer() {
-        if (mPlayer == null) return;
-        mPlayer.release();
-        mPlayer = null;
-        mPlayButton.setBackgroundColor(getContext().getColor(R.color.bg_gray));
-        mPlayButton.setText(R.string.play_recording);
-        Drawable top = ContextCompat.getDrawable(getContext(), R.drawable.ic_baseline_play_arrow_24);
-        mPlayButton.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
-    }
-
-    private void prepareRecording() {
-        if (mRecord) {
-            mRecordButton.setBackgroundColor(getContext().getColor(R.color.blue));
-            mRecordButton.setText(R.string.stop_recording);
-            Drawable top = ContextCompat.getDrawable(getContext(), R.drawable.ic_baseline_mic_off_24);
-            mRecordButton.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
-            mRecorder = new MediaRecorder();
-            String fileName = mAudioFolder + "/" + System.currentTimeMillis() + ".3gp";
-            try {
-                mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-                mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-                mRecorder.setOutputFile(fileName);
-                mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-                mRecorder.prepare();
-                mRecorder.start();
-            } catch (IOException e) {
-                Log.e(TAG, "prepare() failed");
-            }
-        } else {
-            mRecordButton.setBackgroundColor(getContext().getColor(R.color.bg_gray));
-            mRecordButton.setText(R.string.start_recording);
-            Drawable top = ContextCompat.getDrawable(getContext(), R.drawable.ic_baseline_mic_24);
-            mRecordButton.setCompoundDrawablesWithIntrinsicBounds(null, top, null, null);
-            if (mRecorder == null) return;
-            mRecorder.stop();
-            mRecorder.release();
-            mRecorder = null;
-        }
-        mRecord = !mRecord;
-    }
 
     /**
      * @param otherText An EditText injected from a subclass i.e a write other subclass
@@ -1336,5 +1215,4 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                                 List<Option> selectedOptions, String enteredValue,
                                 String nextQuestion, String response);
     }
-
 }
