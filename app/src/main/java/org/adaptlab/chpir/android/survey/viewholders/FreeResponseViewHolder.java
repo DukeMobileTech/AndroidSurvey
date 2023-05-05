@@ -12,6 +12,7 @@ import android.widget.EditText;
 
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.utils.FormatUtils;
+import org.adaptlab.chpir.android.survey.verhoeff.ParticipantIdValidator;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -42,6 +43,9 @@ public class FreeResponseViewHolder extends QuestionViewHolder {
         public void afterTextChanged(Editable s) {
             if (!backspacing) {
                 mFreeText.removeTextChangedListener(this);
+                if (getQuestion().getQuestionIdentifier().equals("ParticipantID")) {
+                    mFreeText.setText(ParticipantIdValidator.formatText(s.toString()));
+                }
                 mFreeText.setSelection(mFreeText.getText().length());
                 mFreeText.addTextChangedListener(this);
             }

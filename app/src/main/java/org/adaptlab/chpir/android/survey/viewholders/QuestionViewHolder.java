@@ -18,6 +18,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -61,6 +63,7 @@ import org.adaptlab.chpir.android.survey.repositories.ResponseRepository;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.utils.ConstantUtils;
 import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
+import org.adaptlab.chpir.android.survey.verhoeff.ParticipantIdValidator;
 import org.adaptlab.chpir.android.survey.viewmodels.DisplayViewModel;
 import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
 
@@ -109,6 +112,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     private TextView mSpannedTextView;
     private TextView mAfterTextInstructionTextView;
     private TextView mOptionSetInstructionTextView;
+    private TextView mValidationTextView;
     private ViewGroup mResponseComponent;
     private ViewGroup mAudioComponent;
     private Button mClearButton;
@@ -135,6 +139,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         mAudioComponent = itemView.findViewById(R.id.audioComponent);
         mSpecialResponseRadioGroup = itemView.findViewById(R.id.specialResponseButtons);
         mClearButton = itemView.findViewById(R.id.clearResponsesButton);
+        mValidationTextView = itemView.findViewById(R.id.validation_text);
     }
 
     public QuestionViewHolder(@NonNull View itemView, Context context) {
@@ -433,6 +438,36 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         mResponse.setText(serialize());
         clearSpecialResponse();
         updateResponse();
+        validateResponse();
+    }
+
+    private void validateResponse() {
+        if (getQuestion().getQuestionIdentifier().equals("ParticipantID")) {
+            boolean valid = ParticipantIdValidator.validate2(mResponse.getText());
+            animateValidationTextView(valid);
+        }
+    }
+
+    private void animateValidationTextView(boolean valid) {
+        Animation animation = new AlphaAnimation(0, 0);
+
+        if (valid) {
+            if (mValidationTextView.getVisibility() == TextView.VISIBLE)
+                animation = new AlphaAnimation(1, 0);
+            mValidationTextView.setVisibility(TextView.INVISIBLE);
+        } else {
+            animation = new AlphaAnimation(0, 1);
+            mValidationTextView.setVisibility(TextView.VISIBLE);
+            mValidationTextView.setText(R.string.not_valid_response);
+        }
+
+        animation.setDuration(1000);
+        if (mValidationTextView.getAnimation() == null ||
+                mValidationTextView.getAnimation().hasEnded() ||
+                !mValidationTextView.getAnimation().hasStarted()) {
+            // Only animate if not currently animating
+            mValidationTextView.setAnimation(animation);
+        }
     }
 
     void updateResponse() {
@@ -711,16 +746,8 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         return mResponse;
     }
 
-    void setResponse(Response mResponse) {
-        this.mResponse = mResponse;
-    }
-
     public Survey getSurvey() {
         return mSurvey;
-    }
-
-    void setSurvey(Survey mSurvey) {
-        this.mSurvey = mSurvey;
     }
 
     private void setQuestionTextComponents() {

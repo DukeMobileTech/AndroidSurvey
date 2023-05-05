@@ -50,6 +50,21 @@ public class VerhoeffErrorDetection {
         return doCheck(generateCheckArray(checkString));
     }
 
+    /*
+     * Format: ## - %%% - @
+     *
+     * # = Two-digit facility numeric ID
+     * % = Three-digit participant numeric ID
+     * @ = One check-digit letter
+     */
+    public boolean performCheck2(String checkString) {
+        if (!checkString.matches("^\\d{2}\\-\\d{3}\\-[A-J]$")) {
+            return false;
+        }
+
+        return doCheck(generateCheckArray2(checkString));
+    }
+
     private int[] generateCheckArray(String checkString) {
         String[] splitString = checkString.split("-");
 
@@ -68,6 +83,24 @@ public class VerhoeffErrorDetection {
         checkArray[1] = Integer.parseInt(participantId[2]);
 
         checkArray[0] = (int) splitString[3].charAt(0) - 65;
+
+        return checkArray;
+    }
+
+    private int[] generateCheckArray2(String checkString) {
+        String[] splitString = checkString.split("-");
+        int[] checkArray = new int[6];
+
+        String[] facilityId = splitString[0].split("");
+        checkArray[5] = Integer.parseInt(facilityId[0]);
+        checkArray[4] = Integer.parseInt(facilityId[1]);
+
+        String[] participantId = splitString[1].split("");
+        checkArray[3] = Integer.parseInt(participantId[0]);
+        checkArray[2] = Integer.parseInt(participantId[1]);
+        checkArray[1] = Integer.parseInt(participantId[2]);
+
+        checkArray[0] = (int) splitString[2].charAt(0) - 65;
 
         return checkArray;
     }

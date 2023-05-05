@@ -7,10 +7,17 @@ public class ParticipantIdValidator {
         return verhoeff.performCheck(value);
     }
 
+    public static boolean validate2(String value) {
+        VerhoeffErrorDetection verhoeff = new VerhoeffErrorDetection();
+        return verhoeff.performCheck2(value);
+    }
+
     public static String formatText(String text) {
         text = text.toUpperCase();
 
-        if (text.matches("[A-Z]") ||
+        if (text.matches("\\d{2}") || text.matches("\\d{2}-\\d{3}")) {
+            text = text + "-";
+        } else if (text.matches("[A-Z]") ||
                 text.matches("[A-Z]\\-\\d{3}") ||
                 text.matches("[A-Z]\\-\\d{3}\\-\\d{2}")) {
             text = text + "-";
