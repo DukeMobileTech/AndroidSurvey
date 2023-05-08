@@ -453,7 +453,8 @@ public class SurveyViewModel extends AndroidViewModel {
                     && response != null && !response.getText().contains(",");
             if ((!question.getQuestionType().equals(Question.INSTRUCTIONS) &&
                     !mQuestionsToSkipSet.contains(question.getQuestionIdentifier()) &&
-                    response != null && response.isEmptyResponse()) || (oneChoice)) {
+                    response != null && response.isEmptyResponse()) || (oneChoice &&
+                    !mQuestionsToSkipSet.contains(question.getQuestionIdentifier()))) {
                 if (stringBuilder.length() > 0) stringBuilder.append(System.lineSeparator());
                 stringBuilder.append(context.getResources().getString(R.string.question))
                         .append(" ").append(question.getPosition())

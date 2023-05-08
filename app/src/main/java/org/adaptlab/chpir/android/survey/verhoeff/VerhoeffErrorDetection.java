@@ -38,16 +38,15 @@ public class VerhoeffErrorDetection {
 
     private static int[] generateCheckArray(String checkString) {
         String[] splitString = checkString.split("-");
-
         int[] checkArray = new int[6];
         String[] facilityId = splitString[0].split("");
-        checkArray[5] = Integer.parseInt(facilityId[0]);
-        checkArray[4] = Integer.parseInt(facilityId[1]);
+        checkArray[5] = Integer.parseInt(facilityId[1]);
+        checkArray[4] = Integer.parseInt(facilityId[2]);
 
         String[] participantId = splitString[1].split("");
-        checkArray[3] = Integer.parseInt(participantId[0]);
-        checkArray[2] = Integer.parseInt(participantId[1]);
-        checkArray[1] = Integer.parseInt(participantId[2]);
+        checkArray[3] = Integer.parseInt(participantId[1]);
+        checkArray[2] = Integer.parseInt(participantId[2]);
+        checkArray[1] = Integer.parseInt(participantId[3]);
 
         checkArray[0] = ((int) splitString[2].charAt(0)) - 65;
 
@@ -62,7 +61,7 @@ public class VerhoeffErrorDetection {
      * @ = One check-digit letter
      */
     public boolean performCheck(String checkString) {
-        if (checkString.matches("\\d{2}-\\d{3}-[a-z]")) {
+        if (checkString.matches("\\d{2}\\-\\d{3}\\-[a-z]")) {
             char lastChar = checkString.charAt(checkString.length() - 1);
             checkString = checkString.substring(0, checkString.length() - 1) + Character.toUpperCase(lastChar);
         }
