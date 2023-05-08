@@ -318,7 +318,9 @@ public class SettingsFragment extends Fragment {
                         @Override
                         public void onAsyncTaskFinished(String param) {
                             if (param == null || param.equals(HttpURLConnection.HTTP_UNAUTHORIZED + "")) {
-                                Toast.makeText(getActivity(), R.string.invalid_user_credentials, Toast.LENGTH_LONG).show();
+                                if (getActivity() != null) {
+                                    Toast.makeText(getActivity(), R.string.invalid_user_credentials, Toast.LENGTH_LONG).show();
+                                }
                             } else {
                                 mSettings.setApiKey(param);
                                 mSettings.setDeviceUserName(username.getText().toString());
