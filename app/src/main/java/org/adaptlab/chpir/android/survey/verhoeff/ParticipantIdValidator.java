@@ -7,11 +7,6 @@ public class ParticipantIdValidator {
         return verhoeff.performCheck(value);
     }
 
-    public static boolean validate2(String value) {
-        VerhoeffErrorDetection verhoeff = new VerhoeffErrorDetection();
-        return verhoeff.performCheck2(value);
-    }
-
     public static String formatText(String text) {
         text = text.toUpperCase();
 

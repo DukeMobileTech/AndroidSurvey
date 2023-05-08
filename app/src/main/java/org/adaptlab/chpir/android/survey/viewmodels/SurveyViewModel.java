@@ -65,6 +65,8 @@ public class SurveyViewModel extends AndroidViewModel {
     private int mDisplayPosition;
     private String mDeviceLanguage;
     private String mInstrumentLanguage;
+    private String mGender = "";
+    private int mParticipantID = -1;
 
     public SurveyViewModel(@NonNull Application application, String uuid) {
         super(application);
@@ -213,6 +215,65 @@ public class SurveyViewModel extends AndroidViewModel {
 
     public void setExpandableListTitle(List<String> listTitle) {
         mExpandableListTitle = listTitle;
+    }
+
+    public void setParticipantID(String participantID) {
+        String[] splitString = participantID.split("-");
+        mParticipantID = Integer.parseInt(splitString[1]);
+        setParticipantBlocks();
+    }
+
+    public void setParticipantGender(String response) {
+        mGender = response;
+        setParticipantBlocks();
+    }
+
+    private void setParticipantBlocks() {
+        if (!mGender.isEmpty() && mParticipantID != -1) {
+            Log.i(TAG, "GENDER = " + mGender + " ID = " + mParticipantID);
+            int block = -1;
+            List<String> questionsToSkip = new ArrayList<>();
+            if (mGender.equals("0")) { // female
+                block = mParticipantID % 13;
+                if (block == 0) block = 13;
+                for (int k = 1; k <= 13; k++) {
+                    if (k == block)  continue;
+                    for(String identifier : mQuestionsMap.keySet()) {
+                        if (identifier.contains("-")) {
+                            String[] parts = identifier.split("-");
+                            if (parts[1].charAt(0) == 'F') {
+                                String blockStr = parts[1].substring(1);
+                                int blockNum = Integer.parseInt(blockStr);
+                                if (blockNum != 0 && block != blockNum) { // do not skip block 0 and assigned block
+                                    questionsToSkip.add(identifier);
+                                }
+                            }
+                        }
+                    }
+                }
+            } else if (mGender.equals("1")) { // male
+                block = mParticipantID % 11;
+                if (block == 0) block = 11;
+                for (int k = 1; k <= 11; k++) {
+                   if (k == block)  continue;
+                   for(String identifier : mQuestionsMap.keySet()) {
+                       if (identifier.contains("-")) {
+                           String[] parts = identifier.split("-");
+                           if (parts[1].charAt(0) == 'M') {
+                                String blockStr = parts[1].substring(1);
+                                int blockNum = Integer.parseInt(blockStr);
+                                if (blockNum != 0 && block != blockNum) { // do not skip block 0 and assigned block
+                                    questionsToSkip.add(identifier);
+                                }
+                           }
+                       }
+                   }
+                }
+            }
+            Log.i(TAG, "BLOCK = " + block);
+            Log.i(TAG, "QUESTIONS TO SKIP: " + String.join(",", questionsToSkip));
+            updateQuestionsToSkipMap("ParticipantID", questionsToSkip);
+        }
     }
 
     public void setSkipData() {

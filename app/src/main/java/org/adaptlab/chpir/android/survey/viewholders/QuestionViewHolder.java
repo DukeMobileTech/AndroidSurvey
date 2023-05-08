@@ -437,14 +437,16 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     void saveResponse() {
         mResponse.setText(serialize());
         clearSpecialResponse();
-        updateResponse();
         validateResponse();
+        updateResponse();
     }
 
     private void validateResponse() {
         if (getQuestion().getQuestionIdentifier().equals("ParticipantID")) {
-            boolean valid = ParticipantIdValidator.validate2(mResponse.getText());
+            boolean valid = ParticipantIdValidator.validate(mResponse.getText());
             animateValidationTextView(valid);
+        } else if (getQuestion().getQuestionIdentifier().equals("Gender")) {
+            mSurveyViewModel.setParticipantGender(mResponse.getText());
         }
     }
 
@@ -455,6 +457,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
             if (mValidationTextView.getVisibility() == TextView.VISIBLE)
                 animation = new AlphaAnimation(1, 0);
             mValidationTextView.setVisibility(TextView.INVISIBLE);
+            mSurveyViewModel.setParticipantID(mResponse.getText());
         } else {
             animation = new AlphaAnimation(0, 1);
             mValidationTextView.setVisibility(TextView.VISIBLE);

@@ -1,96 +1,45 @@
 package org.adaptlab.chpir.android.survey.verhoeff;
 
 public class VerhoeffErrorDetection {
-    private static final int[][] op = {
-            {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
-            {1, 2, 3, 4, 0, 6, 7, 8, 9, 5},
-            {2, 3, 4, 0, 1, 7, 8, 9, 5, 6},
-            {3, 4, 0, 1, 2, 8, 9, 5, 6, 7},
-            {4, 0, 1, 2, 3, 9, 5, 6, 7, 8},
-            {5, 9, 8, 7, 6, 0, 4, 3, 2, 1},
-            {6, 5, 9, 8, 7, 1, 0, 4, 3, 2},
-            {7, 6, 5, 9, 8, 2, 1, 0, 4, 3},
-            {8, 7, 6, 5, 9, 3, 2, 1, 0, 4},
-            {9, 8, 7, 6, 5, 4, 3, 2, 1, 0}};
-
-    private static final int[][] F = new int[8][];
-    private static final int[] F0 = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    private static final int[] F1 = {1, 5, 7, 6, 2, 8, 3, 0, 9, 4};
-
-    public VerhoeffErrorDetection() {
-        F[0] = F0;
-        F[1] = F1;
-        for (int i = 2; i < 8; i++) {
-            F[i] = new int[10];
-            for (int j = 0; j < 10; j++)
-                F[i][j] = F[i - 1][F[1][j]];
-        }
-    }
+    // The multiplication table
+    static int[][] d = new int[][]
+            {
+                    {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
+                    {1, 2, 3, 4, 0, 6, 7, 8, 9, 5},
+                    {2, 3, 4, 0, 1, 7, 8, 9, 5, 6},
+                    {3, 4, 0, 1, 2, 8, 9, 5, 6, 7},
+                    {4, 0, 1, 2, 3, 9, 5, 6, 7, 8},
+                    {5, 9, 8, 7, 6, 0, 4, 3, 2, 1},
+                    {6, 5, 9, 8, 7, 1, 0, 4, 3, 2},
+                    {7, 6, 5, 9, 8, 2, 1, 0, 4, 3},
+                    {8, 7, 6, 5, 9, 3, 2, 1, 0, 4},
+                    {9, 8, 7, 6, 5, 4, 3, 2, 1, 0}
+            };
+    // The permutation table
+    static int[][] p = new int[][]
+            {
+                    {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
+                    {1, 5, 7, 6, 2, 8, 3, 0, 9, 4},
+                    {5, 8, 0, 3, 7, 9, 6, 1, 4, 2},
+                    {8, 9, 1, 6, 0, 4, 3, 5, 2, 7},
+                    {9, 4, 5, 3, 1, 2, 6, 8, 7, 0},
+                    {4, 2, 8, 6, 5, 7, 3, 9, 0, 1},
+                    {2, 7, 9, 3, 8, 0, 6, 4, 1, 5},
+                    {7, 0, 4, 6, 9, 1, 3, 2, 5, 8}
+            };
 
     private static boolean doCheck(int[] a) {
-        int check = 0;
-        for (int i = 0; i < a.length; i++)
-            check = op[check][F[i % 8][a[i]]];
-        return check == 0;
-    }
-
-    /*
-     * Format: $ - ### - %% - @
-     *
-     * $ = One letter to indicate participant type
-     * # = Three-digit facility numeric ID
-     * % = Two-digit participant numeric ID
-     * @ = One check-digit letter
-     */
-    public boolean performCheck(String checkString) {
-        if (!checkString.matches("^[A-Z]\\-\\d{3}\\-\\d{2}\\-[A-J]$")) {
-            return false;
+        int c = 0;
+        for (int i = 0; i < a.length; i++) {
+            c = d[c][p[(i % 8)][a[i]]];
         }
-
-        return doCheck(generateCheckArray(checkString));
+        return (c == 0);
     }
 
-    /*
-     * Format: ## - %%% - @
-     *
-     * # = Two-digit facility numeric ID
-     * % = Three-digit participant numeric ID
-     * @ = One check-digit letter
-     */
-    public boolean performCheck2(String checkString) {
-        if (!checkString.matches("^\\d{2}\\-\\d{3}\\-[A-J]$")) {
-            return false;
-        }
-
-        return doCheck(generateCheckArray2(checkString));
-    }
-
-    private int[] generateCheckArray(String checkString) {
+    private static int[] generateCheckArray(String checkString) {
         String[] splitString = checkString.split("-");
 
-        int[] checkArray = new int[8];
-        int charToAscii = splitString[0].charAt(0);
-        checkArray[7] = charToAscii / 10;
-        checkArray[6] = charToAscii % 10;
-
-        String[] facilityId = splitString[1].split("");
-        checkArray[5] = Integer.parseInt(facilityId[1]);
-        checkArray[4] = Integer.parseInt(facilityId[2]);
-        checkArray[3] = Integer.parseInt(facilityId[3]);
-
-        String[] participantId = splitString[2].split("");
-        checkArray[2] = Integer.parseInt(participantId[1]);
-        checkArray[1] = Integer.parseInt(participantId[2]);
-
-        checkArray[0] = (int) splitString[3].charAt(0) - 65;
-
-        return checkArray;
-    }
-
-    private int[] generateCheckArray2(String checkString) {
-        String[] splitString = checkString.split("-");
         int[] checkArray = new int[6];
-
         String[] facilityId = splitString[0].split("");
         checkArray[5] = Integer.parseInt(facilityId[0]);
         checkArray[4] = Integer.parseInt(facilityId[1]);
@@ -100,8 +49,26 @@ public class VerhoeffErrorDetection {
         checkArray[2] = Integer.parseInt(participantId[1]);
         checkArray[1] = Integer.parseInt(participantId[2]);
 
-        checkArray[0] = (int) splitString[2].charAt(0) - 65;
+        checkArray[0] = ((int) splitString[2].charAt(0)) - 65;
 
         return checkArray;
+    }
+
+    /*
+     * Format: ## - %%% - @
+     *
+     * # = Two-digit site numeric ID
+     * % = Three-digit participant numeric ID
+     * @ = One check-digit letter
+     */
+    public boolean performCheck(String checkString) {
+        if (checkString.matches("\\d{2}-\\d{3}-[a-z]")) {
+            char lastChar = checkString.charAt(checkString.length() - 1);
+            checkString = checkString.substring(0, checkString.length() - 1) + Character.toUpperCase(lastChar);
+        }
+        if (!checkString.matches("\\d{2}\\-\\d{3}\\-[A-J]")) {
+            return false;
+        }
+        return doCheck(generateCheckArray(checkString));
     }
 }
