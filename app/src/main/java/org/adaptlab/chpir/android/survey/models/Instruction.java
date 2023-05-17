@@ -97,10 +97,21 @@ public class Instruction extends ReceiveModel {
     }
 
     public String getText(Instrument instrument) {
-        if (instrument.getLanguage().equals(AppUtil.getDeviceLanguage())) return mText;
-        for (InstructionTranslation translation : translations()) {
-            if (translation.getLanguage().equals(AppUtil.getDeviceLanguage())) {
+        String iLanguage = instrument.getLanguage();
+        String dLanguage = AppUtil.getDeviceLanguage();
+        if (iLanguage.equals(dLanguage)) return mText;
+        List<InstructionTranslation> translations = translations();
+        for (InstructionTranslation translation : translations) {
+            if (translation.getLanguage().equals(dLanguage)) {
                 return translation.getText();
+            }
+        }
+        if (dLanguage.contains("-")) {
+            dLanguage = dLanguage.split("-")[0];
+            for (InstructionTranslation translation : translations) {
+                if (translation.getLanguage().equals(dLanguage)) {
+                    return translation.getText();
+                }
             }
         }
         // Fall back to default

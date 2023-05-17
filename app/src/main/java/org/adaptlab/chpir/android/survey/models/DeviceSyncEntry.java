@@ -41,7 +41,13 @@ public class DeviceSyncEntry extends SendModel {
             jsonObject.put("current_version_name", AppUtil.getVersionName(AppUtil.getContext()));
             jsonObject.put("num_complete_surveys", Survey.getCompleted().size());
             jsonObject.put("num_incomplete_surveys", Survey.getIncomplete().size());
-            jsonObject.put("current_language", new Locale(AppUtil.getDeviceLanguage()).getDisplayLanguage());
+            String language = AppUtil.getDeviceLanguage();
+            if (language.contains("-")) {
+                String[] codes = language.split("-");
+                jsonObject.put("current_language", new Locale(codes[0], codes[1]).getDisplayLanguage() + " (" + codes[1] + ")");
+            } else {
+                jsonObject.put("current_language", new Locale(AppUtil.getDeviceLanguage()).getDisplayLanguage());
+            }
             jsonObject.put("instrument_versions", instrumentVersions().toString());
             jsonObject.put("device_uuid", AdminSettings.getInstance().getDeviceIdentifier());
             jsonObject.put("api_key", AdminSettings.getInstance().getApiKey());

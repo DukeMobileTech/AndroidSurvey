@@ -127,11 +127,22 @@ public class Section extends ReceiveModel {
      * text for the section.
      */
 	public String getTitle() {
-		if (getInstrument().getLanguage().equals(AppUtil.getDeviceLanguage())) return mTitle;
+        String iLanguage = getInstrument().getLanguage();
+        String dLanguage = AppUtil.getDeviceLanguage();
+		if (iLanguage.equals(dLanguage)) return mTitle;
         if (activeTranslation() != null) return activeTranslation().getText();
-        for (SectionTranslation translation : translations()) {
-            if (translation.getLanguage().equals(AppUtil.getDeviceLanguage())) {
+        List<SectionTranslation> translations = translations();
+        for (SectionTranslation translation : translations) {
+            if (translation.getLanguage().equals(dLanguage)) {
                 return translation.getText();
+            }
+        }
+        if (dLanguage.contains("-")) {
+            dLanguage = dLanguage.split("-")[0];
+            for (SectionTranslation translation : translations) {
+                if (translation.getLanguage().equals(dLanguage)) {
+                    return translation.getText();
+                }
             }
         }
 		//Default

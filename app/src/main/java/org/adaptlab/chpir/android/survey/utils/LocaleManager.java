@@ -40,6 +40,10 @@ public class LocaleManager {
 
     private static Context updateResources(Context context, String language) {
         Locale locale = new Locale(language);
+        if (language.contains("-")) {
+            String[] codes = language.split("-");
+            locale = new Locale(codes[0], codes[1]);
+        }
         Locale.setDefault(locale);
 
         Resources res = context.getResources();

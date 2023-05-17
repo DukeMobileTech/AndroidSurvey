@@ -50,10 +50,21 @@ public class Option extends ReceiveModel {
      * text for the option.
      */
     public String getText(Instrument instrument) {
-        if (instrument.getLanguage().equals(getDeviceLanguage())) return mText;
-        for (OptionTranslation translation : translations()) {
-            if (translation.getLanguage().equals(getDeviceLanguage())) {
+        String iLanguage = instrument.getLanguage();
+        String dLanguage = getDeviceLanguage();
+        if (iLanguage.equals(dLanguage)) return mText;
+        List<OptionTranslation> translations = translations();
+        for (OptionTranslation translation : translations) {
+            if (translation.getLanguage().equals(dLanguage)) {
                 return translation.getText();
+            }
+        }
+        if (dLanguage.contains("-")) {
+            dLanguage = dLanguage.split("-")[0];
+            for (OptionTranslation translation : translations) {
+                if (translation.getLanguage().equals(dLanguage)) {
+                    return translation.getText();
+                }
             }
         }
         // Fall back to default

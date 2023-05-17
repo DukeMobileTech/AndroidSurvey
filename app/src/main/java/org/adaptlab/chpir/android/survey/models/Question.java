@@ -309,13 +309,23 @@ public class Question extends ReceiveModel {
      * text for the question.
      */
     public String getText() {
-        if (getInstrument().getLanguage().equals(AppUtil.getDeviceLanguage())) return mText;
-        for (QuestionTranslation translation : translations()) {
-            if (translation.getLanguage().equals(AppUtil.getDeviceLanguage())) {
+        String iLanguage = getInstrument().getLanguage();
+        String dLanguage = AppUtil.getDeviceLanguage();
+        if (iLanguage.equals(dLanguage)) return mText;
+        List<QuestionTranslation> translations = translations();
+        for (QuestionTranslation translation : translations) {
+            if (translation.getLanguage().equals(dLanguage)) {
                 return translation.getText();
             }
         }
-
+        if (dLanguage.contains("-")) {
+            dLanguage = dLanguage.split("-")[0];
+            for (QuestionTranslation translation : translations) {
+                if (translation.getLanguage().equals(dLanguage)) {
+                    return translation.getText();
+                }
+            }
+        }
         // Fall back to default
         return mText;
     }

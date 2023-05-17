@@ -130,17 +130,28 @@ public class Instrument extends ReceiveModel {
      * text for the title.
      */
     public String getTitle() {
-        if (getLanguage().equals(AppUtil.getDeviceLanguage())) return mTitle;
+        String iLanguage = getLanguage();
+        String dLanguage = AppUtil.getDeviceLanguage();
+        if (iLanguage.equals(dLanguage)) return mTitle;
         if (activeTranslation() != null && !activeTranslation().getTitle().trim().equals("")) {
             return activeTranslation().getTitle();
         }
-        for (InstrumentTranslation translation : translations()) {
-            if (translation.getLanguage().equals(AppUtil.getDeviceLanguage())
+        List<InstrumentTranslation> translations = translations();
+        for (InstrumentTranslation translation : translations) {
+            if (translation.getLanguage().equals(dLanguage)
                     && !translation.getTitle().trim().equals("")) {
                 return translation.getTitle();
             }
         }
-
+        if (dLanguage.contains("-")) {
+            dLanguage = dLanguage.split("-")[0];
+            for (InstrumentTranslation translation : translations) {
+                if (translation.getLanguage().equals(dLanguage)
+                        && !translation.getTitle().trim().equals("")) {
+                    return translation.getTitle();
+                }
+            }
+        }
         // Fall back to default
         return mTitle;
     }

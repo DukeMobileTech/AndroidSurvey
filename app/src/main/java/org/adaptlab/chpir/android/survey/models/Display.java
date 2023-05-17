@@ -146,10 +146,21 @@ public class Display extends ReceiveModel {
     }
 
     public String getTitle() {
-        if (getInstrument().getLanguage().equals(AppUtil.getDeviceLanguage())) return mTitle;
-        for (DisplayTranslation translation : translations()) {
-            if (translation.getLanguage().equals(AppUtil.getDeviceLanguage())) {
+        String iLanguage = getInstrument().getLanguage();
+        String dLanguage = AppUtil.getDeviceLanguage();
+        if (iLanguage.equals(dLanguage)) return mTitle;
+        List<DisplayTranslation> translations = translations();
+        for (DisplayTranslation translation : translations) {
+            if (translation.getLanguage().equals(dLanguage)) {
                 return translation.getText();
+            }
+        }
+        if (dLanguage.contains("-")) {
+            dLanguage = dLanguage.split("-")[0];
+            for (DisplayTranslation translation : translations) {
+                if (translation.getLanguage().equals(dLanguage)) {
+                    return translation.getText();
+                }
             }
         }
         //Default

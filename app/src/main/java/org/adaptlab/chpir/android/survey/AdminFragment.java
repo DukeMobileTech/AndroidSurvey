@@ -394,7 +394,12 @@ public class AdminFragment extends Fragment {
         final List<String> languageCodes = Instrument.getLanguages();
         ArrayList<String> displayLanguages = new ArrayList<>();
         for (String languageCode : languageCodes) {
-            displayLanguages.add(new Locale(languageCode).getDisplayLanguage());
+            if (languageCode.contains("-")) {
+                String[] codes = languageCode.split("-");
+                displayLanguages.add(new Locale(codes[0], codes[1]).getDisplayLanguage() + " (" + codes[1] + ")");
+            } else {
+                displayLanguages.add(new Locale(languageCode).getDisplayLanguage());
+            }
         }
         final ArrayAdapter<String> mAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, displayLanguages);
         mAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
