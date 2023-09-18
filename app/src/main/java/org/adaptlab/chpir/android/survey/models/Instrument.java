@@ -15,8 +15,10 @@ import androidx.collection.LongSparseArray;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
+import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.apache.commons.lang3.RandomUtils;
 import org.json.JSONArray;
@@ -196,9 +198,33 @@ public class Instrument extends ReceiveModel {
                 display.delete();
                 iterator.remove();
             }
-            // Temp fix
+
             List<Question> questions = displayQuestions.get(display.getRemoteId());
             if (questions != null && display.getQuestionCount() != questions.size()) {
+                // Mark deleted those without valid loop source
+                for (Question question : questions) {
+                    String loopedSource = question.getLoopSource();
+                    Log.i(TAG, "Looped Source == " + loopedSource);
+                    if (loopedSource != null && !loopedSource.isEmpty()) {
+                        Question parent = Question.findByQuestionIdentifier(loopedSource);
+                        if (parent == null || parent.isDeleted()) {
+                            question.setDeleted(true);
+                            question.save();
+                            Log.i(TAG, "Delete question with id " + question.getQuestionIdentifier());
+                        }
+                    }
+                    String[] parts = question.getQuestionIdentifier().split("_" + loopedSource);
+                    if (parts.length > 0) {
+                        Log.i(TAG, "Parent Source = " + parts[0]);
+                        Question parent = Question.findByQuestionIdentifier(parts[0]);
+                        if (parent == null || parent.isDeleted()) {
+                            question.setDeleted(true);
+                            question.save();
+                            Log.i(TAG, "Delete question with id " + question.getQuestionIdentifier());
+                        }
+                    }
+                }
+                // Temp fix
                 boolean getOut = false;
                 for (Question question : questions) {
                     if (question.getLoopQuestionCount() > 0 ) {
@@ -236,7 +262,22 @@ public class Instrument extends ReceiveModel {
         for (Display display : displays()) {
             List<Question> questionList = mDisplayQuestions.get(display.getRemoteId());
             if (questionList == null || display.getQuestionCount() != questionList.size()) {
+                int listSize = 0;
+                if (questionList != null) listSize = questionList.size();
+                Log.e(TAG, "Instrument Title = " + mTitle);
+                Log.e(TAG, "Display Title = " + display.getTitle());
+                Log.e(TAG, "Question List = " + listSize);
+                Log.e(TAG, "Question Count = " + display.getQuestionCount());
                 setLoaded(false);
+                if (AppUtil.PRODUCTION) {
+                    FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+                    crashlytics.setCustomKey(AppUtil.getContext().getString(R.string.last_instrument), mTitle);
+                    crashlytics.setCustomKey(AppUtil.getContext().getString(R.string.last_display), display.getTitle());
+                    crashlytics.setCustomKey(AppUtil.getContext().getString(R.string.list_size), listSize);
+                    crashlytics.setCustomKey(AppUtil.getContext().getString(R.string.question_count), display.getQuestionCount());
+                    crashlytics.recordException(new Exception("Inconsistencies"));
+                    crashlytics.sendUnsentReports();
+                }
                 return;
             }
         }
