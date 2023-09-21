@@ -99,6 +99,12 @@ public class Question extends ReceiveModel {
         return new Select().from(Question.class).where("QuestionIdentifier = ?", identifier)
                 .executeSingle();
     }
+    
+    public static Question findByQuestionIdentifier(String identifier, Long instrumentId) {
+        if (identifier == null) return null;
+        return new Select().from(Question.class).where("QuestionIdentifier = ? AND InstrumentRemoteId = ?",
+                identifier, instrumentId).executeSingle();
+    }
 
     public static Question findByQuestionIdentifier(String identifier, Long instrumentId, boolean isDeleted) {
         if (identifier == null) return null;

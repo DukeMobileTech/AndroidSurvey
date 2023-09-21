@@ -189,101 +189,6 @@ public class Instrument extends ReceiveModel {
         mRemoteId = id;
     }
 
-    private void sanitizeDisplays() {
-        HashMap<Long, List<Question>> displayQuestions = getDisplayQuestions();
-        for (Iterator<Display> iterator = mDisplays.iterator(); iterator.hasNext(); ) {
-            Display display = iterator.next();
-            if (displayQuestions.get(display.getRemoteId()) == null) {
-                // Display has no questions, so delete it
-                display.delete();
-                iterator.remove();
-            }
-
-            List<Question> questions = displayQuestions.get(display.getRemoteId());
-            if (questions != null && display.getQuestionCount() != questions.size()) {
-                // Mark deleted those without valid loop source
-                for (Question question : questions) {
-                    String loopedSource = question.getLoopSource();
-                    Log.i(TAG, "Looped Source == " + loopedSource);
-                    if (loopedSource != null && !loopedSource.isEmpty()) {
-                        Question parent = Question.findByQuestionIdentifier(loopedSource);
-                        if (parent == null || parent.isDeleted()) {
-                            question.setDeleted(true);
-                            question.save();
-                            Log.i(TAG, "Delete question with id " + question.getQuestionIdentifier());
-                        }
-                    }
-                    String[] parts = question.getQuestionIdentifier().split("_" + loopedSource);
-                    if (parts.length > 0) {
-                        Log.i(TAG, "Parent Source = " + parts[0]);
-                        Question parent = Question.findByQuestionIdentifier(parts[0]);
-                        if (parent == null || parent.isDeleted()) {
-                            question.setDeleted(true);
-                            question.save();
-                            Log.i(TAG, "Delete question with id " + question.getQuestionIdentifier());
-                        }
-                    }
-                }
-                // Temp fix
-                boolean getOut = false;
-                for (Question question : questions) {
-                    if (question.getLoopQuestionCount() > 0 ) {
-                        List<LoopQuestion> loopQuestions = question.loopQuestions();
-                        for (LoopQuestion loopQuestion : loopQuestions) {
-                            if (loopQuestion.isSameDisplay()) {
-                                display.setQuestionCount(questions.size());
-                                getOut = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (getOut) break;
-                }
-            }
-        }
-        // Ensure they are numbered consecutively
-        Collections.sort(mDisplays, new Comparator<Display>() {
-            @Override
-            public int compare(Display o1, Display o2) {
-                return Double.compare(o1.getDisplayPosition(), o2.getDisplayPosition());
-            }
-        });
-        for (int k = 0; k < mDisplays.size(); k++) {
-            Display display = mDisplays.get(k);
-            if (display.getPosition() != k + 1) {
-                display.setPosition(k + 1);
-                display.save();
-            }
-        }
-    }
-
-    private void sanitize() {
-        HashMap<Long, List<Question>> mDisplayQuestions = getDisplayQuestions();
-        for (Display display : displays()) {
-            List<Question> questionList = mDisplayQuestions.get(display.getRemoteId());
-            if (questionList == null || display.getQuestionCount() != questionList.size()) {
-                int listSize = 0;
-                if (questionList != null) listSize = questionList.size();
-                Log.e(TAG, "Instrument Title = " + mTitle);
-                Log.e(TAG, "Display Title = " + display.getTitle());
-                Log.e(TAG, "Question List = " + listSize);
-                Log.e(TAG, "Question Count = " + display.getQuestionCount());
-                setLoaded(false);
-                if (AppUtil.PRODUCTION) {
-                    FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
-                    crashlytics.setCustomKey(AppUtil.getContext().getString(R.string.last_instrument), mTitle);
-                    crashlytics.setCustomKey(AppUtil.getContext().getString(R.string.last_display), display.getTitle());
-                    crashlytics.setCustomKey(AppUtil.getContext().getString(R.string.list_size), listSize);
-                    crashlytics.setCustomKey(AppUtil.getContext().getString(R.string.question_count), display.getQuestionCount());
-                    crashlytics.recordException(new Exception("Inconsistencies"));
-                    crashlytics.sendUnsentReports();
-                }
-                return;
-            }
-        }
-        setLoaded(true);
-    }
-
     @NonNull
     private HashMap<Long, List<Question>> getDisplayQuestions() {
         HashMap<Long, List<Question>> mDisplayQuestions = new HashMap<>();
@@ -717,6 +622,101 @@ public class Instrument extends ReceiveModel {
         sanitize();
     }
 
+    private void sanitizeDisplays() {
+        HashMap<Long, List<Question>> displayQuestions = getDisplayQuestions();
+        for (Iterator<Display> iterator = mDisplays.iterator(); iterator.hasNext(); ) {
+            Display display = iterator.next();
+            if (displayQuestions.get(display.getRemoteId()) == null) {
+                // Display has no questions, so delete it
+                display.delete();
+                iterator.remove();
+            }
+
+            List<Question> questions = displayQuestions.get(display.getRemoteId());
+            if (questions != null && display.getQuestionCount() != questions.size()) {
+                // Mark deleted those without valid loop source
+                for (Question question : questions) {
+                    String loopedSource = question.getLoopSource();
+                    if (loopedSource != null && !loopedSource.isEmpty()) {
+                        Question parent = Question.findByQuestionIdentifier(loopedSource, mRemoteId);
+                        if (parent == null || parent.isDeleted()) {
+                            question.setDeleted(true);
+                            question.save();
+                        }
+                    }
+                    String[] parts = question.getQuestionIdentifier().split("_" + loopedSource);
+                    if (parts.length > 0) {
+                        Question parent = Question.findByQuestionIdentifier(parts[0], mRemoteId);
+                        if (parent == null || parent.isDeleted()) {
+                            question.setDeleted(true);
+                            question.save();
+                        }
+                    }
+                }
+                // Temp fix
+                boolean getOut = false;
+                for (Question question : questions) {
+                    if (question.getLoopQuestionCount() > 0 ) {
+                        List<LoopQuestion> loopQuestions = question.loopQuestions();
+                        for (LoopQuestion loopQuestion : loopQuestions) {
+                            if (loopQuestion.isSameDisplay()) {
+                                display.setQuestionCount(questions.size());
+                                getOut = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (getOut) break;
+                }
+            }
+        }
+        // Ensure they are numbered consecutively
+        Collections.sort(mDisplays, new Comparator<Display>() {
+            @Override
+            public int compare(Display o1, Display o2) {
+                return Double.compare(o1.getDisplayPosition(), o2.getDisplayPosition());
+            }
+        });
+
+        Log.i(TAG, mTitle);
+        for (int k = 0; k < mDisplays.size(); k++) {
+            Display display = mDisplays.get(k);
+            if (display.getPosition() != k + 1) {
+                display.setPosition(k + 1);
+                display.save();
+            }
+            Log.i(TAG, display.getPosition() + " => " + display.getDisplayPosition()
+                    + " => " + display.getTitle());
+        }
+    }
+
+    private void sanitize() {
+        HashMap<Long, List<Question>> mDisplayQuestions = getDisplayQuestions();
+        for (Display display : displays()) {
+            List<Question> questionList = mDisplayQuestions.get(display.getRemoteId());
+            if (questionList == null || display.getQuestionCount() != questionList.size()) {
+                int listSize = 0;
+                if (questionList != null) listSize = questionList.size();
+                Log.e(TAG, "Instrument Title = " + mTitle);
+                Log.e(TAG, "Display Title = " + display.getTitle());
+                Log.e(TAG, "Question List = " + listSize);
+                Log.e(TAG, "Question Count = " + display.getQuestionCount());
+                setLoaded(false);
+                if (AppUtil.PRODUCTION) {
+                    FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+                    crashlytics.setCustomKey(AppUtil.getContext().getString(R.string.last_instrument), mTitle);
+                    crashlytics.setCustomKey(AppUtil.getContext().getString(R.string.last_display), display.getTitle());
+                    crashlytics.setCustomKey(AppUtil.getContext().getString(R.string.list_size), listSize);
+                    crashlytics.setCustomKey(AppUtil.getContext().getString(R.string.question_count), display.getQuestionCount());
+                    crashlytics.recordException(new Exception("Inconsistencies"));
+                    crashlytics.sendUnsentReports();
+                }
+                return;
+            }
+        }
+        setLoaded(true);
+    }
+
     private void createDisplayInstruction(Question parent, Question looped, LoopQuestion lq, Display display, String text, int index) {
         Instruction  instruction = Instruction.findByText(text);
         if (instruction == null) instruction = createLoopInstruction(text);
@@ -763,7 +763,8 @@ public class Instrument extends ReceiveModel {
             display.setDeleted(parent.getDeleted());
             mDisplays.add(display);
         }
-        display.setDisplayPosition(parent.getDisplayPosition() + 0.1);
+        display.setPosition(parent.getPosition());
+        display.setDisplayPosition(parent.getPosition() + 0.1);
         display.setQuestionCount(getDisplayQuestionCount(q, lq, lqs));
         display.save();
         return display;
