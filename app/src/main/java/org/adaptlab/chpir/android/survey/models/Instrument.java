@@ -18,6 +18,7 @@ import com.activeandroid.query.Select;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 import org.adaptlab.chpir.android.activerecordcloudsync.ReceiveModel;
+import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.apache.commons.lang3.RandomUtils;
@@ -530,14 +531,9 @@ public class Instrument extends ReceiveModel {
     }
 
     public void setLoops() {
+        if (BuildConfig.DEBUG) Log.i(TAG, "Setting Loops For :: " + mTitle);
         mDisplays = displays();
         List<Question> questions = questions();
-        //Set display position to a double
-        for (int k = 0; k < mDisplays.size(); k++) {
-            Display display = mDisplays.get(k);
-            display.setDisplayPosition(display.getPosition());
-        }
-
         HashMap<String, Question> questionsMap = new HashMap<>();
         for (Question question : questions) {
             questionsMap.put(question.getQuestionIdentifier(), question);
@@ -623,6 +619,12 @@ public class Instrument extends ReceiveModel {
     }
 
     private void sanitizeDisplays() {
+        //Set display position to a double
+        for (int k = 0; k < mDisplays.size(); k++) {
+            Display display = mDisplays.get(k);
+            display.setDisplayPosition(display.getPosition() + 0.0);
+        }
+
         HashMap<Long, List<Question>> displayQuestions = getDisplayQuestions();
         for (Iterator<Display> iterator = mDisplays.iterator(); iterator.hasNext(); ) {
             Display display = iterator.next();
@@ -656,7 +658,7 @@ public class Instrument extends ReceiveModel {
                 // Temp fix
                 boolean getOut = false;
                 for (Question question : questions) {
-                    if (question.getLoopQuestionCount() > 0 ) {
+                    if (question.getLoopQuestionCount() > 0) {
                         List<LoopQuestion> loopQuestions = question.loopQuestions();
                         for (LoopQuestion loopQuestion : loopQuestions) {
                             if (loopQuestion.isSameDisplay()) {
@@ -669,6 +671,16 @@ public class Instrument extends ReceiveModel {
                     if (getOut) break;
                 }
             }
+
+            //Set display position of p2 displays
+            String disTitle = display.getTitle();
+            if (disTitle.endsWith(" p2")) {
+                if (BuildConfig.DEBUG) Log.i(TAG, "Loop Display :: " + disTitle);
+                String parentTitle = disTitle.substring(0, disTitle.length() - 3);
+                Display parent = Display.findByTitleAndInstrument(parentTitle, mRemoteId);
+                display.setDisplayPosition(parent.getPosition() + 0.1);
+                if (BuildConfig.DEBUG) Log.i(TAG, "Parent == " + parent.toString());
+            }
         }
         // Ensure they are numbered consecutively
         Collections.sort(mDisplays, new Comparator<Display>() {
@@ -678,15 +690,16 @@ public class Instrument extends ReceiveModel {
             }
         });
 
-        Log.i(TAG, mTitle);
         for (int k = 0; k < mDisplays.size(); k++) {
             Display display = mDisplays.get(k);
             if (display.getPosition() != k + 1) {
                 display.setPosition(k + 1);
                 display.save();
             }
-            Log.i(TAG, display.getPosition() + " => " + display.getDisplayPosition()
-                    + " => " + display.getTitle());
+            if (BuildConfig.DEBUG) {
+                Log.i(TAG, display.getPosition() + " => " + display.getDisplayPosition()
+                        + " => " + display.getTitle());
+            }
         }
     }
 
@@ -718,7 +731,7 @@ public class Instrument extends ReceiveModel {
     }
 
     private void createDisplayInstruction(Question parent, Question looped, LoopQuestion lq, Display display, String text, int index) {
-        Instruction  instruction = Instruction.findByText(text);
+        Instruction instruction = Instruction.findByText(text);
         if (instruction == null) instruction = createLoopInstruction(text);
         int position;
         if (lq.isSameDisplay()) {
@@ -761,10 +774,10 @@ public class Instrument extends ReceiveModel {
             display.setSectionId(parent.getSectionId());
             display.setRemoteId(getBoundedDisplayId());
             display.setDeleted(parent.getDeleted());
+            display.setPosition(parent.getPosition());
+            display.setDisplayPosition(parent.getPosition() + 0.1);
             mDisplays.add(display);
         }
-        display.setPosition(parent.getPosition());
-        display.setDisplayPosition(parent.getPosition() + 0.1);
         display.setQuestionCount(getDisplayQuestionCount(q, lq, lqs));
         display.save();
         return display;

@@ -65,6 +65,14 @@ public class Display extends ReceiveModel {
         mSectionId = sectionId;
     }
 
+    Long getInstrumentId() {
+        return mInstrumentId;
+    }
+
+    void setInstrumentId(Long id) {
+        mInstrumentId = id;
+    }
+
     @Override
     public void createObjectFromJSON(JSONObject jsonObject) {
         if (BuildConfig.DEBUG) Log.i(TAG, "Creating Display: " + jsonObject);
@@ -179,10 +187,6 @@ public class Display extends ReceiveModel {
         return Instrument.findByRemoteId(mInstrumentId);
     }
 
-    void setInstrumentId(Long id) {
-        mInstrumentId = id;
-    }
-
     public int getQuestionCount() {
         return mQuestionCount;
     }
@@ -199,8 +203,18 @@ public class Display extends ReceiveModel {
         this.mDisplayPosition = mDisplayPosition;
     }
 
+    public String toString() {
+        return "remoteId: " + getRemoteId() +
+                " instrumentId: " + getInstrumentId() +
+                " sectionId: " + getSectionId() +
+                " title: " + getTitle() +
+                " position: " + getPosition() +
+                " displayPosition: " + getDisplayPosition() +
+                " deleted: " + getDeleted()
+                ;
+    }
+
     public enum DisplayMode {
         SINGLE, MULTIPLE, TABLE
     }
-
 }

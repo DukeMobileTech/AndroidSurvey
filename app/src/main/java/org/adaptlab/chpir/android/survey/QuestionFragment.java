@@ -187,7 +187,7 @@ public abstract class QuestionFragment extends Fragment {
                 String responseText = "";
                 String[] responses = response.getText().split(Response.LIST_DELIMITER, -1);
                 Question causeQuestion = mSurveyFragment.getQuestions().get(causeId);
-                if (causeQuestion.isSingleSelect()) {
+                if (causeQuestion.isSingleSelect() && question.getLoopNumber() < responses.length) {
                     int index = Integer.parseInt(responses[question.getLoopNumber()]);
                     responseText = mSurveyFragment.getOptions().get(causeQuestion).get(index).getText(mSurveyFragment.getInstrument());
                 } else if (causeQuestion.hasMultipleResponses()) {
