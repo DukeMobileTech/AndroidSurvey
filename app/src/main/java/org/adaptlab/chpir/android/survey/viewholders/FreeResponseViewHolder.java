@@ -37,6 +37,9 @@ public class FreeResponseViewHolder extends QuestionViewHolder {
             if (!FormatUtils.isEmpty(s.toString())) {
                 backspacing = before > count;
                 mText = s.toString();
+                if (getQuestion().getQuestionIdentifier().equals("ParticipantID")) {
+                    mText = mText.toUpperCase();
+                }
             }
         }
 
