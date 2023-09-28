@@ -82,4 +82,5 @@
     <string name="survey_submitted">ይህ ቃለ መጠይቅ ግልፅ መደረግ ይፈልጋል ወይም ቀድሙ የገባ ነው.</string>
     <string name="incomplete_survey">Incomplete Survey</string>
     <string name="incomplete_survey_message">This survey has not been finished. Please complete it first before trying to submit.</string>
+    <string name="next_question">Skip to question</string>
 </resources>

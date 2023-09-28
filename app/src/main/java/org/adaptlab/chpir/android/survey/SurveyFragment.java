@@ -863,29 +863,42 @@ public class SurveyFragment extends Fragment {
 
     protected void setNextQuestion(String currentQuestionIdentifier, String nextQuestionIdentifier,
                                    String questionIdentifier) {
-        List<String> skipList = new ArrayList<>();
-        boolean toBeSkipped = false;
-        boolean found = false;
-        for (int k = mDisplayNumber; k < mDisplays.size(); k++) {
-            if (found) break;
-            for (Question curQuestion : getDisplayQuestions(mDisplays.get(k))) {
-                if (curQuestion.getQuestionIdentifier().equals(nextQuestionIdentifier)) {
-                    found = true;
-                    break;
-                }
-                if (toBeSkipped) {
-                    skipList.add(curQuestion.getQuestionIdentifier());
-                    // Skip loop children questions
-                    for (Question question : loopChildren(curQuestion.getQuestionIdentifier())) {
-                        skipList.add(question.getQuestionIdentifier());
+        if (mQuestions.containsKey(nextQuestionIdentifier)) {
+            List<String> skipList = new ArrayList<>();
+            boolean toBeSkipped = false;
+            boolean found = false;
+            for (int k = mDisplayNumber; k < mDisplays.size(); k++) {
+                if (found) break;
+                for (Question curQuestion : getDisplayQuestions(mDisplays.get(k))) {
+                    if (curQuestion.getQuestionIdentifier().equals(nextQuestionIdentifier)) {
+                        found = true;
+                        break;
                     }
+                    if (toBeSkipped) {
+                        skipList.add(curQuestion.getQuestionIdentifier());
+                        // Skip loop children questions
+                        for (Question question : loopChildren(curQuestion.getQuestionIdentifier())) {
+                            skipList.add(question.getQuestionIdentifier());
+                        }
+                    }
+                    if (curQuestion.getQuestionIdentifier().equals(currentQuestionIdentifier))
+                        toBeSkipped = true;
                 }
-                if (curQuestion.getQuestionIdentifier().equals(currentQuestionIdentifier))
-                    toBeSkipped = true;
+            }
+            updateQuestionsToSkipMap(questionIdentifier + "/skipTo", skipList);
+            hideQuestionsInDisplay();
+        } else {
+            // Log non-existent question being skipped to
+            if (AppUtil.PRODUCTION) {
+                FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+                crashlytics.setCustomKey(AppUtil.getContext().getString(R.string.last_instrument), mInstrument.getTitle());
+                crashlytics.setCustomKey(AppUtil.getContext().getString(R.string.last_display), mDisplay.getTitle());
+                crashlytics.setCustomKey(AppUtil.getContext().getString(R.string.last_question), currentQuestionIdentifier);
+                crashlytics.setCustomKey(AppUtil.getContext().getString(R.string.next_question), nextQuestionIdentifier);
+                crashlytics.recordException(new Exception("Inconsistencies"));
+                crashlytics.sendUnsentReports();
             }
         }
-        updateQuestionsToSkipMap(questionIdentifier + "/skipTo", skipList);
-        hideQuestionsInDisplay();
     }
 
     private List<Question> loopChildren(String sourceIdentifier) {
