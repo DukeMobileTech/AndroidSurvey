@@ -1086,10 +1086,10 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
             for (String para : paras) {
                 builder.append("<p>").append(para).append("</p>");
             }
-            return builder.toString();
-        } else {
-            return text;
+            text = builder.toString();
         }
+        text = text.replaceFirst("<p>","").replaceFirst("</p>", "");
+        return text;
     }
 
     private void setOptionSetInstructionsText() {
@@ -1132,6 +1132,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         }
 
         if (getQuestion().getQuestionType().equals(Question.INSTRUCTIONS) ||
+                getQuestion().getQuestionType().equals(Question.PAIRWISE_COMPARISON) ||
                 getQuestion().getQuestionType().equals(Question.AUDIO)) {
             mClearButton.setVisibility(View.GONE);
         } else {

@@ -66,13 +66,10 @@ public class PairwiseComparisonViewHolder extends QuestionViewHolder {
                         Bitmap bitmap = BitmapFactory.decodeFile(path, options);
                         int width = bitmap.getWidth();
                         int height = bitmap.getHeight();
-                        double targetHeight = displayMetrics.heightPixels * 0.12;
-                        // Scale based on height
-                        if (targetHeight > bitmap.getHeight()) {
-                            double scale = targetHeight / height;
-                            width = (int) Math.round(width * scale);
-                            height = (int) Math.round(height * scale);
-                        }
+                        double targetHeight = displayMetrics.heightPixels * 0.35;
+                        double scale = targetHeight / height;
+                        width = (int) Math.round(width * scale);
+                        height = (int) Math.round(height * scale);
                         ImageView imageView = new ImageView(getContext());
                         bitmap = Bitmap.createScaledBitmap(bitmap, width, height, true);
                         imageView.setImageBitmap(bitmap);

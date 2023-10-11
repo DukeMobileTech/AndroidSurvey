@@ -1,9 +1,5 @@
 package org.adaptlab.chpir.android.survey.verhoeff;
 
-import android.util.Log;
-
-import java.util.Arrays;
-
 public class VerhoeffErrorDetection {
     private static final String TAG = "VerhoeffErrorDetection";
     // The multiplication table
@@ -45,17 +41,18 @@ public class VerhoeffErrorDetection {
         String[] splitString = checkString.split("-");
         int[] checkArray = new int[6];
         String[] facilityId = splitString[0].split("");
-        checkArray[5] = Integer.parseInt(facilityId[0]);
-        checkArray[4] = Integer.parseInt(facilityId[1]);
+        int start = facilityId.length == 2 ? 0 : 1;
+        checkArray[5] = Integer.parseInt(facilityId[start]);
+        checkArray[4] = Integer.parseInt(facilityId[start + 1]);
 
         String[] participantId = splitString[1].split("");
-        checkArray[3] = Integer.parseInt(participantId[0]);
-        checkArray[2] = Integer.parseInt(participantId[1]);
-        checkArray[1] = Integer.parseInt(participantId[2]);
+        start = participantId.length == 3 ? 0 : 1;
+        checkArray[3] = Integer.parseInt(participantId[start]);
+        checkArray[2] = Integer.parseInt(participantId[start + 1]);
+        checkArray[1] = Integer.parseInt(participantId[start + 2]);
 
         checkArray[0] = ((int) splitString[2].charAt(0)) - 65;
 
-        Log.i(TAG, "checkArray = " + Arrays.toString(checkArray));
         return checkArray;
     }
 
@@ -67,7 +64,6 @@ public class VerhoeffErrorDetection {
      * @ = One check-digit letter
      */
     public boolean performCheck(String checkString) {
-        Log.i(TAG, "checkString = " + checkString);
         if (checkString.matches("\\d{2}\\-\\d{3}\\-[a-z]")) {
             char lastChar = checkString.charAt(checkString.length() - 1);
             checkString = checkString.substring(0, checkString.length() - 1) + Character.toUpperCase(lastChar);
