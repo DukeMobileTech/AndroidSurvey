@@ -82,12 +82,12 @@ public class SurveyViewModel extends AndroidViewModel {
         mSectionRelations = new ArrayList<>();
     }
 
-    public void setSectionRelations(List<SectionRelation> sectionRelations) {
-        mSectionRelations = sectionRelations;
-    }
-
     public List<SectionRelation> getSectionRelations() {
         return mSectionRelations;
+    }
+
+    public void setSectionRelations(List<SectionRelation> sectionRelations) {
+        mSectionRelations = sectionRelations;
     }
 
     public void updateSectionDisplays(Long id, List<DisplayRelation> displayRelations) {
@@ -237,8 +237,8 @@ public class SurveyViewModel extends AndroidViewModel {
                 block = mParticipantID % 13;
                 if (block == 0) block = 13;
                 for (int k = 1; k <= 13; k++) {
-                    if (k == block)  continue;
-                    for(String identifier : mQuestionsMap.keySet()) {
+                    if (k == block) continue;
+                    for (String identifier : mQuestionsMap.keySet()) {
                         if (identifier.contains("-")) {
                             String[] parts = identifier.split("-");
                             if (parts[1].charAt(0) == 'F') {
@@ -255,19 +255,19 @@ public class SurveyViewModel extends AndroidViewModel {
                 block = mParticipantID % 11;
                 if (block == 0) block = 11;
                 for (int k = 1; k <= 11; k++) {
-                   if (k == block)  continue;
-                   for(String identifier : mQuestionsMap.keySet()) {
-                       if (identifier.contains("-")) {
-                           String[] parts = identifier.split("-");
-                           if (parts[1].charAt(0) == 'M') {
+                    if (k == block) continue;
+                    for (String identifier : mQuestionsMap.keySet()) {
+                        if (identifier.contains("-")) {
+                            String[] parts = identifier.split("-");
+                            if (parts[1].charAt(0) == 'M') {
                                 String blockStr = parts[1].substring(1);
                                 int blockNum = Integer.parseInt(blockStr);
                                 if (blockNum != 0 && block != blockNum) { // do not skip block 0 and assigned block
                                     questionsToSkip.add(identifier);
                                 }
-                           }
-                       }
-                   }
+                            }
+                        }
+                    }
                 }
             }
             Log.i(TAG, "BLOCK = " + block);

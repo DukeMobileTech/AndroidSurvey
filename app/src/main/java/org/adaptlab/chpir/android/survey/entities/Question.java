@@ -511,11 +511,13 @@ public class Question implements SurveyEntity, Translatable {
 
     public boolean isSingleResponse() {
         return (mQuestionType.equals(SELECT_ONE) || mQuestionType.equals(SELECT_ONE_WRITE_OTHER) ||
-                mQuestionType.equals(DROP_DOWN));
+                mQuestionType.equals(DROP_DOWN) || mQuestionType.equals(SELECT_ONE_IMAGE));
     }
 
     public boolean isMultipleResponse() {
-        return mQuestionType.equals(SELECT_MULTIPLE) || mQuestionType.equals(SELECT_MULTIPLE_WRITE_OTHER);
+        return (mQuestionType.equals(SELECT_MULTIPLE) ||
+                mQuestionType.equals(SELECT_MULTIPLE_WRITE_OTHER) ||
+                mQuestionType.equals(SELECT_MULTIPLE_IMAGES));
     }
 
     public boolean isListResponse() {
