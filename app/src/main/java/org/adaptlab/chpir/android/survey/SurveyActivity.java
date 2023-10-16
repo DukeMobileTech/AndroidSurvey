@@ -422,11 +422,12 @@ public class SurveyActivity extends AppCompatActivity {
                 if (groupPosition == mSurveyViewModel.getExpandableListTitle().size() - 2) {
                     showNotes();
                 }
-
-                String selectedItem = ((List) (mSurveyViewModel.getExpandableListData().get(mSurveyViewModel.getExpandableListTitle().get(groupPosition)))).get(childPosition).toString();
+                SectionRelation sectionRelation = mSurveyViewModel.getSectionRelations().get(groupPosition);
+                List<DisplayRelation> displayRelations = mSurveyViewModel.getSectionDisplayRelations(sectionRelation.section.getRemoteId());
+                DisplayRelation displayRelation = displayRelations.get(childPosition);
                 int index = 0;
                 for (Display display : mSurveyViewModel.getDisplays()) {
-                    if (mSurveyViewModel.getDisplayTitle(display.getRemoteId()).equals(selectedItem)) {
+                    if (display.getRemoteId().equals(displayRelation.display.getRemoteId())) {
                         moveToDisplay(index);
                         break;
                     }
