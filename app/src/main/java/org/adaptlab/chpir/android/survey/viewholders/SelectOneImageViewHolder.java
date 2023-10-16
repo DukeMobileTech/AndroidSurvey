@@ -19,6 +19,7 @@ import com.google.android.material.card.MaterialCardView;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.adapters.OnItemClickListener;
 import org.adaptlab.chpir.android.survey.adapters.OptionDiagramAdapter;
+import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.relations.DiagramRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionSetOptionRelation;
@@ -27,6 +28,7 @@ import org.adaptlab.chpir.android.survey.relations.OptionSetRelation;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 import static org.adaptlab.chpir.android.survey.utils.FormatUtils.removeNonNumericCharacters;
 
 public class SelectOneImageViewHolder extends QuestionViewHolder {
@@ -53,7 +55,8 @@ public class SelectOneImageViewHolder extends QuestionViewHolder {
             for (final OptionRelation optionRelation : optionRelations) {
                 View view = inflater.inflate(R.layout.list_item_collage, null);
                 final MaterialCardView cardView = view.findViewById(R.id.materialCardView);
-                cardView.setId(optionRelations.indexOf(optionRelation));
+                final int optionId = optionRelations.indexOf(optionRelation);
+                cardView.setId(optionId);
 
                 OptionSetOptionRelation relation = getOptionSetOptionRelation(optionRelation);
                 GridView gridView = (GridView) inflater.inflate(R.layout.list_item_option_grid_view, null);
@@ -114,6 +117,29 @@ public class SelectOneImageViewHolder extends QuestionViewHolder {
             }
             questionComponent.addView(view);
         }
+        toggleCarryForward();
+    }
+
+    void toggleCarryForward() {
+        if (getQuestion().isCarryForward() &&
+                !(getCarryForwardQuestion().getQuestionType().equals(Question.CHOICE_TASK))) {
+            ArrayList<Integer> responseIndices = new ArrayList<>();
+            String[] listOfIndices = getCarryForwardResponse().getText().split(COMMA);
+            for (String index : listOfIndices) {
+                if (!index.equals("")) {
+                    responseIndices.add(Integer.parseInt(index));
+                }
+            }
+            for (int k = 0; k < mCardViews.size(); k++) {
+                if (responseIndices.contains(k)) {
+                    MaterialCardView cardView = mCardViews.get(k);
+                    cardView.setEnabled(false);
+                    cardView.setCheckable(false);
+                    cardView.setOnClickListener(null);
+                    cardView.setCardForegroundColor(getContext().getColorStateList(R.color.fourth));
+                }
+            }
+        }
     }
 
     private void setForeGroundSelection() {
@@ -126,6 +152,7 @@ public class SelectOneImageViewHolder extends QuestionViewHolder {
                 cardView.setCardForegroundColor(colorStateList);
             }
         }
+        toggleCarryForward();
     }
 
     private void setResponseIndex(int index, boolean status) {

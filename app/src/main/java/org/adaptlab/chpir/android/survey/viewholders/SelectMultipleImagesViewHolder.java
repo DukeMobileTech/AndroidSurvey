@@ -18,6 +18,7 @@ import com.google.android.material.card.MaterialCardView;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.adapters.OnItemClickListener;
 import org.adaptlab.chpir.android.survey.adapters.OptionDiagramAdapter;
+import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.relations.DiagramRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionSetOptionRelation;
@@ -109,6 +110,30 @@ public class SelectMultipleImagesViewHolder extends QuestionViewHolder {
             }
             questionComponent.addView(view);
         }
+        toggleCarryForward();
+    }
+
+
+    void toggleCarryForward() {
+        if (getQuestion().isCarryForward() &&
+                !(getCarryForwardQuestion().getQuestionType().equals(Question.CHOICE_TASK))) {
+            ArrayList<Integer> responseIndices = new ArrayList<>();
+            String[] listOfIndices = getCarryForwardResponse().getText().split(COMMA);
+            for (String index : listOfIndices) {
+                if (!index.equals("")) {
+                    responseIndices.add(Integer.parseInt(index));
+                }
+            }
+            for (int k = 0; k < mCardViews.size(); k++) {
+                if (responseIndices.contains(k)) {
+                    MaterialCardView cardView = mCardViews.get(k);
+                    cardView.setEnabled(false);
+                    cardView.setCheckable(false);
+                    cardView.setOnClickListener(null);
+                    cardView.setCardForegroundColor(getContext().getColorStateList(R.color.fourth));
+                }
+            }
+        }
     }
 
     private void setResponseIndex(int index, boolean status) {
@@ -130,6 +155,7 @@ public class SelectMultipleImagesViewHolder extends QuestionViewHolder {
                 cardView.setCardForegroundColor(colorStateList);
             }
         }
+        toggleCarryForward();
     }
 
     @Override

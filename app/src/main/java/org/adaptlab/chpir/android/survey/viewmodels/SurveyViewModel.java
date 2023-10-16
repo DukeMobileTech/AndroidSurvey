@@ -13,6 +13,7 @@ import androidx.lifecycle.LiveData;
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.SurveyApp;
+import org.adaptlab.chpir.android.survey.adapters.QuestionRelationAdapter;
 import org.adaptlab.chpir.android.survey.entities.Display;
 import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.Response;
@@ -55,11 +56,12 @@ public class SurveyViewModel extends AndroidViewModel {
     private List<Display> mDisplays;
     private List<Integer> mPreviousDisplays;
     private List<String> mLocations;
+    private List<SectionRelation> mSectionRelations;
     private HashMap<Long, DisplayViewModel> mDisplayViewModels;
     private HashMap<Long, List<Question>> mVisibleDisplayQuestions;
     private HashMap<Long, List<Question>> mDisplayQuestions;
     private HashMap<Long, List<DisplayRelation>> mSectionDisplays;
-    private List<SectionRelation> mSectionRelations;
+    private HashMap<String, QuestionRelationAdapter> mQuestionRelationAdapters;
 
     private Survey mSurvey;
     private int mDisplayPosition;
@@ -75,11 +77,20 @@ public class SurveyViewModel extends AndroidViewModel {
         mLiveDataSurvey = mSurveyRepository.getSurveyDao().findByUUID(uuid);
         mDisplayTitles = new LongSparseArray<>();
         mPreviousDisplays = new ArrayList<>();
+        mSectionRelations = new ArrayList<>();
         mDisplayViewModels = new HashMap<>();
         mVisibleDisplayQuestions = new HashMap<>();
         mDisplayQuestions = new HashMap<>();
         mSectionDisplays = new HashMap<>();
-        mSectionRelations = new ArrayList<>();
+        mQuestionRelationAdapters = new HashMap<>();
+    }
+
+    public QuestionRelationAdapter getQuestionRelationAdapter(String identifier) {
+        return mQuestionRelationAdapters.get(identifier);
+    }
+
+    public void updateQuestionRelationAdapters(String identifier, QuestionRelationAdapter adapter) {
+        mQuestionRelationAdapters.put(identifier, adapter);
     }
 
     public List<SectionRelation> getSectionRelations() {

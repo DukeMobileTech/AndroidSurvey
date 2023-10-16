@@ -239,11 +239,11 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         return mTextEntryOptionIds;
     }
 
-    private Response getCarryForwardResponse() {
+    Response getCarryForwardResponse() {
         return getSurveyViewModel().getResponses().get(getQuestion().getCarryForwardIdentifier());
     }
 
-    private Question getCarryForwardQuestion() {
+    Question getCarryForwardQuestion() {
         return getSurveyViewModel().getQuestionsMap().get(getQuestion().getCarryForwardIdentifier());
     }
 
@@ -439,6 +439,16 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         clearSpecialResponse();
         validateResponse();
         updateResponse();
+        updateFollowingQuestions();
+    }
+
+    private void updateFollowingQuestions() {
+        for (Question question : mQuestionRelation.followUpQuestions) {
+            QuestionRelationAdapter adapter = mSurveyViewModel.getQuestionRelationAdapter(question.getQuestionIdentifier());
+            if (adapter != null) {
+                adapter.notifyDataSetChanged();
+            }
+        }
     }
 
     private void validateResponse() {
@@ -1088,7 +1098,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
             }
             text = builder.toString();
         }
-        text = text.replaceFirst("<p>","").replaceFirst("</p>", "");
+        text = text.replaceFirst("<p>", "").replaceFirst("</p>", "");
         return text;
     }
 

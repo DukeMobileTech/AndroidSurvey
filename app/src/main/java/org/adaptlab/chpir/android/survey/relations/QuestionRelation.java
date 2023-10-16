@@ -51,4 +51,6 @@ public class QuestionRelation {
     public List<Response> carryForwardResponses;
     @Relation(parentColumn = "QuestionId", entityColumn = "QuestionId", entity = QuestionCollage.class)
     public List<QuestionCollageRelation> questionCollages;
+    @Relation(parentColumn = "QuestionIdentifier", entityColumn = "CarryForwardIdentifier", entity = Question.class)
+    public List<Question> followUpQuestions;
 }
