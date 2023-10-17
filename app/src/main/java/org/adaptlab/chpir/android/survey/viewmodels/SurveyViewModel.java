@@ -36,6 +36,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
 
@@ -68,7 +69,7 @@ public class SurveyViewModel extends AndroidViewModel {
     private String mDeviceLanguage;
     private String mInstrumentLanguage;
     private String mGender = "";
-    private int mParticipantID = -1;
+    private long mParticipantID = -1;
 
     public SurveyViewModel(@NonNull Application application, String uuid) {
         super(application);
@@ -230,7 +231,7 @@ public class SurveyViewModel extends AndroidViewModel {
 
     public void setParticipantID(String participantID) {
         String[] splitString = participantID.split("-");
-        mParticipantID = Integer.parseInt(splitString[1]);
+        mParticipantID = Long.parseLong(splitString[0] + splitString[1] + ((int) splitString[2].charAt(0) - 65));
         setParticipantBlocks();
     }
 
@@ -242,10 +243,11 @@ public class SurveyViewModel extends AndroidViewModel {
     private void setParticipantBlocks() {
         if (!mGender.isEmpty() && mParticipantID != -1) {
             Log.i(TAG, "GENDER = " + mGender + " ID = " + mParticipantID);
+            Random rBlock = new Random(mParticipantID);
             int block = -1;
             List<String> questionsToSkip = new ArrayList<>();
             if (mGender.equals("0")) { // female
-                block = mParticipantID % 13;
+                block = rBlock.nextInt(13);
                 if (block == 0) block = 13;
                 for (int k = 1; k <= 13; k++) {
                     if (k == block) continue;
@@ -263,7 +265,7 @@ public class SurveyViewModel extends AndroidViewModel {
                     }
                 }
             } else if (mGender.equals("1")) { // male
-                block = mParticipantID % 11;
+                block = rBlock.nextInt(11);
                 if (block == 0) block = 11;
                 for (int k = 1; k <= 11; k++) {
                     if (k == block) continue;
@@ -282,7 +284,6 @@ public class SurveyViewModel extends AndroidViewModel {
                 }
             }
             Log.i(TAG, "BLOCK = " + block);
-            Log.i(TAG, "QUESTIONS TO SKIP: " + String.join(",", questionsToSkip));
             updateQuestionsToSkipMap("ParticipantID", questionsToSkip);
         }
     }
