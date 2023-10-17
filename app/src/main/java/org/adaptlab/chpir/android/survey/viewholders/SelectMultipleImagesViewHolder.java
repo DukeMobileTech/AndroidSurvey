@@ -19,6 +19,7 @@ import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.adapters.OnItemClickListener;
 import org.adaptlab.chpir.android.survey.adapters.OptionDiagramAdapter;
 import org.adaptlab.chpir.android.survey.entities.Question;
+import org.adaptlab.chpir.android.survey.entities.Response;
 import org.adaptlab.chpir.android.survey.relations.DiagramRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionRelation;
 import org.adaptlab.chpir.android.survey.relations.OptionSetOptionRelation;
@@ -118,7 +119,10 @@ public class SelectMultipleImagesViewHolder extends QuestionViewHolder {
         if (getQuestion().isCarryForward() &&
                 !(getCarryForwardQuestion().getQuestionType().equals(Question.CHOICE_TASK))) {
             ArrayList<Integer> responseIndices = new ArrayList<>();
-            String[] listOfIndices = getCarryForwardResponse().getText().split(COMMA);
+            Response cfr = getCarryForwardResponse();
+            if (cfr == null) return;
+
+            String[] listOfIndices = cfr.getText().split(COMMA);
             for (String index : listOfIndices) {
                 if (!index.equals("")) {
                     responseIndices.add(Integer.parseInt(index));

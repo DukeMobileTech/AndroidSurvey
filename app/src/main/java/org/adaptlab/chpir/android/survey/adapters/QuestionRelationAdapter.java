@@ -21,12 +21,12 @@ public class QuestionRelationAdapter extends ListAdapter<QuestionRelation, Quest
     private static final DiffUtil.ItemCallback<QuestionRelation> DIFF_CALLBACK = new DiffUtil.ItemCallback<QuestionRelation>() {
         @Override
         public boolean areItemsTheSame(@NonNull QuestionRelation oldItem, @NonNull QuestionRelation newItem) {
-            if (oldItem.carryForwardResponses.isEmpty() && newItem.carryForwardResponses.isEmpty()) {
-                return oldItem.question.getQuestionIdentifier().equals(newItem.question.getQuestionIdentifier());
-            } else {
+            if (!oldItem.carryForwardResponses.isEmpty() && !newItem.carryForwardResponses.isEmpty()) {
                 return oldItem.carryForwardResponses.get(0).getQuestionIdentifier().equals(
                         newItem.carryForwardResponses.get(0).getQuestionIdentifier()) &&
                         oldItem.question.getQuestionIdentifier().equals(newItem.question.getQuestionIdentifier());
+            } else {
+                return oldItem.question.getQuestionIdentifier().equals(newItem.question.getQuestionIdentifier());
             }
         }
 

@@ -27,12 +27,12 @@ public class AudioComponent {
     private final Context mContext;
     private final ViewGroup mViewGroup;
     private final QuestionViewHolder mQuestionViewHolder;
+    private final List<String> mAudioFiles;
     private MediaRecorder mRecorder = null;
     private MediaPlayer mPlayer = null;
     private boolean mRecord;
     private boolean mPlay;
     private AppCompatButton mRecordButton;
-    private final List<String> mAudioFiles;
     private LinearLayout mAudioLayout;
     private String mAudioFile;
 
