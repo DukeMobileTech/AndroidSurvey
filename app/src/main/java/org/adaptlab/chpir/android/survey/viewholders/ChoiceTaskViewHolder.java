@@ -27,6 +27,7 @@ import org.adaptlab.chpir.android.survey.utils.FormatUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
@@ -72,7 +73,10 @@ public class ChoiceTaskViewHolder extends QuestionViewHolder {
         List<String> letters = new ArrayList<>();
         if (getResponse().getRandomizedData() == null || getResponse().getRandomizedData().isEmpty()) {
             shuffledOptionRelations = new ArrayList<>(optionRelations);
-            Collections.shuffle(shuffledOptionRelations);
+            if (getSurveyViewModel() != null && getSurveyViewModel().getParticipantID() != -1) {
+                long seed = getSurveyViewModel().getParticipantID() + getQuestion().getRemoteId();
+                Collections.shuffle(shuffledOptionRelations, new Random(seed));
+            }
             List<Integer> order = new ArrayList<>();
             for (OptionRelation optionRelation : shuffledOptionRelations) {
                 int index = optionRelations.indexOf(optionRelation);

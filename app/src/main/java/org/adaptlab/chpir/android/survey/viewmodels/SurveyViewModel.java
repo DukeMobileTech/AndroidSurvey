@@ -13,6 +13,7 @@ import androidx.lifecycle.LiveData;
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.SurveyApp;
+import org.adaptlab.chpir.android.survey.adapters.NavigationDrawerAdapter;
 import org.adaptlab.chpir.android.survey.adapters.QuestionRelationAdapter;
 import org.adaptlab.chpir.android.survey.entities.Display;
 import org.adaptlab.chpir.android.survey.entities.Question;
@@ -23,12 +24,14 @@ import org.adaptlab.chpir.android.survey.relations.DisplayRelation;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
 import org.adaptlab.chpir.android.survey.relations.SectionRelation;
 import org.adaptlab.chpir.android.survey.repositories.SurveyRepository;
+import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,10 +40,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
+import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtmlWhitelist;
 
 public class SurveyViewModel extends AndroidViewModel {
+    public static final String GENDER = "Gender";
+    public static final String PARTICIPANT = "ParticipantID";
     public final String TAG = this.getClass().getName();
     private final SurveyRepository mSurveyRepository;
     private LiveData<Survey> mLiveDataSurvey;
@@ -63,13 +70,14 @@ public class SurveyViewModel extends AndroidViewModel {
     private HashMap<Long, List<Question>> mDisplayQuestions;
     private HashMap<Long, List<DisplayRelation>> mSectionDisplays;
     private HashMap<String, QuestionRelationAdapter> mQuestionRelationAdapters;
-
+    private NavigationDrawerAdapter mNavigationDrawerAdapter;
     private Survey mSurvey;
     private int mDisplayPosition;
     private String mDeviceLanguage;
     private String mInstrumentLanguage;
     private String mGender = "";
     private long mParticipantID = -1;
+    private boolean firstTime;
 
     public SurveyViewModel(@NonNull Application application, String uuid) {
         super(application);
@@ -84,6 +92,25 @@ public class SurveyViewModel extends AndroidViewModel {
         mDisplayQuestions = new HashMap<>();
         mSectionDisplays = new HashMap<>();
         mQuestionRelationAdapters = new HashMap<>();
+        firstTime = true;
+    }
+
+    public void setNavigationDrawerAdapter(NavigationDrawerAdapter adapter) {
+        mNavigationDrawerAdapter = adapter;
+    }
+
+    public long getParticipantID() {
+        return mParticipantID;
+    }
+
+    public void setParticipantID(String participantID) {
+        String[] splitString = participantID.split("-");
+        mParticipantID = Long.parseLong(splitString[0] + splitString[1] + ((int) splitString[2].charAt(0) - 65));
+        Response gender = mResponses.get(GENDER);
+        if (gender != null && !gender.getText().isEmpty()) {
+            mGender = gender.getText();
+        }
+        setParticipantBlocks();
     }
 
     public QuestionRelationAdapter getQuestionRelationAdapter(String identifier) {
@@ -229,14 +256,57 @@ public class SurveyViewModel extends AndroidViewModel {
         mExpandableListTitle = listTitle;
     }
 
-    public void setParticipantID(String participantID) {
-        String[] splitString = participantID.split("-");
-        mParticipantID = Long.parseLong(splitString[0] + splitString[1] + ((int) splitString[2].charAt(0) - 65));
+    public void setNavigationDrawerData() {
+        LongSparseArray<Section> longSparseArray = new LongSparseArray<>();
+        LinkedHashMap<String, List<String>> listData = new LinkedHashMap<>();
+        List<SectionRelation> sectionRelations = getSectionRelations();
+        for (SectionRelation relation : sectionRelations) {
+            longSparseArray.put(relation.section.getRemoteId(), relation.section);
+            String sectionTitle = TranslationUtil.getText(relation.section, relation.translations, this);
+            List<String> displayTitles = new ArrayList<>();
+            List<DisplayRelation> displayRelations = getSectionDisplayRelations(relation.section.getRemoteId());
+            for (DisplayRelation displayRelation : displayRelations) {
+                String displayTitle = TranslationUtil.getText(displayRelation.display, displayRelation.translations, this);
+                displayTitles.add(styleTextWithHtmlWhitelist(displayTitle).toString());
+                addDisplayTitle(displayRelation.display.getRemoteId(), styleTextWithHtmlWhitelist(displayTitle).toString());
+            }
+            listData.put(styleTextWithHtmlWhitelist(sectionTitle).toString(), displayTitles);
+        }
+        setExtraItemLinks(listData);
+        setSections(longSparseArray);
+        setExpandableListData(listData);
+        setExpandableListTitle(new ArrayList<>(listData.keySet()));
+    }
+
+    private void setExtraItemLinks(LinkedHashMap<String, List<String>> listData) {
+        Context context = SurveyApp.getInstance();
+        List<String> notes = Collections.singletonList(context.getString(R.string.survey_notes));
+        List<String> review = Collections.singletonList(context.getString(R.string.survey_review));
+        listData.put(context.getString(R.string.survey_notes), notes);
+        listData.put(context.getString(R.string.survey_review), review);
+    }
+
+    private void checkIdGender() {
+        Response gender = mResponses.get(GENDER);
+        if (gender != null && !gender.getText().isEmpty()) {
+            mGender = gender.getText();
+        }
+        Response id = mResponses.get(PARTICIPANT);
+        if (id != null && !id.getText().isEmpty()) {
+            String[] splitString = id.getText().split("-");
+            mParticipantID = Long.parseLong(splitString[0] + splitString[1] + ((int) splitString[2].charAt(0) - 65));
+        }
         setParticipantBlocks();
+        firstTime = false;
     }
 
     public void setParticipantGender(String response) {
         mGender = response;
+        Response id = mResponses.get(PARTICIPANT);
+        if (id != null && !id.getText().isEmpty()) {
+            String[] splitString = id.getText().split("-");
+            mParticipantID = Long.parseLong(splitString[0] + splitString[1] + ((int) splitString[2].charAt(0) - 65));
+        }
         setParticipantBlocks();
     }
 
@@ -245,10 +315,12 @@ public class SurveyViewModel extends AndroidViewModel {
             Log.i(TAG, "GENDER = " + mGender + " ID = " + mParticipantID);
             Random rBlock = new Random(mParticipantID);
             int block = -1;
+            String sectionTitle = "";
             List<String> questionsToSkip = new ArrayList<>();
             if (mGender.equals("0")) { // female
                 block = rBlock.nextInt(13);
                 if (block == 0) block = 13;
+                sectionTitle = "F" + block;
                 for (int k = 1; k <= 13; k++) {
                     if (k == block) continue;
                     for (String identifier : mQuestionsMap.keySet()) {
@@ -267,6 +339,7 @@ public class SurveyViewModel extends AndroidViewModel {
             } else if (mGender.equals("1")) { // male
                 block = rBlock.nextInt(11);
                 if (block == 0) block = 11;
+                sectionTitle = "M" + block;
                 for (int k = 1; k <= 11; k++) {
                     if (k == block) continue;
                     for (String identifier : mQuestionsMap.keySet()) {
@@ -285,6 +358,67 @@ public class SurveyViewModel extends AndroidViewModel {
             }
             Log.i(TAG, "BLOCK = " + block);
             updateQuestionsToSkipMap("ParticipantID", questionsToSkip);
+            setQuestionOrder(mSectionRelations, sectionTitle);
+            setNavigationDrawerData();
+            mNavigationDrawerAdapter.updateData(getExpandableListTitle(), getExpandableListData());
+        }
+    }
+
+    private void setQuestionOrder(List<SectionRelation> sectionRelations, String sectionTitle) {
+        List<Display> displayList = new ArrayList<>();
+        randomizeDisplays(sectionRelations, displayList, sectionTitle);
+        displayList = getSortedDisplays(displayList);
+        setDisplayOrder(displayList);
+        update();
+        setDisplays(displayList);
+    }
+
+    private void randomizeDisplays(List<SectionRelation> sectionRelations, List<Display> displayList, String sectionTitle) {
+        int index = 1;
+        for (SectionRelation sectionRelation : sectionRelations) {
+            List<DisplayRelation> displayRelations;
+            if (sectionRelation.section.getTitle().equals(sectionTitle) && sectionRelation.section.isRandomizeDisplays()) {
+                List<List<DisplayRelation>> relations = new ArrayList<>();
+                for (int k = 0; k < sectionRelation.displays.size(); k += 2) {
+                    if (k + 2 < sectionRelation.displays.size()) {
+                        relations.add(sectionRelation.displays.subList(k, k + 2));
+                    } else {
+                        relations.add(sectionRelation.displays.subList(k, sectionRelation.displays.size()));
+                    }
+                }
+                Collections.shuffle(relations, new Random(mParticipantID));
+                displayRelations = relations.stream()
+                        .flatMap(List::stream)
+                        .collect(Collectors.toList());
+                displayRelations.stream().map(displayRelation -> displayRelation.display.getTitle()).forEach(System.out::println);
+            } else {
+                displayRelations = sectionRelation.displays;
+            }
+            for (DisplayRelation displayRelation : displayRelations) {
+                displayRelation.display.setInstrumentPosition(index);
+                index += 1;
+                displayList.add(displayRelation.display);
+            }
+            updateSectionDisplays(sectionRelation.section.getRemoteId(), displayRelations);
+        }
+    }
+
+    private List<Display> getSortedDisplays(List<Display> displayList) {
+        List<Display> displays = new ArrayList<>();
+        for (Display display : displayList) {
+            if (!display.isDeleted()) {
+                displays.add(display);
+            }
+        }
+        displays.sort(this::compareDisplays);
+        return displays;
+    }
+
+    private int compareDisplays(Display display1, Display display2) {
+        if (display1.getInstrumentPosition() == display2.getInstrumentPosition()) {
+            return display1.getTitle().compareTo(display2.getTitle());
+        } else {
+            return display1.getInstrumentPosition() - display2.getInstrumentPosition();
         }
     }
 
@@ -391,6 +525,9 @@ public class SurveyViewModel extends AndroidViewModel {
 
     public void setResponses(HashMap<String, Response> map) {
         mResponses = map;
+        if (firstTime) {
+            checkIdGender();
+        }
     }
 
     public void setResponse(String questionIdentifier, Response response) {

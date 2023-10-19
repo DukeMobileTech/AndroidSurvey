@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.LongSparseArray;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -15,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.Spinner;
 
@@ -39,7 +37,6 @@ import org.adaptlab.chpir.android.survey.entities.Display;
 import org.adaptlab.chpir.android.survey.entities.Instrument;
 import org.adaptlab.chpir.android.survey.entities.Question;
 import org.adaptlab.chpir.android.survey.entities.Response;
-import org.adaptlab.chpir.android.survey.entities.Section;
 import org.adaptlab.chpir.android.survey.entities.Survey;
 import org.adaptlab.chpir.android.survey.relations.DisplayRelation;
 import org.adaptlab.chpir.android.survey.relations.QuestionTranslationRelation;
@@ -49,7 +46,6 @@ import org.adaptlab.chpir.android.survey.repositories.SurveyRepository;
 import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.utils.LocaleManager;
 import org.adaptlab.chpir.android.survey.utils.LocationManager;
-import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
 import org.adaptlab.chpir.android.survey.viewmodelfactories.InstrumentRelationViewModelFactory;
 import org.adaptlab.chpir.android.survey.viewmodelfactories.SurveyRelationViewModelFactory;
 import org.adaptlab.chpir.android.survey.viewmodelfactories.SurveyViewModelFactory;
@@ -60,16 +56,13 @@ import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
 import org.adaptlab.chpir.android.survey.views.CustomViewPager;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.adaptlab.chpir.android.survey.utils.ConstantUtils.COMMA;
-import static org.adaptlab.chpir.android.survey.utils.FormatUtils.styleTextWithHtmlWhitelist;
 
 public class SurveyActivity extends AppCompatActivity {
     public final static String EXTRA_INSTRUMENT_ID = "org.adaptlab.chpir.android.survey.EXTRA_INSTRUMENT_ID";
@@ -196,22 +189,16 @@ public class SurveyActivity extends AppCompatActivity {
                 sectionRelations.sort((SectionRelation sr1, SectionRelation sr2) -> sr1.section.getPosition() - sr2.section.getPosition());
 
                 mSurveyViewModel.setSectionRelations(sectionRelations);
+
                 List<Display> displayList = new ArrayList<>();
-                if (mSurveyViewModel.getSurvey() != null &&
-                        mSurveyViewModel.getSurvey().getDisplayOrder().isEmpty()) {
-                    randomizeDisplays(sectionRelations, displayList);
-                    displayList = getSortedDisplays(displayList);
-                    mSurveyViewModel.setDisplayOrder(displayList);
-                } else {
-                    for (SectionRelation sectionRelation : sectionRelations) {
-                        mSurveyViewModel.updateSectionDisplays(sectionRelation.section.getRemoteId(),
-                                getSortedDisplayRelations(sectionRelation.displays));
-                        for (DisplayRelation displayRelation : sectionRelation.displays) {
-                            displayList.add(displayRelation.display);
-                        }
+                for (SectionRelation sectionRelation : sectionRelations) {
+                    mSurveyViewModel.updateSectionDisplays(sectionRelation.section.getRemoteId(),
+                            getSortedDisplayRelations(sectionRelation.displays));
+                    for (DisplayRelation displayRelation : sectionRelation.displays) {
+                        displayList.add(displayRelation.display);
                     }
-                    displayList = getSortedDisplays(displayList);
                 }
+                displayList = getSortedDisplays(displayList);
                 mSurveyViewModel.update();
                 mSurveyViewModel.setDisplays(displayList);
                 mDisplayPagerAdapter.setDisplays(displayList);
@@ -237,35 +224,6 @@ public class SurveyActivity extends AppCompatActivity {
                 setSectionViewModel();
             }
         });
-    }
-
-    private void randomizeDisplays(List<SectionRelation> sectionRelations, List<Display> displayList) {
-        int index = 1;
-        for (SectionRelation sectionRelation : sectionRelations) {
-            List<DisplayRelation> displayRelations;
-            if (sectionRelation.section.isRandomizeDisplays()) {
-                List<List<DisplayRelation>> relations = new ArrayList<>();
-                for (int k = 0; k < sectionRelation.displays.size(); k += 2) {
-                    if (k + 2 < sectionRelation.displays.size()) {
-                        relations.add(sectionRelation.displays.subList(k, k + 2));
-                    } else {
-                        relations.add(sectionRelation.displays.subList(k, sectionRelation.displays.size()));
-                    }
-                }
-                Collections.shuffle(relations);
-                displayRelations = relations.stream()
-                        .flatMap(List::stream)
-                        .collect(Collectors.toList());
-            } else {
-                displayRelations = sectionRelation.displays;
-            }
-            for (DisplayRelation displayRelation : displayRelations) {
-                displayRelation.display.setInstrumentPosition(index);
-                index += 1;
-                displayList.add(displayRelation.display);
-            }
-            mSurveyViewModel.updateSectionDisplays(sectionRelation.section.getRemoteId(), displayRelations);
-        }
     }
 
     private List<Display> getSortedDisplays(List<Display> displayList) {
@@ -344,27 +302,7 @@ public class SurveyActivity extends AppCompatActivity {
     }
 
     private void setSectionViewModel() {
-        LongSparseArray<Section> longSparseArray = new LongSparseArray<>();
-        LinkedHashMap<String, List<String>> listData = new LinkedHashMap<>();
-        List<SectionRelation> sectionRelations = mSurveyViewModel.getSectionRelations();
-        for (SectionRelation relation : sectionRelations) {
-            longSparseArray.put(relation.section.getRemoteId(), relation.section);
-            List<String> displayTitles = new ArrayList<>();
-            List<DisplayRelation> displayRelations = mSurveyViewModel.getSectionDisplayRelations(relation.section.getRemoteId());
-            for (DisplayRelation displayRelation : displayRelations) {
-                String displayTitle = TranslationUtil.getText(displayRelation.display,
-                        displayRelation.translations, mSurveyViewModel);
-                displayTitles.add(styleTextWithHtmlWhitelist(displayTitle).toString());
-                mSurveyViewModel.addDisplayTitle(displayRelation.display.getRemoteId(),
-                        styleTextWithHtmlWhitelist(displayTitle).toString());
-            }
-            String sectionTitle = TranslationUtil.getText(relation.section, relation.translations, mSurveyViewModel);
-            listData.put(styleTextWithHtmlWhitelist(sectionTitle).toString(), displayTitles);
-        }
-        setExtraItemLinks(listData);
-        mSurveyViewModel.setSections(longSparseArray);
-        mSurveyViewModel.setExpandableListData(listData);
-        mSurveyViewModel.setExpandableListTitle(new ArrayList<>(listData.keySet()));
+        mSurveyViewModel.setNavigationDrawerData();
         setNavigationDrawer();
     }
 
@@ -379,13 +317,6 @@ public class SurveyActivity extends AppCompatActivity {
         return displays;
     }
 
-    private void setExtraItemLinks(LinkedHashMap<String, List<String>> listData) {
-        List<String> notes = Collections.singletonList(getString(R.string.survey_notes));
-        List<String> review = Collections.singletonList(getString(R.string.survey_review));
-        listData.put(getString(R.string.survey_notes), notes);
-        listData.put(getString(R.string.survey_review), review);
-    }
-
     private void setNavigationDrawer() {
         mDrawerLayout = findViewById(R.id.drawerLayout);
         mExpandableListView = findViewById(R.id.navigation);
@@ -394,8 +325,9 @@ public class SurveyActivity extends AppCompatActivity {
         params.width = width;
         mExpandableListView.setLayoutParams(params);
 
-        ExpandableListAdapter adapter = new NavigationDrawerAdapter(getApplicationContext(),
+        NavigationDrawerAdapter adapter = new NavigationDrawerAdapter(getApplicationContext(),
                 mSurveyViewModel.getExpandableListTitle(), mSurveyViewModel.getExpandableListData());
+        mSurveyViewModel.setNavigationDrawerAdapter(adapter);
         mExpandableListView.setAdapter(adapter);
         mExpandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
             @Override

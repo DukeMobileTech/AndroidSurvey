@@ -1,6 +1,7 @@
 package org.adaptlab.chpir.android.survey.adapters;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +15,8 @@ import java.util.Map;
 
 public class NavigationDrawerAdapter extends BaseExpandableListAdapter {
 
-    private final List<String> mExpandableListTitle;
-    private final Map<String, List<String>> mExpandableListDetail;
+    private List<String> mExpandableListTitle;
+    private Map<String, List<String>> mExpandableListDetail;
     private final LayoutInflater mLayoutInflater;
 
     public NavigationDrawerAdapter(Context context, List<String> expandableListTitle,
@@ -23,6 +24,12 @@ public class NavigationDrawerAdapter extends BaseExpandableListAdapter {
         mExpandableListTitle = expandableListTitle;
         mExpandableListDetail = expandableListDetail;
         mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+    }
+
+    public void updateData(List<String> expandableListTitle, Map<String, List<String>> expandableListDetail) {
+        mExpandableListTitle = expandableListTitle;
+        mExpandableListDetail = expandableListDetail;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -67,7 +74,7 @@ public class NavigationDrawerAdapter extends BaseExpandableListAdapter {
             convertView = mLayoutInflater.inflate(R.layout.list_group, null);
         }
         TextView listTitleTextView = convertView.findViewById(R.id.listTitle);
-//        listTitleTextView.setTypeface(mInstrument.getTypeFace(mContext), Typeface.BOLD);
+        listTitleTextView.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
         listTitleTextView.setText(listTitle);
         return convertView;
     }
