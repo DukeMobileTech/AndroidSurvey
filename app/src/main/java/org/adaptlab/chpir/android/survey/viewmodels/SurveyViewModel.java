@@ -104,6 +104,7 @@ public class SurveyViewModel extends AndroidViewModel {
     }
 
     public void setParticipantID(String participantID) {
+        if (participantID.length() != 8) return;
         String[] splitString = participantID.split("-");
         mParticipantID = Long.parseLong(splitString[0] + splitString[1] + ((int) splitString[2].charAt(0) - 65));
         Response gender = mResponses.get(GENDER);
@@ -292,7 +293,7 @@ public class SurveyViewModel extends AndroidViewModel {
             mGender = gender.getText();
         }
         Response id = mResponses.get(PARTICIPANT);
-        if (id != null && !id.getText().isEmpty()) {
+        if (id != null && id.getText().length() == 8) {
             String[] splitString = id.getText().split("-");
             mParticipantID = Long.parseLong(splitString[0] + splitString[1] + ((int) splitString[2].charAt(0) - 65));
         }
@@ -303,7 +304,7 @@ public class SurveyViewModel extends AndroidViewModel {
     public void setParticipantGender(String response) {
         mGender = response;
         Response id = mResponses.get(PARTICIPANT);
-        if (id != null && !id.getText().isEmpty()) {
+        if (id != null && id.getText().length() == 8) {
             String[] splitString = id.getText().split("-");
             mParticipantID = Long.parseLong(splitString[0] + splitString[1] + ((int) splitString[2].charAt(0) - 65));
         }
