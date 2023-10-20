@@ -86,12 +86,12 @@ public class PairwiseComparisonViewHolder extends QuestionViewHolder {
 
         mSlider = sliderLayout.findViewById(R.id.discreteSlider);
         mSlider.setLabelFormatter(value -> {
-            if (value < 0) {
+            if (value < 5.0) {
                 return "A" + Math.abs((int) value);
-            } else if (value > 0) {
+            } else if (value > 5.0) {
                 return "B" + Math.abs((int) value);
             } else {
-                return "0";
+                return "5";
             }
         });
         mSlider.addOnChangeListener((slider, value, fromUser) -> {
@@ -134,7 +134,7 @@ public class PairwiseComparisonViewHolder extends QuestionViewHolder {
     @Override
     protected void deserialize(String responseText) {
         if (responseText.equals("")) {
-            mSlider.setValue((float) 0.0);
+            mSlider.setValue((float) 5.0);
         } else {
             mSlider.setValue(Float.parseFloat(responseText));
         }
@@ -142,7 +142,7 @@ public class PairwiseComparisonViewHolder extends QuestionViewHolder {
 
     @Override
     protected void unSetResponse() {
-        mSlider.setValue((float) 0.0);
+        mSlider.setValue((float) 5.0);
     }
 
     @Override

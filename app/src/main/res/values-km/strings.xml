@@ -200,13 +200,12 @@
     <string name="stop_recording">Stop Recording</string>
     <string name="play_recording">Play Recording</string>
     <string name="stop_playing">Stop Playing</string>
-    <string name="strongly_prefer">ពេញចិត្តខ្លាំង</string>
+    <string name="strongly_prefer_a">ពេញចិត្តខ្លាំង A</string>
+    <string name="somewhat_prefer_a">ចូលចិត្តខ្លះ A</string>
+    <string name="strongly_prefer_b">ពេញចិត្តខ្លាំង B</string>
+    <string name="somewhat_prefer_b">ចូលចិត្តខ្លះ B</string>
     <string name="no_preference">មិនមានចំណាប់អារម្មណ៍</string>
     <string name="image">Image</string>
-    <string name="_5">5</string>
-    <string name="_0">0</string>
-    <string name="a5">A5</string>
-    <string name="b5">B5</string>
     <string name="a">A</string>
     <string name="b">B</string>
     <string name="c">C</string>

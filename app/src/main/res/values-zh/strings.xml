@@ -200,13 +200,9 @@
     <string name="stop_recording">Stop Recording</string>
     <string name="play_recording">Play Recording</string>
     <string name="stop_playing">Stop Playing</string>
-    <string name="strongly_prefer">Strongly Prefer</string>
+    <string name="strongly_prefer_a">Strongly Prefer</string>
     <string name="no_preference">No Preference</string>
     <string name="image">Image</string>
-    <string name="_5">5</string>
-    <string name="_0">0</string>
-    <string name="a5">A5</string>
-    <string name="b5">B5</string>
     <string name="a">A</string>
     <string name="b">B</string>
 </resources>

@@ -24,6 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
+        android:gravity="center"
         android:orientation="horizontal">
 
         <TextView
@@ -31,7 +32,15 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="start"
-            android:text="@string/strongly_prefer"
+            android:text="@string/strongly_prefer_a"
+            android:textColor="@color/blue" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="start"
+            android:text="@string/somewhat_prefer_a"
             android:textColor="@color/blue" />
 
         <TextView
@@ -47,7 +56,15 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="end"
-            android:text="@string/strongly_prefer"
+            android:text="@string/somewhat_prefer_b"
+            android:textColor="@color/blue" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:text="@string/strongly_prefer_b"
             android:textColor="@color/blue" />
 
     </LinearLayout>
@@ -57,9 +74,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:stepSize="1.0"
-        android:value="0.0"
-        android:valueFrom="-5.0"
-        android:valueTo="5.0"
+        android:value="5.0"
+        android:valueFrom="0.0"
+        android:valueTo="10.0"
         app:tickColor="@color/blue"
         app:trackColor="@color/bg_gray"
         app:trackHeight="8dp" />
@@ -81,24 +98,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="start"
-                android:text="@string/a5"
+                android:text="@string/a"
                 android:textColor="@color/blue" />
         </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/_0"
-                android:textColor="@color/blue" />
-
-        </LinearLayout>
-
 
         <LinearLayout
             android:layout_width="0dp"
@@ -109,7 +111,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/b5"
+                android:text="@string/b"
                 android:textColor="@color/blue" />
         </LinearLayout>
     </LinearLayout>
