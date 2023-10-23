@@ -893,7 +893,15 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                         }
                         cardView.setId(index);
 
+                        List<OptionCollageRelation> optionCollageRelations = new ArrayList<>();
                         for (OptionCollageRelation optionCollageRelation : relation.optionCollages) {
+                            if (!optionCollageRelation.optionCollage.isDeleted()) {
+                                optionCollageRelations.add(optionCollageRelation);
+                            }
+                        }
+                        optionCollageRelations.sort((ocr1, ocr2) -> ocr1.optionCollage.getPosition().compareTo(ocr2.optionCollage.getPosition()));
+
+                        for (OptionCollageRelation optionCollageRelation : optionCollageRelations) {
                             for (CollageRelation collageRelation : optionCollageRelation.collages) {
                                 GridView gridView = (GridView) inflater.inflate(R.layout.list_item_option_grid_view, null);
                                 gridView.setNumColumns(collageRelation.diagrams.size());
