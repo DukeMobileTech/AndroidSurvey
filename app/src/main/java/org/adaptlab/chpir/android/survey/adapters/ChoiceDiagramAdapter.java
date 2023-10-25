@@ -33,6 +33,7 @@ public class ChoiceDiagramAdapter extends BaseAdapter {
     private final QuestionRelation mQuestionRelation;
     private final SurveyViewModel mSurveyViewModel;
     private final int mCount;
+    private final int mRow;
     private List<Bitmap> mBitmaps;
     private List<Integer> mWidths;
     private List<Integer> mHeights;
@@ -40,13 +41,14 @@ public class ChoiceDiagramAdapter extends BaseAdapter {
 
     public ChoiceDiagramAdapter(Context context, QuestionRelation questionRelation,
                                 List<DiagramRelation> diagramRelations,
-                                SurveyViewModel surveyViewModel, int count) {
+                                SurveyViewModel surveyViewModel, int count, int row) {
         this.mContext = context;
         this.mQuestionRelation = questionRelation;
         this.mDiagramRelations = diagramRelations;
         this.mSurveyViewModel = surveyViewModel;
         this.mDiagramRelations.sort((dr1, dr2) -> dr1.diagram.getPosition().compareTo(dr2.diagram.getPosition()));
         this.mCount = count;
+        this.mRow = row;
         setBitmaps();
     }
 
@@ -90,9 +92,6 @@ public class ChoiceDiagramAdapter extends BaseAdapter {
         mWidths = new ArrayList<>();
         mHeights = new ArrayList<>();
         mBitmaps = new ArrayList<>();
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        ((Activity) mContext).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        int optionWidth = (displayMetrics.widthPixels - 32) / mCount;
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inScaled = true;
         for (int k = 0; k < mDiagramRelations.size(); k++) {
@@ -107,27 +106,49 @@ public class ChoiceDiagramAdapter extends BaseAdapter {
             mHeights.add(height);
             mWidths.add(width);
         }
-
-        double total = 0.0;
-        for (int imgWidth : mWidths) {
-            total += imgWidth;
-        }
-        double remainder = optionWidth - total;
-        for (int i = 0; i < mWidths.size(); i++) {
-            int width = mWidths.get(i);
-            double portion = (width / total) * remainder;
-            double newWidth = width + portion;
-            double scale = newWidth / width;
-            int width1 = (int) Math.round(width * scale);
-            int height1 = (int) Math.round(mHeights.get(i) * scale);
-            mWidths.set(i, width1);
-            mHeights.set(i, height1);
-        }
-
+        setDimensions();
         if (mHeights.isEmpty()) {
             mHeight = 0;
         } else {
             mHeight = Collections.max(mHeights);
+        }
+    }
+
+    private void setDimensions() {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        ((Activity) mContext).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int optionWidth = (displayMetrics.widthPixels - 32) / mCount;
+        if (mRow != 2) {
+            for (int i = 0; i < mWidths.size(); i++) {
+                int width = mWidths.get(i);
+                double newWidth;
+                if (i == 0) {
+                    newWidth = (optionWidth * 0.75);
+                } else {
+                    newWidth = (optionWidth * 0.25);
+                }
+                double scale = newWidth / width;
+                int width1 = (int) Math.round(width * scale);
+                int height1 = (int) Math.round(mHeights.get(i) * scale);
+                mWidths.set(i, width1);
+                mHeights.set(i, height1);
+            }
+        } else {
+            double textHeight = displayMetrics.heightPixels * 0.08;
+            double imageHeight = displayMetrics.heightPixels * 0.06;
+            for (int i = 0; i < mHeights.size(); i++) {
+                int height = mHeights.get(i);
+                double scale;
+                if (i == 0) {
+                    scale = textHeight / height;
+                } else {
+                    scale = imageHeight / height;
+                }
+                int width1 = (int) Math.round(mWidths.get(i) * scale);
+                int height1 = (int) Math.round(mHeights.get(i) * scale);
+                mWidths.set(i, width1);
+                mHeights.set(i, height1);
+            }
         }
     }
 

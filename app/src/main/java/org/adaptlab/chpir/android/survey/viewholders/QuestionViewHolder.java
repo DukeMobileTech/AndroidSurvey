@@ -900,13 +900,14 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                             }
                         }
                         optionCollageRelations.sort((ocr1, ocr2) -> ocr1.optionCollage.getPosition().compareTo(ocr2.optionCollage.getPosition()));
-
+                        int row = 0;
                         for (OptionCollageRelation optionCollageRelation : optionCollageRelations) {
+                            row +=1;
                             for (CollageRelation collageRelation : optionCollageRelation.collages) {
                                 GridView gridView = (GridView) inflater.inflate(R.layout.list_item_option_grid_view, null);
                                 gridView.setNumColumns(collageRelation.diagrams.size());
                                 ChoiceDiagramAdapter adapter = new ChoiceDiagramAdapter(getContext(), getQuestionRelation(),
-                                        collageRelation.diagrams, getSurveyViewModel(), mCarryForwardOptionRelations.size());
+                                        collageRelation.diagrams, getSurveyViewModel(), mCarryForwardOptionRelations.size(), row);
                                 gridView.setAdapter(adapter);
                                 LinearLayout gridViewLayout = new LinearLayout(getContext());
                                 gridViewLayout.setBackground(AppCompatResources.getDrawable(getContext(), R.drawable.choice_option_border));
