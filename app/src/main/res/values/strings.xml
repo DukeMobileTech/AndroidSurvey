@@ -200,10 +200,10 @@
     <string name="stop_recording">Stop Recording</string>
     <string name="play_recording">Play Recording</string>
     <string name="stop_playing">Stop Playing</string>
-    <string name="strongly_prefer_a">Strongly\nPrefer A</string>
-    <string name="somewhat_prefer_a">Somewhat\nPrefer A</string>
-    <string name="strongly_prefer_b">Strongly\nPrefer B</string>
-    <string name="somewhat_prefer_b">Somewhat\nPrefer B</string>
+    <string name="strongly_prefer_a">Strongly\nPrefer <b>A</b></string>
+    <string name="somewhat_prefer_a">Somewhat\nPrefer <b>A</b></string>
+    <string name="strongly_prefer_b">Strongly\nPrefer <b>B</b></string>
+    <string name="somewhat_prefer_b">Somewhat\nPrefer <b>B</b></string>
     <string name="no_preference">No\nPreference</string>
     <string name="image">Image</string>
     <string name="a">A</string>

@@ -2,6 +2,7 @@ package org.adaptlab.chpir.android.survey.viewholders;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.DisplayMetrics;
@@ -26,6 +27,7 @@ import java.io.File;
 import java.util.List;
 
 public class PairwiseComparisonViewHolder extends QuestionViewHolder {
+    private final double MID_POINT = 3.0;
     private float mProgress;
     private Slider mSlider;
 
@@ -45,15 +47,15 @@ public class PairwiseComparisonViewHolder extends QuestionViewHolder {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         ((Activity) getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
-        ConstraintLayout imageLayout = (ConstraintLayout) inflater.inflate(R.layout.pair_wise, null);
+        ConstraintLayout pairwiseComparisonLayout = (ConstraintLayout) inflater.inflate(R.layout.pair_wise, null);
         for (final OptionRelation optionRelation : optionRelations) {
             OptionSetOptionRelation relation = getOptionSetOptionRelation(optionRelation);
             int index = optionRelations.indexOf(optionRelation);
             LinearLayout linearLayout;
             if (index == 0) {
-                linearLayout = imageLayout.findViewById(R.id.leftLayout);
+                linearLayout = pairwiseComparisonLayout.findViewById(R.id.leftLayout);
             } else {
-                linearLayout = imageLayout.findViewById(R.id.rightLayout);
+                linearLayout = pairwiseComparisonLayout.findViewById(R.id.rightLayout);
             }
             if (!relation.optionCollages.isEmpty()) {
                 List<DiagramRelation> diagramRelations = relation.optionCollages.get(0).collages.get(0).diagrams;
@@ -66,10 +68,17 @@ public class PairwiseComparisonViewHolder extends QuestionViewHolder {
                         Bitmap bitmap = BitmapFactory.decodeFile(path, options);
                         int width = bitmap.getWidth();
                         int height = bitmap.getHeight();
-                        double targetHeight = displayMetrics.heightPixels * 0.35;
-                        double scale = targetHeight / height;
-                        width = (int) Math.round(width * scale);
-                        height = (int) Math.round(height * scale);
+                        if (getContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                            double targetHeight = displayMetrics.heightPixels * 0.35;
+                            double scale = targetHeight / height;
+                            width = (int) Math.round(width * scale);
+                            height = (int) Math.round(height * scale);
+                        } else if (getContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                            double targetWidth = displayMetrics.widthPixels * 0.22;
+                            double scale = targetWidth / width;
+                            width = (int) Math.round(width * scale);
+                            height = (int) Math.round(height * scale);
+                        }
                         ImageView imageView = new ImageView(getContext());
                         bitmap = Bitmap.createScaledBitmap(bitmap, width, height, true);
                         imageView.setImageBitmap(bitmap);
@@ -78,22 +87,16 @@ public class PairwiseComparisonViewHolder extends QuestionViewHolder {
                 }
             }
         }
-        questionComponent.addView(imageLayout);
+        TextView imageInstructions = pairwiseComparisonLayout.findViewById(R.id.pcQuestionText);
+        imageInstructions.setText(getQuestionText());
+        TextView sliderInstructions = pairwiseComparisonLayout.findViewById(R.id.pcSliderText);
+        sliderInstructions.setText(getOptionSetInstructions());
+
+        questionComponent.addView(pairwiseComparisonLayout);
 
         View sliderLayout = inflater.inflate(R.layout.slider, null);
-        TextView textView = sliderLayout.findViewById(R.id.beforeSliderTextView);
-        textView.setText(getOptionSetInstructions());
-
         mSlider = sliderLayout.findViewById(R.id.discreteSlider);
-        mSlider.setLabelFormatter(value -> {
-            if (value < 5.0) {
-                return "A" + Math.abs((int) value);
-            } else if (value > 5.0) {
-                return "B" + Math.abs((int) value);
-            } else {
-                return "5";
-            }
-        });
+        mSlider.setLabelFormatter(String::valueOf);
         mSlider.addOnChangeListener((slider, value, fromUser) -> {
             mProgress = value;
             saveResponse();
@@ -134,7 +137,7 @@ public class PairwiseComparisonViewHolder extends QuestionViewHolder {
     @Override
     protected void deserialize(String responseText) {
         if (responseText.equals("")) {
-            mSlider.setValue((float) 5.0);
+            mSlider.setValue((float) MID_POINT);
         } else {
             mSlider.setValue(Float.parseFloat(responseText));
         }
@@ -142,7 +145,7 @@ public class PairwiseComparisonViewHolder extends QuestionViewHolder {
 
     @Override
     protected void unSetResponse() {
-        mSlider.setValue((float) 5.0);
+        mSlider.setValue((float) MID_POINT);
     }
 
     @Override

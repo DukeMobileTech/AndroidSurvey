@@ -33,8 +33,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -118,7 +116,6 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
     private Button mClearButton;
     private RadioGroup mSpecialResponseRadioGroup;
     private LinearLayout mGridViewLayout;
-    private ConstraintLayout mConstraintLayout;
     private boolean mDeserializing = false;
 
     public QuestionViewHolder(View itemView, Context context, OnResponseSelectedListener listener) {
@@ -127,7 +124,6 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         mListener = listener;
         mResponseRepository = new ResponseRepository((Application) context.getApplicationContext());
 
-        mConstraintLayout = itemView.findViewById(R.id.constraintLayout);
         mNumberTextView = itemView.findViewById(R.id.numberTextView);
         mBeforeTextInstructionTextView = itemView.findViewById(R.id.beforeTextInstructions);
         mSpannedTextView = itemView.findViewById(R.id.spannedTextView);
@@ -797,6 +793,16 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
 
     private void setQuestionText() {
         if (mSpannedTextView == null) return;
+
+        if (getQuestion().getQuestionType().equals(Question.PAIRWISE_COMPARISON)) {
+            mNumberTextView.setVisibility(View.GONE);
+            mBeforeTextInstructionTextView.setVisibility(View.GONE);
+            mSpannedTextView.setVisibility(View.GONE);
+            mAfterTextInstructionTextView.setVisibility(View.GONE);
+            mOptionSetInstructionTextView.setVisibility(View.GONE);
+            return;
+        }
+
         if (getQuestion().getPopUpInstructionId() == null) {
             mSpannedTextView.setCompoundDrawables(null, null, null, null);
         } else {
@@ -805,13 +811,6 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                     getQuestionPopUpInstructions());
         }
         mSpannedTextView.setText(getQuestionText());
-        if (mQuestionRelation.question.getQuestionType().equals(Question.PAIRWISE_COMPARISON)) {
-            ConstraintSet constraintSet = new ConstraintSet();
-            constraintSet.clone(mConstraintLayout);
-            constraintSet.center(R.id.spannedTextView, ConstraintSet.PARENT_ID, ConstraintSet.LEFT, 0,
-                    ConstraintSet.PARENT_ID, ConstraintSet.RIGHT, 0, 0.5f);
-            constraintSet.applyTo(mConstraintLayout);
-        }
         setQuestionDiagrams();
     }
 
@@ -876,7 +875,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                         TextView textView;
                         MaterialCardView cardView;
                         if (index == 0) {
-                            cardView = imageLayout.findViewById(R.id.leftCardView);
+                            cardView = imageLayout.findViewById(R.id.leftGrid);
                             linearLayout = imageLayout.findViewById(R.id.leftLayout);
                             textView = imageLayout.findViewById(R.id.leftTitle);
                             textView.setText(getContext().getResources().getString(R.string.option, 'A'));
@@ -902,7 +901,7 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
                         optionCollageRelations.sort((ocr1, ocr2) -> ocr1.optionCollage.getPosition().compareTo(ocr2.optionCollage.getPosition()));
                         int row = 0;
                         for (OptionCollageRelation optionCollageRelation : optionCollageRelations) {
-                            row +=1;
+                            row += 1;
                             for (CollageRelation collageRelation : optionCollageRelation.collages) {
                                 GridView gridView = (GridView) inflater.inflate(R.layout.list_item_option_grid_view, null);
                                 gridView.setNumColumns(collageRelation.diagrams.size());

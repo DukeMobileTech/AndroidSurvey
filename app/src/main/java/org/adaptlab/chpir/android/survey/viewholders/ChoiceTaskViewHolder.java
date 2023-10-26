@@ -124,7 +124,7 @@ public class ChoiceTaskViewHolder extends QuestionViewHolder {
             TextView textView;
             MaterialCardView cardView;
             if (index == 0) {
-                cardView = imageLayout.findViewById(R.id.leftCardView);
+                cardView = imageLayout.findViewById(R.id.leftGrid);
                 linearLayout = imageLayout.findViewById(R.id.leftLayout);
                 textView = imageLayout.findViewById(R.id.leftTitle);
                 textView.setText(getContext().getResources().getString(R.string.option, 'A'));
