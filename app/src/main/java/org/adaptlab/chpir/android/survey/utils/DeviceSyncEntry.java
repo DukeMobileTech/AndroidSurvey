@@ -37,7 +37,13 @@ public class DeviceSyncEntry implements Uploadable {
         if (AppUtil.getDeviceLanguage() == null) {
             jsonObject.addProperty("current_language", Locale.getDefault().getDisplayLanguage());
         } else {
-            jsonObject.addProperty("current_language", new Locale(AppUtil.getDeviceLanguage()).getDisplayLanguage());
+            String language = AppUtil.getDeviceLanguage();
+            if (language.contains("-")) {
+                String[] codes = language.split("-");
+                jsonObject.addProperty("current_language", new Locale(codes[0], codes[1]).getDisplayLanguage() + " (" + codes[1] + ")");
+            } else {
+                jsonObject.addProperty("current_language", new Locale(AppUtil.getDeviceLanguage()).getDisplayLanguage());
+            }
         }
         jsonObject.addProperty("instrument_versions", mInstrumentRepository.instrumentVersions());
         jsonObject.addProperty("device_uuid", mSettings.getDeviceIdentifier());

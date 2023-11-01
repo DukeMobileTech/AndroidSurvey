@@ -198,7 +198,11 @@ public class SettingsFragment extends Fragment {
         languageCodes.addAll(mLanguages);
         ArrayList<String> displayLanguages = new ArrayList<>();
         for (String languageCode : languageCodes) {
-            if (!TextUtils.isEmpty(languageCode)) {
+            if (languageCode.isEmpty()) continue;
+            if (languageCode.contains("-")) {
+                String[] codes = languageCode.split("-");
+                displayLanguages.add(new Locale(codes[0], codes[1]).getDisplayLanguage() + " (" + codes[1] + ")");
+            } else {
                 displayLanguages.add(new Locale(languageCode).getDisplayLanguage());
             }
         }
