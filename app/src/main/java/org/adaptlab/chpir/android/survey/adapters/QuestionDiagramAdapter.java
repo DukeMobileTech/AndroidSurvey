@@ -52,6 +52,10 @@ public class QuestionDiagramAdapter extends BaseAdapter {
         if (!mSurveyViewModel.getInstrumentLanguage().equals(mSurveyViewModel.getDeviceLanguage())) {
             translatedOptionIdentifier = diagramRelation.options.get(0).option.getIdentifier() + "_" +
                     mSurveyViewModel.getDeviceLanguage().toUpperCase();
+            if (mSurveyViewModel.getDeviceLanguage().contains("-")) {
+                translatedOptionIdentifier = diagramRelation.options.get(0).option.getIdentifier() + "_" +
+                        mSurveyViewModel.getDeviceLanguage().split("-")[0].toUpperCase();
+            }
         }
         if (translatedOptionIdentifier.isEmpty()) {
             path = mContext.getFilesDir().getAbsolutePath() + "/" +

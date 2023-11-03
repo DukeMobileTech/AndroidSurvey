@@ -23,7 +23,6 @@ import org.adaptlab.chpir.android.survey.viewmodels.SurveyViewModel;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class ChoiceDiagramAdapter extends BaseAdapter {
@@ -59,6 +58,10 @@ public class ChoiceDiagramAdapter extends BaseAdapter {
         if (!mSurveyViewModel.getInstrumentLanguage().equals(mSurveyViewModel.getDeviceLanguage())) {
             translatedOptionIdentifier = diagramRelation.options.get(0).option.getIdentifier() + "_" +
                     mSurveyViewModel.getDeviceLanguage().toUpperCase();
+            if (mSurveyViewModel.getDeviceLanguage().contains("-")) {
+                translatedOptionIdentifier = diagramRelation.options.get(0).option.getIdentifier() + "_" +
+                        mSurveyViewModel.getDeviceLanguage().split("-")[0].toUpperCase();
+            }
         }
         if (translatedOptionIdentifier.isEmpty()) {
             path = mContext.getFilesDir().getAbsolutePath() + "/" +
@@ -107,11 +110,6 @@ public class ChoiceDiagramAdapter extends BaseAdapter {
             mWidths.add(width);
         }
         setDimensions();
-        if (mHeights.isEmpty()) {
-            mHeight = 0;
-        } else {
-            mHeight = Collections.max(mHeights);
-        }
     }
 
     private void setDimensions() {
@@ -135,7 +133,7 @@ public class ChoiceDiagramAdapter extends BaseAdapter {
             }
         } else {
             double textHeight = displayMetrics.heightPixels * 0.08;
-            double imageHeight = displayMetrics.heightPixels * 0.06;
+            double imageHeight = displayMetrics.heightPixels * 0.09;
             for (int i = 0; i < mHeights.size(); i++) {
                 int height = mHeights.get(i);
                 double scale;
@@ -149,6 +147,12 @@ public class ChoiceDiagramAdapter extends BaseAdapter {
                 mWidths.set(i, width1);
                 mHeights.set(i, height1);
             }
+        }
+
+        if (mHeights.isEmpty()) {
+            mHeight = 0;
+        } else {
+            mHeight = (int) (displayMetrics.heightPixels * 0.165);
         }
     }
 
