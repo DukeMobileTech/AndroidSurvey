@@ -1232,11 +1232,11 @@ public abstract class QuestionViewHolder extends RecyclerView.ViewHolder {
         mCarryForwardOptionRelations = new ArrayList<>();
         if (questionRelation.carryForwardOptionSets.size() > 0) {
             OptionSetRelation optionSetRelation = questionRelation.carryForwardOptionSets.get(0);
-            if (optionSetRelation != null && optionSetRelation.optionSetOptions != null) {
+            if (optionSetRelation != null && !optionSetRelation.optionSet.isDeleted() && optionSetRelation.optionSetOptions != null) {
                 List<OptionSetOptionRelation> optionSetOptionRelations = optionSetRelation.optionSetOptions;
                 optionSetOptionRelations.sort((o1, o2) -> o1.optionSetOption.getPosition().compareTo(o2.optionSetOption.getPosition()));
                 for (OptionSetOptionRelation relation : optionSetOptionRelations) {
-                    if (relation.options.size() > 0) {
+                    if (relation != null && !relation.optionSetOption.isDeleted() && relation.options.size() > 0) {
                         mCarryForwardOptionRelations.add(relation.options.get(0));
                     }
                 }

@@ -211,4 +211,6 @@
     <string name="c">C</string>
     <string name="order">Order: %s</string>
     <string name="option">Option %s</string>
+    <string name="gender">gender</string>
+    <string name="participant">participant</string>
 </resources>

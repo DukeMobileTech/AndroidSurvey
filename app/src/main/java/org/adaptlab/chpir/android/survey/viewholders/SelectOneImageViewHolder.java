@@ -60,6 +60,9 @@ public class SelectOneImageViewHolder extends QuestionViewHolder {
                 cardView.setId(optionId);
 
                 OptionSetOptionRelation relation = getOptionSetOptionRelation(optionRelation);
+                if (relation == null || relation.optionCollages == null || relation.optionCollages.isEmpty()) {
+                    continue;
+                }
                 GridView gridView = (GridView) inflater.inflate(R.layout.list_item_option_grid_view, null);
                 List<DiagramRelation> diagrams = relation.optionCollages.get(0).collages.get(0).diagrams;
                 gridView.setNumColumns(diagrams.size());

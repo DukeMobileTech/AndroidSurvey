@@ -10,6 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
+
 import org.adaptlab.chpir.android.survey.BuildConfig;
 import org.adaptlab.chpir.android.survey.R;
 import org.adaptlab.chpir.android.survey.SurveyApp;
@@ -24,6 +26,7 @@ import org.adaptlab.chpir.android.survey.relations.DisplayRelation;
 import org.adaptlab.chpir.android.survey.relations.QuestionRelation;
 import org.adaptlab.chpir.android.survey.relations.SectionRelation;
 import org.adaptlab.chpir.android.survey.repositories.SurveyRepository;
+import org.adaptlab.chpir.android.survey.utils.AppUtil;
 import org.adaptlab.chpir.android.survey.utils.TranslationUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
@@ -301,12 +304,23 @@ public class SurveyViewModel extends AndroidViewModel {
         firstTime = false;
     }
 
+    private void recordCrashKeys() {
+        if (AppUtil.PRODUCTION) {
+            FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+            Context context = SurveyApp.getInstance();
+            crashlytics.setCustomKey(context.getString(R.string.gender), mGender);
+            crashlytics.setCustomKey(context.getString(R.string.participant), mParticipantID);
+        }
+    }
+
     public void setParticipantGender(String response) {
         mGender = response;
         Response id = mResponses.get(PARTICIPANT);
         if (id != null && id.getText().length() == 8) {
             String[] splitString = id.getText().split("-");
-            mParticipantID = Long.parseLong(splitString[0] + splitString[1] + ((int) splitString[2].charAt(0) - 65));
+            if (splitString.length >= 3) {
+                mParticipantID = Long.parseLong(splitString[0] + splitString[1] + ((int) splitString[2].charAt(0) - 65));
+            }
         }
         setParticipantBlocks();
     }
@@ -314,6 +328,7 @@ public class SurveyViewModel extends AndroidViewModel {
     private void setParticipantBlocks() {
         if (!mGender.isEmpty() && mParticipantID != -1) {
             Log.i(TAG, "GENDER = " + mGender + " ID = " + mParticipantID);
+            recordCrashKeys();
             Random rBlock = new Random(mParticipantID);
             int block = -1;
             String sectionTitle = "";
@@ -361,7 +376,9 @@ public class SurveyViewModel extends AndroidViewModel {
             updateQuestionsToSkipMap("ParticipantID", questionsToSkip);
             setQuestionOrder(mSectionRelations, sectionTitle);
             setNavigationDrawerData();
-            mNavigationDrawerAdapter.updateData(getExpandableListTitle(), getExpandableListData());
+            if (mNavigationDrawerAdapter != null) {
+                mNavigationDrawerAdapter.updateData(getExpandableListTitle(), getExpandableListData());
+            }
         }
     }
 

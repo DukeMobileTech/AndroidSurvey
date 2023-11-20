@@ -198,19 +198,21 @@ public abstract class SurveyRoomDatabase extends RoomDatabase {
 
     public static SurveyRoomDatabase getDatabase(final Context context) {
         String password = AppUtil.getDatabaseKey();
-        final byte[] passphrase = SQLiteDatabase.getBytes(password.toCharArray());
-        final SupportFactory factory = new SupportFactory(passphrase);
-        if (INSTANCE == null) {
-            synchronized (SurveyRoomDatabase.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                            SurveyRoomDatabase.class, "SurveyDatabase")
-                            .addCallback(sRoomDatabaseCallback)
-                            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5,
-                                    MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9,
-                                    MIGRATION_9_10, MIGRATION_10_11)
-                            .openHelperFactory(factory)
-                            .build();
+        if (password != null) {
+            final byte[] passphrase = SQLiteDatabase.getBytes(password.toCharArray());
+            final SupportFactory factory = new SupportFactory(passphrase);
+            if (INSTANCE == null) {
+                synchronized (SurveyRoomDatabase.class) {
+                    if (INSTANCE == null) {
+                        INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
+                                SurveyRoomDatabase.class, "SurveyDatabase")
+                                .addCallback(sRoomDatabaseCallback)
+                                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5,
+                                        MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9,
+                                        MIGRATION_9_10, MIGRATION_10_11)
+                                .openHelperFactory(factory)
+                                .build();
+                    }
                 }
             }
         }
