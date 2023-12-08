@@ -332,6 +332,7 @@ public class SurveyViewModel extends AndroidViewModel {
             Random rBlock = new Random(mParticipantID);
             int block = -1;
             String sectionTitle = "";
+            String assignedBlock = "";
             List<String> questionsToSkip = new ArrayList<>();
             if (mGender.equals("0")) { // female
                 block = rBlock.nextInt(13);
@@ -352,6 +353,7 @@ public class SurveyViewModel extends AndroidViewModel {
                         }
                     }
                 }
+                assignedBlock = "F" + block;
             } else if (mGender.equals("1")) { // male
                 block = rBlock.nextInt(11);
                 if (block == 0) block = 11;
@@ -371,9 +373,11 @@ public class SurveyViewModel extends AndroidViewModel {
                         }
                     }
                 }
+                assignedBlock = "M" + block;
             }
             Log.i(TAG, "BLOCK = " + block);
             updateQuestionsToSkipMap("ParticipantID", questionsToSkip);
+            mSurvey.setAssignedBlock(assignedBlock);
             setQuestionOrder(mSectionRelations, sectionTitle);
             setNavigationDrawerData();
             if (mNavigationDrawerAdapter != null) {

@@ -293,6 +293,21 @@ public class Survey implements Uploadable {
         }
     }
 
+    public void setAssignedBlock(String block) {
+        try {
+            JSONObject metadata;
+            if (TextUtils.isEmpty(getMetadata())) {
+                metadata = new JSONObject();
+            } else {
+                metadata = new JSONObject(getMetadata());
+            }
+            metadata.put("assigned_block", block);
+            setMetadata(metadata.toString());
+        } catch (JSONException er) {
+            if (BuildConfig.DEBUG) Log.e(TAG, er.getMessage());
+        }
+    }
+
     public String getPreviousDisplays() {
         return mPreviousDisplays;
     }
